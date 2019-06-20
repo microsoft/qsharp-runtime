@@ -1,0 +1,31 @@
+##
+# xplat Native Simulator build
+##
+steps:
+
+- bash: ./bootstrap.sh
+  displayName: "Bootstrap Native QuantumSimulator"
+  workingDirectory: $(SimulationSrcDir)/Runtime
+
+
+- task: CMake@1
+  displayName: 'CMake  --build build'
+  inputs:
+    workingDirectory: $(SimulationSrcDir)/Runtime
+    cmakeArgs: ' --build build'
+
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: artifact staging directory'
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)'
+    Contents: '$(SimulationSrcDir)/Runtime/build/**'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+
+

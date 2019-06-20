@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common\AssemblyCommon.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <QscConfig Condition=" '$(QscConfig)' == '' ">$(Configuration)</QscConfig>
+    <QscExe Condition="'$(QscExe)' == ''">dotnet ../CsharpGenerationApp/bin/$(QscConfig)/netcoreapp2.1/Microsoft.Quantum.CsharpGenerationApp.dll</QscExe>
+    <RunQsc>True</RunQsc>
+    <RunQDocGen>True</RunQDocGen>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <QsharpCompile Include="**\*.qs" Exclude="obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\Nuspecs\build\Microsoft.Quantum.Development.Kit.targets" />
+</Project>

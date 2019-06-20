@@ -1,0 +1,36 @@
+@echo ON
+
+:: Check dependencies
+:: Notice that we can't check for msbuild as it's not in the build's machine path...
+cmake   -version || GOTO missingDependency
+echo.
+
+SET BUILD_FOLDER=build
+
+IF NOT EXIST linux mkdir linux
+IF NOT EXIST osx mkdir osx
+
+IF NOT EXIST %BUILD_FOLDER% mkdir %BUILD_FOLDER%
+pushd %BUILD_FOLDER%
+
+IF EXIST CMakeCache.txt del CMakeCache.txt
+
+cmake -A "x64" ^
+    -DBUILD_SHARED_LIBS:BOOL="1" ^
+    -DENABLE_MPI_INTEL:BOOL="0" ^
+    ..
+
+popd
+
+:: Done
+GOTO EOF
+
+
+:missingDependency
+echo.
+echo One or more dependencies are missing. Refer to README.md to make sure you have all known dependencies.
+echo.
+EXIT /B 1001
+
+
+:EOF

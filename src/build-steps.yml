@@ -1,0 +1,67 @@
+##
+# Build, test and pack the simulation framework.
+##
+steps:
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build C# generation'
+  inputs:
+    command: build
+    arguments: >
+      -c $(BuildConfiguration)
+      -v $(Build.Verbosity)
+      /p:DefineConstants=$(Assembly.Constants)
+      /p:Version=$(Assembly.Version)
+    projects: '$(SimulationSrcDir)/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj'
+
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish C# generation'
+  inputs:
+    command: publish
+    arguments: '-c $(BuildConfiguration) -v $(Build.Verbosity)  /p:DefineConstants=$(Assembly.Constants) /p:Version=$(Assembly.Version)'
+    publishWebProjects: false
+    projects: $(SimulationSrcDir)/CsharpGenerationApp/Microsoft.Quantum.CsharpGenerationApp.fsproj
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+
+- script: bootstrap.cmd
+  displayName: "Bootstrap Native QuantumSimulator"
+  workingDirectory: $(SimulationSrcDir)/Runtime
+
+
+- script: |
+    cmake --build . --config $(BuildConfiguration)
+    ctest -C $(BuildConfiguration)
+  displayName: "Build and test Native QuantumSimulator"
+  workingDirectory: $(SimulationSrcDir)/Runtime/build
+
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Q# simulation'
+  inputs:
+    command: build
+    arguments: >
+      -c $(BuildConfiguration)
+      -v $(Build.Verbosity)
+      /p:DefineConstants=$(Assembly.Constants)
+      /p:Version=$(Assembly.Version)
+      /p:QsharpDocsOutDir=$(DocsOutDir)
+    projects: '$(SimulationSrcDir)/../Simulation.sln'
+
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Q# simulation'
+  inputs:
+    command: test
+    arguments: >
+      -c $(BuildConfiguration)
+      -v $(Build.Verbosity)
+      /p:DefineConstants=$(Assembly.Constants)
+      /p:Version=$(Assembly.Version)
+    projects: |
+      $(SimulationSrcDir)/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj
+      $(SimulationSrcDir)/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj
+      $(SimulationSrcDir)/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
+      $(SimulationSrcDir)/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
