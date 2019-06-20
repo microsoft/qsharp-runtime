@@ -1,8 +1,26 @@
 ##
-# Build, test and pack the simulation framework.
+# Build, test and pack the simulation framework on Windows.
 ##
 steps:
 
+##
+# Native QuantumSimulator
+##
+- script: bootstrap.cmd
+  displayName: "Bootstrap Native QuantumSimulator"
+  workingDirectory: $(SimulationSrcDir)/Runtime
+
+
+- script: |
+    cmake --build . --config $(BuildConfiguration)
+    ctest -C $(BuildConfiguration)
+  displayName: "Build and test Native QuantumSimulator"
+  workingDirectory: $(SimulationSrcDir)/Runtime/build
+
+
+##
+# C# codegen
+##
 - task: DotNetCoreCLI@2
   displayName: 'Build C# generation'
   inputs:
@@ -19,25 +37,19 @@ steps:
   displayName: 'Publish C# generation'
   inputs:
     command: publish
-    arguments: '-c $(BuildConfiguration) -v $(Build.Verbosity)  /p:DefineConstants=$(Assembly.Constants) /p:Version=$(Assembly.Version)'
+    arguments: >
+      -c $(BuildConfiguration) 
+      -v $(Build.Verbosity)
+      /p:DefineConstants=$(Assembly.Constants)
+      /p:Version=$(Assembly.Version)
     publishWebProjects: false
     projects: $(SimulationSrcDir)/CsharpGenerationApp/Microsoft.Quantum.CsharpGenerationApp.fsproj
     zipAfterPublish: false
     modifyOutputPath: false
 
-
-- script: bootstrap.cmd
-  displayName: "Bootstrap Native QuantumSimulator"
-  workingDirectory: $(SimulationSrcDir)/Runtime
-
-
-- script: |
-    cmake --build . --config $(BuildConfiguration)
-    ctest -C $(BuildConfiguration)
-  displayName: "Build and test Native QuantumSimulator"
-  workingDirectory: $(SimulationSrcDir)/Runtime/build
-
-
+##
+# Simulation framework
+##
 - task: DotNetCoreCLI@2
   displayName: 'Build Q# simulation'
   inputs:
@@ -48,7 +60,7 @@ steps:
       /p:DefineConstants=$(Assembly.Constants)
       /p:Version=$(Assembly.Version)
       /p:QsharpDocsOutDir=$(DocsOutDir)
-    projects: '$(SimulationSrcDir)/../Simulation.sln'
+    projects: '$(SimulationSrcDir)/Simulation.sln'
 
 
 - task: DotNetCoreCLI@2
@@ -65,3 +77,17 @@ steps:
       $(SimulationSrcDir)/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj
       $(SimulationSrcDir)/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
       $(SimulationSrcDir)/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
+
+
+- task: NuGetCommand@2
+  displayName: 'Package Q# Simulation'
+  inputs:
+    command: pack
+    packagesToPack: >
+      $(SimulationSrcDir)\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj;
+      $(SimulationSrcDir)\Simulators\Microsoft.Quantum.Simulators.csproj;
+    versioningScheme: byEnvVar
+    versionEnvVar: NUGET_VERSION
+    packDestination: '$(NugetsOutDir)'
+    includeReferencedProjects: true
+

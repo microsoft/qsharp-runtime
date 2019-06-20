@@ -1,0 +1,36 @@
+name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
+trigger: none
+
+variables:
+  Build.Major: 0
+  Build.Minor: 0
+  Build.Verbosity: 'n'
+  IQSharp.Hosting.Env: 'build-agent'
+  Assembly.Constants: ''
+  Assembly.Version: $(Build.BuildNumber)
+  Nuget.Version: $(Assembly.Version)-alpha
+  DocsOutDir: $(build.artifactstagingdirectory)\Docs.build
+  NugetsOutDir: $(build.artifactstagingdirectory)\Nugets.build
+  SimulationSrcDir: $(System.DefaultWorkingDirectory)/src
+
+jobs:
+- job: macOS
+  pool: 'Hosted macOS'
+  steps:
+  - template: steps-xplat.yml
+
+
+- job: Linux
+  pool: 'Hosted Ubuntu 1604'
+  steps:
+  - template: steps-xplat.yml
+
+
+- job: Windows
+  pool: 'Hosted VS2017'
+  dependsOn:
+  - macOS
+  - Linux
+  condition: succeeded()
+  steps:
+  - template: steps-windows.yml
