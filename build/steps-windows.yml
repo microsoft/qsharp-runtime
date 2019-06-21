@@ -37,7 +37,7 @@ steps:
       /p:Version=$(Assembly.Version)
       /p:QsharpDocsOutDir=$(DocsOutDir)
     projects: |
-      $(SimulationSrcDir)/CsharpGenerationApp
+      $(SimulationSrcDir)/CsharpGeneration.App
       $(SimulationSrcDir)/../Simulation.sln
 
 

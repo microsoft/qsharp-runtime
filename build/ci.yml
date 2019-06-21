@@ -12,6 +12,7 @@ variables:
   DocsOutDir: $(build.artifactstagingdirectory)\Docs.build
   NugetsOutDir: $(build.artifactstagingdirectory)\Nugets.build
   SimulationSrcDir: $(System.DefaultWorkingDirectory)/src
+  SkipLocalDev: 'true'
 
 jobs:
 ###- job: macOS
