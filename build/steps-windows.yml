@@ -15,6 +15,17 @@ steps:
 
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build C# code generation'
+  inputs:
+    command: build
+    arguments: >
+      -c $(BuildConfiguration)
+      -v $(Build.Verbosity)
+      /p:DefineConstants=$(Assembly.Constants)
+      /p:Version=$(Assembly.Version)
+    projects: '$(SimulationSrcDir)/Simulation/CsharpGeneration.App'
+
+- task: DotNetCoreCLI@2
   displayName: 'Build Q# simulation'
   inputs:
     command: build
@@ -24,9 +35,7 @@ steps:
       /p:DefineConstants=$(Assembly.Constants)
       /p:Version=$(Assembly.Version)
       /p:QsharpDocsOutDir=$(DocsOutDir)
-    projects: |
-      $(SimulationSrcDir)/Simulation/CsharpGeneration.App
-      $(SimulationSrcDir)/../Simulation.sln
+    projects: '$(SimulationSrcDir)/../Simulation.sln'
 
 
 - task: DotNetCoreCLI@2
