@@ -16,16 +16,16 @@ CALL :nuspecBootstrap   || EXIT /B 1
 IF "%SKIPLOCALDEV%" == "true" GOTO EOF
 
 :: Make sure everything is ready and builds locally.
-cmake --build src\Runtime\build --target Microsoft.Quantum.Simulator.Runtime --config Release || EXIT /B 1
+cmake --build src\Native\build --target Microsoft.Quantum.Simulator.Runtime --config Release || EXIT /B 1
 dotnet  build src\Simulation\CsharpGeneration.App     || EXIT /B 1
 dotnet  build Simulation.sln                          || EXIT /B 1
 
 :: Done
 GOTO EOF
 
-:: Bootstrap Runtime library
+:: Bootstrap Native library
 :runtimeBootstrap
-pushd src\Runtime\
+pushd src\Native\
 CALL bootstrap.cmd
 popd
 EXIT /B

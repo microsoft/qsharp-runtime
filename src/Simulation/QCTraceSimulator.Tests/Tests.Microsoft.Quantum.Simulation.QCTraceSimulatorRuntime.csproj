@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Xunit\Microsoft.Quantum.Xunit.csproj" />
+    <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

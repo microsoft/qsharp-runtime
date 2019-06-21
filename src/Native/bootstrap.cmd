@@ -6,7 +6,7 @@ cmake   -version || GOTO missingDependency
 echo.
 
 SET BUILD_FOLDER=build
-SET DROP_FOLDER=%BUILD_ARTIFACTSTAGINGDIRECTORY%\drop\src\simulation\Runtime\build
+SET DROP_FOLDER=%BUILD_ARTIFACTSTAGINGDIRECTORY%\drop\src\simulation\Native\build
 
 IF NOT EXIST linux mkdir linux
 IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so    copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so     linux\Microsoft.Quantum.Simulator.Runtime.dll
