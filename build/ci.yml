@@ -14,17 +14,17 @@ variables:
   SimulationSrcDir: $(System.DefaultWorkingDirectory)/src
 
 jobs:
-- job: macOS
-  pool: 'Hosted macOS'
-  steps:
-  - template: steps-xplat.yml
-
-
-- job: Linux
-  pool: 'Hosted Ubuntu 1604'
-  steps:
-  - template: steps-xplat.yml
-
+###- job: macOS
+###  pool: 'Hosted macOS'
+###  steps:
+###  - template: steps-xplat.yml
+###
+###
+###- job: Linux
+###  pool: 'Hosted Ubuntu 1604'
+###  steps:
+###  - template: steps-xplat.yml
+###
 
 - job: Windows
   pool: 'Hosted VS2017'
