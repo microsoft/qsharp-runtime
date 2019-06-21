@@ -15,18 +15,6 @@ steps:
 
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build C# code generation'
-  inputs:
-    command: build
-    arguments: >
-      -c $(BuildConfiguration)
-      -v $(Build.Verbosity)
-      /p:DefineConstants=$(Assembly.Constants)
-      /p:Version=$(Assembly.Version)
-    projects: '$(SimulationSrcDir)/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj'
-
-
-- task: DotNetCoreCLI@2
   displayName: 'Build Q# simulation'
   inputs:
     command: build
@@ -37,7 +25,7 @@ steps:
       /p:Version=$(Assembly.Version)
       /p:QsharpDocsOutDir=$(DocsOutDir)
     projects: |
-      $(SimulationSrcDir)/CsharpGeneration.App
+      $(SimulationSrcDir)/Simulation/CsharpGeneration.App
       $(SimulationSrcDir)/../Simulation.sln
 
 
@@ -51,18 +39,18 @@ steps:
       /p:DefineConstants=$(Assembly.Constants)
       /p:Version=$(Assembly.Version)
     projects: |
-      $(SimulationSrcDir)/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj
-      $(SimulationSrcDir)/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj
-      $(SimulationSrcDir)/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
-      $(SimulationSrcDir)/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
+      $(SimulationSrcDir)/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj
+      $(SimulationSrcDir)/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj
+      $(SimulationSrcDir)/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
+      $(SimulationSrcDir)/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
 
 - task: NuGetCommand@2
   displayName: 'Package Q# Simulation'
   inputs:
     command: pack
     packagesToPack: >
-      $(SimulationSrcDir)\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj;
-      $(SimulationSrcDir)\Simulators\Microsoft.Quantum.Simulators.csproj;
+      $(SimulationSrcDir)/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj;
+      $(SimulationSrcDir)/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj;
     versioningScheme: byEnvVar
     versionEnvVar: NUGET_VERSION
     packDestination: '$(NugetsOutDir)'
