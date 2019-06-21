@@ -5,7 +5,7 @@
     <RunQsc>True</RunQsc>
     <RunQDocGen>False</RunQDocGen>
     <QSimDll>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Runtime/build/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QSimDll>
-    <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/CsharpGenerationApp/bin/$(Configuration)/netcoreapp2.1/Microsoft.Quantum.CsharpGenerationApp.dll))</QscExe>
+    <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/CsharpGeneration.App/bin/$(Configuration)/netcoreapp2.1/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
     <LangVersion>latest</LangVersion>
     <QsharpLangVersion>0.8</QsharpLangVersion>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
@@ -32,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(EnlistmentRoot)src\Intrinsic\Microsoft.Quantum.Intrinsic.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Common\Microsoft.Quantum.Simulation.Common.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Core\Microsoft.Quantum.Simulation.Core.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulators\Microsoft.Quantum.Simulators.csproj" Condition="'$(EnlistmentRoot)src\Simulators' != '$(MSBuildProjectDirectory)'"  />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Intrinsic\Microsoft.Quantum.Intrinsic.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Simulation.Core.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" Condition="'$(EnlistmentRoot)src\Simulation\Simulators' != '$(MSBuildProjectDirectory)'"  />
   </ItemGroup>
 </Project>

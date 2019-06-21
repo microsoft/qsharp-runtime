@@ -2,7 +2,7 @@
   <Import Project="..\Common\AssemblyCommon.props" />
   
   <PropertyGroup>
-    <AssemblyName>Microsoft.Quantum.CsharpGenerationApp</AssemblyName>
+    <AssemblyName>Microsoft.Quantum.CsharpGeneration.App</AssemblyName>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>

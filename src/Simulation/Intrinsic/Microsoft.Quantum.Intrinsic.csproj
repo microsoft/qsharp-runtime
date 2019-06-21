@@ -25,5 +25,5 @@
     <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\build\Props\QSharp.targets" />
+  <Import Project="..\..\..\build\Props\QSharp.targets" />
 </Project>

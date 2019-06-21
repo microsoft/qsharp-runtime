@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\Props\QSharp.Dev.props" />
+  <Import Project="..\..\..\build\Props\QSharp.Dev.props" />
   <Import Project="..\Common\AssemblyCommon.props" />
 
   <PropertyGroup>
@@ -12,6 +12,6 @@
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
-  <Import Project="..\..\build\Props\QSharp.targets" />
+  <Import Project="..\..\..\build\Props\QSharp.targets" />
 
 </Project>
