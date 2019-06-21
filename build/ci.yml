@@ -28,9 +28,9 @@ jobs:
 
 - job: Windows
   pool: 'Hosted VS2017'
-  dependsOn:
-  - macOS
-  - Linux
+###  dependsOn:
+###  - macOS
+###  - Linux
   condition: succeeded()
   steps:
   - template: steps-windows.yml
