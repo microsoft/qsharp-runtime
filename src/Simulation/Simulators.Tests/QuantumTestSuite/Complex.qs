@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Simulation.TestSuite.Math {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;

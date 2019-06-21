@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Bug2248 {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Convert;

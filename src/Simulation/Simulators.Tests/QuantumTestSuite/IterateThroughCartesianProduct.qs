@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // note: this code is duplicared in libraries
 
 namespace Microsoft.Quantum.Simulation.TestSuite {

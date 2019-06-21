@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Bug2212 {
 
     function F<'T> (arg1 :'T , arg : Unit) : 'T {

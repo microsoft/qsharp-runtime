@@ -1,4 +1,7 @@
-﻿using Microsoft.Quantum.Simulation.Common;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
 using Microsoft.Quantum.Simulation.XUnit;

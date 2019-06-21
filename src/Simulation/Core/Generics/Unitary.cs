@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.Simulation.Core
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
     ///     Represents an operation that has both a Controlled and an Adjoint 

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 ########################################
 # When creating a package with dotnet pack, nuget changes every ProjectReference to be itself
 # a PackageReference (without cheking if that project has a corresponding package).

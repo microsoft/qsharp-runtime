@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.RoslynWrapper.Testing
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.RoslynWrapper.Testing
 
 open Xunit
 open System.Text.RegularExpressions

@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     using System.Collections.Generic;
     using System.Diagnostics;

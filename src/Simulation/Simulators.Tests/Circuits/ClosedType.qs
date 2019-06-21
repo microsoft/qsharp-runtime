@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // This files contains ClosedType version of operations that can normally be implemented
 // with generics to verify that they can be used interchangeably.
 

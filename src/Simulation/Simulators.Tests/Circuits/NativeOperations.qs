@@ -1,4 +1,7 @@
-﻿namespace NativeOperations
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace NativeOperations
 {
     operation IntrinsicBody () : String
     {

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // This files contains Generic version of gates in ClosedTypes.qb
 // to verify that they can be used interchangeably.
 

@@ -1,4 +1,7 @@
-﻿/// <summary>
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+/// <summary>
 /// Types and functionality related to Quantum Computer Trace Simulator
 /// </summary>
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators

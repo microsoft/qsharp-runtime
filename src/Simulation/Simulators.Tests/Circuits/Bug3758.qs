@@ -1,4 +1,7 @@
-﻿namespace Bug3758
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Bug3758
 {
     open Microsoft.Quantum.Primitive;
 

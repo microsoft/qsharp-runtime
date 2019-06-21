@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation {
     
     /// <summary> Controlled-X gate natively supported by the machine </summary>

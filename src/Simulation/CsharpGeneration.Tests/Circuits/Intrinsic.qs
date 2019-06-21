@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // Some Intrinsic stubs
 // Notice that CNOT is defined in CodegenTests.qs for testing.
 namespace Microsoft.Quantum.Intrinsic {

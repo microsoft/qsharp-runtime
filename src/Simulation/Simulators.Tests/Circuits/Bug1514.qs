@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Bug1514 {
 
     operation Bug1514() : Unit {

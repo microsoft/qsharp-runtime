@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 $qbc="..\..\..\qflat\Qbc\bin\Release\Qbc.exe"
 
 function FixNamespace($code,$namespace)

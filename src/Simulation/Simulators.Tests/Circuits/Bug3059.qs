@@ -1,4 +1,7 @@
-﻿namespace Bug3059 {
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Bug3059 {
 
     function CheckPair (fst : Int, snd : Int) : Unit { }
 

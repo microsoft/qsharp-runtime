@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.Simulation.Core
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
     /// Variant or a functor of the operation appearing in the operation call graph

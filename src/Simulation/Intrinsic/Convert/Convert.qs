@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 /// # Summary
 /// These are some of the functions from System.Convert namespace of .NET CLR
 /// that are relevant within Q# type system.

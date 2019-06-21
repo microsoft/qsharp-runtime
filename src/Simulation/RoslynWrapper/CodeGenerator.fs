@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.RoslynWrapper
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.RoslynWrapper
 
 /// <summary>
 /// This is the entry point to the Roslyn Wrapper.

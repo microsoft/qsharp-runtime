@@ -1,4 +1,7 @@
-﻿using Microsoft.Quantum.Simulation.Core;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation

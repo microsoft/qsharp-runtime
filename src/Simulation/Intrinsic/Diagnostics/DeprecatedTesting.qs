@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Extensions.Testing {
     open Microsoft.Quantum.Warnings;
     open Microsoft.Quantum.Math;

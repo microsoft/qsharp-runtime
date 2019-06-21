@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Tests.CoreOperations {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics;
