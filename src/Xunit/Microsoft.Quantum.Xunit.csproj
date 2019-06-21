@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\simulation\Core\Microsoft.Quantum.Simulation.Core.csproj" />
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

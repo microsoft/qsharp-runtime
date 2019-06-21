@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\Nuspecs\build\Microsoft.Quantum.Development.Kit.LocalDev.props" />
+  <Import Project="..\..\build\Props\QSharp.Dev.props" />
   <Import Project="..\Common\AssemblyCommon.props" />
 
   <PropertyGroup>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Xunit\src\Microsoft.Quantum.Xunit.csproj" />
+    <ProjectReference Include="..\Xunit\Microsoft.Quantum.Xunit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,5 +23,5 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
   
-  <Import Project="..\..\Nuspecs\build\Microsoft.Quantum.Development.Kit.targets" />
+  <Import Project="..\..\build\Props\QSharp.targets" />
 </Project>

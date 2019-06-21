@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    This is the main compilation target for Q# files.
+    It calls the Q# compiler (qsc.dll) to generate C# files that are then added as part of the compilation files
+    of this project.
+  -->
+  <Target Name="QsharpCompile"
+      Inputs="@(QsharpFiles)"
+      Outputs="$(QsharpOutDir)qsc-ok.txt"
+      DependsOnTargets="QsharpPrepare"
+      BeforeTargets="CoreCompile"
+      Condition="$(RunQsc)">
+    <PropertyGroup>
+      <QscCommand>$(QscExe) $(QsharpDocsGen) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
+    </PropertyGroup>
+    <MakeDir Directories="$(QsharpSrcOutDir)" />
+    <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />
+    <WriteLinesToFile File="$(QsharpOutDir)qsc-command.txt" Lines=":: files ::;@(QsharpFiles);:: qsim ::;$(QSimDll);;:: references ::;@(QsReferences);:: command ::;$(QscCommand)" Overwrite="true"/>
+    <!-- Remote all existing codegen files first: -->
+    <ItemGroup>
+      <QsharpCodegenFiles Include="$(QsharpSrcOutDir)**\*.*" />
+    </ItemGroup>
+    <Delete Files="@(QsharpCodegenFiles)" />
+    <Exec Command="$(QscCommand)" />
+    <WriteLinesToFile File="$(QsharpOutDir)qsc-ok.txt" Lines="qsc completed succesfully!" Overwrite="true"/>
+    <ItemGroup>
+      <Compile Include="$(QsharpSrcOutDir)**\*.g.cs">
+        <Visible>false</Visible>
+      </Compile>
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Removes all the intermediate build outputs.
+  -->
+  <Target Name="QsharpClean" 
+      DependsOnTargets="QsharpPrepare" 
+      BeforeTargets="Clean">
+    <ItemGroup>
+      <QsharpBuiltFiles Include="$(QsharpOutDir)**\*.*" />
+    </ItemGroup>
+    <Delete Files="@(QsharpBuiltFiles)" />
+  </Target>
+
+  <!--
+    Helper target that sets the variables needed for Q# compilation.
+  -->
+  <Target Name="QsharpPrepare" 
+      DependsOnTargets="ResolveAssemblyReferences" 
+      BeforeTargets="CoreCompile;QsharpClean">
+    <ItemGroup>
+      <QsReferences Include="@(ReferencePath)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath), '(?i)system.|mscorlib|netstandard.library|microsoft.netcore.app')) == false" />
+      <QsharpFiles Include="@(QsharpCompile)">
+        <Visible>false</Visible>
+      </QsharpFiles>
+      <SkippedQsharpFiles Include="**\*.qs" Exclude="@(QsharpFiles);@(QsharpIgnore)">
+        <Visible>false</Visible>
+      </SkippedQsharpFiles>
+    </ItemGroup>
+    <PropertyGroup>
+      <QsharpOutDir Condition="'$(QsharpOutDir)' == ''">$(BaseIntermediateOutputPath)qsharp</QsharpOutDir>
+      <QsharpOutDir Condition="!HasTrailingSlash('$(QsharpOutDir)')">$(QsharpOutDir)\</QsharpOutDir>
+      <QsharpSrcOutDir Condition="'$(QsharpSrcOutDir)' == ''">$(QsharpOutDir)src\</QsharpSrcOutDir>
+      <QsharpFormatBackupDir Condition="'$(QsharpFormatBackupDir)' == ''">$(QsharpOutDir).backup.$([System.DateTime]::Now.ToString(`yyyyMMddhhmmss`))</QsharpFormatBackupDir>
+      <QsharpDocsOutDir Condition="'$(QsharpDocsOutDir)' == ''">$(QsharpOutDir)docs\</QsharpDocsOutDir>
+      <QsharpDocsGen Condition="$(RunQDocGen)">--doc $(QsharpDocsOutDir)</QsharpDocsGen>
+    </PropertyGroup>
+    <Warning
+        Condition="'@(SkippedQbFiles)' != ''"
+        Text="Some .qs files in your project will be skipped during build: @(SkippedQsharpFiles)" />
+  </Target>
+</Project>

@@ -16,6 +16,13 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
+$target = "Microsoft.Quantum.CsharpGeneration.nuspec"
+
+if (Test-Path $target) { 
+    Write-Host "$target exists. Skipping generating new one."
+    exit
+ }
+
 # Start with the nuspec template
 $nuspec = [xml](Get-Content "Microsoft.Quantum.CsharpGeneration.nuspec.template")
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
@@ -57,5 +64,5 @@ Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.CsharpGeneration.fsproj
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)
-$nuspec.Save("Microsoft.Quantum.CsharpGeneration.nuspec")
+$nuspec.Save($target)
 

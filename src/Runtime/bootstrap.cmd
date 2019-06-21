@@ -17,11 +17,8 @@ IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib copy %DROP_F
 IF NOT EXIST %BUILD_FOLDER% mkdir %BUILD_FOLDER%
 pushd %BUILD_FOLDER%
 
-IF EXIST CMakeCache.txt del CMakeCache.txt
-
 cmake -A "x64" ^
     -DBUILD_SHARED_LIBS:BOOL="1" ^
-    -DENABLE_MPI_INTEL:BOOL="0" ^
     ..
 
 popd

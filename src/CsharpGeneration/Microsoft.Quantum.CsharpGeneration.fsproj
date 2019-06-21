@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RoslynWrapper\RoslynWrapper.fsproj" />
+    <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.8.1906.1704-beta" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.6.2" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.8.1906.1704-beta" />
+    <ProjectReference Include="..\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj" />
   </ItemGroup>
   
 </Project>
