@@ -1,4 +1,5 @@
-# Copyright © 2017 Microsoft Corporation. All Rights Reserved.
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 add_executable(local_test local_test.cpp)
 add_executable(factory_test factory_test.cpp)

@@ -1,4 +1,5 @@
-# Copyright © 2017 Microsoft Corporation. All Rights Reserved.
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 project(quantum-simulator)
 cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
