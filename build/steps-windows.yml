@@ -2,6 +2,12 @@
 # Build, test and pack the simulation framework on Windows.
 ##
 steps:
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 4.9.3'
+  inputs:
+    versionSpec: '4.9.3'
+
+
 - script: bootstrap.cmd
   displayName: "Bootstraping environment"
   workingDirectory: $(SimulationSrcDir)/../
