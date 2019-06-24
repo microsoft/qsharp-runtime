@@ -59,6 +59,7 @@ steps:
       $(SimulationSrcDir)/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
       $(SimulationSrcDir)/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
 
+
 - task: NuGetCommand@2
   displayName: 'Package Q# Simulation'
   inputs:
