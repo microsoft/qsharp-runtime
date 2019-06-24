@@ -21,11 +21,11 @@ jobs:
   - template: steps-xplat.yml
 
 
- - job: Linux
+- job: Linux
   pool: 'Hosted Ubuntu 1604'
   steps:
   - template: steps-xplat.yml
- 
+
 
 - job: Windows
   pool: 'Hosted VS2017'
