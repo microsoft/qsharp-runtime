@@ -10,72 +10,59 @@ extern "C" {
 // non-quantum
 
 MICROSOFT_QUANTUM_DECL unsigned init();
-MICROSOFT_QUANTUM_DECL void destroy(unsigned);
-MICROSOFT_QUANTUM_DECL void seed(unsigned id,unsigned);
-MICROSOFT_QUANTUM_DECL void Dump(unsigned id, bool(*callback)(size_t, double, double));
-MICROSOFT_QUANTUM_DECL bool DumpQubits(unsigned id, unsigned n, unsigned* q, bool(*callback)(size_t, double, double));
-MICROSOFT_QUANTUM_DECL void DumpIds(unsigned id, void(*callback)(unsigned));
+MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid);
+MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s);
+MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned sid, _In_ bool(*callback)(size_t, double, double));
+MICROSOFT_QUANTUM_DECL bool DumpQubits(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* q, _In_ bool(*callback)(size_t, double, double));
+MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned sid, _In_ void(*callback)(unsigned));
 
-MICROSOFT_QUANTUM_DECL std::size_t random_choice(unsigned id,std::size_t, double* p);
+MICROSOFT_QUANTUM_DECL std::size_t random_choice(_In_ unsigned sid, _In_ std::size_t n, _In_reads_(n) double* p);
 
-MICROSOFT_QUANTUM_DECL double JointEnsembleProbability(unsigned id, unsigned n, int* b, unsigned* q);
+MICROSOFT_QUANTUM_DECL double JointEnsembleProbability(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) int* b, _In_reads_(n) unsigned* q);
 
 // allocate and release
-MICROSOFT_QUANTUM_DECL void allocateQubit(unsigned id, unsigned q);
-MICROSOFT_QUANTUM_DECL void release(unsigned id, unsigned n);
-MICROSOFT_QUANTUM_DECL unsigned num_qubits(unsigned id);
+MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid);
+MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned sid);
 
 // single-qubit gates
-MICROSOFT_QUANTUM_DECL void X(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void Y(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void Z(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void H(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void S(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void T(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void AdjS(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL void AdjT(unsigned id, unsigned);
+MICROSOFT_QUANTUM_DECL void X(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void Y(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void Z(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void H(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void S(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void T(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void AdjS(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void AdjT(_In_ unsigned sid, _In_ unsigned q);
 
 
 // multi-controlled single-qubit gates
 
-MICROSOFT_QUANTUM_DECL void MCX(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCY(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCZ(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCH(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCS(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCT(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCAdjS(unsigned id, unsigned n, unsigned* c, unsigned);
-MICROSOFT_QUANTUM_DECL void MCAdjT(unsigned id, unsigned n, unsigned* c, unsigned);
-
-// multi-qubit gates
-//MICROSOFT_QUANTUM_DECL void SWAP(unsigned id, unsigned, unsigned);
-//MICROSOFT_QUANTUM_DECL void MultiX(unsigned id, unsigned n, unsigned* q);
-
-// controlled multi-qubit gates
-//MICROSOFT_QUANTUM_DECL void MCSWAP(unsigned id, unsigned n, unsigned* c, unsigned, unsigned);
-//MICROSOFT_QUANTUM_DECL void MCMultiX(unsigned id, unsigned nc, unsigned* c, unsigned nq, unsigned* q);
+MICROSOFT_QUANTUM_DECL void MCX(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCY(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCZ(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCH(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCS(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCT(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCAdjS(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL void MCAdjT(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
 
 // rotations
-MICROSOFT_QUANTUM_DECL void R(unsigned id, unsigned b, double, unsigned);
-//MICROSOFT_QUANTUM_DECL void R1(unsigned id, double, unsigned);
+MICROSOFT_QUANTUM_DECL void R(_In_ unsigned sid, _In_ unsigned b, _In_ double phi, _In_ unsigned q);
 
 // multi-controlled rotations
-MICROSOFT_QUANTUM_DECL void MCR(unsigned id, unsigned b, double, unsigned n, unsigned* c, unsigned);
-//MICROSOFT_QUANTUM_DECL void MCR1(unsigned id, double, unsigned n, unsigned* c, unsigned);
+MICROSOFT_QUANTUM_DECL void MCR(_In_ unsigned sid, _In_ unsigned b, _In_ double phi, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q);
 
 // Exponential of Pauli operators
-MICROSOFT_QUANTUM_DECL void Exp(unsigned id, unsigned n, unsigned* b, double, unsigned* q);
-MICROSOFT_QUANTUM_DECL void MCExp(unsigned id, unsigned n, unsigned* b, double, unsigned nc, unsigned* cs, unsigned* q);
+MICROSOFT_QUANTUM_DECL void Exp(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* b, _In_ double phi, _In_reads_(n) unsigned* q);
+MICROSOFT_QUANTUM_DECL void MCExp(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* b, _In_ double phi, _In_ unsigned nc, _In_reads_(nc) unsigned* cs, _In_reads_(n) unsigned* q);
 
 // measurements
-MICROSOFT_QUANTUM_DECL unsigned M(unsigned id, unsigned);
-MICROSOFT_QUANTUM_DECL unsigned Measure(unsigned id, unsigned n, unsigned* b, unsigned* q);
+MICROSOFT_QUANTUM_DECL unsigned M(_In_ unsigned sid, _In_ unsigned q);
+MICROSOFT_QUANTUM_DECL unsigned Measure(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* b, _In_reads_(n) unsigned* q);
 
-// wave function cheat
-//MICROSOFT_QUANTUM_DECL std::complex<double> const* wavefunction(unsigned id);
-  
 // permutation oracle emulation
-MICROSOFT_QUANTUM_DECL void PermuteBasis(unsigned id, unsigned n, unsigned* q, std::size_t table_size, std::size_t *permutation_table);
-MICROSOFT_QUANTUM_DECL void AdjPermuteBasis(unsigned id, unsigned n, unsigned* q, std::size_t table_size, std::size_t *permutation_table);
+MICROSOFT_QUANTUM_DECL void PermuteBasis(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* q, _In_ std::size_t table_size, _In_reads_(table_size) std::size_t *permutation_table);
+MICROSOFT_QUANTUM_DECL void AdjPermuteBasis(_In_ unsigned sid, _In_ unsigned n, _In_reads_(n) unsigned* q, _In_ std::size_t table_size, _In_reads_(table_size) std::size_t *permutation_table);
 
 }
