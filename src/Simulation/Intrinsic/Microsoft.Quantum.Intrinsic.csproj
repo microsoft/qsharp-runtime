@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <QscExe Condition="'$(QscExe)' == ''">dotnet $([MSBuild]::NormalizePath($(MSBuildThisFileDirectory)../CsharpGeneration.App/bin/$(Configuration)/netcoreapp2.1/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
+    <QscExe Condition="'$(QscExe)' == ''">dotnet $([MSBuild]::NormalizePath($(MSBuildThisFileDirectory)../CsharpGeneration.App/bin/$(Configuration)/netcoreapp2.2/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
     <RunQsc>True</RunQsc>
     <RunQDocGen>True</RunQDocGen>
   </PropertyGroup>

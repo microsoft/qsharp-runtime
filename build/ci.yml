@@ -15,23 +15,27 @@ variables:
   SkipLocalDev: 'true'
 
 jobs:
-###- job: macOS
-###  pool: 'Hosted macOS'
-###  steps:
-###  - template: steps-xplat.yml
-###
-###
-###- job: Linux
-###  pool: 'Hosted Ubuntu 1604'
-###  steps:
-###  - template: steps-xplat.yml
-###
+- job: macOS
+  pool: 'Hosted macOS'
+  steps:
+  - template: steps-xplat.yml
+
+
+- job: Linux
+  pool: 'Hosted Ubuntu 1604'
+  steps:
+  - template: steps-xplat.yml
+
 
 - job: Windows
   pool: 'Hosted VS2017'
-###  dependsOn:
-###  - macOS
-###  - Linux
+  dependsOn:
+  - macOS
+  - Linux
   condition: succeeded()
   steps:
   - template: steps-windows.yml
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+    inputs:
+      failOnAlert: true

@@ -2,6 +2,12 @@
 # Build, test and pack the simulation framework on Windows.
 ##
 steps:
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 4.9.3'
+  inputs:
+    versionSpec: '4.9.3'
+
+
 - script: bootstrap.cmd
   displayName: "Bootstraping environment"
   workingDirectory: $(SimulationSrcDir)/../
@@ -52,6 +58,7 @@ steps:
       $(SimulationSrcDir)/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj
       $(SimulationSrcDir)/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj
       $(SimulationSrcDir)/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj
+
 
 - task: NuGetCommand@2
   displayName: 'Package Q# Simulation'

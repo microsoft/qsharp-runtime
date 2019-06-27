@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
-namespace Microsoft.Quantum.RoslynWrapper
+﻿namespace Microsoft.Quantum.RoslynWrapper
 
 #nowarn "1182"    // Unused parameters
 [<AutoOpen>]
