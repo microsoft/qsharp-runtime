@@ -6,6 +6,12 @@
 #include "config.hpp"
 #include <complex>
 
+// SAL only defined in windows.
+#ifndef _In_
+#define _In_
+#define _In_reads_(n)
+#endif
+
 extern "C" {
 // non-quantum
 
