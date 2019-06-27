@@ -17,7 +17,7 @@ steps:
     cmake --build . --config $(BuildConfiguration)
     ctest -C $(BuildConfiguration)
   displayName: "Build and test Native QuantumSimulator"
-  workingDirectory: $(SimulationSrcDir)/Native/build
+  workingDirectory: $(SimulationSrcDir)/Simulation/Native/build
 
 
 - task: DotNetCoreCLI@2
