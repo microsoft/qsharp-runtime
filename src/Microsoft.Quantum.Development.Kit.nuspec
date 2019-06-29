@@ -29,7 +29,7 @@
     <file src="..\build\Props\QSharp.targets" target="build\Microsoft.Quantum.Development.Kit.targets" />
     <file src="..\build\Props\*.xaml" target="build" />
     <file src="..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
-    <file src="..\simulation\CsharpGenerationApp\bin\$Configuration$\netcoreapp2.1\publish\**" target="tools\qsc" exclude="**\*.pdb" />
+    <file src="..\src\Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp2.1\publish\**" target="tools\qsc" exclude="**\*.pdb" />
   </files>
 
 </package>
