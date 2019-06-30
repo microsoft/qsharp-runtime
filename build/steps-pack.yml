@@ -1,0 +1,29 @@
+##
+# Pack all build artifacts.
+##
+
+- task: NuGetCommand@2
+  displayName: 'Pack Q# Simulation'
+  inputs:
+    command: pack
+    packagesToPack: >
+      $(SimulationSrcDir)/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj;
+      $(SimulationSrcDir)/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj;
+    versioningScheme: byEnvVar
+    versionEnvVar: NUGET_VERSION
+    packDestination: '$(NugetsOutDir)'
+    includeReferencedProjects: true
+
+
+- task: NuGetCommand@2
+  displayName: 'Pack other QDK nugets'
+  inputs:
+    command: pack
+    packagesToPack: >
+      $(SimulationSrcDir)/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec;
+      $(SimulationSrcDir)/Microsoft.Quantum.Development.Kit.nuspec;
+      $(SimulationSrcDir)/Xunit/Microsoft.Quantum.Xunit.csproj;
+    versioningScheme: byEnvVar
+    versionEnvVar: NUGET_VERSION
+    packDestination: '$(System.DefaultWorkingDirectory)'
+    includeReferencedProjects: false
