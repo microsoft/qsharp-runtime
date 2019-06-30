@@ -7,18 +7,18 @@ steps:
   workingDirectory: $(Runtime.WorkingDirectory)/
 
 
-- script: ./build.sh
+- bash: ./build.sh
   displayName: "Building Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
 
 
-- script: ./test.sh
+- bash: ./test.sh
   displayName: "Testing Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
   condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
-- script: ./pack.sh
+- bash: ./pack.sh
   displayName: "Pack Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
 
