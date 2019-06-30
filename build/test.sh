@@ -10,7 +10,7 @@ ctest -C $BUILD_CONFIGURATION
 popd
 
 
-test_managed() {
+test_one() {
     dotnet test $1 \
         -c $BUILD_CONFIGURATION \
         -v $BUILD_VERBOSITY \
@@ -20,14 +20,14 @@ test_managed() {
 }
 
 echo "##[info]Testing C# code generation"
-test_managed '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
+test_one '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
 
 echo "##[info]Testing Roslyn Wrapper"
-test_managed '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
+test_one '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
 echo "##[info]Testing Tracer"
-test_managed '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
+test_one '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
 
 echo "##[info]Testing Q# Simulators"
-test_managed '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
+test_one '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
 

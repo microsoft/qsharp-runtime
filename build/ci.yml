@@ -6,7 +6,7 @@ variables:
   Build.Major: 0
   Build.Minor: 0
   IQSharp.Hosting.Env: 'build-agent'
-  Runtime.WorkingDirectory: $(System.DefaultWorkingDirectory)/src
+  Runtime.WorkingDirectory: $(System.DefaultWorkingDirectory)
   Nuget.Outdir: $(Build.ArtifactStagingDirectory)/drops/nugets
   Docs.Outdir: $(Build.ArtifactStagingDirectory)/drops/docs
   Drop.Native: $(Build.DefaultWorkingDirectory)/xplat
