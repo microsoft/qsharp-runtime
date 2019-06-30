@@ -1,0 +1,48 @@
+##
+# Run all build steps.
+##
+steps:
+- script: bootstrap.cmd
+  displayName: "Bootstraping Q# runtime environment"
+  workingDirectory: $(Runtime.WorkingDirectory)/
+
+
+- script: ./build.sh
+  displayName: "Building Q# runtime"
+  workingDirectory: $(Runtime.WorkingDirectory)/build
+
+
+- script: ./test.sh
+  displayName: "Testing Q# runtime"
+  workingDirectory: $(Runtime.WorkingDirectory)/build
+  condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
+
+
+- script: ./pack.sh
+  displayName: "Pack Q# runtime"
+  workingDirectory: $(Runtime.WorkingDirectory)/build
+
+
+##
+# Publish tests results and build artifacts.
+##
+- task: PublishTestResults@2
+  displayName: 'Publish tests results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '$(Runtime.WorkingDirectory)/**/*.trx'
+    testRunTitle: 'Q# runtime tests'
+
+- task: PublishSymbols@1
+  displayName: 'Publish symbols'
+  continueOnError: true
+  inputs:
+    SearchPattern: '$(Runtime.WorkingDirectory)/src/**/*.pdb'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  condition: succeededOrFailed()
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: qsharp-runtime
