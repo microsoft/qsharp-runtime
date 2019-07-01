@@ -5,18 +5,18 @@ steps:
 - template: steps-init.yml
 
 
-- bash: ./build.sh
+- powershell: ./build.ps1
   displayName: "Building Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
 
 
-- bash: ./test.sh
+- powershell: ./test.ps1
   displayName: "Testing Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
   condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
-- bash: ./pack.sh
+- powershell: ./pack.ps1
   displayName: "Pack Q# runtime"
   workingDirectory: $(Runtime.WorkingDirectory)/build
 
