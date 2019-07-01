@@ -6,8 +6,7 @@ $ErrorActionPreference = 'Stop'
 .\set-env.ps1
 
 Write-Host "##[info]Build Native simulator"
-cmake --build ../src/Simulation/Native/build `
-    --config $BUILD_CONFIGURATION
+cmake --build ../src/Simulation/Native/build --config $Env:BUILD_CONFIGURATION
 if ($LastExitCode -ne 0) { throw "Cannot build Native simulator." }
 
 
