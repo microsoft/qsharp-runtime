@@ -15,7 +15,7 @@ popd
 
 
 pack_one() {
-    bin/nuget pack $1 \
+    nuget pack $1 \
         -OutputDirectory $NUGET_OUTDIR \
         -Properties Configuration=$BUILD_CONFIGURATION \
         -Version $NUGET_VERSION \

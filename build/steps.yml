@@ -2,9 +2,7 @@
 # Run all build steps.
 ##
 steps:
-- script: bootstrap.cmd
-  displayName: "Bootstraping Q# runtime environment"
-  workingDirectory: $(Runtime.WorkingDirectory)/
+- template: steps-init.yml
 
 
 - bash: ./build.sh
@@ -23,26 +21,4 @@ steps:
   workingDirectory: $(Runtime.WorkingDirectory)/build
 
 
-##
-# Publish tests results and build artifacts.
-##
-- task: PublishTestResults@2
-  displayName: 'Publish tests results'
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFormat: VSTest
-    testResultsFiles: '$(Runtime.WorkingDirectory)/**/*.trx'
-    testRunTitle: 'Q# runtime tests'
-
-- task: PublishSymbols@1
-  displayName: 'Publish symbols'
-  continueOnError: true
-  inputs:
-    SearchPattern: '$(Runtime.WorkingDirectory)/src/**/*.pdb'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
-  condition: succeededOrFailed()
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: qsharp-runtime
+- template: steps-wrap-up.yml
