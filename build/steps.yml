@@ -7,18 +7,18 @@ steps:
 
 - powershell: ./build.ps1
   displayName: "Building Q# runtime"
-  workingDirectory: $(Runtime.WorkingDirectory)/build
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 
 - powershell: ./test.ps1
   displayName: "Testing Q# runtime"
-  workingDirectory: $(Runtime.WorkingDirectory)/build
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
   condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
 - powershell: ./pack.ps1
   displayName: "Pack Q# runtime"
-  workingDirectory: $(Runtime.WorkingDirectory)/build
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 
 - template: steps-wrap-up.yml

@@ -5,20 +5,20 @@ steps:
 
 - bash: ./bootstrap.sh
   displayName: "Bootstrap Native QuantumSimulator"
-  workingDirectory: $(Runtime.WorkingDirectory)/src/Simulation/Native
+  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
 
 - task: CMake@1
   displayName: 'CMake  --build build'
   inputs:
-    workingDirectory: $(Runtime.WorkingDirectory)/src/Simulation/Native
+    workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
     cmakeArgs: ' --build build'
 
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: artifact staging directory'
   inputs:
-    SourceFolder: '$(Runtime.WorkingDirectory)'
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
     Contents: 'src/Simulation/Native/build/**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 

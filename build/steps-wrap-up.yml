@@ -8,14 +8,14 @@ steps:
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: VSTest
-    testResultsFiles: '$(Runtime.WorkingDirectory)/**/*.trx'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*.trx'
     testRunTitle: 'Q# runtime tests'
 
 - task: PublishSymbols@1
   displayName: 'Publish symbols'
   continueOnError: true
   inputs:
-    SearchPattern: '$(Runtime.WorkingDirectory)/src/**/*.pdb'
+    SearchPattern: '$(System.DefaultWorkingDirectory)/src/**/*.pdb'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: qsharp-runtime'
