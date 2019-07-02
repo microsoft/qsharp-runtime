@@ -3,11 +3,13 @@
 
 $ErrorActionPreference = 'Stop'
 
-.\set-env.ps1
+& "$PSScriptRoot/set-env.ps1"
+$all_ok = $True
 
 Write-Host "##[info]Test Native simulator"
 pushd ../src/Simulation/Native/build
 ctest -C $BUILD_CONFIGURATION
+$script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 popd
 
 
@@ -21,7 +23,7 @@ function Test-One {
         /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
         /property:Version=$Env:ASSEMBLY_VERSION
 
-    if ($LastExitCode -ne 0) { throw "Cannot test $project." }
+    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 }
 
 Write-Host "##[info]Testing C# code generation"
@@ -35,4 +37,9 @@ Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simul
 
 Write-Host "##[info]Testing Q# Simulators"
 Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
+
+if (-not $all_ok) 
+{
+    throw "At least one project failed to compile. Check the logs."
+}
 

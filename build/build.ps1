@@ -3,15 +3,19 @@
 
 $ErrorActionPreference = 'Stop'
 
-.\set-env.ps1
+& "$PSScriptRoot/set-env.ps1"
+$all_ok = $True
 
 Write-Host "##[info]Build Native simulator"
 cmake --build ../src/Simulation/Native/build --config $Env:BUILD_CONFIGURATION
-if ($LastExitCode -ne 0) { throw "Cannot build Native simulator." }
+$script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 
 
 function Build-One {
-    Param($action, $project)
+    param(
+        [string]$action,
+        [string]$project
+    );
 
     dotnet $action $project `
         -c $Env:BUILD_CONFIGURATION `
@@ -20,7 +24,7 @@ function Build-One {
         /property:Version=$Env:ASSEMBLY_VERSION `
         /property:QsharpDocsOutDir=$Env:DOCS_OUTDIR
 
-    if ($LastExitCode -ne 0) { throw "Cannot $action $project." }
+    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 }
 
 Write-Host "##[info]Build C# code generation"
@@ -28,4 +32,9 @@ Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
 
 Write-Host "##[info]Build Q# simulation"
 Build-One 'build' '../Simulation.sln'
+
+if (-not $all_ok) 
+{
+    throw "At least one project failed to compile. Check the logs."
+}
 

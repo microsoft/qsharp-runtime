@@ -3,7 +3,8 @@
 
 $ErrorActionPreference = 'Stop'
 
-.\set-env.ps1
+& "$PSScriptRoot/set-env.ps1"
+$all_ok = $True
 
 Write-Host "##[info]Copy Native simulator xplat binaries"
 pushd ../src/Simulation/Native
@@ -24,7 +25,7 @@ function Pack-One() {
         -Verbosity detailed `
         $include_references
 
-    if ($LastExitCode -ne 0) { throw "Cannot pack $project." }
+    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 }
 
 
@@ -34,3 +35,8 @@ Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-In
 Pack-One '../src/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec'
 Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
+
+if (-not $all_ok) 
+{
+    throw "At least one project failed to compile. Check the logs."
+}
