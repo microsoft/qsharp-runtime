@@ -1,0 +1,18 @@
+steps:
+
+##
+# Pre-reqs
+##
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 4.9.3'
+  inputs:
+    versionSpec: '4.9.3'
+ 
+##
+# Bootstrap
+##
+- task: BatchScript@1
+  displayName: 'Prepare build'
+  inputs:
+    filename: bootstrap.cmd
+    modifyEnvironment: true
