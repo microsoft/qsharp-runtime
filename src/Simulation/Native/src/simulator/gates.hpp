@@ -26,10 +26,10 @@ namespace Gates
 /// a type for runtime basis specification
 enum Basis
 {
-    PauliI,
-    PauliX,
-    PauliY,
-    PauliZ
+    PauliI = 0,
+    PauliX = 1,
+    PauliY = 3,
+    PauliZ = 2
 };
 
 /// a general one qubit gate, storing the qubit number
