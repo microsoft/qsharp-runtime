@@ -13,7 +13,7 @@ CALL :runtimeBootstrap  || EXIT /B 1
 CALL :nuspecBootstrap   || EXIT /B 1
 
 :: Next steps are only needed for developers environment, they are skipped for cloud builds.
-IF "%SKIPLOCALDEV%" == "true" GOTO EOF
+IF NOT "%AGENT_ID%" == "" GOTO EOF
 
 :: Make sure everything is ready and builds locally.
 cmake --build src\Simulation\Native\build --target Microsoft.Quantum.Simulator.Runtime --config Release || EXIT /B 1

@@ -1,0 +1,25 @@
+steps:
+
+##
+# Wrap-up, publish symbols and drop folder.
+##
+- task: PublishTestResults@2
+  displayName: 'Publish tests results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*.trx'
+    testRunTitle: 'Q# runtime tests'
+
+- task: PublishSymbols@1
+  displayName: 'Publish symbols'
+  continueOnError: true
+  inputs:
+    SearchPattern: '$(System.DefaultWorkingDirectory)/src/**/*.pdb'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: qsharp-runtime'
+  condition: succeededOrFailed()
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: qsharp-runtime
