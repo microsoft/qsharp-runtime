@@ -19,6 +19,14 @@ steps:
   condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
+- task: CopyFiles@2
+  displayName: 'Copy Files to: artifact staging directory'
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: 'src/Simulation/Native/build/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+
 - task: PublishTestResults@2
   displayName: 'Publish tests results'
   condition: succeededOrFailed()
