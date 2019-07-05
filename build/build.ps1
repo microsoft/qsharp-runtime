@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 Write-Host "##[info]Build Native simulator"
-cmake --build ../src/Simulation/Native/build --config $Env:BUILD_CONFIGURATION
+cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION
 $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 
 
@@ -17,7 +17,8 @@ function Build-One {
         [string]$project
     );
 
-    dotnet $action $project `
+    Write-Host "##[info]Building $project ($action)..."
+    dotnet $action (Join-Path $PSScriptRoot $project) `
         -c $Env:BUILD_CONFIGURATION `
         -v $Env:BUILD_VERBOSITY `
         /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
@@ -27,10 +28,8 @@ function Build-One {
     $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 }
 
-Write-Host "##[info]Build C# code generation"
 Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
 
-Write-Host "##[info]Build Q# simulation"
 Build-One 'build' '../Simulation.sln'
 
 if (-not $all_ok) 
