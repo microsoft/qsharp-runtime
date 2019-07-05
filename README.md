@@ -25,7 +25,7 @@ To build on Windows:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2017 or later](). Make sure you install the following workloads:
+    * Install [Visual Studio 2017 or later](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
         * **.NET Core cross-platform development**
 2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2017`.
@@ -52,6 +52,16 @@ To build on other platforms:
 
 The `Simulation.sln` solution does not include the full-state simulator. To integrate any changes with the rest of the simulation components you need to manually build it using `make` in the `src\Simulation\Native\build` folder.
 
+
+## Testing ##
+
+All unittests are part of the `Simulation.sln` solution. To run the tests:
+
+* From [Visual Studio](https://docs.microsoft.com/en-us/visualstudio/test/getting-started-with-unit-testing?view=vs-2019#run-unit-tests):
+    * Open Test Explorer by choosing Test > Windows > Test Explorer from the top menu bar.
+    * Run your unit tests by clicking Run All.
+* From the command line run:
+    * `dotnet test Simulation.sln`
 
 
 ## Feedback ##
