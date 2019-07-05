@@ -4,23 +4,28 @@
 steps:
 
 - bash: ./bootstrap.sh
-  displayName: "Bootstrap Native QuantumSimulator"
-  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
+  displayName: "Bootstrap repository"
+  workingDirectory: $(System.DefaultWorkingDirectory)
 
 
-- task: CMake@1
-  displayName: 'CMake  --build build'
+- powershell: ./build.ps1
+  displayName: "Building Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+
+
+- powershell: ./test.ps1
+  displayName: "Testing Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+  condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
+
+
+- task: PublishTestResults@2
+  displayName: 'Publish tests results'
+  condition: succeededOrFailed()
   inputs:
-    workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
-    cmakeArgs: ' --build build'
-
-
-- task: CopyFiles@2
-  displayName: 'Copy Files to: artifact staging directory'
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: 'src/Simulation/Native/build/**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    testResultsFormat: VSTest
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*.trx'
+    testRunTitle: 'Q# xplat runtime tests'
 
 
 - task: PublishBuildArtifacts@1
@@ -28,5 +33,3 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: xplat
-
-
