@@ -7,8 +7,8 @@ It consists of the libraries and packages needed to create and simulate quantum 
 
 - **[ProjectTemplates/](./src/ProjectTemplates/)**: Source for the [project templates](https://www.nuget.org/packages/Microsoft.Quantum.ProjectTemplates/) 
     that can be used to create new Q# applications using .NET Core's CLI.
-- **[Simulation/](./src/Simulation/)**: Source for Q# simulators.
-- **[Xunit/](./src/Xunit/)**: Source for the xUnit Q# test case discoverer.
+- **[Simulation/](./src/Simulation/)**: Source for Q# simulation. Includes code generation, full-state and other simulators.
+- **[xUnit/](./src/Xunit/)**: Source for the xUnit's Q# test-case discoverer.
 
 ## New to Quantum? ##
 
