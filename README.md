@@ -29,7 +29,7 @@ To build on Windows:
         * **Desktop development with C++**
         * **.NET Core cross-platform development**
 2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2017`.
-    * this script prepares and build the native (C++) full-state simulator.
+    * this script prepares and builds the native (C++) full-state simulator.
     * you only need to run it once.
 3. Open and build the [`Simulation.sln`](./Simulation.sln) solution in Visual Studio.
 
@@ -50,12 +50,12 @@ To build on other platforms:
     * `dotnet publish src/Simulation/CsharpGeneration.App`
     * `dotnet build Simulation.sln`
 
-The `Simulation.sln` solution does not include the full-state simulator. To integrate any changes with the rest of the simulation components you need to manually build it using `make` in the `src\Simulation\Native\build` folder.
+The `Simulation.sln` solution does not include the full-state simulator. To integrate any changes with the rest of the simulation components, you need to manually build it using `make` in the `src\Simulation\Native\build` folder.
 
 
 ## Testing ##
 
-All unittests are part of the `Simulation.sln` solution. To run the tests:
+All unit tests are part of the `Simulation.sln` solution. To run the tests:
 
 * From [Visual Studio](https://docs.microsoft.com/en-us/visualstudio/test/getting-started-with-unit-testing?view=vs-2019#run-unit-tests):
     * Open Test Explorer by choosing Test > Windows > Test Explorer from the top menu bar.
