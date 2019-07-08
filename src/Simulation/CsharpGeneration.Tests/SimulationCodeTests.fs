@@ -25,6 +25,11 @@ module SimulationCode =
     open Microsoft.Quantum.QsCompiler
     open Microsoft.Quantum.QsCompiler.SyntaxTokens
 
+    let clearFormatting (str:string) =
+        str
+        |> Seq.filter (not << Char.IsWhiteSpace)
+        |> String.Concat
+
     [<Fact>]
     let ``Pure roslyn``() =
         let code = "
@@ -53,8 +58,8 @@ namespace N1
         let root = SyntaxFactory.ParseCompilationUnit(code)
         let ws = new AdhocWorkspace()
         let formattedRoot = Formatter.Format(root, ws)
-        let formattedText = formattedRoot.ToFullString()
-        Assert.Equal(expected, formattedText)
+        let actual = formattedRoot.ToFullString()
+        Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
     [<Fact>]
     let ``doubles in different locales`` () =    
@@ -104,7 +109,7 @@ namespace N1
             syntaxTree
         with | e -> sprintf "compilation threw exception: \n%s" e.Message |> failwith // should never happen (all exceptions are caught by the compiler)
         
-    let syntaxTree = parse [ @"Circuits\Intrinsic.qs"; @"Circuits\CodegenTests.qs" ]
+    let syntaxTree = parse [ (Path.Combine("Circuits", "Intrinsic.qs")); (Path.Combine("Circuits", "CodegenTests.qs")) ]
 
     let globalContext = createContext None syntaxTree
 
@@ -204,15 +209,11 @@ namespace N1
 
     let createTestContext op = globalContext.setCallable op
 
-    let clearFormatting (str:string) =
-        str
-        |> Seq.filter (not << Char.IsWhiteSpace)
-        |> String.Concat
     
     let testOneFile fileName (expected:string) =
         let expected = expected.Replace("%%%", (Uri(Path.GetFullPath fileName)).AbsolutePath)
         let expected = expected.Replace("%%", (Path.GetFullPath fileName).Replace("\\", "\\\\"))
-        let tree   = parse [@"Circuits\Intrinsic.qs"; fileName]
+        let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
         let actual = 
             tree 
             |> buildSyntaxTree (Path.GetFullPath fileName |> NonNullable<string>.New)
@@ -2949,7 +2950,7 @@ namespace Microsoft.Quantum
         }
     }
 }"""
-        |> testOneFile @"Circuits\EmptyElements.qs"
+        |> testOneFile (Path.Combine("Circuits","EmptyElements.qs"))
 
     [<Fact>]
     let ``one file - UserDefinedTypes`` () =    
@@ -3020,13 +3021,13 @@ namespace Microsoft.Quantum
     }
 }        
         """
-        |> testOneFile @"Circuits\Types.qs"
+        |> testOneFile (Path.Combine("Circuits","Types.qs"))
 
     [<Fact>]
     let ``find local elements `` () =
         let oneName = function | QsCustomType udt -> udt.FullName.Name.Value | QsCallable  op -> op.FullName.Name.Value
         let expected = [ "H"; "M"; "Qubits"; "Qubits"; "R"; "S"; "X"; "Z"; ]     // Qubits is two times: one for UDT and one for constructor.
-        let local    = syntaxTree |> findLocalElements (Path.GetFullPath @"Circuits\Intrinsic.qs" |> NonNullable<string>.New)
+        let local    = syntaxTree |> findLocalElements (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")) |> NonNullable<string>.New)
         Assert.Equal(1, local.Length)
         Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]).Value)
         let actual   = (snd local.[0]) |> List.map oneName |> List.sort
@@ -3076,7 +3077,7 @@ namespace Microsoft.Quantum.Tests.Inline
     }
 }"""
         |> 
-        testOneFile @"Circuits\HelloWorld.qs"
+        testOneFile (Path.Combine("Circuits","HelloWorld.qs"))
 
         
     [<Fact>]
@@ -3190,5 +3191,5 @@ namespace Microsoft.Quantum.Tests.LineNumbers
     }
 }"""
         |> 
-        testOneFile @"Circuits\LineNumbers.qs"
+        testOneFile (Path.Combine("Circuits","LineNumbers.qs"))
 
