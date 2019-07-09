@@ -9,7 +9,7 @@ For more details on how to contribute to Q# or the rest of the Quantum Developme
 
 Have a question? The `q#` tags on [Stack Overflow](https://stackoverflow.com/questions/tagged/q%23) and [Quantum Computing StackExchange](https://quantumcomputing.stackexchange.com/questions/tagged/q%23) are great places to ask questions about Q#, Quantum Development Kit and quantum computing in general.
 You can learn more about our work on the [Q# Development Blog](https://devblogs.microsoft.com/qsharp/) and ask questions in the comments as well.
-However you ask it, your well-worded question will serve as a resource to others searching for help.
+Wherever you ask it, your detailed question will serve as a resource to others searching for help.
 
 ## Reporting Issues
 
