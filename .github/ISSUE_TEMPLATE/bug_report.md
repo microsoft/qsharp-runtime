@@ -22,7 +22,7 @@ Describe the error that you see.
 If applicable, add screenshots to help explain your problem.
 
 ## System information
-- OS: [e.g. Windows, MacOS, Redhat, Ubuntu]
+- OS: [e.g. Windows, macOS, Redhat, Ubuntu]
 
 - .NET Core Version: [e.g. the output of `dotnet --version`]
 

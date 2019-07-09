@@ -29,14 +29,14 @@ To build on Windows:
         * **Desktop development with C++**
         * **.NET Core cross-platform development**
 2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2017`.
-    * this script prepares and builds the native (C++) full-state simulator.
-    * you only need to run it once.
+    * This script prepares and builds the native (C++) full-state simulator.
+    * You only need to run it once.
 3. Open and build the [`Simulation.sln`](./Simulation.sln) solution in Visual Studio.
 
-The `Simulation.sln` solution does not include the full-state simulator. To change it you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must first manually build it using the `Release` configuration.
+The `Simulation.sln` solution does not include the full-state quantum simulator. To change it, you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must first manually build it using the `Release` configuration.
 
 
-### MacOS/Linux ###
+### macOS/Linux ###
 
 To build on other platforms:
 
@@ -44,8 +44,8 @@ To build on other platforms:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core SDK](https://dotnet.microsoft.com/download)
 2. Run [bootstrap.sh](./bootstrap.sh)
-    * this script prepares and builds the native (C++) full-state simulator.
-    * you only need to run it once.
+    * This script prepares and builds the native (C++) full-state simulator.
+    * You only need to run it once.
 3. From the command line, run these two commands:
     * `dotnet publish src/Simulation/CsharpGeneration.App`
     * `dotnet build Simulation.sln`
