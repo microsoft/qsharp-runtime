@@ -4,28 +4,40 @@
 steps:
 
 - bash: ./bootstrap.sh
-  displayName: "Bootstrap Native QuantumSimulator"
-  workingDirectory: $(SimulationSrcDir)/Simulation/Native
+  displayName: "Bootstrap repository"
+  workingDirectory: $(System.DefaultWorkingDirectory)
 
 
-- task: CMake@1
-  displayName: 'CMake  --build build'
-  inputs:
-    workingDirectory: $(SimulationSrcDir)/Simulation/Native
-    cmakeArgs: ' --build build'
+- powershell: ./build.ps1
+  displayName: "Building Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+
+
+- powershell: ./test.ps1
+  displayName: "Testing Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+  condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: artifact staging directory'
   inputs:
-    SourceFolder: '$(build.sourcesdirectory)'
-    Contents: '$(SimulationSrcDir)/Simulation/Native/build/**'
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: 'src/Simulation/Native/build/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+
+- task: PublishTestResults@2
+  displayName: 'Publish tests results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*.trx'
+    testRunTitle: 'Q# xplat runtime tests'
 
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
+  displayName: 'Publish Artifact: xplat'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
-
-
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: xplat

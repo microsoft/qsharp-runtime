@@ -1,18 +1,12 @@
 name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
-trigger: none
+trigger:
+- master
 
 variables:
   Build.Major: 0
   Build.Minor: 0
-  Build.Verbosity: 'n'
-  IQSharp.Hosting.Env: 'build-agent'
-  Assembly.Constants: ''
-  Assembly.Version: $(Build.BuildNumber)
-  Nuget.Version: $(Assembly.Version)-alpha
-  DocsOutDir: $(build.artifactstagingdirectory)\Docs.build
-  NugetsOutDir: $(build.artifactstagingdirectory)\Nugets.build
-  SimulationSrcDir: $(System.DefaultWorkingDirectory)/src
-  SkipLocalDev: 'true'
+  Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
+  Drop.Native: $(System.DefaultWorkingDirectory)/xplat
 
 jobs:
 - job: macOS
@@ -34,7 +28,12 @@ jobs:
   - Linux
   condition: succeeded()
   steps:
-  - template: steps-windows.yml
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download xplat native binaries'
+    inputs:
+      artifactName: xplat
+      downloadPath: $(System.DefaultWorkingDirectory)
+  - template: steps.yml
   - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
     displayName: 'Component Detection'
     inputs:

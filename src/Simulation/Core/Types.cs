@@ -42,19 +42,19 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// Pauli Identity operator. Corresponds to Q# constant <code>PauliI</code>.
         /// </summary>
-        PauliI,
+        PauliI = 0,
         /// <summary>
         /// Pauli X operator. Corresponds to Q# constant <code>PauliX</code>.
         /// </summary>
-        PauliX,
+        PauliX = 1,
         /// <summary>
         /// Pauli Y operator. Corresponds to Q# constant <code>PauliY</code>.
         /// </summary>
-        PauliY,
+        PauliY = 3,
         /// <summary>
         /// Pauli Z operator. Corresponds to Q# constant <code>PauliZ</code>.
         /// </summary>
-        PauliZ
+        PauliZ = 2
     }
 
     /// <summary>
