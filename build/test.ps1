@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 Write-Host "##[info]Test Native simulator"
-pushd ../src/Simulation/Native/build
+pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
 ctest -C $BUILD_CONFIGURATION
 $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 popd
@@ -16,7 +16,8 @@ popd
 function Test-One {
     Param($project)
 
-    dotnet test $project `
+    Write-Host "##[info]Testing $project..."
+    dotnet test (Join-Path $PSScriptRoot $project) `
         -c $Env:BUILD_CONFIGURATION `
         -v $Env:BUILD_VERBOSITY `
         --logger trx `
@@ -26,16 +27,12 @@ function Test-One {
     $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
 }
 
-Write-Host "##[info]Testing C# code generation"
 Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
 
-Write-Host "##[info]Testing Roslyn Wrapper"
 Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
-Write-Host "##[info]Testing Tracer"
 Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
 
-Write-Host "##[info]Testing Q# Simulators"
 Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
 
 if (-not $all_ok) 

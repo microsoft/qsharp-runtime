@@ -4,7 +4,10 @@
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\))</EnlistmentRoot>
     <RunQsc>True</RunQsc>
     <RunQDocGen>False</RunQDocGen>
-    <QSimDll>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QSimDll>
+    <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/))</NativeBuildPath>
+    <QSimDll>$([MSBuild]::NormalizePath($(NativeBuildPath)/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QSimDll>
+    <QSimDll Condition="!Exists('$(QSimDll)')">$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QSimDll>
+    <QSimDll Condition="!Exists('$(QSimDll)')">$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QSimDll>
     <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/CsharpGeneration.App/bin/$(Configuration)/netcoreapp2.1/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
     <LangVersion>latest</LangVersion>
     <QsharpLangVersion>0.8</QsharpLangVersion>
@@ -36,6 +39,6 @@
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Simulation.Core.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" Condition="'$(EnlistmentRoot)src\Simulation\Simulators' != '$(MSBuildProjectDirectory)'"  />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" Condition=" '$([MSBuild]::NormalizePath($(EnlistmentRoot)src\Simulation\Simulators))' != '$(MSBuildProjectDirectory)'"  />
   </ItemGroup>
 </Project>
