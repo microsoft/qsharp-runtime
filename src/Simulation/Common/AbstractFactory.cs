@@ -12,9 +12,9 @@ namespace Microsoft.Quantum.Simulation.Common
     /// <summary>
     ///     A Base class for Factories used to create and manage instances
     ///     of objects of certain type.
-    ///     It takes of creating new instances and caching them.
+    ///     It takes on creating new instances and caching them.
     ///     It also provides a mechanism to register overrides when a given
-    ///     type should be replaces by a subclass.
+    ///     type should be replaced by a subclass.
     /// </summary>
     public abstract class AbstractFactory<T>
     {
@@ -23,9 +23,9 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Register an override for the given operation.
-        /// The original Type must be a subclass of Operation, and the replace Type must be a 
+        /// The original Type must be a subclass of Operation, and the replacement Type must be a 
         /// subclass of the Type it is overriding, otherwise an ArgumentException is thrown.
-        /// It also throws Exception if either of the parameters is null.
+        /// It also throws an Exception if either of the parameters is null.
         /// </summary>
         public virtual void Register(Type original, Type replace, Type signature = null)
         {
@@ -51,17 +51,17 @@ namespace Microsoft.Quantum.Simulation.Common
 
             if (!typeof(T).IsAssignableFrom(replace))
             {
-                throw new ArgumentException($"Invalid replace Type: can only override with a Type that extends {typeof(T).FullName}", nameof(replace));
+                throw new ArgumentException($"Invalid replacement Type: can only override with a Type that extends {typeof(T).FullName}", nameof(replace));
             }
 
             if (!signature.IsAssignableFrom(original))
             {
-                throw new ArgumentException($"Invalid original Type: the original Type must be assignamable from {signature.FullName}", nameof(original));
+                throw new ArgumentException($"Invalid original Type: the original Type must be assignable from {signature.FullName}", nameof(original));
             }
 
             if (!signature.IsAssignableFrom(replace))
             {
-                throw new ArgumentException($"Invalid replace Type: the override Type must be assignamble {signature.FullName}", nameof(replace));
+                throw new ArgumentException($"Invalid replace Type: the override Type must be assignable to {signature.FullName}", nameof(replace));
             }
 
             Type key = (original.IsGenericType && original.ContainsGenericParameters) ? original.GetGenericTypeDefinition() : original;
