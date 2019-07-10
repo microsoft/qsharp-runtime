@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
             Debug.Assert(k == numExcluded);
 
-            // The following is not really efficient, but let's wait to see it distinct can be part of the contract
+            // The following is not really efficient, but let's wait to see if distinct can be part of the contract
             // for the qubitsInArgument parameter of StartOperation call.
             // Well, we are talking about really small arrays here anyway.
             return excludedQubits.Where(q => q != null).Distinct().OrderBy(Qubit => Qubit.Id);

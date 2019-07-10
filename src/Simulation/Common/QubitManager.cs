@@ -11,7 +11,7 @@ using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
-    /// Manages Allocation, release, borrowing and return of qubits.
+    /// Manages allocation, release, borrowing and return of qubits.
     /// Reuse of qubit Ids is allowed if they have been released.
     /// Allocation and release are O(1) operations.
     /// QubitManager uses memory - sizeof(long)*qubitCapacity. qubitCapacity is passed in to the constructor.

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /// <summary>
-/// The types used C# code that is a result of the compilation from Q#.
+/// The types used to represent Q# type in the generated C# code.
 /// </summary>
 namespace Microsoft.Quantum.Simulation.Core
 {

@@ -142,7 +142,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// Verifies that the object received as argument is congruent
         /// with the Type that is expected to be applied to.
         /// </summary>
-        private static bool IsValidValue(Type targetType, object partialValues) // decides wherther partialValues are compatible with targetType
+        private static bool IsValidValue(Type targetType, object partialValues) // decides whether partialValues are compatible with targetType
         {
             if (targetType == null) return true; // targetType is a generic type
             else if (partialValues == null)
@@ -194,7 +194,7 @@ namespace Microsoft.Quantum.Simulation.Core
             return Activator.CreateInstance(tupleType,fields); 
         }
 
-        // returns a list of lenght 1 with the object inside if object is not a tuple
+        // returns a list of length 1 with the object inside if object is not a tuple
         public static object[] GetTupleValues(object arg)
         {
             if (arg == null) return new object[] { arg };
