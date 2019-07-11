@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
 
-            // If no file provided, get the `Message` primitive to generate the message into the console;
+            // If no file provided, use `Message` to generate the message into the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
                 var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
