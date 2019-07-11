@@ -1,0 +1,40 @@
+name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
+trigger:
+- master
+
+variables:
+  Build.Major: 0
+  Build.Minor: 0
+  Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
+  Drop.Native: $(System.DefaultWorkingDirectory)/xplat
+
+jobs:
+- job: macOS
+  pool: 'Hosted macOS'
+  steps:
+  - template: steps-xplat.yml
+
+
+- job: Linux
+  pool: 'Hosted Ubuntu 1604'
+  steps:
+  - template: steps-xplat.yml
+
+
+- job: Windows
+  pool: 'Hosted VS2017'
+  dependsOn:
+  - macOS
+  - Linux
+  condition: succeeded()
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download xplat native binaries'
+    inputs:
+      artifactName: xplat
+      downloadPath: $(System.DefaultWorkingDirectory)
+  - template: steps.yml
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+    inputs:
+      failOnAlert: true

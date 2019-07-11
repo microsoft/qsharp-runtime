@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Microsoft</authors>
+    <owners>QuantumEngineering, Microsoft</owners>
+
+    <license type="expression">MIT</license>
+    <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
+    <iconUrl>https://secure.gravatar.com/avatar/bd1f02955b2853ba0a3b1cdc2434e8ec.png</iconUrl>
+
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Library for testing Q# programs and algorithms using the xUnit framework.</description>
+
+    <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
+
+    <copyright>$copyright$</copyright>
+    <tags>Quantum Q# Qsharp test xunit</tags>
+
+    <dependencies>
+      <dependency id="xunit" version="2.3.1" />
+      <dependency id="Microsoft.Quantum.Development.Kit" version="$version$" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="bin\$Configuration$\**\Microsoft.Quantum.Simulation.XUnit*" target="lib" />
+  </files>
+</package>
