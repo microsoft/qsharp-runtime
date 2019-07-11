@@ -38,5 +38,5 @@ Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
 if (-not $all_ok) 
 {
-    throw "At least one project failed to compile. Check the logs."
+    throw "At least one project failed to pack. Check the logs."
 }

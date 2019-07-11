@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
     newtype P2 = ((Int, Int), Int);
 
     function TakesUdtPartial<'T, 'U> (build : ('T -> 'U), remainingArgs : 'T) : 'U {
-	    return build(remainingArgs);
+        return build(remainingArgs);
     } 
 
     operation PassingUDTConstructorTest() : Unit
@@ -67,45 +67,45 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
         AssertEqual(c2, 1);
     }
 
-	function returnUdtConstructor () : (((Int, Int), Int) -> P2) {
-		return P2;
-	}
+    function returnUdtConstructor () : (((Int, Int), Int) -> P2) {
+        return P2;
+    }
 
-	function returnPartialUdtConstructor () : ((Int, Int) -> P2) {
-		return P2((3,_),_);
-	}
+    function returnPartialUdtConstructor () : ((Int, Int) -> P2) {
+        return P2((3,_),_);
+    }
 
-	function CallReturnedUdtConstructorTest () : Unit 
-	{
-		let udt1 = (returnUdtConstructor())((1,2),3);
-		let ((a1,b1),c1) = udt1!;
+    function CallReturnedUdtConstructorTest () : Unit 
+    {
+        let udt1 = (returnUdtConstructor())((1,2),3);
+        let ((a1,b1),c1) = udt1!;
         AssertEqual(a1, 1);
         AssertEqual(b1, 2);
         AssertEqual(c1, 3);
 
-		let udt2 = (returnPartialUdtConstructor())(2,1);
-		let ((a2,b2),c2) = udt2!;
+        let udt2 = (returnPartialUdtConstructor())(2,1);
+        let ((a2,b2),c2) = udt2!;
         AssertEqual(a2, 3);
         AssertEqual(b2, 2);
         AssertEqual(c2, 1);
-	}
+    }
 
-	function ConstantArray<'T>(size : Int, item : 'T) : 'T[] {
-		mutable arr = new 'T[size];
-		for (i in 0 .. size-1) {
-			set arr w/= i <- item;
-		}
-		return arr;
-	}
+    function ConstantArray<'T>(size : Int, item : 'T) : 'T[] {
+        mutable arr = new 'T[size];
+        for (i in 0 .. size-1) {
+            set arr w/= i <- item;
+        }
+        return arr;
+    }
 
-	function UdtConstructorArrayTest () : Unit {
-		let arr = ConstantArray(5, P2);
-		for (ctor in arr) {
-			let ((a,b),c) = (ctor((1, 2), 3))!;
-			AssertEqual(a, 1);
-			AssertEqual(b, 2);
-			AssertEqual(c, 3);
-		}
-	}
+    function UdtConstructorArrayTest () : Unit {
+        let arr = ConstantArray(5, P2);
+        for (ctor in arr) {
+            let ((a,b),c) = (ctor((1, 2), 3))!;
+            AssertEqual(a, 1);
+            AssertEqual(b, 2);
+            AssertEqual(c, 3);
+        }
+    }
 }
 

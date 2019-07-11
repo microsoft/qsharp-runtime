@@ -43,8 +43,6 @@ namespace Microsoft.Quantum.Tests.StartOperation {
     }
     
     
-    // todo: change ctrls to Qubits.
-    
     operation AllVariants<'T> (gate : ('T => Unit : Adjoint, Controlled), i : 'T, ctrls : Qubits) : Unit {
         
         body (...) {

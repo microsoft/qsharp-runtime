@@ -3,7 +3,7 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 {    
-	open Microsoft.Quantum.Intrinsic;    
+    open Microsoft.Quantum.Intrinsic;    
 
     operation OneBitPrecisionEigenvalue (U : (Qubit => Unit is Adj + Ctl), P : (Qubit => Unit is Adj))
     : Bool {
@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
                 H(control);
 
                 let meas = M(control);
-				if (meas == One) { X(control); }
+                if (meas == One) { X(control); }
                 set (measuredZero, measuredOne) = (measuredZero or meas == Zero, measuredOne or meas == One);
             } 
             until (iter == 20 or measuredZero and measuredOne);
@@ -32,15 +32,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 
     }
 
-	// testing
+    // testing
 
     operation RepeatUntilSuccessTest () : Unit {
-		let evZ = OneBitPrecisionEigenvalue(Z,X);
-		let evS = OneBitPrecisionEigenvalue(S,X);
-		let evX = OneBitPrecisionEigenvalue(X,H);
-		if (not evZ or not evX or evS) {
-			fail "wrong result";		
-		}
+        let evZ = OneBitPrecisionEigenvalue(Z,X);
+        let evS = OneBitPrecisionEigenvalue(S,X);
+        let evX = OneBitPrecisionEigenvalue(X,H);
+        if (not evZ or not evX or evS) {
+            fail "wrong result";		
+        }
     }
 
 }

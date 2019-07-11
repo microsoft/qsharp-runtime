@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     /// <summary>
     /// Interface used to collect statistics ( usually in a streaming fashion ).
-    /// See <see cref="MomentsStatistic"/> and <see cref="MinMaxStatistic"/> for the examples of the implementation.
+    /// See <see cref="MomentsStatistic"/> and <see cref="MinMaxStatistic"/> for examples of the implementation.
     /// </summary>
     public interface IDoubleStatistic
     {

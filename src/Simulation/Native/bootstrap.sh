@@ -1,4 +1,6 @@
 #!/bin/bash -v
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 if [ "$(uname)" == "Darwin" ]; then
   GCC_VERSION=-7
