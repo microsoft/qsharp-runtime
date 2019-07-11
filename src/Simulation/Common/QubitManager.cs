@@ -311,7 +311,7 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        /// Borrows a number of qubits. Chooses them for among already allocated ones.
+        /// Borrows a number of qubits. Chooses them from among already allocated ones.
         /// Makes sure borrowed qubits are not on the exclusion list.
         /// Exclusion list is supposed to contain qubits that can not be borrowed, 
         /// for example those, that are being used (or could be used) in the current context.
@@ -436,7 +436,7 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        ///  Same as Borrow, but allowes array of exluded qubits to be unsorted. It is recommended to use Borrow instead.
+        ///  Same as Borrow, but allows array of exluded qubits to be unsorted. It is recommended to use Borrow instead.
         /// </summary>
         /// <param name="numToBorrow"></param>
         /// <param name="excludedQubits"></param>
