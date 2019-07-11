@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     {
         body (...)
         {
-            FailOn(Length(pauli) == 0, $"Lenght of pauli array should be at least 1");
+            FailOn(Length(pauli) == 0, $"Length of Pauli array should be at least 1");
             FailOn(Length(pauli) != Length(target), $"pauli and target must be of the same length");
             MultiPauliFlip(pauli, target, 0);
             R(PauliZ, -2.0 * angle, target[0]);
@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
                 
         controlled (ctrls, ...)
         {
-            FailOn(Length(pauli) == 0, $"Lenght of pauli array should be at least 1");
+            FailOn(Length(pauli) == 0, $"Length of Pauli array should be at least 1");
             FailOn(Length(pauli) != Length(target), $"pauli and target must be of the same length");
             MultiPauliFlip(pauli, target, 0);
             Controlled R(ctrls, (PauliZ, -2.0 * angle, target[0]));

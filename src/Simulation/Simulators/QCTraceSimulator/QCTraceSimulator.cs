@@ -212,12 +212,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// 
         /// <param name="functor">
         /// The functor (also called variant) of the operation for which the metric is requested.
-        /// If not specified, this defaults to the "body" variant.
+        /// If not specified, this defaults to the "body" specialization.
         /// </param>
         /// 
         /// <remarks>
         /// For a more detailed discussion of metrics, statistics, call graph edges and 
-        /// operation variants, see the Remarks section of the <see cref="QCTraceSimulator"/> class
+        /// operation specializations, see the Remarks section of the <see cref="QCTraceSimulator"/> class
         /// documentation.
         /// </remarks>
         public double GetMetric<TOperation>(
@@ -251,19 +251,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// is not well-defined. </exception>
         /// 
         /// <param name="functor">
-        /// The functor (also called variant) of the operation for which the metric is requested. 
+        /// The functor specialization of the operation for which the metric is requested. 
         /// If not specified, this defaults to the "body" variant.
         /// </param>
         /// 
         /// <param name="callerFunctor">
-        /// The functor (also called variant) of the caller of the operation
+        /// The functor specialization of the caller of the operation
         /// for which the metric is requested.
         /// If not specified, this defaults to the "body" variant.
         /// </param>
         ///
         /// <remarks>
         /// For a more detailed discussion of metrics, statistics, call graph edges and 
-        /// operation variants, see the Remarks section of the <see cref="QCTraceSimulator"/> class
+        /// operation specializations, see the Remarks section of the <see cref="QCTraceSimulator"/> class
         /// documentation.
         /// </remarks>
         public double GetMetric<TOperation, TCaller>(
@@ -297,13 +297,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// </typeparam>
         /// 
         /// <param name="functor">
-        /// The functor (also called variant) of the operation for which the metric is requested. 
+        /// The functor specialization of the operation for which the metric is requested. 
         /// If not specified, this defaults to the "body" variant.
         /// </param>
         /// 
         /// <remarks>
         /// For a more detailed discussion of metrics, statistics, call graph edges and 
-        /// operation variants, see the Remarks section of the <see cref="QCTraceSimulator"/> class
+        /// operation specializations, see the Remarks section of the <see cref="QCTraceSimulator"/> class
         /// documentation.
         /// </remarks>
         public double GetMetricStatistic<T>(
@@ -336,19 +336,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// </typeparam>
         /// 
         /// <param name="functor">
-        /// The functor (also called variant) of the operation for which the metric is requested. 
-        /// If not specified, this defaults to the "body" variant.
+        /// The functor specialization of the operation for which the metric is requested. 
+        /// If not specified, this defaults to the "body" specialization.
         /// </param>
         /// 
         /// <param name="callerFunctor">
-        /// The functor (also called variant) of the caller of the operation
+        /// The functor specialization of the caller of the operation
         /// for which the metric is requested. 
-        /// If not specified, this defaults to the "body" variant.
+        /// If not specified, this defaults to the "body" specialization.
         /// </param>
         /// 
         /// <remarks>
         /// For a more detailed discussion of metrics, statistics, call graph edges and 
-        /// operation variants, see the Remarks section of the <see cref="QCTraceSimulator"/> class
+        /// operation specializations, see the Remarks section of the <see cref="QCTraceSimulator"/> class
         /// documentation.
         /// </remarks>
         public double GetMetricStatistic<TOperation, TCaller>(
