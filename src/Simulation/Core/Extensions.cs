@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-// Hide this code from the debugger since this is called from Qb directly:
+// Hide this code from the debugger since this is called from Q# directly:
 #line hidden
 using System;
 using System.Diagnostics;

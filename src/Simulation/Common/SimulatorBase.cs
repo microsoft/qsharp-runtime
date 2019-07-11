@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// 
         /// Instances are cached, thus calling this method for the same Operation more than once returns the same instance.
         /// 
-        /// If the operation has no body in the Qflat file, and no override has been defined in the Simulator,
+        /// If the operation has no body in the Q# file, and no override has been defined in the Simulator,
         /// this method will throw an InvalidOperationException.
         /// </summary>
         public virtual I Get<I, T>() where T : AbstractCallable, I

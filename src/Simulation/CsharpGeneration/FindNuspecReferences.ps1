@@ -7,7 +7,7 @@
 # This is problematic because we currently don't want to create a package for every dll 
 # in the compiler.
 # On the other hand, when creating a package using nuget pack, nuget does not
-# identifies PackageReferences defined in the csproj, so all the dependencies (like
+# identify PackageReferences defined in the csproj, so all the dependencies (like
 # FParsec or F#) are not listed and the package doesn't work.
 #
 # We don't want to hardcode the list of dependencies on the .nuspec, as they can

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
-    /// Corresponds to Q# Range type. For example, the Q# value of <code>[start .. step .. end]</code> 
+    /// Corresponds to Q# Range type. For example, the Q# value of <code>start .. step .. end</code> 
     /// is of the Range type.
     /// </summary>
     public class Range : IEnumerable<long>
@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// Creates a range corresponding to Q# value [start .. step .. end]
+        /// Creates a range corresponding to Q# value <code>start .. step .. end</code>
         /// </summary>
         public Range(long start, long step, long end)
         {
