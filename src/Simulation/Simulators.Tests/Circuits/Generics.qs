@@ -597,8 +597,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics {
     }
     
     
-    // FIXME: currently, the case without the dummy variable is not supported...
-    
     function MapDefaults<'T> (fct : ('T -> Unit), dummy : 'T) : Unit {
         
         let arr = new 'T[5];

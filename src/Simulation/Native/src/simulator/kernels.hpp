@@ -534,22 +534,6 @@ bool subsytemwavefunction(std::vector<T, A1> const& wfn,
 
     return true;
 }
-
-/*
-template <class T, class A, class M>
-void apply_controlled(std::vector<T, A>& wfn, M const& mat, unsigned c, unsigned q)
-{
-  std::size_t mask = (1ull << c);
-  apply_controlled(wfn, mat, mask, q);
-}
-
-template <class T, class A, class M>
-void apply_controlled(std::vector<T, A>& wfn, M const& mat, unsigned c1, unsigned c2, unsigned q)
-{
-  std::size_t mask = (1ull << c1 | 1ull << c2);
-  apply_controlled(wfn, mat, mask, q);
-}
- */
 }
 }
 }

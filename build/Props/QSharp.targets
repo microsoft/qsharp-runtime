@@ -17,7 +17,7 @@
     <MakeDir Directories="$(QsharpSrcOutDir)" />
     <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />
     <WriteLinesToFile File="$(QsharpOutDir)qsc-command.txt" Lines=":: files ::;@(QsharpFiles);:: qsim ::;$(QSimDll);;:: references ::;@(QsReferences);:: command ::;$(QscCommand)" Overwrite="true"/>
-    <!-- Remote all existing codegen files first: -->
+    <!-- Remove all existing codegen files first: -->
     <ItemGroup>
       <QsharpCodegenFiles Include="$(QsharpSrcOutDir)**\*.*" />
     </ItemGroup>

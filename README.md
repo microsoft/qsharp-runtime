@@ -14,7 +14,16 @@ It consists of the libraries and packages needed to create and simulate quantum 
 
 See the [introduction to quantum computing](https://docs.microsoft.com/quantum/concepts/) provided with the Quantum Development Kit.
 
-## Building  ##
+
+## Installing the Quantum Development Kit
+
+**If you're looking to use Q# to write quantum applications, please see the instructions on how to get started with using the [Quantum Development Kit](https://docs.microsoft.com/quantum/install-guide/) including the Q# compiler, language server, and development environment extensions.**
+
+Please see the [installation guide](https://docs.microsoft.com/quantum/install-guide) for further information on how to get started using the Quantum Development Kit to develop quantum applications.
+You may also visit our [Quantum](https://github.com/microsoft/quantum) repository, which offers a wide variety of samples on how to write quantum based programs.
+
+
+## Building from Source ##
 
 [![Build Status](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_apis/build/status/microsoft.qsharp-runtime?branchName=master)](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/latest?definitionId=15&branchName=master)
 
