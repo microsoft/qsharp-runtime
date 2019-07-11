@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// Creates a an instance of a quantum simulator.
         /// </summary>
         /// <param name="throwOnReleasingQubitsNotInZeroState"> If set to true, the exception is thrown when trying to release qubits not in zero state. </param>
-        /// <param name="randomNumberGeneratorSeed"> Seed for the random number generator used by a simulator for measurement outcomes and Primitives.Random operation. </param>
+        /// <param name="randomNumberGeneratorSeed"> Seed for the random number generator used by a simulator for measurement outcomes and the Random operation. </param>
         /// <param name="disableBorrowing"> If true, Borrowing qubits will be disabled, and a new qubit will be allocated instead every time borrowing is requested. Performance may improve. </param>
         public QuantumSimulator(
             bool throwOnReleasingQubitsNotInZeroState = true,
@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
-        ///     Makes sure the angle for a rotation or exp operation is not NaN or Infity.
+        ///     Makes sure the angle for a rotation or exp operation is not NaN or Infinity.
         /// </summary>
         static void CheckAngle(double angle)
         {
@@ -96,7 +96,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
-        ///     Makes sure all qubits are valid as parameter of a primitive quantum operation. In particular it checks that 
+        ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
         /// </summary>
@@ -119,14 +119,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
 
         /// <summary>
-        ///     Makes sure all qubits are valid as parameter of a primitive quantum operation. In particular it checks that 
+        ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> targets)
         {
-            if (targets == null) throw new ArgumentNullException(nameof(targets), "Trying to perform a primitive operation on a null Qubit array.");
-            if (targets.Length == 0) throw new ArgumentNullException(nameof(targets), "Trying to perform a primitive operation on an empty Qubit array.");
+            if (targets == null) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on a null Qubit array.");
+            if (targets.Length == 0) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on an empty Qubit array.");
 
             bool[] used = new bool[((QSimQubitManager)QubitManager).MaxId];
 
@@ -139,7 +139,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
-        ///     Makes sure all qubits are valid as parameter of a primitive quantum operation. In particular it checks that 
+        ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
         /// </summary>

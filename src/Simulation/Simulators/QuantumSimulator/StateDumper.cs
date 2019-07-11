@@ -69,7 +69,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
-        /// A simple implemntation of a <see cref="StateDumper"/>. It outputs the
+        /// A simple implementation of a <see cref="StateDumper"/>. It outputs the
         /// a string representation of the state to the given channel.
         /// </summary>
         public class SimpleDumper : StateDumper
@@ -145,7 +145,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 $"{FormatMagnitude(magnitude, angle)}{FormatAngle(magnitude, angle)}";
 
             /// <summary>
-            /// Returns a string for the amplitude's cartersian representation (real + imagnary).
+            /// Returns a string for the amplitude's cartesian representation (real + imagnary).
             /// </summary>
             public virtual string FormatCartesian(double real, double img) =>
                 $"{real,9:F6} + {img,9:F6} i";

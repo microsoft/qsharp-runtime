@@ -9,7 +9,7 @@ using System.Linq;
 #line hidden
 namespace Microsoft.Quantum.Simulation.Core
 {
-    // Something in Qb that can be called but does not return a value.
+    // Something in Q# that can be called but does not return a value.
     public partial interface ICallable<in I, out O> : ICallable
     {
         O Apply(I args);

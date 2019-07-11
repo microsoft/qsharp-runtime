@@ -4,7 +4,7 @@
 namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
-    /// Variant or a functor of the operation appearing in the operation call graph
+    /// Functor specialization of the operation appearing in the operation call graph
     /// </summary>
     public enum OperationFunctor
     {
@@ -13,15 +13,15 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         Body,
         /// <summary>
-        /// Adjoint variant of the operation, defined by Q# keyword <code>adjoint</code>
+        /// Adjoint specialization of the operation, defined by Q# keyword <code>adjoint</code>
         /// </summary>
         Adjoint,
         /// <summary>
-        /// Controlled variant of the operation, defined by Q# keyword <code>controlled</code>
+        /// Controlled specialization of the operation, defined by Q# keyword <code>controlled</code>
         /// </summary>
         Controlled,
         /// <summary>
-        /// Controlled Adjoint variant of the operation, defined by
+        /// Controlled Adjoint specialization of the operation, defined by
         /// Q# keyword <code>controlled adjoint</code>
         /// </summary>
         ControlledAdjoint

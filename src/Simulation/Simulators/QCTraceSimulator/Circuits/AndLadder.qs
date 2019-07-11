@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     operation AndLadder (controls : Qubit[], targets : Qubit[]) : Unit
     is Adj {
 
-        FailOn(Length(controls) != Length(targets) + 1, $"length(controls) must be equal to lenth(target) + 1");
+        FailOn(Length(controls) != Length(targets) + 1, $"Length(controls) must be equal to Length(target) + 1");
         FailOn(Length(controls) < 2, $"function is underfined for less then 2 controls");
         CCX(controls[0], controls[1], targets[0]);
             
