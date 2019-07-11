@@ -78,11 +78,19 @@ All unit tests are part of the `Simulation.sln` solution. To run the tests:
 If you have feedback about the Q# simulators or any other runtime component, please let us know by filing a [new issue](https://github.com/microsoft/qsharp-runtime/issues/new)!
 If you have feedback about some other part of the Microsoft Quantum Development Kit, please see the [contribution guide](https://docs.microsoft.com/quantum/contributing/) for more information.
 
+
+## Reporting Security Issues
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security
+Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
+receive a response within 24 hours. If for some reason you do not, please follow up via
+email to ensure we received your original message. Further information, including the
+[MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
+the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+
+
 ## Legal and Licensing ##
 
-### Data Collection ###
-
-The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's privacy statement. Our privacy statement is located at https://go.microsoft.com/fwlink/?LinkID=824704. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 
 ## Contributing ##
 
