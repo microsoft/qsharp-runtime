@@ -11,13 +11,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
     /// <summary>
     ///     Verifies that all operations of the one-qubit Unitary work.
-    ///     It recieves as parameter the Unitary (notice that any gate can be converted to Unitary
+    ///     It receives as parameter the Unitary (notice that any gate can be converted to Unitary
     ///     using Partial Application), a start state that the qubit should be initialized with,
     ///     and the qubit state that the Qubit should be at
     ///     once the Unitary has been applied.
     ///     The verification applies the gate and asserts the qubit state. Then it applies
-    ///     the adjoint and verifies the qubit is back to Zero.
-    ///     then it tests controlled with different number of control qubits, also verifying that
+    ///     the Adjoint and verifies the qubit is back to Zero.
+    ///     then it tests Controlled with different number of control qubits, also verifying that
     ///     Adjoint Controlled works.
     /// </summary>
     operation VerifyUnitary (gate : (Qubit => Unit : Adjoint, Controlled), start : (Pauli, Result), expected : (Complex, Complex)) : Unit {

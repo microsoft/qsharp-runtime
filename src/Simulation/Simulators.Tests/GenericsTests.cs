@@ -256,7 +256,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     var gen = new GenericCallable(s, typeof(Gen0<>));
                     var ctrl = gen.Controlled;
                     var partial = ctrl.Partial((new QArray<Qubit>(), _));
-                    // FIXME: [BH] I *THINK* IT'S OK TO GET QArray INSTEAD OF IQArray HERE, BUT DOUBLE CHECK!
                     Assert.Same(typeof((QArray<Qubit>, long)), partial.IdentifyBaseArgsType(typeof(long)));
                     Assert.Same(typeof((QArray<Qubit>, string)), partial.IdentifyBaseArgsType(typeof(string)));
                     Assert.Same(typeof((QArray<Qubit>, Qubit)), partial.IdentifyBaseArgsType(typeof(Qubit)));
@@ -744,7 +743,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             });
         }
 
-        [Fact] // FIXME: remove dummy in MapDefaults in Generics.qb to make this test meaningful! (currently this is not supported in the simulation core)
+        [Fact] // FIXME: remove dummy in MapDefaults in Generics.qs to make this test meaningful! (currently this is not supported in the simulation core)
         public void GenericsHiddenGenericParameters() 
         {
             Helper.RunWithMultipleSimulators((s) =>

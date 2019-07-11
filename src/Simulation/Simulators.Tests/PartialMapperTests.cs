@@ -158,7 +158,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 // If too many parameters, are ignored:
                 TestOneMapping(expected, Result.One, (Result.One, (1, 2.0), (3, (op, qubits)), qubit));
                 
-                // Parameters missmatch
+                // Parameters mismatch
                 TestOneMappingError<TestTuple, (double, double), MissingMethodException>((2.0, 3.0), (Result.One, _, (3, (op, qubits)), qubit)); 
                 TestOneMappingError<TestTuple, int, MissingMethodException>(1, (_, (1, 2.0), (3, (op, qubits)), qubit)); 
                 TestOneMappingError<TestTuple, int, MissingMethodException>(1, (Result.One, _, (3, (op, qubits)), qubit));
@@ -167,7 +167,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 // Too little parameters
                 TestOneMappingError<TestTuple, Result, InvalidOperationException>(Result.One, (_, _, (3, (op, qubits)), qubit));
 
-                // Both, parameters missmathc and too little parameters
+                // Both, parameters mismatch and too little parameters
                 TestOneMappingError<TestTuple, int, InvalidOperationException>(1, (_, _, (3, (op, qubits)), qubit)); 
             });
         }

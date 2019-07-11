@@ -301,7 +301,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         }
 
         /// <summary>
-        /// Implements Qb standard library assert
+        /// Implements the Q# standard library callable Assert```
         /// </summary>
         public void Assert(IQArray<Pauli> observable, IQArray<Qubit> qubits, Result value)
         {
@@ -309,7 +309,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         }
 
         /// <summary>
-        /// Implements Qb standard library assertProb
+        /// Implements the Q# standard library callable AssertProb
         /// </summary>
         public void AssertProb(IQArray<Pauli> observable, IQArray<Qubit> qubits, Result value, double probability)
         {
