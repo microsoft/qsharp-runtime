@@ -224,7 +224,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         }
 
         /// <summary>
-        /// Implements Qb standard library function Measure.
+        /// Implements the Q# standard library callable Measure.
         /// Not all measurements considered primitive operations. The measurements
         /// that are primitive operations are listed in
         /// MetricsCalculatorConfiguration.MeasurementToPrimitiveOperation
