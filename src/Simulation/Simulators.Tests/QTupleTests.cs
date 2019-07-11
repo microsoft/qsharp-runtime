@@ -183,7 +183,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var dataB = ((1L, 2L), (q6, (3L, (q4, q6)), 3.5));
             var dataC = (q5, new TupleB(dataB));
             var dataD = new QArray<Qubit>(q1, q2, q3, q4, q6);
-            var dataE = (4L, (IQArray<Qubit>)qubits); // FIXME: [BH] CHECK IF THIS IS OK
+            var dataE = (4L, (IQArray<Qubit>)qubits); 
             var dataF = op;
             var dataG = (q3, new TupleF(dataF), new TupleC(dataC), new TupleD(dataD));
             var dataQ = ((1L, 2L), (q1, (3L, (q2, q3)), 3.5));

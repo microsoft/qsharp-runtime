@@ -145,7 +145,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 IgnorableAssert.Disable();
                 try
                 {
-                    //We have to call the method in the same tread for IgnorableAssert.Disable() to work 
+                    //We have to call the method in the same thread for IgnorableAssert.Disable() to work 
                     s.Get<SimpleRangeTest>().Apply(QVoid.Instance);
                 }
                 finally

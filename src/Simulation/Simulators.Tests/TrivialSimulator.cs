@@ -7,7 +7,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     /// 
     /// This is a trivial implementation of a Simulator. Only used for unittesting. 
-    /// Not apt to simulate any circuits as it implements no Primitive Gates.
+    /// Not apt to simulate any circuits as it implements no Intrinsic Gates.
     /// 
     public class TrivialSimulator : SimulatorBase
     {
