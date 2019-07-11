@@ -155,7 +155,7 @@ Cell[BoxData[""], "Input",
 
 Cell[CellGroupData[{
 
-Cell["PauliExpectation.qb", "Chapter",
+Cell["PauliExpectation.qs", "Chapter",
  CellChangeTimes->{3.7184788834158244`*^9, 3.7186466473395104`*^9}],
 
 Cell[CellGroupData[{
