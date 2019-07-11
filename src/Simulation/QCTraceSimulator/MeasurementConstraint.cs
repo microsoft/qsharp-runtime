@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             /// </summary>
             Assert,
             /// <summary>
-            /// Indicated that constraint corresponds to the user wanting to enforce
+            /// Indicates that constraint corresponds to the user wanting to enforce
             /// the measurement outcome for debugging purposes. User does not know that
             /// this particular outcome will happen, but they want to observe execution path
             /// when this outcome happens.
