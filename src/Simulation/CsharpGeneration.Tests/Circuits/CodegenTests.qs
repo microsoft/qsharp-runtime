@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Testing {
     }
     
     
-    // A duplicated H, yeah, just in case...
+    // A duplicated H, just in case...
     operation H (q1 : Qubit) : Unit {
         
     }

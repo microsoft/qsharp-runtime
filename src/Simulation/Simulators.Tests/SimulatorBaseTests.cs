@@ -207,7 +207,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 subject.Get<Gen<string>>();
             });
 
-            // TODO: #829: because we can't check dependencies, this
+            // TODO: because we can't check dependencies, this
             // is not throwing an Exception, even though Gen depends on X:
             var gen1 = subject.Get<DependsOnGen>();
             Assert.NotNull(gen1);

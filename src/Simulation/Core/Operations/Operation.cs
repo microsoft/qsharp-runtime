@@ -52,7 +52,6 @@ namespace Microsoft.Quantum.Simulation.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public abstract Func<I, O> Body { get; }
 
-        // TODO (Task #817): ADD STATIC ANALYZER THAT RETURNS AN ERROR IF A UNITARY DOES NOT PROVIDE AN OVERRIDE OF AdjointBody
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public virtual Func<I, QVoid> AdjointBody => throw new NotImplementedException();
 

@@ -1,3 +1,6 @@
+:: Copyright (c) Microsoft Corporation. All rights reserved.
+:: Licensed under the MIT License.
+
 :: Initializes the current repo
 :: and prepares it for build
 @echo off
