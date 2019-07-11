@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     /// <summary>
     /// The interface used to receive notifications about events from <see cref="QCTraceSimulatorCore"/>.
-    /// See <see cref="DistinctInputsChecker"/> for a simple example of the class implementing this interface. 
+    /// See <see cref="DistinctInputsChecker"/> for a simple example of a class implementing this interface. 
     /// </summary>
     public interface IQCTraceSimulatorListener
     {
