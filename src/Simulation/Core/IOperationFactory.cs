@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Core
         I Get<I, T>() where T : AbstractCallable, I;
 
         /// <summary>
-        ///     Executes an Operation. The execution maybe asynchronous, 
+        ///     Executes an Operation. The execution may be asynchronous, 
         ///     so it returns a Task.
         /// </summary>
         Task<O> Run<T, I, O>(I args) where T : AbstractCallable, ICallable;

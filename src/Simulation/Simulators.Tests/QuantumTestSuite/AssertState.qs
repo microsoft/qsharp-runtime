@@ -25,9 +25,9 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
         for (i in 0 .. Length(observable) - 1) {
             
             if (observable[i] != PauliI) {
-                set paulies = paulies w/ nonIdCount <- observable[i];
-                set qubitsPr = qubitsPr w/ nonIdCount <- qubits[i];
-                set nonIdCount = nonIdCount + 1;
+                set paulies w/= nonIdCount <- observable[i];
+                set qubitsPr w/= nonIdCount <- qubits[i];
+                set nonIdCount += 1;
             }
         }
         

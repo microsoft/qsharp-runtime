@@ -33,8 +33,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             // Test reuse of deallocated qubits
             qm.Release(qa1[1]);
-            // Note: The Qb compiler today cannot release a single qubit that has been allocated as part of a group. 
-            //       But QubitManager supports this anyway.
 
             Qubit q2 = qm.Allocate();
             Assert.True(q2.Id == 2);
