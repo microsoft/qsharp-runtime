@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Core
         
         /// <summary>
         /// Used by UDTs that extend Qubit. 
-        /// Sets id to MaxValue for null qubitsÑ 0 is typically the default qubit.id.
+        /// Sets id to MaxValue for null qubits. 0 is typically the default qubit.id.
         /// </summary>
         public Qubit(Qubit q) : this(q?.Id ?? int.MaxValue) {}
 

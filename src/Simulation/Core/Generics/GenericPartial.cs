@@ -10,7 +10,7 @@ using static Microsoft.Quantum.Simulation.Core.PartialMapper;
 namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
-    ///     Represents the result of doing a partial applicatin to an operation whose
+    ///     Represents the result of doing a partial application to an operation whose
     ///     input Type is not resolved until it gets Applied at runtime.
     /// </summary>
     [DebuggerTypeProxy(typeof(GenericPartial.DebuggerProxy))]

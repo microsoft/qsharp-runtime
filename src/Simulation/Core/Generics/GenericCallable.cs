@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Microsoft.Quantum.Simulation.Core
 {    
     /// <summary>
-    ///     Represents an operation that whose
+    ///     Represents an operation whose
     ///     input and output Types are not resolved until it gets Applied at runtime.
     /// </summary>
     public partial interface ICallable : IApplyData
@@ -205,8 +205,8 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// There are situations that the type parameters of a Generic operation can't be resolved, becuase 
-        /// the input tuple does not uses them directly, for example, in Bind<'T> the 'T is in the arguments 
+        /// There are situations that the type parameters of a Generic operation can't be resolved, because 
+        /// the input tuple does not use them directly, for example, in Bind<'T> the 'T is in the arguments 
         /// of the input operations which in turn are just passed in as ICallables, with no type info.
         /// In this scenario, we simply use object as 'T as we just pass it down.
         /// </summary>
@@ -223,7 +223,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         /// <summary>
         /// Populates the generic Type Arguments based on the resolved type.
-        /// Basically if the resolved type comes from a generic type, then what ever resolved values it 
+        /// Basically if the resolved type comes from a generic type, then whatever resolved values it 
         /// had are applied to original.
         /// This method is the one that computes what the Type the GenericParameter should take based on the input argument.
         /// It recursively checks if the Operations is expecting a
