@@ -25,7 +25,10 @@ function Pack-One() {
         -Verbosity detailed `
         $include_references
 
-    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
+    if  ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to pack $project"
+        $script:all_ok = $False
+    }
 }
 
 

@@ -8,7 +8,10 @@ $all_ok = $True
 
 Write-Host "##[info]Build Native simulator"
 cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION
-$script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
+if  ($LastExitCode -ne 0) {
+    Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
+    $script:all_ok = $False
+}
 
 
 function Build-One {
@@ -25,7 +28,10 @@ function Build-One {
         /property:Version=$Env:ASSEMBLY_VERSION `
         /property:QsharpDocsOutDir=$Env:DOCS_OUTDIR
 
-    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
+    if  ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to build $project."
+        $script:all_ok = $False
+    }
 }
 
 Build-One 'publish' '../src/Simulation/CsharpGeneration.App'

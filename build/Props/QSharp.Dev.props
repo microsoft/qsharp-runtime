@@ -5,9 +5,13 @@
     <RunQsc>True</RunQsc>
     <RunQDocGen>False</RunQDocGen>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/))</NativeBuildPath>
-    <QSimDll>$([MSBuild]::NormalizePath($(NativeBuildPath)/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QSimDll>
-    <QSimDll Condition="!Exists('$(QSimDll)')">$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QSimDll>
-    <QSimDll Condition="!Exists('$(QSimDll)')">$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QSimDll>
+    <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
+    <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>
+    <QsimDllWindows>$([MSBuild]::NormalizePath($(NativeBuildPath)/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QsimDllWindows>
+    <QSimDll Condition="Exists('$(QsimDllMac)')">$(QsimDllMac)</QSimDll>
+    <QSimDll Condition="Exists('$(QsimDllLinux)')">$(QsimDllLinux)</QSimDll>
+    <QSimDll Condition="Exists('$(QsimDllWindows)')">$(QsimDllWindows)</QSimDll>
+    <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindows)</QSimDll>
     <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/CsharpGeneration.App/bin/$(Configuration)/netcoreapp2.1/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
     <LangVersion>latest</LangVersion>
     <QsharpLangVersion>0.8</QsharpLangVersion>

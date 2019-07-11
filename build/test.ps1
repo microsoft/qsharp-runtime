@@ -9,7 +9,10 @@ $all_ok = $True
 Write-Host "##[info]Test Native simulator"
 pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
 ctest -C $BUILD_CONFIGURATION
-$script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
+if  ($LastExitCode -ne 0) {
+    Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
+    $script:all_ok = $False
+}
 popd
 
 
@@ -24,7 +27,10 @@ function Test-One {
         /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
         /property:Version=$Env:ASSEMBLY_VERSION
 
-    $script:all_ok = ($LastExitCode -eq 0) -and $script:all_ok
+    if  ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to test $project"
+        $script:all_ok = $False
+    }
 }
 
 Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
