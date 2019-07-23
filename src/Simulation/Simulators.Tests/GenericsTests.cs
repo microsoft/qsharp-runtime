@@ -124,13 +124,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.Same(typeof(ControlledOperation<((Qubit, bool), Result), QVoid>), gen0.Controlled.FindCallable(typeof((QArray<Qubit>, ((TestQubit, bool), Result))), typeof(QVoid)).GetType());
                 Assert.Same(typeof(ControlledOperation<long, QVoid>), gen0.Controlled.FindCallable(typeof((QArray<Qubit>, long)), typeof(QVoid)).GetType()); // Twice to check for caching.
 
-                // A bunch of Debug.Asserts are hit, but Controlled will create something even if given the wrong type of Input/output, 
-                // here just for check backwards compatibility. Evaluate if we need to change this behavior.
-                OperationsTestHelper.IgnoreDebugAssert(() =>
-                {
-                    Assert.Same(typeof(ControlledOperation<int, QVoid>), gen0.Controlled.FindCallable(typeof(Result), typeof(QVoid)).GetType());
-                });
-
                 var gen2 = new GenericCallable(s, typeof(Gen2<,>));
                 var r2 = gen2.Controlled.FindCallable(typeof((LittleEndian, (QArray<Qubit>, long, bool))), typeof(QVoid)) as ControlledOperation<(QArray<Qubit>, long, bool), QVoid>;
                 Assert.NotNull(r2);
