@@ -1,11 +1,10 @@
-//  
+// dotnet run -- -i operation.qs -r /home/cyl/q/qsharp-runtime/src/Simulation/Intrinsic/bin/Debug/netstandard2.0/Microsoft.Quantum.Intrinsic.dll -o thing
 namespace Microsoft.Hack {
     open Microsoft.Quantum.Intrinsic;
-    
+
     operation Foo() : Int {
  
         using (q = Qubit()) {
-            // /home/cyl/q/qsharp-runtime/src/Simulation/HackathonWalker/operation.qs(6,13): error QS5022: No identifier with that name exists.
             H(q);
     
             if (M(q) == Zero) {

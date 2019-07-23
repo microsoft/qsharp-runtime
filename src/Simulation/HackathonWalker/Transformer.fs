@@ -1438,73 +1438,22 @@ module HackathonTransformer =
     let generate fileName allQsElements = 
         allQsElements 
         |> buildSyntaxTree fileName
-        |> formatSyntaxTree
+        |> formatSyntaxTree   
 
-
-       
-
-    // type private ConditionalStatementChanger(stm) = 
-    // inherit StatementKindTransformation<StatementCounter>(stm)
-
-    // override this.onConditionalStatement (node:QsConditionalStatement) =
-    //     printfn "hello"
-    //     base.onConditionalStatement node
-
-    // and private StatementCounter(counter) = 
-    // inherit ScopeTransformation<StatementKindCounter, ExpressionCounter>
-    //     (Func<_,_>(fun s -> new StatementKindCounter(s :?> StatementCounter, counter)), new ExpressionCounter(counter))
-
-
-
-    type private Counter () = 
-        member val callsCount = 0 with get, set
-        member val opsCount = 0 with get, set
-        member val funCount = 0 with get, set
-        member val udtCount = 0 with get, set
-        member val forCount = 0 with get, set
-        member val ifsCount = 0 with get, set            
-
-    type private StatementKindCounter(stm, counter : Counter) = 
-        inherit StatementKindTransformation<StatementCounter>(stm)
+    type private ConditionalChangerStatement(stm) = 
+        inherit StatementKindTransformation<ConditionalChangerScope>(stm)
 
         override this.onConditionalStatement (node:QsConditionalStatement) =
-            counter.ifsCount <- counter.ifsCount + 1
+            printfn "found an if!"
             base.onConditionalStatement node
-            
-        override this.onForStatement (node:QsForStatement) =
-            counter.forCount <- counter.forCount + 1
-            base.onForStatement node
 
-    and private StatementCounter(counter) = 
-        inherit ScopeTransformation<StatementKindCounter, ExpressionCounter>
-                (Func<_,_>(fun s -> new StatementKindCounter(s :?> StatementCounter, counter)), new ExpressionCounter(counter))
-                    
-    and private ExpressionKindCounter(ex, counter : Counter) = 
-        inherit ExpressionKindTransformation<ExpressionCounter>(ex)
+    and private ConditionalChangerScope() = 
+        inherit ScopeTransformation<ConditionalChangerStatement, NoExpressionTransformations>
+                (Func<_,_>(fun s -> new ConditionalChangerStatement(s :?> ConditionalChangerScope)), 
+                 new NoExpressionTransformations())
 
-        override this.beforeCallLike (op,args) =
-            counter.callsCount <- counter.callsCount + 1
-            (op,args)
+    type private CondtionalChangerSyntaxTree() = 
+        inherit SyntaxTreeTransformation<ConditionalChangerScope>(new ConditionalChangerScope())
 
-    and private ExpressionCounter(counter) = 
-        inherit ExpressionTransformation<ExpressionKindCounter>
-                (new Func<_,_>(fun e -> new ExpressionKindCounter(e :?> ExpressionCounter, counter)))
-
-
-    type private SyntaxCounter(counter) = 
-        inherit SyntaxTreeTransformation<StatementCounter>(new StatementCounter(counter))
-
-        override this.beforeCallable (node:QsCallable) =
-            match node.Kind with
-            | Operation ->       counter.opsCount <- counter.opsCount + 1
-            | Function  ->       counter.funCount <- counter.funCount + 1
-            | TypeConstruStatementCounterctor -> ()
-            node
-        
-        override this.onType (udt:QsCustomType) =
-            counter.udtCount <- counter.udtCount + 1
-            base.onType udt
     let ``basic walk`` (allQsElements : seq<QsNamespace>) = 
-        let counter = new Counter()
-        allQsElements |> Seq.map (SyntaxCounter(counter)).Transform |> Seq.toList |> ignore
-        printfn "counter : %i" counter.ifsCount
+        allQsElements |> Seq.map (CondtionalChangerSyntaxTree()).Transform |> Seq.toList |> ignore
