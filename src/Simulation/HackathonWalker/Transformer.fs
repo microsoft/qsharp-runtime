@@ -1440,20 +1440,28 @@ module HackathonTransformer =
         |> buildSyntaxTree fileName
         |> formatSyntaxTree   
 
-    type private ConditionalChangerStatement(stm) = 
+
+    type private ConditionalChangerStatement(stm, ctx : CodegenContext) = 
         inherit StatementKindTransformation<ConditionalChangerScope>(stm)
 
         override this.onConditionalStatement (node:QsConditionalStatement) =
             printfn "found an if!"
+            printfn "%s" (Option.get ctx.fileName)
             base.onConditionalStatement node
+            // let cases = stm.ConditionalBlocks |> Seq.map (fun (c, b) -> 
+            // let cond, block = this.onPositionedBlock (Some c, b)
+            //     cond |> Option.get, block)
+            // let defaultCase = stm.Default |> QsNullable<_>.Map (fun b -> this.onPositionedBlock (None, b) |> snd)
+            // QsConditionalStatement.New (cases, defaultCase) |> QsConditionalStatement
 
-    and private ConditionalChangerScope() = 
+    and private ConditionalChangerScope(ctx) = 
         inherit ScopeTransformation<ConditionalChangerStatement, NoExpressionTransformations>
-                (Func<_,_>(fun s -> new ConditionalChangerStatement(s :?> ConditionalChangerScope)), 
+                (Func<_,_>(fun s -> new ConditionalChangerStatement(s :?> ConditionalChangerScope, ctx)), 
                  new NoExpressionTransformations())
 
-    type private CondtionalChangerSyntaxTree() = 
-        inherit SyntaxTreeTransformation<ConditionalChangerScope>(new ConditionalChangerScope())
+    type private CondtionalChangerSyntaxTree(ctx) = 
+        inherit SyntaxTreeTransformation<ConditionalChangerScope>(new ConditionalChangerScope(ctx))
 
-    let ``basic walk`` (allQsElements : seq<QsNamespace>) = 
-        allQsElements |> Seq.map (CondtionalChangerSyntaxTree()).Transform |> Seq.toList |> ignore
+    let ``basic walk`` (allQsElements : seq<QsNamespace>) =
+        let globalContext = createContext (Some "imafilename") allQsElements
+        allQsElements |> Seq.map (CondtionalChangerSyntaxTree(globalContext)).Transform |> Seq.toList |> ignore
