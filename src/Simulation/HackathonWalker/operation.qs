@@ -2,33 +2,37 @@
 namespace Microsoft.Hack {
     open Microsoft.Quantum.Intrinsic;
 
+    operation ClasicallyControlled<'T>(q: Qubit, op: ('T => Unit), arg: 'T) : Unit {
+        if (M(q) == One) {
+            op(arg);
+        }
+    }
+
     operation Foo() : Int {
  
-        using (q = Qubit()) {
-            H(q);
+        using ((q1, q2) = (Qubit(), Qubit())) {
+            H(q1);
     
-            if (M(q) == Zero) {
-                return 1;
+            if (M(q1) == One) {
+                X(q2);
             }
         }
     
         return 0;
     }
+
+
 }
 
 // replace with
 
 // namespace Microsoft.Hack {
-//     operation __onTrue() : Unit {
-//         return 1;
-//     }
- 
 //     operation Foo() : Int {
  
 //         using(q = Qubit()){
 //             H(q);
  
-//             Microsoft.Hack.ClassicallyControlled(q, __onTrue)
+//             Microsoft.Hack.ClassicallyControlled(q1, X, q2)
 //         }
  
 //         return 0;
