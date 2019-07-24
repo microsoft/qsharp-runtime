@@ -2,7 +2,7 @@
 namespace Microsoft.Hack {
     open Microsoft.Quantum.Intrinsic;
 
-    operation ClasicallyControlled<'T>(q: Qubit, op: ('T => Unit), arg: 'T) : Unit {
+    operation ClasicallyControlled(q: Qubit, op: Operator, arg: Qubit) : Unit {
         if (M(q) == One) {
             op(arg);
         }
