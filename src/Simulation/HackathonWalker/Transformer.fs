@@ -1473,6 +1473,17 @@ module HackathonTransformer =
             let exprKind = CallLikeExpression (functionName, ImmutableQubitWithName "bbb"  ) // QsExpressionKind<'Expr, ...>
             let inferredInfo = InferredExpressionInformation.New (false, // IsMutable
                                                                    true) // HasLocalQuantumDependency)
+
+            
+            let exTypeKind = 
+                let all   = node.ConditionalBlocks
+                let (cond, thenBlock) = all.[0]
+                                    // body is a QsScope already
+                let thenStatements  = thenBlock.Body.Statements
+                if(all.Length > 1) then ArgumentException "Only supports one if block (no else statements)" |> raise
+                if(thenStatements.Length > 1) then ArgumentException "Only supports one operator in block (create a helper operator definition if multiple are required)" |> raise
+                let experOp = thenStatements.[0].Statement
+                //QsTypeKind.Operation (QsTypeKind.Qubit |> ResolvedType.New, QsTypeKind.UnitType |> ResolvedType.New)
             // let accumulatedDiagnostics = new List<QsCompilerDiagnostic>() 
             // let addDiagnostic = accumulatedDiagnostics.Add
             // /// Builds a QsCompilerDiagnostic with the given error code and range.
@@ -1480,8 +1491,16 @@ module HackathonTransformer =
             // /// Builds a QsCompilerDiagnostic with the given warning code and range.
             // let addWarning code range = range |> QsCompilerDiagnostic.Warning code |> addDiagnostic
 
-
-            TypedExpression.New (exprKind, Null, Null, inferredInfo, QsRangeInfo.Null) 
+                match experOp with
+                | QsExpressionStatement expr -> expr.ResolvedType //todo errors if it isn't a statment
+                | _ -> ArgumentException "Statement was not right" |> raise
+            let dictionaryType  = 
+                let tpResolutions = seq [exTypeKind] |> Seq.map (fun entry -> 
+                    match entry.Resolution with
+                        | TypeParameter thisTypeParameter -> thisTypeParameter
+                    , entry)
+                tpResolutions.ToImmutableDictionary(fst, snd)
+            TypedExpression.New (exprKind, dictionaryType, exTypeKind, inferredInfo, QsRangeInfo.Null) 
 
             // base.onConditionalStatement node
             // let cases = stm.ConditionalBlocks |> Seq.map (fun (c, b) -> 
@@ -1489,7 +1508,18 @@ module HackathonTransformer =
             //     cond |> Option.get, block)
             // let defaultCase = stm.Default |> QsNullable<_>.Map (fun b -> this.onPositionedBlock (None, b) |> snd)
             // QsConditionalStatement.New (cases, defaultCase) |> QsConditionalStatement
-            // CallLikeExpression 
+       
+            //let res = if (experOp :? QsExpressionKind.QsExpressionStatement) then experOp :?> QsExpressionStatement else null
+            
+            //let experInThen = [ 
+                //for i in 1 .. thenStatements.Length -> 
+                //let (cond, block) = all.[i] ]
+                //cond |> buildExpression, block.Body |> buildBlock ]
+                //create a Call statement to generated method
+                //must take no parameters (for now, later can take parameters, just nothing mutable
+            QsConditionalStatement node
+
+
 
     and private ConditionalChangerScope(ctx) = 
         inherit ScopeTransformation<ConditionalChangerStatement, NoExpressionTransformations>
