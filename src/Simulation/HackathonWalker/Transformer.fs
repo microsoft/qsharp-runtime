@@ -1446,7 +1446,7 @@ module HackathonTransformer =
 
         override this.onConditionalStatement (node:QsConditionalStatement) =
             printfn "found an if!"
-            printfn "%s" <| Option.get ctx.fileName
+            // printfn "%s" <| Option.get ctx.fileName
 
 
             let toExpr (ex : QsExpressionKind<QsExpression, QsSymbol, QsType>) =
@@ -1482,7 +1482,7 @@ module HackathonTransformer =
                 let thenStatements  = thenBlock.Body.Statements
                 if(all.Length > 1) then ArgumentException "Only supports one if block (no else statements)" |> raise
                 if(thenStatements.Length > 1) then ArgumentException "Only supports one operator in block (create a helper operator definition if multiple are required)" |> raise
-                let experOp = thenStatements.[0].Statement
+                // let experOp = thenStatements.[0].Statement
                 //QsTypeKind.Operation (QsTypeKind.Qubit |> ResolvedType.New, QsTypeKind.UnitType |> ResolvedType.New)
             // let accumulatedDiagnostics = new List<QsCompilerDiagnostic>() 
             // let addDiagnostic = accumulatedDiagnostics.Add
@@ -1491,17 +1491,15 @@ module HackathonTransformer =
             // /// Builds a QsCompilerDiagnostic with the given warning code and range.
             // let addWarning code range = range |> QsCompilerDiagnostic.Warning code |> addDiagnostic
 
-                match experOp with
-                | QsExpressionStatement expr -> expr.Expression |> function
-                    | CallLikeExpression (lhs, rhs) -> rhs.ResolvedType //todo errors if it isn't a statment
-                | _ -> ArgumentException "Statement was not right" |> raise
-            let dictionaryType  = 
-                let tpResolutions = seq [] |> Seq.map (fun entry -> 
-                    match entry.Resolution with
-                        | TypeParameter thisTypeParameter -> thisTypeParameter
-                    , entry)
-                tpResolutions.ToImmutableDictionary(fst, snd)
-            QsExpressionStatement <| TypedExpression.New (exprKind, dictionaryType, QsTypeKind.UnitType |> ResolvedType.New, inferredInfo, QsRangeInfo.Null)  //exTypeKind here is return type
+                // this is supposed to get the typeparameters (generic params)
+                // match experOp with
+                // | QsExpressionStatement expr -> expr.Expression |> function
+                //     | CallLikeExpression (lhs, rhs) -> rhs.ResolvedType //todo errors if it isn't a statment
+                // | _ -> ArgumentException "Statement was not right" |> raise
+          
+
+            let tpResolutions = (new Dictionary<QsTypeParameter, ResolvedType>()).ToImmutableDictionary();
+            QsExpressionStatement <| TypedExpression.New (exprKind, tpResolutions, QsTypeKind.UnitType |> ResolvedType.New, inferredInfo, QsRangeInfo.Null)  //exTypeKind here is return type
        
             //let res = if (experOp :? QsExpressionKind.QsExpressionStatement) then experOp :?> QsExpressionStatement else null
             
@@ -1519,4 +1517,4 @@ module HackathonTransformer =
 
     let ``basic walk`` (allQsElements : seq<QsNamespace>) =
         let globalContext = createContext (Some "imafilename") allQsElements
-        allQsElements |> Seq.map (CondtionalChangerSyntaxTree(globalContext)).Transform |> Seq.toList |> ignore
+        allQsElements |> Seq.map (CondtionalChangerSyntaxTree(globalContext)).Transform // |> Seq.toList |> ignore
