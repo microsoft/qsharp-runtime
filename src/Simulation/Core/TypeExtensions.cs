@@ -60,6 +60,11 @@ namespace Microsoft.Quantum.Simulation.Core
             return (typeof(Qubit).IsAssignableFrom(t));
         }
 
+        public static bool IsResult(this Type t)
+        {
+            return (typeof(Result).IsAssignableFrom(t));
+        }
+
         // returns true if arg does not contain any field of type MissingParameter (recursive)
         public static bool IsFullyDefined(this Type arg)
         {
@@ -175,6 +180,10 @@ namespace Microsoft.Quantum.Simulation.Core
             else if (t.IsQubit())
             {
                 result = typeof(Qubit);
+            }
+            else if (t.IsResult())
+            {
+                result = typeof(Result);
             }
             else if (t.IsTuple())
             {
