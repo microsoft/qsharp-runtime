@@ -1517,4 +1517,4 @@ module HackathonTransformer =
 
     let ``basic walk`` (allQsElements : seq<QsNamespace>) =
         let globalContext = createContext (Some "imafilename") allQsElements
-        allQsElements |> Seq.map (CondtionalChangerSyntaxTree(globalContext)).Transform // |> Seq.toList |> ignore
+        allQsElements |> Seq.map (CondtionalChangerSyntaxTree(globalContext)).Transform |> Seq.toList // |> ignore
