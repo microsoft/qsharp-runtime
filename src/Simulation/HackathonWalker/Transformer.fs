@@ -1516,11 +1516,24 @@ module HackathonTransformer =
                 //     | CallLikeExpression (lhs, rhs) -> rhs.ResolvedType //todo errors if it isn't a statment
                 // | _ -> ArgumentException "Statement was not right" |> raise
           
-            let exprKind = CallLikeExpression (functionName, ImmutableQubitWithName "bbb"  ) // QsExpressionKind<'Expr, ...>//parameters go in the second spot
-
-            let tpResolutions = (new Dictionary<QsTypeParameter, ResolvedType>()).ToImmutableDictionary();
+          
             if shouldTransform then
                 printfn "transforming on %A" node
+                let testQubitIdentifier = 
+                    match node.ConditionalBlocks |> Seq.toList with
+                    | [ (typedExpr, block) ] -> 
+                        match typedExpr.Expression with
+                        | EQ (lhs, _) -> match lhs.Expression with
+                                            | CallLikeExpression (fn, args) ->
+                                                match args.Expression with
+                                                | Identifier (symbol, _) -> Some symbol
+                                                | _ -> None
+                                            | _ -> None
+                        | _ -> None
+                    | _ -> None
+                let exprKind = CallLikeExpression (functionName, ImmutableQubitWithName "bbb"  ) // QsExpressionKind<'Expr, ...>//parameters go in the second spot
+
+                let tpResolutions = (new Dictionary<QsTypeParameter, ResolvedType>()).ToImmutableDictionary();
                 QsExpressionStatement <| TypedExpression.New (exprKind, tpResolutions, QsTypeKind.UnitType |> ResolvedType.New, inferredInfo, QsRangeInfo.Null)  //exTypeKind here is return type
             else
                 base.onConditionalStatement node
