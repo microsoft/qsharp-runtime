@@ -25,6 +25,29 @@ namespace Microsoft.Quantum.Convert
         }
     }
 
+
+    public partial class BigIntAsInt
+    {
+        public class Native : BigIntAsInt
+        {
+            static (long, bool) BigIntAsIntFunc(BigInteger x)
+            {
+                if (x > long.MaxValue || x < long.MinValue)
+                {
+                    return (0, false);
+                }
+                else
+                {
+                    return ((long)x, true);
+                }
+            }
+
+            public Native(IOperationFactory m) : base(m) { }
+            public override Func<BigInteger, (long, bool)> Body => BigIntAsIntFunc;
+        }
+    }
+
+
     public partial class BigIntAsBoolArray
     {
         public class Native : BigIntAsBoolArray
