@@ -3,7 +3,8 @@ namespace Microsoft.Hack {
     open Microsoft.Quantum.Intrinsic;
 
     operation ClasicallyControlled(q: Qubit, op: (Qubit => Unit), arg: Qubit) : Unit {
-        if (M(q) == One) {
+        let res = M(q) == One;
+        if (res) {
             op(arg);
         }
     }
