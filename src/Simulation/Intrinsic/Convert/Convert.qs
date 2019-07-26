@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Convert {
     /// which is true, if and only if the conversion was possible.
     /// # Remarks
     /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
-    function BigIntAsInt(a : BigInt) : (Int, Bool) {
+    function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
         body intrinsic;
     }
     

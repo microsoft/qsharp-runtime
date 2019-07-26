@@ -26,11 +26,11 @@ namespace Microsoft.Quantum.Convert
     }
 
 
-    public partial class BigIntAsInt
+    public partial class MaybeBigIntAsInt
     {
-        public class Native : BigIntAsInt
+        public class Native : MaybeBigIntAsInt
         {
-            static (long, bool) BigIntAsIntFunc(BigInteger x)
+            static (long, bool) MaybeBigIntAsIntFunc(BigInteger x)
             {
                 if (x > long.MaxValue || x < long.MinValue)
                 {
@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Convert
             }
 
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<BigInteger, (long, bool)> Body => BigIntAsIntFunc;
+            public override Func<BigInteger, (long, bool)> Body => MaybeBigIntAsIntFunc;
         }
     }
 
