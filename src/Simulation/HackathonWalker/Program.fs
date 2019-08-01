@@ -55,7 +55,7 @@ let generateFiles (options : Options) =
     let allSources = GetSourceFiles.Apply syntaxTree |> Seq.filter (fun fileName -> fileName.Value.EndsWith ".qs")
     for source in allSources do
         try 
-          let content = syntaxTree |> HackathonTransformer.``basic walk`` |> HackathonTransformer.generate source
+          let content = syntaxTree |> HackathonTransformer.basicWalk |> HackathonTransformer.generate source
           CompilationLoader.GeneratedFile(source, options.OutputFolder, ".g.cs", content) |> ignore
         with | ex -> logger.Log(ex)
 
