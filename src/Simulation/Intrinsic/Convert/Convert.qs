@@ -32,6 +32,17 @@ namespace Microsoft.Quantum.Convert {
     
     
     /// # Summary
+    /// Converts a given big integer to an equivalent integer, if possible.
+    /// The function returns a pair of the resulting integer and a Boolean flag
+    /// which is true, if and only if the conversion was possible.
+    /// # Remarks
+    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
+    function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
+        body intrinsic;
+    }
+    
+    
+    /// # Summary
     /// Converts a given big integer to an array of Booleans.
     /// The 0 element of the array is the least significant bit of the big integer.
     /// # Remarks
