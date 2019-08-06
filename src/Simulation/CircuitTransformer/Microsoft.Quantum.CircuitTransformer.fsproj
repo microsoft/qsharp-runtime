@@ -2,15 +2,13 @@
   <Import Project="..\Common\AssemblyCommon.props" />
 
   <PropertyGroup>
-    <AssemblyName>Microsoft.Quantum.HackathonWalker</AssemblyName>
+    <AssemblyName>Microsoft.Quantum.CircuitTransformer</AssemblyName>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="Transformer.fs" />
-    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,11 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
+    <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.8.1907.1701" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <ProjectReference Include="..\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj" />
   </ItemGroup>
 
 </Project>

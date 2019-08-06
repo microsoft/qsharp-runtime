@@ -40,7 +40,9 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGen
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration.App", "src\Simulation\CsharpGeneration.App\Microsoft.Quantum.CsharpGeneration.App.fsproj", "{915C2FC8-E9FB-4AC9-B233-F591880D7611}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration.App", "src\Simulation\CircuitTransformer\Microsoft.Quantum.CircuitTransformer.fsproj", "{0707121F-CD2F-4BF6-951B-DB94228FDA15}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CircuitTransformer", "src\Simulation\CircuitTransformer\Microsoft.Quantum.CircuitTransformer.fsproj", "{B3CC0BC1-A994-4FA7-930B-231649CD6D09}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.Microsoft.Quantum.CircuitTransformer", "src\Simulation\CircuitTransformer.Tests\Tests.Microsoft.Quantum.CircuitTransformer.fsproj", "{6F0C91A4-082C-457B-AA39-DEC91C5D9AD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -262,22 +264,22 @@ Global
 		{915C2FC8-E9FB-4AC9-B233-F591880D7611}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{915C2FC8-E9FB-4AC9-B233-F591880D7611}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{915C2FC8-E9FB-4AC9-B233-F591880D7611}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Debug|x64.Build.0 = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.MinSizeRel|x64.Build.0 = Debug|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Release|x64.ActiveCfg = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.Release|x64.Build.0 = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Debug|x64.Build.0 = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Release|x64.ActiveCfg = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.Release|x64.Build.0 = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,7 +298,7 @@ Global
 		{48206BD6-48DD-4442-A395-3A6594E4C9C6} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 		{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 		{915C2FC8-E9FB-4AC9-B233-F591880D7611} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
-		{0707121F-CD2F-4BF6-951B-DB94228FDA15} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
+		{B3CC0BC1-A994-4FA7-930B-231649CD6D09} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
