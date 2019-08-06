@@ -1,4 +1,5 @@
 // dotnet run -- -i operation.qs -r /home/cyl/q/qsharp-runtime/src/Simulation/Intrinsic/bin/Debug/netstandard2.0/Microsoft.Quantum.Intrinsic.dll -o thing
+// dotnet run -- -i .\operation.qs -r D:\qsharp-hackathon\src\Simulation\Simulators\bin\Debug\netstandard2.0\Microsoft.Quantum.Intrinsic.dll -o thing 
 namespace Microsoft.Hack {
     open Microsoft.Quantum.Intrinsic;
 

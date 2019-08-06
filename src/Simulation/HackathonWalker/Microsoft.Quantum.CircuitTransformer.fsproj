@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Common\AssemblyCommon.props" />
-  
+
   <PropertyGroup>
     <AssemblyName>Microsoft.Quantum.HackathonWalker</AssemblyName>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,5 +24,5 @@
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
-  
+
 </Project>

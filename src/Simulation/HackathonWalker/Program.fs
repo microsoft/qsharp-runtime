@@ -60,7 +60,7 @@ let generateFiles (options : Options) =
         with | ex -> logger.Log(ex)
 
 
-let [<EntryPoint>] main args = 
+let main args = 
     match Parser.Default.ParseArguments<Options> args with 
     | :? Parsed<Options> as options -> generateFiles options.Value; 0
     | _ -> 1
