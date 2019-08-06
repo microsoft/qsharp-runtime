@@ -40,7 +40,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGen
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration.App", "src\Simulation\CsharpGeneration.App\Microsoft.Quantum.CsharpGeneration.App.fsproj", "{915C2FC8-E9FB-4AC9-B233-F591880D7611}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration.App", "src\Simulation\HackathonWalker\Microsoft.Quantum.CircuitTransformer.fsproj", "{0707121F-CD2F-4BF6-951B-DB94228FDA15}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration.App", "src\Simulation\CircuitTransformer\Microsoft.Quantum.CircuitTransformer.fsproj", "{0707121F-CD2F-4BF6-951B-DB94228FDA15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
