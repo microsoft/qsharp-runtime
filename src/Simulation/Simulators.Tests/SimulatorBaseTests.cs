@@ -3,6 +3,7 @@
 
 using System;
 using Xunit;
+using Xunit.Abstractions;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
@@ -23,6 +24,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
     public class SimulatorBaseTests
     {
+        private readonly ITestOutputHelper output;
+
+        public SimulatorBaseTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
 
         /// <summary>
         /// Verifies that built-in operations (Allocate/Relase) can be retrieved and succesfully applied from a TrivialSimulator.
@@ -41,9 +48,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var calledOnAllocate = false;
             var calledOnRelease = false;
             subject.OnAllocateQubits += count => {
+                output.WriteLine($"Allocate count = {count}");
                 calledOnAllocate = true;
             };
-            subject.OnReleaseQubits += count => {
+            subject.OnReleaseQubits += register => {
+                output.WriteLine($"Release qubits = {register}");
                 calledOnRelease = true;
             };
 
@@ -52,9 +61,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             // Try the operations
             var qubits = allocate.Apply(3);
+            Assert.True(calledOnAllocate);
             Assert.Equal(3, qubits.Length);
 
             release.Apply(qubits);
+            Assert.True(calledOnRelease);
 
             subject.CheckNoQubitLeak();
         }

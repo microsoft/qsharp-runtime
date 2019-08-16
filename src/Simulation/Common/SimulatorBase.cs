@@ -176,6 +176,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override Qubit Apply()
             {
+                sim.OnAllocateQubits?.Invoke(1);
                 return manager.Allocate();
             }
 
@@ -192,6 +193,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
+                    sim.OnAllocateQubits?.Invoke(count);
                     return manager.Allocate(count);
                 }
             }
