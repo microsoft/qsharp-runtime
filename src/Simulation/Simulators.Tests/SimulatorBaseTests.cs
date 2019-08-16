@@ -23,6 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
     public class SimulatorBaseTests
     {
+
         /// <summary>
         /// Verifies that built-in operations (Allocate/Relase) can be retrieved and succesfully applied from a TrivialSimulator.
         /// </summary>
@@ -34,6 +35,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var subject = new TrivialSimulator();
 
             Assert.Equal(typeof(TrivialSimulator).Name, subject.Name);
+
+            // Check whether our events for allocation and deallocation
+            // are actually called.
+            var calledOnAllocate = false;
+            var calledOnRelease = false;
+            subject.OnAllocateQubits += count => {
+                calledOnAllocate = true;
+            };
+            subject.OnReleaseQubits += count => {
+                calledOnRelease = true;
+            };
 
             var allocate = subject.Get<Intrinsic.Allocate>();
             var release = subject.Get<Intrinsic.Release>();
