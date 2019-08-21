@@ -21,6 +21,10 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         public event Action<ICallable, IApplyData> OnOperationStart = null;
         public event Action<ICallable, IApplyData> OnOperationEnd = null;
+        public event Action<long> OnAllocateQubits = null;
+        public event Action<IQArray<Qubit>> OnReleaseQubits = null;
+        public event Action<long> OnBorrowQubits = null;
+        public event Action<IQArray<Qubit>> OnReturnQubits = null;
         public event Action<string> OnLog = null;
 
         public IQubitManager QubitManager { get; }
@@ -161,15 +165,18 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Allocate : Intrinsic.Allocate
         {
+            private SimulatorBase sim;
             private IQubitManager manager;
 
             public Allocate(SimulatorBase m) : base(m)
             {
+                this.sim = m;
                 this.manager = m.QubitManager;
             }
 
             public override Qubit Apply()
             {
+                sim.OnAllocateQubits?.Invoke(1);
                 return manager.Allocate();
             }
 
@@ -181,10 +188,12 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else if (count == 0)
                 {
+                    sim.OnAllocateQubits?.Invoke(count);
                     return new QArray<Qubit>();
                 }
                 else
                 {
+                    sim.OnAllocateQubits?.Invoke(count);
                     return manager.Allocate(count);
                 }
             }
@@ -196,20 +205,24 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Release : Intrinsic.Release
         {
+            private SimulatorBase sim;
             private IQubitManager manager;
 
             public Release(SimulatorBase m) : base(m)
             {
+                this.sim = m;
                 this.manager = m.QubitManager;
             }
 
             public override void Apply(Qubit q)
             {
+                sim.OnReleaseQubits?.Invoke(new QArray<Qubit>(new[] { q }));
                 manager.Release(q);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
+                sim.OnReleaseQubits?.Invoke(qubits);
                 manager.Release(qubits);
             }
         }
@@ -234,6 +247,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override IQArray<Qubit> Apply(long count)
             {
+                sim.OnBorrowQubits?.Invoke(count);
                 return sim.QubitManager.Borrow(count);
             }
         }
@@ -253,11 +267,13 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override void Apply(Qubit q)
             {
+                sim.OnReturnQubits?.Invoke(new QArray<Qubit>(new[] { q }));
                 sim.QubitManager.Return(q);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
+                sim.OnReturnQubits?.Invoke(qubits);
                 sim.QubitManager.Return(qubits);
             }
         }
