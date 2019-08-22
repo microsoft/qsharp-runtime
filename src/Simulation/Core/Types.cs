@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using Newtonsoft.Json;
 
 /// <summary>
 /// The types used to represent Q# type in the generated C# code.
@@ -52,6 +53,7 @@ namespace Microsoft.Quantum.Simulation.Core
     /// Represents the Result of a Measurement. Corresponds to Q# type <code>Result</code>.
     /// </summary>
     [Serializable]
+    [JsonConverter(typeof(ResultConverter))]
     public abstract class Result : IEquatable<Result>
     {
         /// <summary>
@@ -160,5 +162,24 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         /// <param name="message">String that is a part of  Q# fail statement</param>
         public ExecutionFailException(string message) : base(message) { }
+    }
+
+    /// <summary>
+    /// This class is used to serialize Result instances using the default values.
+    /// </summary>
+    public class ResultConverter : JsonConverter<Result>
+    {
+        public override Result ReadJson(JsonReader reader, Type objectType, Result existingValue, bool hasExistingValue, JsonSerializer serializer) =>
+            (serializer.Deserialize<int>(reader) == 1)
+                ? Result.One
+                : Result.Zero;
+
+        public override void WriteJson(JsonWriter writer, Result value, JsonSerializer serializer)
+        {
+            // See https://github.com/JamesNK/Newtonsoft.Json/issues/386#issuecomment-421161191
+            // for why this works to pass through.
+            var token = Newtonsoft.Json.Linq.JToken.FromObject(value.GetValue(), serializer);
+            token.WriteTo(writer);
+        }
     }
 }

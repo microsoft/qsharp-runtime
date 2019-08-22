@@ -302,6 +302,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var array3 = JsonConvert.DeserializeObject<QArray<long>>(json);
             Assert.Equal(array1, array2);
             Assert.Equal(array1, array3);
+
+            // Results enumeration
+            var array_result = new QArray<Result>(Result.One, Result.Zero, Result.Zero) as IQArray<Result>;
+            json = JsonConvert.SerializeObject(array_result);
+            Assert.Equal("[1,0,0]", json);
+
+            var array_from_json = JsonConvert.DeserializeObject<IQArray<Result>>(json);
+            Assert.Equal(array_result, array_from_json);
         }
     }
 }
