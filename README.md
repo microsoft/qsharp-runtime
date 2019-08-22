@@ -112,6 +112,7 @@ For more details, please see [CONTRIBUTING.md](./CONTRIBUTING.md), or the [contr
 
 If you're interested in helping test the Q# runtime, or if you want to try out new features before they are released, you can add the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) to your .NET Core SDK configuration.
 Packages on the prerelease feed are marked with `-alpha` in their version number, so that projects built using released versions of Quantum Development Kit libraries will not be affected.
+Note that the prerelease feed is used automatically when building libraries in this repository.
 
 To use the prerelease feed, edit your `NuGet.Config` file to include the prerelease feed URL (`https://pkgs.dev.azure.com/ms-quantum-public/Microsoft Quantum (public)/_packaging/alpha/nuget/v3/index.json`) as a package source.
 The location of this file varies depending on your operating system:
@@ -134,3 +135,4 @@ For example, the following `NuGet.Config` file includes both the main NuGet pack
   </packageSources>
 </configuration>
 ```
+
