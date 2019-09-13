@@ -4,7 +4,7 @@ trigger:
 
 variables:
   Build.Major: 0
-  Build.Minor: 0
+  Build.Minor: 9
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
 
