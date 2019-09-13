@@ -292,7 +292,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 }
                 else
                 {
-                    Debug.WriteLine($"Measurement outcome with probability {constraint.Probability} did not happened, result is {Utils.Opposite(constraint.ConstrainToResult)}");
+                    Debug.WriteLine($"Measurement outcome with probability {constraint.Probability} did not happen, result is {Utils.Opposite(constraint.ConstrainToResult)}");
                     return Utils.Opposite(constraint.ConstrainToResult);
                 }
             }
