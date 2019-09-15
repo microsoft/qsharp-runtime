@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.Simulation.Core
             new Range(0L, -1L);
 
         /// <summary>
-        /// Returns an empty range.
+        /// Returns true if the range is empty.
         /// </summary>
         public bool IsEmpty =>
             (End < Start && Step >= 0) || (End > Start && Step <= 0);
