@@ -387,11 +387,11 @@ namespace Microsoft.Quantum.Simulation.Core
                 return new QArray<T>();
             }
 
-            long rangeCount = 1 + (range.End - range.Start) / range.Step;
-            if (rangeCount <= 0)
+            if (range.IsEmpty)
             {
                 return new QArray<T>();
             }
+            long rangeCount = 1 + (range.End - range.Start) / range.Step;
             long rangeEnd = range.Start + (rangeCount - 1) * range.Step;
 
             // Make sure the slice fits
