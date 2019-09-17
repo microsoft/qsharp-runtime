@@ -21,7 +21,7 @@ type Options = {
       HelpText = "Q# code or name of the Q# file to compile.")>]
     Input : IEnumerable<string>
             
-    [<Option('r', "references", Required = false, Default = [||],
+    [<Option('r', "references", Required = false, Default = ([||] : string[]),
       HelpText = "Referenced binaries to include in the compilation.")>]
     References : IEnumerable<string>
  
