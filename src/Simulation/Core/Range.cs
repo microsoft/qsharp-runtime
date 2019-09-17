@@ -66,9 +66,15 @@ namespace Microsoft.Quantum.Simulation.Core
         public static Range Empty =>
             new Range(0L, -1L);
 
+        /// <summary>
+        /// Returns true if the range is empty.
+        /// </summary>
+        public bool IsEmpty =>
+            (End < Start && Step >= 0) || (End > Start && Step <= 0);
+
         public Range Reverse()
         {
-            if ((End < Start && Step >= 0) || (End > Start && Step <= 0)) return Range.Empty; 
+            if (IsEmpty) return Range.Empty; 
             long newStart = Start + ((End - Start) / Step) * Step;
             return new Range(newStart, -Step, Start);
         }

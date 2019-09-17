@@ -11,6 +11,6 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Represents a complex number by its real and imaginary components.
     /// The first element of the tuple is the real component, the second one - the imaginary component.
-    newtype Complex = (Double, Double);
+    newtype Complex = (Real: Double, Imag: Double);
 
 }
