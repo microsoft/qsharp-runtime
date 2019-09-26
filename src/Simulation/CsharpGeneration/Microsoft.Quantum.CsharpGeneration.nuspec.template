@@ -19,4 +19,8 @@
     <copyright>$copyright$</copyright>
     <tags>Quantum Q# Qsharp </tags>
   </metadata>
+  
+  <files>
+    <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
+  <files>
 </package>
