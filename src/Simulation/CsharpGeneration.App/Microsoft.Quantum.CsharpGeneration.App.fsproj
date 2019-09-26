@@ -5,6 +5,10 @@
     <AssemblyName>Microsoft.Quantum.CsharpGeneration.App</AssemblyName>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +26,10 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19351-01" PrivateAssets="All"/>
   </ItemGroup>
   
 </Project>
