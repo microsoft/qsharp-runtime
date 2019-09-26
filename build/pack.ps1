@@ -23,6 +23,8 @@ function Pack-One() {
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
         -Verbosity detailed `
+        -Symbols `
+        -SymbolPackageFormat snupkg `
         $include_references
 
     if  ($LastExitCode -ne 0) {
