@@ -23,6 +23,7 @@ function Pack-One() {
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
         -Verbosity detailed `
+        -SymbolPackageFormat snupkg `
         $option1 `
         $option2 `
         $option3
@@ -35,11 +36,11 @@ function Pack-One() {
 
 
 Write-Host "##[info]Using nuget to create packages"
-Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects' '-Symbols' '-SymbolPackageFormat snupkg'
-Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects' '-Symbols' '-SymbolPackageFormat snupkg'
+Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects' '-Symbols' 
+Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects' '-Symbols'
 Pack-One '../src/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec' 
 Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
-Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj' '-Symbols' '-SymbolPackageFormat snupkg'
+Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj' '-Symbols'
 
 if (-not $all_ok) 
 {
