@@ -274,7 +274,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             catch(System.Exception e)
             {
-                Assert.True(true); //make sure that exeption actually happened
+                Assert.True(true); // make sure that exeption actually happened
             }
             Assert.Equal(1, exceptionCount); // check that we cought exception once
         }
