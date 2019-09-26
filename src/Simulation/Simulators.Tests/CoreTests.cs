@@ -259,5 +259,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Circuits.BigIntTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
         }
+
+        [Fact]
+        public void CatchFail()
+        {
+            int exceptionCount = 0;
+            System.Action<System.Runtime.ExceptionServices.ExceptionDispatchInfo> inc = (System.Runtime.ExceptionServices.ExceptionDispatchInfo e) => exceptionCount++;
+            var sim = new TrivialSimulator();
+            sim.OnFail += inc; // increment exception counter when exception is caught
+            var inst = sim.Get<Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail>();
+            try
+            {
+                inst.Apply(QVoid.Instance);
+            }
+            catch(System.Exception e)
+            {
+                Assert.True(true); //make sure that exeption actually happened
+            }
+            Assert.Equal(1, exceptionCount); // check that we cought exception once
+        }
     }
 }

@@ -21,6 +21,7 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         public event Action<ICallable, IApplyData> OnOperationStart = null;
         public event Action<ICallable, IApplyData> OnOperationEnd = null;
+        public event Action<System.Runtime.ExceptionServices.ExceptionDispatchInfo> OnFail = null;
         public event Action<long> OnAllocateQubits = null;
         public event Action<IQArray<Qubit>> OnReleaseQubits = null;
         public event Action<long> OnBorrowQubits = null;
@@ -335,6 +336,11 @@ namespace Microsoft.Quantum.Simulation.Common
         public virtual void EndOperation(ICallable operation, IApplyData resultValue)
         {
             OnOperationEnd?.Invoke(operation, resultValue);
+        }
+
+        public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo )
+        {
+            OnFail?.Invoke(exceptionInfo);
         }
     }
 }
