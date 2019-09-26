@@ -17,15 +17,15 @@ popd
 
 
 function Pack-One() {
-    Param($project, $include_references="")
+    Param($project, $option1="", $option2="", $option3="")
     nuget pack $project `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
         -Verbosity detailed `
-        -Symbols `
-        -SymbolPackageFormat snupkg `
-        $include_references
+        $option1 `
+        $option2 `
+        $option3
 
     if  ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to pack $project"
@@ -35,11 +35,11 @@ function Pack-One() {
 
 
 Write-Host "##[info]Using nuget to create packages"
-Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects'
-Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects'
-Pack-One '../src/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec'
+Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects' '-Symbols' '-SymbolPackageFormat snupkg'
+Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects' '-Symbols' '-SymbolPackageFormat snupkg'
+Pack-One '../src/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec' 
 Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
-Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
+Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj' '-Symbols' '-SymbolPackageFormat snupkg'
 
 if (-not $all_ok) 
 {
