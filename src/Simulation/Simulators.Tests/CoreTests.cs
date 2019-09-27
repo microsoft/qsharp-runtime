@@ -271,6 +271,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             try
             {
                 inst.Apply(QVoid.Instance);
+                Assert.True(false); // make sure that exception actually happened
             }
             catch(System.Exception e)
             {
