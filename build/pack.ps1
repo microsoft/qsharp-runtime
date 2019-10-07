@@ -35,7 +35,6 @@ function Pack-One() {
 Write-Host "##[info]Using nuget to create packages"
 Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects'
-Pack-One '../src/ProjectTemplates/Microsoft.Quantum.ProjectTemplates.nuspec'
 Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
