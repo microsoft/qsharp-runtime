@@ -27,5 +27,4 @@
   </ItemGroup>
 
   <Import Project="..\..\..\build\Props\QSharp.targets" />
-
 </Project>
