@@ -805,8 +805,8 @@ module SimulationCode =
                 releases    
                 
             let symbols = removeDiscarded using.Binding.Lhs
-            let exName = nextArgName() 
-            let exHandle = ident exName
+            let exDispatchInfoName = nextArgName() 
+            let exDispatchInfoHandle = ident exDispatchInfoName
             let caughtEx = nextArgName()
 
             // allocations and deallocations
@@ -817,14 +817,17 @@ module SimulationCode =
 
             // To force that exceptions thrown during the execution of the allocation scope take precedence over the ones thrown upon release
             // we catch all exceptions in a variable and throw after releaseing if necessary. 
-            let exceptionHandle = ``typed var`` "Exception" exName (``:=`` ``null`` |> Some) |> ``#line hidden`` :> StatementSyntax
+
+            // System.Runtime.ExceptionServices.ExceptionDispatchInfo is used to keep all call stack information when rethrowing
+            let exceptionHandle = ``typed var`` "System.Runtime.ExceptionServices.ExceptionDispatchInfo" exDispatchInfoName (``:=`` ``null`` |> Some) |> ``#line hidden`` :> StatementSyntax
+            
             let catch = 
-                let setEx = exHandle <-- ident caughtEx |> statement
-                let rethrow = ``throw`` (exHandle |> Some) // need to do this since otherwise we get a not all paths return a value
-                ``catch`` (Some ("Exception", caughtEx)) [setEx; rethrow]
+                let setEx = exDispatchInfoHandle <-- ``invoke`` (ident "System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture") ``(`` [ident caughtEx] ``)`` |> statement
+                ``catch`` (Some ("Exception", caughtEx)) [setEx; ``throw`` None] // use standard mechanism to rethrow the exception by using "throw;"
             let finallyBlock = 
-                let condition = exHandle .!=. ``null``
-                let throwIfNecessary = ``if`` ``(`` condition ``)`` [``throw`` (exHandle |> Some)] None 
+                let condition = exDispatchInfoHandle .!=. ``null``
+                let rethrow = ``invoke`` (exDispatchInfoHandle <|.|> (ident "Throw")) ``(`` [] ``)`` |> statement // rethrow that keeps the call stack unchanged
+                let throwIfNecessary = ``if`` ``(`` condition ``)`` [rethrow] None 
                 throwIfNecessary :: deallocation
             let body = ``try`` (buildBlock using.Body) [catch |> ``#line hidden``] (``finally`` finallyBlock |> ``#line hidden`` |> Some)
             let statements = [allocation; exceptionHandle; body]
