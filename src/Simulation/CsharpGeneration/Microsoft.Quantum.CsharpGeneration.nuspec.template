@@ -21,7 +21,7 @@
   </metadata>
   
   <files>
-    <file src="bin\$Configuration$\Microsoft.Quantum.*.pdb" target="lib" />
-    <file src="bin\$Configuration$\Microsoft.Quantum.*.xml" target="lib" />
+    <file src="bin\**\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
+    <file src="bin\**\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
   <files>
 </package>
