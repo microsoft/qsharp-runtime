@@ -17,13 +17,16 @@ popd
 
 
 function Pack-One() {
-    Param($project, $include_references="")
+    Param($project, $option1="", $option2="", $option3="")
     nuget pack $project `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
         -Verbosity detailed `
-        $include_references
+        -SymbolPackageFormat snupkg `
+        $option1 `
+        $option2 `
+        $option3
 
     if  ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to pack $project"
