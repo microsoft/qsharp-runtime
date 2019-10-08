@@ -77,6 +77,11 @@ namespace Microsoft.Quantum.Simulation.Core
                 this.Factory?.StartOperation(this, __dataIn(a));
                 __result__ = this.Body(a);
             }
+            catch( Exception e)
+            {
+                this.Factory?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
+                throw;
+            }
             finally
             {
                 this.Factory?.EndOperation(this, __dataOut(__result__));

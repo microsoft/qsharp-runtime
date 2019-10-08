@@ -48,5 +48,11 @@ namespace Microsoft.Quantum.Simulation.Core
         /// event in simulators.
         /// </summary>
         void EndOperation(ICallable operation, IApplyData resultValue);
+
+        /// <summary>
+        /// Called by operation, when an exception occurs. Used to enable OnFail
+        /// event in simulators. 
+        /// </summary>
+        void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo e);
     }
 }
