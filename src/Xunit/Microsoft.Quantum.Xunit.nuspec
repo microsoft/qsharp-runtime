@@ -27,5 +27,7 @@
 
   <files>
     <file src="bin\$Configuration$\**\Microsoft.Quantum.Simulation.XUnit*" target="lib" />
+    <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
+    <file src="bin\$Configuration$\**\$id$.pdb" target="lib" />
   </files>
 </package>
