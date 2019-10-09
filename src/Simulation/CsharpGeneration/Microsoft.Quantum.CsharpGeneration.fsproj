@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Common\AssemblyCommon.props" />
+  <Import Project="..\Common\DebugSymbols.props" />
   
   <PropertyGroup>
     <AssemblyName>Microsoft.Quantum.CsharpGeneration</AssemblyName>

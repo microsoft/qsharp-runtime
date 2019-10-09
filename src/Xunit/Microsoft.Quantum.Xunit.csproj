@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\Simulation\Common\AssemblyCommon.props" />
+  <Import Project="..\Simulation\Common\DebugSymbols.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
-
-    <Company>Microsoft</Company>
-    <Authors>Microsoft</Authors>
-    <Product>Microsoft Quantum Development Kit Preview</Product>
-    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
