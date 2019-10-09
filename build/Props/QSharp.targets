@@ -23,7 +23,7 @@
     </ItemGroup>
     <Delete Files="@(QsharpCodegenFiles)" />
     <Exec Command="$(QscCommand)" />
-    <WriteLinesToFile File="$(QsharpOutDir)qsc-ok.txt" Lines="qsc completed succesfully!" Overwrite="true"/>
+    <WriteLinesToFile File="$(QsharpOutDir)qsc-ok.txt" Lines="qsc completed successfully!" Overwrite="true"/>
     <ItemGroup>
       <Compile Include="$(QsharpSrcOutDir)**\*.g.cs">
         <Visible>false</Visible>
