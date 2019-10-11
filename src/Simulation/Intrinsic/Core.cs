@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+using Microsoft.Quantum.Simulation.Core;
+
 namespace Microsoft.Quantum.Core
 {
     public partial class Length<__T__>
