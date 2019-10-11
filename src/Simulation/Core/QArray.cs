@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         long Length { get; }
 
-        IQArray<T> Slice(Range range);
+        IQArray<T> Slice(QRange range);
 
         T[] ToArray();
     }
@@ -353,7 +353,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         /// <param name="index">The long index of the element to access</param>
         /// <returns>The element</returns>
-        public QArray<T> Modify(Range indices, IQArray<T> values)
+        public QArray<T> Modify(QRange indices, IQArray<T> values)
         {
             if (values.Length != indices.Count())
             {
@@ -379,7 +379,7 @@ namespace Microsoft.Quantum.Simulation.Core
         ///     If the elements of the range are outside the array bounds, it throws
         ///     an ArgumentOutOfRangeException
         /// </summary>
-        public QArray<T> Slice(Range range)
+        public QArray<T> Slice(QRange range)
         {
             if (range == null)
             {
@@ -417,7 +417,7 @@ namespace Microsoft.Quantum.Simulation.Core
             return result;
         }
 
-        IQArray<T> IQArray<T>.Slice(Range range) => Slice(range);
+        IQArray<T> IQArray<T>.Slice(QRange range) => Slice(range);
 
         /// <summary>
         ///     Returns a new QArray with the result of concatenating the

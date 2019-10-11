@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using Microsoft.Quantum.Simulation.Core;
-
 namespace Microsoft.Quantum.Core
 {
     public partial class Length<__T__>
@@ -20,7 +17,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeStart
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<Range, long> Body => (arg) => (arg.Start);
+            public override Func<QRange, long> Body => (arg) => (arg.Start);
         }
     }
 
@@ -29,7 +26,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeEnd
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<Range, long> Body => (arg) => (arg.End);
+            public override Func<QRange, long> Body => (arg) => (arg.End);
         }
     }
 
@@ -38,7 +35,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeStep
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<Range, long> Body => (arg) => (arg.Step);
+            public override Func<QRange, long> Body => (arg) => (arg.Step);
         }
     }
 
@@ -47,7 +44,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeReverse
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<Range, Range> Body => (arg) => (arg.Reverse());
+            public override Func<QRange, QRange> Body => (arg) => (arg.Reverse());
         }
     }
 }
