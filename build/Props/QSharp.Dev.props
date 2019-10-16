@@ -14,7 +14,7 @@
     <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindows)</QSimDll>
     <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/CsharpGeneration.App/bin/$(Configuration)/netcoreapp3.0/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
     <LangVersion>latest</LangVersion>
-    <QsharpLangVersion>0.8</QsharpLangVersion>
+    <QsharpLangVersion>0.9</QsharpLangVersion>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
     <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
   </PropertyGroup>
