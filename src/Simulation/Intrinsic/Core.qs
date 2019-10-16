@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Core {
     /// # Summary
     /// Compiler recognized attribute used to mark the entry point of an executable.
     @Attribute()
-    newtype EntryPoint = String;
+    newtype EntryPoint = Unit;
 
     /// # Summary
     /// Returns the number of elements in an array.
