@@ -155,7 +155,7 @@ module SimulationCode =
         | QsTypeKind.Qubit         -> "Qubit"
         | QsTypeKind.Result        -> "Result"
         | QsTypeKind.Pauli         -> "Pauli"
-        | QsTypeKind.Range         -> "Range"
+        | QsTypeKind.Range         -> "QRange"
         | QsTypeKind.ArrayType arrayType    -> sprintf "IQArray<%s>" (arrayType |> roslynTypeName context)
         | QsTypeKind.TupleType tupleType    -> tupleType |> roslynTupleTypeName context
         | QsTypeKind.UserDefinedType name   -> justTheName context (QsQualifiedName.New (name.Namespace, name.Name))
@@ -544,7 +544,7 @@ module SimulationCode =
                     [ (buildExpression start); (buildExpression step); (buildExpression rEnd) ]
                 | _ ->
                     [ (buildExpression lhs); (buildExpression rEnd) ]
-            ``new`` (``type`` ["Range"]) ``(`` args ``)``
+            ``new`` (``type`` ["QRange"]) ``(`` args ``)``
 
         and buildValueArray at elems =
             match at.Resolution |> QArrayType with

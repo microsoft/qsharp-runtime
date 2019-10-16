@@ -3,6 +3,13 @@
 ##
 steps:
 
+- task: UseDotNet@2
+  displayName: 'Use .NET Core SDK 3.0.100'
+  inputs:
+    packageType: sdk
+    version: '3.0.100'
+    
+
 - bash: ./bootstrap.sh
   displayName: "Bootstrap repository"
   workingDirectory: $(System.DefaultWorkingDirectory)

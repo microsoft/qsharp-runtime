@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 var qs = new Qs(Qs);
                 var udtOp = new U3(x);
                 var udtQ = new Q(q2);
-                var t1 = new QTuple<(long, Range, (Qubit, IUnitary))>((1L, new Range(10, -2, 4), (q2, x)));
+                var t1 = new QTuple<(long, QRange, (Qubit, IUnitary))>((1L, new QRange(10, -2, 4), (q2, x)));
                 var t4 = new T4((3L, (1.1, false, Result.One)));
                 var t5 = new T5((Pauli.PauliX, Qs, qs, Q));
 
