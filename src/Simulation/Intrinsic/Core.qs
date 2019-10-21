@@ -46,24 +46,6 @@ namespace Microsoft.Quantum.Core {
     }
 
     /// # Summary
-    /// Checks whether the given value is the default value for that type. 
-    ///
-    /// # Input
-    /// ## arg
-    /// Value to check.  
-    ///
-    /// # Output
-    /// Returns true if the given value is the default value for that type. 
-    /// 
-    /// # Type Parameters
-    /// ## 'T
-    /// The type of the civen value. 
-    ///
-    function IsDefault<'T> (arg : 'T) {
-        return arg == Default<'T>();
-    }
-
-    /// # Summary
     /// Returns the number of elements in an array.
     ///
     /// # Input
