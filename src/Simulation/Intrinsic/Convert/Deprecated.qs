@@ -9,7 +9,6 @@
 /// If there are several versions of the function for Bool, Int and Double types, the corresponding
 /// functions have suffix B,I and D.
 namespace Microsoft.Quantum.Extensions.Convert {
-    open Microsoft.Quantum.Warnings;
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.convert.intasdouble".

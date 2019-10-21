@@ -8,7 +8,6 @@
 
 
 namespace Microsoft.Quantum.Extensions.Math {
-    open Microsoft.Quantum.Warnings;
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.math.absd".

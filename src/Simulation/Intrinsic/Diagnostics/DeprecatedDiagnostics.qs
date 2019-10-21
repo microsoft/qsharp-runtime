@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Extensions.Diagnostics {
-    open Microsoft.Quantum.Warnings;
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.diagnostics.dumpmachine".
