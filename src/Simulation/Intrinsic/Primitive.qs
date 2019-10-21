@@ -6,16 +6,16 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.random".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Random")
     operation Random (probs : Double[]) : Int {
-        _Renamed("Microsoft.Quantum.Primitive.Random", "Microsoft.Quantum.Intrinsic.Random");
         return Microsoft.Quantum.Intrinsic.Random(probs);
     }
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.assert".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Assert")
     operation Assert (bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Assert", "Microsoft.Quantum.Intrinsic.Assert");
             Microsoft.Quantum.Intrinsic.Assert(bases, qubits, result, msg);
         }
         adjoint auto;
@@ -25,10 +25,10 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.assertprob".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.AssertProb")
     operation AssertProb (bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
     {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.AssertProb", "Microsoft.Quantum.Intrinsic.AssertProb");
             Microsoft.Quantum.Intrinsic.AssertProb(bases, qubits, result, prob, msg, tol);
         }
         adjoint auto;
@@ -38,16 +38,16 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.message".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Message")
     function Message (msg : String) : Unit {
-        _Renamed("Microsoft.Quantum.Primitive.Message", "Microsoft.Quantum.Intrinsic.Message");
         return Microsoft.Quantum.Intrinsic.Message(msg);
     }
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.i".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.I")
     operation I (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.I", "Microsoft.Quantum.Intrinsic.I");
             Microsoft.Quantum.Intrinsic.I(qubit);
         }
         adjoint self;
@@ -57,9 +57,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.x".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.X")
     operation X (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.X", "Microsoft.Quantum.Intrinsic.X");
             Microsoft.Quantum.Intrinsic.X(qubit);
         }
         adjoint self;
@@ -69,9 +69,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.y".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Y")
     operation Y (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Y", "Microsoft.Quantum.Intrinsic.Y");
             Microsoft.Quantum.Intrinsic.Y(qubit);
         }
         adjoint self;
@@ -81,9 +81,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.z".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Z")
     operation Z (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Z", "Microsoft.Quantum.Intrinsic.Z");
             Microsoft.Quantum.Intrinsic.Z(qubit);
         }
         adjoint self;
@@ -93,9 +93,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.h".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.H")
     operation H (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.H", "Microsoft.Quantum.Intrinsic.H");
             Microsoft.Quantum.Intrinsic.H(qubit);
         }
         adjoint self;
@@ -105,9 +105,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.s".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.S")
     operation S (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.S", "Microsoft.Quantum.Intrinsic.S");
             Microsoft.Quantum.Intrinsic.S(qubit);
         }
         adjoint auto;
@@ -117,9 +117,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.t".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.T")
     operation T (qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.T", "Microsoft.Quantum.Intrinsic.T");
             Microsoft.Quantum.Intrinsic.T(qubit);
         }
         adjoint auto;
@@ -129,9 +129,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.cnot".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.CNOT")
     operation CNOT (control : Qubit, target : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.CNOT", "Microsoft.Quantum.Intrinsic.CNOT");
             Microsoft.Quantum.Intrinsic.CNOT(control, target);
         }
 
@@ -142,9 +142,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.ccnot".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.CCNOT")
     operation CCNOT (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.CCNOT", "Microsoft.Quantum.Intrinsic.CCNOT");
             Microsoft.Quantum.Intrinsic.CCNOT(control1, control2, target);
         }
 
@@ -155,9 +155,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.swap".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.SWAP")
     operation SWAP (qubit1 : Qubit, qubit2 : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.SWAP", "Microsoft.Quantum.Intrinsic.SWAP");
             Microsoft.Quantum.Intrinsic.SWAP(qubit1, qubit2);
         }
 
@@ -168,9 +168,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.canon.applytoeachca".
+    @ Deprecated("ApplyToEachCA(X, _)")
     operation MultiX (qubits : Qubit[]) : Unit {
         body (...) {
-            _Removed("Microsoft.Quantum.Primitive.MultiX", "ApplyToEachCA(X, _)");
             for (index in 0 .. Length(qubits) - 1) {
                 X(qubits[index]);
             }
@@ -183,9 +183,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.r".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.R")
     operation R(pauli : Pauli, theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.R", "Microsoft.Quantum.Intrinsic.R");
             Microsoft.Quantum.Intrinsic.R(pauli, theta, qubit);
         }
         adjoint auto;
@@ -195,9 +195,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.rfrac".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.RFrac")
     operation RFrac(pauli : Pauli, numerator : Int, power : Int, qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.RFrac", "Microsoft.Quantum.Intrinsic.RFrac");
             Microsoft.Quantum.Intrinsic.RFrac(pauli, numerator, power, qubit);
         }
         
@@ -209,9 +209,9 @@ namespace Microsoft.Quantum.Primitive {
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.rx".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Rx")
     operation Rx (theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Rx", "Microsoft.Quantum.Intrinsic.Rx");
             Microsoft.Quantum.Intrinsic.Rx(theta, qubit);
         }
         
@@ -222,9 +222,9 @@ namespace Microsoft.Quantum.Primitive {
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.ry".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Ry")
     operation Ry (theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Ry", "Microsoft.Quantum.Intrinsic.Ry");
             Microsoft.Quantum.Intrinsic.Ry(theta, qubit);
         }
         
@@ -235,9 +235,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.rz".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Rz")
     operation Rz (theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Rz", "Microsoft.Quantum.Intrinsic.Rz");
             Microsoft.Quantum.Intrinsic.Rz(theta, qubit);
         }
         
@@ -248,10 +248,10 @@ namespace Microsoft.Quantum.Primitive {
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.r1".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.R1")
     operation R1 (theta : Double, qubit : Qubit) : Unit
     {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.R1", "Microsoft.Quantum.Intrinsic.R1");
             Microsoft.Quantum.Intrinsic.R1(theta, qubit);
         }
         
@@ -262,10 +262,10 @@ namespace Microsoft.Quantum.Primitive {
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.r1frac".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.R1Frac")
     operation R1Frac (numerator : Int, power : Int, qubit : Qubit) : Unit
     {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.R1Frac", "Microsoft.Quantum.Intrinsic.R1Frac");
             Microsoft.Quantum.Intrinsic.R1Frac(numerator, power, qubit);
         }
         
@@ -276,9 +276,9 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.exp".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Exp")
     operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.Exp", "Microsoft.Quantum.Intrinsic.Exp");
             Microsoft.Quantum.Intrinsic.Exp(paulis, theta, qubits);
         }
         adjoint auto;
@@ -288,9 +288,9 @@ namespace Microsoft.Quantum.Primitive {
     
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.expfrac".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.ExpFrac")
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit {
         body (...) {
-            _Renamed("Microsoft.Quantum.Primitive.ExpFrac", "Microsoft.Quantum.Intrinsic.ExpFrac");
             Microsoft.Quantum.Intrinsic.ExpFrac(paulis, numerator, power, qubits);
         }
         adjoint auto;
@@ -300,29 +300,29 @@ namespace Microsoft.Quantum.Primitive {
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.measure".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Measure")
     operation Measure(bases : Pauli[], qubits : Qubit[]) : Result {
-        _Renamed("Microsoft.Quantum.Primitive.Measure", "Microsoft.Quantum.Intrinsic.Measure");
         return Microsoft.Quantum.Intrinsic.Measure(bases, qubits);
     }
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.m".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.M")
     operation M (qubit : Qubit) : Result {
-        _Renamed("Microsoft.Quantum.Primitive.M", "Microsoft.Quantum.Intrinsic.M");
         return Microsoft.Quantum.Intrinsic.M(qubit);
     }
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.reset".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.Reset")
     operation Reset (target : Qubit) : Unit {
-        _Renamed("Microsoft.Quantum.Primitive.Reset", "Microsoft.Quantum.Intrinsic.Reset");
         return Microsoft.Quantum.Intrinsic.Reset(target);
     }
 
     /// # Deprecated
     /// Please use @"microsoft.quantum.intrinsic.resetall".
+    @ Deprecated("Microsoft.Quantum.Intrinsic.ResetAll")
     operation ResetAll (qubits : Qubit[]) : Unit {
-        _Renamed("Microsoft.Quantum.Primitive.ResetAll", "Microsoft.Quantum.Intrinsic.ResetAll");
         return Microsoft.Quantum.Intrinsic.ResetAll(qubits);
     }
 
