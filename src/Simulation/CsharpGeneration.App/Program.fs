@@ -33,6 +33,9 @@ type Options = {
       HelpText = "Destination folder where documentation will be generated.")>]
     DocFolder : string
 
+    [<Option('q', "qst", Required = false,
+      HelpText = "QST output file name. If provided, it will generate a .qst file with the binary represenation of the syntax tree.")>]
+    QSTFileName : string
 }
 
 type Logger() = 
@@ -45,10 +48,13 @@ type Logger() =
 
 let generateFiles (options : Options) = 
     let logger = new Logger()
+    let outputFolder = if String.IsNullOrWhiteSpace options.QSTFileName then null else options.OutputFolder
     let loadOptions = 
         new CompilationLoader.Configuration(
             GenerateFunctorSupport = true,
-            DocumentationOutputFolder = options.DocFolder
+            DocumentationOutputFolder = options.DocFolder,
+            BuildOutputFolder = outputFolder,
+            ProjectName = options.QSTFileName
         ) 
 
     let loaded = new CompilationLoader(options.Input, options.References, Nullable(loadOptions), logger)
