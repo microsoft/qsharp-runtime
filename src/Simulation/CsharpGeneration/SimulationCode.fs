@@ -92,7 +92,7 @@ module SimulationCode =
             not (autoNamespaces |> List.contains op.Namespace.Value)
             
     let getTypeParameters types = 
-        let findAll (t: ResolvedType) = t.ExtractAll (function 
+        let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function 
             | QsTypeKind.TypeParameter tp -> seq{ yield tp }
             | _ -> Enumerable.Empty())
         types 
