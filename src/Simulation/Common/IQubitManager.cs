@@ -14,6 +14,9 @@ namespace Microsoft.Quantum.Simulation.Common
         void Release(Qubit qubit);
         void Release(IQArray<Qubit> qubits);
 
+        void Disable(Qubit qubit);
+        void Disable(IQArray<Qubit> qubits);
+
         Qubit Borrow();
         IQArray<Qubit> Borrow(long count);
 
