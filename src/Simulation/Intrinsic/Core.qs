@@ -20,6 +20,32 @@ namespace Microsoft.Quantum.Core {
     newtype EntryPoint = Unit;
 
     /// # Summary
+    /// Compiler recognized attribute used to mark a type or callable as deprecated.
+    /// 
+    /// # Input
+    /// ## NewName
+    /// The full name of the type or callable to use instead. 
+    /// Is set to the empty String if a type or callable has been deprecated without substitution. 
+    ///
+    @Attribute()
+    newtype Deprecated = (NewName : String);
+
+
+    /// # Summary
+    /// Returns a default instance of the specified type. 
+    ///
+    /// # Output
+    /// Default value.
+    ///
+    /// # Type Parameters
+    /// ## 'T
+    /// The type of the default value to return. 
+    ///
+    function Default<'T> () : 'T {
+        return (new 'T[1])[0];
+    }
+
+    /// # Summary
     /// Returns the number of elements in an array.
     ///
     /// # Input

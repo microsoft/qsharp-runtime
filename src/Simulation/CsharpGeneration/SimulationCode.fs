@@ -92,7 +92,7 @@ module SimulationCode =
             not (autoNamespaces |> List.contains op.Namespace.Value)
             
     let getTypeParameters types = 
-        let findAll (t: ResolvedType) = t.ExtractAll (function 
+        let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function 
             | QsTypeKind.TypeParameter tp -> seq{ yield tp }
             | _ -> Enumerable.Empty())
         types 
@@ -765,7 +765,7 @@ module SimulationCode =
             |> this.AddStatement
             QsRepeatStatement rs
 
-        member this.onQubitScope (using:QsQubitScope) = 
+        override this.onQubitScope (using:QsQubitScope) = 
             let (alloc, release) = 
                 match using.Kind with 
                 | Allocate -> ("Allocate", "Release")
@@ -839,12 +839,6 @@ module SimulationCode =
             ``{{`` statements ``}}`` |> this.AddStatement
             lineNumber <- currentLine
             QsQubitScope using
-
-        override this.onAllocateQubits using = 
-            this.onQubitScope using
-
-        override this.onBorrowQubits borrow = 
-            this.onQubitScope borrow
 
         override this.onFailStatement fs = 
             let failException = ``new`` (``type`` ["ExecutionFailException"]) ``(`` [ (buildExpression fs) ] ``)``
