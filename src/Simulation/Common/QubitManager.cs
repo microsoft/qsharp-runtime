@@ -357,7 +357,8 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public long GetQubitsAvailableToBorrowCount(IEnumerable<Qubit> excludedQubitsSortedById)
         {
-            return GetQubitsAvailableToBorrowCount() - excludedQubitsSortedById.Count();
+            // Note: this function is not allowed to call its no-parameters cousin: GetQubitsAvailableToBorrowCount()
+            return numAllocatedQubits - excludedQubitsSortedById.Count();
         }
 
         public virtual long GetQubitsAvailableToBorrowCount()
