@@ -6,6 +6,22 @@ using System;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
+    public class SpecializationRangeAttribute : Attribute
+    { 
+        public string SourceFile { get; }
+        public string SpecializationKind { get; }
+        public int StartLine { get; }
+        public int EndLine { get; }
+
+        public SpecializationRangeAttribute(string sourceFile, string kind, int startLine, int endLine)
+        {
+            this.SourceFile = sourceFile;
+            this.SpecializationKind = kind;
+            this.StartLine = startLine;
+            this.EndLine = endLine;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class CallableDeclarationAttribute : Attribute
     {
