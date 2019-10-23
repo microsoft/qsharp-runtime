@@ -31,14 +31,39 @@ module SimulationCode =
     open Microsoft.Quantum.QsCompiler.Transformations
     open System.Globalization
 
+    type DeclarationPositions() = 
+        inherit SyntaxTreeTransformation<NoScopeTransformations>(new NoScopeTransformations())
+
+        let mutable currentSource = null
+        let declarationLocations = new List<NonNullable<string> * (int * int)>()
+
+        member this.DeclarationLocations = 
+            declarationLocations.ToLookup (fst, snd)
+
+        static member Apply (syntaxTree : IEnumerable<QsNamespace>) = 
+            let walker = new DeclarationPositions()
+            for ns in syntaxTree do 
+                walker.Transform ns |> ignore
+            walker.DeclarationLocations
+
+        override this.onSourceFile file = 
+            currentSource <- file.Value
+            file
+
+        override this.onLocation (loc : QsLocation) = 
+            if currentSource <> null then
+                declarationLocations.Add (NonNullable<string>.New currentSource, loc.Offset)
+            loc
+
     type CodegenContext = { 
-        allQsElements   : IEnumerable<QsNamespace>
-        allUdts         : ImmutableDictionary<QsQualifiedName,QsCustomType>
-        allCallables    : ImmutableDictionary<QsQualifiedName,QsCallable>
-        byName          : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
-        current         : QsQualifiedName option
-        signature       : ResolvedSignature option
-        fileName        : string option
+        allQsElements           : IEnumerable<QsNamespace>
+        allUdts                 : ImmutableDictionary<QsQualifiedName,QsCustomType>
+        allCallables            : ImmutableDictionary<QsQualifiedName,QsCallable>
+        declarationPositions    : ImmutableDictionary<NonNullable<string>, ImmutableSortedSet<int * int>>
+        byName                  : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
+        current                 : QsQualifiedName option
+        signature               : ResolvedSignature option
+        fileName                : string option
     } 
     
     type CodegenContext with
@@ -48,6 +73,7 @@ module SimulationCode =
     let createContext fileName syntaxTree =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
+        let positionInfos = DeclarationPositions.Apply syntaxTree
         let callablesByName = 
             let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
@@ -57,7 +83,16 @@ module SimulationCode =
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
-        { allQsElements = syntaxTree; byName = callablesByName; allUdts = udts; allCallables = callables; current = None; fileName = fileName; signature = None }
+        { 
+            allQsElements = syntaxTree; 
+            byName = callablesByName; 
+            allUdts = udts; 
+            allCallables = callables; 
+            declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
+            current = None; 
+            fileName = fileName; 
+            signature = None 
+        }
               
     let autoNamespaces = 
         [
