@@ -1020,11 +1020,20 @@ module SimulationCode =
             | QsControlledAdjoint -> "ControlledAdjointBody"
         let body = (buildSpecializationBody context sp)
         let attribute = 
-            let source = ``literal`` sp.SourceFile.Value
-            let kind = ``literal`` bodyName
-            let startLine, endLine = ``literal`` 0, ``literal`` 0 // FIXME
-            ``attribute`` None (ident "SpecializationRangeAttribute") [ source; kind; startLine; endLine ]
-
+            let startLine = fst sp.Location.Offset
+            let endLine = 
+                match context.declarationPositions.TryGetValue sp.SourceFile with 
+                | true, startPositions -> 
+                    let index = startPositions.IndexOf sp.Location.Offset
+                    if index = startPositions.Count then -1 else fst startPositions.[index + 1]
+//TODO: diagnostics.
+                | false, _ -> startLine
+            ``attribute`` None (ident "SpecializationRangeAttribute") [ 
+                ``literal`` sp.SourceFile.Value 
+                ``literal`` bodyName 
+                ``literal`` startLine 
+                ``literal`` endLine
+            ]
 
         match body with 
         | Some body ->
