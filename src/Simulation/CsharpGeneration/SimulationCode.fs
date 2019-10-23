@@ -1025,7 +1025,7 @@ module SimulationCode =
                 match context.declarationPositions.TryGetValue sp.SourceFile with 
                 | true, startPositions -> 
                     let index = startPositions.IndexOf sp.Location.Offset
-                    if index = startPositions.Count then -1 else fst startPositions.[index + 1]
+                    if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1]
 //TODO: diagnostics.
                 | false, _ -> startLine
             ``attribute`` None (ident "SpecializationRangeAttribute") [ 
