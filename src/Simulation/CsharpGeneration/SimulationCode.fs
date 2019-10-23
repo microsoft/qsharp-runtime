@@ -291,7 +291,7 @@ module SimulationCode =
                 let (current, _) = loc.Offset
                 this._StatementKind.LineNumber <- this._StatementKind.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
             | Null -> 
-                this._StatementKind.LineNumber <- Some 0 // indicates a hidden line
+                this._StatementKind.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
             this.DeclarationsInStatement <- node.SymbolDeclarations
             this.DeclarationsInScope <- LocalDeclarations.Concat this.DeclarationsInScope this.DeclarationsInStatement // only fine because/if a new StatementBlockBuilder is created for every block!
             base.onStatement node
@@ -310,6 +310,10 @@ module SimulationCode =
                 ``#line hidden`` <| s
             | Some n, Some ln -> 
                 ``#line`` ln n s
+            | Some n, None -> startLine |> function 
+                | Some ln -> 
+                    ``#line`` ln n s
+                | None -> s
             | _ -> s
             
         let QArrayType = function
