@@ -973,7 +973,7 @@ module SimulationCode =
         | _ -> 
             None
         
-    let buildSpecialization context (sp:QsSpecialization) : PropertyDeclarationSyntax option =
+    let buildSpecialization context (sp:QsSpecialization) : (PropertyDeclarationSyntax * _) option =
         let inType  = roslynTypeName context sp.Signature.ArgumentType
         let outType = roslynTypeName context sp.Signature.ReturnType
         let propertyType = "Func<" + inType + ", " + outType + ">"
@@ -984,14 +984,20 @@ module SimulationCode =
             | QsControlled        -> "ControlledBody"
             | QsControlledAdjoint -> "ControlledAdjointBody"
         let body = (buildSpecializationBody context sp)
+        let attribute = 
+            let source = ``literal`` sp.SourceFile.Value
+            let kind = ``literal`` bodyName
+            let startLine, endLine = ``literal`` 0, ``literal`` 0 // FIXME
+            ``attribute`` None (ident "SpecializationRangeAttribute") [ source; kind; startLine; endLine ]
+
 
         match body with 
         | Some body ->
-            Some (
+            let impl = 
                 ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
                     (``=>`` body)
-            )
+            Some (impl, attribute)
         | None ->
             None        
 
@@ -1235,7 +1241,9 @@ module SimulationCode =
         let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
         let typeParameters = typeParametersNames op.Signature
         let baseClass = genericBase baseOp ``<<`` typeArgsInterface ``>>``
-        let bodies = op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList |> List.map (fun x -> x :> MemberDeclarationSyntax)
+        let bodies, attr = 
+            op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList 
+            |> List.map (fun (x, y) -> (x :> MemberDeclarationSyntax, y)) |> List.unzip
         let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType) 
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
         let innerClasses = [ inData |> snd;  outData |> snd ] |> List.choose id
@@ -1247,11 +1255,13 @@ module SimulationCode =
             else
                 [``public``; ``partial`` ]
 
-        ``class`` name ``<<`` typeParameters ``>>``
-            ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
-            ``{``
-                (constructors @ innerClasses @ properties @ bodies @ methods) 
-            ``}``
+        ``attributes`` attr (
+            ``class`` name ``<<`` typeParameters ``>>``
+                ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
+                ``{``
+                    (constructors @ innerClasses @ properties @ bodies @ methods) 
+                ``}``
+            )
         :> MemberDeclarationSyntax     
 
     let isUDTDeclaration =                          function | QsCustomType udt -> Some udt | _ -> None

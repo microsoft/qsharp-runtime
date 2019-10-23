@@ -6,6 +6,7 @@ using System;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SpecializationRangeAttribute : Attribute
     { 
         public string SourceFile { get; }
