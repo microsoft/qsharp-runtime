@@ -3,7 +3,7 @@
   <Import Project="..\Common\DebugSymbols.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 

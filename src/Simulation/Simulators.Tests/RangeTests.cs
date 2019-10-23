@@ -21,13 +21,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             // The SimulatorBase class only implements operations for Qubit management,
             // i.e. Allocate/Release:
-            var subject = new Range(1, 5, 10);
+            var subject = new QRange(1, 5, 10);
 
             Assert.Equal(1, subject.Start);
             Assert.Equal(5, subject.Step);
             Assert.Equal(10, subject.End);
 
-            subject = new Range(10, -5, 0);
+            subject = new QRange(10, -5, 0);
 
             Assert.Equal(10, subject.Start);
             Assert.Equal(-5, subject.Step);
@@ -37,39 +37,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void RangeSamples()
         {
-            var subject = new Range(1, 3);
+            var subject = new QRange(1, 3);
             var expected = new long[] { 1, 2, 3 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(2, 2, 5);
+            subject = new QRange(2, 2, 5);
             expected = new long[] { 2, 4 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(2, 2, 5);
+            subject = new QRange(2, 2, 5);
             expected = new long[] { 2, 4 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(2, 2, 6);
+            subject = new QRange(2, 2, 6);
             expected = new long[] { 2, 4, 6 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(6, -2, 2);
+            subject = new QRange(6, -2, 2);
             expected = new long[] { 6, 4, 2 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(2, 6, 7);
+            subject = new QRange(2, 6, 7);
             expected = new long[] { 2 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(-1, 2, 10);
+            subject = new QRange(-1, 2, 10);
             expected = new long[] { -1, 1, 3, 5, 7, 9 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(-1, -1, -5);
+            subject = new QRange(-1, -1, -5);
             expected = new long[] { -1, -2, -3, -4, -5 };
             Assert.Equal(expected, subject);
 
-            subject = new Range(1, 1);
+            subject = new QRange(1, 1);
             expected = new long[] { 1 };
             Assert.Equal(expected, subject);
         }
@@ -77,19 +77,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void EmptyRangeSamples()
         {
-            var subject = new Range(2, 2, 1);
+            var subject = new QRange(2, 2, 1);
             Assert.Empty(subject);
             Assert.Empty(subject.Reverse());
 
-            subject = new Range(2, 1);
+            subject = new QRange(2, 1);
             Assert.Empty(subject);
             Assert.Empty(subject.Reverse());
 
-            subject = new Range(1, -1, 2);
+            subject = new QRange(1, -1, 2);
             Assert.Empty(subject);
             Assert.Empty(subject.Reverse());
 
-            subject = new Range(1, 2, 0);
+            subject = new QRange(1, 2, 0);
             Assert.Empty(subject);
             Assert.Empty(subject.Reverse());
         }
@@ -97,13 +97,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void InvalidRangeStep()
         {
-            Assert.Throws<ArgumentException>("step", () => { new Range(1, 0, 10); });
+            Assert.Throws<ArgumentException>("step", () => { new QRange(1, 0, 10); });
         }
 
         [Fact]
         public void RangeIteration()
         {
-            var subject = new Range(6, -2, 2);
+            var subject = new QRange(6, -2, 2);
             var expected = new long[] { 6, 4, 2 };
             var actual = new List<long>();
 
@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(expected, actual);
 
             actual = new List<long>();
-            foreach (var j in new Range(6, -(2L), 2))
+            foreach (var j in new QRange(6, -(2L), 2))
             {
                 actual.Add(j);
             }
@@ -124,16 +124,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void RangeReversal()
         {
-            var subject = new Range(6, -2, 2);
-            var expected = new Range(2, 2, 6);
+            var subject = new QRange(6, -2, 2);
+            var expected = new QRange(2, 2, 6);
             Assert.Equal(expected, subject.Reverse());
 
-            subject = new Range(1, 1, 0);
-            expected = new Range(0, -1, 1);
+            subject = new QRange(1, 1, 0);
+            expected = new QRange(0, -1, 1);
             Assert.Equal(expected, subject.Reverse());
 
-            subject = new Range(1, 2, 2);
-            expected = new Range(1, -2, 1);
+            subject = new QRange(1, 2, 2);
+            expected = new QRange(1, -2, 1);
             Assert.Equal(expected, subject.Reverse());
         }
 

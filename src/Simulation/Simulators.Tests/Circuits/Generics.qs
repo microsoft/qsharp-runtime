@@ -209,7 +209,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics {
     }
     
     
-    function Item<'T> (i : Int, array : 'T[]) : 'T {
+    function ItemAt<'T> (i : Int, array : 'T[]) : 'T {
         
         return array[i];
     }
@@ -217,7 +217,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics {
     
     function CreateLookup<'T> (array : 'T[]) : (Int -> 'T) {
         
-        return Item(_, array);
+        return ItemAt(_, array);
     }
     
     

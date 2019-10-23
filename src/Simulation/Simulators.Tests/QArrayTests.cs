@@ -141,13 +141,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void SliceArray()
         {
             var source = new QArray<long>(0);
-            var range = new Range(0, 0);
+            var range = new QRange(0, 0);
             var expected = new QArray<long>(0);
             var actual = source.Slice(range);
             Assert.Equal(expected, actual);
 
             source = new QArray<long>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-            range = new Range(0, 2, 10);
+            range = new QRange(0, 2, 10);
             expected = new QArray<long>(0, 2, 4, 6, 8, 10);
             actual = source.Slice(range);
             Assert.Equal(expected, actual);
@@ -155,7 +155,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             source = new QArray<long>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
             expected = new QArray<long>(1, 6);
-            actual = source.Slice(new Range(1, 5, 10));
+            actual = source.Slice(new QRange(1, 5, 10));
             Assert.Equal(expected, actual);
 
             OperationsTestHelper.IgnoreDebugAssert(() =>
@@ -201,7 +201,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(22, array2[2]);
 
             // Copy-on-write with slices
-            var r = new Range(1, 2, 10);
+            var r = new QRange(1, 2, 10);
             var array3 = array2.Slice(r);
             var expected = new QArray<long>(1, 3, 5, 7, 9);
             Assert.Equal(expected, array3);
@@ -212,7 +212,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             // Mixing slicing and joining
             array2 = new QArray<long>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
             var expected2 = new QArray<long>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-            r = new Range(1, 2, 10);
+            r = new QRange(1, 2, 10);
             array3 = array2.Slice(r);
             var array4 = new QArray<long>(11, 13);
             var array5 = QArray<long>.Add(array3, array4);
@@ -250,7 +250,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(10, index);
 
             // Enumerating a slice
-            var r = new Range(1, 2, 10);
+            var r = new QRange(1, 2, 10);
             var array2 = array1.Slice(r);
             index = 1;
             foreach (var n in array2)
