@@ -7,14 +7,14 @@ using System;
 namespace Microsoft.Quantum.Simulation.Core
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class SpecializationRangeAttribute : Attribute
+    public class SourceLocationAttribute : Attribute
     { 
         public string SourceFile { get; }
-        public string SpecializationKind { get; }
+        public OperationFunctor SpecializationKind { get; }
         public int StartLine { get; }
         public int EndLine { get; }
 
-        public SpecializationRangeAttribute(string sourceFile, string kind, int startLine, int endLine)
+        public SourceLocationAttribute(string sourceFile, OperationFunctor kind, int startLine, int endLine)
         {
             this.SourceFile = sourceFile;
             this.SpecializationKind = kind;

@@ -1028,9 +1028,9 @@ module SimulationCode =
                     if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1]
 //TODO: diagnostics.
                 | false, _ -> startLine
-            ``attribute`` None (ident "SpecializationRangeAttribute") [ 
+            ``attribute`` None (ident "SourceLocation") [ 
                 ``literal`` sp.SourceFile.Value 
-                ``literal`` bodyName 
+                ``ident`` "OperationFunctor" <|.|> ``ident`` bodyName 
                 ``literal`` startLine 
                 ``literal`` endLine
             ]

@@ -2304,10 +2304,10 @@ namespace N1
         |> testOneClass randomAbstractOperation
 
         """
-    [SpecializationRangeAttribute("%%%", "Body", 107, 112)]
-    [SpecializationRangeAttribute("%%%", "AdjointBody", 112, 118)]
-    [SpecializationRangeAttribute("%%%", "ControlledBody", 118, 125)]
-    [SpecializationRangeAttribute("%%%", "ControlledAdjointBody", 125, 131)]
+    [SourceLocation("%%%", OperationFunctor.Body, 107, 112)]
+    [SourceLocation("%%%", OperationFunctor.AdjointBody, 112, 118)]
+    [SourceLocation("%%%", OperationFunctor.ControlledBody, 118, 125)]
+    [SourceLocation("%%%", OperationFunctor.ControlledAdjointBody, 125, 131)]
     public partial class oneQubitOperation : Unitary<Qubit>, ICallable
     {
         public oneQubitOperation(IOperationFactory m) : base(m)
@@ -2405,7 +2405,7 @@ namespace N1
         |> testOneClass genCtrl3
         
         """
-    [SpecializationRangeAttribute("%%%", "Body", 1265, 1271)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1265, 1271)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
         public composeImpl(IOperationFactory m) : base(m)
@@ -2554,7 +2554,7 @@ namespace N1
         |> testOneClass emptyFunction
 
         """
-    [SpecializationRangeAttribute("%%%", "Body", 32, 39)]
+    [SourceLocation("%%%", OperationFunctor.Body, 32, 39)]
     public partial class intFunction : Function<QVoid, Int64>, ICallable
     {
         public intFunction(IOperationFactory m) : base(m)
@@ -2582,7 +2582,7 @@ namespace N1
         |> testOneClass intFunction
 
         """
-    [SpecializationRangeAttribute("%%%", "Body", 44, 50)]
+    [SourceLocation("%%%", OperationFunctor.Body, 44, 50)]
     public partial class powFunction : Function<(Int64,Int64), Int64>, ICallable
     {
         public powFunction(IOperationFactory m) : base(m)
@@ -2619,7 +2619,7 @@ namespace N1
         |> testOneClass powFunction
 
         """
-    [SpecializationRangeAttribute("%%%", "Body", 50, 56)]
+    [SourceLocation("%%%", OperationFunctor.Body, 50, 56)]
     public partial class bigPowFunction : Function<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger>, ICallable
     {
         public bigPowFunction(IOperationFactory m) : base(m)
@@ -3058,7 +3058,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.Inline
 {
-    [SpecializationRangeAttribute("%%%", "Body", 6, -1)]
+    [SourceLocation("%%%", OperationFunctor.Body, 6, -1)]
     public partial class HelloWorld : Operation<Int64, Int64>, ICallable
     {
         public HelloWorld(IOperationFactory m) : base(m)
@@ -3104,7 +3104,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.LineNumbers
 {
-    [SpecializationRangeAttribute("%%%", "Body", 8, -1)]
+    [SourceLocation("%%%", OperationFunctor.Body, 8, -1)]
     public partial class TestLineInBlocks : Operation<Int64, Result>, ICallable
     {
         public TestLineInBlocks(IOperationFactory m) : base(m)
