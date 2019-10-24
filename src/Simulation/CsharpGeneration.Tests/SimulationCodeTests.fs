@@ -2305,9 +2305,9 @@ namespace N1
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 107, 112)]
-    [SourceLocation("%%%", OperationFunctor.AdjointBody, 112, 118)]
-    [SourceLocation("%%%", OperationFunctor.ControlledBody, 118, 125)]
-    [SourceLocation("%%%", OperationFunctor.ControlledAdjointBody, 125, 131)]
+    [SourceLocation("%%%", OperationFunctor.Adjoint, 112, 118)]
+    [SourceLocation("%%%", OperationFunctor.Controlled, 118, 125)]
+    [SourceLocation("%%%", OperationFunctor.ControlledAdjoint, 125, 131)]
     public partial class oneQubitOperation : Unitary<Qubit>, ICallable
     {
         public oneQubitOperation(IOperationFactory m) : base(m)
