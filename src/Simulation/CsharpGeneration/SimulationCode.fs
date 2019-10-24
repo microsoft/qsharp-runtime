@@ -1015,9 +1015,9 @@ module SimulationCode =
         let bodyName = 
             match sp.Kind with 
             | QsBody              -> "Body"
-            | QsAdjoint           -> "AdjointBody"
-            | QsControlled        -> "ControlledBody"
-            | QsControlledAdjoint -> "ControlledAdjointBody"
+            | QsAdjoint           -> "Adjoint"
+            | QsControlled        -> "Controlled"
+            | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
         let attribute = 
             let startLine = fst sp.Location.Offset
@@ -1037,6 +1037,7 @@ module SimulationCode =
 
         match body with 
         | Some body ->
+            let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
             let impl = 
                 ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
