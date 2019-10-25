@@ -25,6 +25,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         bool IsValid(Qubit qubit);
         bool IsFree(Qubit qubit);
+        bool IsDisabled(Qubit qubit);
 
         long GetFreeQubitsCount();
         long GetQubitsAvailableToBorrowCount();

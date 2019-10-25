@@ -141,6 +141,10 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 throw new ArgumentException($"Cannot use qubit {q.Id}. Qubit has already been released.", qubitName);
             }
+            if (QubitManager.IsDisabled(q))
+            {
+                throw new ArgumentException($"Cannot use qubit {q.Id}. Qubit is disabled.", qubitName);
+            }
         }
 
         /// <summary>
