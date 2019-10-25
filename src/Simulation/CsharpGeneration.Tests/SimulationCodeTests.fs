@@ -1617,7 +1617,7 @@ namespace N1
        
     let testOneSpecialization pick (_,op) expected =
         let context = createTestContext op
-        let actual  = op |> pick |> buildSpecialization context |> Option.map formatSyntaxTree
+        let actual  = op |> pick |> buildSpecialization context |> Option.map (fst >> formatSyntaxTree)
         Assert.Equal(expected |> Option.map clearFormatting, actual |> Option.map clearFormatting)
 
     [<Fact>]
@@ -2237,7 +2237,8 @@ namespace N1
         false |> testOne differentArgsOperation
         false |> testOne randomOperation
 
-    let testOneClass (_,op) expected =
+    let testOneClass (_,op : QsCallable) (expected : string) =
+        let expected = expected.Replace("%%%", op.SourceFile.Value)
         let context = createContext None syntaxTree 
         let actual = (buildOperationClass context op).ToFullString()
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
@@ -2303,6 +2304,10 @@ namespace N1
         |> testOneClass randomAbstractOperation
 
         """
+    [SourceLocation("%%%", OperationFunctor.Body, 107, 112)]
+    [SourceLocation("%%%", OperationFunctor.Adjoint, 112, 118)]
+    [SourceLocation("%%%", OperationFunctor.Controlled, 118, 125)]
+    [SourceLocation("%%%", OperationFunctor.ControlledAdjoint, 125, 131)]
     public partial class oneQubitOperation : Unitary<Qubit>, ICallable
     {
         public oneQubitOperation(IOperationFactory m) : base(m)
@@ -2400,6 +2405,7 @@ namespace N1
         |> testOneClass genCtrl3
         
         """
+    [SourceLocation("%%%", OperationFunctor.Body, 1265, 1271)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
         public composeImpl(IOperationFactory m) : base(m)
@@ -2548,6 +2554,7 @@ namespace N1
         |> testOneClass emptyFunction
 
         """
+    [SourceLocation("%%%", OperationFunctor.Body, 32, 39)]
     public partial class intFunction : Function<QVoid, Int64>, ICallable
     {
         public intFunction(IOperationFactory m) : base(m)
@@ -2575,6 +2582,7 @@ namespace N1
         |> testOneClass intFunction
 
         """
+    [SourceLocation("%%%", OperationFunctor.Body, 44, 50)]
     public partial class powFunction : Function<(Int64,Int64), Int64>, ICallable
     {
         public powFunction(IOperationFactory m) : base(m)
@@ -2611,6 +2619,7 @@ namespace N1
         |> testOneClass powFunction
 
         """
+    [SourceLocation("%%%", OperationFunctor.Body, 50, 56)]
     public partial class bigPowFunction : Function<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger>, ICallable
     {
         public bigPowFunction(IOperationFactory m) : base(m)
@@ -3049,6 +3058,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.Inline
 {
+    [SourceLocation("%%%", OperationFunctor.Body, 6, -1)]
     public partial class HelloWorld : Operation<Int64, Int64>, ICallable
     {
         public HelloWorld(IOperationFactory m) : base(m)
@@ -3094,6 +3104,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.LineNumbers
 {
+    [SourceLocation("%%%", OperationFunctor.Body, 8, -1)]
     public partial class TestLineInBlocks : Operation<Int64, Result>, ICallable
     {
         public TestLineInBlocks(IOperationFactory m) : base(m)

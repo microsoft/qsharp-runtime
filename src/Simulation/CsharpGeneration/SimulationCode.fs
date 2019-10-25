@@ -31,14 +31,39 @@ module SimulationCode =
     open Microsoft.Quantum.QsCompiler.Transformations
     open System.Globalization
 
+    type DeclarationPositions() = 
+        inherit SyntaxTreeTransformation<NoScopeTransformations>(new NoScopeTransformations())
+
+        let mutable currentSource = null
+        let declarationLocations = new List<NonNullable<string> * (int * int)>()
+
+        member this.DeclarationLocations = 
+            declarationLocations.ToLookup (fst, snd)
+
+        static member Apply (syntaxTree : IEnumerable<QsNamespace>) = 
+            let walker = new DeclarationPositions()
+            for ns in syntaxTree do 
+                walker.Transform ns |> ignore
+            walker.DeclarationLocations
+
+        override this.onSourceFile file = 
+            currentSource <- file.Value
+            file
+
+        override this.onLocation (loc : QsLocation) = 
+            if currentSource <> null then
+                declarationLocations.Add (NonNullable<string>.New currentSource, loc.Offset)
+            loc
+
     type CodegenContext = { 
-        allQsElements   : IEnumerable<QsNamespace>
-        allUdts         : ImmutableDictionary<QsQualifiedName,QsCustomType>
-        allCallables    : ImmutableDictionary<QsQualifiedName,QsCallable>
-        byName          : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
-        current         : QsQualifiedName option
-        signature       : ResolvedSignature option
-        fileName        : string option
+        allQsElements           : IEnumerable<QsNamespace>
+        allUdts                 : ImmutableDictionary<QsQualifiedName,QsCustomType>
+        allCallables            : ImmutableDictionary<QsQualifiedName,QsCallable>
+        declarationPositions    : ImmutableDictionary<NonNullable<string>, ImmutableSortedSet<int * int>>
+        byName                  : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
+        current                 : QsQualifiedName option
+        signature               : ResolvedSignature option
+        fileName                : string option
     } 
     
     type CodegenContext with
@@ -48,6 +73,7 @@ module SimulationCode =
     let createContext fileName syntaxTree =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
+        let positionInfos = DeclarationPositions.Apply syntaxTree
         let callablesByName = 
             let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
@@ -57,7 +83,16 @@ module SimulationCode =
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
-        { allQsElements = syntaxTree; byName = callablesByName; allUdts = udts; allCallables = callables; current = None; fileName = fileName; signature = None }
+        { 
+            allQsElements = syntaxTree; 
+            byName = callablesByName; 
+            allUdts = udts; 
+            allCallables = callables; 
+            declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
+            current = None; 
+            fileName = fileName; 
+            signature = None 
+        }
               
     let autoNamespaces = 
         [
@@ -291,7 +326,7 @@ module SimulationCode =
                 let (current, _) = loc.Offset
                 this._StatementKind.LineNumber <- this._StatementKind.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
             | Null -> 
-                this._StatementKind.LineNumber <- Some 0 // indicates a hidden line
+                this._StatementKind.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
             this.DeclarationsInStatement <- node.SymbolDeclarations
             this.DeclarationsInScope <- LocalDeclarations.Concat this.DeclarationsInScope this.DeclarationsInStatement // only fine because/if a new StatementBlockBuilder is created for every block!
             base.onStatement node
@@ -310,6 +345,10 @@ module SimulationCode =
                 ``#line hidden`` <| s
             | Some n, Some ln -> 
                 ``#line`` ln n s
+            | Some n, None -> startLine |> function 
+                | Some ln -> 
+                    ``#line`` ln n s
+                | None -> s
             | _ -> s
             
         let QArrayType = function
@@ -969,25 +1008,41 @@ module SimulationCode =
         | _ -> 
             None
         
-    let buildSpecialization context (sp:QsSpecialization) : PropertyDeclarationSyntax option =
+    let buildSpecialization context (sp:QsSpecialization) : (PropertyDeclarationSyntax * _) option =
         let inType  = roslynTypeName context sp.Signature.ArgumentType
         let outType = roslynTypeName context sp.Signature.ReturnType
         let propertyType = "Func<" + inType + ", " + outType + ">"
         let bodyName = 
             match sp.Kind with 
             | QsBody              -> "Body"
-            | QsAdjoint           -> "AdjointBody"
-            | QsControlled        -> "ControlledBody"
-            | QsControlledAdjoint -> "ControlledAdjointBody"
+            | QsAdjoint           -> "Adjoint"
+            | QsControlled        -> "Controlled"
+            | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
+        let attribute = 
+            let startLine = fst sp.Location.Offset
+            let endLine = 
+                match context.declarationPositions.TryGetValue sp.SourceFile with 
+                | true, startPositions -> 
+                    let index = startPositions.IndexOf sp.Location.Offset
+                    if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1]
+//TODO: diagnostics.
+                | false, _ -> startLine
+            ``attribute`` None (ident "SourceLocation") [ 
+                ``literal`` sp.SourceFile.Value 
+                ``ident`` "OperationFunctor" <|.|> ``ident`` bodyName 
+                ``literal`` startLine 
+                ``literal`` endLine
+            ]
 
         match body with 
         | Some body ->
-            Some (
+            let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
+            let impl = 
                 ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
                     (``=>`` body)
-            )
+            Some (impl, attribute)
         | None ->
             None        
 
@@ -1231,7 +1286,9 @@ module SimulationCode =
         let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
         let typeParameters = typeParametersNames op.Signature
         let baseClass = genericBase baseOp ``<<`` typeArgsInterface ``>>``
-        let bodies = op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList |> List.map (fun x -> x :> MemberDeclarationSyntax)
+        let bodies, attr = 
+            op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList 
+            |> List.map (fun (x, y) -> (x :> MemberDeclarationSyntax, y)) |> List.unzip
         let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType) 
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
         let innerClasses = [ inData |> snd;  outData |> snd ] |> List.choose id
@@ -1243,11 +1300,13 @@ module SimulationCode =
             else
                 [``public``; ``partial`` ]
 
-        ``class`` name ``<<`` typeParameters ``>>``
-            ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
-            ``{``
-                (constructors @ innerClasses @ properties @ bodies @ methods) 
-            ``}``
+        ``attributes`` attr (
+            ``class`` name ``<<`` typeParameters ``>>``
+                ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
+                ``{``
+                    (constructors @ innerClasses @ properties @ bodies @ methods) 
+                ``}``
+            )
         :> MemberDeclarationSyntax     
 
     let isUDTDeclaration =                          function | QsCustomType udt -> Some udt | _ -> None
