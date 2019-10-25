@@ -7,12 +7,12 @@
   -->
   <Target Name="QsharpCompile"
       Inputs="@(QsharpFiles)"
-      Outputs="$(QsharpOutDir)qsc-ok.txt"
+      Outputs="$(QsharpSrcOutDir)\$(QsharpTree)"
       DependsOnTargets="QsharpPrepare"
-      BeforeTargets="CoreCompile"
+      BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
     <PropertyGroup>
-      <QscCommand>$(QscExe) $(QsharpDocsGen) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
+      <QscCommand>$(QscExe) $(QsharpDocsGen) --qst $(QsharpTree) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
     </PropertyGroup>
     <MakeDir Directories="$(QsharpSrcOutDir)" />
     <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />
@@ -23,11 +23,9 @@
     </ItemGroup>
     <Delete Files="@(QsharpCodegenFiles)" />
     <Exec Command="$(QscCommand)" />
-    <WriteLinesToFile File="$(QsharpOutDir)qsc-ok.txt" Lines="qsc completed succesfully!" Overwrite="true"/>
     <ItemGroup>
-      <Compile Include="$(QsharpSrcOutDir)**\*.g.cs">
-        <Visible>false</Visible>
-      </Compile>
+      <EmbeddedResource Include="$(QsharpSrcOutDir)\$(QsharpTree)" LogicalName="$(QsharpTree)" Visible="false" />
+      <Compile Include="$(QsharpSrcOutDir)**\*.g.cs" Visible="false" />
     </ItemGroup>
   </Target>
 
@@ -65,6 +63,7 @@
       <QsharpFormatBackupDir Condition="'$(QsharpFormatBackupDir)' == ''">$(QsharpOutDir).backup.$([System.DateTime]::Now.ToString(`yyyyMMddhhmmss`))</QsharpFormatBackupDir>
       <QsharpDocsOutDir Condition="'$(QsharpDocsOutDir)' == ''">$(QsharpOutDir)docs\</QsharpDocsOutDir>
       <QsharpDocsGen Condition="$(RunQDocGen)">--doc $(QsharpDocsOutDir)</QsharpDocsGen>
+      <QsharpTree Condition="'$(QsharpTree)' == ''">__qsharp_data__.bson</QsharpTree>
     </PropertyGroup>
     <Warning
         Condition="'@(SkippedQbFiles)' != ''"

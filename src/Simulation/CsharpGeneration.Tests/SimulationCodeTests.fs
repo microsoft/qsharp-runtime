@@ -323,7 +323,7 @@ namespace N1
 
         [
             ((NS2, "M"       ),    "ICallable<Qubit, Result>")
-            ((NS1, "let_f0"  ),    "ICallable<Int64, Range>")
+            ((NS1, "let_f0"  ),    "ICallable<Int64, QRange>")
         ]
         |> testOne letsOperations
     
@@ -353,7 +353,7 @@ namespace N1
         |> testOne ifOperation
 
         [
-            ((NSC, "RangeEnd"),    "ICallable<Range, Int64>")
+            ((NSC, "RangeEnd"),    "ICallable<QRange, Int64>")
             ((NS1, "foreach_f2"),  "ICallable<(Int64,Int64), Int64>")
         ]
         |> testOne foreachOperation
@@ -1140,7 +1140,7 @@ namespace N1
 
             "X.Apply(qubits.Data[0L]);"
             "X.Adjoint.Apply(qubits.Data[0L]);"
-            "X.Controlled.Apply((qubits.Data?.Slice(new Range(1L,5L)), qubits.Data[0L]));"
+            "X.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
             "call_target1.Apply((1L, X,     X,   X,   X));"
             "call_target1.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
@@ -1162,8 +1162,8 @@ namespace N1
             "var iZero = 0L;"
             "var dZero = 0D;"
 
-            "var a = new Range(0L, 10L);"
-            "var b = new Range(8L, -(1L), 5L);"
+            "var a = new QRange(0L, 10L);"
+            "var b = new QRange(8L, -(1L), 5L);"
             "var j = (n + 1L);"
             "var k = ((((n - 1L) * n.Pow(2L)) / 3L) % 4L);"
 
@@ -1176,7 +1176,7 @@ namespace N1
             if (true)
             {
                 var (l2,(m2,o2)) = t;
-                return u3.Data.Apply<let_udt_2>(u1).Data.Apply<Range>(u1);
+                return u3.Data.Apply<let_udt_2>(u1).Data.Apply<QRange>(u1);
             }
             """
             "var s = String.Format(\"n is {0} and u is {1}, {2}, {3}, {4}\",n,u3.Data.Apply<let_udt_2>(u1),r,n,j);"
@@ -1266,17 +1266,17 @@ namespace N1
     let ``foreach operations`` () =
         [
             "var result = 0L;"
-            @"foreach (var n in new Range(0L, i)) 
+            @"foreach (var n in new QRange(0L, i)) 
             #line hidden
             { 
                 result = (result + i); 
             }"
-            @"foreach (var n in new Range(i, -(1L), 0L)) 
+            @"foreach (var n in new QRange(i, -(1L), 0L)) 
             #line hidden
             { 
                 result = ((result - i) * 2L); 
             }"
-            "var range = new Range(0L, 10L);"
+            "var range = new QRange(0L, 10L);"
             @"foreach (var n in range) 
             #line hidden
             { 
@@ -1725,7 +1725,7 @@ namespace N1
             "var r5 = (IQArray<Result>)QArray<Result>.Create((4L + 2L));"
             "var r6 = QArray<Pauli>.Create(r5.Length);"
             "var r7 = (IQArray<Int64>)QArray<Int64>.Add(r2, r4);"
-            "var r8 = (IQArray<Int64>)r7?.Slice(new Range(1L, 5L, 10L));"
+            "var r8 = (IQArray<Int64>)r7?.Slice(new QRange(1L, 5L, 10L));"
         
             "var r9 = new arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
             "var r10 = (IQArray<arrays_T1>)QArray<arrays_T1>.Create(4L);"
@@ -1733,15 +1733,15 @@ namespace N1
             "var r12 = (IQArray<arrays_T2>)QArray<arrays_T2>.Create(r10.Length);"
             "var r13 = new arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
             "var r14 = (IQArray<Qubit>)QArray<Qubit>.Add(qubits, register.Data);"
-            "var r15 = (IQArray<Qubit>)register.Data?.Slice(new Range(0L, 2L));"
-            "var r16 = (IQArray<Qubit>)qubits?.Slice(new Range(1L, -(1L)));"
+            "var r15 = (IQArray<Qubit>)register.Data?.Slice(new QRange(0L, 2L));"
+            "var r16 = (IQArray<Qubit>)qubits?.Slice(new QRange(1L, -(1L)));"
             "var r18 = (IQArray<Qubits>)QArray<Qubits>.Create(2L);"
             "var r19 = (IQArray<Microsoft.Quantum.Overrides.udt0>)QArray<Microsoft.Quantum.Overrides.udt0>.Create(7L);"            
             "var i0 = r13.Data[0L][1L];"
             "var i1 = r2[(0L + r1.Length)];"
             "var i2 = r3[(i1 * ((2L + 3L) - (8L % 1L)))];"
             "var i3 = qubits[0L];"
-            "var i4 = (IQArray<Range>)indices[0L];"
+            "var i4 = (IQArray<QRange>)indices[0L];"
             "var i5 = indices[0L][1L];"
             "var i6 = (IQArray<Result>)t.Data[0L];"
             "var i7 = register.Data[3L];"
@@ -1762,15 +1762,15 @@ namespace N1
     [<Fact>]
     let ``array slice`` () =
         [
-            "var r2 = new Range(10L,-(2L),0L);"
-            "var ranges = (IQArray<Range>)QArray<Range>.Create(1L);"
+            "var r2 = new QRange(10L,-(2L),0L);"
+            "var ranges = (IQArray<QRange>)QArray<QRange>.Create(1L);"
 
-            "var s1 = (IQArray<Qubit>)qubits?.Slice(new Range(0L,10L));"
+            "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
             "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
             "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
             "var s4 = (IQArray<Qubit>)qubits?.Slice(GetMeARange.Apply(QVoid.Instance));"
 
-            "return qubits?.Slice(new Range(10L,-(3L),0L));"
+            "return qubits?.Slice(new QRange(10L,-(3L),0L));"
         ]
         |> testOneBody (applyVisitor sliceOperations)
     
@@ -2169,9 +2169,9 @@ namespace N1
         |> testOne randomAbstractOperation
         
                 
-        "public static System.Threading.Tasks.Task<IQArray<IQArray<Result>>> Run(IOperationFactory __m__, IQArray<Qubit> qubits, Qubits register, IQArray<IQArray<Range>> indices, arrays_T3 t)
+        "public static System.Threading.Tasks.Task<IQArray<IQArray<Result>>> Run(IOperationFactory __m__, IQArray<Qubit> qubits, Qubits register, IQArray<IQArray<QRange>> indices, arrays_T3 t)
         {
-            return __m__.Run<arraysOperations, (IQArray<Qubit>, Qubits, IQArray<IQArray<Range>>, arrays_T3), IQArray<IQArray<Result>>>((qubits, register, indices, t));
+            return __m__.Run<arraysOperations, (IQArray<Qubit>, Qubits, IQArray<IQArray<QRange>>, arrays_T3), IQArray<IQArray<Result>>>((qubits, register, indices, t));
         }" 
         |> testOne arraysOperations
         
@@ -3142,7 +3142,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     else
                     {
 #line 20 "%%"
-                        foreach (var c in ctrls?.Slice(new Range(0L, 2L, r)))
+                        foreach (var c in ctrls?.Slice(new QRange(0L, 2L, r)))
 #line hidden
                         {
 #line 21 "%%"

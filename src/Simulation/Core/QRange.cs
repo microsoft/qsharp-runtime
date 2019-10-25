@@ -4,26 +4,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
     /// Corresponds to Q# Range type. For example, the Q# value of <code>start .. step .. end</code> 
-    /// is of the Range type.
+    /// is of the QRange type.
     /// </summary>
-    public class Range : IEnumerable<long>
+    public class QRange : IEnumerable<long>
     {
-        public Range() : this(0, 1, 0)
+        public QRange() : this(0, 1, 0)
         {
         }
 
         /// <summary>
         /// Creates a range corresponding to Q# value <code>start .. step .. end</code>
         /// </summary>
-        public Range(long start, long step, long end)
+        public QRange(long start, long step, long end)
         {
             if (step == 0)
             {
@@ -39,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// Creates a range with step equal to 1, corresponding to 
         ///  Q# value of <code>[start .. end]</code> 
         /// </summary>
-        public Range(long start, long end) : this(start, 1, end)
+        public QRange(long start, long end) : this(start, 1, end)
         {
         }
 
@@ -63,8 +61,8 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// Returns an empty range.
         /// </summary>
-        public static Range Empty =>
-            new Range(0L, -1L);
+        public static QRange Empty =>
+            new QRange(0L, -1L);
 
         /// <summary>
         /// Returns true if the range is empty.
@@ -72,11 +70,11 @@ namespace Microsoft.Quantum.Simulation.Core
         public bool IsEmpty =>
             (End < Start && Step >= 0) || (End > Start && Step <= 0);
 
-        public Range Reverse()
+        public QRange Reverse()
         {
-            if (IsEmpty) return Range.Empty; 
+            if (IsEmpty) return QRange.Empty; 
             long newStart = Start + ((End - Start) / Step) * Step;
-            return new Range(newStart, -Step, Start);
+            return new QRange(newStart, -Step, Start);
         }
 
         /// <summary>

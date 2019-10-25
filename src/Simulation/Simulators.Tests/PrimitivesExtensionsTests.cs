@@ -39,9 +39,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 var t = one.IsGenericType 
                     ? one.MakeGenericType(Enumerable.Repeat(typeof(string), one.GetGenericArguments().Length).ToArray())
-                    : one; 
-                Assert.True(t.IsAbstract, $"All types in {extensionsNameSpace} must be abstract, {one.Name} is not.");
-                Assert.True(t.GetNativeImplementation() != null, $"{one.Name} missing Native implementation.");
+                    : one;
+                if (t.IsAbstract)
+                {
+                    Assert.True(t.GetNativeImplementation() != null, $"{one.Name} missing Native implementation.");
+                }
             }
         }
     }

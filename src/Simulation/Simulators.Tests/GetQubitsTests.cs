@@ -66,10 +66,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null((Pauli.PauliI as object).GetQubits());
             Assert.Null((OperationFunctor.Body as object).GetQubits());
 
-            var x1 = new Range(0, 1);
+            var x1 = new QRange(0, 1);
             Assert.Null((x1 as object).GetQubits());
 
-            var tpl1 = (1, 1, (1.2, new Range(0, 1)));
+            var tpl1 = (1, 1, (1.2, new QRange(0, 1)));
             Assert.Null((tpl1 as object).GetQubits());
 
             var tpl2 = (1, new int[] { 1, 2 });

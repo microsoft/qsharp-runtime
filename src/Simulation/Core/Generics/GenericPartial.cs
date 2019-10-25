@@ -174,7 +174,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         /// <summary>
         /// The Types of the PartialApplicaiton need to match the one from the actual base operation and sometimes they might 
-        /// missmatch due to upcasting from compiler...
+        /// mismatch due to upcasting from compiler...
         /// Also return the base PartialApplication type, either a PartialOperation<> or a PartialFunction<>, depending if the base
         /// operationType is a Q# operation or function.
         /// </summary>
