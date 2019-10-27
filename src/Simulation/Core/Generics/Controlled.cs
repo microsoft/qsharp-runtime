@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Core
     ///     input Type is not resolved until it gets Applied at runtime.
     /// </summary>
     [DebuggerTypeProxy(typeof(GenericControlled.DebuggerProxy))]
-    public class GenericControlled : GenericCallable, IApplyData
+    public class GenericControlled : GenericCallable, IApplyData, IWrappedOperation
     {
         public GenericControlled(GenericCallable baseOp) : base(baseOp.Factory, null)
         {
@@ -33,6 +33,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         public GenericCallable BaseOp { get; }
+        ICallable IWrappedOperation.BaseOperation => BaseOp;
 
         IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)this.BaseOp)?.Qubits;
 
