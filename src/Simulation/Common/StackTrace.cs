@@ -38,6 +38,40 @@ namespace Microsoft.Quantum.Simulation.Common
             declarationStartLineNumber = -1;
             declarationEndLineNumber = -1;
         }
+
+        public string GetOperationSourceFromPDB()
+        {
+            string result = null;
+            try
+            {
+                //TODO:
+            }
+            catch ( Exception )
+            {
+
+            }
+            return result;
+        }
+
+        public string GetURLFromPDB()
+        {
+            string result = null;
+            try
+            {
+                //TODO:
+            }
+            catch (Exception)
+            {
+
+            }
+            return result;
+        }
+
+        public override string ToString()
+        {
+            //TODO:
+            return base.ToString();
+        }
     }
 
     public class StackTraceCollector
