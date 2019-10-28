@@ -38,4 +38,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         op(2);
     }
 
+    operation PartialAdjFail1() : Unit is Adj + Ctl {
+        let op = PartialFail(0,_);
+        Adjoint op(2);
+    }
+
+    operation PartialCtlFail1() : Unit is Adj + Ctl {
+        let op = PartialFail(0,_);
+        Controlled op(new Qubit[0], 2);
+    }
+
+    operation GenericAdjFail1() :  Unit is Adj + Ctl {
+        Adjoint GenericFail(5,6);
+    }
+
+    operation GenericCtlFail1() :  Unit is Adj + Ctl {
+        Controlled GenericFail( new Qubit[0], (5,6));
+    }
 }

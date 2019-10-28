@@ -66,29 +66,173 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void GenericFail1Test()
         {
             ToffoliSimulator sim = new ToffoliSimulator();
-            StackTraceCollector sc = new StackTraceCollector(sim);
-            ICallable op = sim.Get<ICallable, GenericFail1>();
-            try
+
             {
-                QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, GenericFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
+
+                    Assert.Equal(3, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail1", stackFrames[2].operation.FullName);
+
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+
+                    Assert.Equal(7, stackFrames[0].failedLineNumber);
+                    Assert.Equal(25, stackFrames[1].failedLineNumber);
+                    Assert.Equal(29, stackFrames[2].failedLineNumber);
+                }
             }
-            catch (ExecutionFailException)
+
             {
-                StackFrame[] stackFrames = sc.CallStack.ToArray();
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, GenericAdjFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
 
-                Assert.Equal(3, stackFrames.Length);
+                    Assert.Equal(3, stackFrames.Length);
 
-                Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
-                Assert.Equal(namespacePrefix + "GenericFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericAdjFail1", stackFrames[2].operation.FullName);
 
-                Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
 
-                Assert.Equal(7, stackFrames[0].failedLineNumber);
-                Assert.Equal(25, stackFrames[1].failedLineNumber);
-                Assert.Equal(29, stackFrames[2].failedLineNumber);
+                    Assert.Equal(5, stackFrames[0].failedLineNumber);
+                    Assert.Equal(23, stackFrames[1].failedLineNumber);
+                    Assert.Equal(52, stackFrames[2].failedLineNumber);
+                }
+            }
+
+            {
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, GenericCtlFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
+
+                    Assert.Equal(3, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "GenericCtlFail1", stackFrames[2].operation.FullName);
+
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+
+                    Assert.Equal(5, stackFrames[0].failedLineNumber);
+                    Assert.Equal(23, stackFrames[1].failedLineNumber);
+                    Assert.Equal(56, stackFrames[2].failedLineNumber);
+                }
+            }
+        }
+
+        [Fact]
+        public void PartialFail1Test()
+        {
+            ToffoliSimulator sim = new ToffoliSimulator();
+
+            {
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, PartialFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
+
+                    Assert.Equal(3, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail1", stackFrames[2].operation.FullName);
+
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+
+                    Assert.Equal(7, stackFrames[0].failedLineNumber);
+                    Assert.Equal(33, stackFrames[1].failedLineNumber);
+                    Assert.Equal(38, stackFrames[2].failedLineNumber);
+                }
+            }
+
+            {
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, PartialAdjFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
+
+                    Assert.Equal(3, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialAdjFail1", stackFrames[2].operation.FullName);
+
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+
+                    Assert.Equal(5, stackFrames[0].failedLineNumber);
+                    Assert.Equal(31, stackFrames[1].failedLineNumber);
+                    Assert.Equal(43, stackFrames[2].failedLineNumber);
+                }
+            }
+
+            {
+                StackTraceCollector sc = new StackTraceCollector(sim);
+                ICallable op = sim.Get<ICallable, PartialCtlFail1>();
+                try
+                {
+                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    StackFrame[] stackFrames = sc.CallStack.ToArray();
+
+                    Assert.Equal(3, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
+                    Assert.Equal(namespacePrefix + "PartialCtlFail1", stackFrames[2].operation.FullName);
+
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].operation.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+
+                    Assert.Equal(5, stackFrames[0].failedLineNumber);
+                    Assert.Equal(31, stackFrames[1].failedLineNumber);
+                    Assert.Equal(48, stackFrames[2].failedLineNumber);
+                }
             }
         }
     }
