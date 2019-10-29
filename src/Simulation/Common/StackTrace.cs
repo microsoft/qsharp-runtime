@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -78,8 +79,8 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public override string ToString()
         {
-            //TODO:
-            return base.ToString();
+            string location = GetURLFromPDB() ?? $"{sourceFile}:line {failedLineNumber}";
+            return $"in {operation.FullName} on {location}";
         }
     }
 
@@ -146,40 +147,107 @@ namespace Microsoft.Quantum.Simulation.Common
             return res;
         }
 
-        static void PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
+        class HalfOpenInterval : IEquatable<HalfOpenInterval>
         {
-            // TODO: change logic to check if given location in the known Q# call-stack locations 
-            List<Tuple<string, int>> qsharpSourceLocations = new List<Tuple<string, int>>();
-            foreach (System.Diagnostics.StackFrame csStackFrame in csharpCallStack)
+            public readonly int start;
+            public readonly int end;
+
+            public HalfOpenInterval(int start, int end)
             {
-                string fileName = csStackFrame.GetFileName();
-                if (System.IO.Path.GetExtension(fileName) == ".qs")
+                if( start > end ) throw new ArgumentException($"Interval start:{start} must be less or equal to end:{end}.");
+                this.start = start;
+                this.end = end;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as HalfOpenInterval);
+            }
+
+            public bool Equals(HalfOpenInterval other)
+            {
+                return other != null &&
+                       start == other.start &&
+                       end == other.end;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(start, end);
+            }
+        }
+
+        class NonOverlappingHalfOpenIntervalSet
+        {
+            class NonOverlappinIntervalsComparator : IComparer<HalfOpenInterval>
+            {
+                public int Compare(HalfOpenInterval x, HalfOpenInterval y)
                 {
-                    qsharpSourceLocations.Add(new Tuple<string, int>(fileName, csStackFrame.GetFileLineNumber()));
+                    if (x.end <= y.start) return -1;
+                    if (x.start >= y.end) return 1;
+                    if (x.start == y.start && x.end == y.end) return 0;
+                    throw new ArgumentException("Compared intervals must be non-overlapping");
                 }
             }
 
-            StackFrame[] stackFrames = qsharpCallStack.ToArray();
-            for (int i = 0; i < stackFrames.Length; ++i)
+            public NonOverlappingHalfOpenIntervalSet(IEnumerable<HalfOpenInterval> inervals)
             {
-                ICallable op = UnwrapCallable(stackFrames[i].operation);
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(int value)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        static void PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
+        {
+            // TODO: change logic to check if given location in the known Q# call-stack locations 
+            //List<Tuple<string, int>> qsharpSourceLocations = new List<Tuple<string, int>>();
+            //foreach (System.Diagnostics.StackFrame csStackFrame in csharpCallStack)
+            //{
+            //    string fileName = csStackFrame.GetFileName();
+            //    if (System.IO.Path.GetExtension(fileName) == ".qs")
+            //    {
+            //        qsharpSourceLocations.Add(new Tuple<string, int>(fileName, csStackFrame.GetFileLineNumber()));
+            //    }
+            //}
+
+            //string fileName = System.IO.Path.GetFullPath(qsharpSourceLocations[i].Item1);
+            //int failedLineNumber = qsharpSourceLocations[i].Item2;
+            //if (fileName == stackFrames[i].sourceFile &&
+            //    sourceLocation.StartLine <= failedLineNumber &&
+            //    ((failedLineNumber <= sourceLocation.EndLine) || sourceLocation.EndLine == -1))
+            //{
+            //    stackFrames[i].failedLineNumber = failedLineNumber;
+            //}
+
+            Dictionary<string, List<HalfOpenInterval>> sourceLocations = new Dictionary<string, List<HalfOpenInterval>>();
+            foreach (StackFrame currentFrame in qsharpCallStack )
+            {
+                ICallable op = UnwrapCallable(currentFrame.operation);
                 object[] locations = op.GetType().GetCustomAttributes(typeof(SourceLocationAttribute), true);
                 foreach (object location in locations)
                 {
                     SourceLocationAttribute sourceLocation = (location as SourceLocationAttribute);
                     if (sourceLocation != null && sourceLocation.SpecializationKind == op.Variant)
                     {
-                        stackFrames[i].sourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
-                        stackFrames[i].declarationStartLineNumber = sourceLocation.StartLine;
-                        stackFrames[i].declarationEndLineNumber = sourceLocation.EndLine;
+                        currentFrame.sourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
+                        currentFrame.declarationStartLineNumber = sourceLocation.StartLine + 1; // note that attribute has base 0 line numbers
+                        currentFrame.declarationEndLineNumber = sourceLocation.EndLine == -1 ? -1 : sourceLocation.EndLine + 1;
 
-                        string fileName = System.IO.Path.GetFullPath(qsharpSourceLocations[i].Item1);
-                        int failedLineNumber = qsharpSourceLocations[i].Item2;
-                        if (fileName == stackFrames[i].sourceFile &&
-                            sourceLocation.StartLine <= failedLineNumber &&
-                            ((failedLineNumber <= sourceLocation.EndLine) || sourceLocation.EndLine == -1))
+                        List<HalfOpenInterval> intervals = sourceLocations.GetValueOrDefault(currentFrame.sourceFile);
+                        HalfOpenInterval currentRange = new HalfOpenInterval(
+                            currentFrame.declarationStartLineNumber,
+                            currentFrame.declarationEndLineNumber == -1 ? int.MaxValue : currentFrame.declarationEndLineNumber);
+                        if (intervals == null)
                         {
-                            stackFrames[i].failedLineNumber = failedLineNumber;
+                            sourceLocations.Add(currentFrame.sourceFile, new List<HalfOpenInterval>(Enumerable.Repeat(currentRange,1));
+                        }
+                        else
+                        {
+                            intervals.Add(currentRange);
                         }
                     }
                 }
