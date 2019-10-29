@@ -3,8 +3,8 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
-    function AlwaysFail() : Unit {
-		fail "Always fail";
+    operation AlwaysFail() : Unit is Adj + Ctl{
+		Fail();
 	}
     
     operation AlwaysFail1() : Unit is Adj + Ctl{
@@ -54,5 +54,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     operation GenericCtlFail1() :  Unit is Adj + Ctl {
         Controlled GenericFail( new Qubit[0], (5,6));
+    }
+
+    function Fail() : Unit {
+        fail "Always fail";
+    }
+
+    operation RecursionFail( a : Int) : Unit is Adj {
+        if ( a >= 1 ) 
+        {
+            RecursionFail(a-1);
+        }
+        else 
+        {
+            Fail();
+        }
+    }
+
+    operation RecursionFail1() : Unit {
+        RecursionFail(2);
     }
 }

@@ -368,5 +368,15 @@ namespace Microsoft.Quantum.Simulation.Core
 
             return t.Name;
         }
+
+        public static ICallable UnwrapCallable(this ICallable op)
+        {
+            ICallable res = op;
+            while (res as IWrappedOperation != null)
+            {
+                res = (res as IWrappedOperation).BaseOperation;
+            }
+            return res;
+        }
     }
 }

@@ -347,7 +347,7 @@ module SimulationCode =
                 ``#line`` ln n s
             | Some n, None -> startLine |> function 
                 | Some ln -> 
-                    ``#line`` ln n s
+                    ``#line`` (ln + 1) n s
                 | None -> s
             | _ -> s
             
@@ -1020,12 +1020,12 @@ module SimulationCode =
             | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
         let attribute = 
-            let startLine = fst sp.Location.Offset
+            let startLine = fst sp.Location.Offset + 1
             let endLine = 
                 match context.declarationPositions.TryGetValue sp.SourceFile with 
                 | true, startPositions -> 
                     let index = startPositions.IndexOf sp.Location.Offset
-                    if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1]
+                    if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
 //TODO: diagnostics.
                 | false, _ -> startLine
             ``attribute`` None (ident "SourceLocation") [ 
