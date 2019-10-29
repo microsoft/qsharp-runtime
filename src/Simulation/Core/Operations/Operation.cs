@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Core
     }
 
     /// <summary>
-    /// An operation that wrapps another operation, for example
+    /// An operation that wraps another operation, for example
     /// <see cref="AdjointedOperation{I, O}"/>, <see cref="ControlledOperation{I, O}"/>,
     /// <see cref="OperationPartial{P, I, O}"/>,
     /// </summary>

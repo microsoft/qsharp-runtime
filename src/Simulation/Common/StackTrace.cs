@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Quantum.Simulation.Core;
+using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -21,12 +22,20 @@ namespace Microsoft.Quantum.Simulation.Common
         public string sourceFile;
 
         /// <summary>
-        /// Line in the operation that resulted in failure. Note that for automatically derived Adjoint and Controlled 
+        /// One based line number in the operation that resulted in failure. Note that for automatically derived Adjoint and Controlled 
         /// variants of the operation, the line always points to the operation declaration
         /// </summary>
         public int failedLineNumber;
 
+        /// <summary>
+        /// One based line number where the declaration starts.
+        /// </summary>
         public int declarationStartLineNumber;
+
+        /// <summary>
+        /// One based line number of the first line after the declaration.
+        /// The value -1, if the declaration ends on the last line of the file.
+        /// </summary>
         public int declarationEndLineNumber;
 
         public StackFrame(ICallable _operation, IApplyData _argument)
@@ -46,7 +55,7 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 //TODO:
             }
-            catch ( Exception )
+            catch (Exception)
             {
 
             }
@@ -78,13 +87,13 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         private readonly Stack<StackFrame> callStack;
         private System.Diagnostics.StackFrame[] frames = null;
-        bool hasNotFailed = true;
+        bool hasFailed = false;
 
         public StackTraceCollector(SimulatorBase sim)
         {
-            sim.OnOperationStart += OnOperationStart;
-            sim.OnOperationEnd += OnOperationEnd;
-            sim.OnFail += OnFail;
+            sim.OnOperationStart += this.OnOperationStart;
+            sim.OnOperationEnd += this.OnOperationEnd;
+            sim.OnFail += this.OnFail;
             callStack = new Stack<StackFrame>();
         }
 
@@ -95,7 +104,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         void OnOperationEnd(ICallable callable, IApplyData arg)
         {
-            if (hasNotFailed)
+            if (!hasFailed)
             {
                 callStack.Pop();
             }
@@ -103,9 +112,9 @@ namespace Microsoft.Quantum.Simulation.Common
 
         void OnFail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo)
         {
-            if (hasNotFailed)
+            if (!hasFailed)
             {
-                hasNotFailed = false;
+                hasFailed = true;
             }
 
             System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace(exceptionInfo.SourceException, 0, true);
@@ -117,10 +126,11 @@ namespace Microsoft.Quantum.Simulation.Common
             }
             else
             {
-                // When the exception is thrown, OnFail can be called mutiple times.
+                // When the exception is thrown, OnFail can be called multiple times.
                 // With every next call we see bigger part of the call stack, so we save the biggest call stack
                 if (currentFrames.Length > frames.Length)
                 {
+                    Debug.Assert((frames.Length == 0) || (frames[0].ToString() == currentFrames[0].ToString()));
                     frames = currentFrames;
                 }
             }
@@ -138,6 +148,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         static void PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
         {
+            // TODO: change logic to check if given location in the known Q# call-stack locations 
             List<Tuple<string, int>> qsharpSourceLocations = new List<Tuple<string, int>>();
             foreach (System.Diagnostics.StackFrame csStackFrame in csharpCallStack)
             {

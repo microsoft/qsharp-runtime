@@ -3,7 +3,7 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
-    operation AlwaysFail() : Unit is Adj + Ctl {
+    function AlwaysFail() : Unit {
 		fail "Always fail";
 	}
     
