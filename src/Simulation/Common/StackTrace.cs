@@ -70,9 +70,11 @@ namespace Microsoft.Quantum.Simulation.Common
             return PortablePdbSymbolReader.TryFormatGitHubUrl(result, failedLineNumber);
         }
 
+        private const string messageFormat = "in {0} on {1}";
+
         public override string ToString()
         {
-            return $"in {operation.FullName} on {sourceFile}:line {failedLineNumber}";
+            return string.Format(messageFormat, operation.FullName, $"{sourceFile}:line {failedLineNumber}");
         }
 
         /// <summary>
@@ -99,7 +101,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
-                    return $"in {operation.FullName} on {url}";
+                    return string.Format(messageFormat, operation.FullName, url);
                 }
             }
         }
@@ -178,7 +180,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     if (sourceLocation != null && sourceLocation.SpecializationKind == op.Variant)
                     {
                         currentFrame.sourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
-                        currentFrame.declarationStartLineNumber = sourceLocation.StartLine; // note that attribute has base 0 line numbers
+                        currentFrame.declarationStartLineNumber = sourceLocation.StartLine;
                         currentFrame.declarationEndLineNumber = sourceLocation.EndLine;
                     }
                 }
