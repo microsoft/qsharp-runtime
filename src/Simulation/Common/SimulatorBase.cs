@@ -98,14 +98,34 @@ namespace Microsoft.Quantum.Simulation.Common
             return result;
         }
 
+        public virtual O RunSync<T, I, O>(I args) where T : AbstractCallable, ICallable
+        {
+            O res = default(O);
+            var op = Get<ICallable, T>();
+            try
+            {
+                res = op.Apply<O>(args);
+            }
+            catch (Exception e) // Dumps q# call-stack in case of exception if CallStack tracking was enabled
+            {
+                StackFrame[] qsharpStackFrames = this.CallStack;
+                if (qsharpStackFrames != null)
+                {
+                    OnLog?.Invoke($"Unhandled Exception: {e.GetType().FullName}: {e.Message}");
+                    foreach (StackFrame sf in qsharpStackFrames)
+                    {
+                        OnLog?.Invoke(sf.ToStringWithBestSourceLocation());
+                    }
+                }
+                OnLog?.Invoke("");
+                throw;
+            }
+            return res;
+        }
 
         public virtual Task<O> Run<T, I, O>(I args) where T : AbstractCallable, ICallable
         {
-            return Task<O>.Run(() =>
-            {
-                var op = Get<ICallable, T>();
-                return op.Apply<O>(args);
-            });
+            return Task<O>.Run(() => RunSync<T, I, O>(args));
         }
 
         /// <summary>
@@ -346,5 +366,16 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             OnFail?.Invoke(exceptionInfo);
         }
+
+        #region Stack trace collection support 
+        private StackTraceCollector stackTraceCollector = null;
+        
+        public void EnableStackTrace()
+        {
+            stackTraceCollector = new StackTraceCollector(this);
+        }
+
+        public StackFrame[] CallStack => stackTraceCollector?.CallStack;
+        #endregion
     }
 }

@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// One based line number in the operation that resulted in failure. Note that for automatically derived Adjoint and Controlled 
         /// variants of the operation, the line always points to the operation declaration
         /// </summary>
-        public int failedLineNumber;
+        public int failedLineNumber = -2;
 
         /// <summary>
         /// One based line number where the declaration starts.
@@ -39,46 +39,81 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public int declarationEndLineNumber;
 
-        private readonly Lazy<string> pdbFileLocation;
-
         public StackFrame(ICallable _operation, IApplyData _argument)
         {
             operation = _operation;
             argument = _argument;
-            sourceFile = null;
-            failedLineNumber = -1;
-            declarationStartLineNumber = -1;
-            declarationEndLineNumber = -1;
-            pdbFileLocation = new Lazy<string>(() => PortablePdbSymbolReader.GetPDBLocation(operation));
         }
 
+        /// <summary>
+        /// Uses PortablePDBs and SourceLink to get the source of failed operation.
+        /// </summary>
         public string GetOperationSourceFromPDB()
         {
+            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(operation);
             return PortablePDBEmbeddedFilesCache.GetEmbeddedFileRange(
-                pdbFileLocation.Value,
+                pdbFileLocation,
                 sourceFile,
                 declarationStartLineNumber,
                 declarationEndLineNumber,
                 showLineNumbers: true, markedLine: failedLineNumber);
         }
 
+        /// <summary>
+        /// Uses PortablePDBs and SourceLink to get URL for file and line number.
+        /// </summary>
+        /// <returns></returns>
         public string GetURLFromPDB()
         {
-            string result = PortablePDBPathRemappingCache.TryGetFileUrl(pdbFileLocation.Value, sourceFile);
+            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(operation);
+            Tuple<string,string> result = PortablePDBPathRemappingCache.TryGetFileUrl(pdbFileLocation, sourceFile);
             return PortablePdbSymbolReader.TryFormatGitHubUrl(result, failedLineNumber);
         }
 
         public override string ToString()
         {
-            string location = GetURLFromPDB() ?? $"{sourceFile}:line {failedLineNumber}";
-            return $"in {operation.FullName} on {location}";
+            return $"in {operation.FullName} on {sourceFile}:line {failedLineNumber}";
+        }
+
+        /// <summary>
+        /// The same as <see cref="ToString"/>, but tries to point to best source location.
+        /// If the source is not available on local machine, source location will be replaced 
+        /// by URL pointing to GitHub repository.
+        /// This is more costly than <see cref="ToString"/> because it checks if source file exists on disk.
+        /// If the file does not exist it calls <see cref="GetURLFromPDB"/> to get the URL
+        /// which is also more costly than <see cref="ToString"/>.
+        /// </summary>
+        public virtual string ToStringWithBestSourceLocation()
+        {
+            string message = ToString();
+            if (System.IO.File.Exists(sourceFile))
+            {
+                return message;
+            }
+            else
+            {
+                string url = GetURLFromPDB();
+                if (url == null)
+                {
+                    return message;
+                }
+                else
+                {
+                    return $"in {operation.FullName} on {url}";
+                }
+            }
         }
     }
 
+    /// <summary>
+    /// Tracks Q# call-stack till the first failure resulting in <see cref="SimulatorBase.OnFail"/>
+    /// event invocation.  
+    /// </summary>
     public class StackTraceCollector
     {
         private readonly Stack<StackFrame> callStack;
         private System.Diagnostics.StackFrame[] frames = null;
+        StackFrame[] stackFramesWithLocations = null;
         bool hasFailed = false;
 
         public StackTraceCollector(SimulatorBase sim)
@@ -91,7 +126,10 @@ namespace Microsoft.Quantum.Simulation.Common
 
         void OnOperationStart(ICallable callable, IApplyData arg)
         {
-            callStack.Push(new StackFrame(callable, arg));
+            if (!hasFailed)
+            {
+                callStack.Push(new StackFrame(callable, arg));
+            }
         }
 
         void OnOperationEnd(ICallable callable, IApplyData arg)
@@ -127,8 +165,6 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
             }
         }
-
-
 
         static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
         {
@@ -174,11 +210,26 @@ namespace Microsoft.Quantum.Simulation.Common
             return qsharpStackFrames;
         }
 
+        /// <summary>
+        /// If failure has happened returns the call-stack at time of failure.
+        /// Returns null if the failure has not happened.
+        /// </summary>
         public StackFrame[] CallStack
         {
             get
             {
-                return PopulateSourceLocations(callStack, frames);
+                if (hasFailed)
+                {
+                    if( stackFramesWithLocations == null )
+                    {
+                        stackFramesWithLocations = PopulateSourceLocations(callStack, frames);
+                    }
+                    return stackFramesWithLocations;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }

@@ -293,5 +293,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             }
         }
+
+        [Fact]
+        public void ErrorLogTest()
+        {
+            ToffoliSimulator sim = new ToffoliSimulator();
+            sim.EnableStackTrace();
+            StringBuilder stringBuilder = new StringBuilder();
+            sim.OnLog += (msg) => stringBuilder.AppendLine(msg);
+            try
+            {
+                QVoid res = sim.RunSync<AlwaysFail4, QVoid, QVoid>(QVoid.Instance);
+            }
+            catch (ExecutionFailException)
+            {
+            }
+            output.WriteLine(stringBuilder.ToString());
+        }
     }
 }
