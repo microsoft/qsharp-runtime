@@ -236,23 +236,44 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public static string GetEmbeddedFileRange( string pdbLocation, string fullName, int lineStart, int lineEnd, bool showLineNumbers = false, int markedLine = -1, string markPrefix = lineMarkPrefix)
         {
-            Dictionary<string, string> sourceToFile = GetEmbeddedFiles(pdbLocation);
-            if (sourceToFile == null) return null;
-            string source = sourceToFile.GetValueOrDefault(fullName);
+            Dictionary<string, string> fileNameToFileSourceText = GetEmbeddedFiles(pdbLocation);
+            if (fileNameToFileSourceText == null) return null;
+            string source = fileNameToFileSourceText.GetValueOrDefault(fullName);
             if (source == null) return null;
-            string[] lines = Regex.Split(source, "\r\n|\r|\n");
+
             StringBuilder builder = new StringBuilder();
-            for( int i = lineStart; i < (lineEnd == -1 ? int.MaxValue : lineEnd); ++i )
+            using (StringReader reader = new StringReader(source))
             {
-                if( showLineNumbers )
+                int lineNumber = 0;
+                string currentLine = null;
+
+                // first go through text source till we reach lineStart
+                while ( reader.Peek() != -1 )
                 {
-                    builder.Append($"{i} ".PadLeft(lineNumberPaddingWidth));
+                    lineNumber++;
+                    currentLine = reader.ReadLine();
+                    if (lineNumber == lineStart)
+                        break;
                 }
-                if (i == markedLine)
+
+                while (reader.Peek() != -1)
                 {
-                    builder.Append(markPrefix);
+                    if (showLineNumbers)
+                    {
+                        builder.Append($"{lineNumber} ".PadLeft(lineNumberPaddingWidth));
+                    }
+                    if (lineNumber == markedLine)
+                    {
+                        builder.Append(markPrefix);
+                    }
+                    builder.AppendLine(currentLine);
+
+                    lineNumber++;
+                    currentLine = reader.ReadLine();
+
+                    if (lineNumber == lineEnd)
+                        break;
                 }
-                builder.AppendLine(lines[i - 1]);
             }
             return builder.ToString();
         }
