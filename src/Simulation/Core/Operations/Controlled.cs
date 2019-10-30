@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Core
     ///     This class is used to represents an operation that has been controlled.
     /// </summary>
     [DebuggerTypeProxy(typeof(ControlledOperation<,>.DebuggerProxy))]
-    public class ControlledOperation<I, O> : Unitary<(IQArray<Qubit>, I)>, IApplyData, ICallable, IWrappedOperation
+    public class ControlledOperation<I, O> : Unitary<(IQArray<Qubit>, I)>, IApplyData, ICallable, IOperationWrapper
     {
         public class In : IApplyData
         {
@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         public Operation<I, QVoid> BaseOp { get; }
-        ICallable IWrappedOperation.BaseOperation => BaseOp;
+        ICallable IOperationWrapper.BaseOperation => BaseOp;
 
         public override void Init() { }
 

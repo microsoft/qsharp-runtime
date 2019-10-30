@@ -372,9 +372,9 @@ namespace Microsoft.Quantum.Simulation.Core
         public static ICallable UnwrapCallable(this ICallable op)
         {
             ICallable res = op;
-            while (res as IWrappedOperation != null)
+            while (res as IOperationWrapper != null)
             {
-                res = (res as IWrappedOperation).BaseOperation;
+                res = (res as IOperationWrapper).BaseOperation;
             }
             return res;
         }

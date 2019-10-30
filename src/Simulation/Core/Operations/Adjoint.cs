@@ -39,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.Core
     ///     Class used to represents an operation that has been adjointed.
     /// </summary>
     [DebuggerTypeProxy(typeof(AdjointedOperation<,>.DebuggerProxy))]
-    public class AdjointedOperation<I, O> : Unitary<I>, IApplyData, ICallable, IWrappedOperation
+    public class AdjointedOperation<I, O> : Unitary<I>, IApplyData, ICallable, IOperationWrapper
     {
         public AdjointedOperation(Operation<I, O> op) : base(op.Factory)
         {
@@ -50,7 +50,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         public Operation<I, QVoid> BaseOp { get; }
-        ICallable IWrappedOperation.BaseOperation => BaseOp;
+        ICallable IOperationWrapper.BaseOperation => BaseOp;
 
         public override void Init() { }
 

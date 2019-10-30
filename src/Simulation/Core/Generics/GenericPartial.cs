@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Core
     ///     input Type is not resolved until it gets Applied at runtime.
     /// </summary>
     [DebuggerTypeProxy(typeof(GenericPartial.DebuggerProxy))]
-    public class GenericPartial : GenericCallable, IApplyData, IWrappedOperation
+    public class GenericPartial : GenericCallable, IApplyData, IOperationWrapper
     {
         private Lazy<Qubit[]> __qubits = null;
 
@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         public GenericCallable BaseOp { get; }
-        ICallable IWrappedOperation.BaseOperation => BaseOp;
+        ICallable IOperationWrapper.BaseOperation => BaseOp;
 
         public override string Name => this.BaseOp.Name;
         public override string FullName => this.BaseOp.FullName;

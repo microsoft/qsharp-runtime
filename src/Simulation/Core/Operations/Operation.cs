@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Core
     /// <see cref="AdjointedOperation{I, O}"/>, <see cref="ControlledOperation{I, O}"/>,
     /// <see cref="OperationPartial{P, I, O}"/>,
     /// </summary>
-    public interface IWrappedOperation
+    public interface IOperationWrapper
     {
         ICallable BaseOperation { get; }
     }

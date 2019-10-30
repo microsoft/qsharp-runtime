@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Core
     ///     Optionally it can receive a Mapper to do the same.
     /// </summary>
     [DebuggerTypeProxy(typeof(OperationPartial<,,>.DebuggerProxy))]
-    public class OperationPartial<P, I, O> : Operation<P, O>, IUnitary<P>, IWrappedOperation
+    public class OperationPartial<P, I, O> : Operation<P, O>, IUnitary<P>, IOperationWrapper
     {
         private Lazy<Qubit[]> __qubits = null;
 
@@ -59,7 +59,7 @@ namespace Microsoft.Quantum.Simulation.Core
         public override void Init() { }
 
         public Operation<I, O> BaseOp { get; }
-        ICallable IWrappedOperation.BaseOperation => BaseOp;
+        ICallable IOperationWrapper.BaseOperation => BaseOp;
 
         public Func<P, I> Mapper { get; }
 
