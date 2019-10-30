@@ -139,17 +139,17 @@ namespace Microsoft.Quantum.Simulation.Common
     public static class PortablePDBPathRemappingCache
     {
         [ThreadStatic]
-        private static Dictionary<string, Tuple<string, string>[]> knownPathRemappings = null;
+        private static Dictionary<string, Tuple<string, string>[]> pdbLocationToPathRemapping = null;
 
         public static Tuple<string, string>[] GetRemappingInfromation(string pdbLocation)
         {
-            if (knownPathRemappings == null)
+            if (pdbLocationToPathRemapping == null)
             {
-                knownPathRemappings = new Dictionary<string, Tuple<string, string>[]>();
+                pdbLocationToPathRemapping = new Dictionary<string, Tuple<string, string>[]>();
             }
 
             Tuple<string, string>[] remappings;
-            if (knownPathRemappings.TryGetValue(pdbLocation, out remappings))
+            if (pdbLocationToPathRemapping.TryGetValue(pdbLocation, out remappings))
             {
                 return remappings;
             }
@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 finally
                 {
-                    knownPathRemappings.Add(pdbLocation, remappings);
+                    pdbLocationToPathRemapping.Add(pdbLocation, remappings);
                 }
                 return remappings;
             }
@@ -206,17 +206,17 @@ namespace Microsoft.Quantum.Simulation.Common
         public const int lineNumberPaddingWidth = 6;
 
         [ThreadStatic]
-        private static Dictionary<string, Dictionary<string, string>> embeddedFiles = null;
+        private static Dictionary<string, Dictionary<string, string>> pdbLocationToEmbeddedFiles = null;
 
         public static Dictionary<string, string> GetEmbeddedFiles(string pdbLocation)
         {
-            if (embeddedFiles == null)
+            if (pdbLocationToEmbeddedFiles == null)
             {
-                embeddedFiles = new Dictionary<string, Dictionary<string, string>>();
+                pdbLocationToEmbeddedFiles = new Dictionary<string, Dictionary<string, string>>();
             }
 
             Dictionary<string, string> embeddedFilesFromPath = null;
-            if (embeddedFiles.TryGetValue(pdbLocation, out embeddedFilesFromPath))
+            if (pdbLocationToEmbeddedFiles.TryGetValue(pdbLocation, out embeddedFilesFromPath))
             {
                 return embeddedFilesFromPath;
             }
@@ -228,7 +228,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 finally
                 {
-                    embeddedFiles.Add(pdbLocation, embeddedFilesFromPath);
+                    pdbLocationToEmbeddedFiles.Add(pdbLocation, embeddedFilesFromPath);
                 }
                 return embeddedFilesFromPath;
             }
@@ -245,19 +245,19 @@ namespace Microsoft.Quantum.Simulation.Common
             using (StringReader reader = new StringReader(source))
             {
                 int lineNumber = 0;
-                string currentLine = null;
 
                 // first go through text source till we reach lineStart
                 while ( reader.Peek() != -1 )
                 {
                     lineNumber++;
-                    currentLine = reader.ReadLine();
                     if (lineNumber == lineStart)
                         break;
+                    reader.ReadLine();
                 }
 
                 while (reader.Peek() != -1)
                 {
+                    string currentLine = reader.ReadLine();
                     if (showLineNumbers)
                     {
                         builder.Append($"{lineNumber} ".PadLeft(lineNumberPaddingWidth));
@@ -269,8 +269,6 @@ namespace Microsoft.Quantum.Simulation.Common
                     builder.AppendLine(currentLine);
 
                     lineNumber++;
-                    currentLine = reader.ReadLine();
-
                     if (lineNumber == lineEnd)
                         break;
                 }
