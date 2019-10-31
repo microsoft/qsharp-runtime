@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Extensions.Testing {
     /// Please use @"microsoft.quantum.diagnostics.assertoperationsequalreferenced".
     /// Note that the order of the arguments to this operation has changed.
     @Deprecated("Microsoft.Quantum.Diagnostics.AssertOperationsEqualReferenced")
-    operation AssertOperationsEqualReferenced(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit : Adjoint), nQubits : Int) : Unit {
+    operation AssertOperationsEqualReferenced(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit is Adj), nQubits : Int) : Unit {
         Microsoft.Quantum.Diagnostics.AssertOperationsEqualReferenced(nQubits, actual, expected);
     }
 
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Extensions.Testing {
     /// Please use @"microsoft.quantum.diagnostics.assertoperationsequalinplace".
     /// Note that the order of the arguments to this operation has changed.
     @Deprecated("Microsoft.Quantum.Diagnostics.AssertOperationsEqualInPlace")
-    operation AssertOperationsEqualInPlace(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit : Adjoint), nQubits : Int) : Unit {
+    operation AssertOperationsEqualInPlace(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit is Adj), nQubits : Int) : Unit {
         Microsoft.Quantum.Diagnostics.AssertOperationsEqualInPlace(nQubits, actual, expected);
     }
 
@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Extensions.Testing {
     /// Please use @"microsoft.quantum.diagnostics.assertoperationsequalinplaceCompBasis".
     /// Note that the order of the arguments to this operation has changed.
     @Deprecated("Microsoft.Quantum.Diagnostics.AssertOperationsEqualInPlaceCompBasis")
-    operation AssertOperationsEqualInPlaceCompBasis(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit : Adjoint), nQubits : Int) : Unit {
+    operation AssertOperationsEqualInPlaceCompBasis(actual : (Qubit[] => Unit), expected : (Qubit[] => Unit is Adj), nQubits : Int) : Unit {
         Microsoft.Quantum.Diagnostics.AssertOperationsEqualInPlaceCompBasis(nQubits, actual, expected);
     }
 
