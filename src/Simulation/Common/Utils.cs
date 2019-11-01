@@ -1,6 +1,7 @@
-﻿using Microsoft.Quantum.Intrinsic;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using Microsoft.Quantum.Simulation.Core;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 

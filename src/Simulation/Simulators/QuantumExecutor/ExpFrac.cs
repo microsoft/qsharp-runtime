@@ -1,7 +1,9 @@
-﻿using Microsoft.Quantum.Simulation.Common;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using System;
-using System.Collections.Generic;
 
 namespace Microsoft.Quantum.Simulation.QuantumExecutor
 {

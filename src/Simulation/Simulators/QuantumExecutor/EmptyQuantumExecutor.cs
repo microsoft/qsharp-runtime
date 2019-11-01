@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.QuantumExecutor
@@ -19,6 +20,11 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         }
 
         public virtual void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp)
         {
             throw new NotImplementedException();
         }

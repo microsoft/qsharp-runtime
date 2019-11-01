@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.QuantumExecutor
@@ -15,116 +18,98 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
     public interface IQuantumExecutor
     {
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/>.  
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
+        /// In Q# the operation applies X gate to <paramref name="qubit"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of R is called in Q#, <see cref="R(Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// When adjoint of X is called in Q#, <see cref="X(Qubit)"/> is called because X is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
-        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
-        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void R(Pauli axis, double theta, Qubit qubit);
+        void X(Qubit qubit);
 
         /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
+        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled R is called in Q#, <see cref="ControlledR(IQArray{Qubit}, Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// When adjoint of Controlled X is called in Q#, <see cref="ControlledX(IQArray{Qubit}, Qubit)"/> is called because X is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
-        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit);
+        void ControlledX(IQArray<Qubit> controls, Qubit qubit);
 
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/>.  
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
+        /// In Q# the operation applies Y gate to <paramref name="qubit"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of RFrac is called in Q#, <see cref="RFrac(Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// When adjoint of Y is called in Q#, <see cref="Y(Qubit)"/> is called because Y is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
-        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void RFrac(Pauli axis, long numerator, long power, Qubit qubit);
+        void Y(Qubit qubit);
 
         /// <summary>
-        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
+        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledRFrac(IQArray{Qubit}, Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// When adjoint of Controlled Y is called in Q#, <see cref="ControlledY(IQArray{Qubit}, Qubit)"/> is called because Y is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit);
+        void ControlledY(IQArray<Qubit> controls, Qubit qubit);
 
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/>.  
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
+        /// In Q# the operation applies Z gate to <paramref name="qubit"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Exp is called in Q#, <see cref="Exp(IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// When adjoint of Z is called in Q#, <see cref="Z(Qubit)"/> is called because Z is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
-        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
-        /// <param name="theta">Angle about the given multi-qubit Pauli operator by which the target register is to be rotated.</param>
-        /// <param name="qubits">Register to apply the exponent to.</param>
-        void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits);
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void Z(Qubit qubit);
 
         /// <summary>
-        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.  
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
+        /// In Q# the operation applies Z gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled Exp is called in Q#, <see cref="ControlledExp(IQArray{Qubit}, IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
-        /// <param name="theta">Angle about the given multi-qubit Pauli operator by which the target register is to be rotated.</param>
-        /// <param name="qubits">Register to apply the exponent to.</param>
-        void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/>.
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of ExpFrac is called in Q#, <see cref="ExpFrac(IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit register is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit register is to be rotated.</param>
-        /// <param name="qubits">Register to apply the exponent to.</param>
-        void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled ExpFrac is called in Q#, <see cref="ControlledExpFrac(IQArray{Qubit}, IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// When adjoint of Controlled Z is called in Q#, <see cref="ControlledZ(IQArray{Qubit}, Qubit)"/> is called because Z is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit register is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit register is to be rotated.</param>
-        /// <param name="qubits">Register to apply the exponent to.</param>
-        void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits);
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void ControlledZ(IQArray<Qubit> controls, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
+        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of SWAP is called in Q#, <see cref="SWAP(Qubit, Qubit)"/> is called because SWAP is self-adjoint.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="qubit1">First qubit to be swapped.</param>
+        /// <param name="qubit2">Second qubit to be swapped.</param>
+        void SWAP(Qubit qubit1, Qubit qubit2);
+
+        /// <summary>
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
+        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states controlled on <paramref name="controls"/>.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled SWAP is called in Q#, <see cref="ControlledSWAP(IQArray{Qubit}, Qubit, Qubit)"/> is called because SWAP is self-adjoint.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="qubit1">First qubit to be swapped.</param>
+        /// <param name="qubit2">Second qubit to be swapped.</param>
+        void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.h">Microsoft.Quantum.Intrinsic.H</a> is called in Q#.
@@ -211,7 +196,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies T gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled T is called in Q#, <see cref="ControlledTsAdj(IQArray{Qubit}, Qubit)"/> is called.
+        /// When adjoint of Controlled T is called in Q#, <see cref="ControlledTAdj(IQArray{Qubit}, Qubit)"/> is called.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -240,6 +225,170 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
         void ControlledTAdj(IQArray<Qubit> controls, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of R is called in Q#, <see cref="R(Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
+        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void R(Pauli axis, double theta, Qubit qubit);
+
+        /// <summary>
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled R is called in Q#, <see cref="ControlledR(IQArray{Qubit}, Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
+        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of RFrac is called in Q#, <see cref="RFrac(Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void RFrac(Pauli axis, long numerator, long power, Qubit qubit);
+
+        /// <summary>
+        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledRFrac(IQArray{Qubit}, Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="axis">Pauli operator to be exponentiated to form the rotation.</param>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1">Microsoft.Quantum.Intrinsic.R1</a> is called in Q#.
+        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of R1 is called in Q#, <see cref="R1(double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void R1(double theta, Qubit qubit);
+
+        /// <summary>
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
+        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled R1 is called in Q#, <see cref="ControlledR1(IQArray{Qubit}, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
+        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of R1Frac is called in Q#, <see cref="R1Frac(long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void R1Frac(long numerator, long power, Qubit qubit);
+
+        /// <summary>
+        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
+        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledR1Frac(IQArray{Qubit}, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
+        /// <param name="qubit">Qubit to which the gate should be applied.</param>
+        void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Exp is called in Q#, <see cref="Exp(IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
+        /// <param name="theta">Angle about the given multi-qubit Pauli operator by which the target register is to be rotated.</param>
+        /// <param name="qubits">Register to apply the exponent to.</param>
+        void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits);
+
+        /// <summary>
+        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.  
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled Exp is called in Q#, <see cref="ControlledExp(IQArray{Qubit}, IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
+        /// <param name="theta">Angle about the given multi-qubit Pauli operator by which the target register is to be rotated.</param>
+        /// <param name="qubits">Register to apply the exponent to.</param>
+        void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits);
+
+        /// <summary>
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/>.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of ExpFrac is called in Q#, <see cref="ExpFrac(IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit register is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit register is to be rotated.</param>
+        /// <param name="qubits">Register to apply the exponent to.</param>
+        void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits);
+
+        /// <summary>
+        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
+        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.
+        /// </summary>
+        /// <remarks>
+        /// When adjoint of Controlled ExpFrac is called in Q#, <see cref="ControlledExpFrac(IQArray{Qubit}, IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
+        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
+        /// </remarks>
+        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
+        /// <param name="paulis">Array of single-qubit Pauli values representing a multi-qubit Pauli to be applied.</param>
+        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit register is to be rotated.</param>
+        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit register is to be rotated.</param>
+        /// <param name="qubits">Register to apply the exponent to.</param>
+        void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.m">Microsoft.Quantum.Intrinsic.M</a> is called in Q#.
@@ -302,152 +451,6 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol);
 
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/>. The gate is given by matrix X=((0,1),(1,0)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of X is called in Q#, <see cref="X(Qubit)"/> is called because X is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void X(Qubit qubit);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix X=((0,1),(1,0)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled X is called in Q#, <see cref="ControlledX(IQArray{Qubit}, Qubit)"/> is called because X is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledX(IQArray<Qubit> controls, Qubit qubit);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
-        /// In Q# the operation applies Y gate to <paramref name="qubit"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Y is called in Q#, <see cref="Y(Qubit)"/> is called because Y is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void Y(Qubit qubit);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled Y is called in Q#, <see cref="ControlledY(IQArray{Qubit}, Qubit)"/> is called because Y is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledY(IQArray<Qubit> controls, Qubit qubit);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
-        /// In Q# the operation applies Z gate to <paramref name="qubit"/>. The gate is given by matrix Z=((1,0),(0,-1)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Z is called in Q#, <see cref="Z(Qubit)"/> is called because Z is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void Z(Qubit qubit);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
-        /// In Q# the operation applies Z gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Z=((1,0),(0,-1)).
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled Z is called in Q#, <see cref="ControlledZ(IQArray{Qubit}, Qubit)"/> is called because Z is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledZ(IQArray<Qubit> controls, Qubit qubit);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1">Microsoft.Quantum.Intrinsic.R1</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/>.  
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of R1 is called in Q#, <see cref="R1(double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void R1(double theta, Qubit qubit);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled R1 is called in Q#, <see cref="ControlledR1(IQArray{Qubit}, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="theta">Angle about which the qubit is to be rotated.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/>.  
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of R1Frac is called in Q#, <see cref="R1Frac(long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void R1Frac(long numerator, long power, Qubit qubit);
-
-        /// <summary>
-        /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledR1Frac(IQArray{Qubit}, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="numerator">Numerator in the dyadic fraction representation of the angle by which the qubit is to be rotated.</param>
-        /// <param name="power">Power of two specifying the denominator of the angle by which the qubit is to be rotated.</param>
-        /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit);
-
-        /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
-        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states.
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of SWAP is called in Q#, <see cref="SWAP(Qubit, Qubit)"/> is called because SWAP is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="qubit1">First qubit to be swapped.</param>
-        /// <param name="qubit2">Second qubit to be swapped.</param>
-        void SWAP(Qubit qubit1, Qubit qubit2);
-
-        /// <summary>
-        /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
-        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states controlled on <paramref name="controls"/>.
-        /// </summary>
-        /// <remarks>
-        /// When adjoint of Controlled SWAP is called in Q#, <see cref="ControlledSWAP(IQArray{Qubit}, Qubit, Qubit)"/> is called because SWAP is self-adjoint.
-        /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// </remarks>
-        /// <param name="controls">The array of qubits on which the operation is controlled.</param>
-        /// <param name="qubit1">First qubit to be swapped.</param>
-        /// <param name="qubit2">Second qubit to be swapped.</param>
-        void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2);
-
-        /// <summary>
         /// Called before a call to any Q# operation.
         /// </summary>
         /// <param name="operation">Information about operation being called.</param>
@@ -490,6 +493,19 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
         /// </remarks>
         void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a simulator level.
+        /// </summary>
+        /// <param name="measurementResults">The actual results of the measurements of a number of qubits upon which branching is to be performed.</param>
+        /// <param name="resultsValues">The expected values of results of the measurements of these qubits.</param>
+        /// <param name="equalOp">Corresponds to quantum program that must be executed if all <paramref name="measurementResults"/> values are equal to corresponding <paramref name="resultsValues"/></param>
+        /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
+        /// <remarks>
+        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
+        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
+        /// </remarks>
+        void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
 
         /// <summary>
         /// Called when qubits are allocated by Q# <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 
