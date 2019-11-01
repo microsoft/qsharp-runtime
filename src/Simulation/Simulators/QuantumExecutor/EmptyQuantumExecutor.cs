@@ -7,7 +7,8 @@ using Microsoft.Quantum.Simulation.Core;
 namespace Microsoft.Quantum.Simulation.QuantumExecutor
 {
     /// <summary>
-    /// An example of IQuantumExecutor that throws <see cref="NotImplementedException"/> for every call.
+    /// A class that implements IQuantumExecutor that does not do any logic, but is convenient to inherit from.
+    /// It throws <see cref="NotImplementedException"/> for most APIs.
     /// </summary>
     class EmptyQuantumExecutor : IQuantumExecutor
     {

@@ -17,8 +17,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             public override Func<(Result, ICallable, ICallable), QVoid> Body => (q) =>
             {
                 var (measurementResult, onZero, onOne) = q;
-                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, () => onZero.Apply(QVoid.Instance),
-                                                            () => onOne.Apply(QVoid.Instance));
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Apply(QVoid.Instance),
+                                                                () => onOne.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
         }
@@ -32,8 +33,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             public override Func<(Result, IAdjointable, IAdjointable), QVoid> Body => (q) =>
             {
                 var (measurementResult, onZero, onOne) = q;
-                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, () => onZero.Apply(QVoid.Instance),
-                                                            () => onOne.Apply(QVoid.Instance));
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Apply(QVoid.Instance),
+                                                                () => onOne.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
 
@@ -41,8 +43,8 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             {
                 var (measurementResult, onZero, onOne) = q;
                 Simulator.QuantumExecutor.ClassicallyControlled(measurementResult,
-                                                            () => onZero.Adjoint.Apply(QVoid.Instance),
-                                                            () => onOne.Adjoint.Apply(QVoid.Instance));
+                                                                () => onZero.Adjoint.Apply(QVoid.Instance),
+                                                                () => onOne.Adjoint.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
         }
@@ -56,19 +58,20 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             public override Func<(Result, IControllable, IControllable), QVoid> Body => (q) =>
             {
                 var (measurementResult, onZero, onOne) = q;
-                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, () => onZero.Apply(QVoid.Instance),
-                                                            () => onOne.Apply(QVoid.Instance));
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Apply(QVoid.Instance),
+                                                                () => onOne.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> ControlledBody =>
-                (q) =>
-                {
-                    var (ctrls, (measurementResult, onZero, onOne)) = q;
-                    Simulator.QuantumExecutor.ClassicallyControlled(
-                  measurementResult, () => onZero.Controlled.Apply(ctrls), () => onOne.Controlled.Apply(ctrls));
-                    return QVoid.Instance;
-                };
+            public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> ControlledBody => (q) =>
+            {
+                var (ctrls, (measurementResult, onZero, onOne)) = q;
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Controlled.Apply(ctrls), 
+                                                                () => onOne.Controlled.Apply(ctrls));
+                return QVoid.Instance;
+            };
         }
 
         public class SimApplyIfElseCA : Extensions.ApplyIfElseIntrinsicCA
@@ -80,8 +83,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             public override Func<(Result, IUnitary, IUnitary), QVoid> Body => (q) =>
             {
                 var (measurementResult, onZero, onOne) = q;
-                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, () => onZero.Apply(QVoid.Instance),
-                                                            () => onOne.Apply(QVoid.Instance));
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Apply(QVoid.Instance),
+                                                                () => onOne.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
 
@@ -89,37 +93,29 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             {
                 var (measurementResult, onZero, onOne) = q;
                 Simulator.QuantumExecutor.ClassicallyControlled(measurementResult,
-                                                            () => onZero.Adjoint.Apply(QVoid.Instance),
-                                                            () => onOne.Adjoint.Apply(QVoid.Instance));
+                                                                () => onZero.Adjoint.Apply(QVoid.Instance),
+                                                                () => onOne.Adjoint.Apply(QVoid.Instance));
                 return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> ControlledBody => (q) =>
             {
                 var (ctrls, (measurementResult, onZero, onOne)) = q;
-                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, () => onZero.Controlled.Apply(ctrls),
-                                                            () => onOne.Controlled.Apply(ctrls));
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult, 
+                                                                () => onZero.Controlled.Apply(ctrls),
+                                                                () => onOne.Controlled.Apply(ctrls));
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> ControlledAdjointBody =>
-                (q) =>
-                {
-                    var (ctrls, (measurementResult, onZero, onOne)) = q;
-                    Simulator.QuantumExecutor.ClassicallyControlled(measurementResult,
-                                                          () => onZero.Controlled.Adjoint.Apply(ctrls),
-                                                          () => onOne.Controlled.Adjoint.Apply(ctrls));
-                    return QVoid.Instance;
-                };
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> ControlledAdjointBody => (q) =>
+            {
+                var (ctrls, (measurementResult, onZero, onOne)) = q;
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResult,
+                                                                () => onZero.Controlled.Adjoint.Apply(ctrls),
+                                                                () => onOne.Controlled.Adjoint.Apply(ctrls));
+                return QVoid.Instance;
+            };
         }
-
-
-
-
-
-
-
-
 
 
 
@@ -179,15 +175,14 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> ControlledBody => //(q) =>
-                (q) =>
-                {
-                    var (ctrls, (measurementResults, resultsValues, onEqualOp, onNonEqualOp)) = q;
-                    Simulator.QuantumExecutor.ClassicallyControlled(measurementResults, resultsValues,
-                                                                () => onEqualOp.Controlled.Apply(ctrls),
-                                                                () => onNonEqualOp.Controlled.Apply(ctrls));
-                    return QVoid.Instance;
-                };
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> ControlledBody => (q) =>
+            {
+                var (ctrls, (measurementResults, resultsValues, onEqualOp, onNonEqualOp)) = q;
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResults, resultsValues,
+                                                            () => onEqualOp.Controlled.Apply(ctrls),
+                                                            () => onNonEqualOp.Controlled.Apply(ctrls));
+                return QVoid.Instance;
+            };
         }
 
         public class SimApplyConditionallyCA : Extensions.ApplyConditionallyIntrinsicCA
@@ -223,15 +218,14 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> ControlledAdjointBody => //(q) =>
-                (q) =>
-                {
-                    var (ctrls, (measurementResults, resultsValues, onEqualOp, onNonEqualOp)) = q;
-                    Simulator.QuantumExecutor.ClassicallyControlled(measurementResults, resultsValues,
-                                                                    () => onEqualOp.Controlled.Adjoint.Apply(ctrls),
-                                                                    () => onNonEqualOp.Controlled.Adjoint.Apply(ctrls));
-                    return QVoid.Instance;
-                };
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> ControlledAdjointBody => (q) =>
+            {
+                var (ctrls, (measurementResults, resultsValues, onEqualOp, onNonEqualOp)) = q;
+                Simulator.QuantumExecutor.ClassicallyControlled(measurementResults, resultsValues,
+                                                                () => onEqualOp.Controlled.Adjoint.Apply(ctrls),
+                                                                () => onNonEqualOp.Controlled.Adjoint.Apply(ctrls));
+                return QVoid.Instance;
+            };
         }
 
     }

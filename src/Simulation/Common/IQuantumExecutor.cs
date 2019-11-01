@@ -7,8 +7,7 @@ using Microsoft.Quantum.Simulation.Core;
 namespace Microsoft.Quantum.Simulation.QuantumExecutor
 {
     /// <summary>
-    /// An interface for implementing QDK target machines which work 
-    /// on a quantum circuit level. 
+    /// An interface for implementing QDK target machines that work on a quantum circuit level. 
     /// It is intended to be used with <see cref="QuantumExecutor"/>.
     /// </summary>
     /// <remarks>
