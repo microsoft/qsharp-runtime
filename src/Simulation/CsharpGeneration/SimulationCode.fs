@@ -1020,6 +1020,7 @@ module SimulationCode =
             | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
         let attribute = 
+            // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
             let startLine = fst sp.Location.Offset + 1
             let endLine = 
                 match context.declarationPositions.TryGetValue sp.SourceFile with 
