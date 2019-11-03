@@ -6,23 +6,6 @@ using System;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class SourceLocationAttribute : Attribute
-    { 
-        public string SourceFile { get; }
-        public OperationFunctor SpecializationKind { get; }
-        public int StartLine { get; }
-        public int EndLine { get; }
-
-        public SourceLocationAttribute(string sourceFile, OperationFunctor kind, int startLine, int endLine)
-        {
-            this.SourceFile = sourceFile;
-            this.SpecializationKind = kind;
-            this.StartLine = startLine;
-            this.EndLine = endLine;
-        }
-    }
-
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class CallableDeclarationAttribute : Attribute
     {
