@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Primitive {
     operation MultiX (qubits : Qubit[]) : Unit {
         body (...) {
             for (index in 0 .. Length(qubits) - 1) {
-                X(qubits[index]);
+                Microsoft.Quantum.Intrinsic.X(qubits[index]);
             }
         }
 

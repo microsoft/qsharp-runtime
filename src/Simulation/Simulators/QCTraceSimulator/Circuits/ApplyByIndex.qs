@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     /// </summary>
     /// <param name="op"> Operation to apply, must have an Adjoint
     /// and Controlled </param>
-    operation ApplyByIndexAdjointableControllable (op : (Qubit[] => Unit : Adjoint, Controlled), index : Int[], target : Qubit[]) : Unit
+    operation ApplyByIndexAdjointableControllable (op : (Qubit[] => Unit is Adj + Ctl), index : Int[], target : Qubit[]) : Unit
     {
         body (...)
         {
