@@ -100,6 +100,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(qa3[2].Id == 6);
             Assert.True(qa3[3].Id == 10);
 
+            // Test Disabling qubits
+            Qubit q8 = qm.Allocate();
+            Assert.True(q8.Id == 11);
+            qm.Disable(q8);
+            var qab2 = qm.Borrow(12, null);
+            Assert.True(qab2[11].Id == 12);  // make sure 11 is not borrowed.
+            qm.Release(q8);
+            qm.Return(qab2);
+
+            var qa4 = qm.Allocate(2);
+            Assert.True(qa4[0].Id == 12); // make sure 11 is not reused.
+            Assert.True(qa4[1].Id == 13); // make sure 11 is not reused.
+            qm.Release(qa4);
+
             // Test allocating qubits over capacity
             OperationsTestHelper.IgnoreDebugAssert(() =>
             {

@@ -14,6 +14,9 @@ namespace Microsoft.Quantum.Simulation.Common
         void Release(Qubit qubit);
         void Release(IQArray<Qubit> qubits);
 
+        void Disable(Qubit qubit);
+        void Disable(IQArray<Qubit> qubits);
+
         Qubit Borrow();
         IQArray<Qubit> Borrow(long count);
 
@@ -22,6 +25,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         bool IsValid(Qubit qubit);
         bool IsFree(Qubit qubit);
+        bool IsDisabled(Qubit qubit);
 
         long GetFreeQubitsCount();
         long GetQubitsAvailableToBorrowCount();
