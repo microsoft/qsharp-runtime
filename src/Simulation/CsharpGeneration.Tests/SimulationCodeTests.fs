@@ -98,15 +98,15 @@ namespace N1
             // TODO: catch compilation errors and fail
         let mgr   = new CompilationUnitManager(null, fun ps -> ps.Diagnostics |> Array.iter addError)
         files |> List.iter (addSourceFile mgr)
-        try let mutable syntaxTree = mgr.GetSyntaxTree()
+        try let mutable compilation = mgr.Build().BuiltCompilation
             if not errors.IsEmpty then 
                 errors 
                 |> List.map (fun e -> sprintf "%s at %s, line %d" e.Message e.Source (e.Range.Start.Line + 1))
                 |> String.concat "\n"
                 |> failwith  
-            let functorGenSuccessful = FunctorGeneration.GenerateFunctorSpecializations(syntaxTree, &syntaxTree)
+            let functorGenSuccessful = CodeGeneration.GenerateFunctorSpecializations(compilation, &compilation)
             // todo: we might want to raise an error here if the functor generation fails (which will be the case for incorrect code)
-            syntaxTree
+            compilation.Namespaces
         with | e -> sprintf "compilation threw exception: \n%s" e.Message |> failwith // should never happen (all exceptions are caught by the compiler)
         
     let syntaxTree = parse [ (Path.Combine("Circuits", "Intrinsic.qs")); (Path.Combine("Circuits", "CodegenTests.qs")) ]

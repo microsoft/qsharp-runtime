@@ -347,7 +347,7 @@ module SimulationCode =
                 ``#line`` ln n s
             | Some n, None -> startLine |> function 
                 | Some ln -> 
-                    ``#line`` (ln + 1) n s
+                    ``#line`` (ln + 1) n s // we need 1-based line numbers here, and startLine is zero-based
                 | None -> s
             | _ -> s
             
@@ -1020,6 +1020,7 @@ module SimulationCode =
             | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
         let attribute = 
+            // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
             let startLine = fst sp.Location.Offset + 1
             let endLine = 
                 match context.declarationPositions.TryGetValue sp.SourceFile with 
