@@ -4,17 +4,24 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> Unitary version of Controlled-Controlled-Z, gate </summary>
-    /// <param name = "a"> the first qubit the operation acts on  </param>
-    /// <param name = "b"> the second qubit the operation acts on </param>
-    /// <param name = "c"> the third qubit the operation acts on </param>
-    /// <remarks> CCZ = exp( -iπ|111⟩⟨111| ) = exp( -iπ((I-Z)/2)⊗((I-Z)/2)⊗((I-Z)/2) )
+    /// # Summary
+    /// Unitary version of Controlled-Controlled-Z, gate
+    /// 
+    /// # Input
+    /// ## a
+    /// the first qubit the operation acts on 
+    /// ## b
+    /// the second qubit the operation acts on
+    /// ## c
+    /// the third qubit the operation acts on
+    /// 
+    /// # Remarks
+    /// CCZ = exp( -iπ|111⟩⟨111| ) = exp( -iπ((I-Z)/2)⊗((I-Z)/2)⊗((I-Z)/2) )
     /// = exp(-i π/2³ I⊗I⊗I) ×
     ///      exp( i π/2³ Z⊗I⊗I ) exp( i π/2³ I⊗Z⊗I ) exp( i π/2³ I⊗I⊗Z ) ×
     ///   exp(-i π/2³ Z⊗Z⊗I ) exp(-i π/2³ I⊗Z⊗Z ) exp(-i π/2³ Z⊗I⊗Z ) ×
     ///   exp( i π/2³ Z⊗Z⊗Z )
     /// Note that CCZ is symmetric with respect to all of its qubit arguments.
-    /// </remarks>
     operation CCZ (a : Qubit, b : Qubit, c : Qubit) : Unit
     {
         body (...)
