@@ -23,8 +23,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 
     function BuggyReturnTest () : Unit
     {
-        AssertBuggyReturn<Int>(0); // This works fine!
-        if (not BuggyReturn<Int>(0)) { // This gives error
+        AssertBuggyReturn<Int>(0); 
+        if (not BuggyReturn<Int>(0)) { 
             Message("BuggyReturn returned false");
         }
     }
