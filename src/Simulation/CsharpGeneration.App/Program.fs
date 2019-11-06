@@ -49,26 +49,22 @@ type Logger() =
 let generateFiles (options : Options) = 
     let logger = new Logger()
     let outputFolder = if String.IsNullOrWhiteSpace options.QSTFileName then null else options.OutputFolder
+    let codeGenDll = typeof<Emitter>.Assembly.Location
     let loadOptions = 
         new CompilationLoader.Configuration(
             GenerateFunctorSupport = true,
             DocumentationOutputFolder = options.DocFolder,
             BuildOutputFolder = outputFolder,
-            ProjectName = options.QSTFileName
+            ProjectName = options.QSTFileName,
+            RewriteSteps = [struct(codeGenDll, null)]
         ) 
-
     let loaded = new CompilationLoader(options.Input, options.References, Nullable(loadOptions), logger)
-    let syntaxTree = loaded.CompilationOutput.Namespaces |> Seq.toArray
-    let allSources = GetSourceFiles.Apply syntaxTree |> Seq.filter (fun fileName -> fileName.Value.EndsWith ".qs")
-    for source in allSources do
-        try let content = syntaxTree |> SimulationCode.generate source
-            CompilationLoader.GeneratedFile(source, options.OutputFolder, ".g.cs", content) |> ignore
-        with | ex -> logger.Log(ex)
+    if loaded.Success then 0 else 2
 
 
 let [<EntryPoint>] main args = 
     match Parser.Default.ParseArguments<Options> args with 
-    | :? Parsed<Options> as options -> generateFiles options.Value; 0
+    | :? Parsed<Options> as options -> generateFiles options.Value
     | _ -> 1
 
 

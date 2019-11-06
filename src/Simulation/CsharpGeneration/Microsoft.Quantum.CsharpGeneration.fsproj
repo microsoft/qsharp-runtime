@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="SimulationCode.fs" />
+    <Compile Include="RewriteStep.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.1910.2502-alpha" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.1911.508-alpha" />
   </ItemGroup>
 
   <ItemGroup>
