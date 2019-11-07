@@ -11,10 +11,9 @@ open Microsoft.Quantum.QsCompiler.SyntaxTree;
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations;
 
 
-type Emitter(output) =
+type Emitter() =
 
-    let mutable _OutputFolder = output
-    new () = new Emitter(null)
+    let mutable _OutputFolder = null
 
     interface IRewriteStep with
 

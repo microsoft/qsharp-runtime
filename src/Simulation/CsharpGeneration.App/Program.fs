@@ -8,7 +8,6 @@ open System.Collections.Generic
 open CommandLine
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.Diagnostics
-open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 
 
 type Options = {
