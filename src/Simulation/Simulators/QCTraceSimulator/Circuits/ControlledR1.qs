@@ -2,12 +2,17 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
-{
-    
-    /// <summary> ControlledR1 is  exp( iφ|11⟩⟨11| )</summary>
-    /// <param name="angle"> φ </param>
-    /// <remark>  exp( iφ|11⟩⟨11| ) = exp( iφ (I-Z)/2⊗(I-Z)/2 ) =
-    /// = exp( iφ/2² I⊗I) exp(-iφ/2² I⊗Z) exp(-iφ/2² Z⊗I) exp(iφ/2² Z⊗Z) </remark>
+{    
+    /// # Summary
+    /// ControlledR1 is  exp( iφ|11⟩⟨11| )
+    /// 
+    /// # Input
+    /// ## angle
+    /// φ
+    /// 
+    /// # Remarks
+    /// exp( iφ|11⟩⟨11| ) = exp( iφ (I-Z)/2⊗(I-Z)/2 ) =
+    /// = exp( iφ/2² I⊗I) exp(-iφ/2² I⊗Z) exp(-iφ/2² Z⊗I) exp(iφ/2² Z⊗Z)
     operation ControlledR1 (angle : Double, a : Qubit, b : Qubit) : Unit
     is Adj {
         //  ExpI( angle/4, target ); Don't need global phase because there is no controlled version of this operation
