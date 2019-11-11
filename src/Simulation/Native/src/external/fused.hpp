@@ -98,7 +98,7 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-      if (fusedgates.num_qubits()+fusedgates.num_controls()+cs.size()>8 or fusedgates.size() > 15)
+      if (fusedgates.num_qubits()+fusedgates.num_controls()+cs.size()>8 || fusedgates.size() > 15)
         flush(wfn);
       Fusion newgates = fusedgates;
       newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
