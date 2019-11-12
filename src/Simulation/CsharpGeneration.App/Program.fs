@@ -58,7 +58,7 @@ let generateFiles (options : Options) =
         ) 
 
     let loaded = new CompilationLoader(options.Input, options.References, Nullable(loadOptions), logger)
-    let syntaxTree = loaded.GeneratedSyntaxTree |> Seq.toArray
+    let syntaxTree = loaded.CompilationOutput.Namespaces |> Seq.toArray
     let allSources = GetSourceFiles.Apply syntaxTree |> Seq.filter (fun fileName -> fileName.Value.EndsWith ".qs")
     for source in allSources do
         try let content = syntaxTree |> SimulationCode.generate source
