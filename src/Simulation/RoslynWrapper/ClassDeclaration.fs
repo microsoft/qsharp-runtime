@@ -10,6 +10,11 @@ module ClassDeclaration =
     open Microsoft.CodeAnalysis.CSharp
     open Microsoft.CodeAnalysis.CSharp.Syntax
 
+    let private setAttributes (attributes : AttributeListSyntax seq) (cd : ClassDeclarationSyntax) = 
+        attributes
+        |> SyntaxFactory.List
+        |> cd.WithAttributeLists
+
     let private setModifiers modifiers (cd : ClassDeclarationSyntax)  =
         modifiers
         |> Seq.map SyntaxFactory.Token
@@ -38,6 +43,9 @@ module ClassDeclaration =
     let genericBase name ``<<`` typeParam ``>>`` = 
         generic name ``<<`` typeParam ``>>``|> SyntaxFactory.SimpleBaseType
 
+    let ``attributes`` attributes (classDecl : ClassDeclarationSyntax) = 
+        classDecl |> setAttributes attributes
+        
     let ``class`` className ``<<`` typeParameters ``>>``
             ``:`` baseClassName ``,`` baseInterfaces
             modifiers
@@ -49,3 +57,7 @@ module ClassDeclaration =
             |> setBases (baseClassName ?+ baseInterfaces)
             |> setModifiers modifiers
             |> setMembers members
+
+
+
+            
