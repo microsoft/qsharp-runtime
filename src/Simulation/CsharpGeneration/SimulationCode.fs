@@ -64,6 +64,7 @@ module SimulationCode =
         current                 : QsQualifiedName option
         signature               : ResolvedSignature option
         fileName                : string option
+        testTargets             : string[]
     } 
     
     type CodegenContext with
@@ -83,6 +84,15 @@ module SimulationCode =
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
+        // TODO: we will want to make this a command line argument
+        let isTestProject = true
+        let testTargets =  
+            if not isTestProject then [||] else
+            callables.Values 
+            |> Seq.collect (fun c -> c.Attributes |> SymbolResolution.TryFindTestTargets)
+            |> Seq.distinct 
+            |> Seq.filter (String.IsNullOrWhiteSpace >> not) 
+            |> Seq.toArray
         { 
             allQsElements = syntaxTree; 
             byName = callablesByName; 
@@ -91,16 +101,26 @@ module SimulationCode =
             declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
             current = None; 
             fileName = fileName; 
-            signature = None 
+            signature = None;
+            testTargets = testTargets
         }
               
-    let autoNamespaces = 
-        [
-            "System"
-            "Microsoft.Quantum.Core"
-            "Microsoft.Quantum.Intrinsic"
-            "Microsoft.Quantum.Simulation.Core" 
-        ]
+    let autoNamespaces (context : CodegenContext) = 
+        let testing = 
+            [
+                "Microsoft.Quantum.Simulation.Simulators"
+                "Xunit"
+                "Xunit.Abstractions"
+            ]
+        let general = 
+            [
+                "System"
+                "Microsoft.Quantum.Core"
+                "Microsoft.Quantum.Intrinsic"
+                "Microsoft.Quantum.Simulation.Core" 
+            ]
+        if context.testTargets.Length = 0 then general 
+        else general @ testing
 
     let funcsAsProps = [
         ("Length", { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "Length" |> NonNullable<String>.New } )
@@ -124,7 +144,7 @@ module SimulationCode =
         elif hasMultipleDefinitions() then
             true
         else
-            not (autoNamespaces |> List.contains op.Namespace.Value)
+            not (autoNamespaces context |> List.contains op.Namespace.Value)
             
     let getTypeParameters types = 
         let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function 
@@ -1411,11 +1431,44 @@ module SimulationCode =
             |> List.map buildOne
             |> List.choose id
 
+        let testHandles : MemberDeclarationSyntax list = 
+            let testTargets = function 
+                | QsCallable c -> 
+                    c.Attributes 
+                    |> SymbolResolution.TryFindTestTargets 
+                    |> Seq.map (fun target -> c.FullName, target) 
+                    |> Seq.toList
+                | _ -> []
+            let unitTests = // contains the full name of the callable which to test as well as the name of the target simulator
+                localElements 
+                |> List.collect testTargets 
+                |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
+            [
+                for (testOperation, targetName) in unitTests do
+
+                    let memberSyntax : MemberDeclarationSyntax = null
+                    yield memberSyntax
+
+                    // TODO: memberSyntax should contain the data structure representing the following C# code:
+
+                    //public partial class TargetNameTests
+                    // TODO: line nr redirect needs to go here
+                    //{
+                    //    [Fact(DisplayName = "TestOperationName")]
+                    //    public void __TestOperationNameTest__()
+                    //    {
+                    //        var sim = new TargetName(); 
+                    //        sim.OnLog += output.WriteLine;
+                    //        sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
+                    //    }
+                    //}
+            ]
+
         ``#line hidden`` <| 
         ``namespace`` nsName.Value
             ``{``
                 []
-                members
+                (members @ testHandles)
             ``}``
         :> MemberDeclarationSyntax
    
@@ -1434,7 +1487,7 @@ module SimulationCode =
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
     let buildSyntaxTree (fileName : NonNullable<string>) allQsElements = 
         let globalContext = createContext (Some fileName.Value) allQsElements
-        let usings = autoNamespaces |> List.map (fun ns -> ``using`` ns)
+        let usings = autoNamespaces globalContext |> List.map (fun ns -> ``using`` ns)
         let localElements = findLocalElements fileName allQsElements
         let namespaces = localElements |> List.map (buildNamespace globalContext)
 
