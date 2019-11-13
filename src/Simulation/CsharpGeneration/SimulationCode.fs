@@ -1446,6 +1446,10 @@ module SimulationCode =
             [
                 for (testOperation, targetName) in unitTests do
 
+                    let targetId = ``ident`` targetName
+                    let constructorCall = ``new`` targetId ``(`` [] ``)``
+                    let getSimulator = ``var`` "sim" (``:=`` constructorCall)
+
                     let memberSyntax : MemberDeclarationSyntax = null
                     yield memberSyntax
 
