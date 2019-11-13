@@ -1451,9 +1451,11 @@ module SimulationCode =
 
                     // TODO: memberSyntax should contain the data structure representing the following C# code:
 
-                    //public partial class TargetNameTests
-                    // TODO: line nr redirect needs to go here
+                    //namespace CompilationUnitId 
                     //{
+                    //  public partial class TargetNameTests
+                    //  TODO: line nr redirect needs to go here
+                    //  {
                     //    [Fact(DisplayName = "TestOperationName")]
                     //    public void __TestOperationNameTest__()
                     //    {
@@ -1461,6 +1463,7 @@ module SimulationCode =
                     //        sim.OnLog += output.WriteLine;
                     //        sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
                     //    }
+                    //  }
                     //}
             ]
 
