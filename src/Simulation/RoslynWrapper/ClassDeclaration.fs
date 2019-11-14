@@ -43,8 +43,8 @@ module ClassDeclaration =
     let genericBase name ``<<`` typeParam ``>>`` = 
         generic name ``<<`` typeParam ``>>``|> SyntaxFactory.SimpleBaseType
 
-    let ``attributes`` attributes (classDecl : ClassDeclarationSyntax) = 
-        classDecl |> setAttributes attributes
+    let ``attributes`` attributes (classDecl : MemberDeclarationSyntax) = 
+        classDecl.AddAttributeLists (attributes |> Seq.toArray)
         
     let ``class`` className ``<<`` typeParameters ``>>``
             ``:`` baseClassName ``,`` baseInterfaces

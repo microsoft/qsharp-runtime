@@ -405,7 +405,7 @@ module SimulationCode =
             match ex.Expression with
 // TODO: Diagnostics
             | InvalidExpr                   -> failwith "Can't generate code for error expression"
-            | UnitValue                     -> (``ident`` "QVoid") <|.|> (``ident`` "Instance")
+            | UnitValue                     -> (ident "QVoid") <|.|> (ident "Instance")
             | IntLiteral           i        -> literal i
             | BigIntLiteral        b        -> ``invoke`` (ident "System.Numerics.BigInteger.Parse") ``(`` [literal (b.ToString("R", CultureInfo.InvariantCulture))] ``)``
             // otherwise converts x.0 to int, see https://stackoverflow.com/questions/24299692/why-is-a-round-trip-conversion-via-a-string-not-safe-for-a-double
@@ -471,7 +471,7 @@ module SimulationCode =
 
         and buildAddExpr (exType : ResolvedType) lhs rhs = 
             match exType.Resolution |> QArrayType with 
-            | Some arrType -> arrType <.> (``ident`` "Add", [buildExpression lhs; buildExpression rhs]) 
+            | Some arrType -> arrType <.> (ident "Add", [buildExpression lhs; buildExpression rhs]) 
             | _ -> ``((`` ((buildExpression lhs) <+> (buildExpression rhs)) ``))``
 
         and buildInterpolatedString (s : string) (exs: ImmutableArray<TypedExpression>) =
@@ -498,7 +498,7 @@ module SimulationCode =
             match lhsEx.ResolvedType.Resolution |> QArrayType with
             | Some arrayType -> 
                 let lhsAsQArray = ``new`` arrayType ``(`` [buildExpression lhsEx] ``)`` 
-                lhsAsQArray <.> (``ident`` "Modify", [ buildExpression accEx; captureExpression rhsEx ]) // in-place modification
+                lhsAsQArray <.> (ident "Modify", [ buildExpression accEx; captureExpression rhsEx ]) // in-place modification
             | _ -> lhsEx.ResolvedType.Resolution |> function
                 | UserDefinedType udt -> 
                     let itemName = accEx.Expression |> function
@@ -527,7 +527,7 @@ module SimulationCode =
 
             let buildPartialMapper () = // may only be executed if there are no more type parameters to be resolved                
                 let argName = nextArgName()
-                let items = getAllItems (``ident`` argName) pIn
+                let items = getAllItems (ident argName) pIn
 
                 let rec argMapping (expr : TypedExpression) =
                     let rec buildMissing = function
@@ -559,7 +559,7 @@ module SimulationCode =
             let values =
                 if hasTypeParameters [ pIn; pOut ] then args |> captureExpression
                 else buildPartialMapper()
-            op <.> (``ident`` "Partial", [ values ])
+            op <.> (ident "Partial", [ values ])
 
         and buildNewUdt n args =
             ``new`` (``type`` [ justTheName context n ]) ``(`` [args |> captureExpression] ``)``   
@@ -750,7 +750,7 @@ module SimulationCode =
                 match node.Rhs.Expression with 
                 | CopyAndUpdate (l, a, r) when l |> matchesIdentifier && l.ResolvedType.Resolution |> isArray -> // we do an in-place modification in this case
                     let access, rhs = buildExpression a, captureExpression r
-                    (buildExpression l) <.> (``ident`` "Modify", [ access; rhs ]) |> statement |> this.AddStatement
+                    (buildExpression l) <.> (ident "Modify", [ access; rhs ]) |> statement |> this.AddStatement
                 | _ when node.Rhs |> matchesIdentifier -> () // unnecessary statement 
                 | _ -> node.Rhs.ResolvedType.Resolution |> QArrayType |> function
                     | Some _ when isArrayInit node.Rhs -> // avoid unnecessary copies here 
@@ -991,13 +991,13 @@ module SimulationCode =
                 (SyntaxBuilder(builder)).dispatchSpecialization sp |> ignore
                 builder.Statements
 
-            let inData = ``ident`` "__in__"
+            let inData = ident "__in__"
             let ret = 
                 match returnType.Resolution with
                 | QsTypeKind.UnitType ->
                     [ 
                         ``#line hidden`` <| 
-                        ``return`` ( Some ((``ident`` "QVoid") <|.|> (``ident`` "Instance")) ) 
+                        ``return`` ( Some ((ident "QVoid") <|.|> (ident "Instance")) ) 
                     ]
                 | _ ->
                     []
@@ -1025,7 +1025,7 @@ module SimulationCode =
                 | QsControlledAdjoint -> "ControlledBody"
 //TODO: diagnostics.
                 | _ -> "Body"
-            Some (``ident`` adjointedBodyName :> ExpressionSyntax)
+            Some (ident adjointedBodyName :> ExpressionSyntax)
         | _ -> 
             None
         
@@ -1052,7 +1052,7 @@ module SimulationCode =
                 | false, _ -> startLine
             ``attribute`` None (ident "SourceLocation") [ 
                 ``literal`` sp.SourceFile.Value 
-                ``ident`` "OperationFunctor" <|.|> ``ident`` bodyName 
+                ident "OperationFunctor" <|.|> ident bodyName 
                 ``literal`` startLine 
                 ``literal`` endLine
             ]
@@ -1093,21 +1093,21 @@ module SimulationCode =
                 let rec buildTuple = function
                     | QsTupleItem one ->
                         match one.VariableName with
-                        | ValidName n -> ``ident`` n.Value  :> ExpressionSyntax
-                        | InvalidName -> ``ident`` ""       :> ExpressionSyntax
+                        | ValidName n -> ident n.Value  :> ExpressionSyntax
+                        | InvalidName -> ident ""       :> ExpressionSyntax
                     | QsTuple many ->       
                         many |> Seq.map buildTuple |> List.ofSeq |> ``tuple``
                 buildTuple arguments
             else
                 match flatArgs with 
-                | []        -> (``ident`` "QVoid") <|.|> (``ident`` "Instance")
-                | [(id, _)] -> ``ident`` id :> ExpressionSyntax
-                | _         -> flatArgs |> List.map (fst >> ``ident``)  |> ``tuple``
+                | []        -> (ident "QVoid") <|.|> (ident "Instance")
+                | [(id, _)] -> ident id :> ExpressionSyntax
+                | _         -> flatArgs |> List.map (fst >> ident)  |> ``tuple``
        
         let uniqueArgName = "__m__"
         let body = 
             [ 
-                ``return`` (Some ((``ident`` uniqueArgName) <.> (``generic`` "Run" ``<<`` opFactoryTypes ``>>``, [ runArgs ])))
+                ``return`` (Some ((ident uniqueArgName) <.> (``generic`` "Run" ``<<`` opFactoryTypes ``>>``, [ runArgs ])))
             ]
 
         let args = 
@@ -1138,7 +1138,7 @@ module SimulationCode =
         | _                             -> false
 
     let findQubitFields context (qsharpType:ResolvedType) =  
-        let item_n n= ``ident`` (sprintf "Item%d" (n+1))
+        let item_n n= ident (sprintf "Item%d" (n+1))
 
         let rec buildSimpleTerm current nullable (t:ResolvedType) =
             match t.Resolution with
@@ -1155,7 +1155,7 @@ module SimulationCode =
             | QsTypeKind.UserDefinedType n  ->
                 QsQualifiedName.New (n.Namespace, n.Name)
                 |> findUdtBase context 
-                |> buildSimpleTerm (current <|?.|> (``ident`` "Data")) false
+                |> buildSimpleTerm (current <|?.|> (ident "Data")) false
             | QsTypeKind.TupleType tt ->
                 let buildOne j t =
                     if nullable then 
@@ -1167,9 +1167,9 @@ module SimulationCode =
                 []
         match qsharpType.Resolution with
         | QsTypeKind.TupleType many  -> 
-            many |> Seq.mapi ( fun j -> buildSimpleTerm ( ``ident`` "Data" <|.|> item_n j ) false ) |> List.concat
+            many |> Seq.mapi ( fun j -> buildSimpleTerm ( ident "Data" <|.|> item_n j ) false ) |> List.concat
         | one -> 
-            qsharpType |> buildSimpleTerm ( ``ident`` "Data" ) true
+            qsharpType |> buildSimpleTerm ( ident "Data" ) true
 
     let areAllQubitArgs (argsTypes:ResolvedType list) =
         let isOne = function
@@ -1198,13 +1198,13 @@ module SimulationCode =
                 | QsTypeKind.Operation _
                 | QsTypeKind.ArrayType _
                 | QsTypeKind.UserDefinedType _
-                | QsTypeKind.Qubit -> ``((`` ( ``cast`` "IApplyData" (field |> snd) ) ``))`` <|?.|> ``ident`` "Qubits"
-                | _       -> (field |> snd)  <?.>  ( ``ident`` "GetQubits", [] )
+                | QsTypeKind.Qubit -> ``((`` ( ``cast`` "IApplyData" (field |> snd) ) ``))`` <|?.|> ident "Qubits"
+                | _       -> (field |> snd)  <?.>  ( ident "GetQubits", [] )
             let body = 
                 match fields with
                 | []     -> ``null`` :> ExpressionSyntax
                 | [one]  -> buildOne one
-                | many   -> ( ``ident`` "Qubit" <.> (``ident`` "Concat", fields |> List.map buildOne) )
+                | many   -> ( ident "Qubit" <.> (ident "Concat", fields |> List.map buildOne) )
             ``property-arrow_get`` "System.Collections.Generic.IEnumerable<Qubit>" "IApplyData.Qubits" [] 
                 ``get`` (``=>`` body)
             :> MemberDeclarationSyntax
@@ -1259,11 +1259,11 @@ module SimulationCode =
         | QsTypeKind.Qubit                  
         | QsTypeKind.UserDefinedType _
         | QsTypeKind.ArrayType _ -> 
-            (``ident`` "data") |> buildMethod qsharpType, None
+            (ident "data") |> buildMethod qsharpType, None
         | QsTypeKind.TupleType vt -> 
-            ( ``new`` (``type`` name) ``(`` [ ``ident`` "data" ] ``)`` ) |> buildMethod qsharpType , (Some buildDataClass)
+            ( ``new`` (``type`` name) ``(`` [ ident "data" ] ``)`` ) |> buildMethod qsharpType , (Some buildDataClass)
         | _                 -> 
-            ( ``new`` (``generic`` "QTuple" ``<<`` [ roslynTypeName context qsharpType ] ``>>``) ``(`` [ ``ident`` "data" ] ``)`` ) |> buildMethod qsharpType, None
+            ( ``new`` (``generic`` "QTuple" ``<<`` [ roslynTypeName context qsharpType ] ``>>``) ``(`` [ ident "data" ] ``)`` ) |> buildMethod qsharpType, None
 
     let typeParametersNames signature = 
 // TODO Diagnostics
@@ -1328,8 +1328,7 @@ module SimulationCode =
                 ``{``
                     (constructors @ innerClasses @ properties @ bodies @ methods) 
                 ``}``
-            )
-        :> MemberDeclarationSyntax     
+            )    
 
     let isUDTDeclaration =                          function | QsCustomType udt -> Some udt | _ -> None
     let isCallableDeclaration =                     function | QsCallable     c -> Some c   | _ -> None
@@ -1364,7 +1363,7 @@ module SimulationCode =
             :> MemberDeclarationSyntax
 
         let buildNamedItemFields = 
-            let items = getAllItems (``ident`` "Data") qsharpType
+            let items = getAllItems (ident "Data") qsharpType
             let rec buildProps = function 
                 | QsTuple items -> items |> Seq.collect (fun i -> buildProps i)
                 | QsTupleItem (Anonymous _) -> items.Dequeue() |> ignore; Seq.empty
@@ -1376,7 +1375,7 @@ module SimulationCode =
         let buildItemFields = 
             let buildOne i t =
                 ``property-arrow_get`` (roslynTypeName context t) (sprintf "Item%d" (i+1)) [ ``public`` ] 
-                    ``get`` (``=>`` (``ident`` "Data" <|.|> ``ident`` (sprintf "Item%d" (i+1))))
+                    ``get`` (``=>`` (ident "Data" <|.|> ident (sprintf "Item%d" (i+1))))
                 :> MemberDeclarationSyntax
             match qsharpType.Resolution with
             | QsTypeKind.TupleType many  -> many |> Seq.mapi buildOne |> List.ofSeq
@@ -1384,8 +1383,8 @@ module SimulationCode =
         let buildDeconstruct =
             let body =
                 let buildOne i t =
-                    let lhs = ``ident`` (sprintf "item%d" (i+1))
-                    let rhs = ``ident`` "Data" <|.|> ``ident`` (sprintf "Item%d" (i+1))
+                    let lhs = ident (sprintf "item%d" (i+1))
+                    let rhs = ident "Data" <|.|> ident (sprintf "Item%d" (i+1))
                     statement (lhs <-- rhs)
                 match qsharpType.Resolution with
                 | QsTypeKind.TupleType many  -> many |> Seq.mapi buildOne |> List.ofSeq
@@ -1446,12 +1445,36 @@ module SimulationCode =
             [
                 for (testOperation, targetName) in unitTests do
 
-                    let targetId = ``ident`` targetName
-                    let constructorCall = ``new`` targetId ``(`` [] ``)``
-                    let getSimulator = ``var`` "sim" (``:=`` constructorCall)
+                    let testOperationName = testOperation.Name.Value
+                    let sim = (ident "sim")
+                    let ``sim.OnLog`` = (sim <|.|> (ident "OnLog" ))
+                    let ``output.WriteLine`` = ((ident "output" ) <|.|> (ident "WriteLines" ))
+                    let Run = generic "Run" ``<<`` [testOperationName; "QVoid"; "QVoid"] ``>>``
 
-                    let memberSyntax : MemberDeclarationSyntax = null
-                    yield memberSyntax
+                    let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
+                    // ToDo: This might not be the right way to assign events
+                    let assignLogEvent = ``sim.OnLog`` <-- (``sim.OnLog`` <+> ``output.WriteLine``) |> statement
+                    let ``sim.Run.Wait`` = sim <.> (Run, [(ident "QVoid")<|.|>(ident "Instance")]) <.> ((ident "Wait"), []) |> statement
+
+                    yield
+                        ``namespace`` "CompilationUnitId"
+                            ``{``
+                                []
+                                [``class`` (targetName + "Tests") ``<<`` [] ``>>``
+                                    ``:`` None ``,`` [] [``public``; ``partial``]
+                                    ``{``
+                                        [``attributes``
+                                            [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperationName]]
+                                            (``method`` "void" ("__" + testOperationName + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                                                ``{``
+                                                    [getSimulator; assignLogEvent; ``sim.Run.Wait``]
+                                                ``}``
+                                            )
+                                        ]
+                                    ``}``
+                                ]
+                            ``}``
+                        :> MemberDeclarationSyntax
 
                     // TODO: memberSyntax should contain the data structure representing the following C# code:
 
