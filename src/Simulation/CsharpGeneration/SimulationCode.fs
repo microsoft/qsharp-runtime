@@ -64,7 +64,7 @@ module SimulationCode =
         current                 : QsQualifiedName option
         signature               : ResolvedSignature option
         fileName                : string option
-        testTargets             : string[]
+        unitTests               : ILookup<NonNullable<string>, string> // for each namespace contains the targets on which unit tests need to be executed
     } 
     
     type CodegenContext with
@@ -85,11 +85,12 @@ module SimulationCode =
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
         let testTargets =  
+            let allTargets (c : QsCallable) = c.Attributes |> SymbolResolution.TryFindTestTargets |> Seq.map (fun target -> c.FullName.Namespace, target)
             if not mayContainTests then [||] else
             callables.Values 
-            |> Seq.collect (fun c -> c.Attributes |> SymbolResolution.TryFindTestTargets)
+            |> Seq.collect allTargets
             |> Seq.distinct 
-            |> Seq.filter (String.IsNullOrWhiteSpace >> not) 
+            |> Seq.filter (snd >> String.IsNullOrWhiteSpace >> not) 
             |> Seq.toArray
         { 
             allQsElements = syntaxTree; 
@@ -100,7 +101,7 @@ module SimulationCode =
             current = None; 
             fileName = fileName; 
             signature = None;
-            testTargets = testTargets
+            unitTests = testTargets.ToLookup(fst, snd)
         }
               
     let autoNamespaces (context : CodegenContext) = 
@@ -117,8 +118,7 @@ module SimulationCode =
                 "Microsoft.Quantum.Intrinsic"
                 "Microsoft.Quantum.Simulation.Core" 
             ]
-        if context.testTargets.Length = 0 then general 
-        else general @ testing
+        if context.unitTests.Any() then general @ testing else general 
 
     let funcsAsProps = [
         ("Length", { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "Length" |> NonNullable<String>.New } )
