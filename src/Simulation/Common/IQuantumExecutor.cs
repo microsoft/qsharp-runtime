@@ -425,6 +425,31 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void Reset(Qubit qubit);
 
         /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a simulator level.
+        /// </summary>
+        /// <param name="measurementResult">The result of the measurement upon which branching is to be performed.</param>
+        /// <param name="onZero">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/></param>
+        /// <param name="onOne">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.One"/></param>
+        /// <remarks>
+        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/>.
+        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
+        /// </remarks>
+        void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a simulator level.
+        /// </summary>
+        /// <param name="measurementResults">The actual results of the measurements of a number of qubits upon which branching is to be performed.</param>
+        /// <param name="resultsValues">The expected values of results of the measurements of these qubits.</param>
+        /// <param name="equalOp">Corresponds to quantum program that must be executed if all <paramref name="measurementResults"/> values are equal to corresponding <paramref name="resultsValues"/></param>
+        /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
+        /// <remarks>
+        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
+        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
+        /// </remarks>
+        void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
+
+        /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assert">Microsoft.Quantum.Intrinsic.Assert</a> is called in Q#.
         /// </summary>
         /// <remarks>
@@ -474,37 +499,12 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void OnOperationEnd(ICallable operation, IApplyData arguments);
 
         /// <summary>
-        /// Called in the end of the call to any Q# operation.
+        /// Called when an exception occurs. 
         /// </summary>
         /// <param name="exceptionDispatchInfo">Information about exception that was raised.</param>
         /// <remarks>
         /// </remarks>
         void OnFail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionDispatchInfo);
-
-        /// <summary>
-        /// Intended for a limited support of branching upon measurement results on a simulator level.
-        /// </summary>
-        /// <param name="measurementResult">The result of the measurement upon which branching is to be performed.</param>
-        /// <param name="onZero">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/></param>
-        /// <param name="onOne">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.One"/></param>
-        /// <remarks>
-        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
-        /// </remarks>
-        void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
-
-        /// <summary>
-        /// Intended for a limited support of branching upon measurement results on a simulator level.
-        /// </summary>
-        /// <param name="measurementResults">The actual results of the measurements of a number of qubits upon which branching is to be performed.</param>
-        /// <param name="resultsValues">The expected values of results of the measurements of these qubits.</param>
-        /// <param name="equalOp">Corresponds to quantum program that must be executed if all <paramref name="measurementResults"/> values are equal to corresponding <paramref name="resultsValues"/></param>
-        /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
-        /// <remarks>
-        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
-        /// </remarks>
-        void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
 
         /// <summary>
         /// Called when qubits are allocated by Q# <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 

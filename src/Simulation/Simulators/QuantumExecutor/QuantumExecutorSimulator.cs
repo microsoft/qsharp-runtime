@@ -41,6 +41,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             QuantumExecutor = quantumExecutor ?? new EmptyQuantumExecutor();
             OnOperationStart += QuantumExecutor.OnOperationStart;
             OnOperationEnd += QuantumExecutor.OnOperationEnd;
+            OnFail += QuantumExecutor.OnFail;
             OnLog += QuantumExecutor.OnMessage;
         }
 
