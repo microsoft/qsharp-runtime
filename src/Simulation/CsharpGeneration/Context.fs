@@ -49,6 +49,7 @@ type internal DeclarationPositions() =
 
 
 type CodegenContext = { 
+    assemblyConstants       : IDictionary<string, string>
     allQsElements           : IEnumerable<QsNamespace>
     allUdts                 : ImmutableDictionary<QsQualifiedName,QsCustomType>
     allCallables            : ImmutableDictionary<QsQualifiedName,QsCallable>
@@ -60,7 +61,7 @@ type CodegenContext = {
     unitTests               : ILookup<NonNullable<string>, string> // for each namespace contains the targets on which unit tests need to be executed
 } 
     with
-    static member internal Create (mayContainTests, syntaxTree) =        
+    static member internal Create (syntaxTree, assemblyConstants, mayContainTests) =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationPositions.Apply syntaxTree
@@ -84,6 +85,7 @@ type CodegenContext = {
             |> Seq.toArray
     
         { 
+            assemblyConstants = assemblyConstants;
             allQsElements = syntaxTree; 
             byName = callablesByName; 
             allUdts = udts; 
@@ -95,5 +97,8 @@ type CodegenContext = {
             unitTests = testTargets.ToLookup(fst, snd)
         }
 
-    static member public Create syntaxTree = 
-        CodegenContext.Create(false, syntaxTree)
+    static member public Create (syntaxTree, assemblyConstants) = 
+        CodegenContext.Create(syntaxTree, assemblyConstants, false)
+
+    static member public Create (syntaxTree) = 
+        CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty, false)

@@ -40,7 +40,7 @@ type Emitter() =
             let isTestProject = _AssemblyConstants.TryGetValue Emitter.IsTestProject |> function
                 | true, value -> value <> null && value.ToLowerInvariant() = "true"
                 | _ -> false
-            let context = CodegenContext.Create (isTestProject, compilation.Namespaces)
+            let context = CodegenContext.Create (compilation.Namespaces, _AssemblyConstants, isTestProject)
 
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 

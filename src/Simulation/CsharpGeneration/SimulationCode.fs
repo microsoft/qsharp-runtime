@@ -1358,6 +1358,10 @@ module SimulationCode =
             localElements
             |> List.map buildOne
             |> List.choose id
+        let assemblyName = 
+            match globalContext.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
+            | true, name -> name
+            | false, _ -> null
 
         let testHandles : MemberDeclarationSyntax list = 
             let testTargets = function 
@@ -1372,22 +1376,23 @@ module SimulationCode =
                 |> List.collect testTargets 
                 |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
             [
+                // For each unit test, we create something like the following code:
+                //
+                // namespace AssemblyName // we omit this nested namespace if the assembly name is not specified
+                // {
+                //   public partial class TargetNameTests
+                //   TODO: line nr redirect needs to go here
+                //   {
+                //     [Fact(DisplayName = "TestOperationName")]
+                //     public void __TestOperationNameTest__()
+                //     {
+                //         var sim = new TargetName(); 
+                //         sim.OnLog += output.WriteLine;
+                //         sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
+                //     }
+                //   }
+                // }
                 for (testOperation, targetName) in unitTests do
-
-                    //namespace CompilationUnitId 
-                    //{
-                    //  public partial class TargetNameTests
-                    //  TODO: line nr redirect needs to go here
-                    //  {
-                    //    [Fact(DisplayName = "TestOperationName")]
-                    //    public void __TestOperationNameTest__()
-                    //    {
-                    //        var sim = new TargetName(); 
-                    //        sim.OnLog += output.WriteLine;
-                    //        sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
-                    //    }
-                    //  }
-                    //}
 
                     let testOperationName = testOperation.Name.Value
                     let testOperationFullName = testOperation.Namespace.Value + "." + testOperationName
@@ -1397,29 +1402,31 @@ module SimulationCode =
                     let Run = generic "Run" ``<<`` [testOperationFullName; "QVoid"; "QVoid"] ``>>``
 
                     let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
-                    // ToDo: This might not be the right way to assign events
-                    let assignLogEvent = ``sim.OnLog`` <-- (``sim.OnLog`` <+> ``output.WriteLine``) |> statement
+                    let assignLogEvent = ``sim.OnLog`` <-- (``sim.OnLog`` <+> ``output.WriteLine``) |> statement // todo: += instead would be nice
                     let ``sim.Run.Wait`` = sim <.> (Run, [(ident "QVoid")<|.|>(ident "Instance")]) <.> ((ident "Wait"), []) |> statement
 
-                    yield
-                        ``namespace`` "CompilationUnitId" // ToDo: Use compilation Id from globalContext
+                    let partialClass = 
+                        ``class`` (targetName + "Tests") ``<<`` [] ``>>``
+                            ``:`` None ``,`` [] [``public``; ``partial``]
                             ``{``
-                                []
-                                [``class`` (targetName + "Tests") ``<<`` [] ``>>``
-                                    ``:`` None ``,`` [] [``public``; ``partial``]
-                                    ``{``
-                                        [``attributes``
-                                            [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperationName]]
-                                            (``method`` "void" ("__" + testOperationName + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
-                                                ``{``
-                                                    [getSimulator; assignLogEvent; ``sim.Run.Wait``]
-                                                ``}``
-                                            )
-                                        ]
-                                    ``}``
+                                [``attributes``
+                                    [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperationName]]
+                                    (``method`` "void" ("__" + testOperationName + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                                        ``{``
+                                            [getSimulator; assignLogEvent; ``sim.Run.Wait``]
+                                        ``}``
+                                    )
                                 ]
                             ``}``
-                        :> MemberDeclarationSyntax
+                    
+                    if assemblyName = null then yield partialClass
+                    else yield
+                            ``namespace`` assemblyName
+                                ``{``
+                                    []
+                                    [partialClass]
+                                ``}``
+                            :> MemberDeclarationSyntax
             ]
 
         ``#line hidden`` <| 
