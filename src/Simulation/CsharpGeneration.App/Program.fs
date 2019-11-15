@@ -56,13 +56,13 @@ let generateFiles (options : Options) =
     let assemblyConstants = new Dictionary<string, string>()
     if options.IsTestProject then assemblyConstants.[Emitter.IsTestProject] <- "true"
     let loadOptions = 
-        new CompilationLoader.Configuration( // FIXME: WE MAY NEED THE OPTION TO CONFIGURE ARBITRARY ASSEMBLY CONSTANTS...
+        new CompilationLoader.Configuration(
             GenerateFunctorSupport = true,
             DocumentationOutputFolder = options.DocFolder,
             BuildOutputFolder = outputFolder,
             ProjectName = options.QSTFileName,
-            RewriteSteps = [struct(codeGenDll, null)]
-            //AssemblyConstants = assemblyConstants
+            RewriteSteps = [struct(codeGenDll, null)],
+            AssemblyConstants = assemblyConstants
         ) 
     let loaded = new CompilationLoader(options.Input, options.References, Nullable(loadOptions), logger)
     if loaded.Success then 0 else 2
