@@ -1445,11 +1445,27 @@ module SimulationCode =
             [
                 for (testOperation, targetName) in unitTests do
 
+                    //namespace CompilationUnitId 
+                    //{
+                    //  public partial class TargetNameTests
+                    //  TODO: line nr redirect needs to go here
+                    //  {
+                    //    [Fact(DisplayName = "TestOperationName")]
+                    //    public void __TestOperationNameTest__()
+                    //    {
+                    //        var sim = new TargetName(); 
+                    //        sim.OnLog += output.WriteLine;
+                    //        sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
+                    //    }
+                    //  }
+                    //}
+
                     let testOperationName = testOperation.Name.Value
+                    let testOperationFullName = testOperation.Namespace.Value + "." + testOperationName
                     let sim = (ident "sim")
                     let ``sim.OnLog`` = (sim <|.|> (ident "OnLog" ))
                     let ``output.WriteLine`` = ((ident "output" ) <|.|> (ident "WriteLines" ))
-                    let Run = generic "Run" ``<<`` [testOperationName; "QVoid"; "QVoid"] ``>>``
+                    let Run = generic "Run" ``<<`` [testOperationFullName; "QVoid"; "QVoid"] ``>>``
 
                     let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
                     // ToDo: This might not be the right way to assign events
@@ -1457,7 +1473,7 @@ module SimulationCode =
                     let ``sim.Run.Wait`` = sim <.> (Run, [(ident "QVoid")<|.|>(ident "Instance")]) <.> ((ident "Wait"), []) |> statement
 
                     yield
-                        ``namespace`` "CompilationUnitId"
+                        ``namespace`` "CompilationUnitId" // ToDo: Use compilation Id from globalContext
                             ``{``
                                 []
                                 [``class`` (targetName + "Tests") ``<<`` [] ``>>``
@@ -1475,23 +1491,6 @@ module SimulationCode =
                                 ]
                             ``}``
                         :> MemberDeclarationSyntax
-
-                    // TODO: memberSyntax should contain the data structure representing the following C# code:
-
-                    //namespace CompilationUnitId 
-                    //{
-                    //  public partial class TargetNameTests
-                    //  TODO: line nr redirect needs to go here
-                    //  {
-                    //    [Fact(DisplayName = "TestOperationName")]
-                    //    public void __TestOperationNameTest__()
-                    //    {
-                    //        var sim = new TargetName(); 
-                    //        sim.OnLog += output.WriteLine;
-                    //        sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
-                    //    }
-                    //  }
-                    //}
             ]
 
         ``#line hidden`` <| 

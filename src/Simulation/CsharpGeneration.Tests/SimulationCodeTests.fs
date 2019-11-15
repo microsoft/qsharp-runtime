@@ -3179,3 +3179,100 @@ namespace Microsoft.Quantum.Tests.LineNumbers
         |> 
         testOneFile (Path.Combine("Circuits","LineNumbers.qs"))
 
+        
+    [<Fact>]
+    let ``one file - UnitTests`` () =
+        """
+#pragma warning disable 1591
+using System;
+using Microsoft.Quantum.Core;
+using Microsoft.Quantum.Intrinsic;
+using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.Simulators;
+using Xunit;
+using Xunit.Abstractions;
+
+#line hidden
+namespace Microsoft.Quantum.Tests.UnitTests
+{
+    [SourceLocation("C:/Repos/qsharp-runtime/src/Simulation/CsharpGeneration.Tests/bin/Debug/netcoreapp3.0/Circuits/UnitTests.qs", OperationFunctor.Body, 17, -1)]
+    public partial class UnitTest1 : Operation<QVoid, QVoid>, ICallable
+    {
+        public UnitTest1(IOperationFactory m) : base(m)
+        {
+        }
+
+        String ICallable.Name => "UnitTest1";
+        String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest1";
+        public override Func<QVoid, QVoid> Body => (__in__) =>
+        {
+#line hidden
+            return QVoid.Instance;
+        }
+
+        ;
+        public override void Init()
+        {
+        }
+
+        public override IApplyData __dataIn(QVoid data) => data;
+        public override IApplyData __dataOut(QVoid data) => data;
+        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+        {
+            return __m__.Run<UnitTest1, QVoid, QVoid>(QVoid.Instance);
+        }
+    }
+
+    namespace CompilationUnitId
+    {
+        public partial class QuantumSimulatorTests
+        {
+            [Fact(DisplayName = "UnitTest1")]
+            public void __UnitTest1Test__()
+            {
+                var sim = new QuantumSimulator();
+                sim.OnLog = sim.OnLog + output.WriteLines;
+                sim.Run<Microsoft.Quantum.Tests.UnitTests.UnitTest1, QVoid, QVoid>(QVoid.Instance).Wait();
+            }
+        }
+    }
+}
+
+#line hidden
+namespace Microsoft.Quantum.Core
+{
+    public class Attribute : UDTBase<QVoid>, IApplyData
+    {
+        public Attribute() : base(default(QVoid))
+        {
+        }
+
+        public Attribute(QVoid data) : base(data)
+        {
+        }
+
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
+        public void Deconstruct()
+        {
+        }
+    }
+
+    public class TestOperation : UDTBase<String>, IApplyData
+    {
+        public TestOperation() : base(default(String))
+        {
+        }
+
+        public TestOperation(String data) : base(data)
+        {
+        }
+
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
+        public void Deconstruct()
+        {
+        }
+    }
+}"""
+        |> 
+        testOneFile (Path.Combine("Circuits","UnitTests.qs"))
+
