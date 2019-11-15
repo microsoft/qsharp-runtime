@@ -17,6 +17,8 @@ type Emitter() =
 
     let _AssemblyConstants = new Dictionary<string, string>()
 
+    static member public IsTestProject = "CsharpGeneration/TestProject"
+
     interface IRewriteStep with
 
         member this.Name = "CsharpGeneration"
@@ -35,11 +37,15 @@ type Emitter() =
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
                 | true, outputFolder when outputFolder <> null -> outputFolder
                 | _ -> step.Name
+            let isTestProject = _AssemblyConstants.TryGetValue Emitter.IsTestProject |> function
+                | true, value -> value <> null && value.ToLowerInvariant() = "true"
+                | _ -> false
+
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
                 |> Seq.filter (fun fileName -> (fileName.Value |> Path.GetFileName).StartsWith "Microsoft.Quantum" |> not)
             for source in allSources do
-                let content = compilation.Namespaces |> SimulationCode.generate source
+                let content = compilation.Namespaces |> SimulationCode.generate source isTestProject
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
             transformed <- compilation
             true

@@ -64,14 +64,14 @@ module SimulationCode =
         current                 : QsQualifiedName option
         signature               : ResolvedSignature option
         fileName                : string option
-        testTargets             : string[]
+        unitTests               : ILookup<NonNullable<string>, string> // for each namespace contains the targets on which unit tests need to be executed
     } 
     
     type CodegenContext with
         member this.setCallable (op: QsCallable) = { this with current = (Some op.FullName); signature = (Some op.Signature) }
         member this.setUdt (udt: QsCustomType) = { this with current = (Some udt.FullName) } 
 
-    let createContext fileName syntaxTree =        
+    let createContext fileName mayContainTests syntaxTree =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationPositions.Apply syntaxTree
@@ -84,14 +84,13 @@ module SimulationCode =
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
-        // TODO: we will want to make this a command line argument
-        let isTestProject = true
         let testTargets =  
-            if not isTestProject then [||] else
+            let allTargets (c : QsCallable) = c.Attributes |> SymbolResolution.TryFindTestTargets |> Seq.map (fun target -> c.FullName.Namespace, target)
+            if not mayContainTests then [||] else
             callables.Values 
-            |> Seq.collect (fun c -> c.Attributes |> SymbolResolution.TryFindTestTargets)
+            |> Seq.collect allTargets
             |> Seq.distinct 
-            |> Seq.filter (String.IsNullOrWhiteSpace >> not) 
+            |> Seq.filter (snd >> String.IsNullOrWhiteSpace >> not) 
             |> Seq.toArray
         { 
             allQsElements = syntaxTree; 
@@ -102,7 +101,7 @@ module SimulationCode =
             current = None; 
             fileName = fileName; 
             signature = None;
-            testTargets = testTargets
+            unitTests = testTargets.ToLookup(fst, snd)
         }
               
     let autoNamespaces (context : CodegenContext) = 
@@ -119,8 +118,7 @@ module SimulationCode =
                 "Microsoft.Quantum.Intrinsic"
                 "Microsoft.Quantum.Simulation.Core" 
             ]
-        if context.testTargets.Length = 0 then general 
-        else general @ testing
+        if context.unitTests.Any() then general @ testing else general 
 
     let funcsAsProps = [
         ("Length", { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "Length" |> NonNullable<String>.New } )
@@ -1514,8 +1512,8 @@ module SimulationCode =
         |> Seq.toList
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
-    let buildSyntaxTree (fileName : NonNullable<string>) allQsElements = 
-        let globalContext = createContext (Some fileName.Value) allQsElements
+    let buildSyntaxTree (fileName : NonNullable<string>) mayContainTests allQsElements = 
+        let globalContext = createContext (Some fileName.Value) mayContainTests allQsElements
         let usings = autoNamespaces globalContext |> List.map (fun ns -> ``using`` ns)
         let localElements = findLocalElements fileName allQsElements
         let namespaces = localElements |> List.map (buildNamespace globalContext)
@@ -1542,9 +1540,9 @@ module SimulationCode =
              
     // Main entry method for a CodeGenerator.
     // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
-    let generate fileName allQsElements = 
+    let generate fileName mayContainTests allQsElements = 
         allQsElements 
-        |> buildSyntaxTree fileName
+        |> buildSyntaxTree fileName mayContainTests
         |> formatSyntaxTree
 
 
