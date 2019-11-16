@@ -35,13 +35,13 @@ module SimulationCode =
         member this.setCallable (op: QsCallable) = { this with current = (Some op.FullName); signature = (Some op.Signature) }
         member this.setUdt (udt: QsCustomType) = { this with current = (Some udt.FullName) } 
               
+    let unitTestingNamespaces = [
+        "Microsoft.Quantum.Simulation.Simulators"
+        "Xunit"
+        "Xunit.Abstractions"
+    ]
+
     let autoNamespaces (context : CodegenContext) = 
-        let testing = 
-            [
-                "Microsoft.Quantum.Simulation.Simulators"
-                "Xunit"
-                "Xunit.Abstractions"
-            ]
         let general = 
             [
                 "System"
@@ -49,7 +49,7 @@ module SimulationCode =
                 "Microsoft.Quantum.Intrinsic"
                 "Microsoft.Quantum.Simulation.Core" 
             ]
-        if context.unitTests.Any() then general @ testing else general 
+        if context.unitTests.Any() then general @ unitTestingNamespaces else general 
 
     let funcsAsProps = [
         ("Length", { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "Length" |> NonNullable<String>.New } )
@@ -1381,7 +1381,7 @@ module SimulationCode =
                 // namespace AssemblyName // we omit this nested namespace if the assembly name is not specified
                 // {
                 //   public partial class TargetNameTests
-                //   TODO: line nr redirect needs to go here
+                //   #line nr source
                 //   {
                 //     [Fact(DisplayName = "TestOperationName")]
                 //     public void __TestOperationNameTest__()
@@ -1394,24 +1394,23 @@ module SimulationCode =
                 // }
                 for (testOperation, targetName) in unitTests do
 
-                    let testOperationName = testOperation.Name.Value
-                    let testOperationFullName = testOperation.Namespace.Value + "." + testOperationName
-                    let sim = (ident "sim")
-                    let ``sim.OnLog`` = (sim <|.|> (ident "OnLog" ))
-                    let ``output.WriteLine`` = ((ident "output" ) <|.|> (ident "WriteLines" ))
-                    let Run = generic "Run" ``<<`` [testOperationFullName; "QVoid"; "QVoid"] ``>>``
+                    let sim = ident "sim"
+                    let ``sim.OnLog`` = sim <|.|> (ident "OnLog" )
+                    let ``output.WriteLine`` = (ident "output" ) <|.|> (ident "WriteLines" )
+                    let Run = generic "Run" ``<<`` [testOperation.Namespace.Value + "." + testOperation.Name.Value; "QVoid"; "QVoid"] ``>>``
 
                     let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
                     let assignLogEvent = ``sim.OnLog`` <-- (``sim.OnLog`` <+> ``output.WriteLine``) |> statement // todo: += instead would be nice
-                    let ``sim.Run.Wait`` = sim <.> (Run, [(ident "QVoid")<|.|>(ident "Instance")]) <.> ((ident "Wait"), []) |> statement
+                    let ``sim.Run.Wait`` = sim <.> (Run, [ ident "QVoid" <|.|> ident "Instance"]) <.> ((ident "Wait"), []) |> statement
 
                     let partialClass = 
                         ``class`` (targetName + "Tests") ``<<`` [] ``>>``
                             ``:`` None ``,`` [] [``public``; ``partial``]
+                            // TODO: line nr redirect needs to go here
                             ``{``
                                 [``attributes``
-                                    [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperationName]]
-                                    (``method`` "void" ("__" + testOperationName + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                                    [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperation.Name.Value]]
+                                    (``method`` "void" ("__" + testOperation.Name.Value + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                                         ``{``
                                             [getSimulator; assignLogEvent; ``sim.Run.Wait``]
                                         ``}``
@@ -1475,6 +1474,49 @@ module SimulationCode =
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
 
+    // Method for generating the addition file containing the constructors 
+    // for all unit test classes if the project contains unit tests.
+    let generateUnitTestClasses (globalContext : CodegenContext) =
+        let unitTestClass targetName = 
+            let className = targetName + "Tests"
+            let outputHelperInterface = "ITestOutputHelper"
+            let testOutputHandle = "output"
+            ``class`` className ``<<`` [] ``>>``
+                ``:`` None ``,`` [] [``public``; ``partial``]
+                ``{``
+                    [
+                        ``prop`` "ITestOutputHelper" testOutputHandle [ ``protected`` ] 
+                        
+                        ``constructor`` className ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
+                            ``:`` []
+                            [``public``]
+                            ``{`` 
+                                [  
+                                    ident "this" <|.|> ident testOutputHandle <-- ident testOutputHandle |> statement
+                                ]
+                            ``}``
+                    ]
+                ``}``
+                :> MemberDeclarationSyntax
+        let usings = unitTestingNamespaces |> List.map (fun ns -> ``using`` ns)
+        let namespaces = [
+                for tests in globalContext.unitTests do 
+                    let partialClasses = tests |> Seq.map unitTestClass |> Seq.toList
+
+                    ``namespace`` tests.Key.Value
+                        ``{``
+                            []
+                            partialClasses
+                        ``}``
+                    :> MemberDeclarationSyntax
+            ]
+        ``compilation unit`` 
+            []
+            usings
+            namespaces
+        // We add a "pragma warning disable 1591" since we don't generate doc comments in our C# code.
+        |> ``pragmaDisableWarning`` 1591
+        |> formatSyntaxTree
              
     // Main entry method for a CodeGenerator.
     // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string

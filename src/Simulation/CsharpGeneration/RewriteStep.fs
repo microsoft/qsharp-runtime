@@ -6,8 +6,10 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 open System
 open System.Collections.Generic
 open System.IO
+open System.Linq
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
+open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
@@ -48,6 +50,10 @@ type Emitter() =
             for source in allSources do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+            if context.unitTests.Any() then 
+                let unitTestSetup = SimulationCode.generateUnitTestClasses context
+                let fileName = Path.Combine (dir, "UnitTestsClassConstructors.cs") |>  Path.GetFullPath |> NonNullable<string>.New
+                CompilationLoader.GeneratedFile(fileName, dir, ".g.cs", unitTestSetup) |> ignore
             transformed <- compilation
             true
 
