@@ -3194,7 +3194,7 @@ using Xunit.Abstractions;
 #line hidden
 namespace Microsoft.Quantum.Tests.UnitTests
 {
-    [SourceLocation("C:/Repos/qsharp-runtime/src/Simulation/CsharpGeneration.Tests/bin/Debug/netcoreapp3.0/Circuits/UnitTests.qs", OperationFunctor.Body, 17, -1)]
+    [SourceLocation("%%%", OperationFunctor.Body, 17, -1)]
     public partial class UnitTest1 : Operation<QVoid, QVoid>, ICallable
     {
         public UnitTest1(IOperationFactory m) : base(m)
@@ -3222,17 +3222,15 @@ namespace Microsoft.Quantum.Tests.UnitTests
         }
     }
 
-    namespace CompilationUnitId
+    public partial class QuantumSimulatorTests
     {
-        public partial class QuantumSimulatorTests
+        [Fact(DisplayName = "UnitTest1")]
+        public void __UnitTest1Test__()
+#line 16 "%%%"
         {
-            [Fact(DisplayName = "UnitTest1")]
-            public void __UnitTest1Test__()
-            {
-                var sim = new QuantumSimulator();
-                sim.OnLog = sim.OnLog + output.WriteLines;
-                sim.Run<Microsoft.Quantum.Tests.UnitTests.UnitTest1, QVoid, QVoid>(QVoid.Instance).Wait();
-            }
+            var sim = new QuantumSimulator();
+            sim.OnLog += this.Output.WriteLine;
+            sim.Run<Microsoft.Quantum.Tests.UnitTests.UnitTest1, QVoid, QVoid>(QVoid.Instance).Wait();
         }
     }
 }
