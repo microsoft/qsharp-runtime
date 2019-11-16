@@ -1358,10 +1358,6 @@ module SimulationCode =
             localElements
             |> List.map buildOne
             |> List.choose id
-        let assemblyName = 
-            match globalContext.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
-            | true, name -> name
-            | false, _ -> null
 
         let testHandles : MemberDeclarationSyntax list = 
             let testTargets = function 
@@ -1375,6 +1371,7 @@ module SimulationCode =
                 localElements 
                 |> List.collect testTargets 
                 |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
+            let assemblyName = globalContext.AssemblyName.Replace(".", "")
             [
                 // For each unit test, we create something like the following code:
                 //
@@ -1387,7 +1384,7 @@ module SimulationCode =
                 //     public void __TestOperationNameTest__()
                 //     {
                 //         var sim = new TargetName(); 
-                //         sim.OnLog += output.WriteLine;
+                //         sim.OnLog += this.Output.WriteLine;
                 //         sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
                 //     }
                 //   }
@@ -1395,18 +1392,18 @@ module SimulationCode =
                 for (testOperation, targetName) in unitTests do
 
                     let sim = ident "sim"
-                    let ``sim.OnLog`` = sim <|.|> (ident "OnLog" )
-                    let ``output.WriteLine`` = (ident "output" ) <|.|> (ident "WriteLines" )
+                    let ``sim.OnLog`` = sim <|.|> ident "OnLog" 
+                    let ``output.WriteLine`` = ident "this" <|.|> ident "Output"  <|.|> ident "WriteLine" 
                     let Run = generic "Run" ``<<`` [testOperation.Namespace.Value + "." + testOperation.Name.Value; "QVoid"; "QVoid"] ``>>``
 
                     let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
-                    let assignLogEvent = ``sim.OnLog`` <-- (``sim.OnLog`` <+> ``output.WriteLine``) |> statement // todo: += instead would be nice
+                    let assignLogEvent = ``sim.OnLog`` <+=> ``output.WriteLine``
                     let ``sim.Run.Wait`` = sim <.> (Run, [ ident "QVoid" <|.|> ident "Instance"]) <.> ((ident "Wait"), []) |> statement
 
                     let partialClass = 
                         ``class`` (targetName + "Tests") ``<<`` [] ``>>``
                             ``:`` None ``,`` [] [``public``; ``partial``]
-                            // TODO: line nr redirect needs to go here
+                            // TODO: line nr redirects here may work for VS Code - not sure how to make it work in VS though
                             ``{``
                                 [``attributes``
                                     [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperation.Name.Value]]
@@ -1480,12 +1477,12 @@ module SimulationCode =
         let unitTestClass targetName = 
             let className = targetName + "Tests"
             let outputHelperInterface = "ITestOutputHelper"
-            let testOutputHandle = "output"
+            let testOutputHandle = "Output"
             ``class`` className ``<<`` [] ``>>``
                 ``:`` None ``,`` [] [``public``; ``partial``]
                 ``{``
                     [
-                        ``prop`` "ITestOutputHelper" testOutputHandle [ ``protected`` ] 
+                        ``propg`` "ITestOutputHelper" testOutputHandle [ ``internal``; ] 
                         
                         ``constructor`` className ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
                             ``:`` []
@@ -1502,8 +1499,12 @@ module SimulationCode =
         let namespaces = [
                 for tests in globalContext.unitTests do 
                     let partialClasses = tests |> Seq.map unitTestClass |> Seq.toList
+                    let assemblyName = globalContext.AssemblyName.Replace(".", "")
+                    let namespaceName = 
+                        if assemblyName = null then tests.Key.Value 
+                        else sprintf "%s.%s" tests.Key.Value assemblyName
 
-                    ``namespace`` tests.Key.Value
+                    ``namespace`` namespaceName
                         ``{``
                             []
                             partialClasses

@@ -39,10 +39,10 @@ type Emitter() =
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
                 | true, outputFolder when outputFolder <> null -> outputFolder
                 | _ -> step.Name
-            let isTestProject = _AssemblyConstants.TryGetValue Emitter.IsTestProject |> function
+            let isTestProject = step.AssemblyConstants.TryGetValue Emitter.IsTestProject |> function
                 | true, value -> value <> null && value.ToLowerInvariant() = "true"
                 | _ -> false
-            let context = CodegenContext.Create (compilation.Namespaces, _AssemblyConstants, isTestProject)
+            let context = CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants, isTestProject)
 
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
@@ -52,7 +52,7 @@ type Emitter() =
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
             if context.unitTests.Any() then 
                 let unitTestSetup = SimulationCode.generateUnitTestClasses context
-                let fileName = Path.Combine (dir, "UnitTestsClassConstructors.cs") |>  Path.GetFullPath |> NonNullable<string>.New
+                let fileName = "UnitTestsClassConstructors.cs" |>  Path.GetFullPath |> NonNullable<string>.New
                 CompilationLoader.GeneratedFile(fileName, dir, ".g.cs", unitTestSetup) |> ignore
             transformed <- compilation
             true

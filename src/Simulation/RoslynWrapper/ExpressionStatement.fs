@@ -11,6 +11,16 @@ module Expressions =
     let (<--) target source =
          SyntaxFactory.AssignmentExpression (SyntaxKind.SimpleAssignmentExpression, target, source)
 
+    // left += right
+    let (<+=>) left right =         
+        SyntaxFactory.AssignmentExpression(SyntaxKind.AddAssignmentExpression, left, right)
+        |> SyntaxFactory.ExpressionStatement
+
+    // left -= right
+    let (<-=>) left right =         
+        SyntaxFactory.AssignmentExpression(SyntaxKind.SubtractAssignmentExpression, left, right)
+        |> SyntaxFactory.ExpressionStatement
+
     // (targetType) expression        
     let ``cast`` targetType expression = 
         SyntaxFactory.CastExpression (ident targetType, expression) :> ExpressionSyntax

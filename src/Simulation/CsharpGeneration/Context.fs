@@ -8,19 +8,11 @@ open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
 
-open Microsoft.CodeAnalysis
-open Microsoft.CodeAnalysis.CSharp.Syntax
-open Microsoft.CodeAnalysis.Formatting
-
-open Microsoft.Quantum.RoslynWrapper
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
-open Microsoft.Quantum.QsCompiler.SyntaxTokens 
 open Microsoft.Quantum.QsCompiler.SyntaxTree
-open Microsoft.Quantum.QsCompiler.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.Transformations
-open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 
 
 type internal DeclarationPositions() = 
@@ -102,3 +94,8 @@ type CodegenContext = {
 
     static member public Create (syntaxTree) = 
         CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty, false)
+
+    member public this.AssemblyName = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
+        | true, name -> name
+        | false, _ -> null
