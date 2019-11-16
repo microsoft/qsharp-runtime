@@ -214,7 +214,7 @@ namespace N1
         let expected = expected.Replace("%%", (Path.GetFullPath fileName).Replace("\\", "\\\\"))
         let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
         let actual = 
-            CodegenContext.Create tree
+            CodegenContext.Create (tree, ImmutableDictionary.Empty, true)
             |> buildSyntaxTree (Path.GetFullPath fileName |> NonNullable<string>.New)
             |> formatSyntaxTree
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
