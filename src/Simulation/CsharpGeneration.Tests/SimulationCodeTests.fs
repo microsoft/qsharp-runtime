@@ -16,14 +16,13 @@ open Microsoft.VisualStudio.LanguageServer.Protocol
 open Xunit
 
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
+open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
 open Microsoft.Quantum.QsCompiler.DataTypes
-open Microsoft.Quantum.QsCompiler.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 
 module SimulationCode =
     open Microsoft.Quantum.QsCompiler
-    open Microsoft.Quantum.QsCompiler.SyntaxTokens
 
     let clearFormatting (str:string) =
         str
@@ -111,7 +110,7 @@ namespace N1
         
     let syntaxTree = parse [ (Path.Combine("Circuits", "Intrinsic.qs")); (Path.Combine("Circuits", "CodegenTests.qs")) ]
 
-    let globalContext = createContext None syntaxTree
+    let globalContext = CodegenContext.Create syntaxTree
 
     let findCallable name = 
         let key = NonNullable<string>.New name
@@ -215,7 +214,7 @@ namespace N1
         let expected = expected.Replace("%%", (Path.GetFullPath fileName).Replace("\\", "\\\\"))
         let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
         let actual = 
-            tree 
+            CodegenContext.Create tree
             |> buildSyntaxTree (Path.GetFullPath fileName |> NonNullable<string>.New)
             |> formatSyntaxTree
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
@@ -240,7 +239,7 @@ namespace N1
     [<Fact>]
     let ``tupleBaseClassName test`` () =
         let testOne (_, udt) expected =
-            let context = (createContext None syntaxTree).setUdt udt
+            let context = (CodegenContext.Create syntaxTree).setUdt udt
             let actual = tupleBaseClassName context udt.Type 
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
         
@@ -2239,7 +2238,7 @@ namespace N1
 
     let testOneClass (_,op : QsCallable) (expected : string) =
         let expected = expected.Replace("%%%", op.SourceFile.Value)
-        let context = createContext None syntaxTree 
+        let context = CodegenContext.Create syntaxTree 
         let actual = (buildOperationClass context op).ToFullString()
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
@@ -2659,7 +2658,7 @@ namespace N1
     [<Fact>]
     let ``buildUdtClass - udts`` () =           
         let testOne (_,udt) expected =
-            let context = createContext None syntaxTree
+            let context = CodegenContext.Create syntaxTree
             let actual  = (buildUdtClass context udt).ToFullString()
             Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 

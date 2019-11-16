@@ -1373,7 +1373,7 @@ module SimulationCode =
                     |> List.collect testTargets 
                     |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
                 else []
-            let assemblyName = globalContext.AssemblyName.Replace(".", "")
+            let assemblyName = if globalContext.AssemblyName = null then null else globalContext.AssemblyName.Replace(".", "")
             [
                 // For each unit test, we create something like the following code:
                 //
