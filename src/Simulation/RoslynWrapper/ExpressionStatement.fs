@@ -219,10 +219,13 @@ module Expressions =
         [("//" + comment |> SyntaxFactory.Comment); (SyntaxFactory.EndOfLine "")] @ (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
         |> node.WithLeadingTrivia
 
+    // #line trivia
+    let ``#lineNr`` (lineNumber : int) (file : string) =
+        SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(lineNumber), SyntaxFactory.Literal(file), true))
+        
     // #line
     let ``#line`` (lineNumber : int) (file : string) node =
-        SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(lineNumber), SyntaxFactory.Literal(file), true))
-        :: (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
+        ``#lineNr`` lineNumber file :: (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
         |> node.WithLeadingTrivia
         
     // #line hidden

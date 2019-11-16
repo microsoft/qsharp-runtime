@@ -1364,13 +1364,15 @@ module SimulationCode =
                 | QsCallable c -> 
                     c.Attributes 
                     |> SymbolResolution.TryFindTestTargets 
-                    |> Seq.map (fun target -> c.FullName, target) 
+                    |> Seq.map (fun target -> (c.FullName, c.SourceFile, fst c.Location.Offset), target) 
                     |> Seq.toList
                 | _ -> []
             let unitTests = // contains the full name of the callable which to test as well as the name of the target simulator
-                localElements 
-                |> List.collect testTargets 
-                |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
+                if globalContext.unitTests.Any() then 
+                    localElements 
+                    |> List.collect testTargets 
+                    |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
+                else []
             let assemblyName = globalContext.AssemblyName.Replace(".", "")
             [
                 // For each unit test, we create something like the following code:
@@ -1391,10 +1393,11 @@ module SimulationCode =
                 // }
                 for (testOperation, targetName) in unitTests do
 
+                    let opName, source, line = testOperation
                     let sim = ident "sim"
                     let ``sim.OnLog`` = sim <|.|> ident "OnLog" 
                     let ``output.WriteLine`` = ident "this" <|.|> ident "Output"  <|.|> ident "WriteLine" 
-                    let Run = generic "Run" ``<<`` [testOperation.Namespace.Value + "." + testOperation.Name.Value; "QVoid"; "QVoid"] ``>>``
+                    let Run = generic "Run" ``<<`` [opName.Namespace.Value + "." + opName.Name.Value; "QVoid"; "QVoid"] ``>>``
 
                     let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (ident targetName) ``(`` [] ``)``)
                     let assignLogEvent = ``sim.OnLog`` <+=> ``output.WriteLine``
@@ -1403,14 +1406,14 @@ module SimulationCode =
                     let partialClass = 
                         ``class`` (targetName + "Tests") ``<<`` [] ``>>``
                             ``:`` None ``,`` [] [``public``; ``partial``]
-                            // TODO: line nr redirects here may work for VS Code - not sure how to make it work in VS though
                             ``{``
                                 [``attributes``
-                                    [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` testOperation.Name.Value]]
-                                    (``method`` "void" ("__" + testOperation.Name.Value + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                                    [``attribute`` None (ident "Fact") [ident "DisplayName" <-- ``literal`` opName.Name.Value]]
+                                    (``method`` "void" ("__" + opName.Name.Value + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                                         ``{``
                                             [getSimulator; assignLogEvent; ``sim.Run.Wait``]
                                         ``}``
+                                        |> ``with trivia`` (``#lineNr`` line source.Value) 
                                     )
                                 ]
                             ``}``

@@ -28,7 +28,7 @@ type Options = {
       HelpText = "Destination folder where the output of the compilation will be generated.")>]
     OutputFolder : string
 
-    [<Option("test", Required = true, Default = false, 
+    [<Option("test", Required = false, Default = false, 
       HelpText = "Specifies whether the project to compile may contain unit tests.")>]
     IsTestProject : bool;
 

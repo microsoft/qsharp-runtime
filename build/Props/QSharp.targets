@@ -12,9 +12,7 @@
       BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
     <PropertyGroup>
-      <IsTestProject>false</IsTestProject>
-      <IsTestProject Condition="$(ReferencePath.Contains('xunit'))">true</IsTestProject>
-      <QscCommand>$(QscExe) $(QsharpDocsGen) --test $(IsTestProject) --qst $(QsharpTree) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
+      <QscCommand>$(QscExe) $(QsharpDocsGen) --test --qst $(QsharpTree) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
     </PropertyGroup>
     <MakeDir Directories="$(QsharpSrcOutDir)" />
     <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />

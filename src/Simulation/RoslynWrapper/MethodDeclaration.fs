@@ -64,3 +64,14 @@ module MethodDeclaration =
         |> setModifiers modifiers
         |> setParameterList methodParams
         |> setBodyBlock bodyBlockStatements
+
+    let ``with trivia`` (trivia : SyntaxTrivia) (method : MethodDeclarationSyntax) =
+        let bodyWithTrivia = 
+            method.Body.WithOpenBraceToken(
+                SyntaxFactory.Token(
+                    SyntaxFactory.TriviaList(trivia),
+                    SyntaxKind.OpenBraceToken,
+                    SyntaxFactory.TriviaList()))
+        method.WithBody bodyWithTrivia
+
+
