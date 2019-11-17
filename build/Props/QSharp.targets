@@ -24,7 +24,7 @@
     <Delete Files="@(QsharpCodegenFiles)" />
     <Exec Command="$(QscCommand)" />
     <ItemGroup>
-      <EmbeddedResource Include="$(QsharpSrcOutDir)\$(QsharpTree)" LogicalName="$(QsharpTree)" Visible="false" />
+      <EmbeddedResource Include="$(QsharpSrcOutDir)\$(QsharpTree).bson" LogicalName="__qsharp_data__.bson" Visible="false" />
       <Compile Include="$(QsharpSrcOutDir)**\*.g.cs" Visible="false" />
     </ItemGroup>
   </Target>
@@ -63,7 +63,7 @@
       <QsharpFormatBackupDir Condition="'$(QsharpFormatBackupDir)' == ''">$(QsharpOutDir).backup.$([System.DateTime]::Now.ToString(`yyyyMMddhhmmss`))</QsharpFormatBackupDir>
       <QsharpDocsOutDir Condition="'$(QsharpDocsOutDir)' == ''">$(QsharpOutDir)docs\</QsharpDocsOutDir>
       <QsharpDocsGen Condition="$(RunQDocGen)">--doc $(QsharpDocsOutDir)</QsharpDocsGen>
-      <QsharpTree Condition="'$(QsharpTree)' == ''">__qsharp_data__.bson</QsharpTree>
+      <QsharpTree Condition="'$(QsharpTree)' == ''">$([System.String]::Copy('$(AssemblyName)').Replace(' ',''))</QsharpTree>
     </PropertyGroup>
     <Warning
         Condition="'@(SkippedQbFiles)' != ''"
