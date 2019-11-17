@@ -4,24 +4,26 @@
 namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 
 open System
+open System.Collections.Generic
 open System.IO
 open Microsoft.Quantum.QsCompiler
-open Microsoft.Quantum.QsCompiler.CsharpGeneration;
-open Microsoft.Quantum.QsCompiler.SyntaxTree;
-open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations;
+open Microsoft.Quantum.QsCompiler.CsharpGeneration
+open Microsoft.Quantum.QsCompiler.ReservedKeywords
+open Microsoft.Quantum.QsCompiler.SyntaxTree
+open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 
 
 type Emitter() =
 
-    let mutable _OutputFolder = null
+    let _AssemblyConstants = new Dictionary<string, string>()
+
+    static member internal IsTestProject = "CsharpGeneration/TestProject"
 
     interface IRewriteStep with
 
         member this.Name = "CsharpGeneration"
         member this.Priority = -1 // doesn't matter because this rewrite step is the only one in the dll
-        member this.OutputFolder
-            with get () = _OutputFolder
-            and set name = _OutputFolder <- name
+        member this.AssemblyConstants = _AssemblyConstants :> IDictionary<string, string> 
         
         member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false
@@ -32,7 +34,9 @@ type Emitter() =
         
         member this.Transformation (compilation, transformed) = 
             let step = this :> IRewriteStep
-            let dir = if step.OutputFolder = null then step.Name else step.OutputFolder
+            let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
+                | true, outputFolder when outputFolder <> null -> outputFolder
+                | _ -> step.Name
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
                 |> Seq.filter (fun fileName -> (fileName.Value |> Path.GetFileName).StartsWith "Microsoft.Quantum" |> not)
