@@ -6,7 +6,6 @@
 #nowarn "1182"    // Unused parameters
 [<AutoOpen>]
 module MethodDeclaration =
-    open Microsoft.CodeAnalysis
     open Microsoft.CodeAnalysis.CSharp
     open Microsoft.CodeAnalysis.CSharp.Syntax
 
