@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Core {
-    @Attribute ()
+    @Attribute()
     newtype Attribute = Unit;
 
-    @Attribute ()
+    @Attribute()
     newtype TestOperation = String;
 }
 
