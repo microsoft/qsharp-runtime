@@ -1435,7 +1435,40 @@ module SimulationCode =
                 (members @ testHandles)
             ``}``
         :> MemberDeclarationSyntax
-   
+
+    type AttributeGenerator () = 
+        inherit SyntaxTreeTransformation<NoScopeTransformations>(new NoScopeTransformations())
+
+        let mutable attributes = []
+        let GenerateAndAdd attrName json =
+            let attr = ``attribute`` (Some ``assembly``) (ident attrName) [ ``literal`` json ]
+            attributes <- attr :: attributes
+
+        member internal this.Apply (elements : IEnumerable<QsNamespaceElement>) = 
+            attributes <- []
+            for element in elements do 
+                base.dispatchNamespaceElement element |> ignore
+            attributes |> List.rev
+
+        override this.beforeSpecialization (spec : QsSpecialization) = 
+            (SpecializationDeclarationHeader.New spec).ToJson()
+            |> GenerateAndAdd "SpecializationDeclaration"
+            spec
+
+        override this.beforeCallable (callable : QsCallable) = 
+            (CallableDeclarationHeader.New callable).ToJson()
+            |> GenerateAndAdd "CallableDeclaration"
+            callable
+
+        override this.onType (qsType : QsCustomType) = 
+            (TypeDeclarationHeader.New qsType).ToJson()
+            |> GenerateAndAdd "TypeDeclaration"
+            qsType
+
+
+    let buildDeclarationAttributes elements = 
+        let generator = new AttributeGenerator()
+        generator.Apply elements       
 
     // Returns only those namespaces and their elements that are defined for the given file.
     let findLocalElements fileName syntaxTree =
@@ -1453,10 +1486,11 @@ module SimulationCode =
         let context = {globalContext with fileName = Some fileName.Value} 
         let usings = autoNamespaces context |> List.map (fun ns -> ``using`` ns)
         let localElements = findLocalElements fileName context.allQsElements
+        let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
 
         ``compilation unit`` 
-            []
+            attributes
             usings
             namespaces
         // We add a "pragma warning disable 1591" since we don't generate doc comments in our C# code.
