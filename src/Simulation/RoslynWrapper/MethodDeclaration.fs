@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.Quantum.RoslynWrapper
 
+open Microsoft.CodeAnalysis
+
 /// <summary>
 /// Use this module to specify the syntax for a <code>class or interface method</code>
 /// </summary>
