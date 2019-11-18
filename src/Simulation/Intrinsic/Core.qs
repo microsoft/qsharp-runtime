@@ -30,17 +30,6 @@ namespace Microsoft.Quantum.Core {
     @Attribute()
     newtype Deprecated = (NewName : String);
 
-    /// # Summary
-    /// Compiler recognized attribute used to mark a unit test.
-    /// 
-    /// # Input
-    /// ## ExecutionTarget
-    /// The name of the target to execute the test on. 
-    /// Possible values are: QuantumSimulator, TraceSimulator, ToffoliSimulator
-    ///
-    @Attribute()
-    newtype TestOperation = (ExecutionTarget : String); // this should possibly go into another namespace -> adapt the compiler dependency accordingly!
-
 
     /// # Summary
     /// Returns a default instance of the specified type. 
