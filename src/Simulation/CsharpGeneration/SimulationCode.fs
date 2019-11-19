@@ -1478,6 +1478,7 @@ module SimulationCode =
             | false, _ -> NonNullable<string>.New ""
         syntaxTree
         |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.toList))
+        |> Seq.sortBy fst
         |> Seq.filter (fun (_,elements) -> not elements.IsEmpty)
         |> Seq.toList
 

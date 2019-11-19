@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-
 namespace Microsoft.Quantum.Diagnostics {
 
     /// # Summary
@@ -14,7 +13,6 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     @Attribute()
     newtype TestOperation = (ExecutionTarget : String);
-
 }
 
 
