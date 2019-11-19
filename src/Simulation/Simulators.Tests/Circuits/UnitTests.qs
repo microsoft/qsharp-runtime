@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Simulation.Tests.QsUnitTests {
 
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Diagnostics;
     
     @TestOperation("QuantumSimulator")
     operation QsharpUnitTest() : Unit {
