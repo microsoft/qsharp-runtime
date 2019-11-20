@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     {
                         // To account for the modification of expectedPr to (1 - expectedPr) when (result == Result.Zero), 
                         // we must also update the ensemblePr to (1 - ensemblePr) when reporting the failure.
-                        extendedMsg = $"{msg}\n\tExpected:\t{expectedPr}\n\tActual:\t{(1 - ensemblePr)}";
+                        extendedMsg = $"{msg}\n\tExpected:\t{originalExpectedPr}\n\tActual:\t{(1 - ensemblePr)}";
                     }
                     else
                     {
