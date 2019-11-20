@@ -4,16 +4,23 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> ControlledRZFrac is exp( i πk/2ⁿ|1⟩⟨1|⊗Z) </summary>
-    /// <param name = "power"> n </param>
-    /// <param name = "numerator"> k </param>
-    /// <param name="control"> first qubit operation acts on </param>
-    /// <param name="target"> second qubit operation acts on </param>
-    /// <remarks>
+	/// # Summary
+    /// ControlledRZFrac is exp( i πk/2ⁿ|1⟩⟨1|⊗Z)
+    /// 
+    /// # Input
+    /// ## numerator
+    /// k
+    /// ## power
+    /// n
+    /// ## control
+    /// first qubit operation acts on
+    /// ## target
+    /// second qubit operation acts on
+    /// 
+    /// # Remarks
     /// exp( i πk/2ⁿ|1⟩⟨1|⊗Z) = exp( iπk/2ⁿ(I-Z)/2⊗Z ) =
     /// = exp( iπk/2ⁿ (I-Z)/2⊗Z )
     /// = exp( iπk/2ⁿ⁺¹ I⊗Z) exp( -iπk/2ⁿ⁺¹ Z⊗Z)
-    /// </remarks>
     operation ControlledRZFrac (numerator : Int, power : Int, control : Qubit, target : Qubit) : Unit
     is Adj {
 

@@ -12,9 +12,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         Adjoint PauliZFlip(PauliY, target);
     }
     
-    
-    /// <remark> Here is Mathematica code to check the correctness of ControlledH implementation </remark>
-    /// <code>
+    /// # Remarks
+    /// Here is Mathematica code to check the correctness of ControlledH implementation:
+    /// ```
     /// H = {{1, 1}, {1, -1}}/Sqrt[2];
     /// T = DiagonalMatrix[{1, Exp[I Pi/4]}];
     /// S = DiagonalMatrix[{1, I}];
@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     /// Dagger = ConjugateTranspose;
     /// Ty = S.H.T.Dagger[ S.H];
     /// Ty.Z.Dagger[Ty] == H // Simplify
-    /// </code>
+    /// ```
     operation ControlledH (control : Qubit, target : Qubit) : Unit
     is Adj {
         Adjoint Ty(target);
