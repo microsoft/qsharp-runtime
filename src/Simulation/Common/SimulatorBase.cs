@@ -98,7 +98,7 @@ namespace Microsoft.Quantum.Simulation.Common
             return result;
         }
 
-        public virtual O RunSync<T, I, O>(I args) where T : AbstractCallable, ICallable
+        public virtual O Execute<T, I, O>(I args) where T : AbstractCallable, ICallable
         {
             O res = default(O);
             var op = Get<ICallable, T>();
@@ -125,7 +125,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual Task<O> Run<T, I, O>(I args) where T : AbstractCallable, ICallable
         {
-            return Task<O>.Run(() => RunSync<T, I, O>(args));
+            return Task<O>.Run(() => Execute<T, I, O>(args));
         }
 
         /// <summary>

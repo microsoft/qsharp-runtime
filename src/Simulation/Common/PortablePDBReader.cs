@@ -13,13 +13,26 @@ namespace Microsoft.Quantum.Simulation.Common
     using System.Text.RegularExpressions;
     using Microsoft.Quantum.Simulation.Core;
 
-    // Based on https://github.com/microsoft/BPerf/blob/master/WebViewer/Microsoft.BPerf.SymbolicInformation.ProgramDatabase/PortablePdbSymbolReader.cs
+    /// <summary>
+    /// Utility class for extracting source file text and source location from PortablePDB meta-data.
+    /// </summary>
+    /// <remarks>
+    /// Based on https://github.com/microsoft/BPerf/blob/master/WebViewer/Microsoft.BPerf.SymbolicInformation.ProgramDatabase/PortablePdbSymbolReader.cs
+    /// </remarks>
     class PortablePdbSymbolReader
     {
+        /// <summary> SourceLink GUID is a part of PortablePDB meta-data specification https://github.com/dotnet/corefx/blob/master/src/System.Reflection.Metadata/specs/PortablePdb-Metadata.md#SourceLink </summary>
         private static readonly Guid SourceLink = new Guid("CC110556-A091-4D38-9FEC-25AB9A351A6A");
 
+        /// <summary> EmbeddedSource GUID is a part of PortablePDB meta-data specification https://github.com/dotnet/corefx/blob/master/src/System.Reflection.Metadata/specs/PortablePdb-Metadata.md#embedded-source-c-and-vb-compilers </summary>
         private static readonly Guid EmbeddedSource = new Guid("0E8A571B-6926-466E-B4AD-8AB04611F5FE");
 
+        /// <summary>
+        /// Unpacks all files stored in a PortablePDB meta-data. The key in the dictionary is the location of a source file 
+        /// on the build machine. The value is the content of the source file itself.
+        /// </summary>
+        /// <param name="pdbFilePath">Path to PortablePDB file to load source files from.</param>
+        /// <returns></returns>
         public static Dictionary<string, string> GetEmbeddedFiles(string pdbFilePath)
         {
             Dictionary<string, string> embeddedFiles = new Dictionary<string, string>();
@@ -59,6 +72,11 @@ namespace Microsoft.Quantum.Simulation.Common
             return embeddedFiles;
         }
 
+        /// <summary>
+        /// Returns SourceLink information, that is JSON string with schema described at https://github.com/dotnet/designs/blob/master/accepted/diagnostics/source-link.md#source-link-json-schema
+        /// stored in PortablePDB.
+        /// </summary>
+        /// <param name="pdbFilePath">Path to PortablePDB file </param>
         public static string GetSourceLinkString(string pdbFilePath)
         {
             using (FileStream stream = File.OpenRead(pdbFilePath))
@@ -95,7 +113,7 @@ namespace Microsoft.Quantum.Simulation.Common
             return pairs.ToArray();
         }
 
-        public static string TryFormatGitHubUrl(Tuple<string,string> rawUrl, int lineNumber)
+        public static string TryFormatGitHubUrl(Tuple<string, string> rawUrl, int lineNumber)
         {
             if (rawUrl == null)
                 return null;
@@ -120,7 +138,7 @@ namespace Microsoft.Quantum.Simulation.Common
             try
             {
                 string filename = System.IO.Path.ChangeExtension(callable.UnwrapCallable().GetType().Assembly.Location, ".pdb");
-                if( File.Exists(filename) )
+                if (File.Exists(filename))
                 {
                     return filename;
                 }
@@ -129,7 +147,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     return null;
                 }
             }
-            catch(NotSupportedException)
+            catch (NotSupportedException)
             {
                 return null;
             }
@@ -172,7 +190,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Tuple of strings such that full URL consists of their concatenation.
         /// First part of URL is URL root for all files in PDB and second part is relative path to given file.
         /// </summary>
-        public static Tuple<string,string> TryGetFileUrl(string pdbLocation, string fileName )
+        public static Tuple<string, string> TryGetFileUrl(string pdbLocation, string fileName)
         {
             if (fileName == null) return null;
 
@@ -196,7 +214,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     }
                 }
             }
-            return new Tuple<string, string>(prefix,rest);
+            return new Tuple<string, string>(prefix, rest);
         }
     }
 
@@ -234,7 +252,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        public static string GetEmbeddedFileRange( string pdbLocation, string fullName, int lineStart, int lineEnd, bool showLineNumbers = false, int markedLine = -1, string markPrefix = lineMarkPrefix)
+        public static string GetEmbeddedFileRange(string pdbLocation, string fullName, int lineStart, int lineEnd, bool showLineNumbers = false, int markedLine = -1, string markPrefix = lineMarkPrefix)
         {
             Dictionary<string, string> fileNameToFileSourceText = GetEmbeddedFiles(pdbLocation);
             if (fileNameToFileSourceText == null) return null;
@@ -247,7 +265,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 int lineNumber = 0;
 
                 // first go through text source till we reach lineStart
-                while ( reader.Peek() != -1 )
+                while (reader.Peek() != -1)
                 {
                     lineNumber++;
                     if (lineNumber == lineStart)

@@ -303,7 +303,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             sim.OnLog += (msg) => stringBuilder.AppendLine(msg);
             try
             {
-                QVoid res = sim.RunSync<AlwaysFail4, QVoid, QVoid>(QVoid.Instance);
+                QVoid res = sim.Execute<AlwaysFail4, QVoid, QVoid>(QVoid.Instance);
             }
             catch (ExecutionFailException)
             {
