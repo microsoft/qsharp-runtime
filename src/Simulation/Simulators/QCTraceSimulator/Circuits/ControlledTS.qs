@@ -4,8 +4,9 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <remark> Based on Remark 3.2 in https://arxiv.org/pdf/1210.0974.pdf
-    /// This is a small refinement of a swap trick </remark>
+    /// # Remarks
+    /// Based on Remark 3.2 in https://arxiv.org/pdf/1210.0974.pdf
+    /// This is a small refinement of a swap trick
     operation ControlledTS (control : Qubit, target : Qubit) : Unit
     is Adj {
 
