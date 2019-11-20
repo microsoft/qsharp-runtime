@@ -3,8 +3,7 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
-    
-    /// </remarks>
+
     operation ControlledR1Frac (numerator : Int, power : Int, control : Qubit, target : Qubit) : Unit
     {
         body (...)
