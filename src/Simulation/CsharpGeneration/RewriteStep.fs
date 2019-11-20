@@ -17,7 +17,7 @@ type Emitter() =
 
     let _AssemblyConstants = new Dictionary<string, string>()
 
-    static member internal IsTestProject = "CsharpGeneration/TestProject"
+    static member internal SupportUnitTests = "CsharpGeneration/TestProject"
 
     interface IRewriteStep with
 

@@ -28,10 +28,6 @@ type Options = {
       HelpText = "Destination folder where the output of the compilation will be generated.")>]
     OutputFolder : string
 
-    [<Option("test", Required = false, Default = false, 
-      HelpText = "Specifies whether the project to compile may contain unit tests.")>]
-    IsTestProject : bool;
-
     [<Option("doc", Required = false,
       HelpText = "Destination folder where documentation will be generated.")>]
     DocFolder : string
@@ -54,7 +50,7 @@ let generateFiles (options : Options) =
     let outputFolder = if String.IsNullOrWhiteSpace options.QSTFileName then null else options.OutputFolder
     let codeGenDll = typeof<Emitter>.Assembly.Location
     let assemblyConstants = new Dictionary<string, string>()
-    if options.IsTestProject then assemblyConstants.[Emitter.IsTestProject] <- "true"
+    assemblyConstants.[Emitter.SupportUnitTests] <- "true" // always permit unit tests
     let loadOptions = 
         new CompilationLoader.Configuration(
             GenerateFunctorSupport = true,
