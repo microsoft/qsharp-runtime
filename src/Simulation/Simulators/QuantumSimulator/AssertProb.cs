@@ -37,6 +37,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                 }
 
+                // Capture original expectedPr for clarity in failure logging later.
+                var originalExpectedPr = expectedPr;
+
                 if (result == Result.Zero)
                 {
                     expectedPr = 1 - expectedPr;
@@ -46,7 +49,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
                 if (Abs(ensemblePr - expectedPr) > tol)
                 {
-                    var extendedMsg = $"{msg}\n\tExpected:\t{expectedPr}\n\tActual:\t{ensemblePr}";
+                    string extendedMsg;
+                    if (result == Result.Zero)
+                    {
+                        // To account for the modification of expectedPr to (1 - expectedPr) when (result == Result.Zero), 
+                        // we must also update the ensemblePr to (1 - ensemblePr) when reporting the failure.
+                        extendedMsg = $"{msg}\n\tExpected:\t{originalExpectedPr}\n\tActual:\t{(1 - ensemblePr)}";
+                    }
+                    else
+                    {
+                        extendedMsg = $"{msg}\n\tExpected:\t{originalExpectedPr}\n\tActual:\t{ensemblePr}";
+                    }
+                    
                     IgnorableAssert.Assert(false, extendedMsg);
                     throw new ExecutionFailException(extendedMsg);
                 }
