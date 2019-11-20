@@ -53,7 +53,7 @@ type CodegenContext = {
     unitTests               : ILookup<NonNullable<string>, string> // for each namespace contains the targets on which unit tests need to be executed
 } 
     with
-    static member internal Create (syntaxTree, assemblyConstants, mayContainTests) =        
+    static member public Create (syntaxTree, assemblyConstants) =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationPositions.Apply syntaxTree
@@ -69,7 +69,6 @@ type CodegenContext = {
 
         let testTargets =  
             let allTargets (c : QsCallable) = c.Attributes |> SymbolResolution.TryFindTestTargets |> Seq.map (fun target -> c.FullName.Namespace, target)
-            if not mayContainTests then [||] else
             callables.Values 
             |> Seq.collect allTargets
             |> Seq.distinct 
@@ -89,11 +88,8 @@ type CodegenContext = {
             unitTests = testTargets.ToLookup(fst, snd)
         }
 
-    static member public Create (syntaxTree, assemblyConstants) = 
-        CodegenContext.Create(syntaxTree, assemblyConstants, false)
-
-    static member public Create (syntaxTree) = 
-        CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty, false)
+    static member public Create syntaxTree = 
+        CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
 
     member public this.AssemblyName = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with

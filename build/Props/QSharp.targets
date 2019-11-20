@@ -12,7 +12,7 @@
       BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
     <PropertyGroup>
-      <QscCommand>$(QscExe) $(QsharpDocsGen) --test --qst $(QsharpTree) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
+      <QscCommand>$(QscExe) $(QsharpDocsGen) --qst $(QsharpTree) --input &quot;@(QsharpFiles,'&quot; &quot;')&quot; --references &quot;@(QsReferences,'&quot; &quot;')&quot; --output $(QsharpSrcOutDir)</QscCommand>
     </PropertyGroup>
     <MakeDir Directories="$(QsharpSrcOutDir)" />
     <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />
