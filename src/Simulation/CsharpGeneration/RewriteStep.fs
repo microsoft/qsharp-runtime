@@ -17,8 +17,6 @@ type Emitter() =
 
     let _AssemblyConstants = new Dictionary<string, string>()
 
-    static member internal SupportUnitTests = "CsharpGeneration/TestProject"
-
     interface IRewriteStep with
 
         member this.Name = "CsharpGeneration"
@@ -39,7 +37,7 @@ type Emitter() =
                 | _ -> step.Name
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
-                |> Seq.filter (fun fileName -> (fileName.Value |> Path.GetFileName).StartsWith "Microsoft.Quantum" |> not)
+                |> Seq.filter (fun fileName -> not ((fileName.Value |> Path.GetFileName).EndsWith ".dll"))
             for source in allSources do
                 let content = compilation.Namespaces |> SimulationCode.generate source
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore

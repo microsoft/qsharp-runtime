@@ -9,6 +9,10 @@ open CommandLine
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.Diagnostics
 
+type ExitStatus = 
+    | SUCCESS = 0
+    | INVALID_OPTIONS = 1
+    | COMPILATION_ERRORS = 2
 
 type Options = {
 
@@ -50,7 +54,6 @@ let generateFiles (options : Options) =
     let outputFolder = if String.IsNullOrWhiteSpace options.QSTFileName then null else options.OutputFolder
     let codeGenDll = typeof<Emitter>.Assembly.Location
     let assemblyConstants = new Dictionary<string, string>()
-    assemblyConstants.[Emitter.SupportUnitTests] <- "true" // always permit unit tests
     let loadOptions = 
         new CompilationLoader.Configuration(
             GenerateFunctorSupport = true,
@@ -61,13 +64,13 @@ let generateFiles (options : Options) =
             AssemblyConstants = assemblyConstants
         ) 
     let loaded = new CompilationLoader(options.Input, options.References, Nullable(loadOptions), logger)
-    if loaded.Success then 0 else 2
+    if loaded.Success then ExitStatus.SUCCESS else ExitStatus.COMPILATION_ERRORS
 
 
 let [<EntryPoint>] main args = 
     match Parser.Default.ParseArguments<Options> args with 
-    | :? Parsed<Options> as options -> generateFiles options.Value
-    | _ -> 1
+    | :? Parsed<Options> as options -> (int)(generateFiles options.Value)
+    | _ -> (int)ExitStatus.INVALID_OPTIONS
 
 
 
