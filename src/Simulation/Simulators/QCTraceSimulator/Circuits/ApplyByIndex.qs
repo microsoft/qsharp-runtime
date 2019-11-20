@@ -4,11 +4,17 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> Applies operation given by op to
+    /// # Summary
+    /// Applies operation given by op to
     /// array of qubits constructed as [ target[k] : k ∈ index ]
-    /// </summary>
-    /// <param name="op"> Operation to apply, must have an Adjoint
-    /// and Controlled </param>
+    /// 
+    /// # Input
+    /// ## op
+    /// Operation to apply, must have an Adjoint and Controlled.
+    /// ## index
+    /// Array of indexes in target to apply the operation to.
+    /// ## target
+    /// Array of qubits from which to select the qubits to operate on.
     operation ApplyByIndexAdjointableControllable (op : (Qubit[] => Unit is Adj + Ctl), index : Int[], target : Qubit[]) : Unit
     {
         body (...)

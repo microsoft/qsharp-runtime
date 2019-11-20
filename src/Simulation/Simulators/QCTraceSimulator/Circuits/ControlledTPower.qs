@@ -4,8 +4,12 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> Power of Controlled T gate </summary>
-    /// <param name="power"> power of T gate being controlled. Must be odd </param>
+    /// # Summary
+    /// Power of Controlled T gate
+    /// 
+    /// # Input
+    /// ## power
+    /// power of T gate being controlled. Must be odd
     operation ControlledTPower (power : Int, target : Qubit, control : Qubit) : Unit
     is Adj {
 
