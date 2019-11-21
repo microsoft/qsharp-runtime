@@ -7,6 +7,7 @@ namespace Microsoft.Quantum.Simulation.Tests.QsUnitTests {
     open Microsoft.Quantum.Diagnostics;
     
     @TestOperation("QuantumSimulator")
+    @TestOperation("ToffoliSimulator")
     operation QsharpUnitTest() : Unit {
 		Message("Worked!");
 	}
