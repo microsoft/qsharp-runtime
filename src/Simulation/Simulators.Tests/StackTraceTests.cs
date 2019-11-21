@@ -41,30 +41,30 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 Assert.Equal(5, stackFrames.Length);
 
-                Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail1", stackFrames[1].operation.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail2", stackFrames[2].operation.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail3", stackFrames[3].operation.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail4", stackFrames[4].operation.FullName);
+                Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                Assert.Equal(namespacePrefix + "AlwaysFail1", stackFrames[1].Callable.FullName);
+                Assert.Equal(namespacePrefix + "AlwaysFail2", stackFrames[2].Callable.FullName);
+                Assert.Equal(namespacePrefix + "AlwaysFail3", stackFrames[3].Callable.FullName);
+                Assert.Equal(namespacePrefix + "AlwaysFail4", stackFrames[4].Callable.FullName);
 
-                Assert.Equal(OperationFunctor.Controlled, stackFrames[0].operation.Variant);
-                Assert.Equal(OperationFunctor.Controlled, stackFrames[1].operation.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
-                Assert.Equal(OperationFunctor.Adjoint, stackFrames[3].operation.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[4].operation.Variant);
+                Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
+                Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
+                Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
+                Assert.Equal(OperationFunctor.Adjoint, stackFrames[3].Callable.Variant);
+                Assert.Equal(OperationFunctor.Body, stackFrames[4].Callable.Variant);
 
-                Assert.Equal(14, stackFrames[2].failedLineNumber);
-                Assert.Equal(21, stackFrames[4].failedLineNumber);
+                Assert.Equal(14, stackFrames[2].FailedLineNumber);
+                Assert.Equal(21, stackFrames[4].FailedLineNumber);
 
                 // For Adjoint and Controlled we expect failedLineNumber to be equal to declarationStartLineNumber
-                Assert.Equal(stackFrames[0].declarationStartLineNumber, stackFrames[0].failedLineNumber);
-                Assert.Equal(stackFrames[1].declarationStartLineNumber, stackFrames[1].failedLineNumber);
-                Assert.Equal(stackFrames[3].declarationStartLineNumber, stackFrames[3].failedLineNumber);
+                Assert.Equal(stackFrames[0].DeclarationStartLineNumber, stackFrames[0].FailedLineNumber);
+                Assert.Equal(stackFrames[1].DeclarationStartLineNumber, stackFrames[1].FailedLineNumber);
+                Assert.Equal(stackFrames[3].DeclarationStartLineNumber, stackFrames[3].FailedLineNumber);
 
                 for (int i = 0; i < stackFrames.Length; ++i)
                 {
                     Assert.StartsWith(@"https://github.com/", stackFrames[i].GetURLFromPDB());
-                    Assert.EndsWith($"#L{stackFrames[i].failedLineNumber}", stackFrames[i].GetURLFromPDB());
+                    Assert.EndsWith($"#L{stackFrames[i].FailedLineNumber}", stackFrames[i].GetURLFromPDB());
                 }
 
                 StringBuilder builder = new StringBuilder();
@@ -78,7 +78,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 for( int i = 0; i < stackFrames.Length; ++i )
                 {
-                    output.WriteLine($"operation:{stackFrames[i].operation.FullName}");
+                    output.WriteLine($"operation:{stackFrames[i].Callable.FullName}");
                     output.WriteLine(stackFrames[i].GetOperationSourceFromPDB());
                 }
             }
@@ -102,17 +102,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(7, stackFrames[0].failedLineNumber);
-                    Assert.Equal(25, stackFrames[1].failedLineNumber);
-                    Assert.Equal(29, stackFrames[2].failedLineNumber);
+                    Assert.Equal(7, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(25, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(29, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -129,17 +129,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericAdjFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericAdjFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(6, stackFrames[0].failedLineNumber);
-                    Assert.Equal(24, stackFrames[1].failedLineNumber);
-                    Assert.Equal(52, stackFrames[2].failedLineNumber);
+                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(24, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(52, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -156,17 +156,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "GenericCtlFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "GenericCtlFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(6, stackFrames[0].failedLineNumber);
-                    Assert.Equal(24, stackFrames[1].failedLineNumber);
-                    Assert.Equal(56, stackFrames[2].failedLineNumber);
+                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(24, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(56, stackFrames[2].FailedLineNumber);
                 }
             }
         }
@@ -189,17 +189,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(7, stackFrames[0].failedLineNumber);
-                    Assert.Equal(33, stackFrames[1].failedLineNumber);
-                    Assert.Equal(38, stackFrames[2].failedLineNumber);
+                    Assert.Equal(7, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(33, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(38, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -216,17 +216,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialAdjFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialAdjFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(6, stackFrames[0].failedLineNumber);
-                    Assert.Equal(32, stackFrames[1].failedLineNumber);
-                    Assert.Equal(43, stackFrames[2].failedLineNumber);
+                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(43, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -243,17 +243,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(3, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "PartialCtlFail1", stackFrames[2].operation.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "PartialCtlFail1", stackFrames[2].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
-                    Assert.Equal(6, stackFrames[0].failedLineNumber);
-                    Assert.Equal(32, stackFrames[1].failedLineNumber);
-                    Assert.Equal(48, stackFrames[2].failedLineNumber);
+                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(48, stackFrames[2].FailedLineNumber);
                 }
             }
         }
@@ -276,22 +276,30 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     Assert.Equal(4, stackFrames.Length);
 
-                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[0].operation.FullName);
-                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[1].operation.FullName);
-                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[2].operation.FullName);
-                    Assert.Equal(namespacePrefix + "RecursionFail1", stackFrames[3].operation.FullName);
+                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "RecursionFail", stackFrames[2].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "RecursionFail1", stackFrames[3].Callable.FullName);
 
-                    Assert.Equal(OperationFunctor.Body, stackFrames[0].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[1].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].operation.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[3].operation.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[3].Callable.Variant);
 
-                    Assert.Equal(70, stackFrames[0].failedLineNumber);
-                    Assert.Equal(66, stackFrames[1].failedLineNumber);
-                    Assert.Equal(66, stackFrames[2].failedLineNumber);
-                    Assert.Equal(75, stackFrames[3].failedLineNumber);
+                    Assert.Equal(70, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(66, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(66, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(75, stackFrames[3].FailedLineNumber);
                 }
             }
+        }
+
+        [Fact]
+        public void UrlMappingTest()
+        {
+            const string rawUrl = @"https://raw.githubusercontent.com/microsoft/qsharp-runtime/af6262c05522d645d0a0952272443e84eeab677a/src/Xunit/TestCaseDiscoverer.cs";
+            const string expectedURL = @"https://github.com/microsoft/qsharp-runtime/blob/af6262c05522d645d0a0952272443e84eeab677a/src/Xunit/TestCaseDiscoverer.cs#L13";
+            Assert.Equal(expectedURL, PortablePdbSymbolReader.TryFormatGitHubUrl(rawUrl, 13));
         }
 
         [Fact]

@@ -14,35 +14,42 @@ namespace Microsoft.Quantum.Simulation.Common
     [Serializable]
     public class StackFrame
     {
-        public readonly ICallable operation;
-        public readonly IApplyData argument;
+        /// <summary>
+        /// Callable corresponding to the stack frame
+        /// </summary>
+        public ICallable Callable { get; private set; }
+        
+        /// <summary>
+        /// Arguments passed to the callable in the stack frame
+        /// </summary>
+        public IApplyData Argument { get; private set; }
 
         /// <summary>
         /// The path to the source where operation is defined
         /// </summary>
-        public string sourceFile;
+        public string SourceFile { get; private set; }
 
         /// <summary>
         /// One based line number in the operation that resulted in failure. Note that for automatically derived Adjoint and Controlled 
         /// variants of the operation, the line always points to the operation declaration
         /// </summary>
-        public int failedLineNumber = -2;
+        public int FailedLineNumber { get; private set; }
 
         /// <summary>
         /// One based line number where the declaration starts.
         /// </summary>
-        public int declarationStartLineNumber;
+        public int DeclarationStartLineNumber { get; private set; }
 
         /// <summary>
         /// One based line number of the first line after the declaration.
         /// The value -1, if the declaration ends on the last line of the file.
         /// </summary>
-        public int declarationEndLineNumber;
+        public int DeclarationEndLineNumber { get; private set; }
 
-        public StackFrame(ICallable _operation, IApplyData _argument)
+        public StackFrame(ICallable callable, IApplyData argument)
         {
-            operation = _operation;
-            argument = _argument;
+            Callable = callable;
+            Argument = argument;
         }
 
         /// <summary>
@@ -50,13 +57,13 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public string GetOperationSourceFromPDB()
         {
-            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(operation);
+            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(Callable);
             return PortablePDBEmbeddedFilesCache.GetEmbeddedFileRange(
                 pdbFileLocation,
-                sourceFile,
-                declarationStartLineNumber,
-                declarationEndLineNumber,
-                showLineNumbers: true, markedLine: failedLineNumber);
+                SourceFile,
+                DeclarationStartLineNumber,
+                DeclarationEndLineNumber,
+                showLineNumbers: true, markedLine: FailedLineNumber);
         }
 
         /// <summary>
@@ -65,16 +72,16 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <returns></returns>
         public string GetURLFromPDB()
         {
-            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(operation);
-            Tuple<string,string> result = PortablePDBPathRemappingCache.TryGetFileUrl(pdbFileLocation, sourceFile);
-            return PortablePdbSymbolReader.TryFormatGitHubUrl(result, failedLineNumber);
+            string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(Callable);
+            string result = PortablePDBPathRemappingCache.TryGetFileUrl(pdbFileLocation, SourceFile);
+            return PortablePdbSymbolReader.TryFormatGitHubUrl(result, FailedLineNumber);
         }
 
         private const string messageFormat = "in {0} on {1}";
 
         public override string ToString()
         {
-            return string.Format(messageFormat, operation.FullName, $"{sourceFile}:line {failedLineNumber}");
+            return string.Format(messageFormat, Callable.FullName, $"{SourceFile}:line {FailedLineNumber}");
         }
 
         /// <summary>
@@ -88,7 +95,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public virtual string ToStringWithBestSourceLocation()
         {
             string message = ToString();
-            if (System.IO.File.Exists(sourceFile))
+            if (System.IO.File.Exists(SourceFile))
             {
                 return message;
             }
@@ -101,9 +108,53 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
-                    return string.Format(messageFormat, operation.FullName, url);
+                    return string.Format(messageFormat, Callable.FullName, url);
                 }
             }
+        }
+
+        public static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
+        {
+            foreach (StackFrame currentFrame in qsharpCallStack)
+            {
+                ICallable op = currentFrame.Callable.UnwrapCallable();
+                object[] locations = op.GetType().GetCustomAttributes(typeof(SourceLocationAttribute), true);
+                foreach (object location in locations)
+                {
+                    SourceLocationAttribute sourceLocation = (location as SourceLocationAttribute);
+                    if (sourceLocation != null && sourceLocation.SpecializationKind == op.Variant)
+                    {
+                        currentFrame.SourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
+                        currentFrame.DeclarationStartLineNumber = sourceLocation.StartLine;
+                        currentFrame.DeclarationEndLineNumber = sourceLocation.EndLine;
+                    }
+                }
+            }
+
+            StackFrame[] qsharpStackFrames = qsharpCallStack.ToArray();
+            int qsharpStackFrameId = 0;
+            for (int csharpStackFrameId = 0; csharpStackFrameId < csharpCallStack.Length; ++csharpStackFrameId)
+            {
+                string fileName = csharpCallStack[csharpStackFrameId].GetFileName();
+                if (fileName != null)
+                {
+                    fileName = System.IO.Path.GetFullPath(fileName);
+                    int failedLineNumber = csharpCallStack[csharpStackFrameId].GetFileLineNumber();
+                    StackFrame currentQsharpStackFrame = qsharpStackFrames[qsharpStackFrameId];
+                    if (fileName == currentQsharpStackFrame.SourceFile &&
+                        currentQsharpStackFrame.DeclarationStartLineNumber <= failedLineNumber &&
+                            (
+                                (failedLineNumber < currentQsharpStackFrame.DeclarationEndLineNumber) ||
+                                (currentQsharpStackFrame.DeclarationEndLineNumber == -1)
+                            )
+                        )
+                    {
+                        currentQsharpStackFrame.FailedLineNumber = failedLineNumber;
+                        qsharpStackFrameId++;
+                    }
+                }
+            }
+            return qsharpStackFrames;
         }
     }
 
@@ -168,49 +219,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
-        {
-            foreach (StackFrame currentFrame in qsharpCallStack)
-            {
-                ICallable op = currentFrame.operation.UnwrapCallable();
-                object[] locations = op.GetType().GetCustomAttributes(typeof(SourceLocationAttribute), true);
-                foreach (object location in locations)
-                {
-                    SourceLocationAttribute sourceLocation = (location as SourceLocationAttribute);
-                    if (sourceLocation != null && sourceLocation.SpecializationKind == op.Variant)
-                    {
-                        currentFrame.sourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
-                        currentFrame.declarationStartLineNumber = sourceLocation.StartLine;
-                        currentFrame.declarationEndLineNumber = sourceLocation.EndLine;
-                    }
-                }
-            }
-
-            StackFrame[] qsharpStackFrames = qsharpCallStack.ToArray();
-            int qsharpStackFrameId = 0;
-            for (int csharpStackFrameId = 0; csharpStackFrameId < csharpCallStack.Length; ++csharpStackFrameId)
-            {
-                string fileName = csharpCallStack[csharpStackFrameId].GetFileName();
-                if ( fileName != null )
-                {
-                    fileName = System.IO.Path.GetFullPath(fileName);
-                    int failedLineNumber = csharpCallStack[csharpStackFrameId].GetFileLineNumber();
-                    StackFrame currentQsharpStackFrame = qsharpStackFrames[qsharpStackFrameId];
-                    if (fileName == currentQsharpStackFrame.sourceFile &&
-                        currentQsharpStackFrame.declarationStartLineNumber <= failedLineNumber &&
-                            (
-                                (failedLineNumber < currentQsharpStackFrame.declarationEndLineNumber) ||
-                                (currentQsharpStackFrame.declarationEndLineNumber == -1)
-                            )
-                        )
-                    {
-                        currentQsharpStackFrame.failedLineNumber = failedLineNumber;
-                        qsharpStackFrameId++;
-                    }
-                }
-            }
-            return qsharpStackFrames;
-        }
+        
 
         /// <summary>
         /// If failure has happened returns the call-stack at time of failure.
@@ -224,7 +233,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 {
                     if( stackFramesWithLocations == null )
                     {
-                        stackFramesWithLocations = PopulateSourceLocations(callStack, frames);
+                        stackFramesWithLocations = StackFrame.PopulateSourceLocations(callStack, frames);
                     }
                     return stackFramesWithLocations;
                 }
