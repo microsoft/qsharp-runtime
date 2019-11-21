@@ -4,9 +4,11 @@
 namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 
 open System
+open System.CodeDom.Compiler
 open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
+open System.Reflection
 
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp.Syntax
@@ -20,8 +22,6 @@ open Microsoft.Quantum.QsCompiler.SyntaxTokens
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
-open System.CodeDom.Compiler
-open System.Reflection
 
 
 /// ---------------------------------------------------------------------------
