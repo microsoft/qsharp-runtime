@@ -11,6 +11,11 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
+    /// <summary>
+    /// Stores information about Q# stack frames. During successful execution keeps track only of Callable and Argument.
+    /// When the exception happens, the rest of the information is populated by <see cref="PopulateSourceLocations(Stack{StackFrame}, System.Diagnostics.StackFrame[])"/>
+    /// method.
+    /// </summary>
     [Serializable]
     public class StackFrame
     {
@@ -113,6 +118,9 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
+        /// <summary>
+        /// Finds correspondence between Q# and C# stack frames and populates Q# stack frame information from C# stack frames
+        /// </summary>
         public static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
         {
             foreach (StackFrame currentFrame in qsharpCallStack)
