@@ -1364,6 +1364,7 @@ module SimulationCode =
                     localElements 
                     |> List.collect testTargets 
                     |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
+                    |> List.sortBy (fun ((name,_,_), target) -> (name, target))
                 else []
             let assemblyName = if globalContext.AssemblyName = null then null else globalContext.AssemblyName.Replace(".", "")
             [
@@ -1371,7 +1372,7 @@ module SimulationCode =
                 //
                 // namespace AssemblyName // we omit this nested namespace if the assembly name is not specified
                 // {
-                //   public partial class __AllTests__
+                //   public partial class __ExecuteOnTargetName__
                 //   #line nr source
                 //   {
                 //     [Fact(DisplayName = "TestOperationName")]
