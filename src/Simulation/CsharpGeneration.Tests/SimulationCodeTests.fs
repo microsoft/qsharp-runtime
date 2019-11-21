@@ -2246,6 +2246,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - concrete`` () = 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class emptyOperation : Operation<QVoid, QVoid>, ICallable
     {
         public emptyOperation(IOperationFactory m) : base(m)
@@ -2268,6 +2269,7 @@ namespace N1
         |> testOneClass emptyOperation
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class randomAbstractOperation : Unitary<(Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, ICallable
     {
         public randomAbstractOperation(IOperationFactory m) : base(m)
@@ -2304,6 +2306,7 @@ namespace N1
         |> testOneClass randomAbstractOperation
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 108, 113)]
     [SourceLocation("%%%", OperationFunctor.Adjoint, 113, 119)]
     [SourceLocation("%%%", OperationFunctor.Controlled, 119, 126)]
@@ -2374,6 +2377,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - generics`` () = 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class genCtrl3<__X__, __Y__, __Z__> : Controllable<(__X__,(Int64,(__Y__,__Z__),Result))>, ICallable
     {
         public genCtrl3(IOperationFactory m) : base(m)
@@ -2405,6 +2409,7 @@ namespace N1
         |> testOneClass genCtrl3
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
@@ -2446,6 +2451,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - abstract function`` () = 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class genF1<__A__> : Function<__A__, QVoid>, ICallable
     {
         public genF1(IOperationFactory m) : base(m)
@@ -2532,6 +2538,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () = 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class emptyFunction : Function<QVoid, QVoid>, ICallable
     {
         public emptyFunction(IOperationFactory m) : base(m)
@@ -2554,6 +2561,7 @@ namespace N1
         |> testOneClass emptyFunction
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 33, 40)]
     public partial class intFunction : Function<QVoid, Int64>, ICallable
     {
@@ -2582,6 +2590,7 @@ namespace N1
         |> testOneClass intFunction
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 45, 51)]
     public partial class powFunction : Function<(Int64,Int64), Int64>, ICallable
     {
@@ -2619,6 +2628,7 @@ namespace N1
         |> testOneClass powFunction
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 51, 57)]
     public partial class bigPowFunction : Function<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger>, ICallable
     {
@@ -2664,6 +2674,7 @@ namespace N1
             Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class U : UDTBase<IUnitary>, IApplyData
     {
         public U() : base(default(IUnitary))
@@ -2684,6 +2695,7 @@ namespace N1
         |> testOne udt_U
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class AA : UDTBase<A>, IApplyData
     {
         public AA() : base(default(A))
@@ -2704,6 +2716,7 @@ namespace N1
         |> testOne udt_AA
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class Q : UDTBase<Qubit>, IApplyData
     {
         public Q() : base(default(Qubit))
@@ -2730,6 +2743,7 @@ namespace N1
         |> testOne udt_Q
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class QQ : UDTBase<Q>, IApplyData
     {
         public QQ() : base(default(Q))
@@ -2756,6 +2770,7 @@ namespace N1
         |> testOne udt_QQ
 
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class Qubits : UDTBase<IQArray<Qubit>>, IApplyData
     {
         public Qubits() : base(new QArray<Qubit>())
@@ -2776,6 +2791,7 @@ namespace N1
         |> testOne udt_Qubits
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class udt_args1 : UDTBase<(Int64,IQArray<Qubit>)>, IApplyData
     {
         public udt_args1() : base(default((Int64,IQArray<Qubit>)))
@@ -2799,6 +2815,7 @@ namespace N1
         |> testOne udt_args1
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class udt_Real : UDTBase<Double>, IApplyData
     {
         public udt_Real() : base(default(Double))
@@ -2819,6 +2836,7 @@ namespace N1
         |> testOne udt_Real
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class udt_Complex : UDTBase<(udt_Real,udt_Real)>, IApplyData
     {
         public udt_Complex() : base(default((udt_Real,udt_Real)))
@@ -2842,6 +2860,7 @@ namespace N1
         |> testOne udt_Complex
         
         """
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class udt_TwoDimArray : UDTBase<IQArray<IQArray<Result>>>, IApplyData
     {
         public udt_TwoDimArray() : base(new QArray<IQArray<Result>>())
@@ -2864,6 +2883,7 @@ namespace N1
     [<Fact>]
     let ``one file - EmptyElements`` () =    
         """
+// <auto-generated>
 #pragma warning disable 1591
 using System;
 using Microsoft.Quantum.Core;
@@ -2885,6 +2905,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum
 {
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
         public Pair() : base(default((Int64,Int64)))
@@ -2905,6 +2926,7 @@ namespace Microsoft.Quantum
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class Unused : UDTBase<(Int64,Int64)>, IApplyData
     {
         public Unused() : base(default((Int64,Int64)))
@@ -2925,6 +2947,7 @@ namespace Microsoft.Quantum
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class emptyFunction : Function<Pair, QVoid>, ICallable
     {
         public emptyFunction(IOperationFactory m) : base(m)
@@ -2942,6 +2965,7 @@ namespace Microsoft.Quantum
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public abstract partial class emptyOperation : Operation<QVoid, QVoid>, ICallable
     {
         public emptyOperation(IOperationFactory m) : base(m)
@@ -2964,6 +2988,7 @@ namespace Microsoft.Quantum
     [<Fact>]
     let ``one file - UserDefinedTypes`` () =    
         """
+// <auto-generated>
 #pragma warning disable 1591
 using System;
 using Microsoft.Quantum.Core;
@@ -2980,6 +3005,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum
 {
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
         public Pair() : base(default((Int64,Int64)))
@@ -3004,7 +3030,7 @@ namespace Microsoft.Quantum
         }
     }
 
-
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     public class NestedPair : UDTBase<(Double,((Boolean,String),Int64))>, IApplyData
     {
         public NestedPair() : base(default((Double,((Boolean,String),Int64))))
@@ -3045,6 +3071,7 @@ namespace Microsoft.Quantum
     [<Fact>]
     let ``one file - HelloWorld`` () =
         """
+// <auto-generated>
 #pragma warning disable 1591
 using System;
 using Microsoft.Quantum.Core;
@@ -3058,6 +3085,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.Inline
 {
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 7, -1)]
     public partial class HelloWorld : Operation<Int64, Int64>, ICallable
     {
@@ -3093,6 +3121,7 @@ namespace Microsoft.Quantum.Tests.Inline
     [<Fact>]
     let ``one file - LineNumbers`` () =
         """
+// <auto-generated>
 #pragma warning disable 1591
 using System;
 using Microsoft.Quantum.Core;
@@ -3104,6 +3133,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.LineNumbers
 {
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Quantum.CsharpGeneration", "")]
     [SourceLocation("%%%", OperationFunctor.Body, 9, -1)]
     public partial class TestLineInBlocks : Operation<Int64, Result>, ICallable
     {
