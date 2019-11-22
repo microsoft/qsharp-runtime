@@ -4,7 +4,6 @@
 namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 
 open System
-open System.CodeDom.Compiler
 open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
@@ -1264,11 +1263,6 @@ module SimulationCode =
 
     let isFunction (op:QsCallable) = match op.Kind with | Function -> true | _ -> false
 
-    let generatedCodeAttribute = 
-        let executingAssembly = Assembly.GetExecutingAssembly().GetName()
-        let attName = ``ident`` typeof<GeneratedCodeAttribute>.FullName
-        ``attribute`` None attName [``literal`` executingAssembly.Name; ``literal`` ""]
-
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
@@ -1309,7 +1303,7 @@ module SimulationCode =
             else
                 [``public``; ``partial`` ]
 
-        ``attributes`` (generatedCodeAttribute :: attr) (
+        ``attributes`` attr (
             ``class`` name ``<<`` typeParameters ``>>``
                 ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
                 ``{``
@@ -1400,13 +1394,11 @@ module SimulationCode =
         let allFields     = itemFields @ qubitsField
         let allMethods    = [ buildDeconstruct ]
        
-        ``attributes`` [generatedCodeAttribute] (
-            ``class`` name ``<<`` [] ``>>``
-                ``:`` (Some baseClass) ``,`` interfaces modifiers
-                ``{``
-                    (constructors @ allFields @ allMethods)
-                ``}``
-            )
+        ``class`` name ``<<`` [] ``>>``
+            ``:`` (Some baseClass) ``,`` interfaces modifiers
+            ``{``
+                (constructors @ allFields @ allMethods)
+            ``}``
         :> MemberDeclarationSyntax
            
     // Generates the code for all the elements of the given namespace.
