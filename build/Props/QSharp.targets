@@ -7,7 +7,7 @@
   -->
   <Target Name="QsharpCompile"
       Inputs="@(QsharpFiles)"
-      Outputs="$(QsharpSrcOutDir)\$(QsharpTree)"
+      Outputs="$(QsharpSrcOutDir)\$(QsharpTree).bson"
       DependsOnTargets="QsharpPrepare"
       BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
