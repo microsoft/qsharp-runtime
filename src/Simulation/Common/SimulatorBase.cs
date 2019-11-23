@@ -32,6 +32,18 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public abstract string Name { get; }
 
+
+        /// <summary>
+        /// If the execution finishes in failure, this method returns the call-stack of the Q# operations 
+        /// executed up to the point when the failure happened.
+        /// If the execution was successful, this method returns null.
+        /// </summary>
+        /// <remarks>
+        /// Only Q# operations are tracked and reported in the stack trace. Q# functions or calls from 
+        /// classical hosts like C# or Python are not included.
+        /// </remarks>
+        public StackFrame[] CallStack { get; private set; }
+
         public SimulatorBase(IQubitManager qubitManager = null)
         {
             this.QubitManager = qubitManager;
@@ -100,27 +112,34 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual O Execute<T, I, O>(I args) where T : AbstractCallable, ICallable
         {
-            O res = default(O);
+            StackTraceCollector stackTraceCollector = new StackTraceCollector(this);
             var op = Get<ICallable, T>();
+
             try
             {
-                res = op.Apply<O>(args);
+                var result = op.Apply<O>(args);
+                this.CallStack = null;
+                return result;
             }
             catch (Exception e) // Dumps q# call-stack in case of exception if CallStack tracking was enabled
             {
-                StackFrame[] qsharpStackFrames = this.CallStack;
-                if (qsharpStackFrames != null)
+                this.CallStack = stackTraceCollector.CallStack;
+                OnLog?.Invoke($"Unhandled exception. {e.GetType().FullName}: {e.Message}");
+                bool first = true;
+                foreach (StackFrame sf in this.CallStack)
                 {
-                    OnLog?.Invoke($"Unhandled Exception: {e.GetType().FullName}: {e.Message}");
-                    foreach (StackFrame sf in qsharpStackFrames)
-                    {
-                        OnLog?.Invoke(sf.ToStringWithBestSourceLocation());
-                    }
+                    var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
+                    OnLog?.Invoke(msg);
+                    first = false;
                 }
                 OnLog?.Invoke("");
+
                 throw;
             }
-            return res;
+            finally
+            {
+                stackTraceCollector.Dispose();
+            }
         }
 
         public virtual Task<O> Run<T, I, O>(I args) where T : AbstractCallable, ICallable
@@ -366,16 +385,5 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             OnFail?.Invoke(exceptionInfo);
         }
-
-        #region Stack trace collection support 
-        private StackTraceCollector stackTraceCollector = null;
-        
-        public void EnableStackTrace()
-        {
-            stackTraceCollector = new StackTraceCollector(this);
-        }
-
-        public StackFrame[] CallStack => stackTraceCollector?.CallStack;
-        #endregion
     }
 }

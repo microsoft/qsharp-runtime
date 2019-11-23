@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Common
             return PortablePdbSymbolReader.TryFormatGitHubUrl(result, FailedLineNumber);
         }
 
-        private const string messageFormat = "in {0} on {1}";
+        private const string messageFormat = "{0} on {1}";
 
         public override string ToString()
         {
@@ -167,22 +167,41 @@ namespace Microsoft.Quantum.Simulation.Common
     }
 
     /// <summary>
-    /// Tracks Q# call-stack till the first failure resulting in <see cref="SimulatorBase.OnFail"/>
+    /// Tracks Q# operations call-stack till the first failure resulting in <see cref="SimulatorBase.OnFail"/>
     /// event invocation.  
     /// </summary>
-    public class StackTraceCollector
+    /// <remarks>
+    /// Only Q# operations are tracked and reported in the stack trace. Q# functions or calls from 
+    /// classical hosts like C# or Python are not included.
+    /// </remarks>
+    public class StackTraceCollector : IDisposable
     {
         private readonly Stack<StackFrame> callStack;
+        private readonly SimulatorBase sim;
         private System.Diagnostics.StackFrame[] frames = null;
         StackFrame[] stackFramesWithLocations = null;
         bool hasFailed = false;
 
         public StackTraceCollector(SimulatorBase sim)
         {
+            callStack = new Stack<StackFrame>();
+            this.sim = sim;
+
+            this.Start();
+        }
+
+        private void Start()
+        {
             sim.OnOperationStart += this.OnOperationStart;
             sim.OnOperationEnd += this.OnOperationEnd;
             sim.OnFail += this.OnFail;
-            callStack = new Stack<StackFrame>();
+        }
+
+        private void Stop()
+        {
+            sim.OnOperationStart -= this.OnOperationStart;
+            sim.OnOperationEnd -= this.OnOperationEnd;
+            sim.OnFail -= this.OnFail;
         }
 
         void OnOperationStart(ICallable callable, IApplyData arg)
@@ -251,5 +270,29 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this.Stop();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }

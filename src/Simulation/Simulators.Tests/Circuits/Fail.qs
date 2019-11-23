@@ -74,4 +74,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     operation RecursionFail1() : Unit {
         RecursionFail(2);
     }
+
+	operation DivideBy0() : Int {
+		let z = 0;
+		return 3 / z;
+	}
+
+	operation AllGood() : Unit  {
+		Microsoft.Quantum.Intrinsic.Message("All good!");
+	}
+
+	operation AllGood1() : Unit  {
+		AllGood();
+	}
 }

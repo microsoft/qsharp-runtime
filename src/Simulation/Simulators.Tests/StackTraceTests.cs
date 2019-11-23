@@ -12,6 +12,7 @@ using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Xunit.Abstractions;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
@@ -28,58 +29,60 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AlwaysFail4Test()
         {
-            ToffoliSimulator sim = new ToffoliSimulator();
-            StackTraceCollector sc = new StackTraceCollector(sim);
-            ICallable op = sim.Get<ICallable, AlwaysFail4>();
-            try
+            using (var sim = new QuantumSimulator())
             {
-                QVoid res = op.Apply<QVoid>(QVoid.Instance);
-            }
-            catch (ExecutionFailException)
-            {
-                StackFrame[] stackFrames = sc.CallStack;
-
-                Assert.Equal(5, stackFrames.Length);
-
-                Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail1", stackFrames[1].Callable.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail2", stackFrames[2].Callable.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail3", stackFrames[3].Callable.FullName);
-                Assert.Equal(namespacePrefix + "AlwaysFail4", stackFrames[4].Callable.FullName);
-
-                Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
-                Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
-                Assert.Equal(OperationFunctor.Adjoint, stackFrames[3].Callable.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[4].Callable.Variant);
-
-                Assert.Equal(14, stackFrames[2].FailedLineNumber);
-                Assert.Equal(21, stackFrames[4].FailedLineNumber);
-
-                // For Adjoint and Controlled we expect failedLineNumber to be equal to declarationStartLineNumber
-                Assert.Equal(stackFrames[0].DeclarationStartLineNumber, stackFrames[0].FailedLineNumber);
-                Assert.Equal(stackFrames[1].DeclarationStartLineNumber, stackFrames[1].FailedLineNumber);
-                Assert.Equal(stackFrames[3].DeclarationStartLineNumber, stackFrames[3].FailedLineNumber);
-
-                for (int i = 0; i < stackFrames.Length; ++i)
+                try
                 {
-                    Assert.StartsWith(@"https://github.com/", stackFrames[i].GetURLFromPDB());
-                    Assert.EndsWith($"#L{stackFrames[i].FailedLineNumber}", stackFrames[i].GetURLFromPDB());
+                    QVoid res = AlwaysFail4.Run(sim).Result;
                 }
-
-                StringBuilder builder = new StringBuilder();
-                builder.Append("13 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth));
-                builder.AppendLine("    operation AlwaysFail2() : Unit is Adj + Ctl {");
-                builder.Append("14 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth) + PortablePDBEmbeddedFilesCache.lineMarkPrefix);
-                builder.AppendLine("        Controlled AlwaysFail1(new Qubit[0],());");
-                builder.Append("15 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth));
-                builder.AppendLine("    }");
-                Assert.Equal(builder.ToString(), stackFrames[2].GetOperationSourceFromPDB());
-
-                for( int i = 0; i < stackFrames.Length; ++i )
+                catch (AggregateException ex)
                 {
-                    output.WriteLine($"operation:{stackFrames[i].Callable.FullName}");
-                    output.WriteLine(stackFrames[i].GetOperationSourceFromPDB());
+                    Assert.True(ex.InnerException is ExecutionFailException);
+
+                    StackFrame[] stackFrames = sim.CallStack;
+
+                    Assert.Equal(5, stackFrames.Length);
+
+                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail1", stackFrames[1].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail2", stackFrames[2].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail3", stackFrames[3].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "AlwaysFail4", stackFrames[4].Callable.FullName);
+
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[3].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[4].Callable.Variant);
+
+                    Assert.Equal(14, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(21, stackFrames[4].FailedLineNumber);
+
+                    // For Adjoint and Controlled we expect failedLineNumber to be equal to declarationStartLineNumber
+                    Assert.Equal(stackFrames[0].DeclarationStartLineNumber, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(stackFrames[1].DeclarationStartLineNumber, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(stackFrames[3].DeclarationStartLineNumber, stackFrames[3].FailedLineNumber);
+
+                    for (int i = 0; i < stackFrames.Length; ++i)
+                    {
+                        Assert.StartsWith(@"https://github.com/", stackFrames[i].GetURLFromPDB());
+                        Assert.EndsWith($"#L{stackFrames[i].FailedLineNumber}", stackFrames[i].GetURLFromPDB());
+                    }
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append("13 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth));
+                    builder.AppendLine("    operation AlwaysFail2() : Unit is Adj + Ctl {");
+                    builder.Append("14 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth) + PortablePDBEmbeddedFilesCache.lineMarkPrefix);
+                    builder.AppendLine("        Controlled AlwaysFail1(new Qubit[0],());");
+                    builder.Append("15 ".PadLeft(PortablePDBEmbeddedFilesCache.lineNumberPaddingWidth));
+                    builder.AppendLine("    }");
+                    Assert.Equal(builder.ToString(), stackFrames[2].GetOperationSourceFromPDB());
+
+                    for (int i = 0; i < stackFrames.Length; ++i)
+                    {
+                        output.WriteLine($"operation:{stackFrames[i].Callable.FullName}");
+                        output.WriteLine(stackFrames[i].GetOperationSourceFromPDB());
+                    }
                 }
             }
         }
@@ -87,18 +90,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void GenericFail1Test()
         {
-            ToffoliSimulator sim = new ToffoliSimulator();
+            ResourcesEstimator sim = new ResourcesEstimator();
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, GenericFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = sim.Execute<GenericFail1, QVoid, QVoid>(QVoid.Instance);
                 }
                 catch (ExecutionFailException)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -117,15 +118,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, GenericAdjFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = sim.Execute<GenericAdjFail1, QVoid, QVoid>(QVoid.Instance);
                 }
                 catch (ExecutionFailException)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -144,15 +143,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, GenericCtlFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = sim.Execute<GenericCtlFail1, QVoid, QVoid>(QVoid.Instance);
                 }
                 catch (ExecutionFailException)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -170,22 +167,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             }
         }
-
+        
         [Fact]
         public void PartialFail1Test()
         {
             ToffoliSimulator sim = new ToffoliSimulator();
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, PartialFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = PartialFail1.Run(sim).Result;
                 }
-                catch (ExecutionFailException)
+                catch (AggregateException ex)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    Assert.True(ex.InnerException is ExecutionFailException);
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -204,15 +200,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, PartialAdjFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = PartialAdjFail1.Run(sim).Result;
                 }
-                catch (ExecutionFailException)
+                catch (AggregateException ex)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    Assert.True(ex.InnerException is ExecutionFailException);
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -231,15 +226,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             {
-                StackTraceCollector sc = new StackTraceCollector(sim);
-                ICallable op = sim.Get<ICallable, PartialCtlFail1>();
                 try
                 {
-                    QVoid res = op.Apply<QVoid>(QVoid.Instance);
+                    QVoid res = PartialCtlFail1.Run(sim).Result;
                 }
-                catch (ExecutionFailException)
+                catch (AggregateException ex)
                 {
-                    StackFrame[] stackFrames = sc.CallStack;
+                    Assert.True(ex.InnerException is ExecutionFailException);
+                    StackFrame[] stackFrames = sim.CallStack;
 
                     Assert.Equal(3, stackFrames.Length);
 
@@ -295,6 +289,34 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void DivideByZeroTest()
+        {
+            ToffoliSimulator sim = new ToffoliSimulator();
+
+            try
+            {
+                sim.Execute<DivideBy0, QVoid, long>(QVoid.Instance);
+            }
+            catch (Exception)
+            {
+                StackFrame[] stackFrames = sim.CallStack;
+
+                Assert.Single(stackFrames);
+                Assert.Equal(namespacePrefix + "DivideBy0", stackFrames[0].Callable.FullName);
+            }
+        }
+
+        [Fact]
+        public void AllGoodTest()
+        {
+            ToffoliSimulator sim = new ToffoliSimulator();
+
+            QVoid res = sim.Execute<AllGood1, QVoid, QVoid>(QVoid.Instance);
+            StackFrame[] stackFrames = sim.CallStack;
+            Assert.Null(stackFrames);
+        }
+
+        [Fact]
         public void UrlMappingTest()
         {
             const string rawUrl = @"https://raw.githubusercontent.com/microsoft/qsharp-runtime/af6262c05522d645d0a0952272443e84eeab677a/src/Xunit/TestCaseDiscoverer.cs";
@@ -306,17 +328,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void ErrorLogTest()
         {
             ToffoliSimulator sim = new ToffoliSimulator();
-            sim.EnableStackTrace();
-            StringBuilder stringBuilder = new StringBuilder();
-            sim.OnLog += (msg) => stringBuilder.AppendLine(msg);
+
+            var logs = new List<string>();
+            sim.OnLog += (msg) => logs.Add(msg);
             try
             {
                 QVoid res = sim.Execute<AlwaysFail4, QVoid, QVoid>(QVoid.Instance);
             }
             catch (ExecutionFailException)
             {
+                Assert.Equal(7, logs.Count);
+                Assert.StartsWith("Unhandled exception. Microsoft.Quantum.Simulation.Core.ExecutionFailException: Always fail", logs[0]);
+                Assert.StartsWith(" ---> Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail", logs[1]);
+                Assert.StartsWith("   at Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail1 on", logs[2]);
+                Assert.StartsWith("   at Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail2 on", logs[3]);
+                Assert.StartsWith("   at Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail3 on", logs[4]);
+                Assert.StartsWith("   at Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail4 on", logs[5]);
+                Assert.Equal("", logs[6]);
             }
-            output.WriteLine(stringBuilder.ToString());
         }
     }
 }
