@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Common
     /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
     /// It throws <see cref="NotImplementedException"/> for most APIs.
     /// </summary>
-    class EmptyQuantumProcessor : IQuantumProcessor 
+    public class EmptyQuantumProcessor : IQuantumProcessor 
     {
         public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
         {
