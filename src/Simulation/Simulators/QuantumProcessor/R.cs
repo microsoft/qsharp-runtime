@@ -4,29 +4,27 @@
 using System;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
 
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimR : Quantum.Intrinsic.R
+        public class QuantumProcessorDispatcherR : Quantum.Intrinsic.R
         {
+            private QuantumProcessorDispatcher Simulator { get; }
 
-            private QuantumExecutorSimulator Simulator { get; }
 
-
-            public QuantumExecutorSimR(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherR(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
 
             public override Func<(Pauli, double, Qubit), QVoid> Body => (_args) =>
             {
-
                 var (basis, angle, q1) = _args;
                 if (basis != Pauli.PauliI)
                 {
-                    Simulator.QuantumExecutor.R(basis, angle,q1);
+                    Simulator.QuantumProcessor.R(basis, angle,q1);
                 }
                 return QVoid.Instance;
             };
@@ -39,9 +37,8 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
 
             public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> ControlledBody => (_args) =>
             {
-
                 var (ctrls, (basis, angle, q1)) = _args;
-                Simulator.QuantumExecutor.ControlledR(ctrls, basis, angle, q1);
+                Simulator.QuantumProcessor.ControlledR(ctrls, basis, angle, q1);
                 return QVoid.Instance;
             };
 

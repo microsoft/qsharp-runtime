@@ -5,15 +5,15 @@ using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimAssert : Quantum.Intrinsic.Assert
+        public class QuantumProcessorDispatcherAssert : Quantum.Intrinsic.Assert
         {
-            private QuantumExecutorSimulator Simulator { get; }
+            private QuantumProcessorDispatcher Simulator { get; }
 
-            public QuantumExecutorSimAssert(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherAssert(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 }
 
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                Simulator.QuantumExecutor.Assert(newPaulis, newQubits, result, msg);
+                Simulator.QuantumProcessor.Assert(newPaulis, newQubits, result, msg);
 
                 return QVoid.Instance;
             };

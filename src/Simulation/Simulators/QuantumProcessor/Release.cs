@@ -3,26 +3,26 @@
 
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimRelease : Intrinsic.Release
+        public class QuantumProcessorDispatcherRelease : Intrinsic.Release
         {
-            private readonly QuantumExecutorSimulator sim;
-            public QuantumExecutorSimRelease(QuantumExecutorSimulator m) : base(m){
+            private readonly QuantumProcessorDispatcher sim;
+            public QuantumProcessorDispatcherRelease(QuantumProcessorDispatcher m) : base(m){
                 sim = m;
             }
 
             public override void Apply(Qubit q)
             {
-                sim.QuantumExecutor.OnReleaseQubits(new QArray<Qubit>(q));
+                sim.QuantumProcessor.OnReleaseQubits(new QArray<Qubit>(q));
                 sim.QubitManager.Release(q);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
-                sim.QuantumExecutor.OnReleaseQubits(qubits);
+                sim.QuantumProcessor.OnReleaseQubits(qubits);
                 sim.QubitManager.Release(qubits);
             }
         }

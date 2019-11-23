@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
+namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 {
     open Microsoft.Quantum.Intrinsic;
 
     operation NoOp() : Unit is Ctl + Adj {}   
 
-
+	// Private helper operations.
     operation Delay<'T>(op : ('T => Unit), arg : 'T, aux : Unit) : Unit {
         op(arg);
     }
@@ -25,6 +25,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Private helper operations.
     operation ApplyIfElseIntrinsic(measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
         body intrinsic;
     }
@@ -47,6 +48,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Private helper operations.
     operation ApplyConditionallyIntrinsic(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
         body intrinsic;
     }
@@ -69,6 +71,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Public operations that match Canon names.
     operation ApplyIfElseR<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T) , (onResultOneOp : ('U => Unit), oneArg : 'U)) : Unit {
         let zeroOp = Delay(onResultZeroOp, zeroArg, _);
         let oneOp = Delay(onResultOneOp, oneArg, _);
@@ -94,6 +97,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Public operations that match Canon names.
     operation ApplyIfZero<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T)) : Unit {
         let zeroOp = Delay(onResultZeroOp, zeroArg, _);
         let oneOp = Delay(NoOp, (), _);
@@ -119,6 +123,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Public operations that match Canon names.
     operation ApplyIfOne<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit), oneArg : 'T)) : Unit {
         let oneOp = Delay(onResultOneOp, oneArg, _);
         let zeroOp = Delay(NoOp, (), _);
@@ -144,6 +149,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor.Extensions
     }
 
 
+	// Public operations that match Canon names.
     operation ApplyConditionally<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit), equalArg : 'T) , (onNonEqualOp : ('U => Unit), nonEqualArg : 'U)) : Unit {
         let equalOp = Delay(onEqualOp,equalArg,_);
         let nonEqualOp = Delay(onNonEqualOp,nonEqualArg,_);

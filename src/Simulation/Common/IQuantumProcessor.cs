@@ -4,24 +4,26 @@
 using System;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
-    /// An interface for implementing QDK target machines that work on a quantum circuit level. 
-    /// It is intended to be used with <see cref="QuantumExecutor"/>.
+    /// An interface for implementing QDK target quantum machines that work on a quantum circuit level. 
     /// </summary>
     /// <remarks>
-    /// Simulators implemented using <see cref="IQuantumExecutor"/> interface do not manage qubits on their own.
-    /// Instead they are notified when qubits are allocated, released, borrowed and returned.
+    /// To implement a target machine that executes quantum commands, implement this interface.
+    /// Consider using <see cref="EmptyQuantumProcessor"/> as a stub for easy impementation of this interface.
+    /// Implementors of <see cref="IQuantumProcessor"/> interface do not manage qubits on their own.
+    /// All qubit management (allocation, dealocation, etc.) is done by the caller of this interface.
+    /// Implementors are notified when qubits are allocated, released, borrowed and returned allowing them to react to these events if necessary.
     /// </remarks>
-    public interface IQuantumExecutor
+    public interface IQuantumProcessor
     {
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
         /// In Q# the operation applies X gate to <paramref name="qubit"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of X is called in Q#, <see cref="X(Qubit)"/> is called because X is self-adjoint.
+        /// When adjoint of X is called in Q#, this same method is called because X is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -32,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled X is called in Q#, <see cref="ControlledX(IQArray{Qubit}, Qubit)"/> is called because X is self-adjoint.
+        /// When adjoint of Controlled X is called in Q#, this same method is called because X is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -44,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies Y gate to <paramref name="qubit"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Y is called in Q#, <see cref="Y(Qubit)"/> is called because Y is self-adjoint.
+        /// When adjoint of Y is called in Q#, this same method is called because Y is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -55,7 +57,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled Y is called in Q#, <see cref="ControlledY(IQArray{Qubit}, Qubit)"/> is called because Y is self-adjoint.
+        /// When adjoint of Controlled Y is called in Q#, this same method is called because Y is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -67,7 +69,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies Z gate to <paramref name="qubit"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Z is called in Q#, <see cref="Z(Qubit)"/> is called because Z is self-adjoint.
+        /// When adjoint of Z is called in Q#, this same method is called because Z is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -78,7 +80,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies Z gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled Z is called in Q#, <see cref="ControlledZ(IQArray{Qubit}, Qubit)"/> is called because Z is self-adjoint.
+        /// When adjoint of Controlled Z is called in Q#, this same method is called because Z is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -90,7 +92,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states.
         /// </summary>
         /// <remarks>
-        /// When adjoint of SWAP is called in Q#, <see cref="SWAP(Qubit, Qubit)"/> is called because SWAP is self-adjoint.
+        /// When adjoint of SWAP is called in Q#, this same method is called because SWAP is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit1">First qubit to be swapped.</param>
@@ -102,7 +104,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states controlled on <paramref name="controls"/>.
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled SWAP is called in Q#, <see cref="ControlledSWAP(IQArray{Qubit}, Qubit, Qubit)"/> is called because SWAP is self-adjoint.
+        /// When adjoint of Controlled SWAP is called in Q#, this same method is called because SWAP is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -115,7 +117,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies Hadamard gate to <paramref name="qubit"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
         /// </summary>
         /// <remarks>
-        /// When adjoint of H is called in Q#, <see cref="H(Qubit)"/> is called because Hadamard is self-adjoint.
+        /// When adjoint of H is called in Q#, this same method is called because Hadamard is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -126,7 +128,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies Hadamard gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled H is called in Q#, <see cref="ControlledH(IQArray{Qubit}, Qubit)"/> is called because Hadamard is self-adjoint.
+        /// When adjoint of Controlled H is called in Q#, this same method is called because Hadamard is self-adjoint.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -138,7 +140,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies S gate to <paramref name="qubit"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of S is called in Q#, <see cref="SAdj(Qubit)"/> is called.
+        /// When adjoint of S is called in Q#, <see cref="SAdjoint(Qubit)"/> is called.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -149,7 +151,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies S gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled S is called in Q#, <see cref="ControlledSAdj(IQArray{Qubit}, Qubit)"/> is called.
+        /// When adjoint of Controlled S is called in Q#, <see cref="ControlledSAdjoint(IQArray{Qubit}, Qubit)"/> is called.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -165,7 +167,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void SAdj(Qubit qubit);
+        void SAdjoint(Qubit qubit);
 
         /// <summary>
         /// Called when controlled adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.s">Microsoft.Quantum.Intrinsic.S</a> is called in Q#.
@@ -177,14 +179,14 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledSAdj(IQArray<Qubit> controls, Qubit qubit);
+        void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
         /// In Q# the operation applies T gate to <paramref name="qubit"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
-        /// When adjoint of T is called in Q#, <see cref="TAdj(Qubit)"/> is called.
+        /// When adjoint of T is called in Q#, <see cref="TAdjoint(Qubit)"/> is called.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
@@ -195,7 +197,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// In Q# the operation applies T gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
-        /// When adjoint of Controlled T is called in Q#, <see cref="ControlledTAdj(IQArray{Qubit}, Qubit)"/> is called.
+        /// When adjoint of Controlled T is called in Q#, <see cref="ControlledTAdjoint(IQArray{Qubit}, Qubit)"/> is called.
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
@@ -211,7 +213,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void TAdj(Qubit qubit);
+        void TAdjoint(Qubit qubit);
 
         /// <summary>
         /// Called when controlled adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
@@ -223,7 +225,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// </remarks>
         /// <param name="controls">The array of qubits on which the operation is controlled.</param>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
-        void ControlledTAdj(IQArray<Qubit> controls, Qubit qubit);
+        void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
@@ -395,7 +397,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// Class implementing <see cref="IQuantumExecutor"/> interface can return any class derived from <see cref="Result"/>.
+        /// Class implementing <see cref="IQuantumProcessor"/> interface can return any class derived from <see cref="Result"/>.
         /// </remarks>
         /// <param name="qubit">Qubit to which the gate should be applied.</param>
         /// <returns> Zero if the +1 eigenvalue is observed, and One if the -1 eigenvalue is observed.</returns>
@@ -407,7 +409,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
-        /// Class implementing <see cref="IQuantumExecutor"/> interface can return any class derived from <see cref="Result"/>.
+        /// Class implementing <see cref="IQuantumProcessor"/> interface can return any class derived from <see cref="Result"/>.
         /// </remarks>
         /// <param name="qubits">Qubits to which the gate should be applied.</param>
         /// <param name="bases">Array of single-qubit Pauli values describing multi-qubit Pauli observable.</param>
@@ -425,19 +427,19 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void Reset(Qubit qubit);
 
         /// <summary>
-        /// Intended for a limited support of branching upon measurement results on a simulator level.
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
         /// </summary>
         /// <param name="measurementResult">The result of the measurement upon which branching is to be performed.</param>
         /// <param name="onZero">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/></param>
         /// <param name="onOne">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.One"/></param>
         /// <remarks>
         /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
+        /// The program is executed with the same instance of <see cref="IQuantumProcessor"/> interface.
         /// </remarks>
         void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
 
         /// <summary>
-        /// Intended for a limited support of branching upon measurement results on a simulator level.
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
         /// </summary>
         /// <param name="measurementResults">The actual results of the measurements of a number of qubits upon which branching is to be performed.</param>
         /// <param name="resultsValues">The expected values of results of the measurements of these qubits.</param>
@@ -445,7 +447,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
         /// <remarks>
         /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumExecutor"/> interface.
+        /// The program is executed with the same instance of <see cref="IQuantumProcessor"/> interface.
         /// </remarks>
         void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
 
@@ -462,7 +464,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg);
 
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assert">Microsoft.Quantum.Intrinsic.Assert</a> is called in Q#.
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assertprob">Microsoft.Quantum.Intrinsic.Assert</a> is called in Q#.
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters is similar to the corresponding Q# operation./
@@ -480,6 +482,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <param name="operation">Information about operation being called.</param>
         /// <param name="arguments">Information about the arguments passed to the operation.</param>
         /// <remarks>
+        /// Implement this interface if you want to be notified every time a Q# operation starts.
         /// To get the fully qualified Q# name of operation being called use <see cref="ICallable.FullName"/>.
         /// For the variant of operation, that is to find if Adjoint, Controlled or Controlled Adjoint being called use <see cref="ICallable.Variant"/>.
         /// To get a sequence of all qubits passed to the operation use <see cref="IApplyData.Qubits"/>.
@@ -492,6 +495,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <param name="operation">Information about operation being called.</param>
         /// <param name="arguments">Information about the arguments passed to the operation.</param>
         /// <remarks>
+        /// Implement this interface if you want to be notified every time a Q# operation ends.
         /// To get the fully qualified Q# name of operation being called use <see cref="ICallable.FullName"/>.
         /// For the variant of operation, that is to find if Adjoint, Controlled or Controlled Adjoint being called use <see cref="ICallable.Variant"/>.
         /// To get a sequence of all qubits passed to the operation use <see cref="IApplyData.Qubits"/>.
@@ -499,7 +503,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         void OnOperationEnd(ICallable operation, IApplyData arguments);
 
         /// <summary>
-        /// Called when an exception occurs. 
+        /// Called when an exception occurs. This could be Fail statement in Q#, or any other exception.
         /// </summary>
         /// <param name="exceptionDispatchInfo">Information about exception that was raised.</param>
         /// <remarks>
@@ -509,9 +513,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <summary>
         /// Called when qubits are allocated by Q# <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 
         /// </summary>
-        /// <param name="qubits">Qubits that are allocated</param>.
+        /// <param name="qubits">Qubits that are being allocated</param>.
         /// <remarks>
-        /// Every qubit in simulation framework has a unique identifier <see cref="Qubit.Id"/>.
+        /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// All newly allocated qubits are in |0⟩ state.
         /// </remarks>
         void OnAllocateQubits(IQArray<Qubit> qubits);
@@ -519,9 +523,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <summary>
         /// Called when qubits are released in Q# in the end of <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 
         /// </summary>
-        /// <param name="qubits">Qubits that are released</param>.
+        /// <param name="qubits">Qubits that are being released</param>.
         /// <remarks>
-        /// Every qubit in simulation framework has a unique identifier <see cref="Qubit.Id"/>.
+        /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// All qubits are expected to be released in |0⟩ state.
         /// </remarks>
         void OnReleaseQubits(IQArray<Qubit> qubits);
@@ -529,9 +533,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <summary>
         /// Called when qubits are borrowed by Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
         /// </summary>
-        /// <param name="qubits">Qubits that are borrowed</param>.
+        /// <param name="qubits">Qubits that are being borrowed</param>.
         /// <remarks>
-        /// Every qubit in simulation framework has a unique identifier <see cref="Qubit.Id"/>.
+        /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// Borrowed qubits can be in any state.
         /// </remarks>
         void OnBorrowQubits(IQArray<Qubit> qubits);
@@ -539,9 +543,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
         /// <summary>
         /// Called when qubits are returned in the end of Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
         /// </summary>
-        /// <param name="qubits">Qubits that has been allocated</param>.
+        /// <param name="qubits">Qubits that have been borrowed and are now being returned</param>.
         /// <remarks>
-        /// Every qubit in simulation framework has a unique identifier <see cref="Qubit.Id"/>.
+        /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// Borrowed qubits are expected to be returned in the same state as the state they have been borrowed in.
         /// </remarks>
         void OnReturnQubits(IQArray<Qubit> qubits);

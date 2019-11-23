@@ -4,13 +4,13 @@
 using System;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
-    /// A class that implements IQuantumExecutor that does not do any logic, but is convenient to inherit from.
+    /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
     /// It throws <see cref="NotImplementedException"/> for most APIs.
     /// </summary>
-    class EmptyQuantumExecutor : IQuantumExecutor
+    class EmptyQuantumProcessor : IQuantumProcessor 
     {
         public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             throw new NotImplementedException();
         }
 
-        public virtual void ControlledSAdj(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
             throw new NotImplementedException();
         }
@@ -85,7 +85,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             throw new NotImplementedException();
         }
 
-        public virtual void ControlledTAdj(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
             throw new NotImplementedException();
         }
@@ -200,7 +200,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             throw new NotImplementedException();
         }
 
-        public virtual void SAdj(Qubit qubit)
+        public virtual void SAdjoint(Qubit qubit)
         {
             throw new NotImplementedException();
         }
@@ -215,7 +215,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             throw new NotImplementedException();
         }
 
-        public virtual void TAdj(Qubit qubit)
+        public virtual void TAdjoint(Qubit qubit)
         {
             throw new NotImplementedException();
         }

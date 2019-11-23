@@ -5,16 +5,15 @@ using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimMeasure : Quantum.Intrinsic.Measure
+        public class QuantumProcessorDispatcherMeasure : Quantum.Intrinsic.Measure
         {
-            private QuantumExecutorSimulator Simulator { get; }
+            private QuantumProcessorDispatcher Simulator { get; }
 
-
-            public QuantumExecutorSimMeasure(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherMeasure(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
@@ -29,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 }
 
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                return Simulator.QuantumExecutor.Measure( newPaulis, newQubits);
+                return Simulator.QuantumProcessor.Measure( newPaulis, newQubits);
             };
         }
     }

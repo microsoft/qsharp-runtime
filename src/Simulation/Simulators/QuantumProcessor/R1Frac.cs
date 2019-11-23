@@ -5,28 +5,25 @@ using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
 
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimR1Frac : Quantum.Intrinsic.R1Frac
+        public class QuantumProcessorDispatcherR1Frac : Quantum.Intrinsic.R1Frac
         {
+            private QuantumProcessorDispatcher Simulator { get; }
 
-            private QuantumExecutorSimulator Simulator { get; }
-
-
-            public QuantumExecutorSimR1Frac(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherR1Frac(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
 
             public override Func<(long, long, Qubit), QVoid> Body => (_args) =>
             {
-
                 var (num, denom , q1) = _args;
                 var (numNew, denomNew) = CommonUtils.Reduce(num, denom);
-                Simulator.QuantumExecutor.R1Frac(numNew, denomNew, q1);
+                Simulator.QuantumProcessor.R1Frac(numNew, denomNew, q1);
                 return QVoid.Instance;
             };
 
@@ -38,10 +35,9 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
 
             public override Func<(IQArray<Qubit>, (long, long, Qubit)), QVoid> ControlledBody => (_args) =>
             {
-
                 var (ctrls, (num, denom, q1)) = _args;
                 var (numNew, denomNew) = CommonUtils.Reduce(num, denom);
-                Simulator.QuantumExecutor.ControlledR1Frac(ctrls, numNew, denomNew, q1);
+                Simulator.QuantumProcessor.ControlledR1Frac(ctrls, numNew, denomNew, q1);
                 return QVoid.Instance;
             };
 

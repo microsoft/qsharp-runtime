@@ -5,22 +5,21 @@ using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimExp : Quantum.Intrinsic.Exp
+        public class QuantumProcessorDispatcherExp : Quantum.Intrinsic.Exp
         {
-            private QuantumExecutorSimulator Simulator { get; }
+            private QuantumProcessorDispatcher Simulator { get; }
 
-            public QuantumExecutorSimExp(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherExp(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
 
             public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Body => (_args) =>
             {
-
                 var (paulis, theta, qubits) = _args;
 
                 if (paulis.Length != qubits.Length)
@@ -29,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 }
 
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                Simulator.QuantumExecutor.Exp(newPaulis, theta, newQubits);
+                Simulator.QuantumProcessor.Exp(newPaulis, theta, newQubits);
 
                 return QVoid.Instance;
             };
@@ -42,11 +41,10 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledBody => (_args) =>
             {
-
                 var (ctrls, (paulis, theta, qubits)) = _args;
 
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                Simulator.QuantumExecutor.ControlledExp(ctrls, newPaulis, theta, newQubits);
+                Simulator.QuantumProcessor.ControlledExp(ctrls, newPaulis, theta, newQubits);
 
                 return QVoid.Instance;
             };

@@ -5,17 +5,15 @@ using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
-        public class QuantumExecutorSimAssertProb : Quantum.Intrinsic.AssertProb
+        public class QuantumProcessorDispatcherAssertProb : Quantum.Intrinsic.AssertProb
         {
+            private QuantumProcessorDispatcher Simulator { get; }
 
-            private QuantumExecutorSimulator Simulator { get; }
-
-
-            public QuantumExecutorSimAssertProb(QuantumExecutorSimulator m) : base(m)
+            public QuantumProcessorDispatcherAssertProb(QuantumProcessorDispatcher m) : base(m)
             {
                 this.Simulator = m;
             }
@@ -31,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
                 
                 double probabilityOfZero = result == Result.Zero ? expectedPr : 1.0 - expectedPr;
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                Simulator.QuantumExecutor.AssertProb(newPaulis, newQubits, probabilityOfZero, msg, tol );
+                Simulator.QuantumProcessor.AssertProb(newPaulis, newQubits, probabilityOfZero, msg, tol );
                 return QVoid.Instance;
             };
 

@@ -4,9 +4,9 @@
 using Microsoft.Quantum.Simulation.Core;
 using System;
 
-namespace Microsoft.Quantum.Simulation.QuantumExecutor
+namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumExecutorSimulator
+    public partial class QuantumProcessorDispatcher
     {
         public static long SampleDistribution(IQArray<double> unnormalizedDistribution, double uniformZeroOneSample)
         {
@@ -38,10 +38,10 @@ namespace Microsoft.Quantum.Simulation.QuantumExecutor
             return unnormalizedDistribution.Length;
         }
 
-        public class QuantumExecutorSimRandom : Quantum.Intrinsic.Random
+        public class QuantumProcessorDispatcherRandom : Quantum.Intrinsic.Random
         {
-            private QuantumExecutorSimulator Simulator { get; }
-            public QuantumExecutorSimRandom(QuantumExecutorSimulator m) : base(m)
+            private QuantumProcessorDispatcher Simulator { get; }
+            public QuantumProcessorDispatcherRandom(QuantumProcessorDispatcher m) : base(m)
             {
                 Simulator = m;
             }
