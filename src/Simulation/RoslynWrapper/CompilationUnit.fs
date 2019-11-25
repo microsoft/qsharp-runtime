@@ -49,6 +49,17 @@ module CompilationUnit =
         |> addMembers members
         |> (fun cu -> cu.NormalizeWhitespace())
 
-    let ``pragmaDisableWarning`` warning cu =
+    let ``pragmaDisableWarning`` warning (cu : CompilationUnitSyntax) =
         let pr = SyntaxFactory.PreprocessingMessage (sprintf "#pragma warning disable %d" warning)
-        cu.WithLeadingTrivia [| pr; SyntaxFactory.CarriageReturnLineFeed |]
+        cu.WithLeadingTrivia [| 
+            yield pr; yield SyntaxFactory.CarriageReturnLineFeed;
+            for trivia in cu.GetLeadingTrivia() do yield trivia 
+        |]
+
+    let ``with leading comments`` comments (cu : CompilationUnitSyntax) =
+        cu.WithLeadingTrivia [| 
+            for comment in comments |> Seq.map SyntaxFactory.Comment do 
+                yield comment; 
+                yield SyntaxFactory.CarriageReturnLineFeed 
+            for trivia in cu.GetLeadingTrivia() do yield trivia             
+        |] 

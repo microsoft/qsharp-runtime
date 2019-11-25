@@ -7,7 +7,7 @@
   -->
   <Target Name="QsharpCompile"
       Inputs="@(QsharpFiles)"
-      Outputs="$(QsharpSrcOutDir)\$(QsharpTree)"
+      Outputs="$(QsharpSrcOutDir)\$(QsharpTree).bson"
       DependsOnTargets="QsharpPrepare"
       BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
@@ -25,7 +25,7 @@
     <Exec Command="$(QscCommand)" />
     <ItemGroup>
       <EmbeddedResource Include="$(QsharpSrcOutDir)\$(QsharpTree).bson" LogicalName="__qsharp_data__.bson" Visible="false" />
-      <Compile Include="$(QsharpSrcOutDir)**\*.g.cs" Visible="false" />
+      <Compile Include="$(QsharpSrcOutDir)**\*.g.cs" Visible="false" AutoGen="true" />
     </ItemGroup>
   </Target>
 
