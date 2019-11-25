@@ -78,7 +78,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public string GetURLFromPDB()
         {
             string pdbFileLocation = PortablePdbSymbolReader.GetPDBLocation(Callable);
-            string result = PortablePDBPathRemappingCache.TryGetFileUrl(pdbFileLocation, SourceFile);
+            string result = PortablePDBSourceLinkInfoCache.TryGetFileUrl(pdbFileLocation, SourceFile);
             return PortablePdbSymbolReader.TryFormatGitHubUrl(result, FailedLineNumber);
         }
 

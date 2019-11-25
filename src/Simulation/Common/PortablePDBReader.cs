@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.Common
     /// https://github.com/dotnet/designs/blob/master/accepted/diagnostics/source-link.md#source-link-json-schema
     /// </summary>
     [Serializable]
-    public class SourceLinkPathRemapping
+    public class SourceLinkInfo
     {
         public Dictionary<string, string> documents;
 
@@ -138,7 +138,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// The function will throw an exception if PortablePDB file is not found or anything else went wrong.
         /// </summary>
         /// <param name="pdbFilePath">Path to PortablePDB file </param>
-        public static SourceLinkPathRemapping GetSourceLinkString(string pdbFilePath)
+        public static SourceLinkInfo GetSourceLinkInfo(string pdbFilePath)
         {
             using (FileStream stream = File.OpenRead(pdbFilePath))
             {
@@ -153,7 +153,7 @@ namespace Microsoft.Quantum.Simulation.Common
                         if (metadataReader.GetGuid(customDebugInformation.Kind) == SourceLink)
                         {
                             string jsonString = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(customDebugInformation.Value));
-                            return Newtonsoft.Json.JsonConvert.DeserializeObject<SourceLinkPathRemapping>(jsonString);
+                            return Newtonsoft.Json.JsonConvert.DeserializeObject<SourceLinkInfo>(jsonString);
                         }
                     }
                 }
@@ -233,24 +233,24 @@ namespace Microsoft.Quantum.Simulation.Common
     /// <summary>
     /// Caches path remapping from build machine to URL per location of PDB file.
     /// </summary>
-    public static class PortablePDBPathRemappingCache
+    public static class PortablePDBSourceLinkInfoCache
     {
         /// <summary>
         /// Key is the location of a PortablePDB file on a current machine
         /// </summary>
         // ThreadStaticAttribute makes sure that the cache is thread safe
         [ThreadStatic]
-        private static Dictionary<string, SourceLinkPathRemapping> pdbLocationToPathRemapping = null;
+        private static Dictionary<string, SourceLinkInfo> _cache = null;
 
-        public static SourceLinkPathRemapping GetRemappingInfromation(string pdbLocation)
+        public static SourceLinkInfo GetSourceLinkInfo(string pdbLocation)
         {
-            if (pdbLocationToPathRemapping == null)
+            if (_cache == null)
             {
-                pdbLocationToPathRemapping = new Dictionary<string, SourceLinkPathRemapping>();
+                _cache = new Dictionary<string, SourceLinkInfo>();
             }
 
-            SourceLinkPathRemapping remappings;
-            if (pdbLocationToPathRemapping.TryGetValue(pdbLocation, out remappings))
+            SourceLinkInfo remappings;
+            if (_cache.TryGetValue(pdbLocation, out remappings))
             {
                 return remappings;
             }
@@ -258,11 +258,11 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 try
                 {
-                    remappings = PortablePdbSymbolReader.GetSourceLinkString(pdbLocation);
+                    remappings = PortablePdbSymbolReader.GetSourceLinkInfo(pdbLocation);
                 }
                 finally
                 {
-                    pdbLocationToPathRemapping.Add(pdbLocation, remappings);
+                    _cache.Add(pdbLocation, remappings);
                 }
                 return remappings;
             }
@@ -275,17 +275,17 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             if (fileName == null) return null;
 
-            SourceLinkPathRemapping remapping = GetRemappingInfromation(pdbLocation);
-            if (remapping != null)
+            SourceLinkInfo sourceLinks = GetSourceLinkInfo(pdbLocation);
+            if (sourceLinks != null)
             {
-                if (remapping.documents.ContainsKey(fileName))
+                if (sourceLinks.documents.ContainsKey(fileName))
                 {
-                    return remapping.documents[fileName];
+                    return sourceLinks.documents[fileName];
                 }
 
-                if (remapping.Patterns != null)
+                if (sourceLinks.Patterns != null)
                 {
-                    foreach (ValueTuple<string, string> replacement in remapping.Patterns)
+                    foreach (ValueTuple<string, string> replacement in sourceLinks.Patterns)
                     {
                         if (fileName.StartsWith(replacement.Item1))
                         {
@@ -320,20 +320,20 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         // ThreadStaticAttribute makes sure that the cache is thread safe
         [ThreadStatic]
-        private static Dictionary<string, Dictionary<string, CompressedSourceFile>> pdbLocationToEmbeddedFiles = null;
+        private static Dictionary<string, Dictionary<string, CompressedSourceFile>> _cache = null;
 
         /// <summary>
         /// Returns cached result of calling <see cref="PortablePdbSymbolReader.GetEmbeddedFiles(string)"/>
         /// </summary>
         public static Dictionary<string, CompressedSourceFile> GetEmbeddedFiles(string pdbLocation)
         {
-            if (pdbLocationToEmbeddedFiles == null)
+            if (_cache == null)
             {
-                pdbLocationToEmbeddedFiles = new Dictionary<string, Dictionary<string, CompressedSourceFile>>();
+                _cache = new Dictionary<string, Dictionary<string, CompressedSourceFile>>();
             }
 
             Dictionary<string, CompressedSourceFile> embeddedFilesFromPath = null;
-            if (pdbLocationToEmbeddedFiles.TryGetValue(pdbLocation, out embeddedFilesFromPath))
+            if (_cache.TryGetValue(pdbLocation, out embeddedFilesFromPath))
             {
                 return embeddedFilesFromPath;
             }
@@ -345,7 +345,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 finally
                 {
-                    pdbLocationToEmbeddedFiles.Add(pdbLocation, embeddedFilesFromPath);
+                    _cache.Add(pdbLocation, embeddedFilesFromPath);
                 }
                 return embeddedFilesFromPath;
             }
