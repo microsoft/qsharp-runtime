@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        /// Returns SourceLink information, that is JSON string with schema described at https://github.com/dotnet/designs/blob/master/accepted/diagnostics/source-link.md#source-link-json-schema
+        /// Returns SourceLink information, that is the source link information as described at https://github.com/dotnet/designs/blob/master/accepted/diagnostics/source-link.md#source-link-json-schema
         /// stored in PortablePDB.
         /// The function will throw an exception if PortablePDB file is not found or anything else went wrong.
         /// </summary>
