@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         }        
     }
     
-	/// # Summary
+    /// # Summary
     /// Performs exp( i φ P₁ ⊗ … ⊗ Pₙ )
     /// 
     /// # Input
