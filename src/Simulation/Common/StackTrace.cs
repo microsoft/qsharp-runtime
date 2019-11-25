@@ -159,6 +159,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     {
                         currentQsharpStackFrame.FailedLineNumber = failedLineNumber;
                         qsharpStackFrameId++;
+                        if (qsharpStackFrameId == qsharpStackFrames.Length) break;
                     }
                 }
             }
