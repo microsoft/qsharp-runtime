@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Quantum.Simulation.Core;
+using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -22,12 +23,38 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne)
         {
-            throw new NotImplementedException();
+            if (measurementResult == Result.Zero)
+            {
+                onZero();
+            }
+            else
+            {
+                onOne();
+            }
         }
 
         public virtual void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp)
         {
-            throw new NotImplementedException();
+            Debug.Assert(measurementResults.Count == resultsValues.Count);
+
+            bool equal = true;
+
+            for (int i = 0; i < measurementResults.Count; i++)
+            {
+                if (measurementResults[i] != resultsValues[i])
+                {
+                    equal = false;
+                }
+            }
+
+            if (equal)
+            {
+                equalOp();
+            }
+            else
+            {
+                nonEqualOp();
+            }
         }
 
         public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
