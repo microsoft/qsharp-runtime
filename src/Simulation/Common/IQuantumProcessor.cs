@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Common
     /// </summary>
     /// <remarks>
     /// To implement a target machine that executes quantum commands, implement this interface.
-    /// Consider using <see cref="EmptyQuantumProcessor"/> as a stub for easy impementation of this interface.
+    /// Consider using <see cref="QuantumProcessorBase"/> as a stub for easy impementation of this interface.
     /// Implementors of <see cref="IQuantumProcessor"/> interface do not manage qubits on their own.
     /// All qubit management (allocation, dealocation, etc.) is done by the caller of this interface.
     /// Implementors are notified when qubits are allocated, released, borrowed and returned allowing them to react to these events if necessary.

@@ -72,6 +72,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 
 
 	// Public operations that match Canon names.
+	// This corresponds to "if" statement of the following form in Q#:
+	// if (measurementResult == Zero) {onResultZeroOp(zeroArg);} else {onResultOneOp(oneArg);}
     operation ApplyIfElseR<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T) , (onResultOneOp : ('U => Unit), oneArg : 'U)) : Unit {
         let zeroOp = Delay(onResultZeroOp, zeroArg, _);
         let oneOp = Delay(onResultOneOp, oneArg, _);
@@ -98,6 +100,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 
 
 	// Public operations that match Canon names.
+	// This corresponds to "if" statement of the following form in Q#:
+	// if (measurementResult == Zero) {onResultZeroOp(zeroArg);}
     operation ApplyIfZero<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T)) : Unit {
         let zeroOp = Delay(onResultZeroOp, zeroArg, _);
         let oneOp = Delay(NoOp, (), _);
@@ -124,6 +128,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 
 
 	// Public operations that match Canon names.
+	// This corresponds to "if" statement of the following form in Q#:
+	// if (measurementResult == One) {onResultOneOp(oneArg);}
     operation ApplyIfOne<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit), oneArg : 'T)) : Unit {
         let oneOp = Delay(onResultOneOp, oneArg, _);
         let zeroOp = Delay(NoOp, (), _);
@@ -150,6 +156,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 
 
 	// Public operations that match Canon names.
+	// This corresponds to "if" statement of the following form in Q#:
+	// if ((measurementResults[0] == resultsValues[0]) && (measurementResults[1] == resultsValues[1])) {onEqualOp(equalArg);} else {onNonEqualOp(nonEqualArg);}
     operation ApplyConditionally<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit), equalArg : 'T) , (onNonEqualOp : ('U => Unit), nonEqualArg : 'U)) : Unit {
         let equalOp = Delay(onEqualOp,equalArg,_);
         let nonEqualOp = Delay(onNonEqualOp,nonEqualArg,_);

@@ -568,7 +568,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// Reads the QArray<>
+        /// Reads the <see cref="QArray{T}"/>
         /// </summary>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
