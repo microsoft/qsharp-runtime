@@ -35,8 +35,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits {
         return 5;
     }
     
-    
-    /// <summary> Hadamard gate, e.g. [[1,1],[1,-1]]/Sqrt{2} </summary>
+    /// # Summary
+    /// Hadamard gate, e.g. [[1,1],[1,-1]]/Sqrt{2} 
     operation InternalH (target : Qubit) : Unit
     {
         body (...)
@@ -49,6 +49,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits {
     
     
     /// <summary> Hadamard gate, e.g. [[1,1],[1,-1]]/Sqrt{2} </summary>
+    /// 
+    
+    /// # Summary
+    /// Hadamard gate, e.g. [[1,1],[1,-1]]/Sqrt{2}
     operation InternalHY (target : Qubit) : Unit
     {
         body (...)
@@ -64,6 +68,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits {
     
     
     /// <summary> S gate, e.g. [[1,0],[0,i]] </summary>
+    /// 
+    
+    /// # Summary
+    /// S gate, e.g. [[1,0],[0,i]]
     operation InternalS (target : Qubit) : Unit
     {
         body (...)

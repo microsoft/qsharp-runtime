@@ -3,9 +3,13 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
-    
-    /// <summary> Applies multiply controlled unitary given a singly controlled one </summary>
-    /// <param name="controlledU"> Singly controlled unitary to turn into multiply-controlled. ControlledU first argument is control, second is target </param>
+    /// # Summary
+    /// Applies multiply controlled unitary given a singly controlled one
+    /// 
+    /// # Input
+    /// ## controlledU
+    /// Singly controlled unitary to turn into multiply-controlled.
+    /// First argument is control, second is target.
     operation MultiControlledU (controlledU : ((Qubit, Qubit) => Unit is Adj), controls : Qubit[], target : Qubit) : Unit
     is Adj {
 
@@ -20,8 +24,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     }
     
     
-    /// <summary> Applies multiply controlled unitary given a singly controlled one </summary>
-    /// <param name="controlledU"> Singly controlled unitary to turn into multiply-controlled. ControlledU first argument is control, second and third are targets </param>
+    /// # Summary
+    /// Applies multiply controlled unitary given a singly controlled one
+    /// 
+    /// # Input
+    /// ## controlledU
+    /// Singly controlled unitary to turn into multiply-controlled. 
+    /// First argument is control, second and third are targets
     operation MultiControlledUTwoTargets (controlledU : ((Qubit, Qubit, Qubit) => Unit is Adj), controls : Qubit[], target1 : Qubit, target2 : Qubit) : Unit
     is Adj {
 

@@ -4,10 +4,9 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary>
+    /// # Summary
     /// Returns array of indices of paulies that are
     /// not equal to PauliI
-    /// </summary>
     function IndicesOfNonIdentity (paulies : Pauli[]) : Int[]
     {
         mutable nonIdPauliCount = 0;
