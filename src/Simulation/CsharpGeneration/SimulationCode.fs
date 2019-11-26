@@ -1150,7 +1150,7 @@ module SimulationCode =
     let testOutputHandle = "Output"
     let buildOutput () =
         [
-            ``propg`` outputHelperInterface testOutputHandle [ ``internal``; ] 
+            ``propg`` outputHelperInterface testOutputHandle [ ``internal`` ] 
             :> MemberDeclarationSyntax   
         ]
 
@@ -1175,10 +1175,11 @@ module SimulationCode =
 
         ``attributes``
             [
-                ``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)];
+                ``attribute`` None (``ident`` "Xunit.Fact") [];
                 ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName]
+                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Operation"; ``literal`` opName]
             ]
-            (``method`` "void" (sprintf "__%s_Execution__" targetName) ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+            (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``
                     [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
                 ``}``
@@ -1243,35 +1244,46 @@ module SimulationCode =
 
     let isFunction (op:QsCallable) = match op.Kind with | Function -> true | _ -> false
 
+    let buildTestClass attr targetName opName (op : QsCallable) =
+
+        let constructors =
+            [
+                ``constructor`` targetName ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
+                    ``:`` []
+                    [``public``]
+                    ``{`` 
+                        [  
+                            ``ident`` "this" <|.|> ``ident`` testOutputHandle <-- ``ident`` testOutputHandle |> statement
+                        ]
+                    ``}``
+                    :> MemberDeclarationSyntax
+            ]
+
+        let properties = buildOutput ()
+
+        let methods =
+            [
+                buildUnitTest targetName opName (fst op.Location.Offset) op.SourceFile.Value
+            ]
+            
+
+        ``attributes`` attr (
+            ``class`` targetName ``<<`` [] ``>>``
+                ``:`` None ``,`` [] [``public``]
+                ``{``
+                    (constructors @ properties @ methods) 
+                ``}``
+            )
+
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
         let opNames = operationDependencies context op
-        
-        let testTargets =
-            op.Attributes
-            |> SymbolResolution.TryFindTestTargets
-            |> Seq.filter (String.IsNullOrWhiteSpace >> not)
-            |> Seq.toList
 
-        let constructors =
-            if testTargets.Any() then
-                [
-                    ``constructor`` name ``(`` [ (testOutputHandle, ``type`` outputHelperInterface); ("m", ``type`` "IOperationFactory") ] ``)``
-                        ``:`` [ "m" ]
-                        [``public``]
-                        ``{`` 
-                            [  
-                                ``ident`` "this" <|.|> ``ident`` testOutputHandle <-- ``ident`` testOutputHandle |> statement
-                            ]
-                        ``}``
-                        :> MemberDeclarationSyntax
-                ]
-            else
-                [ (buildConstructor context name) ]
+        let constructors = [ (buildConstructor context name) ]
   
-        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames @ (if testTargets.Any() then buildOutput () else [])
+        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames
             
         let baseOp =
             if isFunction op then 
@@ -1294,15 +1306,21 @@ module SimulationCode =
             |> List.map (fun (x, y) -> (x :> MemberDeclarationSyntax, y)) |> List.unzip
         let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType) 
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
-        let innerClasses = [ inData |> snd;  outData |> snd ] |> List.choose id
-        let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
+        let testTargets =
+            op.Attributes
+            |> SymbolResolution.TryFindTestTargets
+            |> Seq.filter (String.IsNullOrWhiteSpace >> not)
+            |> Seq.toList
         let unitTests =
             [
                 for targetName in testTargets do
-                    buildUnitTest targetName name (fst op.Location.Offset) op.SourceFile.Value
+                    buildTestClass attr targetName name op
             ]
 
+        let innerClasses = ([ inData |> snd;  outData |> snd ] |> List.choose id) @ unitTests
+        let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
+        
         let modifiers = 
             if isAbstract op then            
                 [``public``; ``abstract``; ``partial``]
@@ -1313,9 +1331,9 @@ module SimulationCode =
             ``class`` name ``<<`` typeParameters ``>>``
                 ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
                 ``{``
-                    (constructors @ innerClasses @ properties @ bodies @ methods @ unitTests) 
+                    (constructors @ innerClasses @ properties @ bodies @ methods) 
                 ``}``
-            )    
+            )
 
     let isUDTDeclaration =                          function | QsCustomType udt -> Some udt | _ -> None
     let isCallableDeclaration =                     function | QsCallable     c -> Some c   | _ -> None
