@@ -1174,7 +1174,10 @@ module SimulationCode =
                 [ disposeSim <.> ((``ident`` "Dispose"), []) |> statement ] None
 
         ``attributes``
-            [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)]]
+            [
+                ``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)];
+                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName]
+            ]
             (``method`` "void" (sprintf "__%s_Execution__" targetName) ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``
                     [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
