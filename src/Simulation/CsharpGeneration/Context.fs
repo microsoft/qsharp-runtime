@@ -50,7 +50,6 @@ type CodegenContext = {
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
     fileName                : string option
-    unitTests               : ILookup<NonNullable<string>, string> // for each namespace contains the targets on which unit tests need to be executed
 } 
     with
     static member public Create (syntaxTree, assemblyConstants) =        
@@ -66,14 +65,6 @@ type CodegenContext = {
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
-
-        let testTargets =  
-            let allTargets (c : QsCallable) = c.Attributes |> SymbolResolution.TryFindTestTargets |> Seq.map (fun target -> c.FullName.Namespace, target)
-            callables.Values 
-            |> Seq.collect allTargets
-            |> Seq.distinct 
-            |> Seq.filter (snd >> String.IsNullOrWhiteSpace >> not) 
-            |> Seq.toArray
     
         { 
             assemblyConstants = assemblyConstants;
@@ -84,8 +75,7 @@ type CodegenContext = {
             declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
             current = None; 
             fileName = None;
-            signature = None;
-            unitTests = testTargets.ToLookup(fst, snd)
+            signature = None
         }
 
     static member public Create syntaxTree = 

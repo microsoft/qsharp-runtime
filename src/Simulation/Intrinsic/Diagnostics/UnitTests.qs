@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Known targets are: QuantumSimulator, TraceSimulator, ToffoliSimulator.
     ///
     @Attribute()
-    newtype TestOperation = (ExecutionTarget : String);
+    newtype Test = (ExecutionTarget : String);
 }
 
 

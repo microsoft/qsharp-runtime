@@ -17,8 +17,8 @@ namespace Microsoft.Quantum.Tests.UnitTests {
     
     open Microsoft.Quantum.Diagnostics;
 
-    @TestOperation("QuantumSimulator")
-    @TestOperation("ToffoliSimulator")
+    @Test("QuantumSimulator")
+    @Test("ToffoliSimulator")
     operation UnitTest1 () : Unit {
     }
     

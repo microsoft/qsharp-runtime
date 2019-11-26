@@ -1154,7 +1154,7 @@ module SimulationCode =
             :> MemberDeclarationSyntax   
         ]
 
-    let buildUnitTest targetName opName opLocation opSourceFile =
+    let buildUnitTest (targetName : QsQualifiedName) opName opLocation opSourceFile =
         let sim = ``ident`` "sim"
         let baseSim = ``ident`` "baseSim"
         let disposeSim = ``ident`` "disposeSim"
@@ -1164,7 +1164,7 @@ module SimulationCode =
 
         let simCond = sim |> ``is assign`` "Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
 
-        let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
+        let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| targetName.ToString()) ``(`` [] ``)``)
         let assignLogEvent =
             ``if`` ``(`` simCond ``)``
                 [ ``sim.OnLog`` <+=> (``this.Output`` <|.|> ``ident`` "WriteLine") ] None
@@ -1176,7 +1176,7 @@ module SimulationCode =
         ``attributes``
             [
                 ``attribute`` None (``ident`` "Xunit.Fact") [];
-                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName]
+                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName.Name.Value]
                 ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Operation"; ``literal`` opName]
             ]
             (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
@@ -1244,11 +1244,11 @@ module SimulationCode =
 
     let isFunction (op:QsCallable) = match op.Kind with | Function -> true | _ -> false
 
-    let buildTestClass attr targetName opName (op : QsCallable) =
+    let buildTestClass attr (targetName : QsQualifiedName) opName (op : QsCallable) =
 
         let constructors =
             [
-                ``constructor`` targetName ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
+                ``constructor`` targetName.Name.Value ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
                     ``:`` []
                     [``public``]
                     ``{`` 
@@ -1268,7 +1268,7 @@ module SimulationCode =
             
 
         ``attributes`` attr (
-            ``class`` targetName ``<<`` [] ``>>``
+            ``class`` targetName.Name.Value ``<<`` [] ``>>``
                 ``:`` None ``,`` [] [``public``]
                 ``{``
                     (constructors @ properties @ methods) 
@@ -1307,11 +1307,18 @@ module SimulationCode =
         let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType) 
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
 
+        let defaultTargetNs = NonNullable<_>.New("Microsoft.Quantum.Simulation.Simulators")
         let testTargets =
             op.Attributes
             |> SymbolResolution.TryFindTestTargets
             |> Seq.filter (String.IsNullOrWhiteSpace >> not)
+            |> Seq.map (function
+                        | x when x.Contains(".") ->
+                            let indexOfDot = x.LastIndexOf('.')
+                            {Namespace = NonNullable<_>.New(x.Substring(0, indexOfDot)); Name = NonNullable<_>.New(x.Substring(indexOfDot+1))}
+                        | str -> {Namespace = defaultTargetNs; Name = NonNullable<_>.New(str)} )
             |> Seq.toList
+
         let unitTests =
             [
                 for targetName in testTargets do
