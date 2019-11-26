@@ -1154,6 +1154,34 @@ module SimulationCode =
             :> MemberDeclarationSyntax   
         ]
 
+    let buildUnitTest targetName opName opLocation opSourceFile =
+        let sim = ``ident`` "sim"
+        let baseSim = ``ident`` "baseSim"
+        let disposeSim = ``ident`` "disposeSim"
+        let ``this.Output`` = ``ident`` "this" <|.|> ``ident`` "Output"
+        let ``sim.OnLog`` = baseSim <|.|> ``ident`` "OnLog"
+        let Run = generic "Run" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
+
+        let simCond = sim |> ``is assign`` "SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
+
+        let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
+        let assignLogEvent =
+            ``if`` ``(`` simCond ``)``
+                [ ``sim.OnLog`` <+=> (``this.Output`` <|.|> ``ident`` "WriteLine") ] None
+        let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
+        let disposeOfRun =
+            ``if`` ``(`` (sim |> ``is assign`` "SimulatorBase" disposeSim) ``)``
+                [ disposeSim <|.|> ``ident`` "Dispose" |> statement ] None
+
+        ``attributes``
+            [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)]]
+            (``method`` "void" (sprintf "__%s_Execution__" targetName) ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                ``{``
+                    [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
+                ``}``
+                |> ``with trivia`` (``#lineNr`` opLocation opSourceFile) 
+            )
+
     let buildDataWrapper context name qsharpType =
         let buildDataClass =
             let buildValueTupleConstructor =
@@ -1269,26 +1297,7 @@ module SimulationCode =
         let unitTests =
             [
                 for targetName in testTargets do
-
-                    let sim = ``ident`` "sim"
-                    let ``sim.OnLog`` = sim <|.|> ``ident`` "OnLog" 
-                    let ``output.WriteLine`` = ``ident`` "this" <|.|> ``ident`` "Output"  <|.|> ``ident`` "WriteLine" 
-                    let Run = generic "Run" ``<<`` [name; "QVoid"; "QVoid"] ``>>``
-
-                    let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
-                    let assignLogEvent = ``sim.OnLog`` <+=> ``output.WriteLine``
-                    let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
-
-                    let testHandle =
-                        ``attributes``
-                            [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)]]
-                            (``method`` "void" (sprintf "__%s_Execution__" targetName) ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
-                                ``{``
-                                    [getSimulator; assignLogEvent; ``sim.Run.Wait``]
-                                ``}``
-                                |> ``with trivia`` (``#lineNr`` (fst op.Location.Offset) op.SourceFile.Value) 
-                            )
-                    yield testHandle
+                    buildUnitTest targetName name (fst op.Location.Offset) op.SourceFile.Value
             ]
 
         let modifiers = 
