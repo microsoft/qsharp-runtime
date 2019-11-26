@@ -1162,7 +1162,7 @@ module SimulationCode =
         let ``sim.OnLog`` = baseSim <|.|> ``ident`` "OnLog"
         let Run = generic "Run" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
 
-        let simCond = sim |> ``is assign`` "SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
+        let simCond = sim |> ``is assign`` "Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
 
         let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
         let assignLogEvent =
@@ -1170,8 +1170,8 @@ module SimulationCode =
                 [ ``sim.OnLog`` <+=> (``this.Output`` <|.|> ``ident`` "WriteLine") ] None
         let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
         let disposeOfRun =
-            ``if`` ``(`` (sim |> ``is assign`` "SimulatorBase" disposeSim) ``)``
-                [ disposeSim <|.|> ``ident`` "Dispose" |> statement ] None
+            ``if`` ``(`` (sim |> ``is assign`` "IDisposable" disposeSim) ``)``
+                [ disposeSim <.> ((``ident`` "Dispose"), []) |> statement ] None
 
         ``attributes``
             [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)]]
