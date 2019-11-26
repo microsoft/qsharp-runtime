@@ -9,7 +9,8 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # Input
     /// ## ExecutionTarget
     /// The name of the target to execute the test on. 
-    /// Possible values are: QuantumSimulator, TraceSimulator, ToffoliSimulator
+    /// The name has to be either one of the known targets, or a fully qualified name.
+    /// Known targets are: QuantumSimulator, TraceSimulator, ToffoliSimulator.
     ///
     @Attribute()
     newtype TestOperation = (ExecutionTarget : String);
