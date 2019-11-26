@@ -17,7 +17,15 @@ namespace Microsoft.Quantum.Simulation.Core
         ICallable<P,O> Partial<P>(Func<P, I> mapper);
     }
 
-
+    /// <summary>
+    /// An operation that wraps another operation, for example
+    /// <see cref="AdjointedOperation{I, O}"/>, <see cref="ControlledOperation{I, O}"/>,
+    /// <see cref="OperationPartial{P, I, O}"/>,
+    /// </summary>
+    public interface IOperationWrapper
+    {
+        ICallable BaseOperation { get; }
+    }
 
     /// <summary>
     ///     The base class for all ClosedType quantum operations.

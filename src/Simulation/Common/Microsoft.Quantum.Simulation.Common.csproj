@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Reflection.Metadata" Version="1.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
     <ProjectReference Include="..\Intrinsic\Microsoft.Quantum.Intrinsic.csproj" />
   </ItemGroup>
