@@ -208,6 +208,12 @@ module Expressions =
         SyntaxFactory.BinaryExpression (SyntaxKind.IsExpression, expression, ident targetType)
         :> ExpressionSyntax
 
+    // expr is target var
+    let ``is assign`` targetType (targetAssign : IdentifierNameSyntax) expression =
+        let assign = SyntaxFactory.SingleVariableDesignation targetAssign.Identifier
+        SyntaxFactory.IsPatternExpression (expression, SyntaxFactory.DeclarationPattern ((``ident`` targetType), assign))
+        :> ExpressionSyntax
+
     // ( expr )
     let ``))`` = None
     let ``((`` expr ``))`` = 
