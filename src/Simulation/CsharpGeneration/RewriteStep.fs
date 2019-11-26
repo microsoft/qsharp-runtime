@@ -45,10 +45,6 @@ type Emitter() =
             for source in allSources do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
-            if context.unitTests.Any() then 
-                let unitTestSetup = SimulationCode.generateUnitTestClasses context
-                let fileName = "UnitTestsClassConstructors.cs" |>  Path.GetFullPath |> NonNullable<string>.New
-                CompilationLoader.GeneratedFile(fileName, dir, ".g.cs", unitTestSetup) |> ignore
             transformed <- compilation
             true
 

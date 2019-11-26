@@ -882,9 +882,9 @@ module SimulationCode =
             ``{`` body ``}``
         :> MemberDeclarationSyntax
     
-    /// Returns the contructor for the given operation.
+    /// Returns the constructor for the given operation.
     let buildConstructor context name : MemberDeclarationSyntax =
-        ``constructor`` name ``(`` [ ("m", (``type`` "IOperationFactory")) ] ``)`` 
+        ``constructor`` name ``(`` [ ("m", ``type`` "IOperationFactory") ] ``)`` 
             ``:`` [ "m" ]
             [ ``public`` ]
             ``{`` [] ``}``
@@ -1146,6 +1146,14 @@ module SimulationCode =
             ``get`` (``=>`` (``literal`` fqn) )
         :> MemberDeclarationSyntax
 
+    let outputHelperInterface = "Xunit.Abstractions.ITestOutputHelper"
+    let testOutputHandle = "Output"
+    let buildOutput () =
+        [
+            ``propg`` outputHelperInterface testOutputHandle [ ``internal``; ] 
+            :> MemberDeclarationSyntax   
+        ]
+
     let buildDataWrapper context name qsharpType =
         let buildDataClass =
             let buildValueTupleConstructor =
@@ -1210,9 +1218,29 @@ module SimulationCode =
         let (name, nonGenericName) = findClassName context op
         let opNames = operationDependencies context op
         
-        let constructors = [ (buildConstructor context name) ]
+        let testTargets =
+            op.Attributes
+            |> SymbolResolution.TryFindTestTargets
+            |> Seq.filter (String.IsNullOrWhiteSpace >> not)
+            |> Seq.toList
+
+        let constructors =
+            if testTargets.Any() then
+                [
+                    ``constructor`` name ``(`` [ (testOutputHandle, ``type`` outputHelperInterface); ("m", ``type`` "IOperationFactory") ] ``)``
+                        ``:`` [ "m" ]
+                        [``public``]
+                        ``{`` 
+                            [  
+                                ``ident`` "this" <|.|> ``ident`` testOutputHandle <-- ``ident`` testOutputHandle |> statement
+                            ]
+                        ``}``
+                        :> MemberDeclarationSyntax
+                ]
+            else
+                [ (buildConstructor context name) ]
   
-        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames
+        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames @ (if testTargets.Any() then buildOutput () else [])
             
         let baseOp =
             if isFunction op then 
@@ -1237,7 +1265,32 @@ module SimulationCode =
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
         let innerClasses = [ inData |> snd;  outData |> snd ] |> List.choose id
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
-  
+
+        let unitTests =
+            [
+                for targetName in testTargets do
+
+                    let sim = ``ident`` "sim"
+                    let ``sim.OnLog`` = sim <|.|> ``ident`` "OnLog" 
+                    let ``output.WriteLine`` = ``ident`` "this" <|.|> ``ident`` "Output"  <|.|> ``ident`` "WriteLine" 
+                    let Run = generic "Run" ``<<`` [name; "QVoid"; "QVoid"] ``>>``
+
+                    let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
+                    let assignLogEvent = ``sim.OnLog`` <+=> ``output.WriteLine``
+                    let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
+
+                    let testHandle =
+                        ``attributes``
+                            [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` (sprintf "%s Execution" targetName)]]
+                            (``method`` "void" (sprintf "__%s_Execution__" targetName) ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
+                                ``{``
+                                    [getSimulator; assignLogEvent; ``sim.Run.Wait``]
+                                ``}``
+                                |> ``with trivia`` (``#lineNr`` (fst op.Location.Offset) op.SourceFile.Value) 
+                            )
+                    yield testHandle
+            ]
+
         let modifiers = 
             if isAbstract op then            
                 [``public``; ``abstract``; ``partial``]
@@ -1248,7 +1301,7 @@ module SimulationCode =
             ``class`` name ``<<`` typeParameters ``>>``
                 ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
                 ``{``
-                    (constructors @ innerClasses @ properties @ bodies @ methods) 
+                    (constructors @ innerClasses @ properties @ bodies @ methods @ unitTests) 
                 ``}``
             )    
 
@@ -1352,81 +1405,11 @@ module SimulationCode =
             |> List.map buildOne
             |> List.choose id
 
-        let testHandles : MemberDeclarationSyntax list = 
-            let testTargets = function 
-                | QsCallable c -> 
-                    c.Attributes 
-                    |> SymbolResolution.TryFindTestTargets 
-                    |> Seq.map (fun target -> (c.FullName, c.SourceFile, fst c.Location.Offset), target) 
-                    |> Seq.toList
-                | _ -> []
-            let unitTests = // contains the full name of the callable which to test as well as the name of the target simulator
-                if globalContext.unitTests.Any() then 
-                    localElements 
-                    |> List.collect testTargets 
-                    |> List.filter (snd >> String.IsNullOrWhiteSpace >> not)
-                    |> List.sortBy (fun ((name,_,_), target) -> (name, target))
-                else []
-            let assemblyName = if globalContext.AssemblyName = null then null else globalContext.AssemblyName.Replace(".", "")
-            [
-                // For each unit test, we create something like the following code:
-                //
-                // namespace AssemblyName // we omit this nested namespace if the assembly name is not specified
-                // {
-                //   public partial class __ExecuteOnTargetName__
-                //   #line nr source
-                //   {
-                //     [Fact(DisplayName = "TestOperationName")]
-                //     public void __TestOperationNameTest__()
-                //     {
-                //         var sim = new TargetName(); 
-                //         sim.OnLog += this.Output.WriteLine;
-                //         sim.Run<TestOperationClassName, QVoid, QVoid>(QVoid.Instance).Wait();
-                //     }
-                //   }
-                // }
-                for (testOperation, targetName) in unitTests do
-
-                    let opName, source, line = testOperation
-                    let sim = ``ident`` "sim"
-                    let ``sim.OnLog`` = sim <|.|> ``ident`` "OnLog" 
-                    let ``output.WriteLine`` = ``ident`` "this" <|.|> ``ident`` "Output"  <|.|> ``ident`` "WriteLine" 
-                    let Run = generic "Run" ``<<`` [opName.Namespace.Value + "." + opName.Name.Value; "QVoid"; "QVoid"] ``>>``
-
-                    let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| "Microsoft.Quantum.Simulation.Simulators." + targetName) ``(`` [] ``)``)
-                    let assignLogEvent = ``sim.OnLog`` <+=> ``output.WriteLine``
-                    let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
-
-                    let partialClass = 
-                        ``class`` ("__ExecuteOn" + targetName + "__") ``<<`` [] ``>>``
-                            ``:`` None ``,`` [] [``public``; ``partial``]
-                            ``{``
-                                [``attributes``
-                                    [``attribute`` None (``ident`` "Xunit.Fact") [``ident`` "DisplayName" <-- ``literal`` opName.Name.Value]]
-                                    (``method`` "void" ("__" + opName.Name.Value + "Test__") ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
-                                        ``{``
-                                            [getSimulator; assignLogEvent; ``sim.Run.Wait``]
-                                        ``}``
-                                        |> ``with trivia`` (``#lineNr`` line source.Value) 
-                                    )
-                                ]
-                            ``}``
-                    
-                    if assemblyName = null then yield partialClass
-                    else yield
-                            ``namespace`` assemblyName
-                                ``{``
-                                    []
-                                    [partialClass]
-                                ``}``
-                            :> MemberDeclarationSyntax
-            ]
-
         ``#line hidden`` <| 
         ``namespace`` nsName.Value
             ``{``
                 []
-                (members @ testHandles)
+                (members)
             ``}``
         :> MemberDeclarationSyntax
 
@@ -1503,54 +1486,6 @@ module SimulationCode =
         | :?  ReflectionTypeLoadException as l ->
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
-
-    // Method for generating the addition file containing the constructors 
-    // for all unit test classes if the project contains unit tests.
-    let generateUnitTestClasses (globalContext : CodegenContext) =
-        let unitTestClass targetName = 
-            let className = "__ExecuteOn" + targetName + "__"
-            let outputHelperInterface = "ITestOutputHelper"
-            let testOutputHandle = "Output"
-            ``class`` className ``<<`` [] ``>>``
-                ``:`` None ``,`` [] [``public``; ``partial``]
-                ``{``
-                    [
-                        ``propg`` "ITestOutputHelper" testOutputHandle [ ``internal``; ] 
-                        
-                        ``constructor`` className ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
-                            ``:`` []
-                            [``public``]
-                            ``{`` 
-                                [  
-                                    ``ident`` "this" <|.|> ``ident`` testOutputHandle <-- ``ident`` testOutputHandle |> statement
-                                ]
-                            ``}``
-                    ]
-                ``}``
-                :> MemberDeclarationSyntax
-        let usings = [``using`` "Xunit.Abstractions"]
-        let namespaces = [
-                for tests in globalContext.unitTests do 
-                    let partialClasses = tests |> Seq.map unitTestClass |> Seq.toList
-                    let assemblyName = globalContext.AssemblyName.Replace(".", "")
-                    let namespaceName = 
-                        if assemblyName = null then tests.Key.Value 
-                        else sprintf "%s.%s" tests.Key.Value assemblyName
-
-                    ``namespace`` namespaceName
-                        ``{``
-                            []
-                            partialClasses
-                        ``}``
-                    :> MemberDeclarationSyntax
-            ]
-        ``compilation unit`` 
-            []
-            usings
-            namespaces
-        // We add a "pragma warning disable 1591" since we don't generate doc comments in our C# code.
-        |> ``pragmaDisableWarning`` 1591
-        |> formatSyntaxTree
              
     // Main entry method for a CodeGenerator.
     // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
