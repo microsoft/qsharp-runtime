@@ -12,7 +12,7 @@ module Common =
 
     let mapTuple2 f (t1, t2)= (f t1, f t2)
 
-    let ident s = (SyntaxFactory.Identifier >> SyntaxFactory.IdentifierName) s
+    let ``ident`` s = (SyntaxFactory.Identifier >> SyntaxFactory.IdentifierName) s
 
     let ``:=`` expression = expression |> SyntaxFactory.EqualsValueClause
     let ``=>`` expression = expression |> SyntaxFactory.ArrowExpressionClause

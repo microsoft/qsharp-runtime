@@ -23,4 +23,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
         }
     }
+
+    /// 
+    /// This is a trivial implementation of a Simulator. Only used for unittesting. 
+    /// Not apt to simulate any circuits as it implements no Intrinsic Gates.
+    /// 
+    public class ModifiedTrivialSimulator : TrivialSimulator
+    { }
+}
+
+namespace Microsoft.Quantum.Simulation.Simulators.Tests.UnitTests
+{
+    /// 
+    /// This is a trivial implementation of a Simulator. Only used for unittesting. 
+    /// Not apt to simulate any circuits as it implements no Intrinsic Gates.
+    /// 
+    public class TrivialSimulator : Tests.TrivialSimulator
+    { }
 }
