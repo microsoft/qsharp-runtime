@@ -6,8 +6,10 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 open System
 open System.Collections.Generic
 open System.IO
+open System.Linq
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
+open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
@@ -35,11 +37,13 @@ type Emitter() =
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
                 | true, outputFolder when outputFolder <> null -> outputFolder
                 | _ -> step.Name
+            let context = CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants)
+
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
                 |> Seq.filter (fun fileName -> not ((fileName.Value |> Path.GetFileName).EndsWith ".dll"))
             for source in allSources do
-                let content = compilation.Namespaces |> SimulationCode.generate source
+                let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
             transformed <- compilation
             true
