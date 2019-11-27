@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.Quantum.RoslynWrapper
 
+open Microsoft.CodeAnalysis
+
 /// <summary>
 /// Use this module to specify the syntax for a <code>class or interface method</code>
 /// </summary>
@@ -63,3 +65,14 @@ module MethodDeclaration =
         |> setModifiers modifiers
         |> setParameterList methodParams
         |> setBodyBlock bodyBlockStatements
+
+    let ``with trivia`` (trivia : SyntaxTrivia) (method : MethodDeclarationSyntax) =
+        let bodyWithTrivia = 
+            method.Body.WithOpenBraceToken(
+                SyntaxFactory.Token(
+                    SyntaxFactory.TriviaList(trivia),
+                    SyntaxKind.OpenBraceToken,
+                    SyntaxFactory.TriviaList()))
+        method.WithBody bodyWithTrivia
+
+
