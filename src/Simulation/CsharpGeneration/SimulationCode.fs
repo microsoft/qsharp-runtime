@@ -1244,11 +1244,14 @@ module SimulationCode =
 
     let isFunction (op:QsCallable) = match op.Kind with | Function -> true | _ -> false
 
-    let buildTestClass (targetName : QsQualifiedName) opName (op : QsCallable) =
-
+    let buildTestClass (testTargets : QsQualifiedName list) (targetName : QsQualifiedName) opName (op : QsCallable) =
+        let className = 
+            let requiresQualification = (testTargets |> List.filter (fun t -> t.Name.Value = targetName.Name.Value)).Length > 1
+            if requiresQualification then sprintf "%s_%s" (targetName.Namespace.Value.Replace('.', '_')) targetName.Name.Value
+            else targetName.Name.Value
         let constructors =
             [
-                ``constructor`` targetName.Name.Value ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
+                ``constructor`` className ``(`` [ (testOutputHandle, ``type`` outputHelperInterface) ] ``)``
                     ``:`` []
                     [``public``]
                     ``{`` 
@@ -1260,14 +1263,13 @@ module SimulationCode =
             ]
 
         let properties = buildOutput ()
-
         let methods =
             [
                 buildUnitTest targetName opName (fst op.Location.Offset) op.SourceFile.Value
             ]
             
 
-        ``class`` targetName.Name.Value ``<<`` [] ``>>``
+        ``class`` className ``<<`` [] ``>>``
             ``:`` None ``,`` [] [``public``]
             ``{``
                 (constructors @ properties @ methods) 
@@ -1280,7 +1282,6 @@ module SimulationCode =
         let opNames = operationDependencies context op
 
         let constructors = [ (buildConstructor context name) ]
-  
         let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames
             
         let baseOp =
@@ -1321,7 +1322,7 @@ module SimulationCode =
         let unitTests =
             [
                 for targetName in testTargets do
-                    buildTestClass targetName name op
+                    buildTestClass testTargets targetName name op
                     :> MemberDeclarationSyntax
             ]
 
