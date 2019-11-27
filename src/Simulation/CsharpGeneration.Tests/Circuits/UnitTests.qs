@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Core {
 namespace Microsoft.Quantum.Diagnostics {
 
     @Attribute()
-    newtype TestOperation = String;
+    newtype Test = String;
 }
 
 namespace Microsoft.Quantum.Tests.UnitTests {
@@ -22,6 +22,10 @@ namespace Microsoft.Quantum.Tests.UnitTests {
     operation UnitTest1 () : Unit {
     }
     
+    @Test("SomeNamespace.CustomSimulator")
+    operation UnitTest2() : Unit {
+	}
+
 }
 
 

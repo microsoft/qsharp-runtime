@@ -1244,7 +1244,7 @@ module SimulationCode =
 
     let isFunction (op:QsCallable) = match op.Kind with | Function -> true | _ -> false
 
-    let buildTestClass attr (targetName : QsQualifiedName) opName (op : QsCallable) =
+    let buildTestClass (targetName : QsQualifiedName) opName (op : QsCallable) =
 
         let constructors =
             [
@@ -1267,13 +1267,11 @@ module SimulationCode =
             ]
             
 
-        ``attributes`` attr (
-            ``class`` targetName.Name.Value ``<<`` [] ``>>``
-                ``:`` None ``,`` [] [``public``]
-                ``{``
-                    (constructors @ properties @ methods) 
-                ``}``
-            )
+        ``class`` targetName.Name.Value ``<<`` [] ``>>``
+            ``:`` None ``,`` [] [``public``]
+            ``{``
+                (constructors @ properties @ methods) 
+            ``}``
 
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
@@ -1317,12 +1315,14 @@ module SimulationCode =
                             let indexOfDot = x.LastIndexOf('.')
                             {Namespace = NonNullable<_>.New(x.Substring(0, indexOfDot)); Name = NonNullable<_>.New(x.Substring(indexOfDot+1))}
                         | str -> {Namespace = defaultTargetNs; Name = NonNullable<_>.New(str)} )
+            |> Seq.sort
             |> Seq.toList
 
         let unitTests =
             [
                 for targetName in testTargets do
-                    buildTestClass attr targetName name op
+                    buildTestClass targetName name op
+                    :> MemberDeclarationSyntax
             ]
 
         let innerClasses = ([ inData |> snd;  outData |> snd ] |> List.choose id) @ unitTests

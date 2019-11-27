@@ -11,7 +11,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     operation QsharpUnitTest() : Unit {
 		Message("Worked!");
 	}
+        
+    @Test("QuantumSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.Tests.TrivialSimulator")
+    operation ArbitraryUnitTestTarget() : Unit {
+		Message("Worked!");
+	}
     
 }
-
 
