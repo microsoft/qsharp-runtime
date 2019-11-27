@@ -1154,7 +1154,7 @@ module SimulationCode =
             :> MemberDeclarationSyntax   
         ]
 
-    let buildUnitTest (targetName : QsQualifiedName) opName opLocation opSourceFile =
+    let buildUnitTest (targetName : QsQualifiedName) opName opStart opSourceFile =
         let sim = ``ident`` "sim"
         let baseSim = ``ident`` "baseSim"
         let disposeSim = ``ident`` "disposeSim"
@@ -1183,7 +1183,7 @@ module SimulationCode =
                 ``{``
                     [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
                 ``}``
-                |> ``with trivia`` (``#lineNr`` opLocation opSourceFile) 
+                |> ``with trivia`` (``#lineNr`` (opStart + 1) opSourceFile) // we need 1-based line numbers here, and opStart is zero-based
             )
 
     let buildDataWrapper context name qsharpType =

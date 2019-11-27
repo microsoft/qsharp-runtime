@@ -3294,7 +3294,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "QuantumSimulator")]
             [Xunit.Trait("Operation", "UnitTest1")]
             public void UnitTest1()
-#line 21 "%%%"
+#line 22 "%%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.QuantumSimulator();
                 if (sim is Common.SimulatorBase baseSim && this.Output != null)
@@ -3326,7 +3326,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "ToffoliSimulator")]
             [Xunit.Trait("Operation", "UnitTest1")]
             public void UnitTest1()
-#line 21 "%%%"
+#line 22 "%%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator();
                 if (sim is Common.SimulatorBase baseSim && this.Output != null)
@@ -3387,7 +3387,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "CustomSimulator")]
             [Xunit.Trait("Operation", "UnitTest2")]
             public void UnitTest2()
-#line 25 "%%%"
+#line 26 "%%%"
             {
                 var sim = new SomeNamespace.CustomSimulator();
                 if (sim is Common.SimulatorBase baseSim && this.Output != null)
