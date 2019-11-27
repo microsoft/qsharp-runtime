@@ -25,6 +25,8 @@ namespace Simulator
     : mutex_ptr(new recursive_mutex_type())
     {}
     
+    virtual ~SimulatorInterface() {}
+    
     virtual std::size_t random(std::size_t n, double* d) =0;
       
     virtual double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<unsigned> qs) =0;
