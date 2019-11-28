@@ -4,9 +4,9 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> Creates a new array
+    /// # Summary
+    /// Creates a new array
     /// of the form [ paulies[i] : i ∈ indices ]
-    /// </summary>
     function PauliArrayByIndex (paulies : Pauli[], indices : Int[]) : Pauli[]
     {
         mutable result = new Pauli[Length(indices)];

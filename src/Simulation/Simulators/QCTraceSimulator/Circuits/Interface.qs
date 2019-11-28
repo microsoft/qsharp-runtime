@@ -3,41 +3,64 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation {
     
-    /// <summary> Controlled-X gate natively supported by the machine </summary>
-    /// <param name="control"> the qubit used to control the application of X gate</param>
-    /// <param name="target"> the qubit to which Pauli X is applied when control qubit is in state |1⟩ </param>
-    /// <remarks> Controlled-X gate with target on qubit 2 and control on qubit 1
+    /// # Summary
+    /// Controlled-X gate natively supported by the machine
+    /// 
+    /// # Input
+    /// ## control
+    /// the qubit used to control the application of X gate
+    /// ## target
+    /// the qubit to which Pauli X is applied when control qubit is in state |1⟩ 
+    /// 
+    /// # Remarks
+    /// Controlled-X gate with target on qubit 2 and control on qubit 1
     /// is C₁X₂ = [ [1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0] ]
-    /// </remarks>
     operation Interface_CX (control : Qubit, target : Qubit) : Unit {
         body intrinsic;
     }
     
-    
-    /// <summary> R gate natively supported by the machine. It is exp(-iφP/2) where P is the Pauli matrix </summary>
-    /// <param name="axis"> Pauli matrix, P </param>
-    /// <param name="angle"> Rotation algle, φ </param>
-    /// <param name="target"> the qubit operation is acting on </param>
+    /// # Summary
+    /// R gate natively supported by the machine. It is exp(-iφP/2) where P is the Pauli matrix
+    /// 
+    /// # Input
+    /// ## axis
+    /// Pauli matrix, P
+    /// ## angle
+    /// Rotation algle, φ
+    /// ## target
+    /// the qubit operation is acting on
     operation Interface_R (axis : Pauli, angle : Double, target : Qubit) : Unit {
         body intrinsic;
     }
     
-    
-    /// <summary> RzFrac gate natively supported by the machine. It is exp(iπkP/2ⁿ) where P is the Pauli matrix </summary>
-    /// <param name="axis"> Pauli matrix, P </param>
-    /// <param name="numerator"> k </param>
-    /// <param name="power"> n </param>
-    /// <param name="target"> the qubit operation is acting on </param>
-    /// <remarks> When power is 3 or less the operation is guaranteed to use S and T and Z gates to perform rotation </remarks>
+    /// # Summary
+    /// RzFrac gate natively supported by the machine. It is exp(iπkP/2ⁿ) where P is the Pauli matrix
+    /// 
+    /// # Input
+    /// ## axis
+    /// Pauli matrix, P
+    /// ## numerator
+    /// k
+    /// ## power
+    /// n
+    /// ## target
+    /// the qubit operation is acting on
+    /// 
+    /// # Remarks
+    /// When power is 3 or less the operation is guaranteed to use S and T and Z gates to perform rotation
     operation Interface_RFrac (axis : Pauli, numerator : Int, power : Int, target : Qubit) : Unit {
         body intrinsic;
     }
     
-    
-    /// <summary> Applies Clifford multiplied by a pauli matrix
-    /// given by 'pauli' to the qubit given by 'target' </summary>
-    /// <param name="cliffordID"> Id of the single qubit unitary to apply. See remarks </param>
-    /// <remarks>
+    /// # Summary
+    /// Applies Clifford multiplied by a pauli matrix
+    /// given by 'pauli' to the qubit given by 'target'
+    /// 
+    /// # Input
+    /// ## cliffordId
+    /// Id of the single qubit unitary to apply. See remarks
+    /// 
+    /// # Remarks
     /// The list of id's corresponding to Cliffords is given by:
     /// Idenity - 0
     /// H - 1
@@ -45,7 +68,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     /// H followed by S ( as circuit ) - 3
     /// S followed by H ( as circuit ) - 4
     /// H S H - 5
-    /// </remarks>
     operation Interface_Clifford (cliffordId : Int, pauli : Pauli, target : Qubit) : Unit {
         body intrinsic;
     }

@@ -3,8 +3,9 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
-    
-    ///<summary> Calls "fail message" when the first argument is True </summary>
+
+    /// # Summary
+    /// Calls "fail message" when the first argument is True
     function FailOn (failIfTrue : Bool, message : String) : Unit
     {
         if (failIfTrue)

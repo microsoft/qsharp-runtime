@@ -13,10 +13,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         return _reducedFormRec(numerator / 2, power - 1);
     }
 
-    /// <summary> returns fraction j/2ᵐ represented as tuple (j,m) equal to k/2ⁿ such that j is odd
-    /// when k is 0, returns (0,0) </summary>
-    /// <param name="numerator"> k </param>
-    /// <param name="power"> n </param>
+    /// # Summary
+    /// returns fraction j/2ᵐ represented as tuple (j,m) equal to k/2ⁿ such that j is odd
+    /// when k is 0, returns (0,0)
+    /// 
+    /// # Input
+    /// ## numerator
+    /// k
+    /// 
+    /// ## power
+    /// n
     function ReducedForm (numerator : Int, power : Int) : (Int, Int)
     {
         if (numerator == 0)
