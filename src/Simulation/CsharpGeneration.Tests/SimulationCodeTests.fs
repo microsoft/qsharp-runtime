@@ -3297,7 +3297,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 #line 22 "%%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.QuantumSimulator();
-                if (sim is Common.SimulatorBase baseSim && this.Output != null)
+                if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
                 {
                     baseSim.OnLog += this.Output.WriteLine;
                 }
@@ -3329,7 +3329,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 #line 22 "%%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator();
-                if (sim is Common.SimulatorBase baseSim && this.Output != null)
+                if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
                 {
                     baseSim.OnLog += this.Output.WriteLine;
                 }
@@ -3390,7 +3390,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 #line 26 "%%%"
             {
                 var sim = new SomeNamespace.CustomSimulator();
-                if (sim is Common.SimulatorBase baseSim && this.Output != null)
+                if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
                 {
                     baseSim.OnLog += this.Output.WriteLine;
                 }
