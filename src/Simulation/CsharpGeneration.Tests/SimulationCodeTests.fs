@@ -3292,7 +3292,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 
             [Xunit.Fact()]
             [Xunit.Trait("Target", "QuantumSimulator")]
-            [Xunit.Trait("Operation", "UnitTest1")]
+            [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
 #line 22 "%%%"
             {
@@ -3324,7 +3324,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 
             [Xunit.Fact()]
             [Xunit.Trait("Target", "ToffoliSimulator")]
-            [Xunit.Trait("Operation", "UnitTest1")]
+            [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
 #line 22 "%%%"
             {
@@ -3385,7 +3385,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
 
             [Xunit.Fact()]
             [Xunit.Trait("Target", "CustomSimulator")]
-            [Xunit.Trait("Operation", "UnitTest2")]
+            [Xunit.Trait("Name", "UnitTest2")]
             public void UnitTest2()
 #line 26 "%%%"
             {
