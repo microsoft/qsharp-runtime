@@ -8,6 +8,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
+    @Test("ResourcesEstimator")
     operation QsharpUnitTest() : Unit {
 		Message("Worked!");
 	}

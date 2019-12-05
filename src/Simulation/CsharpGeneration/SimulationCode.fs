@@ -1177,7 +1177,7 @@ module SimulationCode =
             [
                 ``attribute`` None (``ident`` "Xunit.Fact") [];
                 ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName.Name.Value]
-                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Operation"; ``literal`` opName]
+                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Name"; ``literal`` opName]
             ]
             (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``
