@@ -7,7 +7,7 @@ using Microsoft.Quantum.Simulation.Common;
 namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     /// <summary>
-    /// Dispatccher (Simulator) that redirects all the calls to a class implementing <see cref="IQuantumProcessor"/> interface.
+    /// Dispatcher (Simulator) that redirects all the calls to a class implementing <see cref="IQuantumProcessor"/> interface.
     /// </summary>
     public partial class QuantumProcessorDispatcher : SimulatorBase
     {

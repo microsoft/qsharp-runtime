@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/>. The gate is given by matrix X=((0,1),(1,0)).
+        /// When this is invoked, it is expected that the X gate gets applied to the given <paramref name="qubit"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
         /// When adjoint of X is called in Q#, this same method is called because X is self-adjoint.
@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix X=((0,1),(1,0)).
+        /// When this is invoked, it is expected that the X gate gets applied to the given <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix X=((0,1),(1,0)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled X is called in Q#, this same method is called because X is self-adjoint.
@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
-        /// In Q# the operation applies Y gate to <paramref name="qubit"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
+        /// When this is invoked, it is expected that the Y gate gets applied to the given <paramref name="qubit"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Y is called in Q#, this same method is called because Y is self-adjoint.
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.y">Microsoft.Quantum.Intrinsic.Y</a> is called in Q#.
-        /// In Q# the operation applies X gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
+        /// When this is invoked, it is expected that the Y gate gets applied to the given <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Y=((0,-𝑖),(𝑖,0)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled Y is called in Q#, this same method is called because Y is self-adjoint.
@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
-        /// In Q# the operation applies Z gate to <paramref name="qubit"/>. The gate is given by matrix Z=((1,0),(0,-1)).
+        /// When this is invoked, it is expected that the Z gate gets applied to the given <paramref name="qubit"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Z is called in Q#, this same method is called because Z is self-adjoint.
@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.z">Microsoft.Quantum.Intrinsic.Z</a> is called in Q#.
-        /// In Q# the operation applies Z gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Z=((1,0),(0,-1)).
+        /// When this is invoked, it is expected that the Z gate gets applied to the given <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix Z=((1,0),(0,-1)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled Z is called in Q#, this same method is called because Z is self-adjoint.
@@ -89,7 +89,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
-        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states.
+        /// When this is invoked, it is expected that the gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states gets applied.
         /// </summary>
         /// <remarks>
         /// When adjoint of SWAP is called in Q#, this same method is called because SWAP is self-adjoint.
@@ -101,7 +101,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.swap">Microsoft.Quantum.Intrinsic.SWAP</a> is called in Q#.
-        /// In Q# the operation applies gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states controlled on <paramref name="controls"/>.
+        /// When this is invoked, it is expected that the gate given by rule |ψ⟩⊗|ϕ⟩ ↦ |ϕ⟩⊗|ψ⟩ where |ϕ⟩,|ψ⟩ arbitrary one qubit states gets applied, controlled on <paramref name="controls"/>.
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled SWAP is called in Q#, this same method is called because SWAP is self-adjoint.
@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.h">Microsoft.Quantum.Intrinsic.H</a> is called in Q#.
-        /// In Q# the operation applies Hadamard gate to <paramref name="qubit"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
+        /// When this is invoked, it is expected that the Hadamard gate gets applied to <paramref name="qubit"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
         /// </summary>
         /// <remarks>
         /// When adjoint of H is called in Q#, this same method is called because Hadamard is self-adjoint.
@@ -125,7 +125,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.h">Microsoft.Quantum.Intrinsic.H</a> is called in Q#.
-        /// In Q# the operation applies Hadamard gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
+        /// When this is invoked, it is expected that the Hadamard gate gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix H=((1,1),(1,-1))/√2.
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled H is called in Q#, this same method is called because Hadamard is self-adjoint.
@@ -137,7 +137,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.s">Microsoft.Quantum.Intrinsic.S</a> is called in Q#.
-        /// In Q# the operation applies S gate to <paramref name="qubit"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
+        /// When this is invoked, it is expected that the S gate gets applied to <paramref name="qubit"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
         /// </summary>
         /// <remarks>
         /// When adjoint of S is called in Q#, <see cref="SAdjoint(Qubit)"/> is called.
@@ -148,7 +148,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.s">Microsoft.Quantum.Intrinsic.S</a> is called in Q#.
-        /// In Q# the operation applies S gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
+        /// When this is invoked, it is expected that the S gate gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix S=((1,0),(0,𝑖)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled S is called in Q#, <see cref="ControlledSAdjoint(IQArray{Qubit}, Qubit)"/> is called.
@@ -160,7 +160,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.s">Microsoft.Quantum.Intrinsic.S</a> is called in Q#.
-        /// In Q# the operation applies S† gate to <paramref name="qubit"/>. The gate is given by matrix S†=((1,0),(0,-𝑖)).
+        /// When this is invoked, it is expected that the S† gate gets applied to <paramref name="qubit"/>. The gate is given by matrix S†=((1,0),(0,-𝑖)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Adjoint S is called in Q#, <see cref="S(Qubit)"/> is called.
@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.s">Microsoft.Quantum.Intrinsic.S</a> is called in Q#.
-        /// In Q# the operation applies S† gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix S†=((1,0),(0,𝑖)).
+        /// When this is invoked, it is expected that the S† gate gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix S†=((1,0),(0,𝑖)).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled S† is called in Q#, <see cref="ControlledS(IQArray{Qubit}, Qubit)"/> is called.
@@ -183,7 +183,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
-        /// In Q# the operation applies T gate to <paramref name="qubit"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
+        /// When this is invoked, it is expected that the T gate gets applied to <paramref name="qubit"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
         /// When adjoint of T is called in Q#, <see cref="TAdjoint(Qubit)"/> is called.
@@ -194,7 +194,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
-        /// In Q# the operation applies T gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
+        /// When this is invoked, it is expected that the T gate gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T=((1,0),(0,𝑒𝑥𝑝(𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled T is called in Q#, <see cref="ControlledTAdjoint(IQArray{Qubit}, Qubit)"/> is called.
@@ -206,7 +206,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
-        /// In Q# the operation applies T† gate to <paramref name="qubit"/>. The gate is given by matrix T†=((1,0),(0,𝑒𝑥𝑝(-𝑖⋅π/4))).
+        /// When this is invoked, it is expected that the T† gate gets applied to <paramref name="qubit"/>. The gate is given by matrix T†=((1,0),(0,𝑒𝑥𝑝(-𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
         /// When adjoint of Adjoint T is called in Q#, <see cref="T(Qubit)"/> is called.
@@ -217,7 +217,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled adjoint <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.t">Microsoft.Quantum.Intrinsic.T</a> is called in Q#.
-        /// In Q# the operation applies T† gate to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T†=((1,0),(0,𝑒𝑥𝑝(-𝑖⋅π/4))).
+        /// When this is invoked, it is expected that the T† gate gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>. The gate is given by matrix T†=((1,0),(0,𝑒𝑥𝑝(-𝑖⋅π/4))).
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled T† is called in Q#, <see cref="ControlledT(IQArray{Qubit}, Qubit)"/> is called.
@@ -229,7 +229,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/>.  
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) gets applied to <paramref name="qubit"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of R is called in Q#, <see cref="R(Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -242,7 +242,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(-𝑖⋅<paramref name="theta"/>⋅<paramref name="axis"/>/2) gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled R is called in Q#, <see cref="ControlledR(IQArray{Qubit}, Pauli, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -256,7 +256,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/>.  
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) gets applied to <paramref name="qubit"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of RFrac is called in Q#, <see cref="RFrac(Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -270,7 +270,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.rfrac">Microsoft.Quantum.Intrinsic.RFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="axis"/>/2^<paramref name="power"/>) gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledRFrac(IQArray{Qubit}, Pauli, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -285,7 +285,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1">Microsoft.Quantum.Intrinsic.R1</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/>.  
+        /// When this is invoked, it is expected that the gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) gets applied to <paramref name="qubit"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of R1 is called in Q#, <see cref="R1(double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -297,7 +297,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r">Microsoft.Quantum.Intrinsic.R</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
+        /// When this is invoked, it is expected that the gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>))) gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled R1 is called in Q#, <see cref="ControlledR1(IQArray{Qubit}, double, Qubit)"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -310,7 +310,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/>.  
+        /// When this is invoked, it is expected that the gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) gets applied to <paramref name="qubit"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of R1Frac is called in Q#, <see cref="R1Frac(long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -323,7 +323,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.r1frac">Microsoft.Quantum.Intrinsic.R1Frac</a> is called in Q#.
-        /// In Q# the operation applies gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
+        /// When this is invoked, it is expected that the gate given by matrix ((1,0),(0,𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>/2^<paramref name="power"/>))) gets applied to <paramref name="qubit"/> controlled on <paramref name="controls"/>.
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled RFrac is called in Q#, <see cref="ControlledR1Frac(IQArray{Qubit}, long, long, Qubit)"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -337,7 +337,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/>.  
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) gets applied to <paramref name="qubits"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of Exp is called in Q#, <see cref="Exp(IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -350,7 +350,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when a controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.exp">Microsoft.Quantum.Intrinsic.Exp</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.  
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅<paramref name="theta"/>⋅<paramref name="paulis"/>) gets applied to <paramref name="qubits"/> controlled on <paramref name="controls"/>.  
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled Exp is called in Q#, <see cref="ControlledExp(IQArray{Qubit}, IQArray{Pauli}, double, IQArray{Qubit})"/> is called with <paramref name="theta"/> replaced by -<paramref name="theta"/>.
@@ -364,7 +364,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/>.
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) gets applied to <paramref name="qubits"/>.
         /// </summary>
         /// <remarks>
         /// When adjoint of ExpFrac is called in Q#, <see cref="ExpFrac(IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -378,7 +378,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when controlled <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.expfrac">Microsoft.Quantum.Intrinsic.ExpFrac</a> is called in Q#.
-        /// In Q# the operation applies 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) to <paramref name="qubits"/> controlled on <paramref name="controls"/>.
+        /// When this is invoked, it is expected that the 𝑒𝑥𝑝(𝑖⋅π⋅<paramref name="numerator"/>⋅<paramref name="paulis"/>/2^<paramref name="power"/>) gets applied to <paramref name="qubits"/> controlled on <paramref name="controls"/>.
         /// </summary>
         /// <remarks>
         /// When adjoint of Controlled ExpFrac is called in Q#, <see cref="ControlledExpFrac(IQArray{Qubit}, IQArray{Pauli}, long, long, IQArray{Qubit})"/> is called with <paramref name="numerator"/> replaced by -<paramref name="numerator"/>.
@@ -393,7 +393,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.m">Microsoft.Quantum.Intrinsic.M</a> is called in Q#.
-        /// In Q# the operation measures <paramref name="qubit"/> in Z basis, in other words in the computational basis.
+        /// When this is invoked, it is expected that the <paramref name="qubit"/> is measured in Z basis, in other words in the computational basis.
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
@@ -405,7 +405,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.measure">Microsoft.Quantum.Intrinsic.Measure</a> is called in Q#.
-        /// In Q# the operation measures multi-qubit Pauli observable given by <paramref name="bases"/> on <paramref name="qubits"/>.
+        /// When this is invoked, it is expected that the multi-qubit Pauli observable given by <paramref name="bases"/> is measured on <paramref name="qubits"/>.
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
@@ -418,7 +418,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.reset">Microsoft.Quantum.Intrinsic.Reset</a> is called in Q#.
-        /// In Q# the operation, measures <paramref name="qubit"/> and ensures it is in the |0⟩ state such that it can be safely released.
+        /// When this is invoked, it is expected that the <paramref name="qubit"/> is measured and ensured to be in the |0⟩ state such that it can be safely released.
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters are the same as for the corresponding Q# operation.
@@ -434,7 +434,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <param name="onOne">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.One"/></param>
         /// <remarks>
         /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumProcessor"/> interface.
+        /// The program is executed within the same instance of <see cref="IQuantumProcessor"/> interface.
         /// </remarks>
         void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
 
@@ -447,7 +447,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
         /// <remarks>
         /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed with the same instance of <see cref="IQuantumProcessor"/> interface.
+        /// The program is executed within the same instance of <see cref="IQuantumProcessor"/> interface.
         /// </remarks>
         void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
 
