@@ -26,11 +26,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         }        
     }
     
-    
-    /// <summary> Performs exp( i φ P₁ ⊗ … ⊗ Pₙ ) </summary>
-    /// <param name="pauli"> P₁,...,Pₙ </param>
-    /// <param name="angle"> φ </param>
-    /// <param name="target"> Array of qubits on which exponent acts </param>
+    /// # Summary
+    /// Performs exp( i φ P₁ ⊗ … ⊗ Pₙ )
+    /// 
+    /// # Input
+    /// ## pauli
+    /// P₁,...,Pₙ
+    /// ## angle
+    /// φ
+    /// ## target
+    /// Array of qubits on which exponent acts
     operation Exp (pauli : Pauli[], angle : Double, target : Qubit[]) : Unit
     is Adj + Ctl
     {
