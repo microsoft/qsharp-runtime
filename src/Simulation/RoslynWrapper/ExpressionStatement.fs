@@ -11,6 +11,16 @@ module Expressions =
     let (<--) target source =
          SyntaxFactory.AssignmentExpression (SyntaxKind.SimpleAssignmentExpression, target, source)
 
+    // left += right
+    let (<+=>) left right =         
+        SyntaxFactory.AssignmentExpression(SyntaxKind.AddAssignmentExpression, left, right)
+        |> SyntaxFactory.ExpressionStatement
+
+    // left -= right
+    let (<-=>) left right =         
+        SyntaxFactory.AssignmentExpression(SyntaxKind.SubtractAssignmentExpression, left, right)
+        |> SyntaxFactory.ExpressionStatement
+
     // (targetType) expression        
     let ``cast`` targetType expression = 
         SyntaxFactory.CastExpression (ident targetType, expression) :> ExpressionSyntax
@@ -198,6 +208,12 @@ module Expressions =
         SyntaxFactory.BinaryExpression (SyntaxKind.IsExpression, expression, ident targetType)
         :> ExpressionSyntax
 
+    // expr is target var
+    let ``is assign`` targetType (targetAssign : IdentifierNameSyntax) expression =
+        let assign = SyntaxFactory.SingleVariableDesignation targetAssign.Identifier
+        SyntaxFactory.IsPatternExpression (expression, SyntaxFactory.DeclarationPattern ((``ident`` targetType), assign))
+        :> ExpressionSyntax
+
     // ( expr )
     let ``))`` = None
     let ``((`` expr ``))`` = 
@@ -209,10 +225,13 @@ module Expressions =
         [("//" + comment |> SyntaxFactory.Comment); (SyntaxFactory.EndOfLine "")] @ (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
         |> node.WithLeadingTrivia
 
+    // #line trivia
+    let ``#lineNr`` (lineNumber : int) (file : string) =
+        SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(lineNumber), SyntaxFactory.Literal(file), true))
+        
     // #line
     let ``#line`` (lineNumber : int) (file : string) node =
-        SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(lineNumber), SyntaxFactory.Literal(file), true))
-        :: (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
+        ``#lineNr`` lineNumber file :: (List.ofSeq ((node :> SyntaxNode).GetLeadingTrivia()))
         |> node.WithLeadingTrivia
         
     // #line hidden

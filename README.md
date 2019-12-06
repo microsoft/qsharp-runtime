@@ -37,10 +37,10 @@ To build on Windows:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2017 or later](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
+    * Install [Visual Studio 2019 (vesrion 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
-        * **.NET Core cross-platform development**
-2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2017`.
+        * **.NET Core 3 cross-platform development**
+2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2019`.
     * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
 3. Open and build the [`Simulation.sln`](./Simulation.sln) solution in Visual Studio.
@@ -54,7 +54,7 @@ To build on other platforms:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [.NET Core SDK](https://dotnet.microsoft.com/download)
+    * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
 2. Run [bootstrap.sh](./bootstrap.sh)
     * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
