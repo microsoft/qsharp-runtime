@@ -244,6 +244,8 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public static SourceLinkInfo GetSourceLinkInfo(string pdbLocation)
         {
+            if (pdbLocation == null) return null;
+
             if (_cache == null)
             {
                 _cache = new Dictionary<string, SourceLinkInfo>();
@@ -327,6 +329,8 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public static Dictionary<string, CompressedSourceFile> GetEmbeddedFiles(string pdbLocation)
         {
+            if (pdbLocation == null) return null;
+
             if (_cache == null)
             {
                 _cache = new Dictionary<string, Dictionary<string, CompressedSourceFile>>();
