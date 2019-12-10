@@ -70,8 +70,8 @@ namespace Microsoft.Quantum.Math {
     function Floor (value : Double) : Int {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the remainder resulting from the division of a specified number by another specified number.
     ///
@@ -80,8 +80,8 @@ namespace Microsoft.Quantum.Math {
     function IEEERemainder (x : Double, y : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the natural (base $e$) logarithm of a specified number.
     ///
@@ -90,8 +90,8 @@ namespace Microsoft.Quantum.Math {
     function Log (input : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the base 10 logarithm of a specified number.
     ///
@@ -100,8 +100,8 @@ namespace Microsoft.Quantum.Math {
     function Log10 (input : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
@@ -110,8 +110,8 @@ namespace Microsoft.Quantum.Math {
     function MaxD (a : Double, b : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
@@ -120,8 +120,8 @@ namespace Microsoft.Quantum.Math {
     function MaxI (a : Int, b : Int) : Int {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
@@ -130,8 +130,8 @@ namespace Microsoft.Quantum.Math {
     function MaxL (a : BigInt, b : BigInt) : BigInt {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
@@ -140,8 +140,8 @@ namespace Microsoft.Quantum.Math {
     function MinD (a : Double, b : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
@@ -150,8 +150,8 @@ namespace Microsoft.Quantum.Math {
     function MinI (a : Int, b : Int) : Int {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
@@ -160,8 +160,8 @@ namespace Microsoft.Quantum.Math {
     function MinL(a : BigInt, b : BigInt) : BigInt {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Performs modular division on a number raised to the power of another number.
     ///
@@ -179,10 +179,10 @@ namespace Microsoft.Quantum.Math {
     function PowD (x : Double, y : Double) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
-    /// Rounds a value to the nearest integer or to the specified number of fractional digits.
+    /// Rounds a value to the nearest integer.
     ///
     /// # Remarks
     /// See [System.Math.Round](https://docs.microsoft.com/dotnet/api/system.math.round) for more details.
@@ -198,8 +198,8 @@ namespace Microsoft.Quantum.Math {
     function SignD (a : Double) : Int {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns an integer that indicates the sign of a number.
     ///
@@ -208,8 +208,8 @@ namespace Microsoft.Quantum.Math {
     function SignI (a : Int) : Int {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Returns an integer that indicates the sign of a number.
     ///
