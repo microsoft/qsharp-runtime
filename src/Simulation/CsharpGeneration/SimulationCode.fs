@@ -1162,7 +1162,7 @@ module SimulationCode =
         let ``sim.OnLog`` = baseSim <|.|> ``ident`` "OnLog"
         let Run = generic "Run" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
 
-        let simCond = sim |> ``is assign`` "Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
+        let simCond = sim |> ``is assign`` "Microsoft.Quantum.Simulation.Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
 
         let getSimulator = ``var`` "sim" (``:=`` <| ``new`` (``ident`` <| targetName.ToString()) ``(`` [] ``)``)
         let assignLogEvent =
@@ -1177,7 +1177,7 @@ module SimulationCode =
             [
                 ``attribute`` None (``ident`` "Xunit.Fact") [];
                 ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Target"; ``literal`` targetName.Name.Value]
-                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Operation"; ``literal`` opName]
+                ``attribute`` None (``ident`` "Xunit.Trait") [``literal`` "Name"; ``literal`` opName]
             ]
             (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``

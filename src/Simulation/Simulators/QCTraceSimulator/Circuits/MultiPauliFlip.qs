@@ -4,10 +4,16 @@
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
     
-    /// <summary> Applies Clifford that maps Zₖ to P₁ ⊗ … ⊗ Pₙ by conjugation </summary>
-    /// <param name = "paulis">  P₁ , … , Pₙ </param>
-    /// <param name = "k"> k above, number of qubit in array of target qubits on which Z operator acts </param>
-    /// <param name = "target"> Qubits to which apply the Clifford </param>
+    /// # Summary
+    /// Applies Clifford that maps Zₖ to P₁ ⊗ … ⊗ Pₙ by conjugation
+    /// 
+    /// # Input
+    /// ## paulis
+    /// P₁ , … , Pₙ
+    /// ## target
+    /// Qubits to which apply the Clifford
+    /// ## k
+    /// k above, number of qubit in array of target qubits on which Z operator acts
     operation MultiPauliFlip (paulis : Pauli[], target : Qubit[], k : Int) : Unit
     is Adj
     {

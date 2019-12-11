@@ -3,9 +3,10 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
-    
-    /// <summary> Applies a Clifford unitary that maps by conjugation Pauli Z
-    /// to Pauli given by 'basis' argument. The unitary is applied to the qubit given by 'target' argument </summary>
+
+    /// # Summary
+    /// Applies a Clifford unitary that maps by conjugation Pauli Z
+    /// to Pauli given by 'basis' argument. The unitary is applied to the qubit given by 'target' argument
     operation PauliZFlip (basis : Pauli, target : Qubit) : Unit
     is Adj {
 
