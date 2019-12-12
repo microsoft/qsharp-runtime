@@ -832,7 +832,9 @@ module SimulationCode =
 
         override this.beforeSpecialization (sp : QsSpecialization) = 
             count <- 0
-            this._Scope.SetStartLine (Some (sp.Location.Offset |> fst))
+            match sp.Location with 
+            | Value location -> this._Scope.SetStartLine (Some (location.Offset |> fst))
+            | Null -> this._Scope.SetStartLine None // TODO: we may need to have the means to know which original declaration the code came from
             sp
     
     let operationDependencies context (od:QsCallable) =
@@ -962,22 +964,26 @@ module SimulationCode =
             | QsControlled        -> "Controlled"
             | QsControlledAdjoint -> "ControlledAdjoint"
         let body = (buildSpecializationBody context sp)
-        let attribute = 
-            // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
-            let startLine = fst sp.Location.Offset + 1
-            let endLine = 
-                match context.declarationPositions.TryGetValue sp.SourceFile with 
-                | true, startPositions -> 
-                    let index = startPositions.IndexOf sp.Location.Offset
-                    if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
-//TODO: diagnostics.
-                | false, _ -> startLine
-            ``attribute`` None (``ident`` "SourceLocation") [ 
-                ``literal`` sp.SourceFile.Value 
-                ``ident`` "OperationFunctor" <|.|> ``ident`` bodyName 
-                ``literal`` startLine 
-                ``literal`` endLine
-            ]
+        let attributes =
+            match sp.Location with 
+            | Null -> []
+            | Value location -> [
+                // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
+                let startLine = fst location.Offset + 1
+                let endLine = 
+                    match context.declarationPositions.TryGetValue sp.SourceFile with 
+                    | true, startPositions -> 
+                        let index = startPositions.IndexOf location.Offset
+                        if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
+    //TODO: diagnostics.
+                    | false, _ -> startLine
+                ``attribute`` None (``ident`` "SourceLocation") [ 
+                    ``literal`` sp.SourceFile.Value 
+                    ``ident`` "OperationFunctor" <|.|> ``ident`` bodyName 
+                    ``literal`` startLine 
+                    ``literal`` endLine
+                ]
+        ]
 
         match body with 
         | Some body ->
@@ -986,7 +992,7 @@ module SimulationCode =
                 ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
                     (``=>`` body)
-            Some (impl, attribute)
+            Some (impl, attributes)
         | None ->
             None        
 
@@ -1264,9 +1270,10 @@ module SimulationCode =
 
         let properties = buildOutput ()
         let methods =
-            [
-                buildUnitTest targetName opName (fst op.Location.Offset) op.SourceFile.Value
-            ]
+            match op.Location with 
+            | Value location -> [ buildUnitTest targetName opName (fst location.Offset) op.SourceFile.Value ]
+// TODO: diagnostics
+            | Null -> failwith "missing location for unit test"
             
 
         ``class`` className ``<<`` [] ``>>``
@@ -1335,7 +1342,7 @@ module SimulationCode =
             else
                 [``public``; ``partial`` ]
 
-        ``attributes`` attr (
+        ``attributes`` (attr |> List.concat) (
             ``class`` name ``<<`` typeParameters ``>>``
                 ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
                 ``{``
