@@ -34,10 +34,12 @@ type internal DeclarationPositions() =
         currentSource <- file.Value
         file
 
-    override this.onLocation (loc : QsLocation) = 
-        if currentSource <> null then
-            declarationLocations.Add (NonNullable<string>.New currentSource, loc.Offset)
-        loc
+    override this.onLocation sourceLocation = 
+        match sourceLocation with 
+        | Value (loc : QsLocation) when currentSource <> null -> 
+            declarationLocations.Add (NonNullable<string>.New currentSource, loc.Offset) 
+        | _ -> ()
+        sourceLocation
 
 
 type CodegenContext = { 
