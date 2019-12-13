@@ -428,28 +428,81 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Intended for a limited support of branching upon measurement results on a target machine level.
-        /// </summary>
-        /// <param name="measurementResult">The result of the measurement upon which branching is to be performed.</param>
-        /// <param name="onZero">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/></param>
-        /// <param name="onOne">Corresponds to quantum program that must be executed if <paramref name="measurementResult"/> result is <see cref="ResultValue.One"/></param>
-        /// <remarks>
-        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResult"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed within the same instance of <see cref="IQuantumProcessor"/> interface.
-        /// </remarks>
-        void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne);
-
-        /// <summary>
-        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when a conditional statement on measurement results is invoked.
         /// </summary>
         /// <param name="measurementResults">The actual results of the measurements of a number of qubits upon which branching is to be performed.</param>
         /// <param name="resultsValues">The expected values of results of the measurements of these qubits.</param>
-        /// <param name="equalOp">Corresponds to quantum program that must be executed if all <paramref name="measurementResults"/> values are equal to corresponding <paramref name="resultsValues"/></param>
-        /// <param name="nonEqualOp">Corresponds to quantum program that must be executed if at least one of the <paramref name="measurementResults"/> values is not equal to a corresponding <paramref name="resultsValues"/></param>
+        /// <returns> A value representing this conditional statement and encoding the result of condition.</returns>
         /// <remarks>
-        /// Calling <c>onZero()</c> will result in the execution of quantum program that Q# user intends to execute if <paramref name="measurementResults"/> result is <see cref="ResultValue.Zero"/>.
-        /// The program is executed within the same instance of <see cref="IQuantumProcessor"/> interface.
+        /// A typical implementation will compare all <paramref name="measurementResults"/> to <paramref name="resultsValues"/> and return the result of this comparison.
         /// </remarks>
-        void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp);
+        int StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when a conditional statement on a measurement result is invoked.
+        /// </summary>
+        /// <param name="measurementResult">The actual result of the measurement of a qubit upon which branching is to be performed.</param>
+        /// <param name="resultValue">The expected value of result of the measurement of this qubit.</param>
+        /// <returns> A value representing this conditional statement and encoding the result of condition.</returns>
+        /// <remarks>
+        /// A typical implementation will compare <paramref name="measurementResult"/> to <paramref name="resultValue"/> and return the result of this comparison.
+        /// </remarks>
+        int StartConditionalStatement(Result measurementResult, Result resultValue);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when the "then" statement of a conditional statement is about to be executed.
+        /// </summary>
+        /// <param name="statement">A value representing this conditional statement and encoding the result of condition.</param>
+        /// <returns> If true is returned, the "then" statement will be executed, otherwise it will be skipped and RepeatThenClause will not be called.</returns>
+        /// <remarks>
+        /// A typical implementation will use <paramref name="statement"/> to return whether condition was evaluated to true.
+        /// </remarks>
+        bool RunThenClause(int statement);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when the "then" statement of a conditional statement has finished executing.
+        /// </summary>
+        /// <param name="statement">A value representing this conditional statement and encoding the result of condition.</param>
+        /// <returns> If true is returned, the "then" statement will be executed again (without calling RunThenClause), folowed by another call to RepeatThenClause.</returns>
+        /// <remarks>
+        /// A typical implementation will return false.
+        /// </remarks>
+        bool RepeatThenClause(int statement);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when the "else" statement of a conditional statement is about to be executed.
+        /// </summary>
+        /// <param name="statement">A value representing this conditional statement and encoding the result of condition.</param>
+        /// <returns> If true is returned, the "else" statement will be executed, otherwise it will be skipped and RepeatElseClause will not be called.</returns>
+        /// <remarks>
+        /// A typical implementation will use <paramref name="statement"/> to return whether condition was evaluated to false.
+        /// </remarks>
+        bool RunElseClause(int statement);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when the "else" statement of a conditional statement has finished executing.
+        /// </summary>
+        /// <param name="statement">A value representing this conditional statement and encoding the result of condition.</param>
+        /// <returns> If true is returned, the "else" statement will be executed again (without calling RunElseClause), folowed by another call to RepeatElseClause.</returns>
+        /// <remarks>
+        /// A typical implementation will return false.
+        /// </remarks>
+        bool RepeatElseClause(int statement);
+
+        /// <summary>
+        /// Intended for a limited support of branching upon measurement results on a target machine level.
+        /// Called when a conditional statement on measurement results has finished executing.
+        /// </summary>
+        /// <param name="statement">A value representing this conditional statement and encoding the result of condition.</param>
+        /// <remarks>
+        /// A typical implementation will clean up any data structures associated with statement.
+        /// </remarks>
+        void EndConditionalStatement(int statement);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assert">Microsoft.Quantum.Intrinsic.Assert</a> is called in Q#.

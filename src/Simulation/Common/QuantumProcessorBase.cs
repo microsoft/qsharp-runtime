@@ -21,40 +21,58 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
-        public virtual void ClassicallyControlled(Result measurementResult, Action onZero, Action onOne)
-        {
-            if (measurementResult == Result.Zero)
-            {
-                onZero();
-            }
-            else
-            {
-                onOne();
-            }
-        }
-
-        public virtual void ClassicallyControlled(IQArray<Result> measurementResults, IQArray<Result> resultsValues, Action equalOp, Action nonEqualOp)
+        public virtual int StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
         {
             Debug.Assert(measurementResults.Count == resultsValues.Count);
 
-            bool equal = true;
+            int equal = 1;
 
             for (int i = 0; i < measurementResults.Count; i++)
             {
                 if (measurementResults[i] != resultsValues[i])
                 {
-                    equal = false;
+                    equal = 0;
                 }
             }
 
-            if (equal)
+            return equal;
+        }
+
+        public virtual int StartConditionalStatement(Result measurementResult, Result resultValue)
+        {
+
+            if (measurementResult == resultValue)
             {
-                equalOp();
-            }
-            else
+                return 1;
+            } else
             {
-                nonEqualOp();
+                return 0;
             }
+        }
+
+        public virtual bool RunThenClause(int statement)
+        {
+            return (statement != 0);
+        }
+
+        public virtual bool RepeatThenClause(int statement)
+        {
+            return false;
+        }
+
+        public virtual bool RunElseClause(int statement)
+        {
+            return (statement == 0);
+        }
+
+        public virtual bool RepeatElseClause(int statement)
+        {
+            return false;
+        }
+
+        public virtual void EndConditionalStatement(int id)
+        {
+
         }
 
         public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
