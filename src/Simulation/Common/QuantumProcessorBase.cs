@@ -178,7 +178,7 @@ namespace Microsoft.Quantum.Simulation.Common
             throw new NotImplementedException();
         }
 
-        public virtual int StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
+        public virtual long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
         {
             Debug.Assert(measurementResults.Count == resultsValues.Count);
 
@@ -195,39 +195,40 @@ namespace Microsoft.Quantum.Simulation.Common
             return equal;
         }
 
-        public virtual int StartConditionalStatement(Result measurementResult, Result resultValue)
+        public virtual long StartConditionalStatement(Result measurementResult, Result resultValue)
         {
 
             if (measurementResult == resultValue)
             {
                 return 1;
-            } else
+            } 
+            else
             {
                 return 0;
             }
         }
 
-        public virtual bool RunThenClause(int statement)
+        public virtual bool RunThenClause(long statement)
         {
             return (statement != 0);
         }
 
-        public virtual bool RepeatThenClause(int statement)
+        public virtual bool RepeatThenClause(long statement)
         {
             return false;
         }
 
-        public virtual bool RunElseClause(int statement)
+        public virtual bool RunElseClause(long statement)
         {
             return (statement == 0);
         }
 
-        public virtual bool RepeatElseClause(int statement)
+        public virtual bool RepeatElseClause(long statement)
         {
             return false;
         }
 
-        public virtual void EndConditionalStatement(int id)
+        public virtual void EndConditionalStatement(long id)
         {
 
         }
