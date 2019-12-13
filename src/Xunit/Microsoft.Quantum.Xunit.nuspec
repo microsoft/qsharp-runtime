@@ -21,7 +21,7 @@
 
     <dependencies>
       <dependency id="xunit" version="2.3.1" />
-      <dependency id="Microsoft.Quantum.Development.Kit" version="0.10.1912.1303-beta" />
+      <dependency id="Microsoft.Quantum.Development.Kit" version="0.10.1912.1304-beta" />
     </dependencies>
   </metadata>
 
