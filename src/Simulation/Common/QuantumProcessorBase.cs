@@ -13,12 +13,169 @@ namespace Microsoft.Quantum.Simulation.Common
     /// </summary>
     public class QuantumProcessorBase : IQuantumProcessor 
     {
-        public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
+        public virtual void X(Qubit qubit)
         {
+            throw new NotImplementedException();
         }
 
-        public virtual void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
+        public virtual void ControlledX(IQArray<Qubit> controls, Qubit qubit)
         {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Y(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledY(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Z(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void SWAP(Qubit qubit1, Qubit qubit2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void H(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledH(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void S(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledS(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void SAdjoint(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void T(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledT(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void TAdjoint(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void R(Pauli axis, double theta, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void R1(double theta, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void R1Frac(long numerator, long power, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Result M(Qubit qubit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Reset(Qubit qubit)
+        {
+            throw new NotImplementedException();
         }
 
         public virtual int StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
@@ -75,111 +232,39 @@ namespace Microsoft.Quantum.Simulation.Common
 
         }
 
-        public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
+        public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
         {
-            throw new NotImplementedException();
         }
 
-        public virtual void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
+        public virtual void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
         {
-            throw new NotImplementedException();
         }
 
-        public virtual void ControlledH(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void OnOperationStart(ICallable operation, IApplyData arguments)
         {
-            throw new NotImplementedException();
         }
 
-        public virtual void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
+        public virtual void OnOperationEnd(ICallable operation, IApplyData arguments)
         {
-            throw new NotImplementedException();
         }
 
-        public virtual void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
+        public virtual void OnFail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionDispatchInfo)
         {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledS(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledT(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledX(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledY(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void H(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Result M(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
         }
 
         public virtual void OnAllocateQubits(IQArray<Qubit> qubits)
         {
         }
 
+        public virtual void OnReleaseQubits(IQArray<Qubit> qubits)
+        {
+        }
+
         public virtual void OnBorrowQubits(IQArray<Qubit> qubits)
+        {
+        }
+
+        public virtual void OnReturnQubits(IQArray<Qubit> qubits)
         {
         }
 
@@ -195,89 +280,5 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
-        public virtual void OnOperationEnd(ICallable operation, IApplyData arguments)
-        {
-        }
-
-        public virtual void OnOperationStart(ICallable operation, IApplyData arguments)
-        {
-        }
-
-        public virtual void OnFail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionDispatchInfo)
-        {
-        }
-
-        public virtual void OnReleaseQubits(IQArray<Qubit> qubits)
-        {
-        }
-
-        public virtual void OnReturnQubits(IQArray<Qubit> qubits)
-        {
-        }
-
-        public virtual void R(Pauli axis, double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void R1(double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void R1Frac(long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Reset(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void S(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void SAdjoint(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void SWAP(Qubit qubit1, Qubit qubit2)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void T(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void TAdjoint(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void X(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Y(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Z(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
