@@ -33,7 +33,7 @@ type Emitter() =
         member this.Transformation (compilation, transformed) = 
             let step = this :> IRewriteStep
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
-                | true, outputFolder when outputFolder <> null -> outputFolder
+                | true, outputFolder when outputFolder <> null -> Path.Combine(outputFolder, "src")
                 | _ -> step.Name
             let context = CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants)
 

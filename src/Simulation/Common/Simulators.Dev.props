@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
   <PropertyGroup>
-    <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\))</EnlistmentRoot>
-    <RunQsc>True</RunQsc>
-    <RunQDocGen>False</RunQDocGen>
+    <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/))</NativeBuildPath>
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
     <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>
@@ -12,23 +11,7 @@
     <QSimDll Condition="Exists('$(QsimDllLinux)')">$(QsimDllLinux)</QSimDll>
     <QSimDll Condition="Exists('$(QsimDllWindows)')">$(QsimDllWindows)</QSimDll>
     <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindows)</QSimDll>
-    <QscExe>dotnet $([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/CsharpGeneration.App/bin/$(Configuration)/netcoreapp3.0/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
-    <LangVersion>latest</LangVersion>
-    <QsharpLangVersion>0.10</QsharpLangVersion>
-    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)QSharp.ProjectItemsSchema.xaml;" />
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)QSharp.xaml;">
-      <Context>File;BrowseObject</Context>
-    </PropertyPageSchema>
-  </ItemGroup>
-
-  <ItemGroup>
-    <QsharpCompile Include="**/*.qs" Exclude="obj/**" />
-  </ItemGroup>
   
   <ItemGroup>
     <None Include="$(QSimDll)">
@@ -45,4 +28,11 @@
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" Condition=" '$([MSBuild]::NormalizePath($(EnlistmentRoot)src\Simulation\Simulators))' != '$(MSBuildProjectDirectory)'"  />
   </ItemGroup>
+
+  <Target Name="AfterQsharpCompile" AfterTargets="QsharpCompile" BeforeTargets="BeforeCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+
 </Project>

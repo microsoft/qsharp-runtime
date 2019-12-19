@@ -1,22 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.10.1912.1906-alpha">
+
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
-    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <QsharpDocsGeneration>true</QsharpDocsGeneration>
+    <CsharpGeneration>false</CsharpGeneration> <!-- we will provide our own -->
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <QscExe Condition="'$(QscExe)' == ''">dotnet $([MSBuild]::NormalizePath($(MSBuildThisFileDirectory)../CsharpGeneration.App/bin/$(Configuration)/netcoreapp3.0/Microsoft.Quantum.CsharpGeneration.App.dll))</QscExe>
-    <RunQsc>True</RunQsc>
-    <RunQDocGen>True</RunQDocGen>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <QsharpCompile Include="**\*.qs" Exclude="obj\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
@@ -24,7 +16,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
+    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
   </ItemGroup>
 
-  <Import Project="..\..\..\build\Props\QSharp.targets" />
+  <Target Name="AfterQsharpCompile" AfterTargets="QsharpCompile" BeforeTargets="BeforeCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>  
+
 </Project>
+
