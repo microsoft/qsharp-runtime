@@ -59,7 +59,6 @@ To build on other platforms:
     * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
 3. From the command line, run these two commands:
-    * `dotnet publish src/Simulation/CsharpGeneration.App`
     * `dotnet build Simulation.sln`
 
 The `Simulation.sln` solution does not include the full-state simulator. To integrate any changes with the rest of the simulation components, you need to manually build it using `make` in the `src\Simulation\Native\build` folder.
