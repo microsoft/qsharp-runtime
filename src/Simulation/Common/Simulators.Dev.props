@@ -29,7 +29,7 @@
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" Condition=" '$([MSBuild]::NormalizePath($(EnlistmentRoot)src\Simulation\Simulators))' != '$(MSBuildProjectDirectory)'"  />
   </ItemGroup>
 
-  <Target Name="AfterQsharpCompile" AfterTargets="QsharpCompile" BeforeTargets="BeforeCompile">
+  <Target Name="BeforeCsharpCompile">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>
