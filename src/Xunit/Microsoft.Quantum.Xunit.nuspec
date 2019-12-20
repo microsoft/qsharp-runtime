@@ -20,8 +20,7 @@
     <tags>Quantum Q# Qsharp test xunit</tags>
 
     <dependencies>
-      <dependency id="xunit" version="2.3.1" />
-      <dependency id="Microsoft.Quantum.Development.Kit" version="$version$" />
+      <dependency id="xunit" version="2.4.1" />
     </dependencies>
   </metadata>
 
