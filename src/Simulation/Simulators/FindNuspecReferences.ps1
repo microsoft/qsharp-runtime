@@ -63,10 +63,10 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
     }
 }
 
+# Find all dependencies on Microsoft.Quantum.Runtime.Core.csproj
+Add-NuGetDependencyFromCsprojToNuspec "..\Core\Microsoft.Quantum.Runtime.Core.csproj" $dep
 # Find all dependencies on Microsoft.Quantum.Simulators.csproj
 Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.csproj" $dep
-# Find all dependencies on Microsoft.Quantum.Simulation.Core.csproj
-Add-NuGetDependencyFromCsprojToNuspec "..\Core\Microsoft.Quantum.Simulation.Core.csproj" $dep
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)
