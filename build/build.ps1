@@ -34,8 +34,6 @@ function Build-One {
     }
 }
 
-Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
-
 Build-One 'build' '../Simulation.sln'
 
 if (-not $all_ok) 
