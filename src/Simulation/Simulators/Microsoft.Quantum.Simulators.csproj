@@ -11,6 +11,7 @@
     <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <NuspecFile>Microsoft.Quantum.Simulators.nuspec</NuspecFile>
+    <NuspecProperties>version=$(Version)</NuspecProperties>
   </PropertyGroup>
 
   <ItemGroup>
