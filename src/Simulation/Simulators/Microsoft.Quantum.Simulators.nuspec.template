@@ -25,8 +25,8 @@
     <file src="..\Native\linux\*" target="runtimes\linux-x64\native" exclude="**\*.pdb" />
     <file src="..\Native\win10\*" target="runtimes\win-x64\native" exclude="**\*.pdb" />
     <file src="..\Native\build\$Configuration$\Microsoft.Quantum.*" target="runtimes\win-x64\native" exclude="**\*.pdb" />
+    <file src="..\Native\build\$Configuration$\Microsoft.Quantum.*.pdb" target="runtimes\win-x64\native" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
-    <file src="..\Native\build\$Configuration$\Microsoft.Quantum.*.pdb" target="runtimes\win-x64\native" />
   </files>
 </package>
