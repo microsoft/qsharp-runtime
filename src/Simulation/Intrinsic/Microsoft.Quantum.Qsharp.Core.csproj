@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true">
+    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true">
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
