@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-    <ProjectReference Include="..\Intrinsic\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>
