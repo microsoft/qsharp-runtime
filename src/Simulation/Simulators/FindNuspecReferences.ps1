@@ -35,21 +35,27 @@ function Add-PackageReference-IfNew($ref)
 {
     # Identify package's id either from "Include" or "Update" attribute:
     $id = $ref.Include
+    $version = $ref.Version
+    
+    if ($id -eq $null -or $id -eq "") {
+        $id = $ref.Update
+    }
     if ($id.EndsWith('.csproj') -or $id.EndsWith('.fsproj')) 
     {
         $id = [System.IO.Path]::GetFileNameWithoutExtension($id)
     }
-    if ($id -eq $null -or $id -eq "") {
-        $id = $ref.Update
+
+    if ($version -eq $null -or $version -eq "") {
+        $version = '$version$'
     }
 
     # Check if package already added as dependency, only add if new:
     $added = $dep.dependency | Where { $_.id -eq $id }
     if (!$added) {
-        Write-Host "Adding $id"
+        Write-Host "Adding $id (version: $version)"
         $onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
         $onedependency.SetAttribute('id', $id)
-        $onedependency.SetAttribute('version', $_.Version)
+        $onedependency.SetAttribute('version', $version)
     }
 }
 
