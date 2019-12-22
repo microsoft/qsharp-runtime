@@ -3,17 +3,17 @@
 
 ########################################
 # When creating a package with dotnet pack, nuget changes every ProjectReference to be itself
-# a PackageReference (without cheking if that project has a corresponding package).
-# This is problematic because we currently don't want to create a package for every dll 
-# in the compiler.
+# a PackageReference (without checking if that project has a corresponding package).
+# This is problematic because we currently don't want to create a package for every dll.
+#
 # On the other hand, when creating a package using nuget pack, nuget does not
-# identifies PackageReferences defined in the csproj, so all the dependencies (like
-# FParsec or F#) are not listed and the package doesn't work.
+# identifies PackageReferences defined in the csproj, so all the dependencies
+# are not listed and the package doesn't work.
 #
 # We don't want to hardcode the list of dependencies on the .nuspec, as they can
 # quickly become out-of-sync.
-# This script will find the PackageReferences recursively on the QsCompiler project and add them
-# to its nuspec, so we can then create the package using nuget pack with the corresponding
+# This script will find the PackageReferences recursively on the simulation projects and add them
+# to the nuspec, so we can then create the package using nuget pack with the corresponding
 # dependencies listed.
 #
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
@@ -66,7 +66,7 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
 Add-NuGetDependencyFromCsprojToNuspec "../Common/Microsoft.Quantum.Simulation.Common.csproj" $dep
 Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" $dep
-Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.csproj" $dep
+Add-NuGetDependencyFromCsprojToNuspec "../Simulators.Implementation/Microsoft.Quantum.Simulators.Implementation.csproj" $dep
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)
