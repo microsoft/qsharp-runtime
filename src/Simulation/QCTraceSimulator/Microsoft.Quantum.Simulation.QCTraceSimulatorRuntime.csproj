@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-    <ProjectReference Include="..\Common\Microsoft.Quantum.Simulation.Common.csproj" />
+    <ProjectReference Include="..\Common\Microsoft.Quantum.Simulation.Common.csproj" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

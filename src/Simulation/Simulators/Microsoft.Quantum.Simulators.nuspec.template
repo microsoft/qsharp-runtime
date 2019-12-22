@@ -18,11 +18,6 @@
 
     <copyright>$copyright$</copyright>
     <tags>Quantum Q# Qsharp </tags>
-
-    <dependencies>
-      <dependency id="Microsoft.Quantum.Runtime.Core" version="$version$" />
-      <dependency id="Microsoft.Quantum.QSharp.Core" version="$version$" />
-    </dependencies>
   </metadata>
 
   <files>
