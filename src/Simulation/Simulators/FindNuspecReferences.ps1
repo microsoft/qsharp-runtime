@@ -82,13 +82,13 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
         Write-Host "Detected project dependencies: $id"
     }
 
-    # Assume there is a package for non-private project references:
-    $projectDependency | Where-Object {$_.PrivateAssets -ne 'All' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
+    # Assume there is a package for project references that are not tagged as to be included in the simulator package:
+    $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -ne 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
         Add-PackageReference-IfNew $_ $dep
     }
 
     # Recursively check on project references if they are private:
-    $projectDependency | Where-Object {$_.PrivateAssets -eq 'All' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
+    $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -eq 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
         $id = $_.Include
         Write-Host "Recurring for $id"
         Add-NuGetDependencyFromCsprojToNuspec $_.Include $dep
