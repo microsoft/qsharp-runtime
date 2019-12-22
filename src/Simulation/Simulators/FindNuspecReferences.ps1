@@ -90,7 +90,7 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 }
 
 # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
-Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" $dep # has a dependency on Common
+Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" $dep # has a dependency on Common, need to list this because it is listed only in an imported props file ...
 Add-NuGetDependencyFromCsprojToNuspec "../Simulators.Implementation/Microsoft.Quantum.Simulation.Simulators.csproj" $dep
 
 # Save into .nuspec file:
