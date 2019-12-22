@@ -2,6 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
   <PropertyGroup>
+    <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/))</NativeBuildPath>
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>

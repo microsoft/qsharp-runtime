@@ -26,8 +26,8 @@
     <file src="..\Native\win10\*" target="runtimes\win-x64\native" exclude="**\*.pdb" />
     <file src="..\Native\build\$Configuration$\Microsoft.Quantum.*" target="runtimes\win-x64\native" exclude="**\*.pdb" />
     <file src="..\Native\build\$Configuration$\Microsoft.Quantum.*.pdb" target="runtimes\win-x64\native" />
-    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.Common.*" target="lib" />
-    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.*" target="lib" />
-    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulators.*" target="lib" />
+    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.dll" target="lib" />
+    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.xml" target="lib" />
+    <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.pdb" target="lib" />
   </files>
 </package>
