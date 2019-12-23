@@ -61,9 +61,6 @@ Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
-# we don't want to keep symbols packages
-Remove-Item $Env:NUGET_OUTDIR/**/*.snupkg
-
 if (-not $all_ok) 
 {
     throw "At least one project failed to pack. Check the logs."
