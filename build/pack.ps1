@@ -58,7 +58,7 @@ Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.
 Pack-One-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
 Pack-One-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
-Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
+Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
 if (-not $all_ok) 
