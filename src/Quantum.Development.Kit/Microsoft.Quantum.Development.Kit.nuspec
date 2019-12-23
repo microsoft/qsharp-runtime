@@ -25,7 +25,11 @@
   </metadata>
 
   <files>
-    <file src="..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
+    <file src="Props\QSharp.props" target="build\Microsoft.Quantum.Development.Kit.props" />
+    <file src="Props\QSharp.targets" target="build\Microsoft.Quantum.Development.Kit.targets" />
+    <file src="Props\*.xaml" target="build" />
+    <file src="..\..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
+    <file src="..\Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp3.0\publish\**" target="tools\qsc" exclude="**\*.pdb" />
   </files>
 
 </package>

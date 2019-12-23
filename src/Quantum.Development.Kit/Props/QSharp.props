@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <RunQsc Condition=" '$(RunQsc)' == '' ">True</RunQsc>
+    <RunQDocGen Condition=" '$(RunQDocGen)' == '' ">False</RunQDocGen>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <QscExe Condition="'$(QscExe)' == ''">dotnet "$(MSBuildThisFileDirectory)../tools/qsc/Microsoft.Quantum.CsharpGeneration.App.dll"</QscExe>
+    <QsharpLangVersion>0.10</QsharpLangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)QSharp.ProjectItemsSchema.xaml;" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)QSharp.xaml;">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
+  </ItemGroup>
+
+  <ItemGroup>
+    <QsharpCompile Include="**\*.qs" Exclude="obj\**" />
+  </ItemGroup>
+</Project>

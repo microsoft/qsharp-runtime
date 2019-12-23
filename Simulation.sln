@@ -35,13 +35,6 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.RoslynWrapper", "src\
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration", "src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj", "{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Package", "Package", "{DB02F32E-7D05-4C72-9366-29B8A1E2B46E}"
-	ProjectSection(SolutionItems) = preProject
-		src\Simulation\Simulators\.gitignore = src\Simulation\Simulators\.gitignore
-		src\Simulation\Simulators\FindNuspecReferences.ps1 = src\Simulation\Simulators\FindNuspecReferences.ps1
-		src\Simulation\Simulators\Microsoft.Quantum.Simulators.nuspec.template = src\Simulation\Simulators\Microsoft.Quantum.Simulators.nuspec.template
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -263,7 +256,6 @@ Global
 		{618FBF9D-4EF3-435D-9728-81C726236668} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 		{48206BD6-48DD-4442-A395-3A6594E4C9C6} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 		{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
-		{DB02F32E-7D05-4C72-9366-29B8A1E2B46E} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}

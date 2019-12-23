@@ -1,0 +1,2 @@
+The content of this folder is deprecated and only preserved to support both the old and the new setup for some extended period of time. 
+We may choose to keep the Quantum.Development.Kit package to aggregate a collection of packages, but in it's current state is it replaced by the Quantum Sdk built on the compiler repo. 
