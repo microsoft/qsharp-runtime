@@ -16,13 +16,15 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override void Apply(Qubit q)
             {
-                sim.QuantumProcessor.OnReturnQubits(new QArray<Qubit>(q));
+                long count = (sim.QubitManager.ToBeReleasedAfterReturn(q) ? 1 : 0);
+                sim.QuantumProcessor.OnReturnQubits(new QArray<Qubit>(q), count);
                 sim.QubitManager.Return(q);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
-                sim.QuantumProcessor.OnReturnQubits(qubits);
+                long count = sim.QubitManager.ToBeReleasedAfterReturnCount(qubits);
+                sim.QuantumProcessor.OnReturnQubits(qubits, count);
                 sim.QubitManager.Return(qubits);
             }
         }
