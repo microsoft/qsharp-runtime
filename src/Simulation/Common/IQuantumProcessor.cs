@@ -591,7 +591,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// Borrowed qubits can be in any state.
         /// </remarks>
-        void OnBorrowQubits(IQArray<Qubit> qubits);
+        void OnBorrowQubits(IQArray<Qubit> qubits); //
 
         /// <summary>
         /// Called when qubits are returned in the end of Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
