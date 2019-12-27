@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -11,6 +12,13 @@ using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
+    public enum ToffoliDumpFormat
+    {
+        Bits,
+        Hex,
+        Automatic
+    }
+
     /// <summary>
     /// The Toffoli simulator implementation class.
     /// </summary>
@@ -22,6 +30,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// </summary>
         public const uint DEFAULT_QUBIT_COUNT = 65536;
         private const double Tolerance = 1.0E-10;
+
+        public ToffoliDumpFormat DumpFormat { get; set; } = ToffoliDumpFormat.Automatic;
 
         /// <summary>
         /// Constructs a default Toffoli simulator instance.
@@ -323,20 +333,20 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// or just whitespace, the console is written to</param>
         internal void DumpState(long[] ids, string filename)
         {
-            var Do = new Action<Action<string>>((o) =>
+            var data = ids.Select(id => State[id]).ToArray();
+            Action<Action<string>> dump = DumpFormat switch
             {
-                o("State:");
-                foreach (var id in ids)
-                {
-                    o($"{id}:\t{State[id]}");
-                }
-            });
+                ToffoliDumpFormat.Automatic => (channel) => data.Dump(channel),
+                ToffoliDumpFormat.Bits => (channel) => data.DumpAsBits(channel),
+                ToffoliDumpFormat.Hex => (channel) => data.DumpAsHex(channel),
+                _ => throw new ArgumentException($"Invalid format: ${DumpFormat}")
+            };
 
             var logMessage = Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
 
             if (string.IsNullOrWhiteSpace(filename))
             {
-                Do((msg) => logMessage.Apply(msg));
+                dump((msg) => logMessage.Apply(msg));
             }
             else
             {
@@ -344,7 +354,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     using (var file = new System.IO.StreamWriter(filename))
                     {
-                        Do(file.WriteLine);
+                        dump(file.WriteLine);
                     }
                 }
                 catch (Exception e)
@@ -480,6 +490,69 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 simulator.ReturnQubits(qubits);
                 simulator.QubitManager.Return(qubits);
+            }
+        }
+    }
+    
+    internal static class Extensions
+    {
+        public static IEnumerable<IEnumerable<T>> Chunks<T>(this IEnumerable<T> source, int chunkSize)
+        {
+            while (source.Any())
+            {
+                yield return source.Take(chunkSize);
+                source = source.Skip(chunkSize);
+            }
+        }
+
+        public static byte[] ToBytes(this BitArray array)
+        {
+            var dest = new byte[array.Length / 8 + (array.Length % 8 == 0 ? 0 : 1)];
+            array.CopyTo(dest, 0);
+            return dest;
+        }
+
+        private static void WriteHeader(Action<string> channel)
+        {
+            channel("Offset  \tState Data");
+            channel("========\t==========");
+        }
+
+        public static void Dump(this bool[] data, Action<string> channel, int maxSizeForBitFormat = 32)
+        {
+            if (data.Length > maxSizeForBitFormat)
+            {
+                data.DumpAsHex(channel);
+            }
+            else
+            {
+                data.DumpAsBits(channel);
+            }
+        }
+
+        public static void DumpAsHex(this bool[] data, Action<string> channel, int rowLength = 16)
+        {
+            WriteHeader(channel);
+            var bytes = new BitArray(data).ToBytes();
+            var offset = 0L;
+            
+            foreach (var row in bytes.Chunks(rowLength))
+            {
+                var hex = BitConverter.ToString(row.ToArray()).Replace("-", " ");
+                channel($"{offset:x8}\t{hex}");
+                offset += rowLength;
+            }
+        }
+
+        public static void DumpAsBits(this bool[] data, Action<string> channel, int rowLength = 16)
+        {
+            WriteHeader(channel);
+            var offset = 0;
+            foreach (var row in data.Chunks(rowLength))
+            {
+                var bits = String.Join("", row.Select(bit => bit ? "1" : "0"));
+                channel($"{offset / 8:x8}\t{bits}");
+                offset += rowLength;
             }
         }
     }
