@@ -329,6 +329,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// and ArgumentOutOfRangeException.
         /// </summary>
         /// <param name="index">The long index of the element to access</param>
+        /// <param name="value">New value of the element</param>
         /// <returns>The element</returns>
         public QArray<T> Modify(long index, T value)
         {
@@ -351,7 +352,8 @@ namespace Microsoft.Quantum.Simulation.Core
         /// or if an index is outside the array bounds, it throws 
         /// and ArgumentOutOfRangeException.
         /// </summary>
-        /// <param name="index">The long index of the element to access</param>
+        /// <param name="indices">The range of indices of the elements to access</param>
+        /// <param name="values">New values of the elements</param>
         /// <returns>The element</returns>
         public QArray<T> Modify(QRange indices, IQArray<T> values)
         {
@@ -566,7 +568,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// Reads the QArray<>
+        /// Reads the <see cref="QArray{T}"/>
         /// </summary>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
