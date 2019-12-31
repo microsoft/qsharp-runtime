@@ -1118,6 +1118,8 @@ module SimulationCode =
                 ``property-get`` "System.Collections.Generic.IEnumerable<Qubit>" "IApplyData.Qubits" [] 
                     ``get`` (fieldPaths |> List.map buildOne)
         else
+            // this implementation is a workaround for the .NET Core issue discussed here: 
+            // https://github.com/microsoft/qsharp-runtime/issues/116
             let mutable count = 0
             let nextName() =
                 count <- count + 1
