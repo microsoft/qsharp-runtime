@@ -40,22 +40,21 @@ module Expressions =
     let ``default`` targetType = 
         SyntaxFactory.DefaultExpression(ident targetType)
 
-    let ``() =>`` parameters expression = 
-        expression 
-        |> SyntaxFactory.ParenthesizedLambdaExpression 
-        |> (fun ple -> ple.AddParameterListParameters (parameters |> Seq.map (SyntaxFactory.Identifier >> SyntaxFactory.Parameter) |> Seq.toArray))
-
-    let ``() => {}`` parameters block = 
+    let ``() =>`` parameters node = 
         let parameterArr = 
             parameters 
             |> Seq.map SyntaxFactory.Identifier
             |> Seq.map SyntaxFactory.Parameter 
-            |> Seq.toArray
-        block
-        |> (Seq.toArray >> SyntaxFactory.Block)
-        |> SyntaxFactory.ParenthesizedLambdaExpression 
-        |> (fun ple -> ple.AddParameterListParameters parameterArr)        
+            |> SyntaxFactory.SeparatedList
+            |> SyntaxFactory.ParameterList
+        SyntaxFactory.ParenthesizedLambdaExpression (parameterArr, node)
 
+    let ``() => {}`` parameters block = 
+        block
+        |> Seq.toArray
+        |> SyntaxFactory.Block
+        |> ``() =>`` parameters
+        
     let ``_ =>`` parameterName expression = 
         SyntaxFactory.SimpleLambdaExpression (parameterName |> (SyntaxFactory.Identifier >> SyntaxFactory.Parameter), expression)
 
