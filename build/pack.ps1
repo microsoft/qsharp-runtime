@@ -34,7 +34,7 @@ function Pack-One() {
     }
 }
 
-function Pack-One-Dotnet() {
+function Pack-Dotnet() {
     Param($project, $option1="", $option2="", $option3="")
     dotnet pack $project `
         -o $Env:NUGET_OUTDIR `
@@ -55,8 +55,8 @@ function Pack-One-Dotnet() {
 
 Write-Host "##[info]Using nuget to create packages"
 Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects'
-Pack-One-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
-Pack-One-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
+Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
+Pack-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
