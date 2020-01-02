@@ -673,22 +673,32 @@ namespace N1
         
         
         [
-            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => 
-              Qubit.Concat(
-                ((IApplyData)Data.Item1)?.Qubits, 
-                ((IApplyData)Data.Item2)?.Qubits, 
-                ((IApplyData)Data.Item3?.Data)?.Qubits
-              );"
+            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+            {
+                get
+                {
+                    return Qubit.Concat(
+                        ((IApplyData)Data.Item1)?.Qubits, 
+                        ((IApplyData)Data.Item2)?.Qubits, 
+                        ((IApplyData)Data.Item3?.Data)?.Qubits
+                    );
+                }
+            }"
         ]
         |> testOne threeQubitOperation
         
         [
-            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => 
-              Qubit.Concat(
-                ((IApplyData)Data.Item1)?.Qubits, 
-                ((IApplyData)Data.Item2)?.Qubits, 
-                ((IApplyData)Data.Item3)?.Qubits
-              );"
+            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+            {
+                get
+                {
+                    return Qubit.Concat(
+                        ((IApplyData)Data.Item1)?.Qubits, 
+                        ((IApplyData)Data.Item2)?.Qubits, 
+                        ((IApplyData)Data.Item3)?.Qubits
+                    );
+                }
+            }"
         ]
         |> testOne differentArgsOperation
         
@@ -736,29 +746,50 @@ namespace N1
         |> testOne udtTuple
         
         [
-            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => 
-              Qubit.Concat(
-                ((IApplyData)Data.Item1)?.Qubits, 
-                ((IApplyData)Data.Item3.Item2?.Data.Item2)?.Qubits,
-                ((IApplyData)Data.Item3.Item3?.Data)?.Qubits,
-                ((IApplyData)Data.Item3.Item4?.Data)?.Qubits,
-                ((IApplyData)Data.Item3.Item5)?.Qubits
-              );"
+            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits 
+            {
+                get
+                {
+                    return Qubit.Concat(
+                        ((IApplyData)Data.Item1)?.Qubits, 
+                        ((IApplyData)Data.Item3.Item2?.Data.Item2)?.Qubits,
+                        ((IApplyData)Data.Item3.Item3?.Data)?.Qubits,
+                        ((IApplyData)Data.Item3.Item4?.Data)?.Qubits,
+                        ((IApplyData)Data.Item3.Item5)?.Qubits
+                    );
+                }
+            }"
         ]
         |> testOne letsOperations
         
         [
-            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => Data?.GetQubits();"
+            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+            {
+                get
+                {
+                    var __temp1__ = Data;
+                    return __temp1__?.GetQubits();
+                }
+            }"
+
         ]
         |> testOne genU1
         
         [
-            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => 
-              Qubit.Concat(
-                Data.Item1?.GetQubits(), 
-                Data.Item2.Item2.Item1?.GetQubits(), 
-                Data.Item2.Item2.Item2?.GetQubits()
-              );"
+            "System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+            {
+                get
+                {
+                    var __temp1__ = Data.Item1;
+                    var __temp2__ = Data.Item2.Item2.Item1;
+                    var __temp3__ = Data.Item2.Item2.Item2;
+                    return Qubit.Concat(
+                        __temp1__?.GetQubits(), 
+                        __temp2__?.GetQubits(), 
+                        __temp3__?.GetQubits()
+                    );
+                }
+            }"
         ]
         |> testOne genCtrl3
 
@@ -2385,7 +2416,16 @@ namespace N1
             {
             }
 
-            System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => Qubit.Concat(Data.Item1?.GetQubits(), Data.Item2.Item2.Item1?.GetQubits(), Data.Item2.Item2.Item2?.GetQubits());
+            System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits 
+            {
+                get
+                {
+                    var __temp1__ = Data.Item1;
+                    var __temp2__ = Data.Item2.Item2.Item1;
+                    var __temp3__ = Data.Item2.Item2.Item2;
+                    return Qubit.Concat(__temp1__?.GetQubits(), __temp2__?.GetQubits(), __temp3__?.GetQubits());
+                }
+            }
         }
 
         String ICallable.Name => "genCtrl3";
@@ -2417,7 +2457,14 @@ namespace N1
             {
             }
 
-            System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => Qubit.Concat(((IApplyData)Data.Item1)?.Qubits, ((IApplyData)Data.Item2)?.Qubits, Data.Item3?.GetQubits());
+            System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits  
+            {
+                get
+                {
+                    var __temp1__ = Data.Item3;
+                    return Qubit.Concat(((IApplyData)Data.Item1)?.Qubits, ((IApplyData)Data.Item2)?.Qubits, __temp1__?.GetQubits());
+                }
+            }
         }
 
         String ICallable.Name => "composeImpl";
@@ -2673,7 +2720,13 @@ namespace N1
         {
         }
         
-        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)Data)?.Qubits;
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits 
+        {
+            get
+            {
+                return ((IApplyData)Data)?.Qubits;
+            }
+        }
 
         public void Deconstruct()
         {
@@ -2693,7 +2746,13 @@ namespace N1
         {
         }
         
-        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)Data?.Data)?.Qubits;
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits 
+        {
+            get
+            {
+                return ((IApplyData)Data?.Data)?.Qubits;
+            }
+        }
 
         public void Deconstruct()
         {
@@ -2765,7 +2824,13 @@ namespace N1
         {
         }
 
-        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)Data)?.Qubits;
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+        {
+            get
+            {
+                return ((IApplyData)Data)?.Qubits;
+            }
+        }
 
         public void Deconstruct()
         {
@@ -2787,7 +2852,14 @@ namespace N1
 
         public Int64 Item1 => Data.Item1;
         public IQArray<Qubit> Item2 => Data.Item2;
-        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)Data.Item2)?.Qubits;
+        System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits
+        {
+            get
+            {
+                return ((IApplyData)Data.Item2)?.Qubits;
+            }
+        }
+
         public void Deconstruct(out Int64 item1, out IQArray<Qubit> item2)
         {
             item1 = Data.Item1;

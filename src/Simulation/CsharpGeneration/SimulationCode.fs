@@ -1066,7 +1066,7 @@ module SimulationCode =
         | _                             -> false
 
     let findQubitFields context (qsharpType:ResolvedType) =  
-        let item_n n= ``ident`` (sprintf "Item%d" (n+1))
+        let item_n n = ``ident`` (sprintf "Item%d" (n+1))
 
         let rec buildSimpleTerm current nullable (t:ResolvedType) =
             match t.Resolution with
@@ -1117,25 +1117,47 @@ module SimulationCode =
             | _  ->
                 ``property-get`` "System.Collections.Generic.IEnumerable<Qubit>" "IApplyData.Qubits" [] 
                     ``get`` (fieldPaths |> List.map buildOne)
-            :> MemberDeclarationSyntax
         else
-            let buildOne (field: ResolvedType * ExpressionSyntax) = 
-                let t = field |> fst 
+            // this implementation is a workaround for the .NET Core issue discussed here: 
+            // https://github.com/microsoft/qsharp-runtime/issues/116
+            let mutable count = 0
+            let nextName() =
+                count <- count + 1
+                sprintf "__temp%d__" count
+            let mutable items = []
+            for (t, token) in fields do 
                 match t.Resolution with
                 | QsTypeKind.Function _
                 | QsTypeKind.Operation _
                 | QsTypeKind.ArrayType _
                 | QsTypeKind.UserDefinedType _
-                | QsTypeKind.Qubit -> ``((`` ( ``cast`` "IApplyData" (field |> snd) ) ``))`` <|?.|> ``ident`` "Qubits"
-                | _       -> (field |> snd)  <?.>  ( ``ident`` "GetQubits", [] )
-            let body = 
+                | QsTypeKind.Qubit -> 
+                    let qs = ``((`` ( ``cast`` "IApplyData" token) ``))`` <|?.|> ``ident`` "Qubits"
+                    items <- (null, qs) :: items
+                | _       -> 
+                    let id = nextName()
+                    let decl = ``var`` id (``:=`` token)
+                    let qs = (``ident`` id)  <?.>  ( ``ident`` "GetQubits", [] )
+                    items <- (decl, qs) :: items
+            items <- items |> List.rev
+            let statements = 
                 match fields with
-                | []     -> ``null`` :> ExpressionSyntax
-                | [one]  -> buildOne one
-                | many   -> ( ``ident`` "Qubit" <.> (``ident`` "Concat", fields |> List.map buildOne) )
-            ``property-arrow_get`` "System.Collections.Generic.IEnumerable<Qubit>" "IApplyData.Qubits" [] 
-                ``get`` (``=>`` body)
-            :> MemberDeclarationSyntax
+                | []  -> [``return`` (Some ``null``)]
+                | [_] -> 
+                    [
+                        let (decl, qs) = items.Head;
+                        if decl <> null then yield decl
+                        yield ``return`` (snd items.Head |> Some)
+                    ]                    
+                | _   ->
+                    [
+                        for (decl, _) in items do if decl <> null then yield decl
+                        let qs = ( ``ident`` "Qubit" <.> (``ident`` "Concat", items |> List.map snd) )
+                        yield ``return`` (Some qs)
+                    ]
+            ``property-get`` "System.Collections.Generic.IEnumerable<Qubit>" "IApplyData.Qubits" [] 
+                 ``get`` statements
+        :> MemberDeclarationSyntax
         |> List.singleton
            
     let buildName name =
