@@ -8,7 +8,8 @@ cmake   -version || GOTO missingDependency
 echo.
 
 SET BUILD_FOLDER=build
-SET DROP_FOLDER=%BUILD_DEFAULTWORKINGDIRECTORY%\xplat\src\Simulation\Native\build
+SET DROP_FOLDER=%SYSTEM_DEFAULTWORKINGDIRECTORY%\xplat\src\Simulation\Native\build
+DIR %DROP_FOLDER%
 
 IF NOT EXIST linux mkdir linux
 IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so    copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so     linux\Microsoft.Quantum.Simulator.Runtime.dll
