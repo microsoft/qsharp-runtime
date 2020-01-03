@@ -31,7 +31,7 @@ if (Test-Path $target) {
 $nuspec = [xml](Get-Content "Microsoft.Quantum.Simulators.nuspec.template")
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
-function Add-PackageReference-IfNew($ref)
+function Add-PackageReferenceIfNew($ref)
 {
     # Identify package's id either from "Include" or "Update" attribute:
     $id = $ref.Include
@@ -73,7 +73,7 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
     }
 
     $packageDependency | ForEach-Object {
-        Add-PackageReference-IfNew $_ $dep
+        Add-PackageReferenceIfNew $_ 
     }
 
     $projectDependency = $csproj.Project.ItemGroup.ProjectReference | Where-Object { $null -ne $_ }
@@ -84,20 +84,20 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 
     # Assume there is a package for project references that are not tagged as to be included in the simulator package:
     $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -ne 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
-        Add-PackageReference-IfNew $_ $dep
+        Add-PackageReferenceIfNew $_ 
     }
 
     # Recursively check on project references if they are private:
     $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -eq 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
         $id = $_.Include
         Write-Host "Recurring for $id"
-        Add-NuGetDependencyFromCsprojToNuspec $_.Include $dep
+        Add-NuGetDependencyFromCsprojToNuspec $_.Include 
     }
 }
 
 # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
-Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" $dep # has a dependency on Common, need to list this because it is listed only in an imported props file ...
-Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulation.Simulators.csproj" $dep
+Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
+Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulation.Simulators.csproj"
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)
