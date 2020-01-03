@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+#nullable enable
 
 using System;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <param name="qubitCount">The number of qubits to allocate.
         /// There is an overhead of one byte of memory usage per allocated qubit.
         /// There is no time overhead from allocating more qubits.</param>
-        public ToffoliSimulator(uint qubitCount) 
+        public ToffoliSimulator(uint qubitCount)
             : base(new QubitManagerTrackingScope(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
         {
             this.State = new bool[qubitCount];
@@ -85,11 +86,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         /// Gets the parity of a group of qubits.
-        /// Specifically, this counts the number of qubits in the One state, and returns 
+        /// Specifically, this counts the number of qubits in the One state, and returns
         /// true if the number is odd and false if it's even.
         /// </summary>
         /// <param name="qubits">The sequence of qubits</param>
-        /// <returns>true if there are an odd number of qubits in the true (One) state, 
+        /// <returns>true if there are an odd number of qubits in the true (One) state,
         /// and false if there are an even number in the true state</returns>
         internal bool GetParity(IEnumerable<Qubit> qubits)
         {
@@ -493,11 +494,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
     }
-    
+
     internal static class Extensions
     {
         public static IEnumerable<IEnumerable<T>> Chunks<T>(this IEnumerable<T> source, int chunkSize)
         {
+            if (source == null) { throw new NullReferenceException(nameof(source)); }
             while (source.Any())
             {
                 yield return source.Take(chunkSize);
@@ -507,6 +509,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public static byte[] ToBytes(this BitArray array)
         {
+            if (array == null) { throw new NullReferenceException(nameof(array)); }
             var dest = new byte[array.Length / 8 + (array.Length % 8 == 0 ? 0 : 1)];
             array.CopyTo(dest, 0);
             return dest;
@@ -514,12 +517,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         private static void WriteHeader(Action<string> channel)
         {
+            if (channel == null) { throw new NullReferenceException(nameof(channel)); }
             channel("Offset  \tState Data");
             channel("========\t==========");
         }
 
         public static void Dump(this bool[] data, Action<string> channel, int maxSizeForBitFormat = 32)
         {
+            if (data == null) { throw new NullReferenceException(nameof(data)); }
+            if (channel == null) { throw new NullReferenceException(nameof(channel)); }
             if (data.Length > maxSizeForBitFormat)
             {
                 data.DumpAsHex(channel);
@@ -532,10 +538,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public static void DumpAsHex(this bool[] data, Action<string> channel, int rowLength = 16)
         {
+            if (data == null) { throw new NullReferenceException(nameof(data)); }
+            if (channel == null) { throw new NullReferenceException(nameof(channel)); }
             WriteHeader(channel);
             var bytes = new BitArray(data).ToBytes();
             var offset = 0L;
-            
+
             foreach (var row in bytes.Chunks(rowLength))
             {
                 var hex = BitConverter.ToString(row.ToArray()).Replace("-", " ");
@@ -546,6 +554,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public static void DumpAsBits(this bool[] data, Action<string> channel, int rowLength = 16)
         {
+            if (data == null) { throw new NullReferenceException(nameof(data)); }
+            if (channel == null) { throw new NullReferenceException(nameof(channel)); }
             WriteHeader(channel);
             var offset = 0;
             foreach (var row in data.Chunks(rowLength))
