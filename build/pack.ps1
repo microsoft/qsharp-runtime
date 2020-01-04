@@ -34,11 +34,31 @@ function Pack-One() {
     }
 }
 
+function Pack-Dotnet() {
+    Param($project, $option1="", $option2="", $option3="")
+    dotnet pack $project `
+        -o $Env:NUGET_OUTDIR `
+        -c $Env:BUILD_CONFIGURATION `
+        -v detailed `
+        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
+        /property:Version=$Env:NUGET_VERSION `
+        $option1 `
+        $option2 `
+        $option3
+
+    if  ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to pack $project."
+        $script:all_ok = $False
+    }
+}
+
 
 Write-Host "##[info]Using nuget to create packages"
 Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.fsproj' '-IncludeReferencedProjects'
-Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.csproj' '-IncludeReferencedProjects'
-Pack-One '../src/Microsoft.Quantum.Development.Kit.nuspec'
+Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
+Pack-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
+Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
+Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
 if (-not $all_ok) 
