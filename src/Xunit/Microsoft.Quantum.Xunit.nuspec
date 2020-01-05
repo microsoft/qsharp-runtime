@@ -21,13 +21,8 @@
 
     <dependencies>
       <dependency id="xunit" version="2.3.1" />
-      <dependency id="Microsoft.Quantum.Development.Kit" version="0.10.1912.3001-beta" />
+      <dependency id="Microsoft.NET.Test.Sdk" version="15.3.0" />
+      <dependency id="Microsoft.Quantum.Runtime.Core" version="$version$" />
     </dependencies>
   </metadata>
-
-  <files>
-    <file src="bin\$Configuration$\**\Microsoft.Quantum.Simulation.XUnit*" target="lib" />
-    <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
-    <file src="bin\$Configuration$\**\$id$.pdb" target="lib" />
-  </files>
 </package>
