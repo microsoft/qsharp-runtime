@@ -23,6 +23,9 @@ namespace Microsoft.Quantum.Simulation.Common
         void Return(Qubit q);
         void Return(IQArray<Qubit> qubits);
 
+        bool ToBeReleasedAfterReturn(Qubit qubit);
+        long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn);
+
         bool IsValid(Qubit qubit);
         bool IsFree(Qubit qubit);
         bool IsDisabled(Qubit qubit);
