@@ -32,10 +32,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
 
-            var qbits = allocate.Apply(1);
-            Assert.Single(qbits);
+            var qubits = allocate.Apply(1);
+            Assert.Single(qubits);
 
-            var q = qbits[0];
+            var q = qubits[0];
             var result = measure.Apply(q);
             Assert.Equal(Result.Zero, result);
 
@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(Result.One, result);
             sim.State[q.Id] = false; // Make it safe to release
 
-            release.Apply(qbits);
+            release.Apply(qubits);
             sim.CheckNoQubitLeak();
         }
 
@@ -206,6 +206,144 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             x.Apply(q1);
 
             release.Apply(qubits);
+        }
+
+        [Fact]
+        public void ToffoliDumpState()
+        {
+            var sim = new ToffoliSimulator();
+
+            var allocate = sim.Get<Intrinsic.Allocate>();
+            var release = sim.Get<Intrinsic.Release>();
+            var dumpMachine = sim.Get<Microsoft.Quantum.Diagnostics.DumpMachine>();
+
+            var x = sim.Get<Intrinsic.X>();
+
+            // We define a local function to prepare an example state so that we
+            // can repeat it at the end to release everything.
+            void Prepare(IEnumerable<Qubit> qubits)
+            {
+                foreach (var qubit in qubits.EveryNth(3))
+                {
+                    x.Apply(qubit);
+                }
+            };
+
+            // We'll need to override console output writers, so we start by
+            // recording the current stream used as stdout.
+            var stdout = Console.Out;
+
+            try
+            {
+                // Start with a small example (< 32 qubits).
+                var qubits = allocate.Apply(13);
+                Prepare(qubits);
+
+                // Dump the state out.
+                using (var writer = new StringWriter())
+                {
+                    Console.SetOut(writer);
+
+                    sim.DumpFormat = ToffoliDumpFormat.Automatic;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t1001001001001
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+
+                    sim.DumpFormat = ToffoliDumpFormat.Bits;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t1001001001001
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+
+                    sim.DumpFormat = ToffoliDumpFormat.Hex;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t1249
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+                }
+
+                // Reset and return our qubits for the next example.
+                Prepare(qubits);
+                release.Apply(qubits);
+
+                // Proceed with a larger example (≥ 32 qubits).
+                var qubits = allocate.Apply(64);
+                Prepare(qubits);
+
+                // Dump the state out.
+                using (var writer = new StringWriter())
+                {
+                    Console.SetOut(writer);
+
+                    sim.DumpFormat = ToffoliDumpFormat.Automatic;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t9249249249249249
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+
+                    sim.DumpFormat = ToffoliDumpFormat.Bits;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t1001001001001001
+00000002\t0010010010010010
+00000004\t0100100100100100
+00000006\t1001001001001001
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+
+                    sim.DumpFormat = ToffoliDumpFormat.Hex;
+                    dumpMachine.Apply("");
+                    var expected = @"Offset  \tState Data
+========\t==========
+00000000\t9249249249249249
+"
+                        .Replace("\\t", "\t");
+                    Assert.Equal(writer.ToString());
+                    writer.Clear();
+                }
+
+                // Reset and return our qubits for the next example.
+                Prepare(qubits);
+                release.Apply(qubits);
+            }
+            finally
+            {
+                // Restore stdout on our way out.
+                Console.SetOut(stdout);
+            }
+        }
+
+    }
+
+    internal static class Extensions
+    {
+        internal static IEnumerable<T> EveryNth<T>(this IEnumerable<T> source, int n = 2) =>
+            source.Where((element, index) => index % n == 0);
+
+        internal static void Clear(this StringWriter writer)
+        {
+            var builder = writer.GetStringBuilder();
+            builder.Remove(0, builder.Length);
         }
     }
 }
