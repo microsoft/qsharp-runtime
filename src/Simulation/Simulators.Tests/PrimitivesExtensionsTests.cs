@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         private static void TestExtension(string extensionName)
         {
-            Assembly assembly = Assembly.Load("Microsoft.Quantum.Intrinsic");
+            Assembly assembly = Assembly.Load("Microsoft.Quantum.QSharp.Core");
             string extensionsNameSpace = "Microsoft.Quantum." + extensionName;
 
             IEnumerable<Type> abstractTypes =

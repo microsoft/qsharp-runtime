@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulation\Core\Microsoft.Quantum.Simulation.Core.csproj" />
+    <PackageReference Include="xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.1" />
+    <ProjectReference Include="..\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 
 </Project>
