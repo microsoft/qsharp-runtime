@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
 
@@ -12,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Microsoft.Quantum.Simulation.Core.csproj" />
-    <ProjectReference Include="..\Common\Microsoft.Quantum.Simulation.Common.csproj" />
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="..\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
   </ItemGroup>
 
 </Project>
