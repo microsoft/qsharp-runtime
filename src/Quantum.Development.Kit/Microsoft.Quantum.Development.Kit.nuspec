@@ -12,7 +12,7 @@
     <iconUrl>https://secure.gravatar.com/avatar/bd1f02955b2853ba0a3b1cdc2434e8ec.png</iconUrl>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Provides support for developing quantum algorithms in the Q# programming language.</description>
+    <description>Provides tools for developing quantum algorithms in the Q# programming language.</description>
 
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
 
@@ -20,16 +20,16 @@
     <tags>Quantum Q# Qsharp </tags>
 
     <dependencies>
-      <dependency id="Microsoft.Quantum.Simulators" version="0.10.1912.3001-beta" />
+      <dependency id="Microsoft.Quantum.Simulators" version="0.10.2001.512-beta" />
     </dependencies>
   </metadata>
 
   <files>
-    <file src="..\build\Props\QSharp.props" target="build\Microsoft.Quantum.Development.Kit.props" />
-    <file src="..\build\Props\QSharp.targets" target="build\Microsoft.Quantum.Development.Kit.targets" />
-    <file src="..\build\Props\*.xaml" target="build" />
-    <file src="..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
-    <file src="Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp3.0\publish\**" target="tools\qsc" exclude="**\*.pdb" />
+    <file src="Props\QSharp.props" target="build\Microsoft.Quantum.Development.Kit.props" />
+    <file src="Props\QSharp.targets" target="build\Microsoft.Quantum.Development.Kit.targets" />
+    <file src="Props\*.xaml" target="build" />
+    <file src="..\..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
+    <file src="..\Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp3.0\publish\**" target="tools\qsc" exclude="**\*.pdb" />
   </files>
 
 </package>
