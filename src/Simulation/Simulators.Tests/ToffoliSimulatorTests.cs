@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
@@ -217,7 +218,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
-            var dumpMachine = sim.Get<Microsoft.Quantum.Diagnostics.DumpMachine>();
+            var dumpMachine = sim.Get<Microsoft.Quantum.Diagnostics.DumpMachine<string>>();
 
             var x = sim.Get<Intrinsic.X>();
 
@@ -253,27 +254,27 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 00000000\t1001001001001
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
 
                     sim.DumpFormat = ToffoliDumpFormat.Bits;
                     dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+                    expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1001001001001
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
 
                     sim.DumpFormat = ToffoliDumpFormat.Hex;
                     dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+                    expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1249
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
                 }
 
