@@ -261,11 +261,11 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
-        public virtual void OnBorrowQubits(IQArray<Qubit> qubits)
+        public virtual void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
         {
         }
 
-        public virtual void OnReturnQubits(IQArray<Qubit> qubits)
+        public virtual void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
         {
         }
 

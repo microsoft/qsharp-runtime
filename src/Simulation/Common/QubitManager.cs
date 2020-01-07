@@ -163,6 +163,19 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         // Returns true if qubit needs to be released: It has been allocated for borrowing and is not borrowed any more.
+        private bool BorrowingRefCountIsOne(long id)
+        {
+            if (IsAllocatedForBorrowing(id))
+            {
+                if (qubits[id] == AllocatedForBorrowing)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Returns true if qubit needs to be released: It has been allocated for borrowing and is not borrowed any more.
         private bool DecreaseBorrowingRefCount(long id)
         {
             if (IsAllocatedForBorrowing(id)) {
@@ -477,6 +490,37 @@ namespace Microsoft.Quantum.Simulation.Common
 
         protected virtual void ReturnOneQubit(Qubit qubit)
         {
+        }
+
+        /// <summary>
+        /// Returns true if a qubit has been allocated just for borrowing, has been borrowed exactly once,
+        /// and thus will be released after it is returned.
+        /// </summary>
+        public virtual bool ToBeReleasedAfterReturn(Qubit qubit)
+        {
+            return BorrowingRefCountIsOne(qubit.Id);
+        }
+
+        /// <summary>
+        /// Returns a count of input qubits that have been allocated just for borrowing, borrowed exactly once,
+        /// and thus will be released after they are returned.
+        /// </summary>
+        public virtual long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn)
+        {
+            if (qubitsToReturn == null || qubitsToReturn.Length == 0)
+            {
+                return 0;
+            }
+
+            long count = 0;
+            foreach (var qubit in qubitsToReturn)
+            {
+                if (this.ToBeReleasedAfterReturn(qubit)) 
+                { 
+                    count++; 
+                }
+            }
+            return count;
         }
 
         /// <summary>

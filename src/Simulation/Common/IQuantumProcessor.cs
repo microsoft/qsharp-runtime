@@ -587,21 +587,23 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Called when qubits are borrowed by Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that are being borrowed</param>.
+        /// <param name="allocatedForBorrowingCount">Number of qubits that have been allocated for borrowing. This might happen if there have not been enough already allocated qubits available for borrowing.</param>.
         /// <remarks>
         /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// Borrowed qubits can be in any state.
         /// </remarks>
-        void OnBorrowQubits(IQArray<Qubit> qubits);
+        void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount);
 
         /// <summary>
         /// Called when qubits are returned in the end of Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that have been borrowed and are now being returned</param>.
+        /// <param name="releasedOnReturnCount">Number of qubits that have been released once returned. This might happen if they have been allocated only for borrowing.</param>.
         /// <remarks>
         /// Every qubit has a unique identifier <see cref="Qubit.Id"/>.
         /// Borrowed qubits are expected to be returned in the same state as the state they have been borrowed in.
         /// </remarks>
-        void OnReturnQubits(IQArray<Qubit> qubits);
+        void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount);
 
         /// <summary>
         /// Called when 
