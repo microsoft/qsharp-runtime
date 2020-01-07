@@ -6,6 +6,7 @@ using Xunit;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.IO;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
