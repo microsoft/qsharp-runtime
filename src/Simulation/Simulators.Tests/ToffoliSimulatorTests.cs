@@ -17,6 +17,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     public class ToffoliSimulatorTests
     {
+        private readonly ITestOutputHelper output;
+
+        public ToffoliSimulatorTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
         public void ToffoliConstructor()
         {
@@ -232,108 +239,88 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             };
 
-            // We'll need to override console output writers, so we start by
-            // recording the current stream used as stdout.
-            var stdout = Console.Out;
+            // Start with a small example (< 32 qubits).
+            var qubits = allocate.Apply(13);
+            Prepare(qubits);
 
-            try
-            {
-                // Start with a small example (< 32 qubits).
-                var qubits = allocate.Apply(13);
-                Prepare(qubits);
-
-                // Dump the state out.
-                using (var writer = new StringWriter())
-                {
-                    Console.SetOut(writer);
-
-                    sim.DumpFormat = ToffoliDumpFormat.Automatic;
-                    dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+            // Dump the state out.
+            sim.DumpFormat = ToffoliDumpFormat.Automatic;
+            var testPath = Path.GetTempFileName();
+            output.WriteLine($"Dumping machine to {testPath}.");
+            dumpMachine.Apply(testPath);
+            var expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1001001001001
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                    sim.DumpFormat = ToffoliDumpFormat.Bits;
-                    dumpMachine.Apply("");
-                    expected = @"Offset  \tState Data
+            sim.DumpFormat = ToffoliDumpFormat.Bits;
+            testPath = Path.GetTempFileName();
+            dumpMachine.Apply(testPath);
+            expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1001001001001
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                    sim.DumpFormat = ToffoliDumpFormat.Hex;
-                    dumpMachine.Apply("");
-                    expected = @"Offset  \tState Data
+            sim.DumpFormat = ToffoliDumpFormat.Hex;
+            testPath = Path.GetTempFileName();
+            dumpMachine.Apply(testPath);
+            expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1249
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
-                }
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                // Reset and return our qubits for the next example.
-                Prepare(qubits);
-                release.Apply(qubits);
+            // Reset and return our qubits for the next example.
+            Prepare(qubits);
+            release.Apply(qubits);
 
-                // Proceed with a larger example (≥ 32 qubits).
-                qubits = allocate.Apply(64);
-                Prepare(qubits);
+            // Proceed with a larger example (≥ 32 qubits).
+            qubits = allocate.Apply(64);
+            Prepare(qubits);
 
-                // Dump the state out.
-                using (var writer = new StringWriter())
-                {
-                    Console.SetOut(writer);
+            // Dump the state out.
 
-                    sim.DumpFormat = ToffoliDumpFormat.Automatic;
-                    dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+            sim.DumpFormat = ToffoliDumpFormat.Automatic;
+            testPath = Path.GetTempFileName();
+            dumpMachine.Apply(testPath);
+            expected = @"Offset  \tState Data
 ========\t==========
 00000000\t9249249249249249
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                    sim.DumpFormat = ToffoliDumpFormat.Bits;
-                    dumpMachine.Apply("");
-                    expected = @"Offset  \tState Data
+            sim.DumpFormat = ToffoliDumpFormat.Bits;
+            testPath = Path.GetTempFileName();
+            dumpMachine.Apply(testPath);
+            expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1001001001001001
 00000002\t0010010010010010
 00000004\t0100100100100100
 00000006\t1001001001001001
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                    sim.DumpFormat = ToffoliDumpFormat.Hex;
-                    dumpMachine.Apply("");
-                    expected = @"Offset  \tState Data
+            sim.DumpFormat = ToffoliDumpFormat.Hex;
+            testPath = Path.GetTempFileName();
+            dumpMachine.Apply(testPath);
+            expected = @"Offset  \tState Data
 ========\t==========
 00000000\t9249249249249249
 "
-                        .Replace("\\t", "\t");
-                    Assert.Equal(expected, writer.ToString());
-                    writer.Clear();
-                }
+                .Replace("\\t", "\t");
+            Assert.Equal(expected, File.ReadAllText(testPath));
 
-                // Reset and return our qubits for the next example.
-                Prepare(qubits);
-                release.Apply(qubits);
-            }
-            finally
-            {
-                // Restore stdout on our way out.
-                Console.SetOut(stdout);
-            }
+            // Reset and return our qubits for the next example.
+            Prepare(qubits);
+            release.Apply(qubits);
         }
 
     }
