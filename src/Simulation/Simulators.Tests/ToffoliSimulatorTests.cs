@@ -293,7 +293,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             dumpMachine.Apply(testPath);
             expected = @"Offset  \tState Data
 ========\t==========
-00000000\t92 49 24 92 49 24 92 49
+00000000\t49 92 24 49 92 24 49 92
 "
                 .Replace("\\t", "\t");
             Assert.Equal(expected, File.ReadAllText(testPath));
