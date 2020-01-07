@@ -283,7 +283,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 release.Apply(qubits);
 
                 // Proceed with a larger example (≥ 32 qubits).
-                var qubits = allocate.Apply(64);
+                qubits = allocate.Apply(64);
                 Prepare(qubits);
 
                 // Dump the state out.
@@ -298,12 +298,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 00000000\t9249249249249249
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
 
                     sim.DumpFormat = ToffoliDumpFormat.Bits;
                     dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+                    expected = @"Offset  \tState Data
 ========\t==========
 00000000\t1001001001001001
 00000002\t0010010010010010
@@ -311,17 +311,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 00000006\t1001001001001001
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
 
                     sim.DumpFormat = ToffoliDumpFormat.Hex;
                     dumpMachine.Apply("");
-                    var expected = @"Offset  \tState Data
+                    expected = @"Offset  \tState Data
 ========\t==========
 00000000\t9249249249249249
 "
                         .Replace("\\t", "\t");
-                    Assert.Equal(writer.ToString());
+                    Assert.Equal(expected, writer.ToString());
                     writer.Clear();
                 }
 
