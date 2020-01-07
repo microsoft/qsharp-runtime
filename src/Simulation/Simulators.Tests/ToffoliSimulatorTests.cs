@@ -5,6 +5,7 @@ using Xunit;
 
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
@@ -335,7 +336,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
     }
 
-    internal static class Extensions
+    internal static class TestUtilityExtensions
     {
         internal static IEnumerable<T> EveryNth<T>(this IEnumerable<T> source, int n = 2) =>
             source.Where((element, index) => index % n == 0);
