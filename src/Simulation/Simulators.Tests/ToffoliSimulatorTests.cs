@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Xunit;
+using Xunit.Abstractions;
 
 using System;
 using System.Threading.Tasks;
