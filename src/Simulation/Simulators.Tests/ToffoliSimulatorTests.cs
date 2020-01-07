@@ -226,7 +226,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
-            var dumpMachine = sim.Get<Microsoft.Quantum.Diagnostics.DumpMachine<string>>();
+            // We use a wrapper operation defined in the test suite
+            // to help us resolve the type parameters here.
+            var dumpMachine = sim.Get<Microsoft.Quantum.Simulation.Simulators.Tests.DumpToFile>();
 
             var x = sim.Get<Intrinsic.X>();
 
@@ -271,7 +273,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             dumpMachine.Apply(testPath);
             expected = @"Offset  \tState Data
 ========\t==========
-00000000\t1249
+00000000\t49 12
 "
                 .Replace("\\t", "\t");
             Assert.Equal(expected, File.ReadAllText(testPath));
@@ -291,7 +293,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             dumpMachine.Apply(testPath);
             expected = @"Offset  \tState Data
 ========\t==========
-00000000\t9249249249249249
+00000000\t92 49 24 92 49 24 92 49
 "
                 .Replace("\\t", "\t");
             Assert.Equal(expected, File.ReadAllText(testPath));
@@ -314,7 +316,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             dumpMachine.Apply(testPath);
             expected = @"Offset  \tState Data
 ========\t==========
-00000000\t9249249249249249
+00000000\t49 92 24 49 92 24 49 92
 "
                 .Replace("\\t", "\t");
             Assert.Equal(expected, File.ReadAllText(testPath));
