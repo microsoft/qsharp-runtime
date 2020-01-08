@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// it attemps to create the wave function or the resulting subsystem; if it fails
         /// because the qubits are entangled with some external qubit, it just generates a message.
         /// </summary>
-        protected virtual QVoid Dump<T>(T target, IQArray<Qubit> qubits = null)
+        protected virtual QVoid Dump<T>(T target, IQArray<Qubit>? qubits = null)
         {
             var filename = (target is QVoid) ? "" : target.ToString();
 
