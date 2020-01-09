@@ -34,12 +34,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// </summary>
             public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Body => (_args) =>
             {
-                Qubit? f(Pauli p, Qubit q) =>
-                    p switch {
-                        Pauli.PauliI => null,
-                        Pauli.PauliZ => q,
-                        _ => throw new InvalidOperationException($"The Toffoli simulator can only Measure in the Z basis.")
-                    };
+                Qubit f(Pauli p, Qubit q)
+                {
+                    switch (p)
+                    {
+                        case Pauli.PauliI:
+                            return null;
+                        case Pauli.PauliZ:
+                            return q;
+                        default:
+                            throw new InvalidOperationException($"The Toffoli simulator can only Measure in the Z basis.");
+                    }
+                }
 
                 var (paulis, qubits) = _args;
 
@@ -48,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
                 }
 
-                var qubitsToMeasure = paulis.Zip(qubits, f).WhereNotNull();
+                var qubitsToMeasure = paulis.Zip(qubits, f).Where(q => q != null);
 
                 var result = simulator.GetParity(qubitsToMeasure);
 
