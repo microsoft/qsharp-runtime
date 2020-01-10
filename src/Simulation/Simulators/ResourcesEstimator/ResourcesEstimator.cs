@@ -68,7 +68,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// Returns the label to use for the given metric. If the metric should be skipped
         /// it returns null. Otherwise, it returns the same metric's name or some other alias.
         /// </summary>
-        public virtual string? GetMetricLabel(string name)
+        public virtual string GetMetricLabel(string name)
         {
             if (name == MetricsNames.DepthCounter.StartTimeDifference ||
                 name == MetricsNames.WidthCounter.InputWidth ||

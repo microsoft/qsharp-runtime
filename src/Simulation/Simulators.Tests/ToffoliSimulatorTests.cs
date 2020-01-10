@@ -2,13 +2,9 @@
 // Licensed under the MIT License.
 
 using Xunit;
-using Xunit.Abstractions;
 
 using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
@@ -18,13 +14,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     public class ToffoliSimulatorTests
     {
-        private readonly ITestOutputHelper output;
-
-        public ToffoliSimulatorTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
-
         [Fact]
         public void ToffoliConstructor()
         {
@@ -43,10 +32,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
 
-            var qubits = allocate.Apply(1);
-            Assert.Single(qubits);
+            var qbits = allocate.Apply(1);
+            Assert.Single(qbits);
 
-            var q = qubits[0];
+            var q = qbits[0];
             var result = measure.Apply(q);
             Assert.Equal(Result.Zero, result);
 
@@ -55,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(Result.One, result);
             sim.State[q.Id] = false; // Make it safe to release
 
-            release.Apply(qubits);
+            release.Apply(qbits);
             sim.CheckNoQubitLeak();
         }
 
@@ -217,126 +206,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             x.Apply(q1);
 
             release.Apply(qubits);
-        }
-
-        [Fact]
-        public void ToffoliDumpState()
-        {
-            var sim = new ToffoliSimulator();
-
-            var allocate = sim.Get<Intrinsic.Allocate>();
-            var release = sim.Get<Intrinsic.Release>();
-            // We use a wrapper operation defined in the test suite
-            // to help us resolve the type parameters here.
-            var dumpMachine = sim.Get<Microsoft.Quantum.Simulation.Simulators.Tests.DumpToFile>();
-
-            var x = sim.Get<Intrinsic.X>();
-
-            // We define a local function to prepare an example state so that we
-            // can repeat it at the end to release everything.
-            void Prepare(IEnumerable<Qubit> qubits)
-            {
-                foreach (var qubit in qubits.EveryNth(3))
-                {
-                    x.Apply(qubit);
-                }
-            };
-
-            // Start with a small example (< 32 qubits).
-            var qubits = allocate.Apply(13);
-            Prepare(qubits);
-
-            // Dump the state out.
-            sim.DumpFormat = ToffoliDumpFormat.Automatic;
-            var testPath = Path.GetTempFileName();
-            output.WriteLine($"Dumping machine to {testPath}.");
-            dumpMachine.Apply(testPath);
-            var expected = @"Offset  \tState Data
-========\t==========
-00000000\t1001001001001
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            sim.DumpFormat = ToffoliDumpFormat.Bits;
-            testPath = Path.GetTempFileName();
-            dumpMachine.Apply(testPath);
-            expected = @"Offset  \tState Data
-========\t==========
-00000000\t1001001001001
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            sim.DumpFormat = ToffoliDumpFormat.Hex;
-            testPath = Path.GetTempFileName();
-            dumpMachine.Apply(testPath);
-            expected = @"Offset  \tState Data
-========\t==========
-00000000\t49 12
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            // Reset and return our qubits for the next example.
-            Prepare(qubits);
-            release.Apply(qubits);
-
-            // Proceed with a larger example (≥ 32 qubits).
-            qubits = allocate.Apply(64);
-            Prepare(qubits);
-
-            // Dump the state out.
-
-            sim.DumpFormat = ToffoliDumpFormat.Automatic;
-            testPath = Path.GetTempFileName();
-            dumpMachine.Apply(testPath);
-            expected = @"Offset  \tState Data
-========\t==========
-00000000\t49 92 24 49 92 24 49 92
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            sim.DumpFormat = ToffoliDumpFormat.Bits;
-            testPath = Path.GetTempFileName();
-            dumpMachine.Apply(testPath);
-            expected = @"Offset  \tState Data
-========\t==========
-00000000\t1001001001001001
-00000002\t0010010010010010
-00000004\t0100100100100100
-00000006\t1001001001001001
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            sim.DumpFormat = ToffoliDumpFormat.Hex;
-            testPath = Path.GetTempFileName();
-            dumpMachine.Apply(testPath);
-            expected = @"Offset  \tState Data
-========\t==========
-00000000\t49 92 24 49 92 24 49 92
-"
-                .Replace("\\t", "\t");
-            Assert.Equal(expected, File.ReadAllText(testPath));
-
-            // Reset and return our qubits for the next example.
-            Prepare(qubits);
-            release.Apply(qubits);
-        }
-
-    }
-
-    internal static class TestUtilityExtensions
-    {
-        internal static IEnumerable<T> EveryNth<T>(this IEnumerable<T> source, int n = 2) =>
-            source.Where((element, index) => index % n == 0);
-
-        internal static void Clear(this StringWriter writer)
-        {
-            var builder = writer.GetStringBuilder();
-            builder.Remove(0, builder.Length);
         }
     }
 }

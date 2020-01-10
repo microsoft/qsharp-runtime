@@ -10,12 +10,6 @@
     <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
   </PropertyGroup>
 
-  <PropertyGroup>
-    <LanguageVersion>8.0</LanguageVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
