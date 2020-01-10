@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-#nullable enable
 
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -13,13 +11,6 @@ using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public enum ToffoliDumpFormat
-    {
-        Bits,
-        Hex,
-        Automatic
-    }
-
     /// <summary>
     /// The Toffoli simulator implementation class.
     /// </summary>
@@ -32,8 +23,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         public const uint DEFAULT_QUBIT_COUNT = 65536;
         private const double Tolerance = 1.0E-10;
 
-        public ToffoliDumpFormat DumpFormat { get; set; } = ToffoliDumpFormat.Automatic;
-
         /// <summary>
         /// Constructs a default Toffoli simulator instance.
         /// </summary>
@@ -45,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <param name="qubitCount">The number of qubits to allocate.
         /// There is an overhead of one byte of memory usage per allocated qubit.
         /// There is no time overhead from allocating more qubits.</param>
-        public ToffoliSimulator(uint qubitCount)
+        public ToffoliSimulator(uint qubitCount) 
             : base(new QubitManagerTrackingScope(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
         {
             this.State = new bool[qubitCount];
@@ -86,11 +75,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         /// Gets the parity of a group of qubits.
-        /// Specifically, this counts the number of qubits in the One state, and returns
+        /// Specifically, this counts the number of qubits in the One state, and returns 
         /// true if the number is odd and false if it's even.
         /// </summary>
         /// <param name="qubits">The sequence of qubits</param>
-        /// <returns>true if there are an odd number of qubits in the true (One) state,
+        /// <returns>true if there are an odd number of qubits in the true (One) state, 
         /// and false if there are an even number in the true state</returns>
         internal bool GetParity(IEnumerable<Qubit> qubits)
         {
@@ -334,20 +323,20 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// or just whitespace, the console is written to</param>
         internal void DumpState(long[] ids, string filename)
         {
-            var data = ids.Select(id => State[id]).ToArray();
-            Action<Action<string>> dump = DumpFormat switch
+            var Do = new Action<Action<string>>((o) =>
             {
-                ToffoliDumpFormat.Automatic => (channel) => data.Dump(channel),
-                ToffoliDumpFormat.Bits => (channel) => data.DumpAsBits(channel),
-                ToffoliDumpFormat.Hex => (channel) => data.DumpAsHex(channel),
-                _ => throw new ArgumentException($"Invalid format: ${DumpFormat}")
-            };
+                o("State:");
+                foreach (var id in ids)
+                {
+                    o($"{id}:\t{State[id]}");
+                }
+            });
 
             var logMessage = Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
 
             if (string.IsNullOrWhiteSpace(filename))
             {
-                dump((msg) => logMessage.Apply(msg));
+                Do((msg) => logMessage.Apply(msg));
             }
             else
             {
@@ -355,7 +344,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     using (var file = new System.IO.StreamWriter(filename))
                     {
-                        dump(file.WriteLine);
+                        Do(file.WriteLine);
                     }
                 }
                 catch (Exception e)

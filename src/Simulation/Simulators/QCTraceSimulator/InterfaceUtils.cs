@@ -21,9 +21,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// generic parameters. Returns null if type does not implement generic interface
         /// and causes Debug.Assert if type implements more than one of the generic interfaces. 
         /// </summary>
-        static Type? InterfaceType(Type t, Type genericInterfaceDefinition)
+        static Type InterfaceType(Type t, Type genericInterfaceDefinition)
         {
-            Type? interfaceTypeResult = null;
+            Type interfaceTypeResult = null;
             int interfaceCount = 0;
             foreach (Type interfaceType in t.GetInterfaces())
             {
@@ -42,7 +42,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Returns type of ICallable interface implemented by a given type.
         /// If given type does not implement ICallable return null
         /// </summary>
-        public static Type? ICallableType(this Type t)
+        public static Type ICallableType(this Type t)
         {
             return InterfaceType(t, typeof(ICallable<,>));
         }
@@ -51,7 +51,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Returns type of IUnitary interface implemented by a given type.
         /// If given type does not implement ICallable return null
         /// </summary>
-        public static Type? IUnitatryType(this Type t)
+        public static Type IUnitatryType(this Type t)
         {
             return InterfaceType(t, typeof(IUnitary<>));
         }
@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Returns type of IUnitary interface implemented by a given type.
         /// If given type does not implement ICallable return null
         /// </summary>
-        public static Type? IAdjointableType(this Type t)
+        public static Type IAdjointableType(this Type t)
         {
             return InterfaceType(t, typeof(IAdjointable<>));
         }
@@ -69,7 +69,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Returns type of IControllable interface implemented by a given type.
         /// If given type does not implement ICallable return null
         /// </summary>
-        public static Type? IControllableType(Type t)
+        public static Type IControllableType(Type t)
         {
             return InterfaceType(t, typeof(IControllable<>));
         }

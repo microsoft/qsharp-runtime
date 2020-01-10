@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// Entry method to get the dump of the wave function.
             /// </summary>
-            public virtual bool Dump(IQArray<Qubit>? qubits = null)
+            public virtual bool Dump(IQArray<Qubit> qubits = null)
             {
                 if (qubits == null)
                 {
@@ -174,7 +174,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return true;
             }
 
-            public override bool Dump(IQArray<Qubit>? qubits = null)
+            public override bool Dump(IQArray<Qubit> qubits = null)
             {
                 var count = qubits == null
                     ? this.Simulator.QubitManager.GetAllocatedQubitsCount()

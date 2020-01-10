@@ -31,12 +31,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// </summary>
             public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> Body => (_args) =>
             {
-
-                Qubit? f(Pauli p, Qubit q) =>
-                    p switch {
-                        Pauli.PauliZ => q,
-                        _ => null,
-                    };
+                Qubit f(Pauli p, Qubit q)
+                {
+                    switch (p)
+                    {
+                        case Pauli.PauliZ:
+                            return q;
+                        default:
+                            return null;
+                    }
+                }
 
                 var (paulis, qubits, result, expectedProb, msg, tolerance) = _args;
 
@@ -61,7 +65,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 else
                 {
                     // Pick out just the Z measurements
-                    var qubitsToMeasure = paulis.Zip(qubits, f).WhereNotNull();
+                    var qubitsToMeasure = paulis.Zip(qubits, f).Where(q => q != null);
                     var parity = simulator.GetParity(qubitsToMeasure);
                     var actual = parity ? 0.0 : 1.0;
                     if (result == Result.One)
