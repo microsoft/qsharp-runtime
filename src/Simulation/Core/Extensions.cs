@@ -3,7 +3,9 @@
 
 // Hide this code from the debugger since this is called from Q# directly:
 #line hidden
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -12,6 +14,9 @@ namespace Microsoft.Quantum.Simulation.Core
     // Extension method to make it simpler to call an Operation.
     public static partial class Extensions
     {
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T: class =>
+            source.Where(q => q != null).Select(q => q!);
+
         public static Result ToResult(this bool b)
         {
             return b

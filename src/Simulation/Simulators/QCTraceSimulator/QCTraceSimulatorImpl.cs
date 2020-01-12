@@ -94,8 +94,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             metricNameToListener = new Dictionary<string, ICallGraphStatistics>();
             foreach (IQCTraceSimulatorListener l in tCoreConfig.Listeners)
             {
-                ICallGraphStatistics li = l as ICallGraphStatistics;
-                if (li != null)
+                if (l is ICallGraphStatistics li)
                 {
                     string[] variableNames = li.Results.GetVariablesNamesCopy();
                     foreach (string metric in variableNames)
