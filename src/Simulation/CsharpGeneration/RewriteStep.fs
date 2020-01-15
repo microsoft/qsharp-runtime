@@ -22,6 +22,7 @@ type Emitter() =
         member this.Name = "CsharpGeneration"
         member this.Priority = -1 // doesn't matter because this rewrite step is the only one in the dll
         member this.AssemblyConstants = _AssemblyConstants :> IDictionary<string, string> 
+        member this.GeneratedDiagnostics = null
         
         member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false
