@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
     public partial class QuantumProcessorDispatcher
     {
 
-        private static void RunClause(ICallable op, OperationFunctor type, IQArray<Qubit> ctrls)
+        private static void RunClause(ICallable op, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
             switch (type)
             {
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                                                     ICallable onEqualOp,
                                                     ICallable onNonEqualOp,
                                                     OperationFunctor type,
-                                                    IQArray<Qubit> ctrls)
+                                                    IQArray<Qubit>? ctrls)
         {
             bool run;
 
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                                             ICallable onEqualOp,
                                             ICallable onNonEqualOp,
                                             OperationFunctor type,
-                                            IQArray<Qubit> ctrls)
+                                            IQArray<Qubit>? ctrls)
         {
             long statement = Simulator.QuantumProcessor.StartConditionalStatement(measurementResults, resultsValues);
             return ExecuteConditionalStatementInternal(Simulator,
@@ -71,7 +71,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                                             ICallable onEqualOp,
                                             ICallable onNonEqualOp,
                                             OperationFunctor type,
-                                            IQArray<Qubit> ctrls)
+                                            IQArray<Qubit>? ctrls)
         {
             long statement = Simulator.QuantumProcessor.StartConditionalStatement(measurementResult, resultValue);
             return ExecuteConditionalStatementInternal(Simulator,
