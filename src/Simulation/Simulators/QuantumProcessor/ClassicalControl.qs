@@ -92,7 +92,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
         ApplyIfElseIntrinsicC(measurementResult, zeroOp, oneOp);
     }
 
-    operation ApplyIfElseCA<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj + Ctl), zeroArg : 'T) , (onResultOneOp : ('U => Unit is Adj + Ctl), oneArg : 'U)) : Unit is Ctl + Adj {
+    operation ApplyIfElseRCA<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj + Ctl), zeroArg : 'T) , (onResultOneOp : ('U => Unit is Adj + Ctl), oneArg : 'U)) : Unit is Ctl + Adj {
         let zeroOp = DelayCA(onResultZeroOp, zeroArg, _);
         let oneOp = DelayCA(onResultOneOp, oneArg, _);
         ApplyIfElseIntrinsicCA(measurementResult, zeroOp, oneOp);
