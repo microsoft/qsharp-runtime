@@ -287,7 +287,7 @@ namespace Microsoft.Quantum.Simulation.Common
     /// <summary>
     /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
     /// </summary>
-    public class UnsupportedOperationException : NotImplementedException
+    public class UnsupportedOperationException : PlatformNotSupportedException
     {
         public UnsupportedOperationException(string text = "",
                             [CallerFilePath] string file = "",
