@@ -4,178 +4,179 @@
 using System;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
     /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
-    /// It throws <see cref="NotImplementedException"/> for most APIs.
+    /// It throws <see cref="UnsupportedOperationException"/> for most APIs.
     /// </summary>
     public class QuantumProcessorBase : IQuantumProcessor 
     {
         public virtual void X(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledX(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void Y(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledY(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void Z(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void SWAP(Qubit qubit1, Qubit qubit2)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void H(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledH(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void S(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledS(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void SAdjoint(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void T(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledT(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void TAdjoint(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void R(Pauli axis, double theta, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void R1(double theta, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void R1Frac(long numerator, long power, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual Result M(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual void Reset(Qubit qubit)
         {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         public virtual long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
@@ -281,5 +282,19 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
+    }
+
+    /// <summary>
+    /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
+    /// </summary>
+    public class UnsupportedOperationException : PlatformNotSupportedException
+    {
+        public UnsupportedOperationException(string text = "",
+                            [CallerFilePath] string file = "",
+                            [CallerMemberName] string member = "",
+                            [CallerLineNumber] int line = 0)
+            : base($"{file}::{line}::[{member}]:{text}")
+        {
+        }
     }
 }
