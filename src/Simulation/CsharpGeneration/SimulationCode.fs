@@ -906,6 +906,15 @@ module SimulationCode =
         operations
         |> List.map buildOne
 
+    let buildOperationInfoProperty operationInput operationOutput operationType =
+        let propertyType = sprintf @"OperationInfo<%s, %s>" operationInput operationOutput
+        let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [``ident`` operationType] ``)``]
+        let newInstance = ``new`` (``type`` [propertyType]) ``(`` newInstanceArgs ``)``
+        ``property-arrow_get`` propertyType "Info" [``public``; ``static``]
+            ``get``
+            (``=>`` newInstance)
+        :> MemberDeclarationSyntax
+
     let buildSpecializationBody context (sp:QsSpecialization) =
         match sp.Implementation with
         | Provided (args, _) ->           
@@ -1309,9 +1318,12 @@ module SimulationCode =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
         let opNames = operationDependencies context op
+        let inType   = op.Signature.ArgumentType |> roslynTypeName context
+        let outType  = op.Signature.ReturnType   |> roslynTypeName context
+        let opType   = op.Kind.ToString()
 
         let constructors = [ (buildConstructor context name) ]
-        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames
+        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType opType :: buildOpsProperties context opNames
             
         let baseOp =
             if isFunction op then 
@@ -1323,8 +1335,6 @@ module SimulationCode =
                 | (true  , false) -> "Adjointable"
                 | (false , true ) -> "Controllable"
                 | (true  , true ) -> "Unitary"
-        let inType   = op.Signature.ArgumentType |> roslynTypeName context
-        let outType  = op.Signature.ReturnType   |> roslynTypeName context
   
         let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
         let typeParameters = typeParametersNames op.Signature
