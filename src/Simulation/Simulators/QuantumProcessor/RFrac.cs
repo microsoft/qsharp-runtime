@@ -22,10 +22,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(Pauli, long, long, Qubit), QVoid> Body => (_args) =>
             {
-                var (basis, num, denom , q1) = _args;
+                (Pauli basis, long num, long denom, Qubit q1) = _args;
                 if (basis != Pauli.PauliI)
                 {
-                    var (numNew, denomNew) = CommonUtils.Reduce(num, denom);
+                    (long numNew, long denomNew) = CommonUtils.Reduce(num, denom);
                     Simulator.QuantumProcessor.RFrac(basis, numNew, denomNew, q1);
                 }
                 return QVoid.Instance;
@@ -33,21 +33,30 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(Pauli, long, long, Qubit), QVoid> AdjointBody => (_args) =>
             {
-                var (basis, num, denom, q1) = _args;
+                (Pauli basis, long num, long denom, Qubit q1) = _args;
                 return this.Body.Invoke((basis, -num, denom, q1));
             };
 
             public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> ControlledBody => (_args) =>
             {
-                var (ctrls, (basis, num, denom, q1)) = _args;
-                var (numNew, denomNew) = CommonUtils.Reduce(num, denom);
-                Simulator.QuantumProcessor.ControlledRFrac(ctrls, basis, numNew, denomNew, q1);
+                (IQArray<Qubit> ctrls, (Pauli basis, long num, long denom, Qubit q1)) = _args;
+                (long numNew, long denomNew) = CommonUtils.Reduce(num, denom);
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    Simulator.QuantumProcessor.RFrac(basis, numNew, denomNew, q1);
+                }
+                else
+                {
+                    Simulator.QuantumProcessor.ControlledRFrac(ctrls, basis, numNew, denomNew, q1);
+                }
+
                 return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> ControlledAdjointBody => (_args) =>
             {
-                var (ctrls, (basis, num, denom, q1)) = _args;
+                (IQArray<Qubit> ctrls, (Pauli basis, long num, long denom, Qubit q1)) = _args;
                 return this.ControlledBody.Invoke((ctrls, (basis, -num, denom, q1)));
             };
         }

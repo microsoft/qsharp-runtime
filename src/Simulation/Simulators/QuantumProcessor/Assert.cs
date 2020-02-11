@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, string), QVoid> Body => (_args) =>
             {
-                var (paulis, qubits, result, msg) = _args;
+                (IQArray<Pauli> paulis, IQArray<Qubit> qubits, Result result, string msg) = _args;
                 if (paulis.Length != qubits.Length)
                 {
                     IgnorableAssert.Assert((paulis.Length != qubits.Length), "Arrays length mismatch");

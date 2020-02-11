@@ -41,7 +41,16 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledAdjointBody => (_args) =>
             {
                 (IQArray<Qubit> ctrls, Qubit q1) = _args;
-                Simulator.QuantumProcessor.ControlledTAdjoint(ctrls, q1);
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    Simulator.QuantumProcessor.TAdjoint(q1);
+                }
+                else
+                {
+                    Simulator.QuantumProcessor.ControlledTAdjoint(ctrls, q1);
+                }
+
                 return QVoid.Instance;
             };
         }

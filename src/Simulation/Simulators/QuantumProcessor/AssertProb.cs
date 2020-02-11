@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> Body => (_args) =>
             {
-                var (paulis, qubits, result, expectedPr, msg, tol) = _args;
+                (IQArray<Pauli> paulis, IQArray<Qubit> qubits, Result result, double expectedPr, string msg, double tol) = _args;
                 if (paulis.Length != qubits.Length)
                 {
                     IgnorableAssert.Assert((paulis.Length != qubits.Length), "Arrays length mismatch");
@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 
                 double probabilityOfZero = result == Result.Zero ? expectedPr : 1.0 - expectedPr;
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                Simulator.QuantumProcessor.AssertProb(newPaulis, newQubits, probabilityOfZero, msg, tol );
+                Simulator.QuantumProcessor.AssertProb(newPaulis, newQubits, probabilityOfZero, msg, tol);
                 return QVoid.Instance;
             };
 

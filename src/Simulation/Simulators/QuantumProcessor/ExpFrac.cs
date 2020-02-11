@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Pauli>, long, long, IQArray<Qubit>), QVoid> Body => (_args) =>
             {
-                var (paulis, nom, den, qubits) = _args;
+                (IQArray<Pauli> paulis, long nom, long den, IQArray<Qubit> qubits) = _args;
 
                 if (paulis.Length != qubits.Length)
                 {
@@ -33,22 +33,32 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Pauli>, long, long, IQArray<Qubit>), QVoid> AdjointBody => (_args) =>
             {
-                var (paulis, nom, den, qubits) = _args;
+                (IQArray<Pauli> paulis, long nom, long den, IQArray<Qubit> qubits) = _args;
+                
                 return this.Body.Invoke((paulis, -nom, den, qubits));
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid>
                 ControlledBody => (_args) =>
                 {
-                    var (ctrls, (paulis, nom, den, qubits)) = _args;
+                    (IQArray<Qubit> ctrls, (IQArray<Pauli> paulis, long nom, long den, IQArray<Qubit> qubits)) = _args;
 
                     if (paulis.Length != qubits.Length)
                     {
                         throw new InvalidOperationException(
-                      $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
+                            $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                     }
+
                     CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                    Simulator.QuantumProcessor.ControlledExpFrac(ctrls, newPaulis, nom, den, newQubits);
+                    
+                    if ((ctrls == null) || (ctrls.Count == 0))
+                    {
+                        Simulator.QuantumProcessor.ExpFrac(newPaulis, nom, den, newQubits);
+                    }
+                    else
+                    {
+                        Simulator.QuantumProcessor.ControlledExpFrac(ctrls, newPaulis, nom, den, newQubits);
+                    }
 
                     return QVoid.Instance;
                 };
@@ -56,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid>
                 ControlledAdjointBody => (_args) =>
                 {
-                    var (ctrls, (paulis, nom, den, qubits)) = _args;
+                    (IQArray<Qubit> ctrls, (IQArray<Pauli> paulis, long nom, long den, IQArray<Qubit> qubits)) = _args;
 
                     return this.ControlledBody.Invoke((ctrls, (paulis, -nom, den, qubits)));
                 };

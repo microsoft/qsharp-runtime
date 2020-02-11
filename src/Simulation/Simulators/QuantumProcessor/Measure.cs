@@ -20,14 +20,16 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Body => (_args) =>
             {
-                var (paulis, qubits) = _args;
+                (IQArray<Pauli> paulis, IQArray<Qubit> qubits) = _args;
 
                 if (paulis.Length != qubits.Length)
                 {
-                    throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
+                    throw new InvalidOperationException(
+                        $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
                 }
 
                 CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
+
                 return Simulator.QuantumProcessor.Measure( newPaulis, newQubits);
             };
         }
