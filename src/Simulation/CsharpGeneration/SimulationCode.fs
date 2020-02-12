@@ -906,9 +906,11 @@ module SimulationCode =
         operations
         |> List.map buildOne
 
-    let buildOperationInfoProperty operationInput operationOutput operationType =
+    /// Returns a static property of type OperationInfo using the operation's input and output types.
+    let buildOperationInfoProperty operationInput operationOutput operationName =
         let propertyType = sprintf @"OperationInfo<%s, %s>" operationInput operationOutput
-        let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [``ident`` operationType] ``)``]
+        let operationType = simpleBase operationName
+        let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [operationType.Type] ``)``]
         let newInstance = ``new`` (``type`` [propertyType]) ``(`` newInstanceArgs ``)``
         ``property-arrow_get`` propertyType "Info" [``public``; ``static``]
             ``get``
@@ -1320,10 +1322,9 @@ module SimulationCode =
         let opNames = operationDependencies context op
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
-        let opType   = op.Kind.ToString()
 
         let constructors = [ (buildConstructor context name) ]
-        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType opType :: buildOpsProperties context opNames
+        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType nonGenericName :: buildOpsProperties context opNames
             
         let baseOp =
             if isFunction op then 

@@ -1,9 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
+    /// <summary>
+    /// Contains information about the Q# operation that can be used at runtime.
+    /// </summary>
     public class OperationInfo<I, O>
     {
         public Type Operation { get; }

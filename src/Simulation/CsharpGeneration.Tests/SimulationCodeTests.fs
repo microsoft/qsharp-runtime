@@ -978,15 +978,47 @@ namespace N1
         ]
         |> testOne genRecursion
 
-    let generatePropertyDeclarationCodeString (declaration : CSharpSyntaxNode) =
-        let format = Formatting.Formatter.Format (declaration, new AdhocWorkspace())
-        format.ToString()
-
     [<Fact>]
     let ``buildOperationInfoProperty test`` () =
-        let operationInfoPropertyCodeString = buildOperationInfoProperty "string" "string" "int" |> generatePropertyDeclarationCodeString
-        let expectedCodeString = @"public static OperationInfo<string, string> Info => new OperationInfo<string, string>(typeof(int));"
-        Assert.Equal (expectedCodeString, operationInfoPropertyCodeString)
+        let testOne (_, op) expectedCodeString =
+            let context = createTestContext op
+            let (_, operationName) = findClassName context op
+            let inType   = op.Signature.ArgumentType |> roslynTypeName context
+            let outType  = op.Signature.ReturnType   |> roslynTypeName context
+            let codeString =
+                buildOperationInfoProperty inType outType operationName
+                |> formatSyntaxTree
+            Assert.Equal(expectedCodeString |> clearFormatting, codeString |> clearFormatting)
+
+        let template inType outType operationName =
+            sprintf @"public static OperationInfo<%s, %s> Info => new OperationInfo<%s, %s>(typeof(%s));" inType outType inType outType operationName
+
+        template "QVoid" "QVoid" "emptyOperation"
+        |> testOne emptyOperation
+
+        template "Qubit" "QVoid" "oneQubitAbstractOperation"
+        |> testOne oneQubitAbstractOperation
+
+        template "Qubit" "QVoid" "oneQubitOperation"
+        |> testOne oneQubitOperation
+
+        template "(Qubit,(Qubit,Double))" "QVoid" "twoQubitOperation"
+        |> testOne twoQubitOperation
+
+        template "(Qubit,Qubit,Qubits)" "QVoid" "threeQubitOperation"
+        |> testOne threeQubitOperation
+
+        template "(Qubit,Qubit,IQArray<Qubit>)" "QVoid" "differentArgsOperation"
+        |> testOne differentArgsOperation
+
+        template "Int64" "Int64" "helloWorld"
+        |> testOne helloWorld
+
+        template "(Qubit,ICallable,ICallable,IAdjointable,(IControllable,IUnitary),ICallable)" "ICallable" "opParametersTest"
+        |> testOne opParametersTest
+
+        template "QVoid" "QVoid" "emptyFunction"
+        |> testOne emptyFunction
 
     let findBody op = 
         let isBody (sp:QsSpecialization) = match sp.Kind with | QsBody -> true | _ -> false
