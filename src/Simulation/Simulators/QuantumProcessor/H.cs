@@ -26,8 +26,17 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledBody => (args) =>
             {
-                var (ctrls, q1) = args;
-                Simulator.QuantumProcessor.ControlledH(ctrls, q1);
+                (IQArray<Qubit> ctrls, Qubit q1) = args;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    Simulator.QuantumProcessor.H(q1);
+                }
+                else
+                {
+                    Simulator.QuantumProcessor.ControlledH(ctrls, q1);
+                }
+
                 return QVoid.Instance;
             };
         }
