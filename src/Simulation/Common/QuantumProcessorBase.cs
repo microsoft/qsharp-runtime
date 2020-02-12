@@ -181,7 +181,10 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
         {
+            if (measurementResults == null) { return 1; };
+            if (resultsValues == null) { return 1; };
             Debug.Assert(measurementResults.Count == resultsValues.Count);
+            if (measurementResults.Count != resultsValues.Count) { return 1; };
 
             int equal = 1;
 
