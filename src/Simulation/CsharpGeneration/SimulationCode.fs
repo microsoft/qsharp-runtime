@@ -906,6 +906,17 @@ module SimulationCode =
         operations
         |> List.map buildOne
 
+    /// Returns a static property of type OperationInfo using the operation's input and output types.
+    let buildOperationInfoProperty operationInput operationOutput operationName =
+        let propertyType = sprintf @"OperationInfo<%s, %s>" operationInput operationOutput
+        let operationType = simpleBase operationName
+        let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [operationType.Type] ``)``]
+        let newInstance = ``new`` (``type`` [propertyType]) ``(`` newInstanceArgs ``)``
+        ``property-arrow_get`` propertyType "Info" [``public``; ``static``]
+            ``get``
+            (``=>`` newInstance)
+        :> MemberDeclarationSyntax
+
     let buildSpecializationBody context (sp:QsSpecialization) =
         match sp.Implementation with
         | Provided (args, _) ->           
@@ -1309,9 +1320,11 @@ module SimulationCode =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
         let opNames = operationDependencies context op
+        let inType   = op.Signature.ArgumentType |> roslynTypeName context
+        let outType  = op.Signature.ReturnType   |> roslynTypeName context
 
         let constructors = [ (buildConstructor context name) ]
-        let properties = buildName name :: buildFullName context.current.Value :: buildOpsProperties context opNames
+        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType nonGenericName :: buildOpsProperties context opNames
             
         let baseOp =
             if isFunction op then 
@@ -1323,8 +1336,6 @@ module SimulationCode =
                 | (true  , false) -> "Adjointable"
                 | (false , true ) -> "Controllable"
                 | (true  , true ) -> "Unitary"
-        let inType   = op.Signature.ArgumentType |> roslynTypeName context
-        let outType  = op.Signature.ReturnType   |> roslynTypeName context
   
         let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
         let typeParameters = typeParametersNames op.Signature
