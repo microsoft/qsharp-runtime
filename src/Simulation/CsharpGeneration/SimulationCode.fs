@@ -799,7 +799,7 @@ module SimulationCode =
             // To force that exceptions thrown during the execution of the allocation scope take precedence over the ones thrown upon release
             // we catch all exceptions in a variable and throw after releaseing if necessary. 
 
-            // Indicates if deallocation is needed. It is not needed when excaption is thrown.
+            // Indicates if deallocation is needed. It is not needed when exception is thrown.
             let deallocationFlagDeclaration = ``typed var`` "bool" deallocationFlagName (``:=`` ``true`` |> Some) |> ``#line hidden`` :> StatementSyntax
             
             let catch = 
