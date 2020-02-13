@@ -1123,10 +1123,10 @@ namespace N1
             {
                 var qubits = Allocate.Apply(3L);
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true;
                 try
                 {
-                    var op = MicrosoftQuantumTestingHold.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg3__) => (CNOT, (qubits[0L], qubits[1L]), __arg3__)));
+                    var op = MicrosoftQuantumTestingHold.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (CNOT, (qubits[0L], qubits[1L]), __arg2__)));
                     op.Apply(QVoid.Instance);
 
                     MicrosoftQuantumTestingnoOpGeneric.Apply(qubits[0L]);
@@ -1134,19 +1134,18 @@ namespace N1
                     genIter.Apply((X, qubits));
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false;
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg1__ != null)
+                    if (__arg1__)
                     {
-                        __arg1__.Throw();
+                        Release.Apply(qubits);
                     }
-                    Release.Apply(qubits);
                 }
             }
             """
@@ -1411,7 +1410,7 @@ namespace N1
             {
                 var qubits = Allocate.Apply(i);
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true; 
                 try
                 {
                     while (true)
@@ -1429,19 +1428,18 @@ namespace N1
                     }
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false; 
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg1__ != null) 
+                    if (__arg1__) 
                     { 
-                        __arg1__.Throw(); 
+                        Release.Apply(qubits);
                     }
-                    Release.Apply(qubits);
                 }
             }
             """
@@ -1455,7 +1453,7 @@ namespace N1
             {
                 var q = Allocate.Apply();
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true; 
                 try
                 {
                     var flag = true;
@@ -1463,76 +1461,73 @@ namespace N1
                     alloc_op0.Apply(q);
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false; 
                     throw;
                 }
 #line hidden
                 finally 
                 {
-                    if (__arg1__ != null) 
+                    if (__arg1__)
                     { 
-                        __arg1__.Throw(); 
+                        Release.Apply(q);
                     }
-                    Release.Apply(q);
                 }
             }"""
             """
             {
                 var qs = Allocate.Apply(n);
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg3__ = null; 
+                bool __arg2__ = true; 
                 try
                 {
                     alloc_op0.Apply(qs[(n-1L)]);
                 }
 #line hidden
-                catch (Exception __arg4__)
+                catch
                 { 
-                    __arg3__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg4__); 
+                    __arg2__ = false; 
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg3__ != null) 
+                    if (__arg2__)
                     { 
-                        __arg3__.Throw(); 
+                        Release.Apply(qs);
                     }
-                    Release.Apply(qs);
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg5__, q3, __arg6__, q4))) = (Allocate.Apply(), ((Allocate.Apply(), Allocate.Apply(2L)), (Allocate.Apply(), Allocate.Apply(n), Allocate.Apply((n-1L)), Allocate.Apply(4L))));
+                var (q1, (q2, (__arg3__, q3, __arg4__, q4))) = (Allocate.Apply(), ((Allocate.Apply(), Allocate.Apply(2L)), (Allocate.Apply(), Allocate.Apply(n), Allocate.Apply((n-1L)), Allocate.Apply(4L))));
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg7__ = null; 
+                bool __arg5__ = true; 
                 try
                 {
                     alloc_op0.Apply(q1);
                     alloc_op0.Apply(q3[1L]);
                 }
 #line hidden
-                catch (Exception __arg8__)
+                catch
                 { 
-                    __arg7__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg8__); 
+                    __arg5__ = false; 
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg7__ != null) 
+                    if (__arg5__)
                     { 
-                        __arg7__.Throw(); 
+                        Release.Apply(q1);
+                        Release.Apply(q2.Item1);
+                        Release.Apply(q2.Item2);
+                        Release.Apply(__arg3__);
+                        Release.Apply(q3);
+                        Release.Apply(__arg4__);
+                        Release.Apply(q4);
                     }
-                    Release.Apply(q1);
-                    Release.Apply(q2.Item1);
-                    Release.Apply(q2.Item2);
-                    Release.Apply(__arg5__);
-                    Release.Apply(q3);
-                    Release.Apply(__arg6__);
-                    Release.Apply(q4);
                 }
             }"""
         ]
@@ -1543,59 +1538,57 @@ namespace N1
             {
                 var b = Borrow.Apply(n);
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true; 
                 try
                 {
                     alloc_op0.Apply(b[(n-1L)]);
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false; 
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg1__ != null) 
+                    if (__arg1__) 
                     { 
-                        __arg1__.Throw(); 
+                        Return.Apply(b);
                     }
-                    Return.Apply(b);
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg3__, q3))) = (Borrow.Apply(), (Borrow.Apply(2L), (Borrow.Apply(), (Borrow.Apply(n), Borrow.Apply(4L)))));
+                var (q1, (q2, (__arg2__, q3))) = (Borrow.Apply(), (Borrow.Apply(2L), (Borrow.Apply(), (Borrow.Apply(n), Borrow.Apply(4L)))));
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg4__ = null; 
+                bool __arg3__ = true; 
                 try
                 {
                     {
                         var qt = (Allocate.Apply(), (Allocate.Apply(1L), Allocate.Apply(2L)));
 #line hidden
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg6__ = null; 
+                        bool __arg4__ = true; 
                         try
                         {
                             var (qt1, qt2) = ((Qubit, (IQArray<Qubit>, IQArray<Qubit>)))qt;
                             alloc_op0.Apply(qt1);
                         }   
 #line hidden
-                        catch (Exception __arg7__)
+                        catch
                         { 
-                            __arg6__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg7__); 
+                            __arg4__ = false; 
                             throw;
                         }                        
 #line hidden
                         finally
                         {
-                            if (__arg6__ != null) 
+                            if (__arg4__)
                             { 
-                                __arg6__.Throw(); 
+                                Release.Apply(qt.Item1);
+                                Release.Apply(qt.Item2.Item1);
+                                Release.Apply(qt.Item2.Item2);
                             }
-                            Release.Apply(qt.Item1);
-                            Release.Apply(qt.Item2.Item1);
-                            Release.Apply(qt.Item2.Item2);
                         }
                     }
 
@@ -1603,23 +1596,22 @@ namespace N1
                     alloc_op0.Apply(q2[1L]);
                 }
 #line hidden
-                catch (Exception __arg5__)
+                catch
                 { 
-                    __arg4__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg5__); 
+                    __arg3__ = false; 
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg4__ != null) 
+                    if (__arg3__)
                     { 
-                        __arg4__.Throw(); 
+                        Return.Apply(q1);
+                        Return.Apply(q2);
+                        Return.Apply(__arg2__);
+                        Return.Apply(q3.Item1);
+                        Return.Apply(q3.Item2);
                     }
-                    Return.Apply(q1);
-                    Return.Apply(q2);
-                    Return.Apply(__arg3__);
-                    Return.Apply(q3.Item1);
-                    Return.Apply(q3.Item2);
                 }
             }"""
         ]
@@ -2522,26 +2514,25 @@ namespace N1
             {
                 var qubits = Allocate.Apply(1L);
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true;
                 try 
                 {
                     H.Apply(qubits[0L]);
                     MicrosoftQuantumIntrinsicH.Apply(qubits[0L]);                
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false;
                     throw;
                 }
 #line hidden
                 finally 
                 {
-                    if (__arg1__ != null) 
+                    if (__arg1__)
                     { 
-                        __arg1__.Throw(); 
+                        Release.Apply(qubits);
                     }
-                    Release.Apply(qubits);
                 }
             }"""
         ]
@@ -3247,7 +3238,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 #line 13 "%%"
                 var (ctrls,q) = (Allocate.Apply(r), Allocate.Apply());
 #line hidden
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo __arg1__ = null; 
+                bool __arg1__ = true;
                 try 
                 {
 #line 15 "%%"
@@ -3268,22 +3259,21 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     }
                 }
 #line hidden
-                catch (Exception __arg2__)
+                catch
                 { 
-                    __arg1__ = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__arg2__); 
+                    __arg1__ = false;
                     throw;
                 }
 #line hidden
                 finally
                 {
-                    if (__arg1__ != null)
+                    if (__arg1__)
                     {
-                        __arg1__.Throw();
+#line hidden
+                        Release.Apply(ctrls);
+#line hidden
+                        Release.Apply(q);
                     }
-#line hidden
-                    Release.Apply(ctrls);
-#line hidden
-                    Release.Apply(q);
                 }
             }
 

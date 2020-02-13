@@ -787,9 +787,8 @@ module SimulationCode =
                 releases    
                 
             let symbols = removeDiscarded using.Binding.Lhs
-            let exDispatchInfoName = nextArgName() 
-            let exDispatchInfoHandle = ``ident`` exDispatchInfoName
-            let caughtEx = nextArgName()
+            let deallocationFlagName = nextArgName()
+            let deallocationFlagIdentifier = ``ident`` deallocationFlagName
 
             // allocations and deallocations
             let lhs = symbols |> buildSymbolNames id
@@ -800,19 +799,15 @@ module SimulationCode =
             // To force that exceptions thrown during the execution of the allocation scope take precedence over the ones thrown upon release
             // we catch all exceptions in a variable and throw after releaseing if necessary. 
 
-            // System.Runtime.ExceptionServices.ExceptionDispatchInfo is used to keep all call stack information when rethrowing
-            let exceptionHandle = ``typed var`` "System.Runtime.ExceptionServices.ExceptionDispatchInfo" exDispatchInfoName (``:=`` ``null`` |> Some) |> ``#line hidden`` :> StatementSyntax
+            // Indicates if deallocation is needed. It is not needed when excaption is thrown.
+            let deallocationFlagDeclaration = ``typed var`` "bool" deallocationFlagName (``:=`` ``true`` |> Some) |> ``#line hidden`` :> StatementSyntax
             
             let catch = 
-                let setEx = exDispatchInfoHandle <-- ``invoke`` (``ident`` "System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture") ``(`` [``ident`` caughtEx] ``)`` |> statement
-                ``catch`` (Some ("Exception", caughtEx)) [setEx; ``throw`` None] // use standard mechanism to rethrow the exception by using "throw;"
-            let finallyBlock = 
-                let condition = exDispatchInfoHandle .!=. ``null``
-                let rethrow = ``invoke`` (exDispatchInfoHandle <|.|> (``ident`` "Throw")) ``(`` [] ``)`` |> statement // rethrow that keeps the call stack unchanged
-                let throwIfNecessary = ``if`` ``(`` condition ``)`` [rethrow] None 
-                throwIfNecessary :: deallocation
+                let setFlagToFalse = deallocationFlagIdentifier <-- ``false`` |> statement
+                ``catch`` None [setFlagToFalse; ``throw`` None] // use standard mechanism to rethrow the exception by using "throw;"
+            let finallyBlock = [``if`` ``(`` deallocationFlagIdentifier ``)`` deallocation None]
             let body = ``try`` (buildBlock using.Body) [catch |> ``#line hidden``] (``finally`` finallyBlock |> ``#line hidden`` |> Some)
-            let statements = [allocation; exceptionHandle; body]
+            let statements = [allocation; deallocationFlagDeclaration; body]
 
             // Put all statements into their own brackets so variable names have their own context.
             // Make sure the brackets get #line hidden:
