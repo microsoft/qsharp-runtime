@@ -27,6 +27,23 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void AllocateQubit2Test()
+        {
+            using (var sim = new QuantumSimulator())
+            {
+                try
+                {
+                    QVoid res = AllocateQubit2.Run(sim).Result;
+                }
+                catch (AggregateException ex)
+                {
+                    Assert.True(ex.InnerException is ExecutionFailException);
+                    // TODO: Need more checks here - stack frames and line numbers
+                }
+            }
+        }
+
+        [Fact]
         public void AlwaysFail4Test()
         {
             using (var sim = new QuantumSimulator())
