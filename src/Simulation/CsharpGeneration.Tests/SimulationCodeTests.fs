@@ -938,7 +938,6 @@ namespace N1
         ]
         |> testOne selfInvokingOperation
 
-        
     [<Fact>]
     let ``buildOpsProperties test`` () =
         let testOne (_,op) expected =
@@ -979,6 +978,47 @@ namespace N1
         ]
         |> testOne genRecursion
 
+    [<Fact>]
+    let ``buildOperationInfoProperty test`` () =
+        let testOne (_, op) expectedCodeString =
+            let context = createTestContext op
+            let (_, operationName) = findClassName context op
+            let inType   = op.Signature.ArgumentType |> roslynTypeName context
+            let outType  = op.Signature.ReturnType   |> roslynTypeName context
+            let codeString =
+                buildOperationInfoProperty inType outType operationName
+                |> formatSyntaxTree
+            Assert.Equal(expectedCodeString |> clearFormatting, codeString |> clearFormatting)
+
+        let template inType outType operationName =
+            sprintf @"public static OperationInfo<%s, %s> Info => new OperationInfo<%s, %s>(typeof(%s));" inType outType inType outType operationName
+
+        template "QVoid" "QVoid" "emptyOperation"
+        |> testOne emptyOperation
+
+        template "Qubit" "QVoid" "oneQubitAbstractOperation"
+        |> testOne oneQubitAbstractOperation
+
+        template "Qubit" "QVoid" "oneQubitOperation"
+        |> testOne oneQubitOperation
+
+        template "(Qubit,(Qubit,Double))" "QVoid" "twoQubitOperation"
+        |> testOne twoQubitOperation
+
+        template "(Qubit,Qubit,Qubits)" "QVoid" "threeQubitOperation"
+        |> testOne threeQubitOperation
+
+        template "(Qubit,Qubit,IQArray<Qubit>)" "QVoid" "differentArgsOperation"
+        |> testOne differentArgsOperation
+
+        template "Int64" "Int64" "helloWorld"
+        |> testOne helloWorld
+
+        template "(Qubit,ICallable,ICallable,IAdjointable,(IControllable,IUnitary),ICallable)" "ICallable" "opParametersTest"
+        |> testOne opParametersTest
+
+        template "QVoid" "QVoid" "emptyFunction"
+        |> testOne emptyFunction
 
     let findBody op = 
         let isBody (sp:QsSpecialization) = match sp.Kind with | QsBody -> true | _ -> false
@@ -2277,6 +2317,8 @@ namespace N1
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.emptyOperation";
 
+        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyOperation));
+
         public override void Init() { }
         
         public override IApplyData __dataIn(QVoid data) => data;
@@ -2312,7 +2354,9 @@ namespace N1
         }
         String ICallable.Name => "randomAbstractOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.randomAbstractOperation";
-        
+
+        public static OperationInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new OperationInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
+
         public override void Init() { }
 
         public override IApplyData __dataIn((Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) => new In(data);
@@ -2338,6 +2382,8 @@ namespace N1
 
         String ICallable.Name => "oneQubitOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.oneQubitOperation";
+
+        public static OperationInfo<Qubit, QVoid> Info => new OperationInfo<Qubit, QVoid>(typeof(oneQubitOperation));
 
         protected IUnitary<Qubit> X { get; set; }
 
@@ -2423,6 +2469,8 @@ namespace N1
         String ICallable.Name => "genCtrl3";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genCtrl3";
 
+        public static OperationInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new OperationInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
+
         public override void Init() { }
 
         public override IApplyData __dataIn((__X__,(Int64,(__Y__,__Z__),Result)) data) => new In(data);
@@ -2461,6 +2509,9 @@ namespace N1
 
         String ICallable.Name => "composeImpl";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.composeImpl";
+
+        public static OperationInfo<(ICallable, ICallable, __B__), QVoid> Info => new OperationInfo<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
+
         public override Func<(ICallable,ICallable,__B__), QVoid> Body => (__in__) =>
         {
             var (second,first,arg) = __in__;
@@ -2492,7 +2543,9 @@ namespace N1
 
         String ICallable.Name => "genF1";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genF1";
-        
+
+        public static OperationInfo<__A__, QVoid> Info => new OperationInfo<__A__, QVoid>(typeof(genF1<__A__>));
+
         public override void Init() { }
 
         public override IApplyData __dataIn(__A__ data) => new QTuple<__A__>(data);
@@ -2578,6 +2631,8 @@ namespace N1
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.Overrides.emptyFunction";
 
+        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyFunction));
+
         public override void Init() { }
 
         public override IApplyData __dataIn(QVoid data) => data;
@@ -2600,6 +2655,8 @@ namespace N1
 
         String ICallable.Name => "intFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.intFunction";
+
+        public static OperationInfo<QVoid, Int64> Info => new OperationInfo<QVoid, Int64>(typeof(intFunction));
 
         public override Func<QVoid, Int64> Body => (__in__) =>
         {
@@ -2637,6 +2694,9 @@ namespace N1
 
         String ICallable.Name => "powFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.powFunction";
+
+        public static OperationInfo<(Int64, Int64), Int64> Info => new OperationInfo<(Int64, Int64), Int64>(typeof(powFunction));
+
         public override Func<(Int64,Int64), Int64> Body => (__in__) =>
         {
             var (x,y) = __in__;
@@ -2674,6 +2734,9 @@ namespace N1
 
         String ICallable.Name => "bigPowFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.bigPowFunction";
+
+        public static OperationInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger> Info => newOperationInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger>(typeof(bigPowFunction));
+
         public override Func<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger> Body => (__in__) =>
         {
             var (x,y) = __in__;
@@ -3004,6 +3067,7 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.emptyFunction";
+        public static OperationInfo<Pair, QVoid> Info => new OperationInfo<Pair, QVoid>(typeof(emptyFunction));
         public override void Init() { }
         public override IApplyData __dataIn(Pair data) => data;
         public override IApplyData __dataOut(QVoid data) => data;
@@ -3021,6 +3085,7 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.emptyOperation";
+        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyOperation));
         public override void Init() { }
         public override IApplyData __dataIn(QVoid data) => data;
         public override IApplyData __dataOut(QVoid data) => data;
@@ -3155,6 +3220,7 @@ namespace Microsoft.Quantum.Tests.Inline
 
         String ICallable.Name => "HelloWorld";
         String ICallable.FullName => "Microsoft.Quantum.Tests.Inline.HelloWorld";
+        public static OperationInfo<Int64, Int64> Info => new OperationInfo<Int64, Int64>(typeof(HelloWorld));
         public override Func<Int64, Int64> Body => (__in__) =>
         {
             var n = __in__;
@@ -3210,6 +3276,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 
         String ICallable.Name => "TestLineInBlocks";
         String ICallable.FullName => "Microsoft.Quantum.Tests.LineNumbers.TestLineInBlocks";
+        public static OperationInfo<Int64, Result> Info => new OperationInfo<Int64, Result>(typeof(TestLineInBlocks));
         protected Allocate Allocate
         {
             get;
@@ -3447,6 +3514,8 @@ namespace Microsoft.Quantum.Tests.UnitTests
         String ICallable.Name => "UnitTest1";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest1";
 
+        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(UnitTest1));
+
         public override Func<QVoid, QVoid> Body => (__in__) =>
         {
         #line hidden
@@ -3507,6 +3576,8 @@ namespace Microsoft.Quantum.Tests.UnitTests
 
         String ICallable.Name => "UnitTest2";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest2";
+
+        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(UnitTest2));
 
         public override Func<QVoid, QVoid> Body => (__in__) =>
         {
