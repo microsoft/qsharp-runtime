@@ -123,6 +123,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
         {
+            // Populate source location information in CSharp stack from attributes
             foreach (StackFrame currentFrame in qsharpCallStack)
             {
                 ICallable op = currentFrame.Callable.UnwrapCallable();
@@ -135,35 +136,89 @@ namespace Microsoft.Quantum.Simulation.Common
                         currentFrame.SourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
                         currentFrame.DeclarationStartLineNumber = sourceLocation.StartLine;
                         currentFrame.DeclarationEndLineNumber = sourceLocation.EndLine;
+                        break;
                     }
                 }
             }
 
             StackFrame[] qsharpStackFrames = qsharpCallStack.ToArray();
-            int qsharpStackFrameId = 0;
-            for (int csharpStackFrameId = 0; csharpStackFrameId < csharpCallStack.Length; ++csharpStackFrameId)
+            int currentQSharpFrameIndex = 0;
+            int currentCSharpFrameIndex = 0;
+
+            System.Diagnostics.StackFrame csharpFrame = GetNextCSharpStackFrame(csharpCallStack, ref currentCSharpFrameIndex);
+            StackFrame qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
+            while (csharpFrame != null && qsharpFrame != null)
             {
-                string fileName = csharpCallStack[csharpStackFrameId].GetFileName();
-                if (fileName != null)
+                if (IsMatch(csharpFrame, qsharpFrame))
                 {
-                    fileName = System.IO.Path.GetFullPath(fileName);
-                    int failedLineNumber = csharpCallStack[csharpStackFrameId].GetFileLineNumber();
-                    StackFrame currentQsharpStackFrame = qsharpStackFrames[qsharpStackFrameId];
-                    if (fileName == currentQsharpStackFrame.SourceFile &&
-                        currentQsharpStackFrame.DeclarationStartLineNumber <= failedLineNumber &&
-                            (
-                                (failedLineNumber < currentQsharpStackFrame.DeclarationEndLineNumber) ||
-                                (currentQsharpStackFrame.DeclarationEndLineNumber == -1)
-                            )
-                        )
-                    {
-                        currentQsharpStackFrame.FailedLineNumber = failedLineNumber;
-                        qsharpStackFrameId++;
-                        if (qsharpStackFrameId == qsharpStackFrames.Length) break;
-                    }
+                    PopulateQSharpFrameFromCSharpFrame(csharpFrame, qsharpFrame);
+                    qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
                 }
+                csharpFrame = GetNextCSharpStackFrame(csharpCallStack, ref currentCSharpFrameIndex);
             }
             return qsharpStackFrames;
+        }
+
+        /// <summary>
+        /// Return next Q# stack frame that has enough information to match
+        /// </summary>
+        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
+        {
+            while (currentFrameIndex < qsharpStackFrames.Length)
+            {
+                StackFrame currentFrame = qsharpStackFrames[currentFrameIndex];
+                currentFrameIndex++;
+                if (!string.IsNullOrEmpty(currentFrame.SourceFile))
+                {
+                    return currentFrame;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Return next C# stack frame that has enough information to match
+        /// </summary>
+        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpCallStack, ref int currentFrameIndex)
+        {
+            while(currentFrameIndex < csharpCallStack.Length)
+            {
+                System.Diagnostics.StackFrame currentFrame = csharpCallStack[currentFrameIndex];
+                currentFrameIndex++;
+                if (!string.IsNullOrEmpty(currentFrame.GetFileName()) && currentFrame.GetFileLineNumber() != 0)
+                {
+                    return currentFrame;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Check if Q# stack frame and C# stack frame match (refer to the same location in the code)
+        /// </summary>
+        private static bool IsMatch(System.Diagnostics.StackFrame csharpFrame, StackFrame qsharpFrame)
+        {
+            string fileName = System.IO.Path.GetFullPath(csharpFrame.GetFileName());
+            if (fileName != qsharpFrame.SourceFile)
+            {
+                return false;
+            }
+            int failedLineNumber = csharpFrame.GetFileLineNumber();
+            if (failedLineNumber < qsharpFrame.DeclarationStartLineNumber)
+            {
+                return false;
+            }
+            return
+                (failedLineNumber < qsharpFrame.DeclarationEndLineNumber) ||
+                (qsharpFrame.DeclarationEndLineNumber == -1);
+        }
+
+        /// <summary>
+        /// Copy information missing in Q# stack frame from C# stack frame (curently only FailedLineNumber)
+        /// </summary>
+        private static void PopulateQSharpFrameFromCSharpFrame(System.Diagnostics.StackFrame csharpFrame, StackFrame qsharpFrame)
+        {
+            qsharpFrame.FailedLineNumber = csharpFrame.GetFileLineNumber();
         }
     }
 
