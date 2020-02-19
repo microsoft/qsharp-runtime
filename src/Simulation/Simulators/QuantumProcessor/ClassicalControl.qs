@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 {
     open Microsoft.Quantum.Intrinsic;
 
-    operation NoOp() : Unit is Ctl + Adj {}   
+    operation NoOp() : Unit is Ctl + Adj {}
 
     // Private helper operations.
     operation Delay<'T>(op : ('T => Unit), arg : 'T, aux : Unit) : Unit {
