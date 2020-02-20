@@ -121,9 +121,9 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Finds correspondence between Q# and C# stack frames and populates Q# stack frame information from C# stack frames
         /// </summary>
-        public static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpCallStack)
+        public static StackFrame[] PopulateSourceLocations(Stack<StackFrame> qsharpCallStack, System.Diagnostics.StackFrame[] csharpStackFrames)
         {
-            // Populate source location information in CSharp stack from attributes
+            // Populate source location information in QSharp stack from attributes
             foreach (StackFrame currentFrame in qsharpCallStack)
             {
                 ICallable op = currentFrame.Callable.UnwrapCallable();
@@ -145,16 +145,20 @@ namespace Microsoft.Quantum.Simulation.Common
             int currentQSharpFrameIndex = 0;
             int currentCSharpFrameIndex = 0;
 
-            System.Diagnostics.StackFrame csharpFrame = GetNextCSharpStackFrame(csharpCallStack, ref currentCSharpFrameIndex);
+            System.Diagnostics.StackFrame csharpFrame = GetNextCSharpStackFrame(csharpStackFrames, ref currentCSharpFrameIndex);
             StackFrame qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
             while (csharpFrame != null && qsharpFrame != null)
             {
                 if (IsMatch(csharpFrame, qsharpFrame))
                 {
                     PopulateQSharpFrameFromCSharpFrame(csharpFrame, qsharpFrame);
+                    // Advance to the next Q# Stack frame only when it matches C# stack frame.
+                    // This assumes all Q# stack frames with enough information to match will match with corresponding C# stack frames.
+                    // If corresponding C# stack frame doesn't have enough information to match
+                    // this and all subsequent Q# stack frames will not match.
                     qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
                 }
-                csharpFrame = GetNextCSharpStackFrame(csharpCallStack, ref currentCSharpFrameIndex);
+                csharpFrame = GetNextCSharpStackFrame(csharpStackFrames, ref currentCSharpFrameIndex);
             }
             return qsharpStackFrames;
         }
@@ -162,11 +166,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next Q# stack frame that has enough information to match
         /// </summary>
-        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStack, ref int currentFrameIndex)
+        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
         {
-            while (currentFrameIndex < qsharpStack.Length)
+            while (currentFrameIndex < qsharpStackFrames.Length)
             {
-                StackFrame currentFrame = qsharpStack[currentFrameIndex];
+                StackFrame currentFrame = qsharpStackFrames[currentFrameIndex];
                 currentFrameIndex++;
                 if (!string.IsNullOrEmpty(currentFrame.SourceFile))
                 {
@@ -179,11 +183,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next C# stack frame that has enough information to match
         /// </summary>
-        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStack, ref int currentFrameIndex)
+        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStackFrames, ref int currentFrameIndex)
         {
-            while(currentFrameIndex < csharpStack.Length)
+            while(currentFrameIndex < csharpStackFrames.Length)
             {
-                System.Diagnostics.StackFrame currentFrame = csharpStack[currentFrameIndex];
+                System.Diagnostics.StackFrame currentFrame = csharpStackFrames[currentFrameIndex];
                 currentFrameIndex++;
                 if (!string.IsNullOrEmpty(currentFrame.GetFileName()) && currentFrame.GetFileLineNumber() != 0)
                 {
@@ -214,7 +218,7 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        /// Copy information missing in Q# stack frame from C# stack frame (curently only FailedLineNumber)
+        /// Copy information missing in Q# stack frame from C# stack frame (only FailedLineNumber curently)
         /// </summary>
         private static void PopulateQSharpFrameFromCSharpFrame(System.Diagnostics.StackFrame csharpFrame, StackFrame qsharpFrame)
         {
