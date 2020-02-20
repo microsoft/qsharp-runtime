@@ -162,11 +162,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next Q# stack frame that has enough information to match
         /// </summary>
-        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
+        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStack, ref int currentFrameIndex)
         {
-            while (currentFrameIndex < qsharpStackFrames.Length)
+            while (currentFrameIndex < qsharpStack.Length)
             {
-                StackFrame currentFrame = qsharpStackFrames[currentFrameIndex];
+                StackFrame currentFrame = qsharpStack[currentFrameIndex];
                 currentFrameIndex++;
                 if (!string.IsNullOrEmpty(currentFrame.SourceFile))
                 {
@@ -179,11 +179,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next C# stack frame that has enough information to match
         /// </summary>
-        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpCallStack, ref int currentFrameIndex)
+        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStack, ref int currentFrameIndex)
         {
-            while(currentFrameIndex < csharpCallStack.Length)
+            while(currentFrameIndex < csharpStack.Length)
             {
-                System.Diagnostics.StackFrame currentFrame = csharpCallStack[currentFrameIndex];
+                System.Diagnostics.StackFrame currentFrame = csharpStack[currentFrameIndex];
                 currentFrameIndex++;
                 if (!string.IsNullOrEmpty(currentFrame.GetFileName()) && currentFrame.GetFileLineNumber() != 0)
                 {
