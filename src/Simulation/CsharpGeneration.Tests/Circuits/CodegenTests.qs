@@ -1294,7 +1294,16 @@ namespace Microsoft.Quantum.Compiler.Generics {
             set arr = arr w/ i <- map(arr[i]);
         }
     }
+
+    newtype MyType1 = (i1 : Int[], i2 : Double);
+    newtype MyType2 = (i1 : Int, i2 : MyType1, (i3 : Int[], i4 : String));
+
+    function UpdateUdtItems (udt : MyType2) : MyType2 {
     
+        return udt
+            w/ i1 <- 0; 
+    
+    }
 }
 
 
