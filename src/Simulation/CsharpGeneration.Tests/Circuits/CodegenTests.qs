@@ -1300,9 +1300,10 @@ namespace Microsoft.Quantum.Compiler.Generics {
 
     function UpdateUdtItems (udt : MyType2) : MyType2 {
     
+        mutable arr = new Int[10];
         return udt
             w/ i1 <- -5
-            w/ i4 <- "Hello"
+            w/ i3 <- arr 
             w/ i1 <- 1;    
     }
 }

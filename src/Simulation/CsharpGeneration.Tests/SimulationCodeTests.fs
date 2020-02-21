@@ -2638,7 +2638,8 @@ namespace N1
         public override Func<MyType2, MyType2> Body => (__in__) => 
         {
             var udt = __in__;
-            return new MyType2((1L,udt.Data.Item2,(udt.Data.Item3.Item1,"Hello")));
+            vararr=QArray<Int64>.Create(10L);
+            return new MyType2((1L,udt.Data.Item2,(arr?.Copy(),udt.Data.Item3.Item2)));
         };
         
         public override void Init() { }
