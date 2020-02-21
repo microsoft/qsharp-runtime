@@ -2638,7 +2638,7 @@ namespace N1
         public override Func<MyType2, MyType2> Body => (__in__) => 
         {
             var udt = __in__;
-            return new MyType2((newMyType2((0L,udt.Data.Item2,(udt.Data.Item3.Item1,udt.Data.Item3.Item2))).Data.Item1,newMyType2((0L,udt.Data.Item2,(udt.Data.Item3.Item1,udt.Data.Item3.Item2))).Data.Item2,(newMyType2((0L,udt.Data.Item2,(udt.Data.Item3.Item1,udt.Data.Item3.Item2))).Data.Item3.Item1,"Hello")));
+            return new MyType2((1L,udt.Data.Item2,(udt.Data.Item3.Item1,"Hello")));
         };
         
         public override void Init() { }

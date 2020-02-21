@@ -1301,9 +1301,9 @@ namespace Microsoft.Quantum.Compiler.Generics {
     function UpdateUdtItems (udt : MyType2) : MyType2 {
     
         return udt
-            w/ i1 <- 0
-            w/ i4 <- "Hello";
-    
+            w/ i1 <- -5
+            w/ i4 <- "Hello"
+            w/ i1 <- 1;    
     }
 }
 

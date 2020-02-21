@@ -426,20 +426,31 @@ module SimulationCode =
                     let name = QsQualifiedName.New (udt.Namespace, udt.Name)
                     let decl = findUdt context name
 
-                    let updatedItems = accEx.Expression |> function
-                        | Identifier (LocalVariable id, Null) -> id.Value, captureExpression rhsEx
+                    let isUserDefinedType = function | UserDefinedType _ -> true | _ -> false
+                    let getItemName = function
+                        | Identifier (LocalVariable id, Null) -> id.Value
 // TODO: Diagnostics
                         | _ -> failwith "item access expression in copy-and-update expression for user defined type is not a suitable identifier"
-
-                    let lhs = buildExpression lhsEx // FIXME: THIS IS BAD! WE NEED TO CONSOLIDATE FIRST!
+                    let updatedItems = new Dictionary<string, ExpressionSyntax>()
+                    let rec aggregate (lhs : TypedExpression) = 
+                        match lhs.Expression with 
+                        | CopyAndUpdate (l, i, r) when l.ResolvedType.Resolution |> isUserDefinedType -> 
+                            let lhs = aggregate l // need to recur first, or make sure key is not already in dictionary
+                            updatedItems.[getItemName i.Expression] <- captureExpression r
+                            lhs
+                        | _ -> lhs
+                    let lhs = aggregate lhsEx |> buildExpression 
+                    updatedItems.[getItemName accEx.Expression] <- captureExpression rhsEx // needs to be after aggregate
 
                     let root = lhs <|.|> (``ident`` "Data")
                     let items = getAllItems root decl.Type
                     let rec buildArg  = function 
                         | QsTuple args -> args |> Seq.map buildArg |> Seq.toList |> ``tuple``
-                        | QsTupleItem (Named item) when item.VariableName.Value = fst updatedItems -> 
-                            items.Dequeue() |> ignore
-                            snd updatedItems
+                        | QsTupleItem (Named item) -> updatedItems.TryGetValue item.VariableName.Value |> function
+                            | true, rhs ->                             
+                                items.Dequeue() |> ignore
+                                rhs
+                            | _ -> items.Dequeue()
                         | QsTupleItem _ -> items.Dequeue()
                     ``new`` (``type`` [ justTheName context name ]) ``(`` [buildArg decl.TypeItems] ``)``                       
                 | _ -> failwith "copy-and-update expressions are currently only supported for arrays and user defined types"
