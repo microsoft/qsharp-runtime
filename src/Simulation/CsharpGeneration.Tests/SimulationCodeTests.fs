@@ -193,6 +193,7 @@ namespace N1
     let returnTest10                            = findCallable @"returnTest10"
     let bitOperations                           = findCallable @"bitOperations"
     let testLengthDependency                    = findCallable @"testLengthDependency"
+    let UpdateUdtItems                          = findCallable @"UpdateUdtItems"
     
     let udt_args0                               = findUdt @"udt_args0"
     let udt_args1                               = findUdt @"udt_args1"
@@ -2621,6 +2622,39 @@ namespace N1
 
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () = 
+        """
+    [SourceLocation("%%%", OperationFunctor.Body, 1301,-1)]
+    public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
+    {
+        public UpdateUdtItems(IOperationFactorym) : base(m)
+        {
+        }
+        
+        String ICallable.Name => "UpdateUdtItems";
+        String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.UpdateUdtItems";
+        
+        public static OperationInfo<MyType2, MyType2> Info => new OperationInfo<MyType2, MyType2>(typeof(UpdateUdtItems));
+        
+        public override Func<MyType2, MyType2> Body => (__in__) => 
+        {
+            var udt = __in__;
+            vararr=QArray<Int64>.Create(10L);
+            return new MyType2((1L,udt.Data.Item2,(arr?.Copy(),udt.Data.Item3.Item2)));
+        };
+        
+        public override void Init() { }
+        
+        public override IApplyData __dataIn(MyType2data) => data;
+        public override IApplyData __dataOut(MyType2data) => data;
+        public static System.Threading.Tasks.Task<MyType2> Run(IOperationFactory __m__, MyType2 udt)
+        {
+            return __m__.Run<UpdateUdtItems,MyType2,MyType2>(udt);
+        }
+    }
+        """
+        |> testOneClass UpdateUdtItems
+
+
         """
     public abstract partial class emptyFunction : Function<QVoid, QVoid>, ICallable
     {
