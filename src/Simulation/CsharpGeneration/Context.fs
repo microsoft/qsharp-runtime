@@ -3,7 +3,6 @@
 
 namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 
-open System
 open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
@@ -12,34 +11,48 @@ open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
-open Microsoft.Quantum.QsCompiler.Transformations
+open Microsoft.Quantum.QsCompiler.Transformations.Core
 
 
-type internal DeclarationPositions() = 
-    inherit SyntaxTreeTransformation<NoScopeTransformations>(new NoScopeTransformations())
+module internal DeclarationLocations = 
+    
+    type TransformationState() = 
 
-    let mutable currentSource = null
-    let declarationLocations = new List<NonNullable<string> * (int * int)>()
+        member val internal CurrentSource = null with get, set
+        member val internal DeclarationLocations = new List<NonNullable<string> * (int * int)>()
 
-    member this.DeclarationLocations = 
-        declarationLocations.ToLookup (fst, snd)
+    type NamespaceTransformation(parent : SyntaxTreeTransformation<TransformationState>) = 
+        inherit NamespaceTransformation<TransformationState>(parent)
 
-    static member Apply (syntaxTree : IEnumerable<QsNamespace>) = 
-        let walker = new DeclarationPositions()
-        for ns in syntaxTree do 
-            walker.Transform ns |> ignore
+        override this.onSourceFile file = 
+            this.SharedState.CurrentSource <- file.Value
+            file
+
+        override this.onLocation sourceLocation = 
+            match sourceLocation with 
+            | Value (loc : QsLocation) when this.SharedState.CurrentSource <> null -> 
+                this.SharedState.DeclarationLocations.Add (NonNullable<string>.New this.SharedState.CurrentSource, loc.Offset) 
+            | _ -> ()
+            sourceLocation
+
+
+    type internal SyntaxTreeTransformation private(_private_) = 
+        inherit SyntaxTreeTransformation<TransformationState>(new TransformationState(), TransformationOptions.NoRebuild)
+
+        new () as this = 
+            new SyntaxTreeTransformation("_private_") then
+                this.Namespaces <- new NamespaceTransformation(this)
+                this.Statements <- new StatementTransformation<TransformationState>(this, TransformationOptions.Disabled)
+                this.Expressions <- new ExpressionTransformation<TransformationState>(this, TransformationOptions.Disabled)
+                this.Types <- TypeTransformation<TransformationState>(this, TransformationOptions.Disabled)
+
+        member this.DeclarationLocations = 
+            this.SharedState.DeclarationLocations.ToLookup (fst, snd)
+
+    let Accumulate (syntaxTree : IEnumerable<QsNamespace>) = 
+        let walker = new SyntaxTreeTransformation()
+        for ns in syntaxTree do walker.Namespaces.Transform ns |> ignore
         walker.DeclarationLocations
-
-    override this.onSourceFile file = 
-        currentSource <- file.Value
-        file
-
-    override this.onLocation sourceLocation = 
-        match sourceLocation with 
-        | Value (loc : QsLocation) when currentSource <> null -> 
-            declarationLocations.Add (NonNullable<string>.New currentSource, loc.Offset) 
-        | _ -> ()
-        sourceLocation
 
 
 type CodegenContext = { 
@@ -57,7 +70,7 @@ type CodegenContext = {
     static member public Create (syntaxTree, assemblyConstants) =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
-        let positionInfos = DeclarationPositions.Apply syntaxTree
+        let positionInfos = DeclarationLocations.Accumulate syntaxTree
         let callablesByName = 
             let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
