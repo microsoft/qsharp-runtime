@@ -249,47 +249,56 @@ module SimulationCode =
                 this.Types <- new TypeTransformation<HashSet<QsQualifiedName>>(this, TransformationOptions.Disabled)
 
 
-    /// Used to generate the list of statements that implement a Q# operation specialization.
-    type StatementBlockBuilder(context) = 
-        inherit ScopeTransformation<StatementBuilder, NoExpressionTransformations>
-                (new Func<_,_>(fun s -> new StatementBuilder(s :?> StatementBlockBuilder, context)), new NoExpressionTransformations())
-        
+    type SyntaxBuilder private (_private_) =
+        inherit SyntaxTreeTransformation(TransformationOptions.NoRebuild)
+
         member val DeclarationsInStatement = LocalDeclarations.Empty with get, set
         member val DeclarationsInScope = LocalDeclarations.Empty with get, set
 
-        member this.Statements = this._StatementKind.Statements
-        member this.SetStartLine nr = this._StatementKind.StartLine <- nr
+        member val BuiltStatements = [] with get, set
+
+        member val StartLine = None with get, set
+        member val LineNumber = None with get, set
+
+        new (context : CodegenContext) as this = 
+            new SyntaxBuilder("_private_") then 
+                this.Namespaces <- new NamespaceTransformation(this)
+                this.Statements <- new StatementBlockBuilder(this)
+                this.StatementKinds <- new StatementBuilder(this, context)
+                this.Expressions <- new ExpressionTransformation(this, TransformationOptions.Disabled)
+                this.Types <- new TypeTransformation(this, TransformationOptions.Disabled)
+
+    /// Used to generate the list of statements that implement a Q# operation specialization.
+    and StatementBlockBuilder(parent : SyntaxBuilder) = 
+        inherit StatementTransformation(parent)
 
         override this.Transform (scope : QsScope) = 
-            this.DeclarationsInScope <- scope.KnownSymbols
+            parent.DeclarationsInScope <- scope.KnownSymbols
             base.Transform scope
 
         override this.onStatement (node:QsStatement) =
             match node.Location with 
             | Value loc -> 
                 let (current, _) = loc.Offset
-                this._StatementKind.LineNumber <- this._StatementKind.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
+                parent.LineNumber <- parent.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
             | Null -> 
-                this._StatementKind.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
-            this.DeclarationsInStatement <- node.SymbolDeclarations
-            this.DeclarationsInScope <- LocalDeclarations.Concat this.DeclarationsInScope this.DeclarationsInStatement // only fine because/if a new StatementBlockBuilder is created for every block!
+                parent.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
+            parent.DeclarationsInStatement <- node.SymbolDeclarations
+            parent.DeclarationsInScope <- LocalDeclarations.Concat parent.DeclarationsInScope parent.DeclarationsInStatement // only fine because/if a new statement transformation is created for every block!
             base.onStatement node
 
     /// Used to generate the statements that implement a Q# operation specialization.
-    and StatementBuilder(bodyBuilder, context) =
-        inherit StatementKindTransformation<StatementBlockBuilder>(bodyBuilder)
+    and StatementBuilder(parent : SyntaxBuilder, context) =
+        inherit StatementKindTransformation(parent, TransformationOptions.NoRebuild)
        
-        let mutable lineNumber = None
-        let mutable startLine  = None
-
         let withLineNumber s =
             // add a line directive if the operation specifies the source file and a line number
-            match context.fileName, lineNumber with
+            match context.fileName, parent.LineNumber with
             | Some _, Some ln when ln = 0 ->
                 ``#line hidden`` <| s
             | Some n, Some ln -> 
                 ``#line`` ln n s
-            | Some n, None -> startLine |> function 
+            | Some n, None -> parent.StartLine |> function 
                 | Some ln -> 
                     ``#line`` (ln + 1) n s // we need 1-based line numbers here, and startLine is zero-based
                 | None -> s
@@ -561,10 +570,10 @@ module SimulationCode =
             | _ -> ``item`` (buildExpression a) [ (buildExpression i) ] 
            
         let buildBlock (block : QsScope) = 
-            let builder = new StatementBlockBuilder(context)
-            builder.SetStartLine startLine
-            builder.Transform block |> ignore
-            builder.Statements
+            let builder = new SyntaxBuilder(context)
+            builder.StartLine <- parent.StartLine
+            builder.Statements.Transform block |> ignore
+            builder.BuiltStatements
 
         let buildSymbolTuple buildTuple buildSymbol symbol = 
             let rec buildOne = function
@@ -598,18 +607,8 @@ module SimulationCode =
             | CONDITIONAL (_, l, r) -> isArrayInit l && isArrayInit r
             | _ -> false
 
-        member val Statements = [] with get, set
-
-        member this.StartLine 
-          with get() = startLine
-          and set(value) = startLine <- value
-
-        member this.LineNumber
-          with get() = lineNumber
-          and set(value) = lineNumber <- value
-
         member this.AddStatement (s:StatementSyntax) =
-            this.Statements <- this.Statements @ [s |> withLineNumber]
+            parent.BuiltStatements <- parent.BuiltStatements @ [s |> withLineNumber]
 
         override this.onExpressionStatement (node:TypedExpression) =
             buildExpression node
@@ -655,7 +654,7 @@ module SimulationCode =
                     buildBinding imName 
 
                     // build the actual binding, making sure all necessary QArrays instances are created
-                    for localVar in this._Scope.DeclarationsInStatement.Variables do  
+                    for localVar in parent.DeclarationsInStatement.Variables do  
                         let varName = localVar.VariableName.Value
                         match localVar.Type.Resolution |> QArrayType with 
                         | Some arrType -> 
@@ -710,7 +709,7 @@ module SimulationCode =
                 // build the actual binding, making sure all necessary QArrays instances are created
                 let ids = varNames (Seq.collect id) (fun id -> seq{ if id <> "_" then yield id}) node.Lhs
                 for id in ids do 
-                    let decl = this._Scope.DeclarationsInScope.Variables |> Seq.tryFind (fun d -> d.VariableName.Value = id)
+                    let decl = parent.DeclarationsInScope.Variables |> Seq.tryFind (fun d -> d.VariableName.Value = id)
                     match decl |> Option.map (fun d -> d.Type.Resolution |> QArrayType) |> Option.flatten with 
                     | Some arrType -> // we need to make sure to create a new QArray instance here
                         let qArray = ``new`` arrType ``(`` [imName id |> ``ident``] ``)``
@@ -783,8 +782,8 @@ module SimulationCode =
 // todo: diagnostics
                 | InvalidInitializer -> failwith ("InvalidInitializer received")
             let rec buildReleaseExpression (symbol,expr:ResolvedInitializer) : StatementSyntax list =
-                let currentLine = lineNumber
-                lineNumber <- Some 0
+                let currentLine = parent.LineNumber
+                parent.LineNumber <- Some 0
                 let buildOne sym =
                     (``ident`` release) <.> (``ident`` "Apply", [ (``ident`` (sym)) ]) |> (statement >> withLineNumber)
                 let rec buildDeconstruct sym (rhs:ResolvedInitializer) =
@@ -800,7 +799,7 @@ module SimulationCode =
                     | VariableName one, QubitTupleAllocation _      -> (buildDeconstruct one.Value expr) 
                     | VariableNameTuple ss, QubitTupleAllocation aa -> Seq.zip ss aa |> Seq.map buildReleaseExpression |> Seq.toList |> List.concat
                     | _ -> failwith ("InvalidItem received")
-                lineNumber <- currentLine
+                parent.LineNumber <- currentLine
                 releases    
                 
             let symbols = removeDiscarded using.Binding.Lhs
@@ -828,10 +827,10 @@ module SimulationCode =
 
             // Put all statements into their own brackets so variable names have their own context.
             // Make sure the brackets get #line hidden:
-            let currentLine = lineNumber
-            lineNumber <- lineNumber |> Option.map (fun _ -> 0)
+            let currentLine = parent.LineNumber
+            parent.LineNumber <- parent.LineNumber |> Option.map (fun _ -> 0)
             ``{{`` statements ``}}`` |> this.AddStatement
-            lineNumber <- currentLine
+            parent.LineNumber <- currentLine
             QsQubitScope using
 
         override this.onFailStatement fs = 
@@ -839,17 +838,17 @@ module SimulationCode =
             this.AddStatement (``throw`` <| Some failException)
             QsFailStatement fs
 
-    type SyntaxBuilder (bodyBuilder) = 
-        inherit SyntaxTreeTransformation<StatementBlockBuilder>(bodyBuilder)
+    and NamespaceBuilder (parent : SyntaxBuilder) = 
+        inherit NamespaceTransformation(parent, TransformationOptions.NoRebuild)
 
         override this.beforeSpecialization (sp : QsSpecialization) = 
             count <- 0
             match sp.Location with 
-            | Value location -> this._Scope.SetStartLine (Some (location.Offset |> fst))
-            | Null -> this._Scope.SetStartLine None // TODO: we may need to have the means to know which original declaration the code came from
+            | Value location -> parent.StartLine <- (Some (location.Offset |> fst))
+            | Null -> parent.StartLine <- None // TODO: we may need to have the means to know which original declaration the code came from
             sp
     
-    let operationDependencies context (od:QsCallable) =
+    let operationDependencies (od:QsCallable) =
         let seeker = new OperationsSeeker()
         seeker.Namespaces.dispatchCallable(od) |> ignore
         seeker.SharedState |> Seq.toList
@@ -934,9 +933,9 @@ module SimulationCode =
         | Provided (args, _) ->           
             let returnType  = sp.Signature.ReturnType
             let statements  =
-                let builder = new StatementBlockBuilder(context)
-                (SyntaxBuilder(builder)).dispatchSpecialization sp |> ignore
-                builder.Statements
+                let builder = new SyntaxBuilder(context)
+                builder.Namespaces.dispatchSpecialization sp |> ignore
+                builder.BuiltStatements
 
             let inData = ``ident`` "__in__"
             let ret = 
@@ -986,7 +985,7 @@ module SimulationCode =
             | QsAdjoint           -> "Adjoint"
             | QsControlled        -> "Controlled"
             | QsControlledAdjoint -> "ControlledAdjoint"
-        let body = (buildSpecializationBody context sp)
+        let body = buildSpecializationBody context sp
         let attributes =
             match sp.Location with 
             | Null -> []
@@ -998,7 +997,7 @@ module SimulationCode =
                     | true, startPositions -> 
                         let index = startPositions.IndexOf location.Offset
                         if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
-    //TODO: diagnostics.
+//TODO: diagnostics.
                     | false, _ -> startLine
                 ``attribute`` None (``ident`` "SourceLocation") [ 
                     ``literal`` sp.SourceFile.Value 
@@ -1331,7 +1330,7 @@ module SimulationCode =
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
-        let opNames = operationDependencies context op
+        let opNames = operationDependencies op
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
 

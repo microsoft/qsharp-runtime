@@ -220,9 +220,9 @@ namespace N1
             |> formatSyntaxTree
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
-    let testOneBody (builder:StatementBlockBuilder) (expected: string list) =
+    let testOneBody (builder:SyntaxBuilder) (expected: string list) =
         let actual = 
-            builder.Statements
+            builder.BuiltStatements
             |> List.map (fun s -> s.ToFullString())
         Assert.Equal(expected.Length, actual.Length)
         List.zip (expected |> List.map clearFormatting) (actual |> List.map clearFormatting) |> List.iter Assert.Equal
@@ -284,7 +284,7 @@ namespace N1
             let sortByNames l = l |> List.sortBy (fun ((n,_),_) -> n) |> List.sortBy (fun ((_,ns),_) -> ns)
             let actual = 
                 op
-                |> operationDependencies context
+                |> operationDependencies
                 |> List.map (fun n -> ((n.Namespace.Value, n.Name.Value), (n |> roslynCallableTypeName context)))
             
             List.zip (expected |> sortByNames) (actual |> sortByNames)
@@ -842,7 +842,7 @@ namespace N1
     let ``buildInit test`` () =
         let testOne (_,op) body =
             let context  = createTestContext op
-            let deps     = op   |> operationDependencies context |> depsByName
+            let deps     = op   |> operationDependencies |> depsByName
             let actual   = deps |> buildInit context |> formatSyntaxTree
             let expected = sprintf "public override void Init() { %s }" (String.concat "" body)
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
@@ -900,7 +900,7 @@ namespace N1
     let ``getTypeOfOp test`` () =
         let testOne (_,op) =
             let dependendies context d =
-                operationDependencies context d
+                operationDependencies d
                 |> List.map (getTypeOfOp context)
                 |> List.map formatSyntaxTree 
                 |> List.sort
@@ -945,7 +945,7 @@ namespace N1
             let context = createTestContext op
             let actual = 
                 op
-                |> operationDependencies context
+                |> operationDependencies
                 |> depsByName
                 |> buildOpsProperties context
                 |> List.map formatSyntaxTree
@@ -1039,8 +1039,8 @@ namespace N1
 
     let createVisitor (_,op) (sp:QsSpecialization) =
         let context = createTestContext op
-        let builder = new StatementBlockBuilder(context)
-        (SyntaxBuilder(builder)).dispatchSpecialization sp |> ignore
+        let builder = new SyntaxBuilder(context)
+        builder.Namespaces.dispatchSpecialization sp |> ignore
         builder        
 
     let applyVisitor (ns,op) =
@@ -2612,7 +2612,7 @@ namespace N1
         let context = createTestContext op
         let actual = 
             op
-            |> operationDependencies context
+            |> operationDependencies
             |> depsByName
             |> buildOpsProperties context
             |> List.map formatSyntaxTree
