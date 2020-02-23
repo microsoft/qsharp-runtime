@@ -205,32 +205,23 @@ module SimulationCode =
         count <- count + 1
         sprintf "__arg%d__" count
 
-    type ExpressionSeeker(context) = 
-        inherit DefaultExpressionTransformation()
+    type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) = 
+        inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent)
 
-        member val Operations : Set<QsQualifiedName> = Set.empty with get, set
+        //member val Operations : Set<QsQualifiedName> = Set.empty with get, set
 
         override this.Transform ex =
             match ex.Expression with
             | Identifier (id, _) -> 
                 match id with
-                | GlobalCallable n -> this.Operations <- this.Operations.Add n
+                | GlobalCallable name -> this.SharedState.Add name |> ignore
                 | _ -> ()
             | _ -> ()
             base.Transform ex    
 
     /// Used to discover which operations are used by a certain code block.
-    type OperationsSeeker(context : CodegenContext) =
-        inherit ScopeTransformation<StatementKindSeeker, ExpressionSeeker>
-                (new Func<_,_>(fun s -> new StatementKindSeeker(s :?> OperationsSeeker)), new ExpressionSeeker(context))   
-
-        member this.Operations 
-            with get () = this._Expression.Operations
-            and set v = this._Expression.Operations <- v
-           
-    /// Used to discover which operations are used by a certain code block.
-    and StatementKindSeeker(opSeeker : OperationsSeeker) = 
-        inherit StatementKindTransformation<OperationsSeeker>(opSeeker)
+    type StatementKindSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) = 
+        inherit StatementKindTransformation<HashSet<QsQualifiedName>>(parent)
 
         let ALLOCATE = { Name = "Allocate" |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
         let RELEASE  = { Name = "Release"  |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
@@ -238,15 +229,25 @@ module SimulationCode =
         let RETURN   = { Name = "Return"   |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
 
         override this.onAllocateQubits node = 
-            this._Scope.Operations <- this._Scope.Operations.Add ALLOCATE
-            this._Scope.Operations <- this._Scope.Operations.Add RELEASE
+            this.SharedState.Add ALLOCATE |> ignore
+            this.SharedState.Add RELEASE |> ignore
             base.onAllocateQubits node 
 
         override this.onBorrowQubits node = 
-            let t = UnitType |> ResolvedType.New        // Dummy, not used.
-            this._Scope.Operations <- this._Scope.Operations.Add BORROW
-            this._Scope.Operations <- this._Scope.Operations.Add RETURN
+            this.SharedState.Add BORROW |> ignore
+            this.SharedState.Add RETURN |> ignore
             base.onBorrowQubits node 
+
+    /// Used to discover which operations are used by a certain code block.
+    type OperationsSeeker private (_private_) =
+        inherit SyntaxTreeTransformation<HashSet<QsQualifiedName>>(new HashSet<_>(), TransformationOptions.NoRebuild)
+
+        new () as this = 
+            new OperationsSeeker("_private_") then 
+                this.StatementKinds <- new StatementKindSeeker(this)
+                this.Expressions <- new ExpressionSeeker(this)
+                this.Types <- new TypeTransformation<HashSet<QsQualifiedName>>(this, TransformationOptions.Disabled)
+
 
     /// Used to generate the list of statements that implement a Q# operation specialization.
     type StatementBlockBuilder(context) = 
@@ -849,9 +850,9 @@ module SimulationCode =
             sp
     
     let operationDependencies context (od:QsCallable) =
-        let seeker = new OperationsSeeker(context)
-        (SyntaxTreeTransformation<_>(seeker)).dispatchCallable(od) |> ignore
-        seeker.Operations |> Seq.toList
+        let seeker = new OperationsSeeker()
+        seeker.Namespaces.dispatchCallable(od) |> ignore
+        seeker.SharedState |> Seq.toList
 
     let getOpName context n = 
         if needsFullPath context n then prependNamespaceString n
