@@ -20,6 +20,7 @@ open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTokens 
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.SyntaxExtensions
+open Microsoft.Quantum.QsCompiler.Transformations.Core
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 
 
@@ -1502,7 +1503,7 @@ module SimulationCode =
         :> MemberDeclarationSyntax
 
     type AttributeGenerator () = 
-        inherit SyntaxTreeTransformation<NoScopeTransformations>(new NoScopeTransformations())
+        inherit NamespaceTransformation()
 
         let mutable attributes = []
         let GenerateAndAdd attrName json =
