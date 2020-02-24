@@ -30,7 +30,6 @@ open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 /// It uses BrightSword's (John Azariah's) F# wrapper for easier readability.
 /// ---------------------------------------------------------------------------
 module SimulationCode =
-    open Microsoft.Quantum.QsCompiler.Transformations
     open System.Globalization
     
     type CodegenContext with
