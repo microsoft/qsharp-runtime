@@ -838,16 +838,16 @@ module SimulationCode =
     and NamespaceBuilder (parent : SyntaxBuilder) = 
         inherit NamespaceTransformation(parent, TransformationOptions.NoRebuild)
 
-        override this.BeforeSpecialization (sp : QsSpecialization) = 
+        override this.OnSpecializationDeclaration (sp : QsSpecialization) = 
             count <- 0
             match sp.Location with 
             | Value location -> parent.StartLine <- Some (location.Offset |> fst)
             | Null -> parent.StartLine <- None // TODO: we may need to have the means to know which original declaration the code came from
-            sp
+            base.OnSpecializationDeclaration sp
     
     let operationDependencies (od:QsCallable) =
         let seeker = new OperationsSeeker()
-        seeker.Namespaces.DispatchCallable(od) |> ignore
+        seeker.Namespaces.OnCallableDeclaration od |> ignore
         seeker.SharedState |> Seq.toList
 
     let getOpName context n = 
@@ -931,7 +931,7 @@ module SimulationCode =
             let returnType  = sp.Signature.ReturnType
             let statements  =
                 let builder = new SyntaxBuilder(context)
-                builder.Namespaces.DispatchSpecialization sp |> ignore
+                builder.Namespaces.OnSpecializationDeclaration sp |> ignore
                 builder.BuiltStatements
 
             let inData = ``ident`` "__in__"
@@ -1510,20 +1510,20 @@ module SimulationCode =
         member internal this.Apply (elements : IEnumerable<QsNamespaceElement>) = 
             attributes <- []
             for element in elements do 
-                base.DispatchNamespaceElement element |> ignore
+                base.OnNamespaceElement element |> ignore
             attributes |> List.rev
 
-        override this.BeforeSpecialization (spec : QsSpecialization) = 
+        override this.OnSpecializationDeclaration (spec : QsSpecialization) = 
             (SpecializationDeclarationHeader.New spec).ToJson()
             |> GenerateAndAdd "SpecializationDeclaration"
             spec
 
-        override this.BeforeCallable (callable : QsCallable) = 
+        override this.OnCallableDeclaration (callable : QsCallable) = 
             (CallableDeclarationHeader.New callable).ToJson()
             |> GenerateAndAdd "CallableDeclaration"
-            callable
+            base.OnCallableDeclaration callable
 
-        override this.OnType (qsType : QsCustomType) = 
+        override this.OnTypeDeclaration (qsType : QsCustomType) = 
             (TypeDeclarationHeader.New qsType).ToJson()
             |> GenerateAndAdd "TypeDeclaration"
             qsType
