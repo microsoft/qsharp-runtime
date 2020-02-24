@@ -208,14 +208,14 @@ module SimulationCode =
     type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) = 
         inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
 
-        override this.Transform ex =
+        override this.OnTypedExpression ex =
             match ex.Expression with
             | Identifier (id, _) -> 
                 match id with
                 | GlobalCallable name -> this.SharedState.Add name |> ignore
                 | _ -> ()
             | _ -> ()
-            base.Transform ex    
+            base.OnTypedExpression ex    
 
     /// Used to discover which operations are used by a certain code block.
     type StatementKindSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) = 
@@ -226,15 +226,15 @@ module SimulationCode =
         let BORROW   = { Name = "Borrow"   |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
         let RETURN   = { Name = "Return"   |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
 
-        override this.onAllocateQubits node = 
+        override this.OnAllocateQubits node = 
             this.SharedState.Add ALLOCATE |> ignore
             this.SharedState.Add RELEASE |> ignore
-            base.onAllocateQubits node 
+            base.OnAllocateQubits node 
 
-        override this.onBorrowQubits node = 
+        override this.OnBorrowQubits node = 
             this.SharedState.Add BORROW |> ignore
             this.SharedState.Add RETURN |> ignore
-            base.onBorrowQubits node 
+            base.OnBorrowQubits node 
 
     /// Used to discover which operations are used by a certain code block.
     type OperationsSeeker private (_private_) =
@@ -270,11 +270,11 @@ module SimulationCode =
     and StatementBlockBuilder(parent : SyntaxBuilder) = 
         inherit StatementTransformation(parent, TransformationOptions.NoRebuild)
 
-        override this.Transform (scope : QsScope) = 
+        override this.OnScope (scope : QsScope) = 
             parent.DeclarationsInScope <- scope.KnownSymbols
-            base.Transform scope
+            base.OnScope scope
 
-        override this.onStatement (node:QsStatement) =
+        override this.OnStatement (node:QsStatement) =
             match node.Location with 
             | Value loc -> 
                 let (current, _) = loc.Offset
@@ -283,7 +283,7 @@ module SimulationCode =
                 parent.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
             parent.DeclarationsInStatement <- node.SymbolDeclarations
             parent.DeclarationsInScope <- LocalDeclarations.Concat parent.DeclarationsInScope parent.DeclarationsInStatement // only fine because/if a new statement transformation is created for every block!
-            base.onStatement node
+            base.OnStatement node
 
     /// Used to generate the statements that implement a Q# operation specialization.
     and StatementBuilder(parent : SyntaxBuilder, context) =
@@ -570,7 +570,7 @@ module SimulationCode =
         let buildBlock (block : QsScope) = 
             let builder = new SyntaxBuilder(context)
             builder.StartLine <- parent.StartLine
-            builder.Statements.Transform block |> ignore
+            builder.Statements.OnScope block |> ignore
             builder.BuiltStatements
 
         let buildSymbolTuple buildTuple buildSymbol symbol = 
@@ -608,19 +608,19 @@ module SimulationCode =
         member this.AddStatement (s:StatementSyntax) =
             parent.BuiltStatements <- parent.BuiltStatements @ [s |> withLineNumber]
 
-        override this.onExpressionStatement (node:TypedExpression) =
+        override this.OnExpressionStatement (node:TypedExpression) =
             buildExpression node
             |> (statement >> this.AddStatement)
             QsExpressionStatement node
 
-        override this.onReturnStatement (node:TypedExpression) =
+        override this.OnReturnStatement (node:TypedExpression) =
             buildExpression node
             |> Some
             |> ``return``
             |> this.AddStatement
             QsReturnStatement node
 
-        override this.onVariableDeclaration (node:QsBinding<TypedExpression>) = 
+        override this.OnVariableDeclaration (node:QsBinding<TypedExpression>) = 
             let bindsArrays = node.Rhs.ResolvedType |> containsArrays
             let rhs = node.Rhs |> captureExpression 
             let buildBinding buildName = 
@@ -663,7 +663,7 @@ module SimulationCode =
             | _ -> buildBinding id
             QsVariableDeclaration node
 
-        override this.onValueUpdate (node:QsValueUpdate) =
+        override this.OnValueUpdate (node:QsValueUpdate) =
             let rec varNames onTuple onItem (ex : TypedExpression) = 
                 match ex.Expression with 
                 | MissingExpr -> onItem "_"
@@ -717,7 +717,7 @@ module SimulationCode =
             | _ -> lhs <-- rhs |> statement |> this.AddStatement
             QsValueUpdate node
 
-        override this.onConditionalStatement (node:QsConditionalStatement) =    
+        override this.OnConditionalStatement (node:QsConditionalStatement) =    
             let all   = node.ConditionalBlocks
             let (cond, thenBlock) = all.[0]
             let cond  = cond |> buildExpression
@@ -734,7 +734,7 @@ module SimulationCode =
             |> this.AddStatement
             QsConditionalStatement node
                
-        override this.onForStatement (node:QsForStatement) =
+        override this.OnForStatement (node:QsForStatement) =
             let sym   = node.LoopItem |> fst |> buildSymbolNames id
             let range = node.IterationValues |> captureExpression
             let body  = node.Body |> buildBlock
@@ -742,14 +742,14 @@ module SimulationCode =
             |> this.AddStatement
             QsForStatement node
 
-        override this.onWhileStatement (node:QsWhileStatement) =
+        override this.OnWhileStatement (node:QsWhileStatement) =
             let cond   = node.Condition |> buildExpression
             let body  = node.Body |> buildBlock
             ``while`` ``(`` cond  ``)`` body
             |> this.AddStatement
             QsWhileStatement node
                                 
-        override this.onRepeatStatement rs =        
+        override this.OnRepeatStatement rs =        
             let buildTest test fixup =
                 let condition = buildExpression test
                 let thens = [``break``]
@@ -761,7 +761,7 @@ module SimulationCode =
             |> this.AddStatement
             QsRepeatStatement rs
 
-        override this.onQubitScope (using:QsQubitScope) = 
+        override this.OnQubitScope (using:QsQubitScope) = 
             let (alloc, release) = 
                 match using.Kind with 
                 | Allocate -> ("Allocate", "Release")
@@ -831,7 +831,7 @@ module SimulationCode =
             parent.LineNumber <- currentLine
             QsQubitScope using
 
-        override this.onFailStatement fs = 
+        override this.OnFailStatement fs = 
             let failException = ``new`` (``type`` ["ExecutionFailException"]) ``(`` [ (buildExpression fs) ] ``)``
             this.AddStatement (``throw`` <| Some failException)
             QsFailStatement fs
@@ -839,7 +839,7 @@ module SimulationCode =
     and NamespaceBuilder (parent : SyntaxBuilder) = 
         inherit NamespaceTransformation(parent, TransformationOptions.NoRebuild)
 
-        override this.beforeSpecialization (sp : QsSpecialization) = 
+        override this.BeforeSpecialization (sp : QsSpecialization) = 
             count <- 0
             match sp.Location with 
             | Value location -> parent.StartLine <- Some (location.Offset |> fst)
@@ -848,7 +848,7 @@ module SimulationCode =
     
     let operationDependencies (od:QsCallable) =
         let seeker = new OperationsSeeker()
-        seeker.Namespaces.dispatchCallable(od) |> ignore
+        seeker.Namespaces.DispatchCallable(od) |> ignore
         seeker.SharedState |> Seq.toList
 
     let getOpName context n = 
@@ -932,7 +932,7 @@ module SimulationCode =
             let returnType  = sp.Signature.ReturnType
             let statements  =
                 let builder = new SyntaxBuilder(context)
-                builder.Namespaces.dispatchSpecialization sp |> ignore
+                builder.Namespaces.DispatchSpecialization sp |> ignore
                 builder.BuiltStatements
 
             let inData = ``ident`` "__in__"
@@ -1511,20 +1511,20 @@ module SimulationCode =
         member internal this.Apply (elements : IEnumerable<QsNamespaceElement>) = 
             attributes <- []
             for element in elements do 
-                base.dispatchNamespaceElement element |> ignore
+                base.DispatchNamespaceElement element |> ignore
             attributes |> List.rev
 
-        override this.beforeSpecialization (spec : QsSpecialization) = 
+        override this.BeforeSpecialization (spec : QsSpecialization) = 
             (SpecializationDeclarationHeader.New spec).ToJson()
             |> GenerateAndAdd "SpecializationDeclaration"
             spec
 
-        override this.beforeCallable (callable : QsCallable) = 
+        override this.BeforeCallable (callable : QsCallable) = 
             (CallableDeclarationHeader.New callable).ToJson()
             |> GenerateAndAdd "CallableDeclaration"
             callable
 
-        override this.onType (qsType : QsCustomType) = 
+        override this.OnType (qsType : QsCustomType) = 
             (TypeDeclarationHeader.New qsType).ToJson()
             |> GenerateAndAdd "TypeDeclaration"
             qsType

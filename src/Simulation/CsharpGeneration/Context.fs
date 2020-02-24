@@ -24,11 +24,11 @@ module internal DeclarationLocations =
     type NamespaceTransformation(parent : SyntaxTreeTransformation<TransformationState>) = 
         inherit NamespaceTransformation<TransformationState>(parent)
 
-        override this.onSourceFile file = 
+        override this.OnSourceFile file = 
             this.SharedState.CurrentSource <- file.Value
             file
 
-        override this.onLocation sourceLocation = 
+        override this.OnLocation sourceLocation = 
             match sourceLocation with 
             | Value (loc : QsLocation) when this.SharedState.CurrentSource <> null -> 
                 this.SharedState.DeclarationLocations.Add (NonNullable<string>.New this.SharedState.CurrentSource, loc.Offset) 
@@ -51,7 +51,7 @@ module internal DeclarationLocations =
 
     let Accumulate (syntaxTree : IEnumerable<QsNamespace>) = 
         let walker = new SyntaxTreeTransformation()
-        for ns in syntaxTree do walker.Namespaces.Transform ns |> ignore
+        for ns in syntaxTree do walker.Namespaces.OnNamespace ns |> ignore
         walker.DeclarationLocations
 
 
