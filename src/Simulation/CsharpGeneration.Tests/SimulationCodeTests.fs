@@ -1040,7 +1040,7 @@ namespace N1
     let createVisitor (_,op) (sp:QsSpecialization) =
         let context = createTestContext op
         let builder = new SyntaxBuilder(context)
-        builder.Namespaces.DispatchSpecialization sp |> ignore
+        builder.Namespaces.OnSpecializationDeclaration sp |> ignore
         builder        
 
     let applyVisitor (ns,op) =
