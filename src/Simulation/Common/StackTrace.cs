@@ -142,9 +142,12 @@ namespace Microsoft.Quantum.Simulation.Common
             }
 
             StackFrame[] qsharpStackFrames = qsharpCallStack.ToArray();
-            int currentQSharpFrameIndex = 0;
-            int currentCSharpFrameIndex = 0;
+            int currentQSharpFrameIndex = -1;
+            int currentCSharpFrameIndex = -1;
 
+            // A set of Q# stack frames is assumed to be a subset of C# stack frames.
+            // When a C# stack frame doesn't have enough information to match with corresponding Q# frame
+            // this assumption is essentially broken, which results in missing matches.
             System.Diagnostics.StackFrame csharpFrame = GetNextCSharpStackFrame(csharpStackFrames, ref currentCSharpFrameIndex);
             StackFrame qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
             while (csharpFrame != null && qsharpFrame != null)
@@ -152,8 +155,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 if (IsMatch(csharpFrame, qsharpFrame))
                 {
                     PopulateQSharpFrameFromCSharpFrame(csharpFrame, qsharpFrame);
-                    // Advance to the next Q# Stack frame only when it matches C# stack frame.
-                    // This assumes all Q# stack frames with enough information to match will match with corresponding C# stack frames.
+                    // Advance to the next Q# stack frame only when it matches C# stack frame.
                     // If corresponding C# stack frame doesn't have enough information to match
                     // this and all subsequent Q# stack frames will not match.
                     qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
@@ -168,33 +170,38 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
         {
+            if (currentFrameIndex >= qsharpStackFrames.Length)
+            {
+                return null;
+            }
+            currentFrameIndex++;
             while (currentFrameIndex < qsharpStackFrames.Length)
             {
                 StackFrame currentFrame = qsharpStackFrames[currentFrameIndex];
-                currentFrameIndex++;
                 if (!string.IsNullOrEmpty(currentFrame.SourceFile))
                 {
                     return currentFrame;
                 }
+                currentFrameIndex++;
             }
             return null;
         }
 
         /// <summary>
-        /// Return next C# stack frame that has enough information to match
+        /// Return next C# stack frame
         /// </summary>
         private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStackFrames, ref int currentFrameIndex)
         {
-            while(currentFrameIndex < csharpStackFrames.Length)
+            if (currentFrameIndex >= csharpStackFrames.Length)
             {
-                System.Diagnostics.StackFrame currentFrame = csharpStackFrames[currentFrameIndex];
-                currentFrameIndex++;
-                if (!string.IsNullOrEmpty(currentFrame.GetFileName()) && currentFrame.GetFileLineNumber() != 0)
-                {
-                    return currentFrame;
-                }
+                return null;
             }
-            return null;
+            currentFrameIndex++;
+            if (currentFrameIndex >= csharpStackFrames.Length)
+            {
+                return null;
+            }
+            return csharpStackFrames[currentFrameIndex];
         }
 
         /// <summary>
@@ -202,8 +209,13 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         private static bool IsMatch(System.Diagnostics.StackFrame csharpFrame, StackFrame qsharpFrame)
         {
-            string fileName = System.IO.Path.GetFullPath(csharpFrame.GetFileName());
-            if (fileName != qsharpFrame.SourceFile)
+            string fileName = csharpFrame.GetFileName();
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+            string fullPath = System.IO.Path.GetFullPath(fileName);
+            if (fullPath != qsharpFrame.SourceFile)
             {
                 return false;
             }
