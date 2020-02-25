@@ -5,8 +5,6 @@ Welcome to the Microsoft Quantum Development Kit!
 This repository contains the runtime components for the [Quantum Development Kit](https://docs.microsoft.com/quantum/).
 It consists of the libraries and packages needed to create and simulate quantum applications using Q#.
 
-- **[ProjectTemplates/](./src/ProjectTemplates/)**: Source for the [project templates](https://www.nuget.org/packages/Microsoft.Quantum.ProjectTemplates/) 
-    that can be used to create new Q# applications using .NET Core's CLI.
 - **[Simulation/](./src/Simulation/)**: Source for Q# simulation. Includes code generation, full-state and other simulators.
 - **[xUnit/](./src/Xunit/)**: Source for the xUnit's Q# test-case discoverer.
 
