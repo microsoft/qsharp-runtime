@@ -2776,7 +2776,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () = 
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1301,-1)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1301,1312)]
     public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
     {
         public UpdateUdtItems(IOperationFactorym) : base(m)
