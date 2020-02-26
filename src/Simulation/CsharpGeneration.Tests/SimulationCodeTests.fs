@@ -194,6 +194,10 @@ namespace N1
     let bitOperations                           = findCallable @"bitOperations"
     let testLengthDependency                    = findCallable @"testLengthDependency"
     let UpdateUdtItems                          = findCallable @"UpdateUdtItems"
+    let privateFunction                         = findCallable @"PrivateFunction"
+    let internalFunction                        = findCallable @"InternalFunction"
+    let privateOperation                        = findCallable @"PrivateOperation"
+    let internalOperation                       = findCallable @"InternalOperation"
     
     let udt_args0                               = findUdt @"udt_args0"
     let udt_args1                               = findUdt @"udt_args1"
@@ -206,6 +210,8 @@ namespace N1
     let udt_Real                                = findUdt @"udt_Real"
     let udt_Complex                             = findUdt @"udt_Complex"
     let udt_TwoDimArray                         = findUdt @"udt_TwoDimArray"
+    let udt_PrivateType                         = findUdt @"PrivateType"
+    let udt_InternalType                        = findUdt @"InternalType"
 
     let createTestContext op = globalContext.setCallable op
 
@@ -2560,6 +2566,153 @@ namespace N1
         |> testOneClass genF1
         
     [<Fact>]
+    let ``buildOperationClass - access modifiers`` () =
+        """
+[SourceLocation("%%%", OperationFunctor.Body, 1312, 1315)]
+internal partial class PrivateFunction : Function<QVoid, QVoid>, ICallable
+{
+    public PrivateFunction(IOperationFactory m) : base(m)
+    {
+    }
+
+    String ICallable.Name => "PrivateFunction";
+
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.PrivateFunction";
+
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(PrivateFunction));
+
+    public override Func<QVoid, QVoid> Body => (__in__) =>
+    {
+#line hidden
+        return QVoid.Instance;
+    };
+
+    public override void Init()
+    {
+    }
+
+    public override IApplyData __dataIn(QVoid data) => data;
+
+    public override IApplyData __dataOut(QVoid data) => data;
+
+    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+    {
+        return __m__.Run<PrivateFunction, QVoid, QVoid>(QVoid.Instance);
+    }
+}
+"""
+        |> testOneClass privateFunction
+
+        """
+[SourceLocation("%%%", OperationFunctor.Body, 1315, 1318)]
+internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
+{
+    public InternalFunction(IOperationFactory m) : base(m)
+    {
+    }
+
+    String ICallable.Name => "PrivateFunction";
+
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.PrivateFunction";
+
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(PrivateFunction));
+
+    public override Func<QVoid, QVoid> Body => (__in__) =>
+    {
+#line hidden
+        return QVoid.Instance;
+    };
+
+    public override void Init()
+    {
+    }
+
+    public override IApplyData __dataIn(QVoid data) => data;
+
+    public override IApplyData __dataOut(QVoid data) => data;
+
+    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+    {
+        return __m__.Run<InternalFunction, QVoid, QVoid>(QVoid.Instance);
+    }
+}
+"""
+        |> testOneClass internalFunction
+
+        """
+[SourceLocation("%%%", OperationFunctor.Body, 1318, 1321)]
+internal partial class PrivateOperation : Operation<QVoid, QVoid>, ICallable
+{
+    public PrivateOperation(IOperationFactory m) : base(m)
+    {
+    }
+
+    String ICallable.Name => "PrivateOperation";
+
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.PrivateOperation";
+
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(PrivateOperation));
+
+    public override Func<QVoid, QVoid> Body => (__in__) =>
+    {
+#line hidden
+        return QVoid.Instance;
+    };
+
+    public override void Init()
+    {
+    }
+
+    public override IApplyData __dataIn(QVoid data) => data;
+
+    public override IApplyData __dataOut(QVoid data) => data;
+
+    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+    {
+        return __m__.Run<PrivateOperation, QVoid, QVoid>(QVoid.Instance);
+    }
+}
+"""
+        |> testOneClass privateOperation
+
+        """
+[SourceLocation("%%%", OperationFunctor.Body, 1321, 1324)]
+internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
+{
+    public InternalOperation(IOperationFactory m) : base(m)
+    {
+    }
+
+    String ICallable.Name => "InternalOperation";
+
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalOperation";
+
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalOperation));
+
+    public override Func<QVoid, QVoid> Body => (__in__) =>
+    {
+#line hidden
+        return QVoid.Instance;
+    };
+
+    public override void Init()
+    {
+    }
+
+    public override IApplyData __dataIn(QVoid data) => data;
+
+    public override IApplyData __dataOut(QVoid data) => data;
+
+    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+    {
+        return __m__.Run<InternalOperation, QVoid, QVoid>(QVoid.Instance);
+    }
+}
+"""
+        |> testOneClass internalOperation
+
+
+    [<Fact>]
     let ``duplicatedDefinitionsCaller body`` () =
         [
             "emptyFunction.Apply(QVoid.Instance);"
@@ -2789,13 +2942,14 @@ namespace N1
 """
         |> testOneClass bigPowFunction
 
+
+    let testOneUdt (_,udt) expected =
+        let context = CodegenContext.Create syntaxTree
+        let actual  = (buildUdtClass context udt).ToFullString()
+        Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
         
     [<Fact>]
     let ``buildUdtClass - udts`` () =           
-        let testOne (_,udt) expected =
-            let context = CodegenContext.Create syntaxTree
-            let actual  = (buildUdtClass context udt).ToFullString()
-            Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
         """
     public class U : UDTBase<IUnitary>, IApplyData
@@ -2821,7 +2975,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_U
+        |> testOneUdt udt_U
         
         """
     public class AA : UDTBase<A>, IApplyData
@@ -2847,7 +3001,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_AA
+        |> testOneUdt udt_AA
         
         """
     public class Q : UDTBase<Qubit>, IApplyData
@@ -2873,7 +3027,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_Q
+        |> testOneUdt udt_Q
         
         """
     public class QQ : UDTBase<Q>, IApplyData
@@ -2899,7 +3053,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_QQ
+        |> testOneUdt udt_QQ
 
         """
     public class Qubits : UDTBase<IQArray<Qubit>>, IApplyData
@@ -2925,7 +3079,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_Qubits
+        |> testOneUdt udt_Qubits
         
         """
     public class udt_args1 : UDTBase<(Int64,IQArray<Qubit>)>, IApplyData
@@ -2955,7 +3109,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_args1
+        |> testOneUdt udt_args1
         
         """
     public class udt_Real : UDTBase<Double>, IApplyData
@@ -2975,7 +3129,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_Real
+        |> testOneUdt udt_Real
         
         """
     public class udt_Complex : UDTBase<(udt_Real,udt_Real)>, IApplyData
@@ -2998,7 +3152,7 @@ namespace N1
         }
     }
 """
-        |> testOne udt_Complex
+        |> testOneUdt udt_Complex
         
         """
     public class udt_TwoDimArray : UDTBase<IQArray<IQArray<Result>>>, IApplyData
@@ -3018,7 +3172,50 @@ namespace N1
         }
     }
 """
-        |> testOne udt_TwoDimArray
+        |> testOneUdt udt_TwoDimArray
+
+    [<Fact>]
+    let ``buildUdtClass - access modifiers`` () =
+        """
+internal class PrivateType : UDTBase<QVoid>, IApplyData
+{
+    public PrivateType() : base(default(QVoid))
+    {
+    }
+
+    public PrivateType(QVoid data) : base(data)
+    {
+    }
+
+    System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
+
+    public void Deconstruct()
+    {
+    }
+}
+"""
+        |> testOneUdt udt_PrivateType
+
+        """
+internal class InternalType : UDTBase<QVoid>, IApplyData
+{
+    public InternalType() : base(default(QVoid))
+    {
+    }
+
+    public InternalType(QVoid data) : base(data)
+    {
+    }
+
+    System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
+
+    public void Deconstruct()
+    {
+    }
+}
+"""
+        |> testOneUdt udt_InternalType
+
 
     [<Fact>]
     let ``one file - EmptyElements`` () =    
