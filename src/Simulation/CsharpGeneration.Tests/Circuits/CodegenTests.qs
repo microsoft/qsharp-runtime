@@ -1310,16 +1310,16 @@ namespace Microsoft.Quantum.Compiler.Generics {
     // Access Modifiers
 
     private function PrivateFunction () : Unit {
-	}
+    }
 
     internal function InternalFunction () : Unit {
-	}
+    }
 
     private operation PrivateOperation () : Unit {
-	}
+    }
 
     internal operation InternalOperation () : Unit {
-	}
+    }
 
     private newtype PrivateType = Unit;
 
