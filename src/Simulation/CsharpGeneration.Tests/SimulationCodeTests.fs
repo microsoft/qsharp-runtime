@@ -2611,11 +2611,11 @@ internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
     {
     }
 
-    String ICallable.Name => "PrivateFunction";
+    String ICallable.Name => "InternalFunction";
 
-    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.PrivateFunction";
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalFunction";
 
-    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(PrivateFunction));
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalFunction));
 
     public override Func<QVoid, QVoid> Body => (__in__) =>
     {
