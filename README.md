@@ -35,7 +35,7 @@ To build on Windows:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2019 (vesrion 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
+    * Install [Visual Studio 2019 (version 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
         * **.NET Core 3 cross-platform development**
 2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2019`.
