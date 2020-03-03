@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
 
+#nullable enable
+
 namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
@@ -19,16 +21,17 @@ namespace Microsoft.Quantum.Simulation.Common
     /// </summary>
     public abstract class SimulatorBase : AbstractFactory<AbstractCallable>, IOperationFactory
     {
-        public event Action<ICallable, IApplyData> OnOperationStart = null;
-        public event Action<ICallable, IApplyData> OnOperationEnd = null;
-        public event Action<System.Runtime.ExceptionServices.ExceptionDispatchInfo> OnFail = null;
-        public event Action<long> OnAllocateQubits = null;
-        public event Action<IQArray<Qubit>> OnReleaseQubits = null;
-        public event Action<long> OnBorrowQubits = null;
-        public event Action<IQArray<Qubit>> OnReturnQubits = null;
-        public event Action<string> OnLog = null;
+        public event Action<ICallable, IApplyData>? OnOperationStart = null;
+        public event Action<ICallable, IApplyData>? OnOperationEnd = null;
+        public event Action<System.Runtime.ExceptionServices.ExceptionDispatchInfo>? OnFail = null;
+        public event Action<long>? OnAllocateQubits = null;
+        public event Action<IQArray<Qubit>>? OnReleaseQubits = null;
+        public event Action<long>? OnBorrowQubits = null;
+        public event Action<IQArray<Qubit>>? OnReturnQubits = null;
+        public event Action<string>? OnLog = null;
+        public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
 
-        public IQubitManager QubitManager { get; }
+        public IQubitManager? QubitManager { get; }
 
         public abstract string Name { get; }
 
@@ -42,15 +45,16 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Only Q# operations are tracked and reported in the stack trace. Q# functions or calls from 
         /// classical hosts like C# or Python are not included.
         /// </remarks>
-        public StackFrame[] CallStack { get; private set; }
+        public StackFrame[]? CallStack { get; private set; }
 
-        public SimulatorBase(IQubitManager qubitManager = null)
+        public SimulatorBase(IQubitManager? qubitManager = null)
         {
             this.QubitManager = qubitManager;
 
             this.InitBuiltinOperations(this.GetType());
 
             EnableLogToConsole();
+            EnableDefaultStackTraceHandling();
 
             if (this.QubitManager != null)
             {
@@ -92,7 +96,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return new GenericCallable(this, t);
             }
 
-            AbstractCallable result = null;
+            AbstractCallable? result = null;
 
             t = t.GetNativeImplementation() ?? t;
 
@@ -110,6 +114,19 @@ namespace Microsoft.Quantum.Simulation.Common
             return result;
         }
 
+        protected void WriteStackTraceToLog(Exception exception, IEnumerable<StackFrame> callStack)
+        {
+            OnLog?.Invoke($"Unhandled exception. {exception.GetType().FullName}: {exception.Message}");
+            var first = true;
+            foreach (var sf in callStack)
+            {
+                var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
+                OnLog?.Invoke(msg);
+                first = false;
+            }
+            OnLog?.Invoke("");
+        }
+
         public virtual O Execute<T, I, O>(I args) where T : AbstractCallable, ICallable
         {
             StackTraceCollector stackTraceCollector = new StackTraceCollector(this);
@@ -124,16 +141,7 @@ namespace Microsoft.Quantum.Simulation.Common
             catch (Exception e) // Dumps q# call-stack in case of exception if CallStack tracking was enabled
             {
                 this.CallStack = stackTraceCollector.CallStack;
-                OnLog?.Invoke($"Unhandled exception. {e.GetType().FullName}: {e.Message}");
-                bool first = true;
-                foreach (StackFrame sf in this.CallStack)
-                {
-                    var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
-                    OnLog?.Invoke(msg);
-                    first = false;
-                }
-                OnLog?.Invoke("");
-
+                this.OnException?.Invoke(e, this.CallStack);
                 throw;
             }
             finally
@@ -163,6 +171,25 @@ namespace Microsoft.Quantum.Simulation.Common
         public void DisableLogToConsole()
         {
             OnLog -= Console.WriteLine;
+        }
+
+        /// <summary>
+        ///     Adds an event to the OnStackTrace event that logs stack traces
+        ///     as plain text via the OnLog event (e.g.: for console output).
+        /// </summary>
+        public void EnableDefaultStackTraceHandling()
+        {
+            OnException += WriteStackTraceToLog;
+        }
+
+
+        /// <summary>
+        ///     Disables default handling of stack traces, such that stack
+        ///     traces are not written to the OnLog event handler.
+        /// </summary>
+        public void DisableDefaultStackTraceHandling()
+        {
+            OnException -= WriteStackTraceToLog;
         }
 
         /// <summary>
@@ -210,7 +237,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public class Allocate : Intrinsic.Allocate
         {
             private SimulatorBase sim;
-            private IQubitManager manager;
+            private IQubitManager? manager;
 
             public Allocate(SimulatorBase m) : base(m)
             {

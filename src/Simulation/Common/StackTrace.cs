@@ -90,6 +90,22 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
+        ///     Gets the best possible source location for this stack frame.
+        ///     If the source is not available on local machine, the source
+        //      location will be replaced by a URL pointing to GitHub repository.
+        /// </summary>
+        /// <remarks>
+        ///     This is more costly than <see cref="SourceFile"/> because it
+        ///     checks if source file exists on disk.
+        ///     If the file does not exist it calls <see cref="GetURLFromPDB"/> to get the URL
+        ///     which is also more costly than <see cref="SourceFile"/>.
+        /// </remarks>
+        public virtual string GetBestSourceLocation() =>
+            System.IO.File.Exists(SourceFile)
+            ? SourceFile
+            : GetURLFromPDB() ?? SourceFile;
+
+        /// <summary>
         /// The same as <see cref="ToString"/>, but tries to point to best source location.
         /// If the source is not available on local machine, source location will be replaced 
         /// by URL pointing to GitHub repository.
@@ -97,26 +113,8 @@ namespace Microsoft.Quantum.Simulation.Common
         /// If the file does not exist it calls <see cref="GetURLFromPDB"/> to get the URL
         /// which is also more costly than <see cref="ToString"/>.
         /// </summary>
-        public virtual string ToStringWithBestSourceLocation()
-        {
-            string message = ToString();
-            if (System.IO.File.Exists(SourceFile))
-            {
-                return message;
-            }
-            else
-            {
-                string url = GetURLFromPDB();
-                if (url == null)
-                {
-                    return message;
-                }
-                else
-                {
-                    return string.Format(messageFormat, Callable.FullName, url);
-                }
-            }
-        }
+        public virtual string ToStringWithBestSourceLocation() =>
+            string.Format(messageFormat, Callable.FullName, $"{GetBestSourceLocation()}:line {FailedLineNumber}");
 
         /// <summary>
         /// Finds correspondence between Q# and C# stack frames and populates Q# stack frame information from C# stack frames
