@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 Write-Host "##[info]Build Native simulator"
-cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION -- -fileLogger
+cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION
 if  ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
     $script:all_ok = $False
