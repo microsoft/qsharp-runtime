@@ -5,8 +5,6 @@ Welcome to the Microsoft Quantum Development Kit!
 This repository contains the runtime components for the [Quantum Development Kit](https://docs.microsoft.com/quantum/).
 It consists of the libraries and packages needed to create and simulate quantum applications using Q#.
 
-- **[ProjectTemplates/](./src/ProjectTemplates/)**: Source for the [project templates](https://www.nuget.org/packages/Microsoft.Quantum.ProjectTemplates/) 
-    that can be used to create new Q# applications using .NET Core's CLI.
 - **[Simulation/](./src/Simulation/)**: Source for Q# simulation. Includes code generation, full-state and other simulators.
 - **[xUnit/](./src/Xunit/)**: Source for the xUnit's Q# test-case discoverer.
 
@@ -37,7 +35,7 @@ To build on Windows:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2019 (vesrion 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
+    * Install [Visual Studio 2019 (version 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
         * **.NET Core 3 cross-platform development**
 2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2019`.
