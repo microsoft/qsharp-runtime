@@ -2868,13 +2868,13 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         |> testOneClass bigPowFunction
 
 
-    let testOneUdt (_,udt) expected =
+    let private testOneUdt (_,udt) expected =
         let context = CodegenContext.Create syntaxTree
         let actual  = (buildUdtClass context udt).ToFullString()
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
-        
+
     [<Fact>]
-    let ``buildUdtClass - udts`` () =           
+    let ``buildUdtClass - udts`` () =
 
         """
     public class U : UDTBase<IUnitary>, IApplyData
