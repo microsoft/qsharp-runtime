@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
@@ -18,7 +17,5 @@ namespace Microsoft.Quantum.Simulation.Core
         {
             this.Operation = operation;
         }
-
-        public IReadOnlyDictionary<> TargetSpecificRedirects; 
     }
 }
