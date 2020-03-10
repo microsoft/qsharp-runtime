@@ -7,11 +7,12 @@
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/))</NativeBuildPath>
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
     <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>
-    <QsimDllWindows>$([MSBuild]::NormalizePath($(NativeBuildPath)/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QsimDllWindows>
+    <QsimDllWindowsRelease>$([MSBuild]::NormalizePath($(NativeBuildPath)/Release/Microsoft.Quantum.Simulator.Runtime.dll))</QsimDllWindowsRelease>
+    <QsimDllWindowsDebug>$([MSBuild]::NormalizePath($(NativeBuildPath)/Debug/Microsoft.Quantum.Simulator.Runtime.dll))</QsimDllWindowsDebug>
     <QSimDll Condition="Exists('$(QsimDllMac)')">$(QsimDllMac)</QSimDll>
     <QSimDll Condition="Exists('$(QsimDllLinux)')">$(QsimDllLinux)</QSimDll>
-    <QSimDll Condition="Exists('$(QsimDllWindows)')">$(QsimDllWindows)</QSimDll>
-    <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindows)</QSimDll>
+    <QSimDll Condition="Exists('$(QsimDllWindowsRelease)')">$(QsimDllWindowsRelease)</QSimDll>
+    <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindowsDebug)</QSimDll>
   </PropertyGroup>
   
   <ItemGroup>

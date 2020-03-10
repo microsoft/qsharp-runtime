@@ -174,7 +174,7 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        ///     Adds an event to the OnStackTrace event that logs stack traces
+        ///     Adds an event to the OnException event that logs stack traces
         ///     as plain text via the OnLog event (e.g.: for console output).
         /// </summary>
         public void EnableExceptionPrinting()
