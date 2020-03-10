@@ -5,7 +5,7 @@
   <Import Project="..\Common\Simulators.Dev.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
     <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
     <IsPackable>false</IsPackable>
