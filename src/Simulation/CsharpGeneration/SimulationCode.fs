@@ -1324,11 +1324,7 @@ module SimulationCode =
             ``}``
 
     let private classAccessModifier = function
-        // Note that both private and internal Q# declarations translate to internal C# classes, because C# does not
-        // have an access modifier that is equivalent to Q#'s private access modifier (accessible only within the same
-        // namespace and assembly).
         | DefaultAccess -> ``public``
-        | Private
         | Internal -> ``internal``
 
     // Builds the .NET class for the given operation.
