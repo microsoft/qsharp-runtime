@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Common
             this.InitBuiltinOperations(this.GetType());
 
             EnableLogToConsole();
-            EnableDefaultStackTraceHandling();
+            EnableExceptionPrinting();
 
             if (this.QubitManager != null)
             {
@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Common
         ///     Adds an event to the OnStackTrace event that logs stack traces
         ///     as plain text via the OnLog event (e.g.: for console output).
         /// </summary>
-        public void EnableDefaultStackTraceHandling()
+        public void EnableExceptionPrinting()
         {
             OnException += WriteStackTraceToLog;
         }
@@ -187,7 +187,7 @@ namespace Microsoft.Quantum.Simulation.Common
         ///     Disables default handling of stack traces, such that stack
         ///     traces are not written to the OnLog event handler.
         /// </summary>
-        public void DisableDefaultStackTraceHandling()
+        public void DisableExceptionPrinting()
         {
             OnException -= WriteStackTraceToLog;
         }
