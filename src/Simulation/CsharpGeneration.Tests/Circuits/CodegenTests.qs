@@ -1306,6 +1306,14 @@ namespace Microsoft.Quantum.Compiler.Generics {
             w/ i3 <- arr 
             w/ i1 <- 1;    
     }
+
+    // Access Modifiers
+
+    internal function InternalFunction () : Unit {
+    }
+
+    internal operation InternalOperation () : Unit {
+    }
+
+    internal newtype InternalType = Unit;
 }
-
-

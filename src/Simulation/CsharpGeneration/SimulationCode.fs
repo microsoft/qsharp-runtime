@@ -1323,6 +1323,10 @@ module SimulationCode =
                 (constructors @ properties @ methods) 
             ``}``
 
+    let private classAccessModifier = function
+        | DefaultAccess -> ``public``
+        | Internal -> ``internal``
+
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
@@ -1377,11 +1381,12 @@ module SimulationCode =
         let innerClasses = ([ inData |> snd;  outData |> snd ] |> List.choose id) @ unitTests
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
         
-        let modifiers = 
-            if isAbstract op then            
-                [``public``; ``abstract``; ``partial``]
+        let modifiers =
+            let access = classAccessModifier op.Modifiers.Access
+            if isAbstract op then
+                [ access; ``abstract``; ``partial`` ]
             else
-                [``public``; ``partial`` ]
+                [ access; ``partial`` ]
 
         ``attributes`` (attr |> List.concat) (
             ``class`` name ``<<`` typeParameters ``>>``
@@ -1465,7 +1470,7 @@ module SimulationCode =
            
         let baseClassName = udtBaseClassName context qsharpType
         let baseClass     = ``simpleBase`` baseClassName
-        let modifiers     = [ ``public`` ]
+        let modifiers     = [ classAccessModifier udt.Modifiers.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ] 
         let constructors  = [ buildEmtpyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType
