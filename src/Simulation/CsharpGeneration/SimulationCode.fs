@@ -915,8 +915,13 @@ module SimulationCode =
         |> List.map buildOne
 
     /// Returns a static property of type OperationInfo using the operation's input and output types.
-    let buildOperationInfoProperty operationInput operationOutput operationName =
-        let propertyType = sprintf @"OperationInfo<%s, %s>" operationInput operationOutput
+    let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
+        let propertyType = 
+            match globalContext.ExecutionTarget with
+            | target when target = AssemblyConstants.AlfredProcessor     -> sprintf "AlfredExecutable<%s, %s>"     operationInput operationOutput
+            | target when target = AssemblyConstants.BrunoProcessor      -> sprintf "BrunoExecutable<%s, %s>"      operationInput operationOutput
+            | target when target = AssemblyConstants.ClementineProcessor -> sprintf "ClementineExecutable<%s, %s>" operationInput operationOutput
+            | _                    -> sprintf "EntryPointInfo<%s, %s>"      operationInput operationOutput
         let operationType = simpleBase operationName
         let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [operationType.Type] ``)``]
         let newInstance = ``new`` (``type`` [propertyType]) ``(`` newInstanceArgs ``)``
@@ -1336,7 +1341,14 @@ module SimulationCode =
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
 
         let constructors = [ (buildConstructor context name) ]
-        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType nonGenericName :: buildOpsProperties context opNames
+        let properties = 
+            let opProperties = buildOpsProperties context opNames
+            buildName name :: 
+            buildFullName context.current.Value :: 
+            if globalContext.entryPoints |> Seq.contains op.FullName then 
+                buildOperationInfoProperty globalContext inType outType nonGenericName :: 
+                opProperties
+            else opProperties
             
         let baseOp =
             if isFunction op then 

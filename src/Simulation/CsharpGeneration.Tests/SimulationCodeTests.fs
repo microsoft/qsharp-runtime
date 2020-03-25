@@ -19,7 +19,9 @@ open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
 open Microsoft.Quantum.QsCompiler.DataTypes
+open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
+
 
 module SimulationCode =
     open Microsoft.Quantum.QsCompiler
@@ -985,17 +987,17 @@ namespace N1
     [<Fact>]
     let ``buildOperationInfoProperty test`` () =
         let testOne (_, op) expectedCodeString =
-            let context = createTestContext op
+            let context = {createTestContext op with entryPoints = ImmutableArray.Create op.FullName}
             let (_, operationName) = findClassName context op
             let inType   = op.Signature.ArgumentType |> roslynTypeName context
             let outType  = op.Signature.ReturnType   |> roslynTypeName context
             let codeString =
-                buildOperationInfoProperty inType outType operationName
+                buildOperationInfoProperty context inType outType operationName
                 |> formatSyntaxTree
             Assert.Equal(expectedCodeString |> clearFormatting, codeString |> clearFormatting)
 
         let template inType outType operationName =
-            sprintf @"public static OperationInfo<%s, %s> Info => new OperationInfo<%s, %s>(typeof(%s));" inType outType inType outType operationName
+            sprintf @"public static EntryPointInfo<%s, %s> Info => new EntryPointInfo<%s, %s>(typeof(%s));" inType outType inType outType operationName
 
         template "QVoid" "QVoid" "emptyOperation"
         |> testOne emptyOperation
@@ -2303,9 +2305,14 @@ namespace N1
         false |> testOne differentArgsOperation
         false |> testOne randomOperation
 
-    let testOneClass (_,op : QsCallable) (expected : string) =
+    let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
         let expected = expected.Replace("%%%", op.SourceFile.Value)
-        let context = CodegenContext.Create syntaxTree 
+        let assemblyConstants = 
+            new System.Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ExecutionTarget, executionTarget) 
+            |> Seq.singleton
+            |> ImmutableDictionary.CreateRange
+        let compilation = {Namespaces = syntaxTree; EntryPoints = ImmutableArray.Create op.FullName}
+        let context = CodegenContext.Create (compilation, assemblyConstants)
         let actual = (buildOperationClass context op).ToFullString()
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
@@ -2321,7 +2328,7 @@ namespace N1
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.emptyOperation";
 
-        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyOperation));
+        public static AlfredExecutable<QVoid, QVoid> Info => new AlfredExecutable<QVoid, QVoid>(typeof(emptyOperation));
 
         public override void Init() { }
         
@@ -2333,7 +2340,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass emptyOperation
+        |> testOneClass emptyOperation AssemblyConstants.AlfredProcessor
 
         """
     public abstract partial class randomAbstractOperation : Unitary<(Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, ICallable
@@ -2356,10 +2363,11 @@ namespace N1
                 }
             }
         }
+
         String ICallable.Name => "randomAbstractOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.randomAbstractOperation";
 
-        public static OperationInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new OperationInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
+        public static BrunoExecutable<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new BrunoExecutable<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
 
         public override void Init() { }
 
@@ -2371,7 +2379,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass randomAbstractOperation
+        |> testOneClass randomAbstractOperation AssemblyConstants.BrunoProcessor
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 108, 113)]
@@ -2387,7 +2395,7 @@ namespace N1
         String ICallable.Name => "oneQubitOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.oneQubitOperation";
 
-        public static OperationInfo<Qubit, QVoid> Info => new OperationInfo<Qubit, QVoid>(typeof(oneQubitOperation));
+        public static ClementineExecutable<Qubit, QVoid> Info => new ClementineExecutable<Qubit, QVoid>(typeof(oneQubitOperation));
 
         protected IUnitary<Qubit> X { get; set; }
 
@@ -2441,7 +2449,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass oneQubitOperation
+        |> testOneClass oneQubitOperation AssemblyConstants.ClementineProcessor
         
     [<Fact>]
     let ``buildOperationClass - generics`` () = 
@@ -2473,7 +2481,7 @@ namespace N1
         String ICallable.Name => "genCtrl3";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genCtrl3";
 
-        public static OperationInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new OperationInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
+        public static AlfredExecutable<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new AlfredExecutable<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
 
         public override void Init() { }
 
@@ -2485,7 +2493,7 @@ namespace N1
         }
     }
 """   
-        |> testOneClass genCtrl3
+        |> testOneClass genCtrl3 AssemblyConstants.AlfredProcessor
         
         """
     [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
@@ -2514,7 +2522,7 @@ namespace N1
         String ICallable.Name => "composeImpl";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.composeImpl";
 
-        public static OperationInfo<(ICallable, ICallable, __B__), QVoid> Info => new OperationInfo<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
+        public static BrunoExecutable<(ICallable, ICallable, __B__), QVoid> Info => new BrunoExecutable<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
 
         public override Func<(ICallable,ICallable,__B__), QVoid> Body => (__in__) =>
         {
@@ -2534,7 +2542,7 @@ namespace N1
         }
     }
 """   
-        |> testOneClass composeImpl
+        |> testOneClass composeImpl AssemblyConstants.BrunoProcessor
         
     [<Fact>]
     let ``buildOperationClass - abstract function`` () = 
@@ -2548,7 +2556,7 @@ namespace N1
         String ICallable.Name => "genF1";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genF1";
 
-        public static OperationInfo<__A__, QVoid> Info => new OperationInfo<__A__, QVoid>(typeof(genF1<__A__>));
+        public static ClementineExecutable<__A__, QVoid> Info => new ClementineExecutable<__A__, QVoid>(typeof(genF1<__A__>));
 
         public override void Init() { }
 
@@ -2560,81 +2568,77 @@ namespace N1
         }
     }
 """
-        |> testOneClass genF1
+        |> testOneClass genF1 AssemblyConstants.ClementineProcessor
         
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1312, 1315)]
-internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
-{
-    public InternalFunction(IOperationFactory m) : base(m)
+    [SourceLocation("%%%", OperationFunctor.Body, 1312, 1315)]
+    internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
     {
-    }
+        public InternalFunction(IOperationFactory m) : base(m)
+        {
+        }
 
-    String ICallable.Name => "InternalFunction";
+        String ICallable.Name => "InternalFunction";
+        String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalFunction";
+        public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(InternalFunction));
 
-    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalFunction";
-
-    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalFunction));
-
-    public override Func<QVoid, QVoid> Body => (__in__) =>
-    {
+        public override Func<QVoid, QVoid> Body => (__in__) =>
+        {
 #line hidden
-        return QVoid.Instance;
-    };
+            return QVoid.Instance;
+        };
 
-    public override void Init()
-    {
+        public override void Init()
+        {
+        }
+
+        public override IApplyData __dataIn(QVoid data) => data;
+
+        public override IApplyData __dataOut(QVoid data) => data;
+
+        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+        {
+            return __m__.Run<InternalFunction, QVoid, QVoid>(QVoid.Instance);
+        }
     }
-
-    public override IApplyData __dataIn(QVoid data) => data;
-
-    public override IApplyData __dataOut(QVoid data) => data;
-
-    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
-    {
-        return __m__.Run<InternalFunction, QVoid, QVoid>(QVoid.Instance);
-    }
-}
 """
-        |> testOneClass internalFunction
+        |> testOneClass internalFunction null
 
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1315, 1318)]
-internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
-{
-    public InternalOperation(IOperationFactory m) : base(m)
+    [SourceLocation("%%%", OperationFunctor.Body, 1315, 1318)]
+    internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
     {
+        public InternalOperation(IOperationFactory m) : base(m)
+        {
+        }
+
+        String ICallable.Name => "InternalOperation";
+        String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalOperation";
+        public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(InternalOperation));
+
+        public override Func<QVoid, QVoid> Body => (__in__) =>
+        {
+    #line hidden
+            return QVoid.Instance;
+        };
+
+        public override void Init()
+        {
+        }
+
+        public override IApplyData __dataIn(QVoid data) => data;
+
+        public override IApplyData __dataOut(QVoid data) => data;
+
+        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
+        {
+            return __m__.Run<InternalOperation, QVoid, QVoid>(QVoid.Instance);
+        }
     }
-
-    String ICallable.Name => "InternalOperation";
-
-    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalOperation";
-
-    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalOperation));
-
-    public override Func<QVoid, QVoid> Body => (__in__) =>
-    {
-#line hidden
-        return QVoid.Instance;
-    };
-
-    public override void Init()
-    {
-    }
-
-    public override IApplyData __dataIn(QVoid data) => data;
-
-    public override IApplyData __dataOut(QVoid data) => data;
-
-    public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
-    {
-        return __m__.Run<InternalOperation, QVoid, QVoid>(QVoid.Instance);
-    }
-}
 """
-        |> testOneClass internalOperation
+        |> testOneClass internalOperation null
 
 
     [<Fact>]
@@ -2710,9 +2714,8 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         
         String ICallable.Name => "UpdateUdtItems";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.UpdateUdtItems";
-        
-        public static OperationInfo<MyType2, MyType2> Info => new OperationInfo<MyType2, MyType2>(typeof(UpdateUdtItems));
-        
+        public static EntryPointInfo<MyType2, MyType2> Info => new EntryPointInfo<MyType2, MyType2>(typeof(UpdateUdtItems));
+
         public override Func<MyType2, MyType2> Body => (__in__) => 
         {
             var udt = __in__;
@@ -2730,7 +2733,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         }
     }
         """
-        |> testOneClass UpdateUdtItems
+        |> testOneClass UpdateUdtItems null
 
 
         """
@@ -2742,8 +2745,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
 
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.Overrides.emptyFunction";
-
-        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyFunction));
+        public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(emptyFunction));
 
         public override void Init() { }
 
@@ -2755,7 +2757,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         }
     }
 """
-        |> testOneClass emptyFunction
+        |> testOneClass emptyFunction null
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 33, 40)]
@@ -2767,8 +2769,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
 
         String ICallable.Name => "intFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.intFunction";
-
-        public static OperationInfo<QVoid, Int64> Info => new OperationInfo<QVoid, Int64>(typeof(intFunction));
+        public static EntryPointInfo<QVoid, Int64> Info => new EntryPointInfo<QVoid, Int64>(typeof(intFunction));
 
         public override Func<QVoid, Int64> Body => (__in__) =>
         {
@@ -2785,7 +2786,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         }
     }
 """
-        |> testOneClass intFunction
+        |> testOneClass intFunction null
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 45, 51)]
@@ -2806,8 +2807,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
 
         String ICallable.Name => "powFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.powFunction";
-
-        public static OperationInfo<(Int64, Int64), Int64> Info => new OperationInfo<(Int64, Int64), Int64>(typeof(powFunction));
+        public static EntryPointInfo<(Int64, Int64), Int64> Info => new EntryPointInfo<(Int64, Int64), Int64>(typeof(powFunction));
 
         public override Func<(Int64,Int64), Int64> Body => (__in__) =>
         {
@@ -2825,7 +2825,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         }
     }
 """
-        |> testOneClass powFunction
+        |> testOneClass powFunction null
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 51, 57)]
@@ -2846,8 +2846,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
 
         String ICallable.Name => "bigPowFunction";
         String ICallable.FullName => "Microsoft.Quantum.Testing.bigPowFunction";
-
-        public static OperationInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger> Info => newOperationInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger>(typeof(bigPowFunction));
+        public static EntryPointInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger> Info => new EntryPointInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger>(typeof(bigPowFunction));
 
         public override Func<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger> Body => (__in__) =>
         {
@@ -2865,7 +2864,7 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
         }
     }
 """
-        |> testOneClass bigPowFunction
+        |> testOneClass bigPowFunction null
 
 
     let private testOneUdt (_,udt) expected =
@@ -3203,7 +3202,6 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.emptyFunction";
-        public static OperationInfo<Pair, QVoid> Info => new OperationInfo<Pair, QVoid>(typeof(emptyFunction));
         public override void Init() { }
         public override IApplyData __dataIn(Pair data) => data;
         public override IApplyData __dataOut(QVoid data) => data;
@@ -3221,7 +3219,6 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.emptyOperation";
-        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(emptyOperation));
         public override void Init() { }
         public override IApplyData __dataIn(QVoid data) => data;
         public override IApplyData __dataOut(QVoid data) => data;
@@ -3356,7 +3353,6 @@ namespace Microsoft.Quantum.Tests.Inline
 
         String ICallable.Name => "HelloWorld";
         String ICallable.FullName => "Microsoft.Quantum.Tests.Inline.HelloWorld";
-        public static OperationInfo<Int64, Int64> Info => new OperationInfo<Int64, Int64>(typeof(HelloWorld));
         public override Func<Int64, Int64> Body => (__in__) =>
         {
             var n = __in__;
@@ -3412,7 +3408,6 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 
         String ICallable.Name => "TestLineInBlocks";
         String ICallable.FullName => "Microsoft.Quantum.Tests.LineNumbers.TestLineInBlocks";
-        public static OperationInfo<Int64, Result> Info => new OperationInfo<Int64, Result>(typeof(TestLineInBlocks));
         protected Allocate Allocate
         {
             get;
@@ -3650,8 +3645,6 @@ namespace Microsoft.Quantum.Tests.UnitTests
         String ICallable.Name => "UnitTest1";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest1";
 
-        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(UnitTest1));
-
         public override Func<QVoid, QVoid> Body => (__in__) =>
         {
         #line hidden
@@ -3712,8 +3705,6 @@ namespace Microsoft.Quantum.Tests.UnitTests
 
         String ICallable.Name => "UnitTest2";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest2";
-
-        public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(UnitTest2));
 
         public override Func<QVoid, QVoid> Body => (__in__) =>
         {
