@@ -904,12 +904,18 @@ module SimulationCode =
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
+        let getAccessModifier qualifiedName =
+            match context.allCallables.TryGetValue qualifiedName with
+            | true, callable -> Some callable.Modifiers.Access
+            | false, _ -> None
+
         let getModifiers qualifiedName =
-            // Use the right accessibility for the property depending on the accessibility of the callable. Note: In C#,
-            // "private protected" is the intersection of protected and internal.
-            match context.allCallables.[qualifiedName].Modifiers.Access with
+            // Use the right accessibility for the property depending on the accessibility of the callable.
+            // Note: In C#, "private protected" is the intersection of protected and internal.
+            match getAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
             | DefaultAccess -> [ ``protected`` ]
             | Internal -> [ ``private``; ``protected`` ]
+
         let buildOne qualifiedName =
             /// eg:
             /// protected opType opName { get; }
@@ -918,6 +924,7 @@ module SimulationCode =
             let modifiers = getModifiers qualifiedName
             ``prop`` signature name modifiers
             :> MemberDeclarationSyntax
+
         operations
         |> List.map buildOne
 
