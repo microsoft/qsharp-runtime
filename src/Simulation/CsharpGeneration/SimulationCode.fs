@@ -1551,22 +1551,20 @@ module SimulationCode =
         generator.Apply elements       
 
     // Returns only those namespaces and their elements that are defined for the given file.
-    let findLocalElements fileName syntaxTree =
+    let findLocalElements selector fileName syntaxTree =
         let path = 
             match CompilationBuilder.CompilationUnitManager.TryGetUri fileName with 
             | true, uri -> uri.AbsolutePath |> NonNullable<string>.New
             | false, _ -> NonNullable<string>.New ""
         syntaxTree
-        |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.toList))
+        |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.choose selector |> Seq.toList))
         |> Seq.sortBy fst
         |> Seq.filter (fun (_,elements) -> not elements.IsEmpty)
         |> Seq.toList
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
-    let buildSyntaxTree (fileName : NonNullable<string>) (globalContext : CodegenContext) = 
-        let context = {globalContext with fileName = Some fileName.Value} 
+    let buildSyntaxTree localElements (context : CodegenContext) =         
         let usings = autoNamespaces |> List.map (fun ns -> ``using`` ns)
-        let localElements = findLocalElements fileName context.allQsElements
         let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
 
@@ -1601,11 +1599,28 @@ module SimulationCode =
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
              
+    // Builds the SyntaxTree for callables and types loaded via test names, 
+    // formats it and returns it as a string
+    let loadedViaTestNames (dllName : NonNullable<string>) globalContext = 
+        let isLoadedViaTestName nsElement = 
+            let asOption = function | Value _ -> Some nsElement | _ -> None
+            match nsElement with  
+            | QsCallable c as e -> SymbolResolution.TryGetTestName c.Attributes   
+            | QsCustomType t as e -> SymbolResolution.TryGetTestName t.Attributes 
+            |> asOption
+        let context = {globalContext with fileName = Some dllName.Value} 
+        let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
+        buildSyntaxTree localElements context
+        |> formatSyntaxTree
+
     // Main entry method for a CodeGenerator.
     // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
-    let generate fileName globalContext = 
-        buildSyntaxTree fileName globalContext
+    let generate (fileName : NonNullable<string>) globalContext = 
+        let context = {globalContext with fileName = Some fileName.Value} 
+        let localElements = findLocalElements Some fileName context.allQsElements
+        buildSyntaxTree localElements context
         |> formatSyntaxTree
+
 
 
     
