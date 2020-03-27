@@ -904,15 +904,15 @@ module SimulationCode =
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
-        let getAccessModifier qualifiedName =
+        let getCallableAccessModifier qualifiedName =
             match context.allCallables.TryGetValue qualifiedName with
             | true, callable -> Some callable.Modifiers.Access
             | false, _ -> None
 
-        let getModifiers qualifiedName =
+        let getPropertyModifiers qualifiedName =
             // Use the right accessibility for the property depending on the accessibility of the callable.
             // Note: In C#, "private protected" is the intersection of protected and internal.
-            match getAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
+            match getCallableAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
             | DefaultAccess -> [ ``protected`` ]
             | Internal -> [ ``private``; ``protected`` ]
 
@@ -921,7 +921,7 @@ module SimulationCode =
             /// protected opType opName { get; }
             let signature = roslynCallableTypeName context qualifiedName
             let name = getOpName context qualifiedName
-            let modifiers = getModifiers qualifiedName
+            let modifiers = getPropertyModifiers qualifiedName
             ``prop`` signature name modifiers
             :> MemberDeclarationSyntax
 
