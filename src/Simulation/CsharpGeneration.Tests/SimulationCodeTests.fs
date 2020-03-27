@@ -194,8 +194,9 @@ namespace N1
     let bitOperations                           = findCallable @"bitOperations"
     let testLengthDependency                    = findCallable @"testLengthDependency"
     let UpdateUdtItems                          = findCallable @"UpdateUdtItems"
-    let internalFunction                        = findCallable @"InternalFunction"
-    let internalOperation                       = findCallable @"InternalOperation"
+    let emptyInternalFunction                   = findCallable @"EmptyInternalFunction"
+    let emptyInternalOperation                  = findCallable @"EmptyInternalOperation"
+    let useInternalCallables                    = findCallable @"UseInternalCallables"
 
     let udt_args0                               = findUdt @"udt_args0"
     let udt_args1                               = findUdt @"udt_args1"
@@ -2565,18 +2566,18 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1312, 1315)]
-internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
+[SourceLocation("%%%", OperationFunctor.Body, 1312, 1314)]
+internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
 {
-    public InternalFunction(IOperationFactory m) : base(m)
+    public EmptyInternalFunction(IOperationFactory m) : base(m)
     {
     }
 
-    String ICallable.Name => "InternalFunction";
+    String ICallable.Name => "EmptyInternalFunction";
 
-    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalFunction";
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.EmptyInternalFunction";
 
-    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalFunction));
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(EmptyInternalFunction));
 
     public override Func<QVoid, QVoid> Body => (__in__) =>
     {
@@ -2594,25 +2595,25 @@ internal partial class InternalFunction : Function<QVoid, QVoid>, ICallable
 
     public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
     {
-        return __m__.Run<InternalFunction, QVoid, QVoid>(QVoid.Instance);
+        return __m__.Run<EmptyInternalFunction, QVoid, QVoid>(QVoid.Instance);
     }
 }
 """
-        |> testOneClass internalFunction
+        |> testOneClass emptyInternalFunction
 
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1315, 1318)]
-internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
+[SourceLocation("%%%", OperationFunctor.Body, 1314, 1316)]
+internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallable
 {
-    public InternalOperation(IOperationFactory m) : base(m)
+    public EmptyInternalOperation(IOperationFactory m) : base(m)
     {
     }
 
-    String ICallable.Name => "InternalOperation";
+    String ICallable.Name => "EmptyInternalOperation";
 
-    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.InternalOperation";
+    String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.EmptyInternalOperation";
 
-    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(InternalOperation));
+    public static OperationInfo<QVoid, QVoid> Info => new OperationInfo<QVoid, QVoid>(typeof(EmptyInternalOperation));
 
     public override Func<QVoid, QVoid> Body => (__in__) =>
     {
@@ -2630,11 +2631,11 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
 
     public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
     {
-        return __m__.Run<InternalOperation, QVoid, QVoid>(QVoid.Instance);
+        return __m__.Run<EmptyInternalOperation, QVoid, QVoid>(QVoid.Instance);
     }
 }
 """
-        |> testOneClass internalOperation
+        |> testOneClass emptyInternalOperation
 
 
     [<Fact>]
@@ -2696,7 +2697,26 @@ internal partial class InternalOperation : Operation<QVoid, QVoid>, ICallable
             |> List.map formatSyntaxTree
             
         List.zip (expected |> List.map clearFormatting) (actual  |> List.map clearFormatting) |> List.iter Assert.Equal
-        
+
+    [<Fact>]
+    let ``buildOpsProperties - internal callables`` () =
+        let property = sprintf "private protected %s %s { get; set; }"
+        let expected =
+            [
+                property "ICallable<QVoid, QVoid>" "EmptyInternalFunction"
+                property "ICallable<QVoid, QVoid>" "EmptyInternalOperation"
+                property "ICallable<QVoid, InternalType>" "InternalType"
+                property "ICallable<QVoid, InternalType>" "MakeInternalType"
+            ]
+        let op = snd useInternalCallables
+        let actual =
+            op
+            |> operationDependencies
+            |> depsByName
+            |> buildOpsProperties (createTestContext op)
+            |> List.map formatSyntaxTree
+        List.zip (List.map clearFormatting expected) (List.map clearFormatting actual)
+        |> List.iter Assert.Equal
 
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () = 
