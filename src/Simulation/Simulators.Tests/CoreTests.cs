@@ -279,5 +279,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             Assert.Equal(1, exceptionCount); // check that we cought exception once
         }
+
+        [Fact]
+        public void InternalCallables() =>
+            Helper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
     }
 }
