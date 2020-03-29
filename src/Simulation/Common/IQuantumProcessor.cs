@@ -640,3 +640,4 @@ namespace Microsoft.Quantum.Simulation.Common
         void OnMessage(string msg);
     }
 }
+
