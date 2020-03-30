@@ -4,107 +4,6 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;
-
-    /// # Summary
-    /// The random operation takes an array of doubles as input, and returns
-    /// a randomly-selected index into the array as an `Int`.
-    /// The probability of selecting a specific index is proportional to the value
-    /// of the array element at that index.
-    /// Array elements that are equal to zero are ignored and their indices are never
-    /// returned. If any array element is less than zero,
-    /// or if no array element is greater than zero, then the operation fails.
-    ///
-    /// # Input
-    /// ## probs
-    /// An array of floating-point numbers proportional to the probability of
-    /// selecting each index.
-    ///
-    /// # Output
-    /// An integer $i$ with probability $\Pr(i) = p_i / \sum_i p_i$, where $p_i$
-    /// is the $i$th element of `probs`.
-    operation Random (probs : Double[]) : Int {
-        body intrinsic;
-    }
-    
-    
-    /// # Summary
-    /// Asserts that measuring the given qubits in the given Pauli basis will
-    /// always have the given result.
-    ///
-    /// # Input
-    /// ## bases
-    /// A measurement effect to assert the probability of, expressed as a
-    /// multi-qubit Pauli operator.
-    /// ## qubits
-    /// A register on which to make the assertion.
-    /// ## result
-    /// The expected result of `Measure(bases, qubits)`.
-    /// ## msg
-    /// A message to be reported if the assertion fails.
-    ///
-    /// # Remarks
-    /// Note that the Adjoint and Controlled versions of this operation will not
-    /// check the condition.
-    ///
-    /// # See Also
-    /// - AssertProb
-    operation Assert (bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
-    is Adj + Ctl {
-        body intrinsic;
-    }
-    
-    
-    /// # Summary
-    /// Asserts that measuring the given qubits in the given Pauli basis will have the given result
-    /// with the given probability, within some tolerance.
-    ///
-    /// # Input
-    /// ## bases
-    /// A measurement effect to assert the probability of, expressed as a
-    /// multi-qubit Pauli operator.
-    /// ## qubits
-    /// A register on which to make the assertion.
-    /// ## result
-    /// An expected result of `Measure(bases, qubits)`.
-    /// ## prob
-    /// The probability with which the given result is expected.
-    /// ## msg
-    /// A message to be reported if the assertion fails.
-    ///
-    /// # Example
-    /// ```qsharp
-    /// using (register = Qubit()) {
-    ///     H(register);
-    ///     AssertProb([PauliZ], [register], One, 0.5,
-    ///         "Measuring in conjugate basis did not give 50/50 results.", 1e-5);
-    /// }
-    /// ```
-    ///
-    /// # Remarks
-    /// Note that the Adjoint and Controlled versions of this operation will not
-    /// check the condition.
-    ///
-    /// # See Also
-    /// - Assert
-    operation AssertProb (bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
-    is Adj + Ctl {
-        body intrinsic;
-    }
-    
-    
-    /// # Summary
-    /// Logs a message.
-    ///
-    /// # Input
-    /// ## msg
-    /// The message to be reported.
-    ///
-    /// # Remarks
-    /// The specific behavior of this function is simulator-dependent,
-    /// but in most cases the given message will be written to the console.
-    function Message (msg : String) : Unit {
-        body intrinsic;
-    }
     
     
     //-------------------------------------------------
@@ -126,7 +25,8 @@ namespace Microsoft.Quantum.Intrinsic {
     
     /// # Summary
     /// Applies the Pauli $X$ gate.
-    /// 
+    ///
+    /// # Description
     /// \begin{align}
     ///     \sigma_x \mathrel{:=}
     ///     \begin{bmatrix}
@@ -147,6 +47,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the Pauli $Y$ gate.
     ///
+    /// # Description
     /// \begin{align}
     ///     \sigma_y \mathrel{:=}
     ///     \begin{bmatrix}
@@ -168,6 +69,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the Pauli $Z$ gate.
     ///
+    /// # Description
     /// \begin{align}
     ///     \sigma_z \mathrel{:=}
     ///     \begin{bmatrix}
@@ -189,6 +91,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the Hadamard transformation to a single qubit.
     ///
+    /// # Description
     /// \begin{align}
     ///     H \mathrel{:=}
     ///     \frac{1}{\sqrt{2}}
@@ -211,6 +114,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the π/4 phase gate to a single qubit.
     ///
+    /// # Description
     /// \begin{align}
     ///     S \mathrel{:=}
     ///     \begin{bmatrix}
@@ -231,6 +135,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the π/8 gate to a single qubit.
     ///
+    /// # Description
     /// \begin{align}
     ///     T \mathrel{:=}
     ///     \begin{bmatrix}
@@ -251,6 +156,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the controlled-NOT (CNOT) gate to a pair of qubits.
     ///
+    /// # Description
     /// \begin{align}
     ///     \operatorname{CNOT} \mathrel{:=}
     ///     \begin{bmatrix}
@@ -316,6 +222,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the SWAP gate to a pair of qubits.
     ///
+    /// # Description
     /// \begin{align}
     ///     \operatorname{SWAP} \mathrel{:=}
     ///     \begin{bmatrix}
@@ -360,6 +267,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies a rotation about the given Pauli axis.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_{\mu}(\theta) \mathrel{:=}
     ///     e^{-i \theta \sigma_{\mu} / 2},
@@ -388,6 +296,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Applies a rotation about the given Pauli axis by an angle specified
     /// as a dyadic fraction.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_{\mu}(n, k) \mathrel{:=}
     ///     e^{i \pi n \sigma_{\mu} / 2^k},
@@ -427,6 +336,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies a rotation about the $x$-axis by a given angle.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_x(\theta) \mathrel{:=}
     ///     e^{-i \theta \sigma_x / 2} = 
@@ -464,6 +374,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies a rotation about the $y$-axis by a given angle.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_y(\theta) \mathrel{:=}
     ///     e^{-i \theta \sigma_y / 2} = 
@@ -501,6 +412,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies a rotation about the $z$-axis by a given angle.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_z(\theta) \mathrel{:=}
     ///     e^{-i \theta \sigma_z / 2} = 
@@ -538,6 +450,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies a rotation about the $\ket{1}$ state by a given angle.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_1(\theta) \mathrel{:=}
     ///     \operatorname{diag}(1, e^{i\theta}).
@@ -567,6 +480,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Applies a rotation about the $\ket{1}$ state by an angle specified
     /// as a dyadic fraction.
     ///
+    /// # Description
     /// \begin{align}
     ///     R_1(n, k) \mathrel{:=}
     ///     \operatorname{diag}(1, e^{i \pi k / 2^n}).
@@ -604,6 +518,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Summary
     /// Applies the exponential of a multi-qubit Pauli operator.
     ///
+    /// # Description
     /// \begin{align}
     ///     e^{i \theta [P_0 \otimes P_1 \cdots P_{N-1}]},
     /// \end{align}
@@ -629,6 +544,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Applies the exponential of a multi-qubit Pauli operator
     /// with an argument given by a dyadic fraction.
     ///
+    /// # Description
     /// \begin{align}
     ///     e^{i \pi k [P_0 \otimes P_1 \cdots P_{N-1}] / 2^n},
     /// \end{align}
@@ -662,6 +578,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Performs a joint measurement of one or more qubits in the
     /// specified Pauli bases.
     ///
+    /// # Description
     /// The output result is given by the distribution:
     /// \begin{align}
     ///     \Pr(\texttt{Zero} | \ket{\psi}) =
@@ -701,6 +618,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Performs a measurement of a single qubit in the
     /// Pauli $Z$ basis.
     ///
+    /// # Description
     /// The output result is given by
     /// the distribution
     /// \begin{align}
