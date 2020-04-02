@@ -34,6 +34,7 @@ option(USE_GATE_FUSION "Use gate fusion" ON)
 if (MSVC)
   # always create debug info
   add_definitions("/Zi")
+  add_definitions("/Qspectre")
 
   # build with no VC runtime depedencies:
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
