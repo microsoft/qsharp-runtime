@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Runtime.Machine
+namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
     /// Interface that a quantum machine must implement.
