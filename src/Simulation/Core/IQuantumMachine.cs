@@ -9,13 +9,9 @@ namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
     /// Interface that a quantum machine must implement.
-    ///
-    /// Type parameters:
-    ///     - Job: Type of job that handles the execution of a program in the quantum machine.
-    ///     - QResult: Type of result the quantum machine returns.
     /// </summary>
-    // TODO: This interface should be migrated to the qsharp-runtime repository.
-
+    /// <typeparam name="Job">Type of job that handles the execution of a program in the quantum machine.</typeparam>
+    /// <typeparam name="QRawResult">Type of result the quantum machine returns.</typeparam>
     public interface IQuantumMachine<Job, QRawResult>
     {
         /// <summary>
@@ -34,27 +30,23 @@ namespace Microsoft.Quantum.Runtime
         /// Executes a Q# program.
         /// Submits a job to execute it and continuously checks whether it has been completed.
         /// Once its execution completes, returns its output.
-        ///
-        /// Type parameters:
-        ///     - QInput: Type of input the quantum program receives.
-        ///     - QOutput: Type of output the quantum program returns.
         /// </summary>
         /// <param name="info">Information about the Q# program</param>
         /// <param name="input">Input for the Q# program</param>
+        /// <typeparam name="QInput">Type of input the quantum program receives.</typeparam>
+        /// <typeparam name="QOutput">Type of output the quantum program returns.</typeparam>
         /// <returns>Sampled output of the quantum program</returns>
         Task<Tuple<QOutput, QRawResult>> ExecuteAsync<QInput, QOutput>(OperationInfo<QInput, QOutput> info, QInput input);
 
         /// <summary>
         /// Submits a job to execute a Q# program.
         /// Does not wait for execution to be completed.
-        ///
-        /// Type parameters:
-        ///     - QInput: Type of input the quantum program receives.
-        ///     - QOutput: Type of output the quantum program returns.
         /// </summary>
         /// <param name="info">Information about the Q# program</param>
         /// <param name="input">Input for the Q# program</param>
-        /// <returns>Job object</returns>
+        /// <typeparam name="QInput">Type of input the quantum program receives.</typeparam>
+        /// <typeparam name="QOutput">Type of output the quantum program returns.</typeparam>
+        /// <returns>A Job instance. Status and results from the execution can be retrieved from this instance.</returns>
         Task<Job> SubmitAsync<QInput, QOutput>(OperationInfo<QInput, QOutput> info, QInput input);
     }
 }
