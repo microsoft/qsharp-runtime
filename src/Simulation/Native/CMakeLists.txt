@@ -34,11 +34,10 @@ option(USE_GATE_FUSION "Use gate fusion" ON)
 if (MSVC)
   # always create debug info
   add_definitions("/Zi")
-  add_definitions("/Qspectre")
 
   # build with no VC runtime depedencies:
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-  set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   /MTd")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Qspectre")
+  set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   /MTd /Qspectre")
 else (MSVC)
   set(CMAKE_CXX_FLAGS "-static-libgcc")
 endif (MSVC)
