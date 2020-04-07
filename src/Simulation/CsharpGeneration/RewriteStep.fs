@@ -54,9 +54,9 @@ type Emitter() =
                 |> Seq.filter (fun entryPoint -> context.allCallables.ContainsKey entryPoint)
             match Seq.tryExactlyOne validEntryPoints with
             | Some entryPoint ->
-                let source = context.allCallables.[entryPoint].SourceFile
-                let content = EntryPoint.generate entryPoint
-                CompilationLoader.GeneratedFile(source, dir, ".EntryPoint.g.cs", content) |> ignore
+                let callable = context.allCallables.[entryPoint]
+                let content = EntryPoint.generate context callable
+                CompilationLoader.GeneratedFile(callable.SourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
             | None -> ()
 
             transformed <- compilation
