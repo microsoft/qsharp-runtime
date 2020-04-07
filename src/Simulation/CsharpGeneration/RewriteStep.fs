@@ -44,7 +44,20 @@ type Emitter() =
             for source in allSources do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+
+            // TODO: There is not really any reason why this needs be tied to a particular source file, except
+            //       GeneratedFile requires one.
+            // TODO: Show diagnostic if there is more than one entry point.
+            // TODO: Remove filter once entry points are automatically populated.
+            let validEntryPoints =
+                context.entryPoints
+                |> Seq.filter (fun entryPoint -> context.allCallables.ContainsKey entryPoint)
+            match Seq.tryExactlyOne validEntryPoints with
+            | Some entryPoint ->
+                let source = context.allCallables.[entryPoint].SourceFile
+                let content = EntryPoint.generate entryPoint
+                CompilationLoader.GeneratedFile(source, dir, ".EntryPoint.g.cs", content) |> ignore
+            | None -> ()
+
             transformed <- compilation
             true
-
-

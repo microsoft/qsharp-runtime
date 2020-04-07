@@ -65,6 +65,7 @@ type CodegenContext = {
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
     fileName                : string option
+    entryPoints             : IEnumerable<QsQualifiedName>
 } 
     with
     static member public Create (syntaxTree, assemblyConstants) =        
@@ -82,15 +83,17 @@ type CodegenContext = {
             result.ToImmutableDictionary()
     
         { 
-            assemblyConstants = assemblyConstants;
-            allQsElements = syntaxTree; 
-            byName = callablesByName; 
-            allUdts = udts; 
-            allCallables = callables; 
+            assemblyConstants = assemblyConstants
+            allQsElements = syntaxTree
+            byName = callablesByName
+            allUdts = udts
+            allCallables = callables
             declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
-            current = None; 
-            fileName = None;
+            current = None
+            fileName = None
             signature = None
+            // TODO: Find the entry points automatically.
+            entryPoints = [ {Namespace = NonNullable<_>.New "QsSandbox"; Name = NonNullable<_>.New "HelloQ"} ]
         }
 
     static member public Create syntaxTree = 
