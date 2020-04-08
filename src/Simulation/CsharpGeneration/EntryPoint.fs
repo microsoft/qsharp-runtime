@@ -1,4 +1,4 @@
-﻿module Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
+﻿module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
 
 open Microsoft.CodeAnalysis.CSharp.Syntax
 open Microsoft.Quantum.QsCompiler.SyntaxTokens
@@ -15,7 +15,7 @@ let rec private getArguments context = function
     | QsTuple items -> items |> Seq.map (getArguments context) |> Seq.concat
 
 /// Returns a property containing a sequence of command-line options corresponding to each argument given.
-let private getArgumentOptionsProperty arguments =
+let private getArgumentOptionsProperty args =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
     let getOption (name, typeName) =
@@ -27,22 +27,45 @@ let private getArgumentOptionsProperty arguments =
             ``{``
                 [``ident`` "Required" <-- ``true``]
             ``}``
-    let options = arguments |> Seq.map getOption |> Seq.toList
+    let options = args |> Seq.map getOption |> Seq.toList
+
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
+/// Returns the name of the argument property for the given argument name.
+let private getArgumentPropertyName (s : string) =
+    s.Substring(0, 1).ToUpper() + s.Substring 1
+
 /// Returns a sequence of properties corresponding to each argument given.
 let private getArgumentProperties =
-    let capitalize (s : string) = s.Substring(0, 1).ToUpper() + s.Substring 1
-    Seq.map (fun (name, typeName) -> ``prop`` typeName (capitalize name) [``public``])
+    Seq.map (fun (name, typeName) -> ``prop`` typeName (getArgumentPropertyName name) [``public``])
+
+/// Returns the method for running the entry point using the argument properties declared in the runner.
+let private getRunMethod context (entryPoint : QsCallable) =
+    let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
+    let argNames = getArguments context entryPoint.ArgumentTuple |> Seq.map fst
+    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
+    let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
+    let factoryArgName = "__factory__"
+    let callArgs : seq<ExpressionSyntax> =
+        Seq.concat [
+            Seq.singleton (upcast ``ident`` factoryArgName)
+            argNames |> Seq.map (fun name -> ``ident`` "this" <|.|> ``ident`` (getArgumentPropertyName name))
+        ]
+
+    ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
+        ``(`` [``param`` factoryArgName ``of`` (``type`` "IOperationFactory")] ``)``
+        [``public``; ``async``]
+        (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
 /// Returns a C# class that can run the entry point using command-line options to provide the entry point's arguments.
 let private getEntryPointRunner context entryPoint =
-    let arguments = getArguments context entryPoint.ArgumentTuple
+    let args = getArguments context entryPoint.ArgumentTuple
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
-            Seq.singleton (upcast getArgumentOptionsProperty arguments)
-            getArgumentProperties arguments |> Seq.map (fun property -> upcast property)
+            Seq.singleton (upcast getArgumentOptionsProperty args)
+            getArgumentProperties args |> Seq.map (fun property -> upcast property)
+            Seq.singleton (upcast getRunMethod context entryPoint)
         ]
 
     ``class`` "__QsEntryPointRunner__" ``<<`` [] ``>>``
