@@ -65,4 +65,5 @@ let internal generate context (entryPoint : QsCallable) =
         []
         (Seq.map ``using`` SimulationCode.autoNamespaces)
         [ns]
+    |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
