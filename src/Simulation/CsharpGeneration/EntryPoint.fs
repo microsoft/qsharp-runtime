@@ -6,8 +6,6 @@ open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.RoslynWrapper
 
 
-type private ArgumentTuple = QsTuple<LocalVariableDeclaration<QsLocalSymbol>>
-
 /// Returns a sequence of all of the named items in the argument tuple and their respective C# types.
 let rec private getArguments context = function
     | QsTupleItem variable ->
@@ -16,9 +14,8 @@ let rec private getArguments context = function
         | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (getArguments context) |> Seq.concat
 
-/// Returns a property containing a sequence of command-line options corresponding to each named argument in the entry
-/// point.
-let private getArgumentOptionsProperty context (arguments : ArgumentTuple) =
+/// Returns a property containing a sequence of command-line options corresponding to each argument given.
+let private getArgumentOptionsProperty arguments =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
     let getOption (name, typeName) =
@@ -30,17 +27,29 @@ let private getArgumentOptionsProperty context (arguments : ArgumentTuple) =
             ``{``
                 [``ident`` "Required" <-- ``true``]
             ``}``
-    let options = arguments |> getArguments context |> Seq.map getOption |> Seq.toList
+    let options = arguments |> Seq.map getOption |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
+/// Returns a sequence of properties corresponding to each argument given.
+let private getArgumentProperties = Seq.map <| function
+    // TODO: Use PascalCase.
+    (name, typeName) -> ``prop`` typeName name [``public``]
+
 /// Returns a C# class that can run the entry point using command-line options to provide the entry point's arguments.
 let private getEntryPointRunner context entryPoint =
+    let arguments = getArguments context entryPoint.ArgumentTuple
+    let members : seq<MemberDeclarationSyntax> =
+        Seq.concat [
+            Seq.singleton (upcast getArgumentOptionsProperty arguments)
+            getArgumentProperties arguments |> Seq.map (fun property -> upcast property)
+        ]
+
     ``class`` "__QsEntryPointRunner__" ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``]
         ``{``
-            [getArgumentOptionsProperty context entryPoint.ArgumentTuple]
+            members
         ``}``
 
 /// Generates the C# source code for a standalone executable that runs the Q# entry point.
@@ -51,7 +60,6 @@ let internal generate context (entryPoint : QsCallable) =
                 []
                 [getEntryPointRunner context entryPoint]
             ``}``
-        :> MemberDeclarationSyntax
 
     ``compilation unit``
         []
