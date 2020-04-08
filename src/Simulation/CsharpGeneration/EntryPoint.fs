@@ -9,22 +9,27 @@ open System.IO
 open System.Reflection
 
 
-/// Returns a sequence of all of the named items in the argument tuple and their respective C# types.
+/// Returns a sequence of all of the named items in the argument tuple and their respective C# and Q# types.
 let rec private getArguments context = function
     | QsTupleItem variable ->
-        match variable.VariableName with
-        | ValidName name -> Seq.singleton (name.Value, SimulationCode.roslynTypeName context variable.Type)
-        | InvalidName -> Seq.empty
+        match variable.VariableName, variable.Type.Resolution with
+        | ValidName name, ArrayType itemType ->
+            // Command-line parsing libraries can't convert to IQArray. Use IEnumerable instead.
+            let typeName = sprintf "System.Collections.Generic.IEnumerable<%s>"
+                                   (SimulationCode.roslynTypeName context itemType)
+            Seq.singleton (name.Value, typeName, variable.Type)
+        | ValidName name, _ ->
+            Seq.singleton (name.Value, SimulationCode.roslynTypeName context variable.Type, variable.Type)
+        | InvalidName, _ -> Seq.empty
     | QsTuple items -> items |> Seq.map (getArguments context) |> Seq.concat
 
 /// Returns a property containing a sequence of command-line options corresponding to each argument given.
 let private getArgumentOptionsProperty args =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let getOption (name, typeName) =
+    let getOption (name, typeName, _) =
         // TODO: Generate diagnostic if argument option name conflicts with a standard option name.
         // TODO: Use kebab-case.
-        // TODO: We might need to convert IQArray<T> to a standard array type.
         let optionName = "--" + name
         ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [``literal`` optionName] ``)``
             ``{``
@@ -41,19 +46,28 @@ let private getArgumentPropertyName (s : string) =
 
 /// Returns a sequence of properties corresponding to each argument given.
 let private getArgumentProperties =
-    Seq.map (fun (name, typeName) -> ``prop`` typeName (getArgumentPropertyName name) [``public``])
+    Seq.map (fun (name, typeName, _) -> ``prop`` typeName (getArgumentPropertyName name) [``public``])
 
 /// Returns the method for running the entry point using the argument properties declared in the runner.
 let private getRunMethod context (entryPoint : QsCallable) =
     let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
-    let argNames = getArguments context entryPoint.ArgumentTuple |> Seq.map fst
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
     let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
     let factoryArgName = "__factory__"
+
+    let getArgExpr (name, _, qsType : ResolvedType) =
+        let property = ``ident`` "this" <|.|> ``ident`` (getArgumentPropertyName name)
+        match qsType.Resolution with
+        | ArrayType itemType ->
+            // Convert the IEnumerable property into a QArray.
+            let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
+            ``new`` (``type`` arrayTypeName) ``(`` [property] ``)``
+        | _ -> property
+
     let callArgs : seq<ExpressionSyntax> =
         Seq.concat [
             Seq.singleton (upcast ``ident`` factoryArgName)
-            argNames |> Seq.map (fun name -> ``ident`` "this" <|.|> ``ident`` (getArgumentPropertyName name))
+            Seq.map getArgExpr (getArguments context entryPoint.ArgumentTuple)
         ]
 
     ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
