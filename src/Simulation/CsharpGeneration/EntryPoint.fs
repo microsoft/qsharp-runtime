@@ -29,9 +29,9 @@ let private getArgumentOptionsProperty args =
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
     let getOption (name, typeName, _) =
         // TODO: Generate diagnostic if argument option name conflicts with a standard option name.
-        // TODO: Use kebab-case.
-        let optionName = "--" + name
-        ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [``literal`` optionName] ``)``
+        let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
+        let nameExpr = ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
+        ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [nameExpr] ``)``
             ``{``
                 [``ident`` "Required" <-- ``true``]
             ``}``
