@@ -4,6 +4,9 @@ open Microsoft.CodeAnalysis.CSharp.Syntax
 open Microsoft.Quantum.QsCompiler.SyntaxTokens
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.RoslynWrapper
+open System
+open System.IO
+open System.Reflection
 
 
 /// Returns a sequence of all of the named items in the argument tuple and their respective C# types.
@@ -58,8 +61,11 @@ let private getRunMethod context (entryPoint : QsCallable) =
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
-/// Returns a C# class that can run the entry point using command-line options to provide the entry point's arguments.
-let private getEntryPointRunner context entryPoint =
+/// The name of the entry point runner class.
+let private runnerClassName = "__QsEntryPointRunner__"
+
+/// Returns the class for running the entry point using command-line options to provide the entry point's arguments.
+let private getRunnerClass context entryPoint =
     let args = getArguments context entryPoint.ArgumentTuple
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
@@ -68,25 +74,37 @@ let private getEntryPointRunner context entryPoint =
             Seq.singleton (upcast getRunMethod context entryPoint)
         ]
 
-    ``class`` "__QsEntryPointRunner__" ``<<`` [] ``>>``
+    ``class`` runnerClassName ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``]
         ``{``
             members
         ``}``
 
-/// Generates the C# source code for a standalone executable that runs the Q# entry point.
-let internal generate context (entryPoint : QsCallable) =
+/// Returns the source code for the entry point runner.
+let private getRunner context (entryPoint : QsCallable) =
     let ns =
         ``namespace`` entryPoint.FullName.Namespace.Value
             ``{``
-                []
-                [getEntryPointRunner context entryPoint]
+                (Seq.map ``using`` SimulationCode.autoNamespaces)
+                [getRunnerClass context entryPoint]
             ``}``
 
-    ``compilation unit``
-        []
-        (Seq.map ``using`` SimulationCode.autoNamespaces)
-        [ns]
+    ``compilation unit`` [] [] [ns]
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
+
+/// Returns the source code for the entry point driver.
+let private getDriver (entryPoint : QsCallable) =
+    let name = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPointDriver.cs"
+    use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream name
+    use reader = new StreamReader(stream)
+    reader.ReadToEnd()
+        .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
+        .Replace("@SimulatorKind", "__QsSimulatorKind__")
+        .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
+        .Replace("@EntryPointRunner", runnerClassName)
+
+/// Generates C# source code for a standalone executable that runs the Q# entry point.
+let internal generate context entryPoint =
+    getRunner context entryPoint + Environment.NewLine + getDriver entryPoint
