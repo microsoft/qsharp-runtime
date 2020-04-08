@@ -32,9 +32,9 @@ let private getArgumentOptionsProperty arguments =
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
 /// Returns a sequence of properties corresponding to each argument given.
-let private getArgumentProperties = Seq.map <| function
-    // TODO: Use PascalCase.
-    (name, typeName) -> ``prop`` typeName name [``public``]
+let private getArgumentProperties =
+    let capitalize (s : string) = s.Substring(0, 1).ToUpper() + s.Substring 1
+    Seq.map (fun (name, typeName) -> ``prop`` typeName (capitalize name) [``public``])
 
 /// Returns a C# class that can run the entry point using command-line options to provide the entry point's arguments.
 let private getEntryPointRunner context entryPoint =
