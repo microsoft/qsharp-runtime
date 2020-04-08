@@ -81,6 +81,11 @@ type CodegenContext = {
                 if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
+
+        // TODO: Find the entry points automatically. See https://github.com/microsoft/qsharp-runtime/pull/163.
+        let defaultEntryPoints =
+            let helloQ = {Namespace = NonNullable<_>.New "QsSandbox"; Name = NonNullable<_>.New "HelloQ"}
+            if callables.ContainsKey helloQ then [helloQ] else []
     
         { 
             assemblyConstants = assemblyConstants
@@ -92,8 +97,7 @@ type CodegenContext = {
             current = None
             fileName = None
             signature = None
-            // TODO: Find the entry points automatically.
-            entryPoints = [ {Namespace = NonNullable<_>.New "QsSandbox"; Name = NonNullable<_>.New "HelloQ"} ]
+            entryPoints = defaultEntryPoints
         }
 
     static member public Create syntaxTree = 
