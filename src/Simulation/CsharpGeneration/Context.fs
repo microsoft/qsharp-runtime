@@ -68,27 +68,22 @@ type CodegenContext = {
     entryPoints             : IEnumerable<QsQualifiedName>
 } 
     with
-    static member public Create (syntaxTree, assemblyConstants) =        
+    static member public Create (syntaxTree, ?assemblyConstants, ?entryPoints) =
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationLocations.Accumulate syntaxTree
-        let callablesByName = 
+        let callablesByName =
             let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
             | QsCallable c -> Some (ns, c)
             | _ -> None))
-            |> Seq.iter (fun (ns:QsNamespace,c:QsCallable) -> 
-                if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
+            |> Seq.iter (fun (ns:QsNamespace,c:QsCallable) ->
+                if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name])
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
-
-        // TODO: Find the entry points automatically. See https://github.com/microsoft/qsharp-runtime/pull/163.
-        let defaultEntryPoints =
-            let helloQ = {Namespace = NonNullable<_>.New "QsSandbox"; Name = NonNullable<_>.New "HelloQ"}
-            if callables.ContainsKey helloQ then [helloQ] else []
     
-        { 
-            assemblyConstants = assemblyConstants
+        {
+            assemblyConstants = defaultArg assemblyConstants (ImmutableDictionary.Empty :> IDictionary<_, _>)
             allQsElements = syntaxTree
             byName = callablesByName
             allUdts = udts
@@ -97,11 +92,8 @@ type CodegenContext = {
             current = None
             fileName = None
             signature = None
-            entryPoints = defaultEntryPoints
+            entryPoints = defaultArg entryPoints (ImmutableArray.Empty :> IEnumerable<_>)
         }
-
-    static member public Create syntaxTree = 
-        CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
 
     member public this.AssemblyName = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
