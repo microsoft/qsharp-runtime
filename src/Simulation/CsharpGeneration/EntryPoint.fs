@@ -1,6 +1,7 @@
 ﻿module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
 
 open Microsoft.CodeAnalysis.CSharp.Syntax
+open Microsoft.Quantum.QsCompiler.SyntaxProcessing.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.SyntaxTokens
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.RoslynWrapper
@@ -48,7 +49,7 @@ let private getArgumentPropertyName (s : string) =
 let private getArgumentProperties =
     Seq.map (fun (name, typeName, _) -> ``prop`` typeName (getArgumentPropertyName name) [``public``])
 
-/// Returns the method for running the entry point using the argument properties declared in the runner.
+/// Returns the method for running the entry point using the argument properties declared in the adapter.
 let private getRunMethod context (entryPoint : QsCallable) =
     let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
@@ -75,33 +76,37 @@ let private getRunMethod context (entryPoint : QsCallable) =
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
-/// The name of the entry point runner class.
-let private runnerClassName = "__QsEntryPointRunner__"
+/// The name of the entry point adapter class.
+let private adapterClassName = "__QsEntryPointAdapter__"
 
-/// Returns the class for running the entry point using command-line options to provide the entry point's arguments.
-let private getRunnerClass context entryPoint =
+/// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
+let private getAdapterClass context (entryPoint : QsCallable) =
+    let summary =
+        ``property-arrow_get`` "string" "Summary" [``public``; ``static``]
+            ``get`` (``=>`` (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ())))
     let args = getArguments context entryPoint.ArgumentTuple
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
+            Seq.singleton (upcast summary)
             Seq.singleton (upcast getArgumentOptionsProperty args)
             getArgumentProperties args |> Seq.map (fun property -> upcast property)
             Seq.singleton (upcast getRunMethod context entryPoint)
         ]
 
-    ``class`` runnerClassName ``<<`` [] ``>>``
+    ``class`` adapterClassName ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``]
         ``{``
             members
         ``}``
 
-/// Returns the source code for the entry point runner.
-let private getRunner context (entryPoint : QsCallable) =
+/// Returns the source code for the entry point adapter.
+let private getAdapter context (entryPoint : QsCallable) =
     let ns =
         ``namespace`` entryPoint.FullName.Namespace.Value
             ``{``
                 (Seq.map ``using`` SimulationCode.autoNamespaces)
-                [getRunnerClass context entryPoint]
+                [getAdapterClass context entryPoint]
             ``}``
 
     ``compilation unit`` [] [] [ns]
@@ -117,8 +122,8 @@ let private getDriver (entryPoint : QsCallable) =
         .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
         .Replace("@SimulatorKind", "__QsSimulatorKind__")
         .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
-        .Replace("@EntryPointRunner", runnerClassName)
+        .Replace("@EntryPointAdapter", adapterClassName)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
-    getRunner context entryPoint + Environment.NewLine + getDriver entryPoint
+    getAdapter context entryPoint + Environment.NewLine + getDriver entryPoint

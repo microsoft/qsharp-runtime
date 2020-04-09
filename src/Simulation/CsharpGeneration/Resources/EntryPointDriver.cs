@@ -21,7 +21,7 @@
             var simulate = new Command("simulate")
             {
                 Description = "Run the program using a local simulator.",
-                Handler = CommandHandler.Create<@EntryPointRunner, @SimulatorKind>(Simulate)
+                Handler = CommandHandler.Create<@EntryPointAdapter, @SimulatorKind>(Simulate)
             };
             simulate.AddOption(new Option<@SimulatorKind>(
                 new[] { "--simulator", "-s" },
@@ -31,11 +31,11 @@
             var resources = new Command("resources")
             {
                 Description = "Estimate the resource usage of the program.",
-                Handler = CommandHandler.Create<@EntryPointRunner>(Resources)
+                Handler = CommandHandler.Create<@EntryPointAdapter>(Resources)
             };
 
-            var root = new RootCommand() { simulate, resources };
-            foreach (var option in @EntryPointRunner.Options)
+            var root = new RootCommand(@EntryPointAdapter.Summary) { simulate, resources };
+            foreach (var option in @EntryPointAdapter.Options)
             {
                 root.AddGlobalOption(option);
             }
@@ -43,13 +43,13 @@
             return await root.InvokeAsync(args);
         }
 
-        private static async Task Simulate(@EntryPointRunner entryPoint, @SimulatorKind simulator)
+        private static async Task Simulate(@EntryPointAdapter entryPoint, @SimulatorKind simulator)
         {
             var result = await WithSimulator(entryPoint.Run, simulator);
             Console.WriteLine(result);
         }
 
-        private static async Task Resources(@EntryPointRunner entryPoint)
+        private static async Task Resources(@EntryPointAdapter entryPoint)
         {
             var estimator = new ResourcesEstimator();
             await entryPoint.Run(estimator);
