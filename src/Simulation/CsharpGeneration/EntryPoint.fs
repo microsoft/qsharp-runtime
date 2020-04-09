@@ -10,54 +10,68 @@ open System.IO
 open System.Reflection
 
 
-/// Returns a sequence of all of the named items in the argument tuple and their respective C# and Q# types.
-let rec private getArguments context = function
+/// An entry point parameter.
+type private Parameter =
+    { Name : string
+      QsharpType : ResolvedType
+      CsharpTypeName : string
+      Description : string }
+
+/// Returns a sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
+let rec private getParameters context doc = function
     | QsTupleItem variable ->
         match variable.VariableName, variable.Type.Resolution with
         | ValidName name, ArrayType itemType ->
             // Command-line parsing libraries can't convert to IQArray. Use IEnumerable instead.
             let typeName = sprintf "System.Collections.Generic.IEnumerable<%s>"
                                    (SimulationCode.roslynTypeName context itemType)
-            Seq.singleton (name.Value, typeName, variable.Type)
+            Seq.singleton { Name = name.Value
+                            QsharpType = variable.Type
+                            CsharpTypeName = typeName
+                            Description = ParameterDescription doc name.Value }
         | ValidName name, _ ->
-            Seq.singleton (name.Value, SimulationCode.roslynTypeName context variable.Type, variable.Type)
+            Seq.singleton { Name = name.Value
+                            QsharpType = variable.Type
+                            CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
+                            Description = ParameterDescription doc name.Value }
         | InvalidName, _ -> Seq.empty
-    | QsTuple items -> items |> Seq.map (getArguments context) |> Seq.concat
+    | QsTuple items -> items |> Seq.map (getParameters context doc) |> Seq.concat
 
-/// Returns a property containing a sequence of command-line options corresponding to each argument given.
-let private getArgumentOptionsProperty args =
+/// Returns a property containing a sequence of command-line options corresponding to each parameter given.
+let private getParameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let getOption (name, typeName, _) =
-        // TODO: Generate diagnostic if argument option name conflicts with a standard option name.
+    let getOption { Name = name; CsharpTypeName = typeName; Description = desc } =
+        // TODO: Generate diagnostic if the parameter option name conflicts with a standard option name.
         let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
         let nameExpr = ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
-        ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [nameExpr] ``)``
+        ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [nameExpr; ``literal`` desc] ``)``
             ``{``
                 [``ident`` "Required" <-- ``true``]
             ``}``
-    let options = args |> Seq.map getOption |> Seq.toList
+    let options = parameters |> Seq.map getOption |> Seq.toList
 
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
-/// Returns the name of the argument property for the given argument name.
-let private getArgumentPropertyName (s : string) =
+/// Returns the name of the parameter property for the given parameter name.
+let private getParameterPropertyName (s : string) =
     s.Substring(0, 1).ToUpper() + s.Substring 1
 
-/// Returns a sequence of properties corresponding to each argument given.
-let private getArgumentProperties =
-    Seq.map (fun (name, typeName, _) -> ``prop`` typeName (getArgumentPropertyName name) [``public``])
+/// Returns a sequence of properties corresponding to each parameter given.
+let private getParameterProperties =
+    Seq.map (fun { Name = name; CsharpTypeName = typeName } ->
+        ``prop`` typeName (getParameterPropertyName name) [``public``])
 
-/// Returns the method for running the entry point using the argument properties declared in the adapter.
+/// Returns the method for running the entry point using the parameter properties declared in the adapter.
 let private getRunMethod context (entryPoint : QsCallable) =
     let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
     let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
-    let factoryArgName = "__factory__"
+    let factoryParamName = "__factory__"
 
-    let getArgExpr (name, _, qsType : ResolvedType) =
-        let property = ``ident`` "this" <|.|> ``ident`` (getArgumentPropertyName name)
+    let getArgExpr { Name = name; QsharpType = qsType } =
+        let property = ``ident`` "this" <|.|> ``ident`` (getParameterPropertyName name)
         match qsType.Resolution with
         | ArrayType itemType ->
             // Convert the IEnumerable property into a QArray.
@@ -67,12 +81,12 @@ let private getRunMethod context (entryPoint : QsCallable) =
 
     let callArgs : seq<ExpressionSyntax> =
         Seq.concat [
-            Seq.singleton (upcast ``ident`` factoryArgName)
-            Seq.map getArgExpr (getArguments context entryPoint.ArgumentTuple)
+            Seq.singleton (upcast ``ident`` factoryParamName)
+            Seq.map getArgExpr (getParameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
 
     ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
-        ``(`` [``param`` factoryArgName ``of`` (``type`` "IOperationFactory")] ``)``
+        ``(`` [``param`` factoryParamName ``of`` (``type`` "IOperationFactory")] ``)``
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
@@ -84,12 +98,12 @@ let private getAdapterClass context (entryPoint : QsCallable) =
     let summary =
         ``property-arrow_get`` "string" "Summary" [``public``; ``static``]
             ``get`` (``=>`` (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ())))
-    let args = getArguments context entryPoint.ArgumentTuple
+    let parameters = getParameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
             Seq.singleton (upcast summary)
-            Seq.singleton (upcast getArgumentOptionsProperty args)
-            getArgumentProperties args |> Seq.map (fun property -> upcast property)
+            Seq.singleton (upcast getParameterOptionsProperty parameters)
+            getParameterProperties parameters |> Seq.map (fun property -> upcast property)
             Seq.singleton (upcast getRunMethod context entryPoint)
         ]
 
