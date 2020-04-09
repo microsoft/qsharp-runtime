@@ -26,7 +26,7 @@
             simulate.AddOption(new Option<@SimulatorKind>(
                 new[] { "--simulator", "-s" },
                 () => @SimulatorKind.FullState,
-                $"The name of the simulator to use."));
+                "The name of the simulator to use."));
 
             var resources = new Command("resources")
             {
