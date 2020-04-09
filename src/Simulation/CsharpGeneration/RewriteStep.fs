@@ -36,8 +36,7 @@ type Emitter() =
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
                 | true, outputFolder when outputFolder <> null -> Path.Combine(outputFolder, "src")
                 | _ -> step.Name
-            let context =
-                CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants, compilation.EntryPoints)
+            let context = CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants)
 
             let allSources = 
                 GetSourceFiles.Apply compilation.Namespaces 
@@ -47,7 +46,7 @@ type Emitter() =
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
 
             // TODO: Show diagnostic if there is more than one entry point.
-            match Seq.tryExactlyOne context.entryPoints with
+            match Seq.tryExactlyOne compilation.EntryPoints with
             | Some entryPoint ->
                 let callable = context.allCallables.[entryPoint]
                 let content = EntryPoint.generate context callable

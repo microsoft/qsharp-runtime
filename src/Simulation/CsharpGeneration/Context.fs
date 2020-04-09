@@ -65,35 +65,36 @@ type CodegenContext = {
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
     fileName                : string option
-    entryPoints             : IEnumerable<QsQualifiedName>
 } 
     with
-    static member public Create (syntaxTree, ?assemblyConstants, ?entryPoints) =
+    static member public Create (syntaxTree, assemblyConstants) =        
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationLocations.Accumulate syntaxTree
-        let callablesByName =
+        let callablesByName = 
             let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
             | QsCallable c -> Some (ns, c)
             | _ -> None))
-            |> Seq.iter (fun (ns:QsNamespace,c:QsCallable) ->
-                if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name])
+            |> Seq.iter (fun (ns:QsNamespace,c:QsCallable) -> 
+                if result.ContainsKey c.FullName.Name then result.[c.FullName.Name] <- (ns.Name, c) :: (result.[c.FullName.Name]) 
                 else result.[c.FullName.Name] <- [ns.Name, c])
             result.ToImmutableDictionary()
     
-        {
-            assemblyConstants = defaultArg assemblyConstants (ImmutableDictionary.Empty :> IDictionary<_, _>)
-            allQsElements = syntaxTree
-            byName = callablesByName
-            allUdts = udts
-            allCallables = callables
+        { 
+            assemblyConstants = assemblyConstants;
+            allQsElements = syntaxTree; 
+            byName = callablesByName; 
+            allUdts = udts; 
+            allCallables = callables; 
             declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
-            current = None
-            fileName = None
+            current = None; 
+            fileName = None;
             signature = None
-            entryPoints = defaultArg entryPoints (ImmutableArray.Empty :> IEnumerable<_>)
         }
+
+    static member public Create syntaxTree = 
+        CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
 
     member public this.AssemblyName = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
