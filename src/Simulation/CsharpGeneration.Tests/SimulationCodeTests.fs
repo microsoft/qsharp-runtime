@@ -221,8 +221,7 @@ namespace N1
         let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
         let actual = 
             CodegenContext.Create (tree, ImmutableDictionary.Empty)
-            |> buildSyntaxTree (Path.GetFullPath fileName |> NonNullable<string>.New)
-            |> formatSyntaxTree
+            |> generate (Path.GetFullPath fileName |> NonNullable<string>.New)
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
     let testOneBody (builder:SyntaxBuilder) (expected: string list) =
@@ -3313,7 +3312,7 @@ namespace Microsoft.Quantum
     let ``find local elements `` () =
         let oneName = function | QsCustomType udt -> udt.FullName.Name.Value | QsCallable  op -> op.FullName.Name.Value
         let expected = [ "H"; "M"; "Qubits"; "Qubits"; "R"; "S"; "X"; "Z"; ]     // Qubits is two times: one for UDT and one for constructor.
-        let local    = syntaxTree |> findLocalElements (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")) |> NonNullable<string>.New)
+        let local    = syntaxTree |> findLocalElements Some (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")) |> NonNullable<string>.New)
         Assert.Equal(1, local.Length)
         Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]).Value)
         let actual   = (snd local.[0]) |> List.map oneName |> List.sort
