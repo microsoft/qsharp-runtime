@@ -1309,11 +1309,20 @@ namespace Microsoft.Quantum.Compiler.Generics {
 
     // Access Modifiers
 
-    internal function InternalFunction () : Unit {
-    }
+    internal function EmptyInternalFunction () : Unit { }
 
-    internal operation InternalOperation () : Unit {
-    }
+    internal operation EmptyInternalOperation () : Unit { }
 
     internal newtype InternalType = Unit;
+
+    internal operation MakeInternalType () : InternalType {
+        return InternalType();
+    }
+
+    operation UseInternalCallables () : Unit {
+        EmptyInternalFunction();
+        EmptyInternalOperation();
+        let x = InternalType();
+        let y = MakeInternalType();
+    }
 }

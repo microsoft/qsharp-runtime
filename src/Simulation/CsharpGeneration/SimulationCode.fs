@@ -899,18 +899,32 @@ module SimulationCode =
             [ ``public`` ]
             ``{`` [] ``}``
         :> MemberDeclarationSyntax     
-       
+
     /// For each Operation used in the given OperationDeclartion, returns
-    /// a Property that returns an instance of the operation by calling the 
+    /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
-        let buildOne n =
+        let getCallableAccessModifier qualifiedName =
+            match context.allCallables.TryGetValue qualifiedName with
+            | true, callable -> Some callable.Modifiers.Access
+            | false, _ -> None
+
+        let getPropertyModifiers qualifiedName =
+            // Use the right accessibility for the property depending on the accessibility of the callable.
+            // Note: In C#, "private protected" is the intersection of protected and internal.
+            match getCallableAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
+            | DefaultAccess -> [ ``protected`` ]
+            | Internal -> [ ``private``; ``protected`` ]
+
+        let buildOne qualifiedName =
             /// eg:
             /// protected opType opName { get; }
-            let signature = roslynCallableTypeName context n
-            let name = getOpName context n
-            ``prop`` signature name [ ``protected`` ] 
+            let signature = roslynCallableTypeName context qualifiedName
+            let name = getOpName context qualifiedName
+            let modifiers = getPropertyModifiers qualifiedName
+            ``prop`` signature name modifiers
             :> MemberDeclarationSyntax
+
         operations
         |> List.map buildOne
 

@@ -593,5 +593,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
         AssertEqual(true, (pi > 3.14 and pi < 3.15));
     }
-}
 
+    internal function EmptyInternalFunction() : Unit { }
+
+    internal operation EmptyInternalOperation() : Unit { }
+
+    internal newtype InternalType = Int;
+
+    internal operation MakeInternalType() : InternalType {
+        return InternalType(5);
+    }
+
+    // This is a public operation that uses an internal type inside to test the access modifiers of the generated
+    // operation properties.
+    operation InternalCallablesTest() : Unit {
+        EmptyInternalFunction();
+        EmptyInternalOperation();
+        let x = InternalType(3);
+        let y = MakeInternalType();
+        AssertEqual(15, x! * y!);
+    }
+}
