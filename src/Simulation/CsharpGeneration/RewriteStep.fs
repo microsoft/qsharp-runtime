@@ -45,7 +45,6 @@ type Emitter() =
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
 
-            // TODO: Show diagnostic if there is more than one entry point.
             match Seq.tryExactlyOne compilation.EntryPoints with
             | Some entryPoint ->
                 let callable = context.allCallables.[entryPoint]

@@ -41,10 +41,12 @@ let rec private getParameters context doc = function
 let private getParameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
+    let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
     let getOption { Name = name; CsharpTypeName = typeName; Description = desc } =
-        // TODO: Generate diagnostic if the parameter option name conflicts with a standard option name.
-        let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
-        let nameExpr = ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
+        let nameExpr =
+            if name.Length = 1
+            then ``literal`` ("-" + name)
+            else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
         ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [nameExpr; ``literal`` desc] ``)``
             ``{``
                 [``ident`` "Required" <-- ``true``]
