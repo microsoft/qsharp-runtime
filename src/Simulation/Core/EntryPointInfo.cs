@@ -22,10 +22,10 @@ namespace Microsoft.Quantum.Simulation.Core
     /// Base class containing information about an entry point 
     /// for a Q# executable targeted for a Alfred quantum processor.
     /// </summary>
-    public class AlfredExecutable<I, O> 
+    public class AlfredEntryPointInfo<I, O> 
     : EntryPointInfo<I, O>
     {
-        public AlfredExecutable(Type operation) 
+        public AlfredEntryPointInfo(Type operation) 
         : base(operation)
         { }
     }
@@ -34,10 +34,10 @@ namespace Microsoft.Quantum.Simulation.Core
     /// Base class containing information about an entry point 
     /// for a Q# executable targeted for a Bruno quantum processor.
     /// </summary>
-    public class BrunoExecutable<I, O>
+    public class BrunoEntryPointInfo<I, O>
     : EntryPointInfo<I, O>
     {
-        public BrunoExecutable(Type operation)
+        public BrunoEntryPointInfo(Type operation)
         : base(operation)
         { }
     }
@@ -46,10 +46,10 @@ namespace Microsoft.Quantum.Simulation.Core
     /// Base class containing information about an entry point 
     /// for a Q# executable targeted for a Clementine quantum processor.
     /// </summary>
-    public class ClementineExecutable<I, O>
+    public class ClementineEntryPointInfo<I, O>
     : EntryPointInfo<I, O>
     {
-        public ClementineExecutable(Type operation)
+        public ClementineEntryPointInfo(Type operation)
         : base(operation)
         { }
     }
