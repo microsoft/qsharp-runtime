@@ -65,9 +65,10 @@ type CodegenContext = {
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
     fileName                : string option
+    entryPoints             : IEnumerable<QsQualifiedName>
 } 
     with
-    static member public Create (syntaxTree, assemblyConstants) =        
+    static member public Create (syntaxTree, assemblyConstants) = 
         let udts = GlobalTypeResolutions syntaxTree
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationLocations.Accumulate syntaxTree
@@ -90,11 +91,23 @@ type CodegenContext = {
             declarationPositions = positionInfos.ToImmutableDictionary((fun g -> g.Key), (fun g -> g.ToImmutableSortedSet()))
             current = None; 
             fileName = None;
-            signature = None
+            signature = None;
+            entryPoints = ImmutableArray.Empty
         }
 
-    static member public Create syntaxTree = 
+    static member public Create (compilation : QsCompilation, assemblyConstants) =        
+        {CodegenContext.Create(compilation.Namespaces, assemblyConstants) with entryPoints = compilation.EntryPoints}
+
+    static member public Create (compilation : QsCompilation) = 
+        CodegenContext.Create(compilation, ImmutableDictionary.Empty)
+
+    static member public Create (syntaxTree : ImmutableArray<QsNamespace>) = 
         CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
+
+    member public this.ExecutionTarget = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with 
+        | true, name -> name
+        | false, _ -> null
 
     member public this.AssemblyName = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with

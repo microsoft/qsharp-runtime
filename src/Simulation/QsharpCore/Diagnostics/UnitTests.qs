@@ -14,6 +14,16 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     @Attribute()
     newtype Test = (ExecutionTarget : String);
+
+    /// # Summary
+    /// Compiler recognized attribute via which an alternative name can be defined 
+    /// that may be used when loading a type or callable for testing purposes.
+    /// 
+    /// # Input
+    /// Defined name for testing purposes. 
+    /// The String is expected to contain a fully qualified name. 
+    @Attribute()
+    newtype EnableTestingViaName = String;
 }
 
 
