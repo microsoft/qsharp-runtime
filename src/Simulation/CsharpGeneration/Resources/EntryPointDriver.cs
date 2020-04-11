@@ -46,7 +46,12 @@
         private static async Task Simulate(@EntryPointAdapter entryPoint, @SimulatorKind simulator)
         {
             var result = await WithSimulator(entryPoint.Run, simulator);
-            Console.WriteLine(result);
+#pragma warning disable CS0184
+            if (!(result is QVoid))
+#pragma warning restore CS0184
+            {
+                Console.WriteLine(result);
+            }
         }
 
         private static async Task Resources(@EntryPointAdapter entryPoint)
