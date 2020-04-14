@@ -929,8 +929,13 @@ module SimulationCode =
         |> List.map buildOne
 
     /// Returns a static property of type OperationInfo using the operation's input and output types.
-    let buildOperationInfoProperty operationInput operationOutput operationName =
-        let propertyType = sprintf @"OperationInfo<%s, %s>" operationInput operationOutput
+    let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
+        let propertyType = 
+            match globalContext.ExecutionTarget with
+            | target when target = AssemblyConstants.AlfredProcessor     -> sprintf "AlfredEntryPointInfo<%s, %s>"     operationInput operationOutput
+            | target when target = AssemblyConstants.BrunoProcessor      -> sprintf "BrunoEntryPointInfo<%s, %s>"      operationInput operationOutput
+            | target when target = AssemblyConstants.ClementineProcessor -> sprintf "ClementineEntryPointInfo<%s, %s>" operationInput operationOutput
+            | _                    -> sprintf "EntryPointInfo<%s, %s>"      operationInput operationOutput
         let operationType = simpleBase operationName
         let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [operationType.Type] ``)``]
         let newInstance = ``new`` (``type`` [propertyType]) ``(`` newInstanceArgs ``)``
@@ -1350,7 +1355,14 @@ module SimulationCode =
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
 
         let constructors = [ (buildConstructor context name) ]
-        let properties = buildName name :: buildFullName context.current.Value :: buildOperationInfoProperty inType outType nonGenericName :: buildOpsProperties context opNames
+        let properties = 
+            let opProperties = buildOpsProperties context opNames
+            buildName name :: 
+            buildFullName context.current.Value :: 
+            if globalContext.entryPoints |> Seq.contains op.FullName then 
+                buildOperationInfoProperty globalContext inType outType nonGenericName :: 
+                opProperties
+            else opProperties
             
         let baseOp =
             if isFunction op then 
@@ -1553,13 +1565,13 @@ module SimulationCode =
         generator.Apply elements       
 
     // Returns only those namespaces and their elements that are defined for the given file.
-    let findLocalElements fileName syntaxTree =
+    let findLocalElements selector fileName syntaxTree =
         let path = 
             match CompilationBuilder.CompilationUnitManager.TryGetUri fileName with 
             | true, uri -> uri.AbsolutePath |> NonNullable<string>.New
             | false, _ -> NonNullable<string>.New ""
         syntaxTree
-        |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.toList))
+        |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.choose selector |> Seq.toList))
         |> Seq.sortBy fst
         |> Seq.filter (fun (_,elements) -> not elements.IsEmpty)
         |> Seq.toList
@@ -1576,12 +1588,11 @@ module SimulationCode =
     ]
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
-    let buildSyntaxTree (fileName : NonNullable<string>) (globalContext : CodegenContext) = 
-        let context = {globalContext with fileName = Some fileName.Value} 
+    let buildSyntaxTree localElements (context : CodegenContext) =         
         let usings = autoNamespaces |> List.map (fun ns -> ``using`` ns)
-        let localElements = findLocalElements fileName context.allQsElements
         let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
+
 
         ``compilation unit`` 
             attributes
@@ -1604,8 +1615,24 @@ module SimulationCode =
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
              
+    // Builds the SyntaxTree for callables and types loaded via test names, 
+    // formats it and returns it as a string
+    let loadedViaTestNames (dllName : NonNullable<string>) globalContext = 
+        let isLoadedViaTestName nsElement = 
+            let asOption = function | Value _ -> Some nsElement | _ -> None
+            match nsElement with  
+            | QsCallable c as e -> SymbolResolution.TryGetTestName c.Attributes   
+            | QsCustomType t as e -> SymbolResolution.TryGetTestName t.Attributes 
+            |> asOption
+        let context = {globalContext with fileName = Some dllName.Value} 
+        let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
+        buildSyntaxTree localElements context
+        |> formatSyntaxTree
+
     // Main entry method for a CodeGenerator.
     // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
-    let generate fileName globalContext = 
-        buildSyntaxTree fileName globalContext
+    let generate (fileName : NonNullable<string>) globalContext = 
+        let context = {globalContext with fileName = Some fileName.Value} 
+        let localElements = findLocalElements Some fileName context.allQsElements
+        buildSyntaxTree localElements context
         |> formatSyntaxTree

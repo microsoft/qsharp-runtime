@@ -8,6 +8,7 @@ open System.Collections.Generic
 open System.IO
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
+open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
@@ -36,14 +37,24 @@ type Emitter() =
             let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
                 | true, outputFolder when outputFolder <> null -> Path.Combine(outputFolder, "src")
                 | _ -> step.Name
-            let context = CodegenContext.Create (compilation.Namespaces, step.AssemblyConstants)
 
-            let allSources = 
-                GetSourceFiles.Apply compilation.Namespaces 
-                |> Seq.filter (fun fileName -> not ((fileName.Value |> Path.GetFileName).EndsWith ".dll"))
-            for source in allSources do
+            let context = CodegenContext.Create (compilation, step.AssemblyConstants)
+            let containsEntryPoint = compilation.EntryPoints.Length <> 0
+            let targetsQuantumProcessor = 
+                match step.AssemblyConstants.TryGetValue "ResolvedExecutionTarget" with
+                | true, target -> target = AssemblyConstants.AlfredProcessor || target = AssemblyConstants.BrunoProcessor || target = AssemblyConstants.ClementineProcessor
+                | _ -> false
+            let includeReferences = containsEntryPoint && targetsQuantumProcessor
+
+            let allSources = GetSourceFiles.Apply compilation.Namespaces 
+            let generateCode (fileName : NonNullable<string>) = includeReferences || not ((fileName.Value |> Path.GetFileName).EndsWith ".dll")
+
+            for source in allSources |> Seq.filter generateCode do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+            for source in allSources |> Seq.filter (not << generateCode) do
+                let content = SimulationCode.loadedViaTestNames source context
+                CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             match Seq.tryExactlyOne compilation.EntryPoints with
             | Some entryPoint ->

@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Runtime
         /// <typeparam name="TInput">Type of input the quantum program receives.</typeparam>
         /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
         /// <returns>Sampled output of the quantum program</returns>
-        Task<Tuple<TOutput, TRawResult>> ExecuteAsync<TInput, TOutput>(OperationInfo<TInput, TOutput> info, TInput input);
+        Task<Tuple<TOutput, TRawResult>> ExecuteAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
 
         /// <summary>
         /// Submits a job to execute a Q# program.
@@ -47,6 +47,6 @@ namespace Microsoft.Quantum.Runtime
         /// <typeparam name="TInput">Type of input the quantum program receives.</typeparam>
         /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
         /// <returns>A Job instance. Status and results from the execution can be retrieved from this instance.</returns>
-        Task<TJob> SubmitAsync<TInput, TOutput>(OperationInfo<TInput, TOutput> info, TInput input);
+        Task<TJob> SubmitAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
     }
 }
