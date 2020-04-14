@@ -50,12 +50,14 @@ let rec private getParameters context doc = function
     | QsTuple items -> items |> Seq.map (getParameters context doc) |> Seq.concat
 
 /// Returns the custom argument handler for the given Q# type.
-let private getArgumentHandler = function
-    | UnitType -> ``ident`` driverClassName <|.|> ``ident`` "UnitArgumentHandler" |> Some
-    | Result -> ``ident`` driverClassName <|.|> ``ident`` "ResultArgumentHandler" |> Some
-    | BigInt -> ``ident`` driverClassName <|.|> ``ident`` "BigIntArgumentHandler" |> Some
-    | Range -> ``ident`` driverClassName <|.|> ``ident`` "RangeArgumentHandler" |> Some
+let private getArgumentHandler =
+    function
+    | UnitType -> Some "UnitArgumentHandler"
+    | Result -> Some "ResultArgumentHandler"
+    | BigInt -> Some "BigIntArgumentHandler"
+    | Range -> Some "RangeArgumentHandler"
     | _ -> None
+    >> Option.map (fun handler -> ``ident`` driverClassName <|.|> ``ident`` handler)
 
 /// Returns a property containing a sequence of command-line options corresponding to each parameter given.
 let private getParameterOptionsProperty parameters =
