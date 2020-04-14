@@ -17,6 +17,21 @@ type private Parameter =
       CsharpTypeName : string
       Description : string }
 
+/// The name of the entry point adapter class.
+let private adapterClassName = "__QsEntryPointAdapter__"
+
+/// The name of the entry point driver class.
+let private driverClassName = "__QsEntryPointDriver__"
+
+/// The name of the result struct.
+let private resultStructName = "__QsResult__"
+
+/// The name of the class containing extension methods for the result struct.
+let private resultExtensionsClassName = "__QsResultExtensions__"
+
+/// The name of the property containing the argument handler for ranges.
+let private rangeHandlerPropertyName = "RangeArgumentHandler"
+
 /// Returns a sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private getParameters context doc = function
     | QsTupleItem variable ->
@@ -37,22 +52,33 @@ let rec private getParameters context doc = function
         | InvalidName, _ -> Seq.empty
     | QsTuple items -> items |> Seq.map (getParameters context doc) |> Seq.concat
 
+/// Returns the custom argument handler for the given Q# type.
+let private getArgumentHandler = function
+    | Range -> ``ident`` driverClassName <|.|> ``ident`` rangeHandlerPropertyName |> Some
+    | _ -> None
+
 /// Returns a property containing a sequence of command-line options corresponding to each parameter given.
 let private getParameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
     let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
-    let getOption { Name = name; CsharpTypeName = typeName; Description = desc } =
+    let getOption { Name = name; QsharpType = qsType; CsharpTypeName = typeName; Description = desc } =
         let nameExpr =
             if name.Length = 1
             then ``literal`` ("-" + name)
             else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
+        let members =
+            getArgumentHandler qsType.Resolution
+            |> Option.map (fun handler -> ``ident`` "Argument" <-- handler :> ExpressionSyntax)
+            |> Option.toList
+            |> List.append [``ident`` "Required" <-- ``true``]
+
         ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` [nameExpr; ``literal`` desc] ``)``
             ``{``
-                [``ident`` "Required" <-- ``true``]
+                members
             ``}``
-    let options = parameters |> Seq.map getOption |> Seq.toList
 
+    let options = parameters |> Seq.map getOption |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
@@ -91,9 +117,6 @@ let private getRunMethod context (entryPoint : QsCallable) =
         ``(`` [``param`` factoryParamName ``of`` (``type`` "IOperationFactory")] ``)``
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
-
-/// The name of the entry point adapter class.
-let private adapterClassName = "__QsEntryPointAdapter__"
 
 /// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
 let private getAdapterClass context (entryPoint : QsCallable) =
@@ -136,9 +159,11 @@ let private getDriver (entryPoint : QsCallable) =
     use reader = new StreamReader(stream)
     reader.ReadToEnd()
         .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
-        .Replace("@SimulatorKind", "__QsSimulatorKind__")
         .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
         .Replace("@EntryPointAdapter", adapterClassName)
+        .Replace("@RangeArgumentHandler", rangeHandlerPropertyName)
+        .Replace("@ResultExtensions", resultExtensionsClassName)
+        .Replace("@Result", resultStructName)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
