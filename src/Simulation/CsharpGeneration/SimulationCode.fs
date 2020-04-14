@@ -1593,7 +1593,6 @@ module SimulationCode =
         let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
 
-
         ``compilation unit`` 
             attributes
             usings
