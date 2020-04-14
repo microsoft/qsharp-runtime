@@ -17,42 +17,57 @@
     internal static class @EntryPointDriver
     {
         /// <summary>
+        /// The argument handler for the Q# Result type.
+        /// </summary>
+        internal static readonly Argument<Result> ResultArgumentHandler = new Argument<Result>(result =>
+        {
+            var arg = result.Tokens.Single().Value;
+            switch (arg.ToLower())
+            {
+                case "zero": return Result.Zero;
+                case "one": return Result.One;
+                default:
+                    result.ErrorMessage = GetErrorMessage(
+                        ((OptionResult)result.Parent).Token.Value, arg, typeof(Result));
+                    return default;
+            };
+        });
+
+        /// <summary>
         /// The argument handler for the Q# BigInt type.
         /// </summary>
-        internal static readonly Argument<BigInteger> BigIntArgumentHandler =
-            new Argument<BigInteger>(result =>
+        internal static readonly Argument<BigInteger> BigIntArgumentHandler = new Argument<BigInteger>(result =>
+        {
+            var arg = result.Tokens.Single().Value;
+            if (BigInteger.TryParse(arg, out var num))
             {
-                var option = (result.Parent as OptionResult)?.Token.Value ?? result.Argument.Name;
-                var arg = result.Tokens.Single().Value;
-                if (BigInteger.TryParse(arg, out var num))
-                {
-                    return num;
-                }
-                else
-                {
-                    result.ErrorMessage = GetErrorMessage(option, arg, typeof(BigInteger));
-                    return default;
-                }
-            });
+                return num;
+            }
+            else
+            {
+                result.ErrorMessage = GetErrorMessage(
+                    ((OptionResult)result.Parent).Token.Value, arg, typeof(BigInteger));
+                return default;
+            }
+        });
 
         /// <summary>
         /// The argument handler for the Q# Range type.
         /// </summary>
-        internal static readonly Argument<QRange> RangeArgumentHandler =
-            new Argument<QRange>(result =>
+        internal static readonly Argument<QRange> RangeArgumentHandler = new Argument<QRange>(result =>
+        {
+            var option = ((OptionResult)result.Parent).Token.Value;
+            var arg = string.Join(' ', result.Tokens.Select(token => token.Value));
+            return new[]
             {
-                var option = (result.Parent as OptionResult)?.Token.Value ?? result.Argument.Name;
-                var arg = string.Join(' ', result.Tokens.Select(token => token.Value));
-                return new[]
-                {
-                    ParseRangeFromEnumerable(option, arg, result.Tokens.Select(token => token.Value)),
-                    ParseRangeFromEnumerable(option, arg, arg.Split(".."))
-                }
-                .Choose(errors => result.ErrorMessage = string.Join('\n', errors.Distinct()));
-            })
-            {
-                Arity = ArgumentArity.OneOrMore
-            };
+                ParseRangeFromEnumerable(option, arg, result.Tokens.Select(token => token.Value)),
+                ParseRangeFromEnumerable(option, arg, arg.Split(".."))
+            }
+            .Choose(errors => result.ErrorMessage = string.Join('\n', errors.Distinct()));
+        })
+        {
+            Arity = ArgumentArity.OneOrMore
+        };
 
         /// <summary>
         /// Runs the entry point.

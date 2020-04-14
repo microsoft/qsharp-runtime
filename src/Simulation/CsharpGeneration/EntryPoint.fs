@@ -51,6 +51,7 @@ let rec private getParameters context doc = function
 
 /// Returns the custom argument handler for the given Q# type.
 let private getArgumentHandler = function
+    | Result -> ``ident`` driverClassName <|.|> ``ident`` "ResultArgumentHandler" |> Some
     | BigInt -> ``ident`` driverClassName <|.|> ``ident`` "BigIntArgumentHandler" |> Some
     | Range -> ``ident`` driverClassName <|.|> ``ident`` "RangeArgumentHandler" |> Some
     | _ -> None
