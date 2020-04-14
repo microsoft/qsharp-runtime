@@ -47,7 +47,7 @@
                 return new[]
                 {
                     ParseRangeFromEnumerable(option, arg, result.Tokens.Select(token => token.Value)),
-                    ParseRangeFromEnumerable(option, arg, arg.Split("..", StringSplitOptions.RemoveEmptyEntries))
+                    ParseRangeFromEnumerable(option, arg, arg.Split(".."))
                 }
                 .Choose(errors => result.ErrorMessage = string.Join('\n', errors));
             })
