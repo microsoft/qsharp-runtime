@@ -16,12 +16,25 @@
     /// </summary>
     internal static class @EntryPointDriver
     {
+        internal static readonly Argument<QVoid> UnitArgumentHandler = new Argument<QVoid>(result =>
+        {
+            if (result.Tokens.Single().Value.Trim() == "()")
+            {
+                return QVoid.Instance;
+            }
+            else
+            {
+                result.ErrorMessage = GetErrorMessage(((OptionResult)result.Parent).Token.Value, arg, typeof(Result));
+                return default;
+            }
+        });
+
         /// <summary>
         /// The argument handler for the Q# Result type.
         /// </summary>
         internal static readonly Argument<Result> ResultArgumentHandler = new Argument<Result>(result =>
         {
-            var arg = result.Tokens.Single().Value;
+            var arg = result.Tokens.Single().Value.Trim();
             switch (arg.ToLower())
             {
                 case "zero": return Result.Zero;
