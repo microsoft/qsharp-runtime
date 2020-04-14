@@ -16,54 +16,28 @@
     /// </summary>
     internal static class @EntryPointDriver
     {
-        internal static Argument<QVoid> UnitArgumentHandler { get; } = new Argument<QVoid>(result =>
-        {
-            var arg = result.Tokens.Single().Value;
-            if (arg.Trim() == "()")
-            {
-                return QVoid.Instance;
-            }
-            else
-            {
-                result.ErrorMessage = GetErrorMessage(((OptionResult)result.Parent).Token.Value, arg, typeof(QVoid));
-                return default;
-            }
-        });
+        /// <summary>
+        /// The argument handler for the Q# Unit type.
+        /// </summary>
+        internal static Argument<QVoid> UnitArgumentHandler { get; } = new Argument<QVoid>(
+            CreateArgumentParser(arg => arg.Trim() == "()" ? (true, QVoid.Instance) : (false, default)));
 
         /// <summary>
         /// The argument handler for the Q# Result type.
         /// </summary>
-        internal static Argument<Result> ResultArgumentHandler { get; } = new Argument<Result>(result =>
-        {
-            var arg = result.Tokens.Single().Value.Trim();
-            switch (arg.ToLower())
+        internal static Argument<Result> ResultArgumentHandler { get; } = new Argument<Result>(
+            CreateArgumentParser(arg => arg.Trim().ToLower() switch
             {
-                case "zero": return Result.Zero;
-                case "one": return Result.One;
-                default:
-                    result.ErrorMessage = GetErrorMessage(
-                        ((OptionResult)result.Parent).Token.Value, arg, typeof(Result));
-                    return default;
-            };
-        });
+                "zero" => (true, Result.Zero),
+                "one" => (true, Result.One),
+                _ => (false, default)
+            }));
 
         /// <summary>
         /// The argument handler for the Q# BigInt type.
         /// </summary>
-        internal static Argument<BigInteger> BigIntArgumentHandler { get; } = new Argument<BigInteger>(result =>
-        {
-            var arg = result.Tokens.Single().Value;
-            if (BigInteger.TryParse(arg, out var num))
-            {
-                return num;
-            }
-            else
-            {
-                result.ErrorMessage = GetErrorMessage(
-                    ((OptionResult)result.Parent).Token.Value, arg, typeof(BigInteger));
-                return default;
-            }
-        });
+        internal static Argument<BigInteger> BigIntArgumentHandler { get; } = new Argument<BigInteger>(
+            CreateArgumentParser(arg => BigInteger.TryParse(arg, out var result) ? (true, result) : (false, default)));
 
         /// <summary>
         /// The argument handler for the Q# Range type.
@@ -164,6 +138,26 @@
                     throw new ArgumentException("Invalid simulator.");
             }
         }
+
+        /// <summary>
+        /// Creates an argument parser that will use a default error message if parsing fails.
+        /// </summary>
+        /// <typeparam name="T">The type of the argument.</typeparam>
+        /// <param name="parser">
+        /// A function that takes the argument as a string and returns the parsed value and a boolean to indicate
+        /// whether parsing succeeded.
+        /// </param>
+        /// <returns>An argument parser.</returns>
+        private static ParseArgument<T> CreateArgumentParser<T>(Func<string, (bool, T)> parser) => result =>
+        {
+            var (success, value) = parser(result.Tokens.Single().Value);
+            if (!success)
+            {
+                result.ErrorMessage = GetErrorMessage(
+                    ((OptionResult)result.Parent).Token.Value, result.Tokens.Single().Value, typeof(T));
+            }
+            return value;
+        };
 
         /// <summary>
         /// Parses a Q# range from an enumerable of strings, where the items are start and end or start, step, and end.
