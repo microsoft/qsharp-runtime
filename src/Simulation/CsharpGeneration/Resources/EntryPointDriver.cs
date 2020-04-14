@@ -10,8 +10,14 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
+    /// </summary>
     internal static class @EntryPointDriver
     {
+        /// <summary>
+        /// The argument handler for the Q# range type.
+        /// </summary>
         internal static readonly Argument<QRange> @RangeArgumentHandler =
             new Argument<QRange>(result =>
             {
@@ -28,6 +34,11 @@
                 Arity = ArgumentArity.OneOrMore
             };
 
+        /// <summary>
+        /// Runs the entry point.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        /// <returns>The exit code.</returns>
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate")
@@ -55,6 +66,11 @@
             return await root.InvokeAsync(args);
         }
 
+        /// <summary>
+        /// Simulates the entry point.
+        /// </summary>
+        /// <param name="entryPoint">The entry point adapter.</param>
+        /// <param name="simulator">The simulator to use.</param>
         private static async Task Simulate(@EntryPointAdapter entryPoint, SimulatorKind simulator)
         {
             var result = await WithSimulator(entryPoint.Run, simulator);
@@ -66,6 +82,10 @@
             }
         }
 
+        /// <summary>
+        /// Estimates the resource usage of the Q# program.
+        /// </summary>
+        /// <param name="entryPoint">The entry point adapter.</param>
         private static async Task Resources(@EntryPointAdapter entryPoint)
         {
             var estimator = new ResourcesEstimator();
@@ -73,6 +93,13 @@
             Console.Write(estimator.ToTSV());
         }
 
+        /// <summary>
+        /// Simulates a callable.
+        /// </summary>
+        /// <typeparam name="T">The return type of the callable.</typeparam>
+        /// <param name="callable">The callable to simulate.</param>
+        /// <param name="simulator">The simulator to use.</param>
+        /// <returns>The return value of the callable.</returns>
         private static async Task<T> WithSimulator<T>(Func<IOperationFactory, Task<T>> callable, SimulatorKind simulator)
         {
             switch (simulator)
@@ -89,6 +116,13 @@
             }
         }
 
+        /// <summary>
+        /// Parses a Q# range from an enumerable of strings, where the items are start and end or start, step, and end.
+        /// </summary>
+        /// <param name="option">The name of the option being parsed.</param>
+        /// <param name="arg">The full argument string for the option.</param>
+        /// <param name="items">The items in the argument.</param>
+        /// <returns>The result of parsing the strings.</returns>
         private static @Result<QRange> ParseRangeFromEnumerable(string option, string arg, IEnumerable<string> items) =>
             items.Select(item => TryParseLong(option, item)).Sequence().Bind(values =>
                 values.Count() == 2
@@ -98,12 +132,21 @@
                 : @Result<QRange>.Failure(
                     $"Cannot parse argument '{arg}' for option '{option}' as expected type {typeof(QRange)}."));
 
+        /// <summary>
+        /// Parses a long from a string.
+        /// </summary>
+        /// <param name="option">The name of the option being parsed.</param>
+        /// <param name="str">The string to parse.</param>
+        /// <returns>The result of parsing the string.</returns>
         private static @Result<long> TryParseLong(string option, string str) =>
             long.TryParse(str, out var result)
             ? @Result<long>.Success(result)
             : @Result<long>.Failure(
                 $"Cannot parse argument '{str}' for option '{option}' as expected type {typeof(long)}.");
 
+        /// <summary>
+        /// The names of simulators that can be used to simulate the entry point.
+        /// </summary>
         private enum SimulatorKind
         {
             FullState,
@@ -111,6 +154,10 @@
         }
     }
 
+    /// <summary>
+    /// The result of a process that can either succeed or fail.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value.</typeparam>
     internal struct @Result<T>
     {
         public bool IsSuccess { get; }
@@ -130,16 +177,53 @@
         public static @Result<T> Failure(string errorMessage) => new @Result<T>(false, default, errorMessage);
     }
 
+    /// <summary>
+    /// Extensions method for <see cref="@Result"/>.
+    /// </summary>
     internal static class @ResultExtensions
     {
+        /// <summary>
+        /// Sequentially composes two results, passing the value of the first result to another result-producing
+        /// function if the first result is a success.
+        /// </summary>
+        /// <typeparam name="T">The value type of the first result.</typeparam>
+        /// <typeparam name="U">The value type of the second result.</typeparam>
+        /// <param name="result">The first result.</param>
+        /// <param name="binder">
+        /// A function that takes the value of the first result and returns a second result.
+        /// </param>
+        /// <returns>
+        /// The first result if the first result is a failure; otherwise, the result of calling the binder function on
+        /// the first result's value.
+        /// </returns>
         internal static @Result<U> Bind<T, U>(this @Result<T> result, Func<T, @Result<U>> binder) =>
             result.IsFailure ? @Result<U>.Failure(result.ErrorMessage) : binder(result.Value);
 
+        /// <summary>
+        /// Converts an enumerable of results into a result of an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The value type of the results.</typeparam>
+        /// <param name="results">The results to sequence.</param>
+        /// <returns>
+        /// A result that contains an enumerable of the result values if all of the results are a success, or the first
+        /// error message if one of the results is a failure.
+        /// </returns>
         internal static @Result<IEnumerable<T>> Sequence<T>(this IEnumerable<@Result<T>> results) =>
             results.All(result => result.IsSuccess)
             ? @Result<IEnumerable<T>>.Success(results.Select(results => results.Value))
             : @Result<IEnumerable<T>>.Failure(results.First(results => results.IsFailure).ErrorMessage);
 
+        /// <summary>
+        /// Chooses the first successful result out of an enumerable of results.
+        /// </summary>
+        /// <typeparam name="T">The type of the result values.</typeparam>
+        /// <param name="results">The results to choose from.</param>
+        /// <param name="onError">
+        /// The action to call with an enumerable of error messages if all of the results are failures.
+        /// </param>
+        /// <returns>
+        /// The value of the first successful result, or default if none of the results were successful.
+        /// </returns>
         internal static T Choose<T>(this IEnumerable<@Result<T>> results, Action<IEnumerable<string>> onError)
         {
             if (results.Any(result => result.IsSuccess))
