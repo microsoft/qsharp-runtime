@@ -30,8 +30,7 @@
                 }
                 else
                 {
-                    result.ErrorMessage =
-                        $"Cannot parse argument '{arg}' for option '{option}' as expected type {typeof(BigInteger)}.";
+                    result.ErrorMessage = GetErrorMessage(option, arg, typeof(BigInteger));
                     return default;
                 }
             });
@@ -150,8 +149,7 @@
                 ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
                 : values.Count() == 3
                 ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : @Result<QRange>.Failure(
-                    $"Cannot parse argument '{arg}' for option '{option}' as expected type {typeof(QRange)}."));
+                : @Result<QRange>.Failure(GetErrorMessage(option, arg, typeof(QRange))));
 
         /// <summary>
         /// Parses a long from a string.
@@ -162,8 +160,17 @@
         private static @Result<long> TryParseLong(string option, string str) =>
             long.TryParse(str, out var result)
             ? @Result<long>.Success(result)
-            : @Result<long>.Failure(
-                $"Cannot parse argument '{str}' for option '{option}' as expected type {typeof(long)}.");
+            : @Result<long>.Failure(GetErrorMessage(option, str, typeof(long)));
+
+        /// <summary>
+        /// Returns an error message string for an argument parser.
+        /// </summary>
+        /// <param name="option">The name of the option.</param>
+        /// <param name="arg">The value of the argument being parsed.</param>
+        /// <param name="type">The expected type of the argument.</param>
+        /// <returns></returns>
+        private static string GetErrorMessage(string option, string arg, Type type) =>
+            $"Cannot parse argument '{arg}' for option '{option}' as expected type {type}.";
 
         /// <summary>
         /// The names of simulators that can be used to simulate the entry point.
