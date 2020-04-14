@@ -16,15 +16,16 @@
     /// </summary>
     internal static class @EntryPointDriver
     {
-        internal static readonly Argument<QVoid> UnitArgumentHandler = new Argument<QVoid>(result =>
+        internal static Argument<QVoid> UnitArgumentHandler { get; } = new Argument<QVoid>(result =>
         {
-            if (result.Tokens.Single().Value.Trim() == "()")
+            var arg = result.Tokens.Single().Value;
+            if (arg.Trim() == "()")
             {
                 return QVoid.Instance;
             }
             else
             {
-                result.ErrorMessage = GetErrorMessage(((OptionResult)result.Parent).Token.Value, arg, typeof(Result));
+                result.ErrorMessage = GetErrorMessage(((OptionResult)result.Parent).Token.Value, arg, typeof(QVoid));
                 return default;
             }
         });
@@ -32,7 +33,7 @@
         /// <summary>
         /// The argument handler for the Q# Result type.
         /// </summary>
-        internal static readonly Argument<Result> ResultArgumentHandler = new Argument<Result>(result =>
+        internal static Argument<Result> ResultArgumentHandler { get; } = new Argument<Result>(result =>
         {
             var arg = result.Tokens.Single().Value.Trim();
             switch (arg.ToLower())
@@ -49,7 +50,7 @@
         /// <summary>
         /// The argument handler for the Q# BigInt type.
         /// </summary>
-        internal static readonly Argument<BigInteger> BigIntArgumentHandler = new Argument<BigInteger>(result =>
+        internal static Argument<BigInteger> BigIntArgumentHandler { get; } = new Argument<BigInteger>(result =>
         {
             var arg = result.Tokens.Single().Value;
             if (BigInteger.TryParse(arg, out var num))
@@ -67,7 +68,7 @@
         /// <summary>
         /// The argument handler for the Q# Range type.
         /// </summary>
-        internal static readonly Argument<QRange> RangeArgumentHandler = new Argument<QRange>(result =>
+        internal static Argument<QRange> RangeArgumentHandler { get; } = new Argument<QRange>(result =>
         {
             var option = ((OptionResult)result.Parent).Token.Value;
             var arg = string.Join(' ', result.Tokens.Select(token => token.Value));
