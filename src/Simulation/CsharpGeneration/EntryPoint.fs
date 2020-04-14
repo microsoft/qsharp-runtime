@@ -29,9 +29,6 @@ let private resultStructName = "__QsResult__"
 /// The name of the class containing extension methods for the result struct.
 let private resultExtensionsClassName = "__QsResultExtensions__"
 
-/// The name of the property containing the argument handler for ranges.
-let private rangeHandlerPropertyName = "RangeArgumentHandler"
-
 /// Returns a sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private getParameters context doc = function
     | QsTupleItem variable ->
@@ -54,7 +51,8 @@ let rec private getParameters context doc = function
 
 /// Returns the custom argument handler for the given Q# type.
 let private getArgumentHandler = function
-    | Range -> ``ident`` driverClassName <|.|> ``ident`` rangeHandlerPropertyName |> Some
+    | BigInt -> ``ident`` driverClassName <|.|> ``ident`` "BigIntArgumentHandler" |> Some
+    | Range -> ``ident`` driverClassName <|.|> ``ident`` "RangeArgumentHandler" |> Some
     | _ -> None
 
 /// Returns a property containing a sequence of command-line options corresponding to each parameter given.
@@ -161,7 +159,6 @@ let private getDriver (entryPoint : QsCallable) =
         .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
         .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
         .Replace("@EntryPointAdapter", adapterClassName)
-        .Replace("@RangeArgumentHandler", rangeHandlerPropertyName)
         .Replace("@ResultExtensions", resultExtensionsClassName)
         .Replace("@Result", resultStructName)
 

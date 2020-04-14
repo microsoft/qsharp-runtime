@@ -8,6 +8,7 @@
     using System.CommandLine.Invocation;
     using System.CommandLine.Parsing;
     using System.Linq;
+    using System.Numerics;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -16,9 +17,29 @@
     internal static class @EntryPointDriver
     {
         /// <summary>
-        /// The argument handler for the Q# range type.
+        /// The argument handler for the Q# BigInt type.
         /// </summary>
-        internal static readonly Argument<QRange> @RangeArgumentHandler =
+        internal static readonly Argument<BigInteger> BigIntArgumentHandler =
+            new Argument<BigInteger>(result =>
+            {
+                var option = (result.Parent as OptionResult)?.Token.Value ?? result.Argument.Name;
+                var arg = result.Tokens.Single().Value;
+                if (BigInteger.TryParse(arg, out var num))
+                {
+                    return num;
+                }
+                else
+                {
+                    result.ErrorMessage =
+                        $"Cannot parse argument '{arg}' for option '{option}' as expected type {typeof(BigInteger)}.";
+                    return default;
+                }
+            });
+
+        /// <summary>
+        /// The argument handler for the Q# Range type.
+        /// </summary>
+        internal static readonly Argument<QRange> RangeArgumentHandler =
             new Argument<QRange>(result =>
             {
                 var option = (result.Parent as OptionResult)?.Token.Value ?? result.Argument.Name;
