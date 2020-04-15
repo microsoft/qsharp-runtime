@@ -26,12 +26,12 @@
         /// The argument handler for the Q# Result type.
         /// </summary>
         internal static Argument<Result> ResultArgumentHandler { get; } = new Argument<Result>(
-            CreateArgumentParser(arg => arg.Trim().ToLower() switch
+            CreateArgumentParser(arg => Enum.TryParse(arg, ignoreCase: true, out ResultValue result) ? result switch
             {
-                "zero" => (true, Result.Zero),
-                "one" => (true, Result.One),
+                ResultValue.Zero => (true, Result.Zero),
+                ResultValue.One => (true, Result.One),
                 _ => (false, default)
-            }));
+            } : (false, default)));
 
         /// <summary>
         /// The argument handler for the Q# BigInt type.
