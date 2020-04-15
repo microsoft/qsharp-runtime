@@ -64,15 +64,13 @@
         /// <returns>The exit code.</returns>
         private static async Task<int> Main(string[] args)
         {
-            var simulate = new Command("simulate")
+            var simulate = new Command("simulate", "Run the program using a local simulator.")
             {
-                Description = "Run the program using a local simulator.",
-                Handler = CommandHandler.Create<@EntryPointAdapter, SimulatorKind>(Simulate)
+                new Option<SimulatorKind>(new[] { "--simulator", "-s" },
+                                          () => SimulatorKind.QuantumSimulator,
+                                          "The name of the simulator to use.")
             };
-            simulate.AddOption(new Option<SimulatorKind>(
-                new[] { "--simulator", "-s" },
-                () => SimulatorKind.QuantumSimulator,
-                "The name of the simulator to use."));
+            simulate.Handler = CommandHandler.Create<@EntryPointAdapter, SimulatorKind>(Simulate);
 
             var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
             foreach (var option in @EntryPointAdapter.Options)
