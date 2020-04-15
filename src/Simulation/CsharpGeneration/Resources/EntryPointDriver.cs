@@ -19,37 +19,54 @@
         /// <summary>
         /// The argument handler for the Q# Unit type.
         /// </summary>
-        internal static Argument<QVoid> UnitArgumentHandler { get; } = new Argument<QVoid>(
-            CreateArgumentParser(arg => arg.Trim() == "()" ? (true, QVoid.Instance) : (false, default)));
+        internal static Argument<QVoid> UnitArgumentHandler
+        {
+            get
+            {
+                var arg = new Argument<QVoid>(CreateArgumentParser(value =>
+                    value.Trim() == QVoid.Instance.ToString() ? (true, QVoid.Instance) : (false, default)));
+                arg.AddSuggestions(new[] { QVoid.Instance.ToString() });
+                return arg;
+            }
+        }
 
         /// <summary>
         /// The argument handler for the Q# Result type.
         /// </summary>
-        internal static Argument<Result> ResultArgumentHandler { get; } = new Argument<Result>(
-            CreateArgumentParser(arg => Enum.TryParse(arg, ignoreCase: true, out ResultValue result) ? result switch
+        internal static Argument<Result> ResultArgumentHandler
+        {
+            get
             {
-                ResultValue.Zero => (true, Result.Zero),
-                ResultValue.One => (true, Result.One),
-                _ => (false, default)
-            } : (false, default)));
+                var arg = new Argument<Result>(CreateArgumentParser(value =>
+                    Enum.TryParse(value, ignoreCase: true, out ResultValue result) ? result switch
+                    {
+                        ResultValue.Zero => (true, Result.Zero),
+                        ResultValue.One => (true, Result.One),
+                        _ => (false, default)
+                    } : (false, default)));
+                arg.AddSuggestions(new[] { ResultValue.Zero.ToString(), ResultValue.One.ToString() });
+                return arg;
+            }
+        }
 
         /// <summary>
         /// The argument handler for the Q# BigInt type.
         /// </summary>
-        internal static Argument<BigInteger> BigIntArgumentHandler { get; } = new Argument<BigInteger>(
-            CreateArgumentParser(arg => BigInteger.TryParse(arg, out var result) ? (true, result) : (false, default)));
+        internal static Argument<BigInteger> BigIntArgumentHandler => new Argument<BigInteger>(
+            CreateArgumentParser(value =>
+                BigInteger.TryParse(value, out var result) ? (true, result) : (false, default)));
 
         /// <summary>
         /// The argument handler for the Q# Range type.
         /// </summary>
-        internal static Argument<QRange> RangeArgumentHandler { get; } = new Argument<QRange>(result =>
+        internal static Argument<QRange> RangeArgumentHandler => new Argument<QRange>(result =>
         {
             var option = ((OptionResult)result.Parent).Token.Value;
-            var arg = string.Join(' ', result.Tokens.Select(token => token.Value));
+            var value = string.Join(' ', result.Tokens.Select(token => token.Value));
             return new[]
             {
-                ParseRangeFromEnumerable(option, arg, result.Tokens.Select(token => token.Value)),
-                ParseRangeFromEnumerable(option, arg, arg.Split(".."))
+                ParseRangeFromEnumerable(option, value, result.Tokens.Select(token => token.Value)),
+                ParseRangeFromEnumerable(option, value, value.Split(".."))
             }
             .Choose(errors => result.ErrorMessage = string.Join('\n', errors.Distinct()));
         })
@@ -140,7 +157,7 @@
         /// Parses a Q# range from an enumerable of strings, where the items are start and end or start, step, and end.
         /// </summary>
         /// <param name="option">The name of the option being parsed.</param>
-        /// <param name="arg">The full argument string for the option.</param>
+        /// <param name="arg">The argument string for the option.</param>
         /// <param name="items">The items in the argument.</param>
         /// <returns>The result of parsing the strings.</returns>
         private static @Result<QRange> ParseRangeFromEnumerable(string option, string arg, IEnumerable<string> items) =>
