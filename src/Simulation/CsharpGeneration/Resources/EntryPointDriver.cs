@@ -81,12 +81,11 @@
         /// <returns>The exit code.</returns>
         private static async Task<int> Main(string[] args)
         {
-            var simulate = new Command("simulate", "(default) Run the program using a local simulator.")
-            {
-                new Option<SimulatorKind>(new[] { "--simulator", "-s" },
-                                          () => SimulatorKind.QuantumSimulator,
-                                          "The name of the simulator to use.")
-            };
+            var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
+            TryCreateOption(new[] { "--simulator", "-s" },
+                            () => SimulatorKind.QuantumSimulator,
+                            "The name of the simulator to use.")
+                .Then(simulate.AddOption);
             simulate.Handler = CommandHandler.Create<@EntryPointAdapter, SimulatorKind>(Simulate);
 
             var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
@@ -106,9 +105,12 @@
         /// <param name="simulator">The simulator to use.</param>
         private static async Task Simulate(@EntryPointAdapter entryPoint, SimulatorKind simulator)
         {
-            static void DisplayReturnValue<T>(T value)
+            static void displayReturnValue<T>(T value)
             {
-                if (!(value is QVoid)) { Console.WriteLine(value); }
+                if (!(value is QVoid))
+                {
+                    Console.WriteLine(value);
+                }
             }
 
             // TODO: Support custom simulators.
@@ -117,11 +119,11 @@
                 case SimulatorKind.QuantumSimulator:
                     using (var quantumSimulator = new QuantumSimulator())
                     {
-                        DisplayReturnValue(await entryPoint.Run(quantumSimulator));
+                        displayReturnValue(await entryPoint.Run(quantumSimulator));
                     }
                     break;
                 case SimulatorKind.ToffoliSimulator:
-                    DisplayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
+                    displayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
                     break;
                 case SimulatorKind.ResourcesEstimator:
                     var resourcesEstimator = new ResourcesEstimator();
@@ -134,17 +136,38 @@
         }
 
         /// <summary>
+        /// Tries to create an option by ignoring aliases that are already in use by the entry point. If all of the
+        /// aliases are in use, the option is not created.
+        /// </summary>
+        /// <typeparam name="T">The type of the option's argument.</typeparam>
+        /// <param name="aliases">The option's aliases.</param>
+        /// <param name="getDefaultValue">A function that returns the option's default value.</param>
+        /// <param name="description">The option's description.</param>
+        /// <returns></returns>
+        private static @Result<Option<T>> TryCreateOption<T>(
+            IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null)
+        {
+            static bool isAliasAvailable(string alias) =>
+                !@EntryPointAdapter.Options.SelectMany(option => option.RawAliases).Contains(alias);
+
+            var validAliases = aliases.Where(isAliasAvailable);
+            return validAliases.Any()
+                ? @Result<Option<T>>.Success(new Option<T>(validAliases.ToArray(), getDefaultValue, description))
+                : @Result<Option<T>>.Failure();
+        }
+
+        /// <summary>
         /// Creates an argument parser that will use a default error message if parsing fails.
         /// </summary>
         /// <typeparam name="T">The type of the argument.</typeparam>
-        /// <param name="parser">
+        /// <param name="parse">
         /// A function that takes the argument as a string and returns the parsed value and a boolean to indicate
         /// whether parsing succeeded.
         /// </param>
         /// <returns>An argument parser.</returns>
-        private static ParseArgument<T> CreateArgumentParser<T>(Func<string, (bool, T)> parser) => result =>
+        private static ParseArgument<T> CreateArgumentParser<T>(Func<string, (bool, T)> parse) => result =>
         {
-            var (success, value) = parser(result.Tokens.Single().Value);
+            var (success, value) = parse(result.Tokens.Single().Value);
             if (!success)
             {
                 result.ErrorMessage = GetErrorMessage(
@@ -220,11 +243,11 @@
 
         public static @Result<T> Success(T value) => new @Result<T>(true, value, default);
 
-        public static @Result<T> Failure(string errorMessage) => new @Result<T>(false, default, errorMessage);
+        public static @Result<T> Failure(string errorMessage = null) => new @Result<T>(false, default, errorMessage);
     }
 
     /// <summary>
-    /// Extensions method for <see cref="@Result"/>.
+    /// Extensions method for <see cref="@Result{T}"/>.
     /// </summary>
     internal static class @ResultExtensions
     {
@@ -232,23 +255,21 @@
         /// Sequentially composes two results, passing the value of the first result to another result-producing
         /// function if the first result is a success.
         /// </summary>
-        /// <typeparam name="T">The value type of the first result.</typeparam>
-        /// <typeparam name="U">The value type of the second result.</typeparam>
+        /// <typeparam name="T">The type of the first result value.</typeparam>
+        /// <typeparam name="U">The type of the second result value.</typeparam>
         /// <param name="result">The first result.</param>
-        /// <param name="binder">
-        /// A function that takes the value of the first result and returns a second result.
-        /// </param>
+        /// <param name="bind">A function that takes the value of the first result and returns a second result.</param>
         /// <returns>
-        /// The first result if the first result is a failure; otherwise, the result of calling the binder function on
-        /// the first result's value.
+        /// The first result if the first result is a failure; otherwise, the result of calling the bind function on the
+        /// first result's value.
         /// </returns>
-        internal static @Result<U> Bind<T, U>(this @Result<T> result, Func<T, @Result<U>> binder) =>
-            result.IsFailure ? @Result<U>.Failure(result.ErrorMessage) : binder(result.Value);
+        internal static @Result<U> Bind<T, U>(this @Result<T> result, Func<T, @Result<U>> bind) =>
+            result.IsFailure ? @Result<U>.Failure(result.ErrorMessage) : bind(result.Value);
 
         /// <summary>
         /// Converts an enumerable of results into a result of an enumerable.
         /// </summary>
-        /// <typeparam name="T">The value type of the results.</typeparam>
+        /// <typeparam name="T">The type of the result values.</typeparam>
         /// <param name="results">The results to sequence.</param>
         /// <returns>
         /// A result that contains an enumerable of the result values if all of the results are a success, or the first
@@ -258,6 +279,20 @@
             results.All(result => result.IsSuccess)
             ? @Result<IEnumerable<T>>.Success(results.Select(results => results.Value))
             : @Result<IEnumerable<T>>.Failure(results.First(results => results.IsFailure).ErrorMessage);
+
+        /// <summary>
+        /// Calls the action on the result value if the result is a success.
+        /// </summary>
+        /// <typeparam name="T">The type of the result value.</typeparam>
+        /// <param name="result">The result.</param>
+        /// <param name="onSuccess">The action to call if the result is a success.</param>
+        internal static void Then<T>(this @Result<T> result, Action<T> onSuccess)
+        {
+            if (result.IsSuccess)
+            {
+                onSuccess(result.Value);
+            }
+        }
 
         /// <summary>
         /// Chooses the first successful result out of an enumerable of results.
