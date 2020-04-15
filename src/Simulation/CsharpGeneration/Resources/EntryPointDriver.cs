@@ -64,7 +64,7 @@
         /// <returns>The exit code.</returns>
         private static async Task<int> Main(string[] args)
         {
-            var simulate = new Command("simulate", "Run the program using a local simulator.")
+            var simulate = new Command("simulate", "(default) Run the program using a local simulator.")
             {
                 new Option<SimulatorKind>(new[] { "--simulator", "-s" },
                                           () => SimulatorKind.QuantumSimulator,
@@ -73,11 +73,12 @@
             simulate.Handler = CommandHandler.Create<@EntryPointAdapter, SimulatorKind>(Simulate);
 
             var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
-            foreach (var option in @EntryPointAdapter.Options)
-            {
-                root.AddGlobalOption(option);
-            }
-            root.AddValidator(result => "A command is required.");
+            foreach (var option in @EntryPointAdapter.Options) { root.AddGlobalOption(option); }
+
+            // Set the simulate command as the default.
+            foreach (var option in simulate.Options) { root.AddOption(option); }
+            root.Handler = simulate.Handler;
+
             return await root.InvokeAsync(args);
         }
 
@@ -90,10 +91,7 @@
         {
             static void DisplayReturnValue<T>(T value)
             {
-                if (!(value is QVoid))
-                {
-                    Console.WriteLine(value);
-                }
+                if (!(value is QVoid)) { Console.WriteLine(value); }
             }
 
             // TODO: Support custom simulators.
