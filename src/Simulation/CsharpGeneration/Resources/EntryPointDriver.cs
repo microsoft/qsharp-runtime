@@ -71,16 +71,10 @@
             };
             simulate.AddOption(new Option<SimulatorKind>(
                 new[] { "--simulator", "-s" },
-                () => SimulatorKind.FullState,
+                () => SimulatorKind.QuantumSimulator,
                 "The name of the simulator to use."));
 
-            var resources = new Command("resources")
-            {
-                Description = "Estimate the resource usage of the program.",
-                Handler = CommandHandler.Create<@EntryPointAdapter>(Resources)
-            };
-
-            var root = new RootCommand(@EntryPointAdapter.Summary) { simulate, resources };
+            var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
             foreach (var option in @EntryPointAdapter.Options)
             {
                 root.AddGlobalOption(option);
@@ -96,44 +90,31 @@
         /// <param name="simulator">The simulator to use.</param>
         private static async Task Simulate(@EntryPointAdapter entryPoint, SimulatorKind simulator)
         {
-            var result = await WithSimulator(entryPoint.Run, simulator);
-#pragma warning disable CS0184
-            if (!(result is QVoid))
-#pragma warning restore CS0184
+            static void DisplayReturnValue<T>(T value)
             {
-                Console.WriteLine(result);
+                if (!(value is QVoid))
+                {
+                    Console.WriteLine(value);
+                }
             }
-        }
 
-        /// <summary>
-        /// Estimates the resource usage of the Q# program.
-        /// </summary>
-        /// <param name="entryPoint">The entry point adapter.</param>
-        private static async Task Resources(@EntryPointAdapter entryPoint)
-        {
-            var estimator = new ResourcesEstimator();
-            await entryPoint.Run(estimator);
-            Console.Write(estimator.ToTSV());
-        }
-
-        /// <summary>
-        /// Simulates a callable.
-        /// </summary>
-        /// <typeparam name="T">The return type of the callable.</typeparam>
-        /// <param name="callable">The callable to simulate.</param>
-        /// <param name="simulator">The simulator to use.</param>
-        /// <returns>The return value of the callable.</returns>
-        private static async Task<T> WithSimulator<T>(Func<IOperationFactory, Task<T>> callable, SimulatorKind simulator)
-        {
+            // TODO: Support custom simulators.
             switch (simulator)
             {
-                case SimulatorKind.FullState:
+                case SimulatorKind.QuantumSimulator:
                     using (var quantumSimulator = new QuantumSimulator())
                     {
-                        return await callable(quantumSimulator);
+                        DisplayReturnValue(await entryPoint.Run(quantumSimulator));
                     }
-                case SimulatorKind.Toffoli:
-                    return await callable(new ToffoliSimulator());
+                    break;
+                case SimulatorKind.ToffoliSimulator:
+                    DisplayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
+                    break;
+                case SimulatorKind.ResourcesEstimator:
+                    var resourcesEstimator = new ResourcesEstimator();
+                    await entryPoint.Run(resourcesEstimator);
+                    Console.WriteLine(resourcesEstimator.ToTSV());
+                    break;
                 default:
                     throw new ArgumentException("Invalid simulator.");
             }
@@ -200,8 +181,9 @@
         /// </summary>
         private enum SimulatorKind
         {
-            FullState,
-            Toffoli
+            QuantumSimulator,
+            ToffoliSimulator,
+            ResourcesEstimator
         }
     }
 
