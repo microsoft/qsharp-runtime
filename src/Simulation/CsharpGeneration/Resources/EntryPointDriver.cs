@@ -108,56 +108,47 @@
         {
             switch (simulator)
             {
-                case "QuantumSimulator":
-                    using (var quantumSimulator = new QuantumSimulator())
-                    {
-                        DisplayReturnValue(await entryPoint.Run(quantumSimulator));
-                    }
-                    break;
-                case "ToffoliSimulator":
-                    DisplayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
-                    break;
                 case "ResourcesEstimator":
                     var resourcesEstimator = new ResourcesEstimator();
                     await entryPoint.Run(resourcesEstimator);
                     Console.WriteLine(resourcesEstimator.ToTSV());
                     break;
                 default:
-                    return await RunCustomSimulator(entryPoint, simulator);
+                    var (isCustom, createSimulator) = simulator switch
+                    {
+                        "QuantumSimulator" => (false, new Func<IOperationFactory>(() => new QuantumSimulator())),
+                        "ToffoliSimulator" => (false, new Func<IOperationFactory>(() => new ToffoliSimulator())),
+                        _ => (true, @EntryPointAdapter.CreateDefaultCustomSimulator)
+                    };
+                    if (isCustom && simulator != @EntryPointAdapter.DefaultSimulator)
+                    {
+                        DisplayCustomSimulatorError(simulator);
+                        return 1;
+                    }
+                    await DisplayEntryPointResult(entryPoint, createSimulator);
+                    break;
             }
             return 0;
         }
 
         /// <summary>
-        /// Simulates the entry point using a custom simulator, given by a fully-qualified name if it is in the current
-        /// assembly, and an assembly-qualified name otherwise.
+        /// Runs the entry point on a simulator and displays its return value.
         /// </summary>
         /// <param name="entryPoint">The entry point adapter.</param>
-        /// <param name="name">The fully-qualified or assembly-qualified name of the simulator to use.</param>
-        /// <returns>The exit code.</returns>
-        private static async Task<int> RunCustomSimulator(@EntryPointAdapter entryPoint, string name)
+        /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
+        private static async Task DisplayEntryPointResult(
+            @EntryPointAdapter entryPoint, Func<IOperationFactory> createSimulator)
         {
-            var originalColor = Console.ForegroundColor;
-            IOperationFactory simulator;
+            var simulator = createSimulator();
             try
             {
-                simulator = (IOperationFactory)Activator.CreateInstance(Type.GetType(name, true));
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine($"The simulator '{name}' could not be used:");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine($"    {exception.GetType()}: {exception.Message}");
-                return 1;
-            }
-            finally
-            {
-                Console.ForegroundColor = originalColor;
-            }
-
-            try
-            {
-                DisplayReturnValue(await entryPoint.Run(simulator));
+                var value = await entryPoint.Run(simulator);
+#pragma warning disable CS0184
+                if (!(value is QVoid))
+#pragma warning restore CS0184
+                {
+                    Console.WriteLine(value);
+                }
             }
             finally
             {
@@ -165,20 +156,6 @@
                 {
                     disposable.Dispose();
                 }
-            }
-            return 0;
-        }
-
-        /// <summary>
-        /// Writes the return value of the entry point to the console.
-        /// </summary>
-        /// <typeparam name="T">The type of the return value.</typeparam>
-        /// <param name="value">The return value.</param>
-        private static void DisplayReturnValue<T>(T value)
-        {
-            if (!(value is QVoid))
-            {
-                Console.WriteLine(value);
             }
         }
 
@@ -217,7 +194,7 @@
             var (success, value) = parse(result.Tokens.Single().Value);
             if (!success)
             {
-                result.ErrorMessage = GetErrorMessage(
+                result.ErrorMessage = GetArgumentErrorMessage(
                     ((OptionResult)result.Parent).Token.Value, result.Tokens.Single().Value, typeof(T));
             }
             return value;
@@ -236,7 +213,7 @@
                 ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
                 : values.Count() == 3
                 ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : @Result<QRange>.Failure(GetErrorMessage(option, arg, typeof(QRange))));
+                : @Result<QRange>.Failure(GetArgumentErrorMessage(option, arg, typeof(QRange))));
 
         /// <summary>
         /// Parses a long from a string.
@@ -247,7 +224,7 @@
         private static @Result<long> TryParseLong(string option, string str) =>
             long.TryParse(str, out var result)
             ? @Result<long>.Success(result)
-            : @Result<long>.Failure(GetErrorMessage(option, str, typeof(long)));
+            : @Result<long>.Failure(GetArgumentErrorMessage(option, str, typeof(long)));
 
         /// <summary>
         /// Returns an error message string for an argument parser.
@@ -256,8 +233,27 @@
         /// <param name="arg">The value of the argument being parsed.</param>
         /// <param name="type">The expected type of the argument.</param>
         /// <returns></returns>
-        private static string GetErrorMessage(string option, string arg, Type type) =>
+        private static string GetArgumentErrorMessage(string option, string arg, Type type) =>
             $"Cannot parse argument '{arg}' for option '{option}' as expected type {type}.";
+
+        /// <summary>
+        /// Displays an error message for using a non-default custom simulator.
+        /// </summary>
+        /// <param name="name">The name of the custom simulator.</param>
+        private static void DisplayCustomSimulatorError(string name)
+        {
+            var originalForeground = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Error.WriteLine($"The simulator '{name}' could not be found.");
+            Console.ForegroundColor = originalForeground;
+            Console.Error.WriteLine();
+            Console.Error.WriteLine(
+                $"If '{name}' is a custom simulator, it must be set in the DefaultSimulator project property:");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("<PropertyGroup>");
+            Console.Error.WriteLine($"  <DefaultSimulator>{name}</DefaultSimulator>");
+            Console.Error.WriteLine("</PropertyGroup>");
+        }
     }
 
     /// <summary>

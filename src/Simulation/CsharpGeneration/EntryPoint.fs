@@ -1,5 +1,6 @@
 ﻿module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
 
+open Microsoft.CodeAnalysis.CSharp
 open Microsoft.CodeAnalysis.CSharp.Syntax
 open Microsoft.Quantum.QsCompiler.SyntaxProcessing.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.SyntaxTokens
@@ -120,27 +121,43 @@ let private getRunMethod context (entryPoint : QsCallable) =
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
+/// Returns a method that creates an instance of the default simulator if it is a custom simulator.
+let private getCustomSimulatorFactory name =
+    let expr : ExpressionSyntax =
+        match name with
+        | "QuantumSimulator" | "ToffoliSimulator" | "ResourcesEstimator" ->
+            upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
+        | _ -> ``new`` (``type`` name) ``(`` [] ``)``
+    ``arrow_method`` "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
+        ``(`` [] ``)``
+        [``public``; ``static``]
+        (Some (``=>`` expr))
+
 /// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
 let private getAdapterClass context (entryPoint : QsCallable) =
-    let constant name typeName value =
+    let makeProperty name typeName value =
         ``property-arrow_get`` typeName name [``public``; ``static``]
-            ``get`` (``=>`` (``literal`` value))
-    let summary = constant "Summary" "string" ((PrintSummary entryPoint.Documentation false).Trim ())
+            ``get`` (``=>`` value)
+
+    let summaryProperty =
+        makeProperty "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue "DefaultSimulator"
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
-        |> constant "DefaultSimulator" "string"
+    let defaultSimulatorProperty = makeProperty "DefaultSimulator" "string" (``literal`` defaultSimulator)
     let parameters = getParameters context entryPoint.Documentation entryPoint.ArgumentTuple
+
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
             Seq.ofList [
-                summary
-                defaultSimulator
+                summaryProperty
+                defaultSimulatorProperty
                 getParameterOptionsProperty parameters
+                getCustomSimulatorFactory defaultSimulator
+                getRunMethod context entryPoint
             ]
             getParameterProperties parameters |> Seq.map (fun property -> upcast property)
-            Seq.singleton (upcast getRunMethod context entryPoint)
         ]
 
     ``class`` adapterClassName ``<<`` [] ``>>``
