@@ -39,22 +39,20 @@ type Emitter() =
                 | _ -> step.Name
 
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
-            let containsEntryPoint = compilation.EntryPoints.Length <> 0
             let targetsQuantumProcessor = 
                 match step.AssemblyConstants.TryGetValue "ResolvedExecutionTarget" with
                 | true, target -> target = AssemblyConstants.AlfredProcessor || target = AssemblyConstants.BrunoProcessor || target = AssemblyConstants.ClementineProcessor
                 | _ -> false
-            let includeReferences = containsEntryPoint && targetsQuantumProcessor
 
             let allSources = GetSourceFiles.Apply compilation.Namespaces 
-            let generateCode (fileName : NonNullable<string>) = includeReferences || not ((fileName.Value |> Path.GetFileName).EndsWith ".dll")
+            let generateCode (fileName : NonNullable<string>) = targetsQuantumProcessor || not ((fileName.Value |> Path.GetFileName).EndsWith ".dll")
 
             for source in allSources |> Seq.filter generateCode do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
             for source in allSources |> Seq.filter (not << generateCode) do
                 let content = SimulationCode.loadedViaTestNames source context
-                CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
+                if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             match Seq.tryExactlyOne compilation.EntryPoints with
             | Some entryPoint ->

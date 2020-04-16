@@ -1614,8 +1614,9 @@ module SimulationCode =
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
              
-    // Builds the SyntaxTree for callables and types loaded via test names, 
-    // formats it and returns it as a string
+    /// Builds the SyntaxTree for callables and types loaded via test names, 
+    /// formats it and returns it as a string.
+    /// Returns null if no elements have been loaded via test name. 
     let loadedViaTestNames (dllName : NonNullable<string>) globalContext = 
         let isLoadedViaTestName nsElement = 
             let asOption = function | Value _ -> Some nsElement | _ -> None
@@ -1625,11 +1626,13 @@ module SimulationCode =
             |> asOption
         let context = {globalContext with fileName = Some dllName.Value} 
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
-        buildSyntaxTree localElements context
-        |> formatSyntaxTree
+        if localElements.Any() then 
+            buildSyntaxTree localElements context
+            |> formatSyntaxTree
+        else null
 
-    // Main entry method for a CodeGenerator.
-    // Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
+    /// Main entry method for a CodeGenerator.
+    /// Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
     let generate (fileName : NonNullable<string>) globalContext = 
         let context = {globalContext with fileName = Some fileName.Value} 
         let localElements = findLocalElements Some fileName context.allQsElements
