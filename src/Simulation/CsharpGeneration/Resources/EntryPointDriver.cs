@@ -82,11 +82,10 @@
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
-            TryCreateOption(new[] { "--simulator", "-s" },
-                            () => SimulatorKind.QuantumSimulator,
-                            "The name of the simulator to use.")
+            TryCreateOption(
+                new[] { "--simulator", "-s" }, () => "QuantumSimulator", "The name of the simulator to use.")
                 .Then(simulate.AddOption);
-            simulate.Handler = CommandHandler.Create<@EntryPointAdapter, SimulatorKind>(Simulate);
+            simulate.Handler = CommandHandler.Create<@EntryPointAdapter, string>(Simulate);
 
             var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
             foreach (var option in @EntryPointAdapter.Options) { root.AddGlobalOption(option); }
@@ -103,35 +102,82 @@
         /// </summary>
         /// <param name="entryPoint">The entry point adapter.</param>
         /// <param name="simulator">The simulator to use.</param>
-        private static async Task Simulate(@EntryPointAdapter entryPoint, SimulatorKind simulator)
+        /// <returns>The exit code.</returns>
+        private static async Task<int> Simulate(@EntryPointAdapter entryPoint, string simulator)
         {
-            static void displayReturnValue<T>(T value)
-            {
-                if (!(value is QVoid))
-                {
-                    Console.WriteLine(value);
-                }
-            }
-
-            // TODO: Support custom simulators.
             switch (simulator)
             {
-                case SimulatorKind.QuantumSimulator:
+                case "QuantumSimulator":
                     using (var quantumSimulator = new QuantumSimulator())
                     {
-                        displayReturnValue(await entryPoint.Run(quantumSimulator));
+                        DisplayReturnValue(await entryPoint.Run(quantumSimulator));
                     }
                     break;
-                case SimulatorKind.ToffoliSimulator:
-                    displayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
+                case "ToffoliSimulator":
+                    DisplayReturnValue(await entryPoint.Run(new ToffoliSimulator()));
                     break;
-                case SimulatorKind.ResourcesEstimator:
+                case "ResourcesEstimator":
                     var resourcesEstimator = new ResourcesEstimator();
                     await entryPoint.Run(resourcesEstimator);
                     Console.WriteLine(resourcesEstimator.ToTSV());
                     break;
                 default:
-                    throw new ArgumentException("Invalid simulator.");
+                    return await RunCustomSimulator(entryPoint, simulator);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Simulates the entry point using a custom simulator, given by a fully-qualified name if it is in the current
+        /// assembly, and an assembly-qualified name otherwise.
+        /// </summary>
+        /// <param name="entryPoint">The entry point adapter.</param>
+        /// <param name="name">The fully-qualified or assembly-qualified name of the simulator to use.</param>
+        /// <returns>The exit code.</returns>
+        private static async Task<int> RunCustomSimulator(@EntryPointAdapter entryPoint, string name)
+        {
+            var originalColor = Console.ForegroundColor;
+            IOperationFactory simulator;
+            try
+            {
+                simulator = (IOperationFactory)Activator.CreateInstance(Type.GetType(name, true));
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"The simulator '{name}' could not be used:");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine($"    {exception.GetType()}: {exception.Message}");
+                return 1;
+            }
+            finally
+            {
+                Console.ForegroundColor = originalColor;
+            }
+
+            try
+            {
+                DisplayReturnValue(await entryPoint.Run(simulator));
+            }
+            finally
+            {
+                if (simulator is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Writes the return value of the entry point to the console.
+        /// </summary>
+        /// <typeparam name="T">The type of the return value.</typeparam>
+        /// <param name="value">The return value.</param>
+        private static void DisplayReturnValue<T>(T value)
+        {
+            if (!(value is QVoid))
+            {
+                Console.WriteLine(value);
             }
         }
 
@@ -211,16 +257,6 @@
         /// <returns></returns>
         private static string GetErrorMessage(string option, string arg, Type type) =>
             $"Cannot parse argument '{arg}' for option '{option}' as expected type {type}.";
-
-        /// <summary>
-        /// The names of simulators that can be used to simulate the entry point.
-        /// </summary>
-        private enum SimulatorKind
-        {
-            QuantumSimulator,
-            ToffoliSimulator,
-            ResourcesEstimator
-        }
     }
 
     /// <summary>
