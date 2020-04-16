@@ -54,7 +54,7 @@ type Emitter() =
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
             for source in allSources |> Seq.filter (not << generateCode) do
                 let content = SimulationCode.loadedViaTestNames source context
-                CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
+                if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             transformed <- compilation
             true
