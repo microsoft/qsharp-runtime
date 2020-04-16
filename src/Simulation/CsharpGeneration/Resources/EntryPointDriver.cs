@@ -82,8 +82,9 @@
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
-            TryCreateOption(
-                new[] { "--simulator", "-s" }, () => "QuantumSimulator", "The name of the simulator to use.")
+            TryCreateOption(new[] { "--simulator", "-s" },
+                            () => @EntryPointAdapter.DefaultSimulator,
+                            "The name of the simulator to use.")
                 .Then(simulate.AddOption);
             simulate.Handler = CommandHandler.Create<@EntryPointAdapter, string>(Simulate);
 

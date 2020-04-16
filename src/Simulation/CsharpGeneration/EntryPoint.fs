@@ -122,14 +122,23 @@ let private getRunMethod context (entryPoint : QsCallable) =
 
 /// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
 let private getAdapterClass context (entryPoint : QsCallable) =
-    let summary =
-        ``property-arrow_get`` "string" "Summary" [``public``; ``static``]
-            ``get`` (``=>`` (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ())))
+    let constant name typeName value =
+        ``property-arrow_get`` typeName name [``public``; ``static``]
+            ``get`` (``=>`` (``literal`` value))
+    let summary = constant "Summary" "string" ((PrintSummary entryPoint.Documentation false).Trim ())
+    let defaultSimulator =
+        context.assemblyConstants.TryGetValue "DefaultSimulator"
+        |> snd
+        |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
+        |> constant "DefaultSimulator" "string"
     let parameters = getParameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
-            Seq.singleton (upcast summary)
-            Seq.singleton (upcast getParameterOptionsProperty parameters)
+            Seq.ofList [
+                summary
+                defaultSimulator
+                getParameterOptionsProperty parameters
+            ]
             getParameterProperties parameters |> Seq.map (fun property -> upcast property)
             Seq.singleton (upcast getRunMethod context entryPoint)
         ]
