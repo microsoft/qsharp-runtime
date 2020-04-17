@@ -1632,9 +1632,17 @@ module SimulationCode =
         else null
 
     /// Main entry method for a CodeGenerator.
-    /// Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string
+    /// Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string.
+    /// Omits code generation for intrinsic callables in references. 
     let generate (fileName : NonNullable<string>) globalContext = 
+        let isIntrinsic = function
+            | QsCallable c -> c.Signature.Information.InferredInformation.IsIntrinsic
+            | QsCustomType _ -> false
+        let filterIntrinsics (ns, elems) = ns, elems |> List.filter (not << isIntrinsic)
         let context = {globalContext with fileName = Some fileName.Value} 
-        let localElements = findLocalElements Some fileName context.allQsElements
+        let localElements = 
+            let elements = findLocalElements Some fileName context.allQsElements
+            if fileName.Value.EndsWith ".dll" then elements |> List.map filterIntrinsics
+            else elements
         buildSyntaxTree localElements context
         |> formatSyntaxTree
