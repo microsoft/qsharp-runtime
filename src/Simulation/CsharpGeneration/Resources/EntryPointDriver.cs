@@ -108,7 +108,7 @@
         {
             switch (simulator)
             {
-                case "ResourcesEstimator":
+                case @EntryPointConstants.ResourcesEstimator:
                     var resourcesEstimator = new ResourcesEstimator();
                     await entryPoint.Run(resourcesEstimator);
                     Console.WriteLine(resourcesEstimator.ToTSV());
@@ -116,8 +116,10 @@
                 default:
                     var (isCustom, createSimulator) = simulator switch
                     {
-                        "QuantumSimulator" => (false, new Func<IOperationFactory>(() => new QuantumSimulator())),
-                        "ToffoliSimulator" => (false, new Func<IOperationFactory>(() => new ToffoliSimulator())),
+                        @EntryPointConstants.QuantumSimulator =>
+                            (false, new Func<IOperationFactory>(() => new QuantumSimulator())),
+                        @EntryPointConstants.ToffoliSimulator =>
+                            (false, new Func<IOperationFactory>(() => new ToffoliSimulator())),
                         _ => (true, @EntryPointAdapter.CreateDefaultCustomSimulator)
                     };
                     if (isCustom && simulator != @EntryPointAdapter.DefaultSimulator)

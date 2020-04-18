@@ -34,8 +34,12 @@ let private resultStructName = "__QsResult__"
 /// The name of the class containing extension methods for the result struct.
 let private resultExtensionsClassName = "__QsResultExtensions__"
 
-/// A public static property with a getter.
+/// A public constant field.
 let private constant name typeName value =
+    ``field`` typeName name [``public``; ``const``] (``:=`` value |> Some)
+
+/// A public static property with a getter.
+let private readonlyProperty name typeName value =
     ``property-arrow_get`` typeName name [``public``; ``static``]
         ``get`` (``=>`` value)
 
@@ -45,9 +49,12 @@ let private constantsClass =
         ``:`` None ``,`` []
         [``internal``; ``static``]
         ``{``
-            [constant "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
+            [readonlyProperty "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
                 (``new array`` (Some "") [``literal`` ("--" + fst CommandLineArguments.SimulatorOption)
-                                          ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])]
+                                          ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])
+             constant "QuantumSimulator" "string" (``literal`` AssemblyConstants.QuantumSimulator)
+             constant "ToffoliSimulator" "string" (``literal`` AssemblyConstants.ToffoliSimulator)
+             constant "ResourcesEstimator" "string" (``literal`` AssemblyConstants.ResourcesEstimator)]
         ``}``
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
@@ -156,12 +163,12 @@ let private customSimulatorFactory name =
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private adapterClass context (entryPoint : QsCallable) =
     let summaryProperty =
-        constant "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
+        readonlyProperty "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue "DefaultSimulator"
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
-    let defaultSimulatorProperty = constant "DefaultSimulator" "string" (``literal`` defaultSimulator)
+    let defaultSimulatorProperty = readonlyProperty "DefaultSimulator" "string" (``literal`` defaultSimulator)
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
 
     let members : seq<MemberDeclarationSyntax> =
