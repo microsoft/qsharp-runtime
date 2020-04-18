@@ -14,7 +14,7 @@
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
     /// </summary>
-    internal static class @EntryPointDriver
+    internal static class Driver
     {
         /// <summary>
         /// The argument handler for the Q# Unit type.
@@ -82,14 +82,14 @@
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
-            TryCreateOption(@EntryPointConstants.SimulatorOptionAliases,
-                            () => @EntryPointAdapter.DefaultSimulator,
+            TryCreateOption(Constants.SimulatorOptionAliases,
+                            () => EntryPoint.DefaultSimulator,
                             "The name of the simulator to use.")
                 .Then(simulate.AddOption);
-            simulate.Handler = CommandHandler.Create<@EntryPointAdapter, string>(Simulate);
+            simulate.Handler = CommandHandler.Create<EntryPoint, string>(Simulate);
 
-            var root = new RootCommand(@EntryPointAdapter.Summary) { simulate };
-            foreach (var option in @EntryPointAdapter.Options) { root.AddGlobalOption(option); }
+            var root = new RootCommand(EntryPoint.Summary) { simulate };
+            foreach (var option in EntryPoint.Options) { root.AddGlobalOption(option); }
 
             // Set the simulate command as the default.
             foreach (var option in simulate.Options) { root.AddOption(option); }
@@ -101,14 +101,14 @@
         /// <summary>
         /// Simulates the entry point.
         /// </summary>
-        /// <param name="entryPoint">The entry point adapter.</param>
+        /// <param name="entryPoint">The entry point.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> Simulate(@EntryPointAdapter entryPoint, string simulator)
+        private static async Task<int> Simulate(EntryPoint entryPoint, string simulator)
         {
             switch (simulator)
             {
-                case @EntryPointConstants.ResourcesEstimator:
+                case Constants.ResourcesEstimator:
                     var resourcesEstimator = new ResourcesEstimator();
                     await entryPoint.Run(resourcesEstimator);
                     Console.WriteLine(resourcesEstimator.ToTSV());
@@ -116,13 +116,13 @@
                 default:
                     var (isCustom, createSimulator) = simulator switch
                     {
-                        @EntryPointConstants.QuantumSimulator =>
+                        Constants.QuantumSimulator =>
                             (false, new Func<IOperationFactory>(() => new QuantumSimulator())),
-                        @EntryPointConstants.ToffoliSimulator =>
+                        Constants.ToffoliSimulator =>
                             (false, new Func<IOperationFactory>(() => new ToffoliSimulator())),
-                        _ => (true, @EntryPointAdapter.CreateDefaultCustomSimulator)
+                        _ => (true, EntryPoint.CreateDefaultCustomSimulator)
                     };
-                    if (isCustom && simulator != @EntryPointAdapter.DefaultSimulator)
+                    if (isCustom && simulator != EntryPoint.DefaultSimulator)
                     {
                         DisplayCustomSimulatorError(simulator);
                         return 1;
@@ -136,10 +136,10 @@
         /// <summary>
         /// Runs the entry point on a simulator and displays its return value.
         /// </summary>
-        /// <param name="entryPoint">The entry point adapter.</param>
+        /// <param name="entryPoint">The entry point.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
         private static async Task DisplayEntryPointResult(
-            @EntryPointAdapter entryPoint, Func<IOperationFactory> createSimulator)
+            EntryPoint entryPoint, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try
@@ -169,17 +169,17 @@
         /// <param name="aliases">The option's aliases.</param>
         /// <param name="getDefaultValue">A function that returns the option's default value.</param>
         /// <param name="description">The option's description.</param>
-        /// <returns></returns>
-        private static @Result<Option<T>> TryCreateOption<T>(
+        /// <returns>The result of trying to create the option.</returns>
+        private static Result<Option<T>> TryCreateOption<T>(
             IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null)
         {
             static bool isAliasAvailable(string alias) =>
-                !@EntryPointAdapter.Options.SelectMany(option => option.RawAliases).Contains(alias);
+                !EntryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
             var validAliases = aliases.Where(isAliasAvailable);
             return validAliases.Any()
-                ? @Result<Option<T>>.Success(new Option<T>(validAliases.ToArray(), getDefaultValue, description))
-                : @Result<Option<T>>.Failure();
+                ? Result<Option<T>>.Success(new Option<T>(validAliases.ToArray(), getDefaultValue, description))
+                : Result<Option<T>>.Failure();
         }
 
         /// <summary>
@@ -209,13 +209,13 @@
         /// <param name="arg">The argument string for the option.</param>
         /// <param name="items">The items in the argument.</param>
         /// <returns>The result of parsing the strings.</returns>
-        private static @Result<QRange> ParseRangeFromEnumerable(string option, string arg, IEnumerable<string> items) =>
+        private static Result<QRange> ParseRangeFromEnumerable(string option, string arg, IEnumerable<string> items) =>
             items.Select(item => TryParseLong(option, item)).Sequence().Bind(values =>
                 values.Count() == 2
-                ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
+                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
                 : values.Count() == 3
-                ? @Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : @Result<QRange>.Failure(GetArgumentErrorMessage(option, arg, typeof(QRange))));
+                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
+                : Result<QRange>.Failure(GetArgumentErrorMessage(option, arg, typeof(QRange))));
 
         /// <summary>
         /// Parses a long from a string.
@@ -223,10 +223,10 @@
         /// <param name="option">The name of the option being parsed.</param>
         /// <param name="str">The string to parse.</param>
         /// <returns>The result of parsing the string.</returns>
-        private static @Result<long> TryParseLong(string option, string str) =>
+        private static Result<long> TryParseLong(string option, string str) =>
             long.TryParse(str, out var result)
-            ? @Result<long>.Success(result)
-            : @Result<long>.Failure(GetArgumentErrorMessage(option, str, typeof(long)));
+            ? Result<long>.Success(result)
+            : Result<long>.Failure(GetArgumentErrorMessage(option, str, typeof(long)));
 
         /// <summary>
         /// Returns an error message string for an argument parser.
@@ -234,7 +234,7 @@
         /// <param name="option">The name of the option.</param>
         /// <param name="arg">The value of the argument being parsed.</param>
         /// <param name="type">The expected type of the argument.</param>
-        /// <returns></returns>
+        /// <returns>An error message string for an argument parser.</returns>
         private static string GetArgumentErrorMessage(string option, string arg, Type type) =>
             $"Cannot parse argument '{arg}' for option '{option}' as expected type {type}.";
 
@@ -262,29 +262,29 @@
     /// The result of a process that can either succeed or fail.
     /// </summary>
     /// <typeparam name="T">The type of the result value.</typeparam>
-    internal struct @Result<T>
+    internal struct Result<T>
     {
         public bool IsSuccess { get; }
         public T Value { get; }
         public bool IsFailure { get => !IsSuccess; }
         public string ErrorMessage { get; }
 
-        private @Result(bool isSuccess, T value, string errorMessage)
+        private Result(bool isSuccess, T value, string errorMessage)
         {
             IsSuccess = isSuccess;
             Value = value;
             ErrorMessage = errorMessage;
         }
 
-        public static @Result<T> Success(T value) => new @Result<T>(true, value, default);
+        public static Result<T> Success(T value) => new Result<T>(true, value, default);
 
-        public static @Result<T> Failure(string errorMessage = null) => new @Result<T>(false, default, errorMessage);
+        public static Result<T> Failure(string errorMessage = null) => new Result<T>(false, default, errorMessage);
     }
 
     /// <summary>
-    /// Extensions method for <see cref="@Result{T}"/>.
+    /// Extensions method for <see cref="Result{T}"/>.
     /// </summary>
-    internal static class @ResultExtensions
+    internal static class ResultExtensions
     {
         /// <summary>
         /// Sequentially composes two results, passing the value of the first result to another result-producing
@@ -298,8 +298,8 @@
         /// The first result if the first result is a failure; otherwise, the result of calling the bind function on the
         /// first result's value.
         /// </returns>
-        internal static @Result<U> Bind<T, U>(this @Result<T> result, Func<T, @Result<U>> bind) =>
-            result.IsFailure ? @Result<U>.Failure(result.ErrorMessage) : bind(result.Value);
+        internal static Result<U> Bind<T, U>(this Result<T> result, Func<T, Result<U>> bind) =>
+            result.IsFailure ? Result<U>.Failure(result.ErrorMessage) : bind(result.Value);
 
         /// <summary>
         /// Converts an enumerable of results into a result of an enumerable.
@@ -310,10 +310,10 @@
         /// A result that contains an enumerable of the result values if all of the results are a success, or the first
         /// error message if one of the results is a failure.
         /// </returns>
-        internal static @Result<IEnumerable<T>> Sequence<T>(this IEnumerable<@Result<T>> results) =>
+        internal static Result<IEnumerable<T>> Sequence<T>(this IEnumerable<Result<T>> results) =>
             results.All(result => result.IsSuccess)
-            ? @Result<IEnumerable<T>>.Success(results.Select(results => results.Value))
-            : @Result<IEnumerable<T>>.Failure(results.First(results => results.IsFailure).ErrorMessage);
+            ? Result<IEnumerable<T>>.Success(results.Select(results => results.Value))
+            : Result<IEnumerable<T>>.Failure(results.First(results => results.IsFailure).ErrorMessage);
 
         /// <summary>
         /// Calls the action on the result value if the result is a success.
@@ -321,7 +321,7 @@
         /// <typeparam name="T">The type of the result value.</typeparam>
         /// <param name="result">The result.</param>
         /// <param name="onSuccess">The action to call if the result is a success.</param>
-        internal static void Then<T>(this @Result<T> result, Action<T> onSuccess)
+        internal static void Then<T>(this Result<T> result, Action<T> onSuccess)
         {
             if (result.IsSuccess)
             {
@@ -340,7 +340,7 @@
         /// <returns>
         /// The value of the first successful result, or default if none of the results were successful.
         /// </returns>
-        internal static T Choose<T>(this IEnumerable<@Result<T>> results, Action<IEnumerable<string>> onError)
+        internal static T Choose<T>(this IEnumerable<Result<T>> results, Action<IEnumerable<string>> onError)
         {
             if (results.Any(result => result.IsSuccess))
             {

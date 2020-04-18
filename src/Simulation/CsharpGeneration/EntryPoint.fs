@@ -19,20 +19,9 @@ type private Parameter =
       CsharpTypeName : string
       Description : string }
 
-/// The name of the entry point constants class.
-let private constantsClassName = "__QsEntryPointConstants__"
-
-/// The name of the entry point adapter class.
-let private adapterClassName = "__QsEntryPointAdapter__"
-
-/// The name of the entry point driver class.
-let private driverClassName = "__QsEntryPointDriver__"
-
-/// The name of the result struct.
-let private resultStructName = "__QsResult__"
-
-/// The name of the class containing extension methods for the result struct.
-let private resultExtensionsClassName = "__QsResultExtensions__"
+/// The namespace in which to put generated code for the entry point.
+let private generatedNamespace (entryPoint : QsCallable) =
+    entryPoint.FullName.Namespace.Value + ".__QsEntryPoint__"
 
 /// A public constant field.
 let private constant name typeName value =
@@ -45,7 +34,7 @@ let private readonlyProperty name typeName value =
 
 /// A static class containing constants used by the entry point driver.
 let private constantsClass =
-    ``class`` constantsClassName ``<<`` [] ``>>``
+    ``class`` "Constants" ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``; ``static``]
         ``{``
@@ -85,7 +74,7 @@ let private argumentHandler =
     | BigInt -> Some "BigIntArgumentHandler"
     | Range -> Some "RangeArgumentHandler"
     | _ -> None
-    >> Option.map (fun handler -> ``ident`` driverClassName <|.|> ``ident`` handler)
+    >> Option.map (fun handler -> ``ident`` "Driver" <|.|> ``ident`` handler)
 
 /// A property containing a sequence of command-line options corresponding to each parameter given.
 let private parameterOptionsProperty parameters =
@@ -183,7 +172,7 @@ let private adapterClass context (entryPoint : QsCallable) =
             parameterProperties parameters |> Seq.map (fun property -> upcast property)
         ]
 
-    ``class`` adapterClassName ``<<`` [] ``>>``
+    ``class`` "EntryPoint" ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``]
         ``{``
@@ -193,7 +182,7 @@ let private adapterClass context (entryPoint : QsCallable) =
 /// The source code for the entry point constants and adapter classes.
 let private generatedClasses context (entryPoint : QsCallable) =
     let ns =
-        ``namespace`` entryPoint.FullName.Namespace.Value
+        ``namespace`` (generatedNamespace entryPoint)
             ``{``
                 (Seq.map ``using`` SimulationCode.autoNamespaces)
                 [
@@ -210,13 +199,7 @@ let private driver (entryPoint : QsCallable) =
     let name = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPointDriver.cs"
     use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream name
     use reader = new StreamReader(stream)
-    reader.ReadToEnd()
-        .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
-        .Replace("@EntryPointConstants", constantsClassName)
-        .Replace("@EntryPointAdapter", adapterClassName)
-        .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
-        .Replace("@ResultExtensions", resultExtensionsClassName)
-        .Replace("@Result", resultStructName)
+    reader.ReadToEnd().Replace("@Namespace", generatedNamespace entryPoint)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
