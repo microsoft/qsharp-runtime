@@ -34,8 +34,8 @@ let private resultStructName = "__QsResult__"
 /// The name of the class containing extension methods for the result struct.
 let private resultExtensionsClassName = "__QsResultExtensions__"
 
-/// Returns a public static property with a getter.
-let private makeConstant name typeName value =
+/// A public static property with a getter.
+let private constant name typeName value =
     ``property-arrow_get`` typeName name [``public``; ``static``]
         ``get`` (``=>`` value)
 
@@ -45,13 +45,13 @@ let private constantsClass =
         ``:`` None ``,`` []
         [``internal``; ``static``]
         ``{``
-            [makeConstant "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
+            [constant "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
                 (``new array`` (Some "") [``literal`` ("--" + fst CommandLineArguments.SimulatorOption)
                                           ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])]
         ``}``
 
-/// Returns a sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
-let rec private getParameters context doc = function
+/// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
+let rec private parameters context doc = function
     | QsTupleItem variable ->
         match variable.VariableName, variable.Type.Resolution with
         | ValidName name, ArrayType itemType ->
@@ -68,10 +68,10 @@ let rec private getParameters context doc = function
                             CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
                             Description = ParameterDescription doc name.Value }
         | InvalidName, _ -> Seq.empty
-    | QsTuple items -> items |> Seq.map (getParameters context doc) |> Seq.concat
+    | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
 
-/// Returns the custom argument handler for the given Q# type.
-let private getArgumentHandler =
+/// The custom argument handler for the given Q# type.
+let private argumentHandler =
     function
     | UnitType -> Some "UnitArgumentHandler"
     | Result -> Some "ResultArgumentHandler"
@@ -80,8 +80,8 @@ let private getArgumentHandler =
     | _ -> None
     >> Option.map (fun handler -> ``ident`` driverClassName <|.|> ``ident`` handler)
 
-/// Returns a property containing a sequence of command-line options corresponding to each parameter given.
-let private getParameterOptionsProperty parameters =
+/// A property containing a sequence of command-line options corresponding to each parameter given.
+let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
     let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
@@ -91,7 +91,7 @@ let private getParameterOptionsProperty parameters =
             then ``literal`` ("-" + name)
             else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
         let members =
-            getArgumentHandler qsType.Resolution
+            argumentHandler qsType.Resolution
             |> Option.map (fun handler -> ``ident`` "Argument" <-- handler :> ExpressionSyntax)
             |> Option.toList
             |> List.append [``ident`` "Required" <-- ``true``]
@@ -105,24 +105,24 @@ let private getParameterOptionsProperty parameters =
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
         ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
 
-/// Returns the name of the parameter property for the given parameter name.
-let private getParameterPropertyName (s : string) =
+/// The name of the parameter property for the given parameter name.
+let private parameterPropertyName (s : string) =
     s.Substring(0, 1).ToUpper() + s.Substring 1
 
-/// Returns a sequence of properties corresponding to each parameter given.
-let private getParameterProperties =
+/// A sequence of properties corresponding to each parameter given.
+let private parameterProperties =
     Seq.map (fun { Name = name; CsharpTypeName = typeName } ->
-        ``prop`` typeName (getParameterPropertyName name) [``public``])
+        ``prop`` typeName (parameterPropertyName name) [``public``])
 
-/// Returns the method for running the entry point using the parameter properties declared in the adapter.
-let private getRunMethod context (entryPoint : QsCallable) =
+/// The method for running the entry point using the parameter properties declared in the adapter.
+let private runMethod context (entryPoint : QsCallable) =
     let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
     let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
     let factoryParamName = "__factory__"
 
     let getArgExpr { Name = name; QsharpType = qsType } =
-        let property = ``ident`` "this" <|.|> ``ident`` (getParameterPropertyName name)
+        let property = ``ident`` "this" <|.|> ``ident`` (parameterPropertyName name)
         match qsType.Resolution with
         | ArrayType itemType ->
             // Convert the IEnumerable property into a QArray.
@@ -133,7 +133,7 @@ let private getRunMethod context (entryPoint : QsCallable) =
     let callArgs : seq<ExpressionSyntax> =
         Seq.concat [
             Seq.singleton (upcast ``ident`` factoryParamName)
-            Seq.map getArgExpr (getParameters context entryPoint.Documentation entryPoint.ArgumentTuple)
+            Seq.map getArgExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
 
     ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
@@ -141,8 +141,8 @@ let private getRunMethod context (entryPoint : QsCallable) =
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
-/// Returns a method that creates an instance of the default simulator if it is a custom simulator.
-let private getCustomSimulatorFactory name =
+/// A method that creates an instance of the default simulator if it is a custom simulator.
+let private customSimulatorFactory name =
     let expr : ExpressionSyntax =
         match name with
         | "QuantumSimulator" | "ToffoliSimulator" | "ResourcesEstimator" ->
@@ -153,27 +153,27 @@ let private getCustomSimulatorFactory name =
         [``public``; ``static``]
         (Some (``=>`` expr))
 
-/// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
-let private getAdapterClass context (entryPoint : QsCallable) =
+/// The class that adapts the entry point for use with the command-line parsing library and the driver.
+let private adapterClass context (entryPoint : QsCallable) =
     let summaryProperty =
-        makeConstant "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
+        constant "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue "DefaultSimulator"
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
-    let defaultSimulatorProperty = makeConstant "DefaultSimulator" "string" (``literal`` defaultSimulator)
-    let parameters = getParameters context entryPoint.Documentation entryPoint.ArgumentTuple
+    let defaultSimulatorProperty = constant "DefaultSimulator" "string" (``literal`` defaultSimulator)
+    let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
 
     let members : seq<MemberDeclarationSyntax> =
         Seq.concat [
             Seq.ofList [
                 summaryProperty
                 defaultSimulatorProperty
-                getParameterOptionsProperty parameters
-                getCustomSimulatorFactory defaultSimulator
-                getRunMethod context entryPoint
+                parameterOptionsProperty parameters
+                customSimulatorFactory defaultSimulator
+                runMethod context entryPoint
             ]
-            getParameterProperties parameters |> Seq.map (fun property -> upcast property)
+            parameterProperties parameters |> Seq.map (fun property -> upcast property)
         ]
 
     ``class`` adapterClassName ``<<`` [] ``>>``
@@ -183,23 +183,23 @@ let private getAdapterClass context (entryPoint : QsCallable) =
             members
         ``}``
 
-/// Returns the source code for the entry point constants and adapter classes.
-let private getGeneratedClasses context (entryPoint : QsCallable) =
+/// The source code for the entry point constants and adapter classes.
+let private generatedClasses context (entryPoint : QsCallable) =
     let ns =
         ``namespace`` entryPoint.FullName.Namespace.Value
             ``{``
                 (Seq.map ``using`` SimulationCode.autoNamespaces)
                 [
                     constantsClass
-                    getAdapterClass context entryPoint
+                    adapterClass context entryPoint
                 ]
             ``}``
     ``compilation unit`` [] [] [ns]
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
 
-/// Returns the source code for the entry point driver.
-let private getDriver (entryPoint : QsCallable) =
+/// The source code for the entry point driver.
+let private driver (entryPoint : QsCallable) =
     let name = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPointDriver.cs"
     use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream name
     use reader = new StreamReader(stream)
@@ -213,4 +213,4 @@ let private getDriver (entryPoint : QsCallable) =
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
-    getGeneratedClasses context entryPoint + Environment.NewLine + getDriver entryPoint
+    generatedClasses context entryPoint + Environment.NewLine + driver entryPoint
