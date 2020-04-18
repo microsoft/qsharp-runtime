@@ -2,6 +2,7 @@
 
 open Microsoft.CodeAnalysis.CSharp
 open Microsoft.CodeAnalysis.CSharp.Syntax
+open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxProcessing.SyntaxExtensions
 open Microsoft.Quantum.QsCompiler.SyntaxTokens
 open Microsoft.Quantum.QsCompiler.SyntaxTree
@@ -18,6 +19,9 @@ type private Parameter =
       CsharpTypeName : string
       Description : string }
 
+/// The name of the entry point constants class.
+let private constantsClassName = "__QsEntryPointConstants__"
+
 /// The name of the entry point adapter class.
 let private adapterClassName = "__QsEntryPointAdapter__"
 
@@ -29,6 +33,22 @@ let private resultStructName = "__QsResult__"
 
 /// The name of the class containing extension methods for the result struct.
 let private resultExtensionsClassName = "__QsResultExtensions__"
+
+/// Returns a public static property with a getter.
+let private makeConstant name typeName value =
+    ``property-arrow_get`` typeName name [``public``; ``static``]
+        ``get`` (``=>`` value)
+
+/// A static class containing constants used by the entry point driver.
+let private constantsClass =
+    ``class`` constantsClassName ``<<`` [] ``>>``
+        ``:`` None ``,`` []
+        [``internal``; ``static``]
+        ``{``
+            [makeConstant "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
+                (``new array`` (Some "") [``literal`` ("--" + fst CommandLineArguments.SimulatorOption)
+                                          ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])]
+        ``}``
 
 /// Returns a sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private getParameters context doc = function
@@ -135,17 +155,13 @@ let private getCustomSimulatorFactory name =
 
 /// Returns the class that adapts the entry point for use with the command-line parsing library and the driver.
 let private getAdapterClass context (entryPoint : QsCallable) =
-    let makeProperty name typeName value =
-        ``property-arrow_get`` typeName name [``public``; ``static``]
-            ``get`` (``=>`` value)
-
     let summaryProperty =
-        makeProperty "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
+        makeConstant "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue "DefaultSimulator"
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
-    let defaultSimulatorProperty = makeProperty "DefaultSimulator" "string" (``literal`` defaultSimulator)
+    let defaultSimulatorProperty = makeConstant "DefaultSimulator" "string" (``literal`` defaultSimulator)
     let parameters = getParameters context entryPoint.Documentation entryPoint.ArgumentTuple
 
     let members : seq<MemberDeclarationSyntax> =
@@ -167,15 +183,17 @@ let private getAdapterClass context (entryPoint : QsCallable) =
             members
         ``}``
 
-/// Returns the source code for the entry point adapter.
-let private getAdapter context (entryPoint : QsCallable) =
+/// Returns the source code for the entry point constants and adapter classes.
+let private getGeneratedClasses context (entryPoint : QsCallable) =
     let ns =
         ``namespace`` entryPoint.FullName.Namespace.Value
             ``{``
                 (Seq.map ``using`` SimulationCode.autoNamespaces)
-                [getAdapterClass context entryPoint]
+                [
+                    constantsClass
+                    getAdapterClass context entryPoint
+                ]
             ``}``
-
     ``compilation unit`` [] [] [ns]
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
@@ -187,11 +205,12 @@ let private getDriver (entryPoint : QsCallable) =
     use reader = new StreamReader(stream)
     reader.ReadToEnd()
         .Replace("@Namespace", entryPoint.FullName.Namespace.Value)
-        .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
+        .Replace("@EntryPointConstants", constantsClassName)
         .Replace("@EntryPointAdapter", adapterClassName)
+        .Replace("@EntryPointDriver", "__QsEntryPointDriver__")
         .Replace("@ResultExtensions", resultExtensionsClassName)
         .Replace("@Result", resultStructName)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
-    getAdapter context entryPoint + Environment.NewLine + getDriver entryPoint
+    getGeneratedClasses context entryPoint + Environment.NewLine + getDriver entryPoint

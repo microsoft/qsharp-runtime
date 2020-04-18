@@ -82,8 +82,7 @@
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
-            // TODO: Replace the option aliases with constants defined in Microsoft.Quantum.QsCompiler.ReservedKeywords.
-            TryCreateOption(new[] { "--simulator", "-s" },
+            TryCreateOption(@EntryPointConstants.SimulatorOptionAliases,
                             () => @EntryPointAdapter.DefaultSimulator,
                             "The name of the simulator to use.")
                 .Then(simulate.AddOption);
