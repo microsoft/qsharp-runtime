@@ -4,7 +4,10 @@
     using Microsoft.Quantum.Simulation.Simulators;
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.CommandLine;
+    using System.CommandLine.Builder;
+    using System.CommandLine.Help;
     using System.CommandLine.Invocation;
     using System.CommandLine.Parsing;
     using System.Linq;
@@ -82,10 +85,18 @@
         private static async Task<int> Main(string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
-            TryCreateOption(Constants.SimulatorOptionAliases,
-                            () => EntryPoint.DefaultSimulator,
-                            "The name of the simulator to use.")
-                .Then(simulate.AddOption);
+            TryCreateOption(
+                Constants.SimulatorOptionAliases,
+                () => EntryPoint.DefaultSimulator,
+                "The name of the simulator to use.").Then(option =>
+                {
+                    option.Argument.AddSuggestions(ImmutableHashSet<string>.Empty
+                        .Add(Constants.QuantumSimulator)
+                        .Add(Constants.ToffoliSimulator)
+                        .Add(Constants.ResourcesEstimator)
+                        .Add(EntryPoint.DefaultSimulator));
+                    simulate.AddOption(option);
+                });
             simulate.Handler = CommandHandler.Create<EntryPoint, string>(Simulate);
 
             var root = new RootCommand(EntryPoint.Summary) { simulate };
@@ -95,7 +106,11 @@
             foreach (var option in simulate.Options) { root.AddOption(option); }
             root.Handler = simulate.Handler;
 
-            return await root.InvokeAsync(args);
+            return await new CommandLineBuilder(root)
+                .UseDefaults()
+                .UseHelpBuilder(context => new QsHelpBuilder(context.Console))
+                .Build()
+                .InvokeAsync(args);
         }
 
         /// <summary>
@@ -259,6 +274,21 @@
     }
 
     /// <summary>
+    /// A modification of the command line <see cref="HelpBuilder"/> class.
+    /// </summary>
+    internal class QsHelpBuilder : HelpBuilder
+    {
+        public QsHelpBuilder(IConsole console) : base(console) { }
+
+        protected override string ArgumentDescriptor(IArgument argument)
+        {
+            // Hide long argument descriptors.
+            var descriptor = base.ArgumentDescriptor(argument);
+            return descriptor.Length > 30 ? argument.Name : descriptor;
+        }
+    }
+
+    /// <summary>
     /// The result of a process that can either succeed or fail.
     /// </summary>
     /// <typeparam name="T">The type of the result value.</typeparam>
@@ -282,7 +312,7 @@
     }
 
     /// <summary>
-    /// Extensions method for <see cref="Result{T}"/>.
+    /// Extension methods for <see cref="Result{T}"/>.
     /// </summary>
     internal static class ResultExtensions
     {
