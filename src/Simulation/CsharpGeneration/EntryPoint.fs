@@ -193,6 +193,7 @@ let private generatedClasses context (entryPoint : QsCallable) =
     ``compilation unit`` [] [] [ns]
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
+    |> fun code -> code + Environment.NewLine
 
 /// The source code for the entry point driver.
 let private driver (entryPoint : QsCallable) =
@@ -203,4 +204,4 @@ let private driver (entryPoint : QsCallable) =
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =
-    generatedClasses context entryPoint + Environment.NewLine + driver entryPoint
+    generatedClasses context entryPoint + driver entryPoint
