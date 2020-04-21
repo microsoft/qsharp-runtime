@@ -5,6 +5,7 @@ module Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint
 
 open System
 open System.Collections.Immutable
+open System.Globalization
 open System.IO
 open System.Reflection
 open System.Threading.Tasks
@@ -13,6 +14,7 @@ open Microsoft.CodeAnalysis.CSharp
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
+open Microsoft.VisualStudio.LanguageServer.Protocol
 open Xunit
 
 
@@ -39,7 +41,10 @@ let private compileQsharp source =
                                                 fileManager testFile source)
     compilationManager.AddOrUpdateSourceFilesAsync fileManagers |> ignore
     let compilation = compilationManager.Build ()
-    Assert.Empty (compilation.Diagnostics ())
+    let errors =
+        compilation.Diagnostics ()
+        |> Seq.filter (fun diagnostic -> diagnostic.Severity = DiagnosticSeverity.Error)
+    Assert.Empty errors
     compilation.BuiltCompilation.Namespaces, compilation.BuiltCompilation.EntryPoints
 
 /// Generates C# source code for the given test case number.
@@ -93,12 +98,16 @@ let private testAssembly = generateCsharp >> compileCsharp
 let private run (assembly : Assembly) (args : string[]) =
     let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".Driver")
     let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
-
+    let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out
+
+    CultureInfo.DefaultThreadCurrentCulture <- CultureInfo ("en-US", false)
     use stream = new StringWriter ()
     Console.SetOut stream
     let exitCode = main.Invoke (null, [| args |]) :?> Task<int> |> Async.AwaitTask |> Async.RunSynchronously
     Console.SetOut previousOut
+    CultureInfo.DefaultThreadCurrentCulture <- previousCulture
+
     stream.ToString (), exitCode
 
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
@@ -113,14 +122,84 @@ let private fails (assembly, args) =
     let _, exitCode = run assembly args
     Assert.NotEqual (0, exitCode)
 
+
+// No Option
+
 [<Fact>]
-let ``Entry point returns Unit`` () =
+let ``Returns Unit`` () =
     (testAssembly 1, Array.empty) |> yields ""
     
 [<Fact>]
-let ``Entry point returns Int`` () =
+let ``Returns Int`` () =
     (testAssembly 2, Array.empty) |> yields "42"
 
 [<Fact>]
-let ``Entry point returns String`` () =
+let ``Returns String`` () =
     (testAssembly 3, Array.empty) |> yields "Hello, World!"
+
+
+// Single Option
+
+[<Fact>]
+let ``Accepts Int`` () =
+    (testAssembly 4, [| "-n"; "42" |]) |> yields "42"
+
+[<Fact>]
+let ``Accepts BigInt`` () =
+    (testAssembly 5, [| "-n"; "9223372036854775808" |]) |> yields "9223372036854775808"
+
+[<Fact>]
+let ``Accepts Double`` () =
+    (testAssembly 6, [| "-n"; "4.2" |]) |> yields "4.2"
+
+[<Fact>]
+let ``Accepts Bool`` () =
+    let assembly = testAssembly 7
+    (assembly, [| "-b" |]) |> yields "True"
+    (assembly, [| "-b"; "false" |]) |> yields "False"
+    (assembly, [| "-b"; "true" |]) |> yields "True"
+
+[<Fact>]
+let ``Accepts Pauli`` () =
+    let assembly = testAssembly 8
+    (assembly, [| "-p"; "PauliI" |]) |> yields "PauliI"
+    (assembly, [| "-p"; "PauliX" |]) |> yields "PauliX"
+    (assembly, [| "-p"; "PauliY" |]) |> yields "PauliY"
+    (assembly, [| "-p"; "PauliZ" |]) |> yields "PauliZ"
+
+[<Fact>]
+let ``Accepts Result`` () =
+    let assembly = testAssembly 9
+    (assembly, [| "-r"; "Zero" |]) |> yields "Zero"
+    (assembly, [| "-r"; "One" |]) |> yields "One"
+
+[<Fact>]
+let ``Accepts Range`` () =
+    let assembly = testAssembly 10
+    (assembly, [| "-r"; "0..0" |]) |> yields "0..1..0"
+    (assembly, [| "-r"; "0..1" |]) |> yields "0..1..1"
+    (assembly, [| "-r"; "0..2..10" |]) |> yields "0..2..10"
+    (assembly, [| "-r"; "0"; "..1" |]) |> yields "0..1..1"
+    (assembly, [| "-r"; "0.."; "1" |]) |> yields "0..1..1"
+    (assembly, [| "-r"; "0"; ".."; "1" |]) |> yields "0..1..1"
+    (assembly, [| "-r"; "0"; "..2"; "..10" |]) |> yields "0..2..10"
+    (assembly, [| "-r"; "0.."; "2"; "..10" |]) |> yields "0..2..10"
+    (assembly, [| "-r"; "0"; ".."; "2"; ".."; "10" |]) |> yields "0..2..10"
+    (assembly, [| "-r"; "0"; "1" |]) |> yields "0..1..1"
+    (assembly, [| "-r"; "0"; "2"; "10" |]) |> yields "0..2..10"
+
+[<Fact>]
+let ``Accepts String`` () =
+    (testAssembly 11, [| "-s"; "Hello, World!" |]) |> yields "Hello, World!"
+
+[<Fact>]
+let ``Accepts String array`` () =
+    let assembly = testAssembly 12
+    (assembly, [| "--xs"; "foo" |]) |> yields "[foo]"
+    (assembly, [| "--xs"; "foo"; "bar" |]) |> yields "[foo,bar]"
+    (assembly, [| "--xs"; "foo bar"; "baz" |]) |> yields "[foo bar,baz]"
+    (assembly, [| "--xs"; "foo"; "bar"; "baz" |]) |> yields "[foo,bar,baz]"
+
+[<Fact>]
+let ``Accepts Unit`` () =
+    (testAssembly 13, [| "-u"; "()" |]) |> yields ""
