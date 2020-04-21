@@ -121,3 +121,26 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
         return u;
     }
 }
+
+// ---
+
+//
+// Help
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    /// # Summary
+    /// This test checks that the entry point documentation appears correctly in the command line help message.
+    ///
+    /// # Input
+    /// ## n
+    /// A number.
+    /// 
+    /// ## pauli
+    /// The name of a Pauli matrix.
+    ///
+    /// ## myCoolBool
+    /// A neat bit.
+    @EntryPoint()
+    operation Help(n : Int, pauli : Pauli, myCoolBool : Bool) : Unit { }
+}

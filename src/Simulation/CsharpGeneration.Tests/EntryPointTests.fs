@@ -238,3 +238,31 @@ let ``Accepts Unit`` () =
     let given = test 13
     given ["-u"; "()"] |> yields ""
     given ["-u"; "42"] |> fails
+
+
+// Help
+
+[<Fact>]
+let ``Uses documentation`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message = (name, name) ||> sprintf "%s:
+  This test checks that the entry point documentation appears correctly in the command line help message.
+
+Usage:
+  %s [options] [command]
+
+Options:
+  -n <n> (REQUIRED)                                   A number.
+  --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+  --my-cool-bool (REQUIRED)                           A neat bit.
+  -s, --simulator <simulator>                         The name of the simulator to use.
+  --version                                           Show version information
+  -?, -h, --help                                      Show help and usage information
+
+Commands:
+  simulate    (default) Run the program using a local simulator."
+
+    let given = test 14
+    given ["--help"] |> yields message
+    given ["-h"] |> yields message
+    given ["-?"] |> yields message
