@@ -280,7 +280,7 @@ let ``Uses kebab-case`` () =
     given ["--camelCaseName"; "foo"] |> fails
 
 [<Fact>]
-let ``Use single-dash short names`` () =
+let ``Uses single-dash short names`` () =
     let given = test 17
     given ["-x"; "foo"] |> yields "foo"
     given ["--x"; "foo"] |> fails
@@ -302,6 +302,37 @@ let ``Shadows -s`` () =
 let ``Shadows version`` () =
     let given = test 20
     given ["--version"; "foo"] |> yields "foo"
+
+
+// Simulators
+
+[<Fact>]
+let ``Supports QuantumSimulator`` () =
+    let given = test 3
+    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
+
+[<Fact>]
+let ``Supports ToffoliSimulator`` () =
+    let given = test 3
+    given ["--simulator"; "ToffoliSimulator"] |> yields "Hello, World!"
+
+[<Fact>]
+let ``Supports ResourcesEstimator`` () =
+    let given = test 3
+    given ["--simulator"; "ResourcesEstimator"] |> yields (("Metric         \tSum            " + "
+CNOT           \t0
+QubitClifford  \t0
+R              \t0
+Measure        \t0
+T              \t0
+Depth          \t0
+Width          \t0
+BorrowedWidth  \t0").Replace("\r\n", "\n"))
+
+[<Fact>]
+let ``Rejects unknown simulator`` () =
+    let given = test 3
+    given ["--simulator"; "FooSimulator"] |> fails
 
 
 // Help
