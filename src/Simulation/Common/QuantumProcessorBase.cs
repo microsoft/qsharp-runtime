@@ -164,12 +164,12 @@ namespace Microsoft.Quantum.Simulation.Common
             throw new UnsupportedOperationException();
         }
 
-        public virtual void Gate(long gateId, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings)
+        public virtual void CustomOperation(long gateId, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings)
         {
             throw new UnsupportedOperationException();
         }
 
-        public virtual void ControlledGate(long gateId, IQArray<Qubit> controls, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings)
+        public virtual void ControlledCustomOperation(long gateId, IQArray<Qubit> controls, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings)
         {
             throw new UnsupportedOperationException();
         }

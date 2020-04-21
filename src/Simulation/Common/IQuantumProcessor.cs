@@ -392,39 +392,39 @@ namespace Microsoft.Quantum.Simulation.Common
         void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits);
 
         /// <summary>
-        /// Used as extensibility mechanism to add custom gates to IQuantumProcessor. 
+        /// Used as extensibility mechanism to add custom operations to IQuantumProcessor. 
         /// </summary>
         /// <remarks>
-        /// The custom gate may use only some of the parameters. Depending on the nature of the gate, all of them may be optional. 
+        /// The custom operation may use only some of the parameters. Depending on the nature of the operation, all of them may be optional. 
         /// A variety of parameter types are provided for flexibility.
         /// </remarks>
-        /// <param name="gateId">The id of the custom gate. It is up to the custom gate implementor to define the meaning.</param>
-        /// <param name="qubits">Array of qubits to apply the gate to. Their meaning is specific to the custom gate.</param>
-        /// <param name="paulis">Array of single-qubit Pauli values. Their meaning is specific to the custom gate.</param>
-        /// <param name="longs">Array of long parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="doubles">Array of double parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="bools">Array of bool parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="results">Array of Result parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="strings">Array of string parameters. Their meaning is specific to the custom gate.</param>
-        void Gate(long gateId, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings);
+        /// <param name="operationId">The id of the custom operation. It is up to the custom operation implementor to define the meaning.</param>
+        /// <param name="qubits">Array of qubits to apply the operation to. Their meaning is specific to the custom operation.</param>
+        /// <param name="paulis">Array of single-qubit Pauli values. Their meaning is specific to the custom operation.</param>
+        /// <param name="longs">Array of long parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="doubles">Array of double parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="bools">Array of bool parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="results">Array of Result parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="strings">Array of string parameters. Their meaning is specific to the custom operation.</param>
+        void CustomOperation(long operationId, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings);
 
         /// <summary>
-        /// Used as extensibility mechanism to add custom gates to IQuantumProcessor. Implements controlled version.
+        /// Used as extensibility mechanism to add custom operations to IQuantumProcessor. Implements controlled version.
         /// </summary>
         /// <remarks>
-        /// The custom gate may use only some of the parameters. Depending on the nature of the gate, all of them may be optional. 
+        /// The custom operation may use only some of the parameters. Depending on the nature of the operation, all of them may be optional. 
         /// A variety of parameter types are provided for flexibility.
         /// </remarks>
-        /// <param name="gateId">The id of the custom gate. It is up to the custom gate implementor to define the meaning.</param>
+        /// <param name="operationId">The id of the custom operation. It is up to the custom operation implementor to define the meaning.</param>
         /// <param name="controls">Array of control qubits for this operation.</param>
-        /// <param name="qubits">Array of qubits to apply the gate to. Their meaning is specific to the custom gate.</param>
-        /// <param name="paulis">Array of single-qubit Pauli values. Their meaning is specific to the custom gate.</param>
-        /// <param name="longs">Array of long parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="doubles">Array of double parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="bools">Array of bool parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="results">Array of Result parameters. Their meaning is specific to the custom gate.</param>
-        /// <param name="strings">Array of string parameters. Their meaning is specific to the custom gate.</param>
-        void ControlledGate(long gateId, IQArray<Qubit> controls, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings);
+        /// <param name="qubits">Array of qubits to apply the operation to. Their meaning is specific to the custom operation.</param>
+        /// <param name="paulis">Array of single-qubit Pauli values. Their meaning is specific to the custom operation.</param>
+        /// <param name="longs">Array of long parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="doubles">Array of double parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="bools">Array of bool parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="results">Array of Result parameters. Their meaning is specific to the custom operation.</param>
+        /// <param name="strings">Array of string parameters. Their meaning is specific to the custom operation.</param>
+        void ControlledCustomOperation(long operationId, IQArray<Qubit> controls, IQArray<Qubit> qubits, IQArray<Pauli> paulis, IQArray<long> longs, IQArray<double> doubles, IQArray<bool> bools, IQArray<Result> results, IQArray<string> strings);
 
         /// <summary>
         /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.m">Microsoft.Quantum.Intrinsic.M</a> is called in Q#.
