@@ -119,8 +119,8 @@ let private yields expected (assembly, args) =
 
 /// Asserts that running the entry point in the assembly with the given argument fails.
 let private fails (assembly, args) =
-    let _, exitCode = run assembly args
-    Assert.NotEqual (0, exitCode)
+    let output, exitCode = run assembly args
+    Assert.True (0 <> exitCode, "Succeeded unexpectedly:\n" + output)
 
 
 // No Option
@@ -142,15 +142,21 @@ let ``Returns String`` () =
 
 [<Fact>]
 let ``Accepts Int`` () =
-    (testAssembly 4, [| "-n"; "42" |]) |> yields "42"
+    let assembly = testAssembly 4
+    (assembly, [| "-n"; "42" |]) |> yields "42"
+    (assembly, [| "-n"; "4.2" |]) |> fails
+    (assembly, [| "-n"; "9223372036854775808" |]) |> fails
 
 [<Fact>]
 let ``Accepts BigInt`` () =
-    (testAssembly 5, [| "-n"; "9223372036854775808" |]) |> yields "9223372036854775808"
+    let assembly = testAssembly 5
+    (assembly, [| "-n"; "9223372036854775808" |]) |> yields "9223372036854775808"
+    (assembly, [| "-n"; "foo" |]) |> fails
 
 [<Fact>]
 let ``Accepts Double`` () =
     (testAssembly 6, [| "-n"; "4.2" |]) |> yields "4.2"
+    (testAssembly 6, [| "-n"; "foo" |]) |> fails
 
 [<Fact>]
 let ``Accepts Bool`` () =
@@ -158,6 +164,7 @@ let ``Accepts Bool`` () =
     (assembly, [| "-b" |]) |> yields "True"
     (assembly, [| "-b"; "false" |]) |> yields "False"
     (assembly, [| "-b"; "true" |]) |> yields "True"
+    (assembly, [| "-b"; "one" |]) |> fails
 
 [<Fact>]
 let ``Accepts Pauli`` () =
@@ -166,12 +173,18 @@ let ``Accepts Pauli`` () =
     (assembly, [| "-p"; "PauliX" |]) |> yields "PauliX"
     (assembly, [| "-p"; "PauliY" |]) |> yields "PauliY"
     (assembly, [| "-p"; "PauliZ" |]) |> yields "PauliZ"
+    (assembly, [| "-p"; "PauliW" |]) |> fails
 
 [<Fact>]
 let ``Accepts Result`` () =
     let assembly = testAssembly 9
     (assembly, [| "-r"; "Zero" |]) |> yields "Zero"
+    (assembly, [| "-r"; "zero" |]) |> yields "Zero"
     (assembly, [| "-r"; "One" |]) |> yields "One"
+    (assembly, [| "-r"; "one" |]) |> yields "One"
+    (assembly, [| "-r"; "0" |]) |> yields "Zero"
+    (assembly, [| "-r"; "1" |]) |> yields "One"
+    (assembly, [| "-r"; "Two" |]) |> fails
 
 [<Fact>]
 let ``Accepts Range`` () =
@@ -187,6 +200,12 @@ let ``Accepts Range`` () =
     (assembly, [| "-r"; "0"; ".."; "2"; ".."; "10" |]) |> yields "0..2..10"
     (assembly, [| "-r"; "0"; "1" |]) |> yields "0..1..1"
     (assembly, [| "-r"; "0"; "2"; "10" |]) |> yields "0..2..10"
+    (assembly, [| "-r"; "0" |]) |> fails
+    (assembly, [| "-r"; "0.." |]) |> fails
+    (assembly, [| "-r"; "0..2.." |]) |> fails
+    (assembly, [| "-r"; "0..2..3.." |]) |> fails
+    (assembly, [| "-r"; "0..2..3..4" |]) |> fails
+    (assembly, [| "-r"; "0"; "1"; "2"; "3" |]) |> fails
 
 [<Fact>]
 let ``Accepts String`` () =
@@ -202,4 +221,6 @@ let ``Accepts String array`` () =
 
 [<Fact>]
 let ``Accepts Unit`` () =
-    (testAssembly 13, [| "-u"; "()" |]) |> yields ""
+    let assembly = testAssembly 13
+    (assembly, [| "-u"; "()" |]) |> yields ""
+    (assembly, [| "-u"; "42" |]) |> fails
