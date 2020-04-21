@@ -8,6 +8,7 @@ open System.Collections.Immutable
 open System.Globalization
 open System.IO
 open System.Reflection
+open System.Text.RegularExpressions
 open System.Threading.Tasks
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp
@@ -121,9 +122,10 @@ let private run (assembly : Assembly) (args : string[]) =
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
 /// output.
 let private yields expected (assembly, args) =
+    let normalize text = Regex.Replace(text, @"\s+", " ").Trim()
     let out, error, exitCode = run assembly args
     Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
-    Assert.Equal (expected, out.TrimEnd ())
+    Assert.Equal (normalize expected, normalize out)
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
@@ -329,15 +331,15 @@ let ``Supports ToffoliSimulator`` () =
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
     let given = test 3
-    given ["--simulator"; "ResourcesEstimator"] |> yields (("Metric         \tSum            " + "
-CNOT           \t0
-QubitClifford  \t0
-R              \t0
-Measure        \t0
-T              \t0
-Depth          \t0
-Width          \t0
-BorrowedWidth  \t0").Replace("\r\n", "\n"))
+    given ["--simulator"; "ResourcesEstimator"] |> yields "Metric          Sum
+CNOT            0
+QubitClifford   0
+R               0
+Measure         0
+T               0
+Depth           0
+Width           0
+BorrowedWidth   0"
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
