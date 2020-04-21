@@ -15,6 +15,7 @@ open Microsoft.CodeAnalysis.CSharp
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
+open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.VisualStudio.LanguageServer.Protocol
 open Xunit
 
@@ -48,10 +49,14 @@ let private compileQsharp source =
     Assert.Empty errors
     compilation.BuiltCompilation.Namespaces, compilation.BuiltCompilation.EntryPoints
 
-/// Generates C# source code for the given test case number.
-let private generateCsharp testNum =
+/// Generates C# source code for the given test case number and default simulator.
+let private generateCsharp (testNum, defaultSimulator) =
     let syntaxTree, entryPoints = compileQsharp tests.[testNum - 1]
-    let context = CodegenContext.Create syntaxTree
+    let assemblyConstants =
+        match defaultSimulator with
+        | Some simulator -> ImmutableDictionary.Empty.Add (AssemblyConstants.DefaultSimulator, simulator)
+        | None -> ImmutableDictionary.Empty
+    let context = CodegenContext.Create (syntaxTree, assemblyConstants)
     let entryPoint = context.allCallables.[Seq.exactlyOne entryPoints]
     [
         SimulationCode.generate (NonNullable<_>.New testFile) context
@@ -132,10 +137,18 @@ let private fails (assembly, args) =
     let out, error, exitCode = run assembly args
     Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
 
-/// A tuple of the test assembly for the given test number, and the given argument string converted into an array.
+/// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
+/// or fails.
 let private test testNum =
-    let assembly = testAssembly testNum
+    let assembly = testAssembly (testNum, None)
     fun args -> assembly, Array.ofList args
+
+/// A tuple of the test assembly and arguments using the given default simulator. The tuple can be passed to yields or
+/// fails.
+let private testWith testNum defaultSimulator =
+    let assembly = testAssembly (testNum, Some defaultSimulator)
+    fun args -> assembly, Array.ofList args
+
 
 // No Option
 
@@ -318,6 +331,17 @@ let ``Shadows version`` () =
 
 // Simulators
 
+// The expected output from the resources estimator.
+let private resourceSummary = "Metric          Sum
+CNOT            0
+QubitClifford   0
+R               0
+Measure         0
+T               0
+Depth           0
+Width           0
+BorrowedWidth   0"
+
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
     let given = test 3
@@ -331,20 +355,29 @@ let ``Supports ToffoliSimulator`` () =
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
     let given = test 3
-    given ["--simulator"; "ResourcesEstimator"] |> yields "Metric          Sum
-CNOT            0
-QubitClifford   0
-R               0
-Measure         0
-T               0
-Depth           0
-Width           0
-BorrowedWidth   0"
+    given ["--simulator"; "ResourcesEstimator"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
     let given = test 3
     given ["--simulator"; "FooSimulator"] |> fails
+
+[<Fact>]
+let ``Supports default standard simulator`` () =
+    let given = testWith 3 "ResourcesEstimator"
+    given [] |> yields resourceSummary
+    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
+
+[<Fact>]
+let ``Supports default custom simulator`` () =
+    // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
+    // standard simulators, so it is treated as one.
+    let given = testWith 3 "Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator"
+    given [] |> yields "Hello, World!"
+    given ["--simulator"; "Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator"] |> yields "Hello, World!"
+    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
+    given ["--simulator"; "ResourcesEstimator"] |> yields resourceSummary
+    given ["--simulator"; "Microsoft.Quantum.Simulation.Simulators.QuantumSimulator"] |> fails
 
 
 // Help
