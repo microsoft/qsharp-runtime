@@ -187,8 +187,8 @@
             !EntryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
-        /// Returns the default value if the alias is shadowed by an entry point option, and the original value
-        /// otherwise.
+        /// Returns the default value and displays a warning if the alias is shadowed by an entry point option, and
+        /// returns the original value otherwise.
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
         /// <param name="alias">The primary option alias corresponding to the value.</param>
