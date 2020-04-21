@@ -331,7 +331,7 @@ let ``Shadows -s`` () =
     given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
-let ``Shadows version`` () =
+let ``Shadows --version`` () =
     let given = test 20
     given ["--version"; "foo"] |> yields "foo"
 
