@@ -121,14 +121,15 @@ let private run (assembly : Assembly) (args : string[]) =
     CultureInfo.DefaultThreadCurrentCulture <- CultureInfo ("en-US", false)
     use outStream = new StringWriter ()
     use errorStream = new StringWriter ()
-    Console.SetOut outStream
-    Console.SetError errorStream
-    let exitCode = main.Invoke (null, [| args |]) :?> Task<int> |> Async.AwaitTask |> Async.RunSynchronously
-    Console.SetError previousError
-    Console.SetOut previousOut
-    CultureInfo.DefaultThreadCurrentCulture <- previousCulture
-
-    outStream.ToString (), errorStream.ToString (), exitCode
+    try
+        Console.SetOut outStream
+        Console.SetError errorStream
+        let exitCode = main.Invoke (null, [| args |]) :?> Task<int> |> Async.AwaitTask |> Async.RunSynchronously
+        outStream.ToString (), errorStream.ToString (), exitCode
+    finally
+        Console.SetError previousError
+        Console.SetOut previousOut
+        CultureInfo.DefaultThreadCurrentCulture <- previousCulture
 
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
 /// output.
