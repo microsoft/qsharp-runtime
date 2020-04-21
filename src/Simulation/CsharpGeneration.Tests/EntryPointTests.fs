@@ -126,7 +126,7 @@ let private fails (assembly, args) =
     Assert.True (0 <> exitCode, "Expected non-zero exit code, but got 0 with:\n\n" + output)
 
 /// A tuple of the test assembly for the given test number, and the given argument string converted into an array.
-let test testNum =
+let private test testNum =
     let assembly = testAssembly testNum
     fun args -> assembly, Array.ofList args
 
