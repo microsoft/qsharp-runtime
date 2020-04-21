@@ -59,9 +59,11 @@ let private generateCsharp testNum =
 
 /// The full path to a referenced assembly given its short name.
 let private referencedAssembly name =
-    (AppContext.GetData "TRUSTED_PLATFORM_ASSEMBLIES" :?> string).Split ';'
-    |> Seq.find (fun path -> String.Equals (Path.GetFileNameWithoutExtension path, name,
-                                            StringComparison.InvariantCultureIgnoreCase))
+    let path =
+        (AppContext.GetData "TRUSTED_PLATFORM_ASSEMBLIES" :?> string).Split ';'
+        |> Seq.tryFind (fun path -> String.Equals (Path.GetFileNameWithoutExtension path, name,
+                                                   StringComparison.InvariantCultureIgnoreCase))
+    path |> Option.defaultWith (fun () -> failwith (sprintf "Missing reference to assembly '%s'." name))
 
 /// Compiles the C# sources into an assembly.
 let private compileCsharp (sources : string seq) =
