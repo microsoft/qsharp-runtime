@@ -117,110 +117,124 @@ let private yields expected (assembly, args) =
     Assert.Equal (0, exitCode)
     Assert.Equal (expected, output.TrimEnd ())
 
-/// Asserts that running the entry point in the assembly with the given argument fails.
+/// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
     let output, exitCode = run assembly args
-    Assert.True (0 <> exitCode, "Succeeded unexpectedly:\n" + output)
+    Assert.True (0 <> exitCode, "Succeeded unexpectedly:" + Environment.NewLine + output)
 
+/// A tuple of the test assembly for the given test number, and the given argument string converted into an array.
+let test testNum =
+    let assembly = testAssembly testNum
+    fun args -> assembly, Array.ofList args
 
 // No Option
 
 [<Fact>]
 let ``Returns Unit`` () =
-    (testAssembly 1, Array.empty) |> yields ""
+    let given = test 1
+    given [] |> yields ""
     
 [<Fact>]
 let ``Returns Int`` () =
-    (testAssembly 2, Array.empty) |> yields "42"
+    let given = test 2
+    given [] |> yields "42"
 
 [<Fact>]
 let ``Returns String`` () =
-    (testAssembly 3, Array.empty) |> yields "Hello, World!"
+    let given = test 3
+    given [] |> yields "Hello, World!"
 
 
 // Single Option
 
 [<Fact>]
 let ``Accepts Int`` () =
-    let assembly = testAssembly 4
-    (assembly, [| "-n"; "42" |]) |> yields "42"
-    (assembly, [| "-n"; "4.2" |]) |> fails
-    (assembly, [| "-n"; "9223372036854775808" |]) |> fails
+    let given = test 4
+    given ["-n"; "42"] |> yields "42"
+    given ["-n"; "4.2"] |> fails
+    given ["-n"; "9223372036854775807"] |> yields "9223372036854775807"
+    given ["-n"; "9223372036854775808"] |> fails
+    given ["-n"; "foo"] |> fails
 
 [<Fact>]
 let ``Accepts BigInt`` () =
-    let assembly = testAssembly 5
-    (assembly, [| "-n"; "9223372036854775808" |]) |> yields "9223372036854775808"
-    (assembly, [| "-n"; "foo" |]) |> fails
+    let given = test 5
+    given ["-n"; "42"] |> yields "42"
+    given ["-n"; "4.2"] |> fails
+    given ["-n"; "9223372036854775807"] |> yields "9223372036854775807"
+    given ["-n"; "9223372036854775808"] |> yields "9223372036854775808"
+    given ["-n"; "foo"] |> fails
 
 [<Fact>]
 let ``Accepts Double`` () =
-    (testAssembly 6, [| "-n"; "4.2" |]) |> yields "4.2"
-    (testAssembly 6, [| "-n"; "foo" |]) |> fails
+    let given = test 6
+    given ["-n"; "4.2"] |> yields "4.2"
+    given ["-n"; "foo"] |> fails
 
 [<Fact>]
 let ``Accepts Bool`` () =
-    let assembly = testAssembly 7
-    (assembly, [| "-b" |]) |> yields "True"
-    (assembly, [| "-b"; "false" |]) |> yields "False"
-    (assembly, [| "-b"; "true" |]) |> yields "True"
-    (assembly, [| "-b"; "one" |]) |> fails
+    let given = test 7
+    given ["-b"] |> yields "True"
+    given ["-b"; "false"] |> yields "False"
+    given ["-b"; "true"] |> yields "True"
+    given ["-b"; "one"] |> fails
 
 [<Fact>]
 let ``Accepts Pauli`` () =
-    let assembly = testAssembly 8
-    (assembly, [| "-p"; "PauliI" |]) |> yields "PauliI"
-    (assembly, [| "-p"; "PauliX" |]) |> yields "PauliX"
-    (assembly, [| "-p"; "PauliY" |]) |> yields "PauliY"
-    (assembly, [| "-p"; "PauliZ" |]) |> yields "PauliZ"
-    (assembly, [| "-p"; "PauliW" |]) |> fails
+    let given = test 8
+    given ["-p"; "PauliI"] |> yields "PauliI"
+    given ["-p"; "PauliX"] |> yields "PauliX"
+    given ["-p"; "PauliY"] |> yields "PauliY"
+    given ["-p"; "PauliZ"] |> yields "PauliZ"
+    given ["-p"; "PauliW"] |> fails
 
 [<Fact>]
 let ``Accepts Result`` () =
-    let assembly = testAssembly 9
-    (assembly, [| "-r"; "Zero" |]) |> yields "Zero"
-    (assembly, [| "-r"; "zero" |]) |> yields "Zero"
-    (assembly, [| "-r"; "One" |]) |> yields "One"
-    (assembly, [| "-r"; "one" |]) |> yields "One"
-    (assembly, [| "-r"; "0" |]) |> yields "Zero"
-    (assembly, [| "-r"; "1" |]) |> yields "One"
-    (assembly, [| "-r"; "Two" |]) |> fails
+    let given = test 9
+    given ["-r"; "Zero"] |> yields "Zero"
+    given ["-r"; "zero"] |> yields "Zero"
+    given ["-r"; "One"] |> yields "One"
+    given ["-r"; "one"] |> yields "One"
+    given ["-r"; "0"] |> yields "Zero"
+    given ["-r"; "1"] |> yields "One"
+    given ["-r"; "Two"] |> fails
 
 [<Fact>]
 let ``Accepts Range`` () =
-    let assembly = testAssembly 10
-    (assembly, [| "-r"; "0..0" |]) |> yields "0..1..0"
-    (assembly, [| "-r"; "0..1" |]) |> yields "0..1..1"
-    (assembly, [| "-r"; "0..2..10" |]) |> yields "0..2..10"
-    (assembly, [| "-r"; "0"; "..1" |]) |> yields "0..1..1"
-    (assembly, [| "-r"; "0.."; "1" |]) |> yields "0..1..1"
-    (assembly, [| "-r"; "0"; ".."; "1" |]) |> yields "0..1..1"
-    (assembly, [| "-r"; "0"; "..2"; "..10" |]) |> yields "0..2..10"
-    (assembly, [| "-r"; "0.."; "2"; "..10" |]) |> yields "0..2..10"
-    (assembly, [| "-r"; "0"; ".."; "2"; ".."; "10" |]) |> yields "0..2..10"
-    (assembly, [| "-r"; "0"; "1" |]) |> yields "0..1..1"
-    (assembly, [| "-r"; "0"; "2"; "10" |]) |> yields "0..2..10"
-    (assembly, [| "-r"; "0" |]) |> fails
-    (assembly, [| "-r"; "0.." |]) |> fails
-    (assembly, [| "-r"; "0..2.." |]) |> fails
-    (assembly, [| "-r"; "0..2..3.." |]) |> fails
-    (assembly, [| "-r"; "0..2..3..4" |]) |> fails
-    (assembly, [| "-r"; "0"; "1"; "2"; "3" |]) |> fails
+    let given = test 10
+    given ["-r"; "0..0"] |> yields "0..1..0"
+    given ["-r"; "0..1"] |> yields "0..1..1"
+    given ["-r"; "0..2..10"] |> yields "0..2..10"
+    given ["-r"; "0"; "..1"] |> yields "0..1..1"
+    given ["-r"; "0.."; "1"] |> yields "0..1..1"
+    given ["-r"; "0"; ".."; "1"] |> yields "0..1..1"
+    given ["-r"; "0"; "..2"; "..10"] |> yields "0..2..10"
+    given ["-r"; "0.."; "2"; "..10"] |> yields "0..2..10"
+    given ["-r"; "0"; ".."; "2"; ".."; "10"] |> yields "0..2..10"
+    given ["-r"; "0"; "1"] |> yields "0..1..1"
+    given ["-r"; "0"; "2"; "10"] |> yields "0..2..10"
+    given ["-r"; "0"] |> fails
+    given ["-r"; "0.."] |> fails
+    given ["-r"; "0..2.."] |> fails
+    given ["-r"; "0..2..3.."] |> fails
+    given ["-r"; "0..2..3..4"] |> fails
+    given ["-r"; "0"; "1"; "2"; "3"] |> fails
 
 [<Fact>]
 let ``Accepts String`` () =
-    (testAssembly 11, [| "-s"; "Hello, World!" |]) |> yields "Hello, World!"
+    let given = test 11
+    given ["-s"; "Hello, World!"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Accepts String array`` () =
-    let assembly = testAssembly 12
-    (assembly, [| "--xs"; "foo" |]) |> yields "[foo]"
-    (assembly, [| "--xs"; "foo"; "bar" |]) |> yields "[foo,bar]"
-    (assembly, [| "--xs"; "foo bar"; "baz" |]) |> yields "[foo bar,baz]"
-    (assembly, [| "--xs"; "foo"; "bar"; "baz" |]) |> yields "[foo,bar,baz]"
+    let given = test 12
+    given ["--xs"; "foo"] |> yields "[foo]"
+    given ["--xs"; "foo"; "bar"] |> yields "[foo,bar]"
+    given ["--xs"; "foo bar"; "baz"] |> yields "[foo bar,baz]"
+    given ["--xs"; "foo"; "bar"; "baz"] |> yields "[foo,bar,baz]"
 
 [<Fact>]
 let ``Accepts Unit`` () =
-    let assembly = testAssembly 13
-    (assembly, [| "-u"; "()" |]) |> yields ""
-    (assembly, [| "-u"; "42" |]) |> fails
+    let given = test 13
+    given ["-u"; "()"] |> yields ""
+    given ["-u"; "42"] |> fails
