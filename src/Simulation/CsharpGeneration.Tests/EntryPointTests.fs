@@ -243,17 +243,45 @@ let ``Accepts Unit`` () =
     given ["-u"; "42"] |> fails
 
 
+// Multiple Options
+
+[<Fact>]
+let ``Accepts two options`` () =
+    let given = test 14
+    given ["-n"; "7"; "-b"; "true"] |> yields "7 True"
+    given ["-b"; "true"; "-n"; "7"] |> yields "7 True"
+
+[<Fact>]
+let ``Accepts three options`` () =
+    let given = test 15
+    given ["-n"; "7"; "-b"; "true"; "--xs"; "foo"] |> yields "7 True [foo]"
+    given ["--xs"; "foo"; "-n"; "7"; "-b"; "true"] |> yields "7 True [foo]"
+    given ["-n"; "7"; "--xs"; "foo"; "-b"; "true"] |> yields "7 True [foo]"
+    given ["-b"; "true"; "-n"; "7"; "--xs"; "foo"] |> yields "7 True [foo]"
+
+[<Fact>]
+let ``Requires all options`` () =
+    let given = test 15
+    given ["-b"; "true"; "--xs"; "foo"] |> fails
+    given ["-n"; "7"; "--xs"; "foo"] |> fails
+    given ["-n"; "7"; "-b"; "true"] |> fails
+    given ["-n"; "7"] |> fails
+    given ["-b"; "true"] |> fails
+    given ["--xs"; "foo"] |> fails
+    given [] |> fails
+
+
 // Name Conversion
 
 [<Fact>]
 let ``Uses kebab-case`` () =
-    let given = test 14
+    let given = test 16
     given ["--camel-case-name"; "foo"] |> yields "foo"
     given ["--camelCaseName"; "foo"] |> fails
 
 [<Fact>]
 let ``Use single-dash short names`` () =
-    let given = test 15
+    let given = test 17
     given ["-x"; "foo"] |> yields "foo"
     given ["--x"; "foo"] |> fails
 
@@ -262,17 +290,17 @@ let ``Use single-dash short names`` () =
 
 [<Fact>]
 let ``Shadows --simulator`` () =
-    let given = test 16
+    let given = test 18
     given ["--simulator"; "foo"] |> yields "foo"
 
 [<Fact>]
 let ``Shadows -s`` () =
-    let given = test 17
+    let given = test 19
     given ["-s"; "foo"] |> yields "foo"
 
 [<Fact>]
 let ``Shadows version`` () =
-    let given = test 18
+    let given = test 20
     given ["--version"; "foo"] |> yields "foo"
 
 
@@ -298,7 +326,7 @@ Options:
 Commands:
   simulate    (default) Run the program using a local simulator."
 
-    let given = test 19
+    let given = test 21
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message

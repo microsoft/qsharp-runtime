@@ -125,6 +125,28 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 // ---
 
 //
+// Multiple Options
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation TwoOptions(n : Int, b : Bool) : String {
+        return $"{n} {b}";
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation ThreeOptions(n : Int, b : Bool, xs : String[]) : String {
+        return $"{n} {b} {xs}";
+    }
+}
+
+// ---
+
+//
 // Name Conversion
 //
 
