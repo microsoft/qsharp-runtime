@@ -59,8 +59,9 @@ let private generateCsharp testNum =
 
 /// The full path to a referenced assembly given its short name.
 let private referencedAssembly name =
+    let delimiter = if Environment.OSVersion.Platform = PlatformID.Win32NT then ';' else ':'
     let path =
-        (AppContext.GetData "TRUSTED_PLATFORM_ASSEMBLIES" :?> string).Split ';'
+        (AppContext.GetData "TRUSTED_PLATFORM_ASSEMBLIES" :?> string).Split delimiter
         |> Seq.tryFind (fun path -> String.Equals (Path.GetFileNameWithoutExtension path, name,
                                                    StringComparison.InvariantCultureIgnoreCase))
     path |> Option.defaultWith (fun () -> failwith (sprintf "Missing reference to assembly '%s'." name))
