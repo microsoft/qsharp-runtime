@@ -12,12 +12,14 @@ open System.Text.RegularExpressions
 open System.Threading.Tasks
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp
+open Microsoft.VisualStudio.LanguageServer.Protocol
+open Xunit
+
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
-open Microsoft.VisualStudio.LanguageServer.Protocol
-open Xunit
+open Microsoft.Quantum.Simulation.Simulators
 
 
 /// The path to the Q# file that provides the Microsoft.Quantum.Core namespace.
@@ -312,15 +314,15 @@ let ``Uses single-dash short names`` () =
 let ``Shadows --simulator`` () =
     let given = test 18
     given ["--simulator"; "foo"] |> yields "foo"
-    given ["--simulator"; "ResourcesEstimator"] |> yields "ResourcesEstimator"
-    given ["-s"; "ResourcesEstimator"; "--simulator"; "foo"] |> fails 
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields AssemblyConstants.ResourcesEstimator
+    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
     given ["-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows -s`` () =
     let given = test 19
     given ["-s"; "foo"] |> yields "foo"
-    given ["--simulator"; "ToffoliSimulator"; "-s"; "foo"] |> yields "foo"
+    given ["--simulator"; AssemblyConstants.ToffoliSimulator; "-s"; "foo"] |> yields "foo"
     given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
@@ -345,17 +347,17 @@ BorrowedWidth   0"
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
     let given = test 3
-    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
     let given = test 3
-    given ["--simulator"; "ToffoliSimulator"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.ToffoliSimulator] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
     let given = test 3
-    given ["--simulator"; "ResourcesEstimator"] |> yields resourceSummary
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
@@ -364,20 +366,20 @@ let ``Rejects unknown simulator`` () =
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 3 "ResourcesEstimator"
+    let given = testWith 3 AssemblyConstants.ResourcesEstimator
     given [] |> yields resourceSummary
-    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 3 "Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator"
+    let given = testWith 3 typeof<ToffoliSimulator>.FullName
     given [] |> yields "Hello, World!"
-    given ["--simulator"; "Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator"] |> yields "Hello, World!"
-    given ["--simulator"; "QuantumSimulator"] |> yields "Hello, World!"
-    given ["--simulator"; "ResourcesEstimator"] |> yields resourceSummary
-    given ["--simulator"; "Microsoft.Quantum.Simulation.Simulators.QuantumSimulator"] |> fails
+    given ["--simulator"; typeof<ToffoliSimulator>.FullName] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields resourceSummary
+    given ["--simulator"; typeof<QuantumSimulator>.FullName] |> fails
 
 
 // Help
