@@ -37,7 +37,7 @@ let private constantsClass =
         ``:`` None ``,`` []
         [``internal``; ``static``]
         ``{``
-            [readonlyProperty "SimulatorOptionAliases" "System.Collections.Generic.IEnumerable<string>"
+            [readonlyProperty "SimulatorOptions" "System.Collections.Generic.IEnumerable<string>"
                 (``new array`` (Some "") [``literal`` ("--" + fst CommandLineArguments.SimulatorOption)
                                           ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])
              constant "QuantumSimulator" "string" (``literal`` AssemblyConstants.QuantumSimulator)

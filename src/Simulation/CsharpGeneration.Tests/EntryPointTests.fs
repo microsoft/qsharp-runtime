@@ -97,7 +97,8 @@ let private compileCsharp (sources : string seq) =
 /// The assembly for the given test case.
 let private testAssembly = generateCsharp >> compileCsharp
 
-/// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output.
+/// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output, errors,
+/// and exit code.
 let private run (assembly : Assembly) (args : string[]) =
     let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".Driver")
     let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
@@ -106,27 +107,28 @@ let private run (assembly : Assembly) (args : string[]) =
     let previousError = Console.Error
 
     CultureInfo.DefaultThreadCurrentCulture <- CultureInfo ("en-US", false)
-    use stream = new StringWriter ()
-    Console.SetOut stream
-    Console.SetError stream
+    use outStream = new StringWriter ()
+    use errorStream = new StringWriter ()
+    Console.SetOut outStream
+    Console.SetError errorStream
     let exitCode = main.Invoke (null, [| args |]) :?> Task<int> |> Async.AwaitTask |> Async.RunSynchronously
     Console.SetError previousError
     Console.SetOut previousOut
     CultureInfo.DefaultThreadCurrentCulture <- previousCulture
 
-    stream.ToString (), exitCode
+    outStream.ToString (), errorStream.ToString (), exitCode
 
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
 /// output.
 let private yields expected (assembly, args) =
-    let output, exitCode = run assembly args
-    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s" exitCode output)
-    Assert.Equal (expected, output.TrimEnd ())
+    let out, error, exitCode = run assembly args
+    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
+    Assert.Equal (expected, out.TrimEnd ())
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
-    let output, exitCode = run assembly args
-    Assert.True (0 <> exitCode, "Expected non-zero exit code, but got 0 with:\n\n" + output)
+    let out, error, exitCode = run assembly args
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
 
 /// A tuple of the test assembly for the given test number, and the given argument string converted into an array.
 let private test testNum =
@@ -295,11 +297,16 @@ let ``Uses single-dash short names`` () =
 let ``Shadows --simulator`` () =
     let given = test 18
     given ["--simulator"; "foo"] |> yields "foo"
+    given ["--simulator"; "ResourcesEstimator"] |> yields "ResourcesEstimator"
+    given ["-s"; "ResourcesEstimator"; "--simulator"; "foo"] |> fails 
+    given ["-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows -s`` () =
     let given = test 19
     given ["-s"; "foo"] |> yields "foo"
+    given ["--simulator"; "ToffoliSimulator"; "-s"; "foo"] |> yields "foo"
+    given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows version`` () =

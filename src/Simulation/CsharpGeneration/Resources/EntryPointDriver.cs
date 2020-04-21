@@ -86,7 +86,7 @@
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             TryCreateOption(
-                Constants.SimulatorOptionAliases,
+                Constants.SimulatorOptions,
                 () => EntryPoint.DefaultSimulator,
                 "The name of the simulator to use.").Then(option =>
                 {
@@ -121,6 +121,7 @@
         /// <returns>The exit code.</returns>
         private static async Task<int> Simulate(EntryPoint entryPoint, string simulator)
         {
+            simulator = DefaultIfShadowed(Constants.SimulatorOptions.First(), simulator, EntryPoint.DefaultSimulator);
             switch (simulator)
             {
                 case Constants.ResourcesEstimator:
@@ -177,8 +178,43 @@
         }
 
         /// <summary>
-        /// Tries to create an option by ignoring aliases that are already in use by the entry point. If all of the
-        /// aliases are in use, the option is not created.
+        /// Returns true if the alias is available for use by the driver (that is, the alias is not already used by an
+        /// entry point option).
+        /// </summary>
+        /// <param name="alias">The alias to check.</param>
+        /// <returns>True if the alias is available for use by the driver.</returns>
+        private static bool IsAliasAvailable(string alias) =>
+            !EntryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
+
+        /// <summary>
+        /// Returns the default value if the alias is shadowed by an entry point option, and the original value
+        /// otherwise.
+        /// </summary>
+        /// <typeparam name="T">The type of the values.</typeparam>
+        /// <param name="alias">The primary option alias corresponding to the value.</param>
+        /// <param name="value">The value of the option given on the command line.</param>
+        /// <param name="defaultValue">The default value for the option.</param>
+        /// <returns></returns>
+        private static T DefaultIfShadowed<T>(string alias, T value, T defaultValue)
+        {
+            if (IsAliasAvailable(alias))
+            {
+                return value;
+            }
+            else
+            {
+                var originalForeground = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Error.WriteLine($"Warning: Option {alias} is overriden by an entry point parameter name.");
+                Console.Error.WriteLine($"         Using default value {defaultValue}.");
+                Console.ForegroundColor = originalForeground;
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Tries to create an option by removing aliases that are already in use by the entry point. If the first
+        /// alias, which is considered the primary alias, is in use, then the option is not created.
         /// </summary>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
         /// <param name="aliases">The option's aliases.</param>
@@ -186,16 +222,11 @@
         /// <param name="description">The option's description.</param>
         /// <returns>The result of trying to create the option.</returns>
         private static Result<Option<T>> TryCreateOption<T>(
-            IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null)
-        {
-            static bool isAliasAvailable(string alias) =>
-                !EntryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
-
-            var validAliases = aliases.Where(isAliasAvailable);
-            return validAliases.Any()
-                ? Result<Option<T>>.Success(new Option<T>(validAliases.ToArray(), getDefaultValue, description))
-                : Result<Option<T>>.Failure();
-        }
+                IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null) =>
+            IsAliasAvailable(aliases.First())
+            ? Result<Option<T>>.Success(
+                new Option<T>(aliases.Where(IsAliasAvailable).ToArray(), getDefaultValue, description))
+            : Result<Option<T>>.Failure();
 
         /// <summary>
         /// Creates an argument parser that will use a default error message if parsing fails.
