@@ -200,6 +200,32 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 // ---
 
 //
+// Simulators
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    open Microsoft.Quantum.Intrinsic;
+
+    @EntryPoint()
+    operation XOrH(useH : Bool) : String {
+        using (q = Qubit()) {
+            if (useH) {
+                H(q);
+            } else {
+                X(q);
+            }
+
+            if (M(q) == One) {
+                X(q);
+            }
+        }
+        return "Hello, World!";
+    }
+}
+
+// ---
+
+//
 // Help
 //
 

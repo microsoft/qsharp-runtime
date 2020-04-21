@@ -25,6 +25,9 @@ open Microsoft.Quantum.Simulation.Simulators
 /// The path to the Q# file that provides the Microsoft.Quantum.Core namespace.
 let private coreFile = Path.Combine ("Circuits", "Core.qs") |> Path.GetFullPath
 
+/// The path to the Q# file that provides the Microsoft.Quantum.Intrinsic namespace.
+let private intrinsicFile = Path.Combine ("Circuits", "Intrinsic.qs") |> Path.GetFullPath
+
 /// The path to the Q# file that contains the test cases.
 let private testFile = Path.Combine ("Circuits", "EntryPointTests.qs") |> Path.GetFullPath
 
@@ -42,6 +45,7 @@ let private compileQsharp source =
 
     use compilationManager = new CompilationUnitManager (isExecutable = true)
     let fileManagers = ImmutableHashSet.Create (fileManager coreFile (File.ReadAllText coreFile),
+                                                fileManager intrinsicFile (File.ReadAllText intrinsicFile),
                                                 fileManager testFile source)
     compilationManager.AddOrUpdateSourceFilesAsync fileManagers |> ignore
     let compilation = compilationManager.Build ()
@@ -336,50 +340,56 @@ let ``Shadows version`` () =
 // The expected output from the resources estimator.
 let private resourceSummary = "Metric          Sum
 CNOT            0
-QubitClifford   0
+QubitClifford   1
 R               0
-Measure         0
+Measure         1
 T               0
 Depth           0
-Width           0
+Width           1
 BorrowedWidth   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 3
-    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
+    let given = test 21
+    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 3
-    given ["--simulator"; AssemblyConstants.ToffoliSimulator] |> yields "Hello, World!"
+    let given = test 21
+    given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 3
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields resourceSummary
+    let given = test 21
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 3
-    given ["--simulator"; "FooSimulator"] |> fails
+    let given = test 21
+    given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 3 AssemblyConstants.ResourcesEstimator
-    given [] |> yields resourceSummary
-    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
+    let given = testWith 21 AssemblyConstants.ResourcesEstimator
+    given ["--use-h"; "false"] |> yields resourceSummary
+    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 3 typeof<ToffoliSimulator>.FullName
-    given [] |> yields "Hello, World!"
-    given ["--simulator"; typeof<ToffoliSimulator>.FullName] |> yields "Hello, World!"
-    given ["--simulator"; AssemblyConstants.QuantumSimulator] |> yields "Hello, World!"
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields resourceSummary
-    given ["--simulator"; typeof<QuantumSimulator>.FullName] |> fails
+    let given = testWith 21 typeof<ToffoliSimulator>.FullName
+    given ["--use-h"; "false"] |> yields "Hello, World!"
+    given ["--use-h"; "true"] |> fails
+    given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
+    given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "true"] |> fails
+    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
+    given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
 
 // Help
@@ -404,7 +414,7 @@ Options:
 Commands:
   simulate    (default) Run the program using a local simulator."
 
-    let given = test 21
+    let given = test 22
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
