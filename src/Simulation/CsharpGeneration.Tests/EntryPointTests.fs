@@ -100,11 +100,14 @@ let private run (assembly : Assembly) (args : string[]) =
     let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out
+    let previousError = Console.Error
 
     CultureInfo.DefaultThreadCurrentCulture <- CultureInfo ("en-US", false)
     use stream = new StringWriter ()
     Console.SetOut stream
+    Console.SetError stream
     let exitCode = main.Invoke (null, [| args |]) :?> Task<int> |> Async.AwaitTask |> Async.RunSynchronously
+    Console.SetError previousError
     Console.SetOut previousOut
     CultureInfo.DefaultThreadCurrentCulture <- previousCulture
 
@@ -114,13 +117,13 @@ let private run (assembly : Assembly) (args : string[]) =
 /// output.
 let private yields expected (assembly, args) =
     let output, exitCode = run assembly args
-    Assert.Equal (0, exitCode)
+    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s" exitCode output)
     Assert.Equal (expected, output.TrimEnd ())
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
     let output, exitCode = run assembly args
-    Assert.True (0 <> exitCode, "Succeeded unexpectedly:" + Environment.NewLine + output)
+    Assert.True (0 <> exitCode, "Expected non-zero exit code, but got 0 with:\n\n" + output)
 
 /// A tuple of the test assembly for the given test number, and the given argument string converted into an array.
 let test testNum =
@@ -240,6 +243,39 @@ let ``Accepts Unit`` () =
     given ["-u"; "42"] |> fails
 
 
+// Name Conversion
+
+[<Fact>]
+let ``Uses kebab-case`` () =
+    let given = test 14
+    given ["--camel-case-name"; "foo"] |> yields "foo"
+    given ["--camelCaseName"; "foo"] |> fails
+
+[<Fact>]
+let ``Use single-dash short names`` () =
+    let given = test 15
+    given ["-x"; "foo"] |> yields "foo"
+    given ["--x"; "foo"] |> fails
+
+
+// Shadowing
+
+[<Fact>]
+let ``Shadows --simulator`` () =
+    let given = test 16
+    given ["--simulator"; "foo"] |> yields "foo"
+
+[<Fact>]
+let ``Shadows -s`` () =
+    let given = test 17
+    given ["-s"; "foo"] |> yields "foo"
+
+[<Fact>]
+let ``Shadows version`` () =
+    let given = test 18
+    given ["--version"; "foo"] |> yields "foo"
+
+
 // Help
 
 [<Fact>]
@@ -262,7 +298,7 @@ Options:
 Commands:
   simulate    (default) Run the program using a local simulator."
 
-    let given = test 14
+    let given = test 19
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message

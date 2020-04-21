@@ -125,6 +125,59 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 // ---
 
 //
+// Name Conversion
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation CamelCase(camelCaseName : String) : String {
+        return camelCaseName;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation SingleLetter(x : String) : String {
+        return x;
+    }
+}
+
+// ---
+
+//
+// Shadowing
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation ShadowSimulator(simulator : String) : String {
+        return simulator;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation ShadowS(s : String) : String {
+        return s;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation ShadowVersion(version : String) : String {
+        return version;
+    }
+}
+
+// ---
+
+//
 // Help
 //
 
