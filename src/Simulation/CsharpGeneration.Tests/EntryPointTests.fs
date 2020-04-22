@@ -19,6 +19,7 @@ open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
+open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.Simulation.Simulators
 
 
@@ -34,8 +35,11 @@ let private testFile = Path.Combine ("Circuits", "EntryPointTests.qs") |> Path.G
 /// The namespace used for the test cases.
 let private testNamespace = "Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint"
 
-/// The test cases.
-let private tests = File.ReadAllText testFile |> fun text -> text.Split "// ---"
+/// The test case for the given test number.
+let private testCase =
+    File.ReadAllText testFile
+    |> fun text -> text.Split "// ---"
+    |> fun cases num -> cases.[num - 1]
 
 /// Compiles Q# source code into a syntax tree with the list of entry points names.
 let private compileQsharp source =
@@ -56,8 +60,7 @@ let private compileQsharp source =
     compilation.BuiltCompilation.Namespaces, compilation.BuiltCompilation.EntryPoints
 
 /// Generates C# source code for the given test case number and default simulator.
-let private generateCsharp (testNum, defaultSimulator) =
-    let syntaxTree, entryPoints = compileQsharp tests.[testNum - 1]
+let private generateCsharp defaultSimulator (syntaxTree : QsNamespace seq, entryPoints) =
     let assemblyConstants =
         match defaultSimulator with
         | Some simulator -> ImmutableDictionary.Empty.Add (AssemblyConstants.DefaultSimulator, simulator)
@@ -106,8 +109,13 @@ let private compileCsharp (sources : string seq) =
     Assert.Equal (0L, stream.Seek (0L, SeekOrigin.Begin))
     Assembly.Load (stream.ToArray ())
 
-/// The assembly for the given test case.
-let private testAssembly = generateCsharp >> compileCsharp
+/// The assembly for the given test case and default simulator.
+let private testAssembly testNum defaultSimulator =
+    testNum
+    |> testCase
+    |> compileQsharp
+    |> generateCsharp defaultSimulator
+    |> compileCsharp
 
 /// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output, errors,
 /// and exit code.
@@ -147,13 +155,13 @@ let private fails (assembly, args) =
 /// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
 /// or fails.
 let private test testNum =
-    let assembly = testAssembly (testNum, None)
+    let assembly = testAssembly testNum None
     fun args -> assembly, Array.ofList args
 
 /// A tuple of the test assembly and arguments using the given default simulator. The tuple can be passed to yields or
 /// fails.
 let private testWith testNum defaultSimulator =
-    let assembly = testAssembly (testNum, Some defaultSimulator)
+    let assembly = testAssembly testNum (Some defaultSimulator)
     fun args -> assembly, Array.ofList args
 
 
