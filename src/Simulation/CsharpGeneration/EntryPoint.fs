@@ -67,6 +67,7 @@ let rec private parameters context doc = function
 
 /// The custom argument handler for the given Q# type.
 let private argumentHandler =
+    // TODO: Support array types derived from types that need a custom argument handler.
     function
     | UnitType -> Some "UnitArgumentHandler"
     | Result -> Some "ResultArgumentHandler"
