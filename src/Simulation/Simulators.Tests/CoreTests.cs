@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 BorrowingTest.Run(s).Wait();
 
-                var tracer = Tests.OperationsTestHelper.GetTracer<(long, Qubit)>(s);
+                var tracer = OperationsTestHelper.GetTracer<(long, Qubit)>(s);
 
                 var testOne = new System.Action<int, OperationFunctor, (int, Qubit)>((int callsCount, OperationFunctor variant, (int, Qubit) info) =>
                 {
@@ -198,7 +198,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.False(File.Exists("()"));
             }
 
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
+            OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
@@ -233,7 +233,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             }
 
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
+            OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
         }
@@ -241,9 +241,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ZeroQubits()
         {
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
+            OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
-                var tracer = Tests.OperationsTestHelper.GetTracer<string>(s);
+                var tracer = OperationsTestHelper.GetTracer<string>(s);
 
                 ZeroQubitsTest.Run(s).Wait();
 
@@ -254,7 +254,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void InterpolatedStrings()
         {
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
+            OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.InterpolatedStringTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -263,7 +263,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void RandomOperation()
         {
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
+            OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.RandomOperationTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -272,7 +272,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void BigInts()
         {
-            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
+            OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.BigIntTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -300,6 +300,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         [Fact]
         public void InternalCallables() =>
-            Tests.OperationsTestHelper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
+            OperationsTestHelper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
     }
 }
