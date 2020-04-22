@@ -259,13 +259,17 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Allocate(long numToAllocate)
         {
-            IgnorableAssert.Assert(numToAllocate > 0, "Attempt to allocate zero qubits.");
-            if (numToAllocate <= 0)
+            IgnorableAssert.Assert(numToAllocate >= 0, "Attempt to allocate negative number of qubits.");
+            if (numToAllocate < 0)
             {
-                throw new ArgumentException("Attempt to allocate zero qubits.");
+                throw new ArgumentException("Attempt to allocate negative number of qubits.");
+            }
+            else if (numToAllocate == 0)
+            {
+                return QArray<Qubit>.Create(0);
             }
 
-            var result = QArray<Qubit>.Create(numToAllocate); 
+            QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate); 
 
             for (int i = 0; i < numToAllocate; i++)
             {
@@ -324,7 +328,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            foreach (var qubit in qubitsToRelease)
+            foreach (Qubit qubit in qubitsToRelease)
             {
                 this.ReleaseOneQubit(qubit, usedOnlyForBorrowing: false);
             }
@@ -361,7 +365,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            foreach (var qubit in qubitsToDisable)
+            foreach (Qubit qubit in qubitsToDisable)
             {
                 this.DisableOneQubit(qubit);
             }
@@ -412,10 +416,14 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Borrow(long numToBorrow, IEnumerable<Qubit> excludedQubitsSortedById) // Note, excluded could be an array of Ids for efficiency, if it is convenient for compiler.
         {
-            IgnorableAssert.Assert(numToBorrow > 0, "Attempt to borrow zero qubits.");
-            if (numToBorrow <= 0)
+            IgnorableAssert.Assert(numToBorrow >= 0, "Attempt to borrow negative number of qubits.");
+            if (numToBorrow < 0)
             {
-                throw new ArgumentException("Attempt to borrow zero qubits.");
+                throw new ArgumentException("Attempt to borrow negative number of qubits.");
+            }
+            else if (numToBorrow == 0)
+            {
+                return QArray<Qubit>.Create(0);
             }
 
             if (DisableBorrowing)
@@ -427,7 +435,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 excludedQubitsSortedById = new Qubit[0];
             }
 
-            var result = QArray<Qubit>.Create(numToBorrow); 
+            QArray<Qubit> result = QArray<Qubit>.Create(numToBorrow); 
             long numBorrowed = TryBorrow(numToBorrow, result, excludedQubitsSortedById);
 
             if (numBorrowed < numToBorrow)
@@ -513,7 +521,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
 
             long count = 0;
-            foreach (var qubit in qubitsToReturn)
+            foreach (Qubit qubit in qubitsToReturn)
             {
                 if (this.ToBeReleasedAfterReturn(qubit)) 
                 { 
@@ -557,7 +565,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            foreach (var qubit in qubitsToReturn)
+            foreach (Qubit qubit in qubitsToReturn)
             {
                 this.Return(qubit);
             }
