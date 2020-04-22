@@ -32,12 +32,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var exe = Path.Combine(asmPath, "TestExe", "QsharpExe.exe");
 
-            ProcessRunner.Run(exe, "", out StringBuilder output, out var _, out int exitCode, out Exception ex);
+            ProcessRunner.Run(exe, "", out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
             Assert.Equal(1, exitCode);
-            Assert.Contains("NotImplementedException", output.ToString());
+            Assert.Contains("NotImplementedException", error.ToString());
 
-            ProcessRunner.Run(exe, "--simulator QuantumSimulator", out output, out StringBuilder error, out exitCode, out ex);
+            ProcessRunner.Run(exe, "--simulator QuantumSimulator", out var _, out error, out exitCode, out ex);
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
@@ -64,16 +64,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 var tracer = OperationsTestHelper.GetTracer<(long, Qubit)>(s);
 
-                var testOne = new System.Action<int, OperationFunctor, (int, Qubit)>((int callsCount, OperationFunctor variant, (int, Qubit) info) =>
+                var testOne = new Action<int, OperationFunctor, (int, Qubit)>((int callsCount, OperationFunctor variant, (int, Qubit) info) =>
                 {
                     var (available, q) = info;
                     Assert.Equal(callsCount, tracer.Log.GetNumberOfCalls(variant, (available, q)));
                 });
 
-                var testOneBody = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Body, info));
-                var testOneAdjoint = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Adjoint, info));
-                var testOneCtrl = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Controlled, info));
-                var testOneCtrlAdj = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.ControlledAdjoint, info));
+                var testOneBody = new Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Body, info));
+                var testOneAdjoint = new Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Adjoint, info));
+                var testOneCtrl = new Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Controlled, info));
+                var testOneCtrlAdj = new Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.ControlledAdjoint, info));
 
                 testOneBody(6, (0, q5));
                 testOneBody(6, (0, q6));

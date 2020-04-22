@@ -33,7 +33,7 @@
     <ItemGroup>
       <_ExeFiles Include="$(OutputPath)*" />
     </ItemGroup>
-    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(_ExeDir)" ContinueOnError="true" />
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(_ExeDir)" ContinueOnError="false" />
   </Target>
 
 </Project>

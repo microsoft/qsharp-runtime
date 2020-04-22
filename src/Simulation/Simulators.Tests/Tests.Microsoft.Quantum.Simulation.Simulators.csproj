@@ -43,7 +43,7 @@
       <_ExeFiles Include="$(_ExeDir)*" />
     </ItemGroup>
     <MakeDir Directories="$(OutputPath)TestExe" />    
-    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="true" />
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
   </Target>
 
 </Project>
