@@ -12,8 +12,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestProjects\**" />
+    <EmbeddedResource Remove="TestProjects\**" />
+    <QsharpCompile Remove="TestProjects\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />  
+    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +33,18 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-  </ItemGroup>
+  </ItemGroup>  
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ExeFiles Include="$(_ExeDir)*" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutputPath)TestExe" />    
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="true" />
+  </Target>
 
 </Project>
 

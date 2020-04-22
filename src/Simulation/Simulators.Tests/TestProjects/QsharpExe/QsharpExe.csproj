@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.10.2004.1717-alpha">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- we will provide our own -->
+    <CsharpGeneration>false</CsharpGeneration>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <DefaultSimulator>ToffoliSimulator</DefaultSimulator>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulation.Simulators.csproj" />
+  </ItemGroup>
+
+  <Target Name="BeforeCsharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <_ExeDir>$(MSBuildThisFileDirectory)built</_ExeDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <FilesToRemove Include="$(_ExeDir)**" />
+    </ItemGroup>
+    <Delete Files="@(_ExeDir)" />
+    <MakeDir Directories="$(_ExeDir)" />
+    <ItemGroup>
+      <_ExeFiles Include="$(OutputPath)*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(_ExeDir)" ContinueOnError="true" />
+  </Target>
+
+</Project>
+

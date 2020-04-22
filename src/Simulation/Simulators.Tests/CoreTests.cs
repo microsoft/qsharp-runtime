@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Reflection;
+using System.Text;
+using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
@@ -14,8 +17,6 @@ using Xunit.Abstractions;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
-    using Helper = Microsoft.Quantum.Simulation.Simulators.Tests.OperationsTestHelper;
-
     public class CoreTests
     {
         private readonly ITestOutputHelper output;
@@ -26,9 +27,26 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void BasicExecution()
+        {
+            var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var exe = Path.Combine(asmPath, "TestExe", "QsharpExe.exe");
+
+            ProcessRunner.Run(exe, "", out StringBuilder output, out var _, out int exitCode, out Exception ex);
+            Assert.Null(ex);
+            Assert.Equal(1, exitCode);
+            Assert.Contains("NotImplementedException", output.ToString());
+
+            ProcessRunner.Run(exe, "--simulator QuantumSimulator", out output, out StringBuilder error, out exitCode, out ex);
+            Assert.Null(ex);
+            Assert.Equal(0, exitCode);
+            Assert.Empty(error.ToString().Trim());
+        }
+
+        [Fact]
         public void Borrowing()
         {
-            Helper.RunWithMultipleSimulators((s) =>
+            OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 var tracker = new StartTracker(s);
 
@@ -44,18 +62,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 BorrowingTest.Run(s).Wait();
 
-                var tracer = Helper.GetTracer<(long, Qubit)>(s);
+                var tracer = Tests.OperationsTestHelper.GetTracer<(long, Qubit)>(s);
 
-                var testOne = new System.Action<int, OperationFunctor, (int, Qubit)>((callsCount, variant, info) =>
+                var testOne = new System.Action<int, OperationFunctor, (int, Qubit)>((int callsCount, OperationFunctor variant, (int, Qubit) info) =>
                 {
                     var (available, q) = info;
                     Assert.Equal(callsCount, tracer.Log.GetNumberOfCalls(variant, (available, q)));
                 });
 
-                var testOneBody = new System.Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Body, info));
-                var testOneAdjoint = new System.Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Adjoint, info));
-                var testOneCtrl = new System.Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.Controlled, info));
-                var testOneCtrlAdj = new System.Action<int, (int, Qubit)>((callsCount, info) => testOne(callsCount, OperationFunctor.ControlledAdjoint, info));
+                var testOneBody = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Body, info));
+                var testOneAdjoint = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Adjoint, info));
+                var testOneCtrl = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.Controlled, info));
+                var testOneCtrlAdj = new System.Action<int, (int, Qubit)>((int callsCount, (int, Qubit) info) => testOne(callsCount, OperationFunctor.ControlledAdjoint, info));
 
                 testOneBody(6, (0, q5));
                 testOneBody(6, (0, q6));
@@ -180,7 +198,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.False(File.Exists("()"));
             }
 
-            Helper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
@@ -215,7 +233,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             }
 
-            Helper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
         }
@@ -223,9 +241,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ZeroQubits()
         {
-            Helper.RunWithMultipleSimulators((s) =>
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
-                var tracer = Helper.GetTracer<string>(s);
+                var tracer = Tests.OperationsTestHelper.GetTracer<string>(s);
 
                 ZeroQubitsTest.Run(s).Wait();
 
@@ -236,7 +254,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void InterpolatedStrings()
         {
-            Helper.RunWithMultipleSimulators((s) =>
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.InterpolatedStringTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -245,7 +263,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void RandomOperation()
         {
-            Helper.RunWithMultipleSimulators((s) =>
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.RandomOperationTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -254,7 +272,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void BigInts()
         {
-            Helper.RunWithMultipleSimulators((s) =>
+            Tests.OperationsTestHelper.RunWithMultipleSimulators((s) =>
             {
                 Circuits.BigIntTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
@@ -282,6 +300,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         [Fact]
         public void InternalCallables() =>
-            Helper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
+            Tests.OperationsTestHelper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
     }
 }
