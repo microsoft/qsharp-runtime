@@ -30,14 +30,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void BasicExecution()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestExe", "QsharpExe.exe");
+            var exe = Path.Combine(asmPath, "TestExe", "QsharpExe.dll");
 
-            ProcessRunner.Run(exe, "", out var _, out StringBuilder error, out int exitCode, out Exception ex);
+            ProcessRunner.Run("dotnet", exe, out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
             Assert.Equal(1, exitCode);
             Assert.Contains("NotImplementedException", error.ToString());
 
-            ProcessRunner.Run(exe, "--simulator QuantumSimulator", out var _, out error, out exitCode, out ex);
+            ProcessRunner.Run("dotnet", $"{exe} --simulator QuantumSimulator", out var _, out error, out exitCode, out ex);
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
