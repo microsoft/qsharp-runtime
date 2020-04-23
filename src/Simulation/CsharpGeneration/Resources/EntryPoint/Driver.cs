@@ -10,6 +10,7 @@
     using System.CommandLine.Help;
     using System.CommandLine.Invocation;
     using System.CommandLine.Parsing;
+    using System.ComponentModel;
     using System.Linq;
     using System.Numerics;
     using System.Threading.Tasks;
@@ -20,62 +21,19 @@
     internal static class Driver
     {
         /// <summary>
-        /// The argument handler for the Q# Unit type.
+        /// A modification of the command line <see cref="HelpBuilder"/> class.
         /// </summary>
-        internal static Argument<QVoid> UnitArgumentHandler
+        private class QsHelpBuilder : HelpBuilder
         {
-            get
+            public QsHelpBuilder(IConsole console) : base(console) { }
+
+            protected override string ArgumentDescriptor(IArgument argument)
             {
-                var arg = new Argument<QVoid>(CreateArgumentParser(value =>
-                    value.Trim() == QVoid.Instance.ToString() ? (true, QVoid.Instance) : (false, default)));
-                arg.AddSuggestions(new[] { QVoid.Instance.ToString() });
-                return arg;
+                // Hide long argument descriptors.
+                var descriptor = base.ArgumentDescriptor(argument);
+                return descriptor.Length > 30 ? argument.Name : descriptor;
             }
         }
-
-        /// <summary>
-        /// The argument handler for the Q# Result type.
-        /// </summary>
-        internal static Argument<Result> ResultArgumentHandler
-        {
-            get
-            {
-                var arg = new Argument<Result>(CreateArgumentParser(value =>
-                    Enum.TryParse(value, ignoreCase: true, out ResultValue result) ? result switch
-                    {
-                        ResultValue.Zero => (true, Result.Zero),
-                        ResultValue.One => (true, Result.One),
-                        _ => (false, default)
-                    } : (false, default)));
-                arg.AddSuggestions(new[] { ResultValue.Zero.ToString(), ResultValue.One.ToString() });
-                return arg;
-            }
-        }
-
-        /// <summary>
-        /// The argument handler for the Q# BigInt type.
-        /// </summary>
-        internal static Argument<BigInteger> BigIntArgumentHandler => new Argument<BigInteger>(
-            CreateArgumentParser(value =>
-                BigInteger.TryParse(value, out var result) ? (true, result) : (false, default)));
-
-        /// <summary>
-        /// The argument handler for the Q# Range type.
-        /// </summary>
-        internal static Argument<QRange> RangeArgumentHandler => new Argument<QRange>(result =>
-        {
-            var option = ((OptionResult)result.Parent).Token.Value;
-            var value = result.Tokens.Single().Value;
-            var range = ParseRangeFromEnumerable(option, value, value.Split(".."));
-            if (range.IsFailure)
-            {
-                result.ErrorMessage = range.ErrorMessage;
-            }
-            return range.ValueOrDefault;
-        })
-        {
-            Arity = ArgumentArity.ExactlyOne
-        };
 
         /// <summary>
         /// Runs the entry point.
@@ -106,11 +64,23 @@
             foreach (var option in simulate.Options) { root.AddOption(option); }
             root.Handler = simulate.Handler;
 
+            RegisterTypeConverters();
             return await new CommandLineBuilder(root)
                 .UseDefaults()
                 .UseHelpBuilder(context => new QsHelpBuilder(context.Console))
                 .Build()
                 .InvokeAsync(args);
+        }
+
+        /// <summary>
+        /// Registers type converters for Q# argument types.
+        /// </summary>
+        private static void RegisterTypeConverters()
+        {
+            TypeDescriptor.AddAttributes(typeof(BigInteger), new TypeConverterAttribute(typeof(BigIntegerConverter)));
+            TypeDescriptor.AddAttributes(typeof(QRange), new TypeConverterAttribute(typeof(QRangeConverter)));
+            TypeDescriptor.AddAttributes(typeof(QVoid), new TypeConverterAttribute(typeof(QVoidConverter)));
+            TypeDescriptor.AddAttributes(typeof(Result), new TypeConverterAttribute(typeof(ResultConverter)));
         }
 
         /// <summary>
@@ -229,52 +199,6 @@
             : Result<Option<T>>.Failure();
 
         /// <summary>
-        /// Creates an argument parser that will use a default error message if parsing fails.
-        /// </summary>
-        /// <typeparam name="T">The type of the argument.</typeparam>
-        /// <param name="parse">
-        /// A function that takes the argument as a string and returns the parsed value and a boolean to indicate
-        /// whether parsing succeeded.
-        /// </param>
-        /// <returns>An argument parser.</returns>
-        private static ParseArgument<T> CreateArgumentParser<T>(Func<string, (bool, T)> parse) => result =>
-        {
-            var (success, value) = parse(result.Tokens.Single().Value);
-            if (!success)
-            {
-                result.ErrorMessage = GetArgumentErrorMessage(
-                    ((OptionResult)result.Parent).Token.Value, result.Tokens.Single().Value, typeof(T));
-            }
-            return value;
-        };
-
-        /// <summary>
-        /// Parses a Q# range from an enumerable of strings, where the items are start and end or start, step, and end.
-        /// </summary>
-        /// <param name="option">The name of the option being parsed.</param>
-        /// <param name="arg">The argument string for the option.</param>
-        /// <param name="items">The items in the argument.</param>
-        /// <returns>The result of parsing the strings.</returns>
-        private static Result<QRange> ParseRangeFromEnumerable(string option, string arg, IEnumerable<string> items) =>
-            items.Select(item => TryParseLong(option, item)).Sequence().Bind(values =>
-                values.Count() == 2
-                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
-                : values.Count() == 3
-                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : Result<QRange>.Failure(GetArgumentErrorMessage(option, arg, typeof(QRange))));
-
-        /// <summary>
-        /// Parses a long from a string.
-        /// </summary>
-        /// <param name="option">The name of the option being parsed.</param>
-        /// <param name="str">The string to parse.</param>
-        /// <returns>The result of parsing the string.</returns>
-        private static Result<long> TryParseLong(string option, string str) =>
-            long.TryParse(str, out var result)
-            ? Result<long>.Success(result)
-            : Result<long>.Failure(GetArgumentErrorMessage(option, str, typeof(long)));
-
-        /// <summary>
         /// Returns an error message string for an argument parser.
         /// </summary>
         /// <param name="option">The name of the option.</param>
@@ -301,94 +225,6 @@
             Console.Error.WriteLine("<PropertyGroup>");
             Console.Error.WriteLine($"  <DefaultSimulator>{name}</DefaultSimulator>");
             Console.Error.WriteLine("</PropertyGroup>");
-        }
-    }
-
-    /// <summary>
-    /// A modification of the command line <see cref="HelpBuilder"/> class.
-    /// </summary>
-    internal class QsHelpBuilder : HelpBuilder
-    {
-        public QsHelpBuilder(IConsole console) : base(console) { }
-
-        protected override string ArgumentDescriptor(IArgument argument)
-        {
-            // Hide long argument descriptors.
-            var descriptor = base.ArgumentDescriptor(argument);
-            return descriptor.Length > 30 ? argument.Name : descriptor;
-        }
-    }
-
-    /// <summary>
-    /// The result of a process that can either succeed or fail.
-    /// </summary>
-    /// <typeparam name="T">The type of the result value.</typeparam>
-    internal struct Result<T>
-    {
-        public bool IsSuccess { get; }
-        public bool IsFailure { get => !IsSuccess; }
-        public T Value { get => IsSuccess ? ValueOrDefault : throw new InvalidOperationException(); }
-        public T ValueOrDefault { get; }
-        public string ErrorMessage { get; }
-
-        private Result(bool isSuccess, T value, string errorMessage)
-        {
-            IsSuccess = isSuccess;
-            ValueOrDefault = value;
-            ErrorMessage = errorMessage;
-        }
-
-        public static Result<T> Success(T value) => new Result<T>(true, value, default);
-
-        public static Result<T> Failure(string errorMessage = null) => new Result<T>(false, default, errorMessage);
-    }
-
-    /// <summary>
-    /// Extension methods for <see cref="Result{T}"/>.
-    /// </summary>
-    internal static class ResultExtensions
-    {
-        /// <summary>
-        /// Sequentially composes two results, passing the value of the first result to another result-producing
-        /// function if the first result is a success.
-        /// </summary>
-        /// <typeparam name="T">The type of the first result value.</typeparam>
-        /// <typeparam name="U">The type of the second result value.</typeparam>
-        /// <param name="result">The first result.</param>
-        /// <param name="bind">A function that takes the value of the first result and returns a second result.</param>
-        /// <returns>
-        /// The first result if the first result is a failure; otherwise, the result of calling the bind function on the
-        /// first result's value.
-        /// </returns>
-        internal static Result<U> Bind<T, U>(this Result<T> result, Func<T, Result<U>> bind) =>
-            result.IsFailure ? Result<U>.Failure(result.ErrorMessage) : bind(result.Value);
-
-        /// <summary>
-        /// Converts an enumerable of results into a result of an enumerable.
-        /// </summary>
-        /// <typeparam name="T">The type of the result values.</typeparam>
-        /// <param name="results">The results to sequence.</param>
-        /// <returns>
-        /// A result that contains an enumerable of the result values if all of the results are a success, or the first
-        /// error message if one of the results is a failure.
-        /// </returns>
-        internal static Result<IEnumerable<T>> Sequence<T>(this IEnumerable<Result<T>> results) =>
-            results.All(result => result.IsSuccess)
-            ? Result<IEnumerable<T>>.Success(results.Select(results => results.Value))
-            : Result<IEnumerable<T>>.Failure(results.First(results => results.IsFailure).ErrorMessage);
-
-        /// <summary>
-        /// Calls the action on the result value if the result is a success.
-        /// </summary>
-        /// <typeparam name="T">The type of the result value.</typeparam>
-        /// <param name="result">The result.</param>
-        /// <param name="onSuccess">The action to call if the result is a success.</param>
-        internal static void Then<T>(this Result<T> result, Action<T> onSuccess)
-        {
-            if (result.IsSuccess)
-            {
-                onSuccess(result.Value);
-            }
         }
     }
 }

@@ -66,15 +66,20 @@ let rec private parameters context doc = function
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
 
 /// The custom argument handler for the given Q# type.
-let private argumentHandler =
-    // TODO: Support array types derived from types that need a custom argument handler.
-    function
-    | UnitType -> Some "UnitArgumentHandler"
-    | Result -> Some "ResultArgumentHandler"
-    | BigInt -> Some "BigIntArgumentHandler"
-    | Range -> Some "RangeArgumentHandler"
-    | _ -> None
-    >> Option.map (fun handler -> ``ident`` "Driver" <|.|> ``ident`` handler)
+let private argumentHandler qsType typeName =
+    let rec suggestions = function
+        | ArrayType (itemType : ResolvedType) -> suggestions itemType.Resolution
+        | Result -> ["Zero"; "One"]
+        | _ -> []
+
+    match suggestions qsType with
+    | [] -> None
+    | suggestions ->
+        let args = List.concat [
+            [``new`` (``type`` (sprintf "System.CommandLine.Argument<%s>" typeName)) ``(`` [] ``)``]
+            List.map ``literal`` suggestions
+        ]
+        ``invoke`` (``ident`` "System.CommandLine.ArgumentExtensions.WithSuggestions") ``(`` args ``)`` |> Some
 
 /// A property containing a sequence of command-line options corresponding to each parameter given.
 let private parameterOptionsProperty parameters =
@@ -87,7 +92,7 @@ let private parameterOptionsProperty parameters =
             then ``literal`` ("-" + name)
             else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
         let members =
-            argumentHandler qsType.Resolution
+            argumentHandler qsType.Resolution typeName
             |> Option.map (fun handler -> ``ident`` "Argument" <-- handler :> ExpressionSyntax)
             |> Option.toList
             |> List.append [``ident`` "Required" <-- ``true``]
@@ -196,10 +201,16 @@ let private generatedClasses context (entryPoint : QsCallable) =
 
 /// The source code for the entry point driver.
 let private driver (entryPoint : QsCallable) =
-    let name = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPointDriver.cs"
-    use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream name
-    use reader = new StreamReader(stream)
-    reader.ReadToEnd().Replace("@Namespace", generatedNamespace entryPoint.FullName.Namespace.Value)
+    let source fileName =
+        let resourceName = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPoint." + fileName
+        use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream resourceName
+        use reader = new StreamReader(stream)
+        reader.ReadToEnd().Replace("@Namespace", generatedNamespace entryPoint.FullName.Namespace.Value)
+
+    String.Join (Environment.NewLine,
+                 source "Converters.cs",
+                 source "Driver.cs",
+                 source "Result.cs")
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =

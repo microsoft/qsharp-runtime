@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\EntryPointDriver.cs" />
+    <EmbeddedResource Include="Resources\EntryPoint\Converters.cs" />
+    <EmbeddedResource Include="Resources\EntryPoint\Driver.cs" />
+    <EmbeddedResource Include="Resources\EntryPoint\Result.cs" />
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Context.fs" />
@@ -29,5 +31,5 @@
   <ItemGroup>
     <ProjectReference Include="..\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj" />
   </ItemGroup>
-  
+
 </Project>
