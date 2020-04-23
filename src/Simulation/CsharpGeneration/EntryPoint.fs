@@ -40,9 +40,9 @@ let private constantsClass =
             [readonlyProperty "SimulatorOptions" "System.Collections.Generic.IEnumerable<string>"
                 (``new array`` (Some "") [``literal`` ("--" + fst CommandLineArguments.SimulatorOption)
                                           ``literal`` ("-" + snd CommandLineArguments.SimulatorOption)])
-             constant "QuantumSimulator" "string" (``literal`` AssemblyConstants.QuantumSimulator)
-             constant "ToffoliSimulator" "string" (``literal`` AssemblyConstants.ToffoliSimulator)
-             constant "ResourcesEstimator" "string" (``literal`` AssemblyConstants.ResourcesEstimator)]
+             constant AssemblyConstants.QuantumSimulator "string" (``literal`` AssemblyConstants.QuantumSimulator)
+             constant AssemblyConstants.ToffoliSimulator "string" (``literal`` AssemblyConstants.ToffoliSimulator)
+             constant AssemblyConstants.ResourcesEstimator "string" (``literal`` AssemblyConstants.ResourcesEstimator)]
         ``}``
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
@@ -139,10 +139,11 @@ let private runMethod context (entryPoint : QsCallable) =
 /// A method that creates an instance of the default simulator if it is a custom simulator.
 let private customSimulatorFactory name =
     let expr : ExpressionSyntax =
-        match name with
-        | "QuantumSimulator" | "ToffoliSimulator" | "ResourcesEstimator" ->
-            upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
-        | _ -> ``new`` (``type`` name) ``(`` [] ``)``
+        if name = AssemblyConstants.QuantumSimulator ||
+           name = AssemblyConstants.ToffoliSimulator ||
+           name = AssemblyConstants.ResourcesEstimator 
+        then upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
+        else ``new`` (``type`` name) ``(`` [] ``)``
     ``arrow_method`` "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
         ``(`` [] ``)``
         [``public``; ``static``]
@@ -153,10 +154,10 @@ let private adapterClass context (entryPoint : QsCallable) =
     let summaryProperty =
         readonlyProperty "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
-        context.assemblyConstants.TryGetValue "DefaultSimulator"
+        context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
-        |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
-    let defaultSimulatorProperty = readonlyProperty "DefaultSimulator" "string" (``literal`` defaultSimulator)
+        |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
+    let defaultSimulatorProperty = readonlyProperty AssemblyConstants.DefaultSimulator "string" (``literal`` defaultSimulator)
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
 
     let members : seq<MemberDeclarationSyntax> =
