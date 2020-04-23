@@ -185,16 +185,6 @@
             : Result<Option<T>>.Failure();
 
         /// <summary>
-        /// Returns an error message string for an argument parser.
-        /// </summary>
-        /// <param name="option">The name of the option.</param>
-        /// <param name="arg">The value of the argument being parsed.</param>
-        /// <param name="type">The expected type of the argument.</param>
-        /// <returns>An error message string for an argument parser.</returns>
-        private static string GetArgumentErrorMessage(string option, string arg, Type type) =>
-            $"Cannot parse argument '{arg}' for option '{option}' as expected type {type}.";
-
-        /// <summary>
         /// Displays an error message for using a non-default custom simulator.
         /// </summary>
         /// <param name="name">The name of the custom simulator.</param>

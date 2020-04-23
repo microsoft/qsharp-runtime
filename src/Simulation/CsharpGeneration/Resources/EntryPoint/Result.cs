@@ -34,6 +34,21 @@
     internal static class ResultExtensions
     {
         /// <summary>
+        /// Sequentially composes two results, passing the value of the first result to another result-producing
+        /// function if the first result is a success.
+        /// </summary>
+        /// <typeparam name="T">The type of the first result value.</typeparam>
+        /// <typeparam name="U">The type of the second result value.</typeparam>
+        /// <param name="result">The first result.</param>
+        /// <param name="bind">A function that takes the value of the first result and returns a second result.</param>
+        /// <returns>
+        /// The first result if the first result is a failure; otherwise, the result of calling the bind function on the
+        /// first result's value.
+        /// </returns>
+        internal static Result<U> Bind<T, U>(this Result<T> result, Func<T, Result<U>> bind) =>
+            result.IsFailure ? Result<U>.Failure(result.ErrorMessage) : bind(result.Value);
+
+        /// <summary>
         /// Converts an enumerable of results into a result of an enumerable.
         /// </summary>
         /// <typeparam name="T">The type of the result values.</typeparam>
