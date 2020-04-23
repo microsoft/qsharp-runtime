@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 open System
 open System.Collections.Generic
 open System.IO
+open Microsoft.CodeAnalysis
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
@@ -16,20 +17,30 @@ open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 
 type Emitter() =
 
-    let _AssemblyConstants = new Dictionary<string, string>()
+    let _AssemblyConstants = new Dictionary<_, _>()
+    let mutable _Diagnostics = []
 
     interface IRewriteStep with
 
         member this.Name = "CsharpGeneration"
         member this.Priority = -1 // doesn't matter because this rewrite step is the only one in the dll
-        member this.AssemblyConstants = _AssemblyConstants :> IDictionary<string, string> 
-        member this.GeneratedDiagnostics = null
+        member this.AssemblyConstants = upcast _AssemblyConstants
+        member this.GeneratedDiagnostics = upcast _Diagnostics
         
-        member this.ImplementsPreconditionVerification = false
+        member this.ImplementsPreconditionVerification = true
         member this.ImplementsPostconditionVerification = false
         member this.ImplementsTransformation = true
 
-        member this.PreconditionVerification _ = NotImplementedException() |> raise
+        member this.PreconditionVerification compilation =
+            if compilation.EntryPoints.Length > 1 then
+                _Diagnostics <- IRewriteStep.Diagnostic
+                    (Message = "C# generation is not possible because there is more than one entry point.",
+                     Severity = DiagnosticSeverity.Error,
+                     Stage = IRewriteStep.Stage.PreconditionVerification) :: _Diagnostics
+                false
+            else
+                true
+
         member this.PostconditionVerification _ = NotImplementedException() |> raise
         
         member this.Transformation (compilation, transformed) = 
@@ -54,7 +65,10 @@ type Emitter() =
                 let content = SimulationCode.loadedViaTestNames source context
                 if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
+            if not compilation.EntryPoints.IsEmpty then
+                let callable = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
+                let content = EntryPoint.generate context callable
+                CompilationLoader.GeneratedFile(callable.SourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
+
             transformed <- compilation
             true
-
-

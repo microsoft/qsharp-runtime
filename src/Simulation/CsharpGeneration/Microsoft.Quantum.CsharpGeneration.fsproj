@@ -8,10 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\EntryPointDriver.cs" />
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="SimulationCode.fs" />
+    <Compile Include="EntryPoint.fs" />
     <Compile Include="RewriteStep.fs" />
   </ItemGroup>
 
@@ -21,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2003.2501-alpha" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2004.1717-alpha" />
   </ItemGroup>
 
   <ItemGroup>
