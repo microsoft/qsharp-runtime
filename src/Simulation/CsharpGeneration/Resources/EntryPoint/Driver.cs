@@ -21,7 +21,7 @@
         /// <summary>
         /// A modification of the command line <see cref="HelpBuilder"/> class.
         /// </summary>
-        private class QsHelpBuilder : HelpBuilder
+        private sealed class QsHelpBuilder : HelpBuilder
         {
             public QsHelpBuilder(IConsole console) : base(console) { }
 

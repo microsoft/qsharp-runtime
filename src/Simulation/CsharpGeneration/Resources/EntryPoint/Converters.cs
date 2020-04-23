@@ -42,7 +42,7 @@
     /// <summary>
     /// Converts a string to a <see cref="BigInteger"/>.
     /// </summary>
-    internal class BigIntegerConverter : ConversionResult<BigInteger>
+    internal sealed class BigIntegerConverter : ConversionResult<BigInteger>
     {
         public BigIntegerConverter(string value)
         {
@@ -54,7 +54,7 @@
     /// <summary>
     /// Converts a string to a <see cref="QRange"/>.
     /// </summary>
-    internal class QRangeConverter : ConversionResult<QRange>
+    internal sealed class QRangeConverter : ConversionResult<QRange>
     {
         public QRangeConverter(string value)
         {
@@ -85,7 +85,7 @@
     /// <summary>
     /// Converts a string to <see cref="QVoid"/>.
     /// </summary>
-    internal class QVoidConverter : ConversionResult<QVoid>
+    internal sealed class QVoidConverter : ConversionResult<QVoid>
     {
         public QVoidConverter(string value)
         {
@@ -97,7 +97,7 @@
     /// <summary>
     /// Converts a string to a <see cref="Result"/>.
     /// </summary>
-    internal class ResultConverter : ConversionResult<Result>
+    internal sealed class ResultConverter : ConversionResult<Result>
     {
         public ResultConverter(string value)
         {
