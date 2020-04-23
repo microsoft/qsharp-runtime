@@ -65,16 +65,16 @@
         internal static Argument<QRange> RangeArgumentHandler => new Argument<QRange>(result =>
         {
             var option = ((OptionResult)result.Parent).Token.Value;
-            var value = string.Join(' ', result.Tokens.Select(token => token.Value));
-            return new[]
+            var value = result.Tokens.Single().Value;
+            var range = ParseRangeFromEnumerable(option, value, value.Split(".."));
+            if (range.IsFailure)
             {
-                ParseRangeFromEnumerable(option, value, result.Tokens.Select(token => token.Value)),
-                ParseRangeFromEnumerable(option, value, value.Split(".."))
+                result.ErrorMessage = range.ErrorMessage;
             }
-            .Choose(errors => result.ErrorMessage = string.Join('\n', errors.Distinct()));
+            return range.ValueOrDefault;
         })
         {
-            Arity = ArgumentArity.OneOrMore
+            Arity = ArgumentArity.ExactlyOne
         };
 
         /// <summary>
@@ -326,14 +326,15 @@
     internal struct Result<T>
     {
         public bool IsSuccess { get; }
-        public T Value { get; }
         public bool IsFailure { get => !IsSuccess; }
+        public T Value { get => IsSuccess ? ValueOrDefault : throw new InvalidOperationException(); }
+        public T ValueOrDefault { get; }
         public string ErrorMessage { get; }
 
         private Result(bool isSuccess, T value, string errorMessage)
         {
             IsSuccess = isSuccess;
-            Value = value;
+            ValueOrDefault = value;
             ErrorMessage = errorMessage;
         }
 
@@ -387,30 +388,6 @@
             if (result.IsSuccess)
             {
                 onSuccess(result.Value);
-            }
-        }
-
-        /// <summary>
-        /// Chooses the first successful result out of an enumerable of results.
-        /// </summary>
-        /// <typeparam name="T">The type of the result values.</typeparam>
-        /// <param name="results">The results to choose from.</param>
-        /// <param name="onError">
-        /// The action to call with an enumerable of error messages if all of the results are failures.
-        /// </param>
-        /// <returns>
-        /// The value of the first successful result, or default if none of the results were successful.
-        /// </returns>
-        internal static T Choose<T>(this IEnumerable<Result<T>> results, Action<IEnumerable<string>> onError)
-        {
-            if (results.Any(result => result.IsSuccess))
-            {
-                return results.First(attempt => attempt.IsSuccess).Value;
-            }
-            else
-            {
-                onError(results.Where(result => result.IsFailure).Select(result => result.ErrorMessage));
-                return default;
             }
         }
     }

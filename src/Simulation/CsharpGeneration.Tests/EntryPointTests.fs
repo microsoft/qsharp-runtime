@@ -243,20 +243,22 @@ let ``Accepts Range`` () =
     given ["-r"; "0..0"] |> yields "0..1..0"
     given ["-r"; "0..1"] |> yields "0..1..1"
     given ["-r"; "0..2..10"] |> yields "0..2..10"
-    given ["-r"; "0"; "..1"] |> yields "0..1..1"
-    given ["-r"; "0.."; "1"] |> yields "0..1..1"
-    given ["-r"; "0"; ".."; "1"] |> yields "0..1..1"
-    given ["-r"; "0"; "..2"; "..10"] |> yields "0..2..10"
-    given ["-r"; "0.."; "2"; "..10"] |> yields "0..2..10"
-    given ["-r"; "0"; ".."; "2"; ".."; "10"] |> yields "0..2..10"
-    given ["-r"; "0"; "1"] |> yields "0..1..1"
-    given ["-r"; "0"; "2"; "10"] |> yields "0..2..10"
+    given ["-r"; "0 ..1"] |> yields "0..1..1"
+    given ["-r"; "0.. 1"] |> yields "0..1..1"
+    given ["-r"; "0 .. 1"] |> yields "0..1..1"
+    given ["-r"; "0 ..2 ..10"] |> yields "0..2..10"
+    given ["-r"; "0.. 2 ..10"] |> yields "0..2..10"
+    given ["-r"; "0 .. 2 .. 10"] |> yields "0..2..10"
+    given ["-r"; "0 1"] |> fails
+    given ["-r"; "0 2 10"] |> fails
+    given ["-r"; "0"; "1"] |> fails
     given ["-r"; "0"] |> fails
     given ["-r"; "0.."] |> fails
     given ["-r"; "0..2.."] |> fails
     given ["-r"; "0..2..3.."] |> fails
     given ["-r"; "0..2..3..4"] |> fails
-    given ["-r"; "0"; "1"; "2"; "3"] |> fails
+    given ["-r"; "0"; ".."; "1"] |> fails
+    given ["-r"; "0..1"; "..2"] |> fails
 
 [<Fact>]
 let ``Accepts String`` () =
