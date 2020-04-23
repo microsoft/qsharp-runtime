@@ -216,7 +216,7 @@ let private driver (entryPoint : QsCallable) =
         use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream resourceName
         use reader = new StreamReader(stream)
         reader.ReadToEnd().Replace("@Namespace", generatedNamespace entryPoint.FullName.Namespace.Value)
-    String.Join (Environment.NewLine, source "Driver.cs", source "Parsers.cs", source "Result.cs")
+    String.Join (Environment.NewLine, source "Driver.cs", source "Parsers.cs", source "Validation.cs")
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let internal generate context entryPoint =

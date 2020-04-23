@@ -8,13 +8,13 @@
     using System.Numerics;
 
     /// <summary>
-    /// A delegate that parses the value and returns the result.
+    /// A delegate that parses the value and returns a validation.
     /// </summary>
     /// <typeparam name="T">The type parsed value.</typeparam>
     /// <param name="value">The string to parse.</param>
     /// <param name="optionName">The name of the option that the value was used with.</param>
-    /// <returns>The result of parsing the value.</returns>
-    internal delegate Result<T> TryParseValue<T>(string value, string optionName = null);
+    /// <returns>A validation of the parsed value.</returns>
+    internal delegate Validation<T> TryParseValue<T>(string value, string optionName = null);
 
     /// <summary>
     /// Parsers for command-line arguments.
@@ -30,12 +30,12 @@
         internal static ParseArgument<IEnumerable<T>> ParseArgumentsWith<T>(TryParseValue<T> parse) => argument =>
         {
             var optionName = ((OptionResult)argument.Parent).Token.Value;
-            var result = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
-            if (result.IsFailure)
+            var validation = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
+            if (validation.IsFailure)
             {
-                argument.ErrorMessage = result.ErrorMessage;
+                argument.ErrorMessage = validation.ErrorMessage;
             }
-            return result.ValueOrDefault;
+            return validation.ValueOrDefault;
         };
 
         /// <summary>
@@ -55,31 +55,31 @@
         /// </summary>
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
-        /// <returns>The parsed result.</returns>
-        internal static Result<BigInteger> TryParseBigInteger(string value, string optionName = null) =>
+        /// <returns>A validation of the parsed <see cref="BigInteger"/>.</returns>
+        internal static Validation<BigInteger> TryParseBigInteger(string value, string optionName = null) =>
             BigInteger.TryParse(value, out var result)
-            ? Result<BigInteger>.Success(result)
-            : Result<BigInteger>.Failure(GetArgumentErrorMessage(value, optionName, typeof(BigInteger)));
+            ? Validation<BigInteger>.Success(result)
+            : Validation<BigInteger>.Failure(GetArgumentErrorMessage(value, optionName, typeof(BigInteger)));
 
         /// <summary>
         /// Parses a <see cref="QRange"/>.
         /// </summary>
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
-        /// <returns>The parsed result.</returns>
-        internal static Result<QRange> TryParseQRange(string value, string optionName = null)
+        /// <returns>A validation of the parsed <see cref="QRange"/>.</returns>
+        internal static Validation<QRange> TryParseQRange(string value, string optionName = null)
         {
-            Result<long> tryParseLong(string longValue) =>
+            Validation<long> tryParseLong(string longValue) =>
                 long.TryParse(longValue, out var result)
-                ? Result<long>.Success(result)
-                : Result<long>.Failure(GetArgumentErrorMessage(longValue, optionName, typeof(long)));
+                ? Validation<long>.Success(result)
+                : Validation<long>.Failure(GetArgumentErrorMessage(longValue, optionName, typeof(long)));
 
             return value.Split("..").Select(tryParseLong).Sequence().Bind(values =>
                 values.Count() == 2
-                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
+                ? Validation<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
                 : values.Count() == 3
-                ? Result<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : Result<QRange>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QRange))));
+                ? Validation<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
+                : Validation<QRange>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QRange))));
         }
 
         /// <summary>
@@ -87,27 +87,27 @@
         /// </summary>
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
-        /// <returns>The parsed result.</returns>
-        internal static Result<QVoid> TryParseQVoid(string value, string optionName = null) =>
+        /// <returns>A validation of the parsed <see cref="QVoid"/>.</returns>
+        internal static Validation<QVoid> TryParseQVoid(string value, string optionName = null) =>
             value.Trim() == QVoid.Instance.ToString()
-            ? Result<QVoid>.Success(QVoid.Instance)
-            : Result<QVoid>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QVoid)));
+            ? Validation<QVoid>.Success(QVoid.Instance)
+            : Validation<QVoid>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QVoid)));
 
         /// <summary>
         /// Parses a <see cref="Result"/>.
         /// </summary>
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
-        /// <returns>The parsed result.</returns>
-        internal static Result<Result> TryParseResult(string value, string optionName = null) =>
+        /// <returns>A validation of the parsed <see cref="Result"/>.</returns>
+        internal static Validation<Result> TryParseResult(string value, string optionName = null) =>
             Enum.TryParse(value, ignoreCase: true, out ResultValue result)
-            ? Result<Result>.Success(result switch
+            ? Validation<Result>.Success(result switch
             {
                 ResultValue.Zero => Result.Zero,
                 ResultValue.One => Result.One,
                 var invalid => throw new Exception($"Invalid result value '{invalid}'.")
             })
-            : Result<Result>.Failure(GetArgumentErrorMessage(value, optionName, typeof(Result)));
+            : Validation<Result>.Failure(GetArgumentErrorMessage(value, optionName, typeof(Result)));
 
         /// <summary>
         /// Returns an error message string for an argument parser.

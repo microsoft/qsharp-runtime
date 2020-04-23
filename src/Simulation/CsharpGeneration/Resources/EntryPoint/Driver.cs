@@ -176,13 +176,13 @@
         /// <param name="aliases">The option's aliases.</param>
         /// <param name="getDefaultValue">A function that returns the option's default value.</param>
         /// <param name="description">The option's description.</param>
-        /// <returns>The result of trying to create the option.</returns>
-        private static Result<Option<T>> TryCreateOption<T>(
+        /// <returns>A validation of the option.</returns>
+        private static Validation<Option<T>> TryCreateOption<T>(
                 IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null) =>
             IsAliasAvailable(aliases.First())
-            ? Result<Option<T>>.Success(
+            ? Validation<Option<T>>.Success(
                 new Option<T>(aliases.Where(IsAliasAvailable).ToArray(), getDefaultValue, description))
-            : Result<Option<T>>.Failure();
+            : Validation<Option<T>>.Failure();
 
         /// <summary>
         /// Displays an error message for using a non-default custom simulator.
