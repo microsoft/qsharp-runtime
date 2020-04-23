@@ -45,24 +45,57 @@ let private constantsClass =
              constant "ResourcesEstimator" "string" (``literal`` AssemblyConstants.ResourcesEstimator)]
         ``}``
 
+/// The name of the C# converter type used for command-line parsing of Q# types.
+let rec private converterName = function
+    | ArrayType (itemType : ResolvedType) -> converterName itemType.Resolution
+    | BigInt -> Some "BigIntegerConverter"
+    | Range -> Some "QRangeConverter"
+    | Result -> Some "ResultConverter"
+    | UnitType -> Some "QVoidConverter"
+    | _ -> None
+
+/// True if the Q# type has a C# converter type.
+let rec private typeHasConverter = converterName >> Option.isSome
+
+/// Adds a validator to the command-line option if the option type uses a custom converter.
+let private withConverterValidator qsType (option : ExpressionSyntax) =
+    match converterName qsType with
+    | Some converter ->
+        let parse = ``() =>`` ["value"] (``new`` (``type`` converter) ``(`` [``ident`` "value"] ``)``)
+        ``invoke`` (``ident`` "ConversionResult.WithValidator") ``(`` [option; upcast parse] ``)``
+    | None -> option
+
+/// The name of the C# type used by the parameter in its command-line option, given its Q# type.
+let rec private parameterCsharpType context (qsType : ResolvedType) =
+    match qsType.Resolution with
+    | ArrayType itemType ->
+        sprintf "System.Collections.Generic.IEnumerable<%s>" (parameterCsharpType context itemType)
+    | _ ->
+        converterName qsType.Resolution
+        |> Option.defaultValue (SimulationCode.roslynTypeName context qsType)
+
+/// Undoes any type conversion that was needed for command-line parsing, so that the argument type is suitable to give
+/// to the Q# entry point.
+let rec private unconvertArgument context qsType (arg : ExpressionSyntax) =
+    match qsType with
+    | ArrayType itemType ->
+        let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
+        let unconverter = ``() =>`` ["value"] (unconvertArgument context itemType.Resolution (``ident`` "value"))
+        ``new`` (``type`` arrayTypeName) ``(``
+            [``invoke`` (``ident`` "System.Linq.Enumerable.Select") ``(`` [arg; upcast unconverter] ``)``] ``)``
+    | _ when typeHasConverter qsType -> arg <|.|> ``ident`` "ValueOrDefault"
+    | _ -> arg
+
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
     | QsTupleItem variable ->
-        match variable.VariableName, variable.Type.Resolution with
-        | ValidName name, ArrayType itemType ->
-            // Command-line parsing libraries can't convert to IQArray. Use IEnumerable instead.
-            let typeName = sprintf "System.Collections.Generic.IEnumerable<%s>"
-                                   (SimulationCode.roslynTypeName context itemType)
+        match variable.VariableName with
+        | ValidName name ->
             Seq.singleton { Name = name.Value
                             QsharpType = variable.Type
-                            CsharpTypeName = typeName
+                            CsharpTypeName = parameterCsharpType context variable.Type
                             Description = ParameterDescription doc name.Value }
-        | ValidName name, _ ->
-            Seq.singleton { Name = name.Value
-                            QsharpType = variable.Type
-                            CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
-                            Description = ParameterDescription doc name.Value }
-        | InvalidName, _ -> Seq.empty
+        | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
 
 /// The custom argument handler for the given Q# type.
@@ -101,6 +134,7 @@ let private parameterOptionsProperty parameters =
             ``{``
                 members
             ``}``
+        |> withConverterValidator qsType.Resolution
 
     let options = parameters |> Seq.map getOption |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``; ``static``]
@@ -121,19 +155,14 @@ let private runMethod context (entryPoint : QsCallable) =
     let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
     let factoryParamName = "__factory__"
 
-    let getArgExpr { Name = name; QsharpType = qsType } =
-        let property = ``ident`` "this" <|.|> ``ident`` (parameterPropertyName name)
-        match qsType.Resolution with
-        | ArrayType itemType ->
-            // Convert the IEnumerable property into a QArray.
-            let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
-            ``new`` (``type`` arrayTypeName) ``(`` [property] ``)``
-        | _ -> property
+    let argExpr { Name = name; QsharpType = qsType } =
+        ``ident`` "this" <|.|> ``ident`` (parameterPropertyName name)
+        |> unconvertArgument context qsType.Resolution
 
     let callArgs : seq<ExpressionSyntax> =
         Seq.concat [
             Seq.singleton (upcast ``ident`` factoryParamName)
-            Seq.map getArgExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
+            Seq.map argExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
 
     ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``

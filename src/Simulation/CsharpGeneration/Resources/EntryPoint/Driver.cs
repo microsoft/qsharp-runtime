@@ -10,9 +10,7 @@
     using System.CommandLine.Help;
     using System.CommandLine.Invocation;
     using System.CommandLine.Parsing;
-    using System.ComponentModel;
     using System.Linq;
-    using System.Numerics;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -64,23 +62,11 @@
             foreach (var option in simulate.Options) { root.AddOption(option); }
             root.Handler = simulate.Handler;
 
-            RegisterTypeConverters();
             return await new CommandLineBuilder(root)
                 .UseDefaults()
                 .UseHelpBuilder(context => new QsHelpBuilder(context.Console))
                 .Build()
                 .InvokeAsync(args);
-        }
-
-        /// <summary>
-        /// Registers type converters for Q# argument types.
-        /// </summary>
-        private static void RegisterTypeConverters()
-        {
-            TypeDescriptor.AddAttributes(typeof(BigInteger), new TypeConverterAttribute(typeof(BigIntegerConverter)));
-            TypeDescriptor.AddAttributes(typeof(QRange), new TypeConverterAttribute(typeof(QRangeConverter)));
-            TypeDescriptor.AddAttributes(typeof(QVoid), new TypeConverterAttribute(typeof(QVoidConverter)));
-            TypeDescriptor.AddAttributes(typeof(Result), new TypeConverterAttribute(typeof(ResultConverter)));
         }
 
         /// <summary>

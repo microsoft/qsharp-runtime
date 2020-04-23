@@ -2,70 +2,112 @@
 {
     using Microsoft.Quantum.Simulation.Core;
     using System;
-    using System.ComponentModel;
-    using System.Globalization;
+    using System.CommandLine;
     using System.Linq;
     using System.Numerics;
 
     /// <summary>
-    /// Converts a string to type <typeparamref name="T"/>.
+    /// The result of trying to convert a string into the type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T">The type of the value to convert from a string.</typeparam>
-    internal abstract class FromStringConverter<T> : TypeConverter
+    /// <typeparam name="T">The type of the value.</typeparam>
+    internal abstract class ConversionResult<T>
     {
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
-            sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        public bool IsValid { get; protected set; }
+        public T ValueOrDefault { get; protected set; }
+    }
 
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) =>
-            value is string s ? Convert(s) : base.ConvertFrom(context, culture, value);
-
-        protected abstract T Convert(string value);
+    internal static class ConversionResult
+    {
+        /// <summary>
+        /// Adds a validator to the option that requires the argument to be successfully parsed by the given function.
+        /// </summary>
+        /// <typeparam name="T">The option's type parameter.</typeparam>
+        /// <typeparam name="U">The type that the parser will produce.</typeparam>
+        /// <param name="option">The option to add the validator to.</param>
+        /// <param name="parse">The function that must successfully parse the arguments.</param>
+        /// <returns>The option after the validator is added.</returns>
+        internal static Option<T> WithValidator<T, U>(Option<T> option, Func<string, ConversionResult<U>> parse)
+        {
+            option.AddValidator(result => result
+                .Tokens
+                .Select(token => token.Value)
+                .Where(value => !parse(value).IsValid)
+                .Select(value =>
+                    $"Cannot parse argument '{value}' for option '{result.Token.Value}' as expected type {typeof(U)}.")
+                .FirstOrDefault());
+            return option;
+        }
     }
 
     /// <summary>
     /// Converts a string to a <see cref="BigInteger"/>.
     /// </summary>
-    internal class BigIntegerConverter : FromStringConverter<BigInteger>
+    internal class BigIntegerConverter : ConversionResult<BigInteger>
     {
-        protected override BigInteger Convert(string value) => BigInteger.Parse(value);
+        public BigIntegerConverter(string value)
+        {
+            IsValid = BigInteger.TryParse(value, out var result);
+            ValueOrDefault = result;
+        }
     }
 
     /// <summary>
     /// Converts a string to a <see cref="QRange"/>.
     /// </summary>
-    internal class QRangeConverter : FromStringConverter<QRange>
+    internal class QRangeConverter : ConversionResult<QRange>
     {
-        protected override QRange Convert(string value)
+        public QRangeConverter(string value)
         {
-            var values = value.Split("..").Select(long.Parse);
-            return values.Count() == 2
-                ? new QRange(values.ElementAt(0), values.ElementAt(1))
-                : values.Count() == 3
-                ? new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2))
-                : throw new ArgumentException();
+            value.Split("..").Select(TryParseLong).Sequence().Then(values =>
+            {
+                if (values.Count() == 2)
+                {
+                    IsValid = true;
+                    ValueOrDefault = new QRange(values.ElementAt(0), values.ElementAt(1));
+                }
+                else if (values.Count() == 3)
+                {
+                    IsValid = true;
+                    ValueOrDefault = new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2));
+                }
+            });
         }
+
+        /// <summary>
+        /// Parses a long from a string.
+        /// </summary>
+        /// <param name="value">The string to parse.</param>
+        /// <returns>The result of parsing the string.</returns>
+        private static Result<long> TryParseLong(string value) =>
+            long.TryParse(value, out var result) ? Result<long>.Success(result) : Result<long>.Failure();
     }
 
     /// <summary>
     /// Converts a string to <see cref="QVoid"/>.
     /// </summary>
-    internal class QVoidConverter : FromStringConverter<QVoid>
+    internal class QVoidConverter : ConversionResult<QVoid>
     {
-        protected override QVoid Convert(string value) =>
-            value.Trim() == QVoid.Instance.ToString() ? QVoid.Instance : throw new ArgumentException();
+        public QVoidConverter(string value)
+        {
+            IsValid = value.Trim() == QVoid.Instance.ToString();
+            ValueOrDefault = QVoid.Instance;
+        }
     }
 
     /// <summary>
     /// Converts a string to a <see cref="Result"/>.
     /// </summary>
-    internal class ResultConverter : FromStringConverter<Result>
+    internal class ResultConverter : ConversionResult<Result>
     {
-        protected override Result Convert(string value) =>
-            Enum.Parse<ResultValue>(value, ignoreCase: true) switch
+        public ResultConverter(string value)
+        {
+            IsValid = Enum.TryParse(value, ignoreCase: true, out ResultValue result);
+            ValueOrDefault = result switch
             {
                 ResultValue.Zero => Result.Zero,
                 ResultValue.One => Result.One,
-                _ => throw new ArgumentException()
+                _ => default
             };
+        }
     }
 }
