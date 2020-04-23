@@ -266,31 +266,63 @@ let ``Accepts String`` () =
     given ["-s"; "Hello, World!"] |> yields "Hello, World!"
 
 [<Fact>]
-let ``Accepts String array`` () =
+let ``Accepts Unit`` () =
     let given = test 12
+    given ["-u"; "()"] |> yields ""
+    given ["-u"; "42"] |> fails
+
+[<Fact>]
+let ``Accepts String array`` () =
+    let given = test 13
     given ["--xs"; "foo"] |> yields "[foo]"
     given ["--xs"; "foo"; "bar"] |> yields "[foo,bar]"
     given ["--xs"; "foo bar"; "baz"] |> yields "[foo bar,baz]"
     given ["--xs"; "foo"; "bar"; "baz"] |> yields "[foo,bar,baz]"
+    given ["--xs"] |> fails
 
 [<Fact>]
-let ``Accepts Unit`` () =
-    let given = test 13
-    given ["-u"; "()"] |> yields ""
-    given ["-u"; "42"] |> fails
+let ``Accepts BigInt array`` () =
+    let given = test 14
+    given ["--bs"; "9223372036854775808"] |> yields "[9223372036854775808]"
+    given ["--bs"; "1"; "2"; "9223372036854775808"] |> yields "[1,2,9223372036854775808]"
+    given ["--bs"; "1"; "2"; "4.2"] |> fails
+
+[<Fact>]
+let ``Accepts Range array`` () =
+    let given = test 15
+    given ["--rs"; "1..10"] |> yields "[1..1..10]"
+    given ["--rs"; "1..10"; "2..4..20"] |> yields "[1..1..10,2..4..20]"
+    given ["--rs"; "1 ..10"; "2 ..4 ..20"] |> yields "[1..1..10,2..4..20]"
+    given ["--rs"; "1 .. 10"; "2 .. 4 .. 20"] |> yields "[1..1..10,2..4..20]"
+    given ["--rs"; "1 .. 1o"; "2 .. 4 .. 20"] |> fails
+
+[<Fact>]
+let ``Accepts Result array`` () =
+    let given = test 16
+    given ["--rs"; "One"] |> yields "[One]"
+    given ["--rs"; "One"; "Zero"] |> yields "[One,Zero]"
+    given ["--rs"; "Zero"; "One"; "Two"] |> fails
+
+[<Fact>]
+let ``Accepts Unit array`` () =
+    let given = test 17
+    given ["--us"; "()"] |> yields "[()]"
+    given ["--us"; "()"; "()"] |> yields "[(),()]"
+    given ["--us"; "()"; "()"; "()"] |> yields "[(),(),()]"
+    given ["--us"; "()"; "unit"; "()"] |> fails
 
 
 // Multiple Options
 
 [<Fact>]
 let ``Accepts two options`` () =
-    let given = test 14
+    let given = test 18
     given ["-n"; "7"; "-b"; "true"] |> yields "7 True"
     given ["-b"; "true"; "-n"; "7"] |> yields "7 True"
 
 [<Fact>]
 let ``Accepts three options`` () =
-    let given = test 15
+    let given = test 19
     given ["-n"; "7"; "-b"; "true"; "--xs"; "foo"] |> yields "7 True [foo]"
     given ["--xs"; "foo"; "-n"; "7"; "-b"; "true"] |> yields "7 True [foo]"
     given ["-n"; "7"; "--xs"; "foo"; "-b"; "true"] |> yields "7 True [foo]"
@@ -298,7 +330,7 @@ let ``Accepts three options`` () =
 
 [<Fact>]
 let ``Requires all options`` () =
-    let given = test 15
+    let given = test 19
     given ["-b"; "true"; "--xs"; "foo"] |> fails
     given ["-n"; "7"; "--xs"; "foo"] |> fails
     given ["-n"; "7"; "-b"; "true"] |> fails
@@ -312,13 +344,13 @@ let ``Requires all options`` () =
 
 [<Fact>]
 let ``Uses kebab-case`` () =
-    let given = test 16
+    let given = test 20
     given ["--camel-case-name"; "foo"] |> yields "foo"
     given ["--camelCaseName"; "foo"] |> fails
 
 [<Fact>]
 let ``Uses single-dash short names`` () =
-    let given = test 17
+    let given = test 21
     given ["-x"; "foo"] |> yields "foo"
     given ["--x"; "foo"] |> fails
 
@@ -327,7 +359,7 @@ let ``Uses single-dash short names`` () =
 
 [<Fact>]
 let ``Shadows --simulator`` () =
-    let given = test 18
+    let given = test 22
     given ["--simulator"; "foo"] |> yields "foo"
     given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields AssemblyConstants.ResourcesEstimator
     given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
@@ -335,14 +367,14 @@ let ``Shadows --simulator`` () =
 
 [<Fact>]
 let ``Shadows -s`` () =
-    let given = test 19
+    let given = test 23
     given ["-s"; "foo"] |> yields "foo"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "-s"; "foo"] |> yields "foo"
     given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows --version`` () =
-    let given = test 20
+    let given = test 24
     given ["--version"; "foo"] |> yields "foo"
 
 
@@ -361,30 +393,30 @@ BorrowedWidth   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 21
+    let given = test 25
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 21
+    let given = test 25
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 21
+    let given = test 25
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 21
+    let given = test 25
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 21 AssemblyConstants.ResourcesEstimator
+    let given = testWith 25 AssemblyConstants.ResourcesEstimator
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -392,7 +424,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 21 typeof<ToffoliSimulator>.FullName
+    let given = testWith 25 typeof<ToffoliSimulator>.FullName
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -425,7 +457,7 @@ Options:
 Commands:
   simulate    (default) Run the program using a local simulator."
 
-    let given = test 22
+    let given = test 26
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
