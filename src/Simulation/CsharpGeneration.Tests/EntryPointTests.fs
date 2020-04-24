@@ -323,6 +323,14 @@ let ``Accepts Unit array`` () =
     given ["--us"; "()"; "()"; "()"] |> yields "[(),(),()]"
     given ["--us"; "()"; "unit"; "()"] |> fails
 
+[<Fact>]
+let ``Supports repeat-name array syntax`` () =
+    let given = test 13
+    given ["--xs"; "Hello"; "--xs"; "World"] |> yields "[Hello,World]"
+    given ["--xs"; "foo"; "bar"; "--xs"; "baz"] |> yields "[foo,bar,baz]"
+    given ["--xs"; "foo"; "--xs"; "bar"; "--xs"; "baz"] |> yields "[foo,bar,baz]"
+    given ["--xs"; "foo bar"; "--xs"; "baz"] |> yields "[foo bar,baz]"
+
 
 // Multiple Options
 
