@@ -20,7 +20,7 @@ type private Parameter =
       Description : string }
 
 /// The namespace in which to put generated code for the entry point.
-let generatedEntryPointNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
+let generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
 
 /// A public constant field.
 let private constant name typeName value =
@@ -182,7 +182,7 @@ let private adapterClass context (entryPoint : QsCallable) =
 /// The source code for the entry point constants and adapter classes.
 let private generatedClasses context (entryPoint : QsCallable) =
     let ns =
-        ``namespace`` (generatedEntryPointNamespace entryPoint.FullName.Namespace.Value)
+        ``namespace`` (generatedNamespace entryPoint.FullName.Namespace.Value)
             ``{``
                 (Seq.map ``using`` SimulationCode.autoNamespaces)
                 [
@@ -200,7 +200,7 @@ let private driver (entryPoint : QsCallable) =
     let name = "Microsoft.Quantum.CsharpGeneration.Resources.EntryPointDriver.cs"
     use stream = Assembly.GetExecutingAssembly().GetManifestResourceStream name
     use reader = new StreamReader(stream)
-    reader.ReadToEnd().Replace("@Namespace", generatedEntryPointNamespace entryPoint.FullName.Namespace.Value)
+    reader.ReadToEnd().Replace("@Namespace", generatedNamespace entryPoint.FullName.Namespace.Value)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let generate context entryPoint =
