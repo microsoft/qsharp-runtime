@@ -3151,8 +3151,10 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 436
 #pragma warning disable 162
 #pragma warning disable 1591
+
 using System;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.Intrinsic;
@@ -3260,8 +3262,10 @@ namespace Microsoft.Quantum
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 436
 #pragma warning disable 162
 #pragma warning disable 1591
+
 using System;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.Intrinsic;
@@ -3349,8 +3353,10 @@ namespace Microsoft.Quantum
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 436
 #pragma warning disable 162
 #pragma warning disable 1591
+
 using System;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.Intrinsic;
@@ -3406,8 +3412,10 @@ namespace Microsoft.Quantum.Tests.Inline
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 436
 #pragma warning disable 162
 #pragma warning disable 1591
+
 using System;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.Intrinsic;
@@ -3529,8 +3537,10 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 436
 #pragma warning disable 162
 #pragma warning disable 1591
+
 using System;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.Intrinsic;
