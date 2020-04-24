@@ -135,6 +135,15 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 
 namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
     @EntryPoint()
+    operation AcceptPauliArray(ps : Pauli[]) : Pauli[] {
+        return ps;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
     operation AcceptRangeArray(rs : Range[]) : Range[] {
         return rs;
     }
