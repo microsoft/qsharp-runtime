@@ -1,7 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
+module Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
 
 open Microsoft.CodeAnalysis.CSharp
 open Microsoft.CodeAnalysis.CSharp.Syntax
@@ -23,7 +23,7 @@ type private Parameter =
       Description : string }
 
 /// The namespace in which to put generated code for the entry point.
-let internal generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
+let generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
 
 /// A public constant field.
 let private constant name typeName value =
@@ -157,10 +157,11 @@ let private runMethod context (entryPoint : QsCallable) =
 /// A method that creates an instance of the default simulator if it is a custom simulator.
 let private customSimulatorFactory name =
     let expr : ExpressionSyntax =
-        match name with
-        | "QuantumSimulator" | "ToffoliSimulator" | "ResourcesEstimator" ->
-            upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
-        | _ -> ``new`` (``type`` name) ``(`` [] ``)``
+        if name = AssemblyConstants.QuantumSimulator ||
+           name = AssemblyConstants.ToffoliSimulator ||
+           name = AssemblyConstants.ResourcesEstimator 
+        then upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
+        else ``new`` (``type`` name) ``(`` [] ``)``
     ``arrow_method`` "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
         ``(`` [] ``)``
         [``public``; ``static``]
@@ -171,9 +172,9 @@ let private adapterClass context (entryPoint : QsCallable) =
     let summaryProperty =
         readonlyProperty "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
-        context.assemblyConstants.TryGetValue "DefaultSimulator"
+        context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
-        |> (fun value -> if String.IsNullOrWhiteSpace value then "QuantumSimulator" else value)
+        |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
     let defaultSimulatorProperty = readonlyProperty "DefaultSimulator" "string" (``literal`` defaultSimulator)
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
 
@@ -222,5 +223,5 @@ let private driver (entryPoint : QsCallable) =
     String.Join (Environment.NewLine, source "Driver.cs", source "Parsers.cs", source "Validation.cs")
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let internal generate context entryPoint =
+let generate context entryPoint =
     generatedClasses context entryPoint + driver entryPoint

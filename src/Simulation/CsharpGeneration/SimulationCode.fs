@@ -1600,6 +1600,7 @@ module SimulationCode =
         // We add a "pragma warning disable 1591" since we don't generate doc comments in our C# code.
         |> ``pragmaDisableWarning`` 1591
         |> ``pragmaDisableWarning`` 0162 // unreachable code
+        |> ``pragmaDisableWarning`` 0436 // shadowing existing classes from references
         |> ``with leading comments`` autogenComment
 
     // Helper method that takes a SyntaxTree, adds trivia (formatting) 

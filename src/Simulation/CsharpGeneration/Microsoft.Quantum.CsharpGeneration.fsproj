@@ -12,7 +12,6 @@
     <EmbeddedResource Include="Resources\EntryPoint\Parsers.cs" />
     <EmbeddedResource Include="Resources\EntryPoint\Validation.cs" />
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
-    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="SimulationCode.fs" />
     <Compile Include="EntryPoint.fs" />
