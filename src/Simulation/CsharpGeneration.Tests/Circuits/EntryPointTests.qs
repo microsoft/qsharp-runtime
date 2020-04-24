@@ -108,6 +108,15 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 
 namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
     @EntryPoint()
+    operation AcceptUnit(u : Unit) : Unit {
+        return u;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
     operation AcceptStringArray(xs : String[]) : String[] {
         return xs;
     }
@@ -117,8 +126,44 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 
 namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
     @EntryPoint()
-    operation AcceptUnit(u : Unit) : Unit {
-        return u;
+    operation AcceptBigIntArray(bs : BigInt[]) : BigInt[] {
+        return bs;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation AcceptPauliArray(ps : Pauli[]) : Pauli[] {
+        return ps;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation AcceptRangeArray(rs : Range[]) : Range[] {
+        return rs;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation AcceptResultArray(rs : Result[]) : Result[] {
+        return rs;
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation AcceptUnitArray(us : Unit[]) : Unit[] {
+        return us;
     }
 }
 
