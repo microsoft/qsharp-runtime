@@ -10,7 +10,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\EntryPointDriver.cs" />
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
-    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="SimulationCode.fs" />
     <Compile Include="EntryPoint.fs" />
