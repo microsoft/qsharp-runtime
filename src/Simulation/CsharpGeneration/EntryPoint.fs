@@ -1,4 +1,7 @@
-﻿module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+module internal Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPoint
 
 open Microsoft.CodeAnalysis.CSharp
 open Microsoft.CodeAnalysis.CSharp.Syntax

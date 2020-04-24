@@ -1,4 +1,7 @@
-﻿namespace @Namespace
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace @Namespace
 {
     using System;
     using System.Collections.Generic;
