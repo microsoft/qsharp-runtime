@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProject
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QsharpExe", "src\Simulation\Simulators.Tests\TestProjects\QsharpExe\QsharpExe.csproj", "{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryPointDriver", "src\Simulation\EntryPointDriver\EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -259,6 +261,22 @@ Global
 		{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Debug|x64.Build.0 = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Release|x64.ActiveCfg = Release|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.Release|x64.Build.0 = Release|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -278,6 +296,7 @@ Global
 		{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 		{09C842CB-930C-4C7D-AD5F-E30DE4A55820} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
 		{2F5796A7-4AF8-4B78-928A-0A3A80752F9D} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
+		{944FE7EF-9220-4CC6-BB20-CE517195B922} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}

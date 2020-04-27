@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace @Namespace
-{
-    using Microsoft.Quantum.Simulation.Core;
-    using System;
-    using System.Collections.Generic;
-    using System.CommandLine.Parsing;
-    using System.Linq;
-    using System.Numerics;
+using System;
+using System.Collections.Generic;
+using System.CommandLine.Parsing;
+using System.Linq;
+using System.Numerics;
+using Microsoft.Quantum.Simulation.Core;
 
+namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
+{
     /// <summary>
     /// A delegate that parses the value and returns a validation.
     /// </summary>

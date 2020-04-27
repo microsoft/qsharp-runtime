@@ -68,8 +68,9 @@ type Emitter() =
 
             if not compilation.EntryPoints.IsEmpty then
                 let callable = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
-                let content = EntryPoint.generate context callable
-                CompilationLoader.GeneratedFile(callable.SourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
+                for name, content in EntryPoint.generate context callable do
+                    let suffix = sprintf ".%s.g.cs" name
+                    CompilationLoader.GeneratedFile(callable.SourceFile, dir, suffix, content) |> ignore
 
             transformed <- compilation
             true

@@ -1,26 +1,33 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace @Namespace
-{
-    using Microsoft.Quantum.Simulation.Core;
-    using Microsoft.Quantum.Simulation.Simulators;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.CommandLine;
-    using System.CommandLine.Builder;
-    using System.CommandLine.Help;
-    using System.CommandLine.Invocation;
-    using System.CommandLine.Parsing;
-    using System.Linq;
-    using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Help;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Quantum.QsCompiler.ReservedKeywords;
+using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.Simulators;
 
+namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
+{
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
     /// </summary>
     internal static class Driver
     {
+        private static readonly IEnumerable<string> SimulatorOptions = new[]
+        {
+            CommandLineArguments.SimulatorOption.Item1,
+            CommandLineArguments.SimulatorOption.Item2
+        };
+        
         /// <summary>
         /// A modification of the command line <see cref="HelpBuilder"/> class.
         /// </summary>
@@ -37,29 +44,30 @@ namespace @Namespace
         }
 
         /// <summary>
-        /// Runs the entry point.
+        /// Runs the entry point using the command-line arguments.
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> Main(string[] args)
+        internal static async Task<int> Run(IEntryPoint entryPoint, string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             TryCreateOption(
-                Constants.SimulatorOptions,
-                () => EntryPoint.DefaultSimulator,
+                entryPoint,
+                SimulatorOptions,
+                () => entryPoint.DefaultSimulator,
                 "The name of the simulator to use.").Then(option =>
                 {
                     option.Argument.AddSuggestions(ImmutableHashSet<string>.Empty
-                        .Add(Constants.QuantumSimulator)
-                        .Add(Constants.ToffoliSimulator)
-                        .Add(Constants.ResourcesEstimator)
-                        .Add(EntryPoint.DefaultSimulator));
+                        .Add(AssemblyConstants.QuantumSimulator)
+                        .Add(AssemblyConstants.ToffoliSimulator)
+                        .Add(AssemblyConstants.ResourcesEstimator)
+                        .Add(entryPoint.DefaultSimulator));
                     simulate.AddOption(option);
                 });
-            simulate.Handler = CommandHandler.Create<EntryPoint, string>(Simulate);
+            simulate.Handler = CommandHandler.Create((string simulator) => Simulate(entryPoint, simulator));
 
-            var root = new RootCommand(EntryPoint.Summary) { simulate };
-            foreach (var option in EntryPoint.Options) { root.AddGlobalOption(option); }
+            var root = new RootCommand(entryPoint.Summary) { simulate };
+            foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
 
             // Set the simulate command as the default.
             foreach (var option in simulate.Options) { root.AddOption(option); }
@@ -78,32 +86,29 @@ namespace @Namespace
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> Simulate(EntryPoint entryPoint, string simulator)
+        private static async Task<int> Simulate(IEntryPoint entryPoint, string simulator)
         {
-            simulator = DefaultIfShadowed(Constants.SimulatorOptions.First(), simulator, EntryPoint.DefaultSimulator);
-            switch (simulator)
+            simulator = DefaultIfShadowed(entryPoint, SimulatorOptions.First(), simulator, entryPoint.DefaultSimulator);
+            if (simulator == AssemblyConstants.ResourcesEstimator)
             {
-                case Constants.ResourcesEstimator:
-                    var resourcesEstimator = new ResourcesEstimator();
-                    await entryPoint.Run(resourcesEstimator);
-                    Console.WriteLine(resourcesEstimator.ToTSV());
-                    break;
-                default:
-                    var (isCustom, createSimulator) = simulator switch
-                    {
-                        Constants.QuantumSimulator =>
-                            (false, new Func<IOperationFactory>(() => new QuantumSimulator())),
-                        Constants.ToffoliSimulator =>
-                            (false, new Func<IOperationFactory>(() => new ToffoliSimulator())),
-                        _ => (true, EntryPoint.CreateDefaultCustomSimulator)
-                    };
-                    if (isCustom && simulator != EntryPoint.DefaultSimulator)
-                    {
-                        DisplayCustomSimulatorError(simulator);
-                        return 1;
-                    }
-                    await DisplayEntryPointResult(entryPoint, createSimulator);
-                    break;
+                var resourcesEstimator = new ResourcesEstimator();
+                await entryPoint.Run(resourcesEstimator);
+                Console.WriteLine(resourcesEstimator.ToTSV());
+            }
+            else
+            {
+                var (isCustom, createSimulator) =
+                    simulator == AssemblyConstants.QuantumSimulator
+                    ? (false, () => new QuantumSimulator())
+                    : simulator == AssemblyConstants.ToffoliSimulator
+                    ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
+                    : (true, entryPoint.CreateDefaultCustomSimulator);
+                if (isCustom && simulator != entryPoint.DefaultSimulator)
+                {
+                    DisplayCustomSimulatorError(simulator);
+                    return 1;
+                }
+                await DisplayEntryPointResult(entryPoint, createSimulator);
             }
             return 0;
         }
@@ -114,15 +119,13 @@ namespace @Namespace
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
         private static async Task DisplayEntryPointResult(
-            EntryPoint entryPoint, Func<IOperationFactory> createSimulator)
+            IEntryPoint entryPoint, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try
             {
                 var value = await entryPoint.Run(simulator);
-#pragma warning disable CS0184
                 if (!(value is QVoid))
-#pragma warning restore CS0184
                 {
                     Console.WriteLine(value);
                 }
@@ -142,8 +145,8 @@ namespace @Namespace
         /// </summary>
         /// <param name="alias">The alias to check.</param>
         /// <returns>True if the alias is available for use by the driver.</returns>
-        private static bool IsAliasAvailable(string alias) =>
-            !EntryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
+        private static bool IsAliasAvailable(IEntryPoint entryPoint, string alias) =>
+            !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
         /// Returns the default value and displays a warning if the alias is shadowed by an entry point option, and
@@ -154,9 +157,9 @@ namespace @Namespace
         /// <param name="value">The value of the option given on the command line.</param>
         /// <param name="defaultValue">The default value for the option.</param>
         /// <returns></returns>
-        private static T DefaultIfShadowed<T>(string alias, T value, T defaultValue)
+        private static T DefaultIfShadowed<T>(IEntryPoint entryPoint, string alias, T value, T defaultValue)
         {
-            if (IsAliasAvailable(alias))
+            if (IsAliasAvailable(entryPoint, alias))
             {
                 return value;
             }
@@ -181,10 +184,16 @@ namespace @Namespace
         /// <param name="description">The option's description.</param>
         /// <returns>A validation of the option.</returns>
         private static Validation<Option<T>> TryCreateOption<T>(
-                IEnumerable<string> aliases, Func<T> getDefaultValue, string description = null) =>
-            IsAliasAvailable(aliases.First())
+                IEntryPoint entryPoint, 
+                IEnumerable<string> aliases, 
+                Func<T> getDefaultValue, 
+                string description = null) => 
+            IsAliasAvailable(entryPoint, aliases.First())
             ? Validation<Option<T>>.Success(
-                new Option<T>(aliases.Where(IsAliasAvailable).ToArray(), getDefaultValue, description))
+                new Option<T>(
+                    aliases.Where(alias => IsAliasAvailable(entryPoint, alias)).ToArray(),
+                    getDefaultValue,
+                    description))
             : Validation<Option<T>>.Failure();
 
         /// <summary>

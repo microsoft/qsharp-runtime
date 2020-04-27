@@ -8,9 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\EntryPoint\Driver.cs" />
-    <EmbeddedResource Include="Resources\EntryPoint\Parsers.cs" />
-    <EmbeddedResource Include="Resources\EntryPoint\Validation.cs" />
+    <!-- TODO: Remove these when the entry point driver is packaged correctly. -->
+    <EmbeddedResource Include="..\EntryPointDriver\Driver.cs" />
+    <EmbeddedResource Include="..\EntryPointDriver\IEntryPoint.cs" />
+    <EmbeddedResource Include="..\EntryPointDriver\Parsers.cs" />
+    <EmbeddedResource Include="..\EntryPointDriver\Validation.cs" />
+    
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="SimulationCode.fs" />
@@ -30,5 +33,4 @@
   <ItemGroup>
     <ProjectReference Include="..\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj" />
   </ItemGroup>
-
 </Project>
