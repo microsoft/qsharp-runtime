@@ -250,4 +250,4 @@ let private driver () =
     |> List.map (fun fileName -> Path.GetFileNameWithoutExtension fileName, source fileName)
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generate context entryPoint = ("EntryPoint", generatedClasses context entryPoint) :: driver ()
+let generate context entryPoint = ["EntryPoint", generatedClasses context entryPoint]

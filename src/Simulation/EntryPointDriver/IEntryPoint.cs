@@ -6,7 +6,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
-    internal interface IEntryPoint
+    public interface IEntryPoint
     {
         string Summary { get; }
         

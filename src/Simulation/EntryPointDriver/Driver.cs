@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
     /// </summary>
-    internal static class Driver
+    public static class Driver
     {
         private static readonly IEnumerable<string> SimulatorOptions = new[]
         {
@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns>The exit code.</returns>
-        internal static async Task<int> Run(IEntryPoint entryPoint, string[] args)
+        public static async Task<int> Run(IEntryPoint entryPoint, string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             TryCreateOption(

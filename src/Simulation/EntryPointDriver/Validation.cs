@@ -11,13 +11,13 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// Represents either a success or a failure of a process.
     /// </summary>
     /// <typeparam name="T">The type of the success value.</typeparam>
-    internal struct Validation<T>
+    public struct Validation<T>
     {
-        public bool IsSuccess { get; }
-        public bool IsFailure { get => !IsSuccess; }
-        public T Value { get => IsSuccess ? ValueOrDefault : throw new InvalidOperationException(); }
-        public T ValueOrDefault { get; }
-        public string ErrorMessage { get; }
+        internal bool IsSuccess { get; }
+        internal bool IsFailure { get => !IsSuccess; }
+        internal T Value { get => IsSuccess ? ValueOrDefault : throw new InvalidOperationException(); }
+        internal T ValueOrDefault { get; }
+        internal string ErrorMessage { get; }
 
         private Validation(bool isSuccess, T value, string errorMessage)
         {
@@ -26,10 +26,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             ErrorMessage = errorMessage;
         }
 
-        public static Validation<T> Success(T value) =>
+        internal static Validation<T> Success(T value) =>
             new Validation<T>(true, value, default);
 
-        public static Validation<T> Failure(string errorMessage = null) =>
+        internal static Validation<T> Failure(string errorMessage = null) =>
             new Validation<T>(false, default, errorMessage);
     }
 
