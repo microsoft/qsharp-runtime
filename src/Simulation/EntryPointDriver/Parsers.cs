@@ -8,7 +8,7 @@ using System.Linq;
 using System.Numerics;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
     /// <summary>
     /// A delegate that parses the value and returns a validation.

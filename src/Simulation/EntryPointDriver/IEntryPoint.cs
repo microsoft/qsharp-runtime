@@ -4,7 +4,7 @@ using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
     internal interface IEntryPoint
     {

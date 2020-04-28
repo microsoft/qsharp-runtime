@@ -26,7 +26,7 @@ type private Parameter =
 let generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private nonGeneratedNamespace = "Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver"
+let private nonGeneratedNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
 
 /// A static class containing constants used by the entry point driver.
 let private constantsClass =

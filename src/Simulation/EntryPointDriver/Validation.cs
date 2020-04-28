@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
     /// <summary>
     /// Represents either a success or a failure of a process.
