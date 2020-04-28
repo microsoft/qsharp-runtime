@@ -64,7 +64,8 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
                         .Add(entryPoint.DefaultSimulator));
                     simulate.AddOption(option);
                 });
-            simulate.Handler = CommandHandler.Create((string simulator) => Simulate(entryPoint, simulator));
+            simulate.Handler = CommandHandler.Create(
+                (ParseResult result, string simulator) => Simulate(entryPoint, result, simulator));
 
             var root = new RootCommand(entryPoint.Summary) { simulate };
             foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
@@ -86,13 +87,13 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> Simulate(IEntryPoint entryPoint, string simulator)
+        private static async Task<int> Simulate(IEntryPoint entryPoint, ParseResult result, string simulator)
         {
             simulator = DefaultIfShadowed(entryPoint, SimulatorOptions.First(), simulator, entryPoint.DefaultSimulator);
             if (simulator == AssemblyConstants.ResourcesEstimator)
             {
                 var resourcesEstimator = new ResourcesEstimator();
-                await entryPoint.Run(resourcesEstimator);
+                await entryPoint.Run(resourcesEstimator, result);
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }
             else
@@ -108,7 +109,7 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
                     DisplayCustomSimulatorError(simulator);
                     return 1;
                 }
-                await DisplayEntryPointResult(entryPoint, createSimulator);
+                await DisplayEntryPointResult(entryPoint, result, createSimulator);
             }
             return 0;
         }
@@ -119,12 +120,12 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
         private static async Task DisplayEntryPointResult(
-            IEntryPoint entryPoint, Func<IOperationFactory> createSimulator)
+            IEntryPoint entryPoint, ParseResult result, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try
             {
-                var value = await entryPoint.Run(simulator);
+                var value = await entryPoint.Run(simulator, result);
                 if (!(value is QVoid))
                 {
                     Console.WriteLine(value);

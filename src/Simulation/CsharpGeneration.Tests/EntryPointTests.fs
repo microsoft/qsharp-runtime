@@ -67,9 +67,9 @@ let private generateCsharp defaultSimulator (syntaxTree : QsNamespace seq, entry
         | None -> ImmutableDictionary.Empty
     let context = CodegenContext.Create (syntaxTree, assemblyConstants)
     let entryPoint = context.allCallables.[Seq.exactlyOne entryPoints]
-    [
-        SimulationCode.generate (NonNullable<_>.New testFile) context
-        EntryPoint.generate context entryPoint
+    List.concat [
+        [SimulationCode.generate (NonNullable<_>.New testFile) context]
+        EntryPoint.generate context entryPoint |> List.map snd
     ]
 
 /// The full path to a referenced assembly given its short name.
@@ -95,6 +95,7 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
             "Microsoft.Quantum.QSharp.Core"
+            "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
             "Microsoft.Quantum.Simulation.Simulators"
@@ -120,7 +121,7 @@ let private testAssembly testNum defaultSimulator =
 /// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output, errors,
 /// and exit code.
 let private run (assembly : Assembly) (args : string[]) =
-    let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".Driver")
+    let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".EntryPoint")
     let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out

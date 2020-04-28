@@ -96,20 +96,21 @@ let private withSuggestions qsType option =
         let args = option :: List.map ``literal`` suggestions
         ``invoke`` (``ident`` "System.CommandLine.OptionExtensions.WithSuggestions") ``(`` args ``)``
 
+let private optionName (paramName : string) =
+    let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
+    if paramName.Length = 1
+    then ``literal`` ("-" + paramName)
+    else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` paramName] ``)``
+
 /// A property containing a sequence of command-line options corresponding to each parameter given.
 let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
     let getOption { Name = name; QsharpType = qsType; CsharpTypeName = typeName; Description = desc } =
-        let nameExpr =
-            if name.Length = 1
-            then ``literal`` ("-" + name)
-            else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` name] ``)``
         let args =
             match argumentParser qsType.Resolution with
-            | Some parser -> [nameExpr; parser; upcast ``false``; ``literal`` desc]
-            | None -> [nameExpr; ``literal`` desc]
+            | Some parser -> [optionName name; parser; upcast ``false``; ``literal`` desc]
+            | None -> [optionName name; ``literal`` desc]
 
         ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` args ``)``
             ``{``
@@ -149,24 +150,28 @@ let private runMethod context (entryPoint : QsCallable) =
     // let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
     // let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
     let taskTypeName = "System.Threading.Tasks.Task<object>"
-    let factoryParamName = "__factory__"
-
-    let argExpr { Name = name; QsharpType = qsType } =
-        let property = ``ident`` "this" <|.|> ``ident`` (parameterPropertyName name)
+    let factoryName = "__factory__"
+    let parseResultName = "__parseResult__"
+    let runParams = [
+        ``param`` factoryName ``of`` (``type`` "IOperationFactory")
+        ``param`` parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
+    ]
+    let argExpr { Name = name; QsharpType = qsType; CsharpTypeName = typeName } =
+        let valueForOption = ``ident`` (sprintf "ValueForOption<%s>" typeName)
+        let value = ``ident`` parseResultName <.> (valueForOption, [optionName name])
         match qsType.Resolution with
         | ArrayType itemType ->
             let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
-            ``new`` (``type`` arrayTypeName) ``(`` [property] ``)``
-        | _ -> property
-
+            ``new`` (``type`` arrayTypeName) ``(`` [value] ``)``
+        | _ -> value
     let callArgs : ExpressionSyntax seq =
         Seq.concat [
-            Seq.singleton (upcast ``ident`` factoryParamName)
+            Seq.singleton (upcast ``ident`` factoryName)
             Seq.map argExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
 
     ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
-        ``(`` [``param`` factoryParamName ``of`` (``type`` "IOperationFactory")] ``)``
+        ``(`` runParams ``)``
         [``public``; ``async``]
         (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
 
