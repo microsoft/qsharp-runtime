@@ -146,10 +146,8 @@ let private parameterProperties =
 /// The method for running the entry point using the parameter properties declared in the adapter.
 let private runMethod context (entryPoint : QsCallable) =
     let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
-    // TODO:
-    // let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
-    // let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
-    let taskTypeName = "System.Threading.Tasks.Task<object>"
+    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
+    let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
     let factoryName = "__factory__"
     let parseResultName = "__parseResult__"
     let runParams = [
@@ -189,7 +187,6 @@ let private mainMethod =
 let private adapterClass context (entryPoint : QsCallable) =
     let property name typeName value =
         ``property-arrow_get`` typeName name [``public``] ``get`` (``=>`` value)
-        
     let summaryProperty =
         property "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
@@ -197,6 +194,7 @@ let private adapterClass context (entryPoint : QsCallable) =
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
     let defaultSimulatorProperty = property "DefaultSimulator" "string" (``literal`` defaultSimulator)
+    
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let members : MemberDeclarationSyntax seq =
         Seq.concat [
@@ -210,10 +208,11 @@ let private adapterClass context (entryPoint : QsCallable) =
             ]
             parameterProperties parameters |> Seq.map (fun property -> upcast property)
         ]
-
-    let baseName = simpleBase (nonGeneratedNamespace + ".IEntryPoint")
+        
+    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
+    let baseName = sprintf "%s.IEntryPoint<%s>" nonGeneratedNamespace returnTypeName
     ``class`` "EntryPoint" ``<<`` [] ``>>``
-        ``:`` (Some baseName) ``,`` []
+        ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
             members

@@ -6,7 +6,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
-    public interface IEntryPoint
+    public interface IEntryPoint<T>
     {
         string Summary { get; }
         
@@ -16,7 +16,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
         IOperationFactory CreateDefaultCustomSimulator();
 
-        // TODO: Type parameterize the return type.
-        Task<object> Run(IOperationFactory factory, ParseResult parseResult);
+        Task<T> Run(IOperationFactory factory, ParseResult parseResult);
     }
 }

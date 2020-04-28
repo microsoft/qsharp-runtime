@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> Run(IEntryPoint entryPoint, string[] args)
+        public static async Task<int> Run<T>(IEntryPoint<T> entryPoint, string[] args)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             TryCreateOption(
@@ -87,7 +87,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> Simulate(IEntryPoint entryPoint, ParseResult result, string simulator)
+        private static async Task<int> Simulate<T>(IEntryPoint<T> entryPoint, ParseResult result, string simulator)
         {
             simulator = DefaultIfShadowed(entryPoint, SimulatorOptions.First(), simulator, entryPoint.DefaultSimulator);
             if (simulator == AssemblyConstants.ResourcesEstimator)
@@ -119,8 +119,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
-        private static async Task DisplayEntryPointResult(
-            IEntryPoint entryPoint, ParseResult result, Func<IOperationFactory> createSimulator)
+        private static async Task DisplayEntryPointResult<T>(
+            IEntryPoint<T> entryPoint, ParseResult result, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try
@@ -146,7 +146,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="alias">The alias to check.</param>
         /// <returns>True if the alias is available for use by the driver.</returns>
-        private static bool IsAliasAvailable(IEntryPoint entryPoint, string alias) =>
+        private static bool IsAliasAvailable<T>(IEntryPoint<T> entryPoint, string alias) =>
             !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="value">The value of the option given on the command line.</param>
         /// <param name="defaultValue">The default value for the option.</param>
         /// <returns></returns>
-        private static T DefaultIfShadowed<T>(IEntryPoint entryPoint, string alias, T value, T defaultValue)
+        private static T DefaultIfShadowed<T, U>(IEntryPoint<U> entryPoint, string alias, T value, T defaultValue)
         {
             if (IsAliasAvailable(entryPoint, alias))
             {
@@ -184,8 +184,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="getDefaultValue">A function that returns the option's default value.</param>
         /// <param name="description">The option's description.</param>
         /// <returns>A validation of the option.</returns>
-        private static Validation<Option<T>> TryCreateOption<T>(
-                IEntryPoint entryPoint, 
+        private static Validation<Option<T>> TryCreateOption<T, U>(
+                IEntryPoint<U> entryPoint, 
                 IEnumerable<string> aliases, 
                 Func<T> getDefaultValue, 
                 string description = null) => 
