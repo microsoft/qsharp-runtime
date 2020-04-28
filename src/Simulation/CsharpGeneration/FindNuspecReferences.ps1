@@ -30,7 +30,6 @@ if (Test-Path $target) {
 $nuspec = [xml](Get-Content "Microsoft.Quantum.CsharpGeneration.nuspec.template")
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
-
 # Recursively find PackageReferences on all ProjectReferences:
 function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 {
@@ -62,10 +61,22 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
     }
 }
 
+# Add EntryPointDriver's project references as package references to avoid a build-time dependency cycle.
+# $version$ is replaced with the current package version when the package is built.
+#
+# TODO: Refactor this so it's easier to add manual dependencies.
+$onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
+$onedependency.SetAttribute('id', "Microsoft.Quantum.Runtime.Core")
+$onedependency.SetAttribute('version', "`$version`$")
+
+$onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
+$onedependency.SetAttribute('id', "Microsoft.Quantum.Simulators")
+$onedependency.SetAttribute('version', "`$version`$")
+
 # Find all dependencies on Microsoft.Quantum.CsharpGeneration.fsproj
-Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.CsharpGeneration.fsproj" $dep
+Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.CsharpGeneration.fsproj"
+Add-NuGetDependencyFromCsprojToNuspec "..\EntryPointDriver\EntryPointDriver.csproj"
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)
 $nuspec.Save($target)
-
