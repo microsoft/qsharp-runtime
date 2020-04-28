@@ -11,14 +11,40 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// Represents either a success or a failure of a process.
     /// </summary>
     /// <typeparam name="T">The type of the success value.</typeparam>
-    public struct Validation<T>
+    public readonly struct Validation<T>
     {
+        /// <summary>
+        /// True if the validation succeeded.
+        /// </summary>
         internal bool IsSuccess { get; }
-        internal bool IsFailure { get => !IsSuccess; }
-        internal T Value { get => IsSuccess ? ValueOrDefault : throw new InvalidOperationException(); }
+        
+        /// <summary>
+        /// True if the validation failed.
+        /// </summary>
+        internal bool IsFailure => !IsSuccess;
+
+        /// <summary>
+        /// The success value of the validation.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the validation failed.</exception>
+        internal T Value => IsSuccess ? ValueOrDefault : throw new InvalidOperationException();
+
+        /// <summary>
+        /// The success value of the validation or a default value if the validation failed.
+        /// </summary>
         internal T ValueOrDefault { get; }
+        
+        /// <summary>
+        /// The error message of the validation.
+        /// </summary>
         internal string ErrorMessage { get; }
 
+        /// <summary>
+        /// Creates a new validation.
+        /// </summary>
+        /// <param name="isSuccess">True if the validation succeeded.</param>
+        /// <param name="value">The success value or a default value</param>
+        /// <param name="errorMessage">The error message.</param>
         private Validation(bool isSuccess, T value, string errorMessage)
         {
             IsSuccess = isSuccess;
@@ -26,9 +52,19 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             ErrorMessage = errorMessage;
         }
 
+        /// <summary>
+        /// Creates a successful validation.
+        /// </summary>
+        /// <param name="value">The success value.</param>
+        /// <returns>The successful validation.</returns>
         internal static Validation<T> Success(T value) =>
             new Validation<T>(true, value, default);
 
+        /// <summary>
+        /// Creates a failed validation.
+        /// </summary>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns>The failed validation.</returns>
         internal static Validation<T> Failure(string errorMessage = null) =>
             new Validation<T>(false, default, errorMessage);
     }
