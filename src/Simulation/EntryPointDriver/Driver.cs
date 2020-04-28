@@ -24,8 +24,8 @@ namespace Microsoft.Quantum.QsCompiler.CsharpGeneration.EntryPointDriver
     {
         private static readonly IEnumerable<string> SimulatorOptions = new[]
         {
-            CommandLineArguments.SimulatorOption.Item1,
-            CommandLineArguments.SimulatorOption.Item2
+            "--" + CommandLineArguments.SimulatorOption.Item1,
+            "-" + CommandLineArguments.SimulatorOption.Item2
         };
         
         /// <summary>
