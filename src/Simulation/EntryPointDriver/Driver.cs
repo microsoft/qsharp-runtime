@@ -36,15 +36,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 return descriptor.Length > 30 ? argument.Name : descriptor;
             }
         }
-        
+
         /// <summary>
         /// The option aliases for the simulator option.
         /// </summary>
-        private static readonly IEnumerable<string> SimulatorOptions = new[]
+        private static readonly IReadOnlyCollection<string> SimulatorOptions = Array.AsReadOnly(new[]
         {
             "--" + CommandLineArguments.SimulatorOption.Item1,
             "-" + CommandLineArguments.SimulatorOption.Item2
-        };
+        });
 
         /// <summary>
         /// Runs the entry point using the command-line arguments.
@@ -201,9 +201,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>A validation of the option.</returns>
         private static Validation<Option<TOption>> TryCreateOption<TOption, TEntryPoint>(
                 IEntryPoint<TEntryPoint> entryPoint,
-                IEnumerable<string> aliases,
+                IReadOnlyCollection<string> aliases,
                 Func<TOption> getDefaultValue,
-                string? description = null) => 
+                string? description = null) =>
             IsAliasAvailable(entryPoint, aliases.First())
             ? Validation<Option<TOption>>.Success(
                 new Option<TOption>(

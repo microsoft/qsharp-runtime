@@ -78,11 +78,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 : Validation<long>.Failure(GetArgumentErrorMessage(longValue, optionName, typeof(long)));
 
             return value.Split("..").Select(TryParseLong).Sequence().Bind(values =>
-                values.Count() == 2
-                ? Validation<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1)))
-                : values.Count() == 3
-                ? Validation<QRange>.Success(new QRange(values.ElementAt(0), values.ElementAt(1), values.ElementAt(2)))
-                : Validation<QRange>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QRange))));
+            {
+                var list = values.ToList();
+                return list.Count switch
+                {
+                    2 => Validation<QRange>.Success(new QRange(list[0], list[1])),
+                    3 => Validation<QRange>.Success(new QRange(list[0], list[1], list[2])),
+                    _ => Validation<QRange>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QRange)))
+                };
+            });
         }
 
         /// <summary>

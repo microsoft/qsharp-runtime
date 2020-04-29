@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.Quantum.QsCompiler.CompilationBuilder;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
@@ -104,10 +105,13 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// A validation that contains an enumerable of the validation values if all of the validations are a success,
         /// or the first error message if one of the validations is a failure.
         /// </returns>
-        internal static Validation<IEnumerable<T>> Sequence<T>(this IEnumerable<Validation<T>> validations) =>
-            validations.All(validation => validation.IsSuccess)
-            ? Validation<IEnumerable<T>>.Success(validations.Select(validation => validation.Value))
-            : Validation<IEnumerable<T>>.Failure(validations.First(validation => validation.IsFailure).ErrorMessage);
+        internal static Validation<IEnumerable<T>> Sequence<T>(this IEnumerable<Validation<T>> validations)
+        {
+            var (successes, failures) = validations.Partition(validation => validation.IsSuccess);
+            return failures.Any()
+                ? Validation<IEnumerable<T>>.Failure(failures.First().ErrorMessage)
+                : Validation<IEnumerable<T>>.Success(successes.Select(validation => validation.Value));
+        }
 
         /// <summary>
         /// Calls the action on the validation value if the validation is a success.
