@@ -24,8 +24,11 @@
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
     
-    <file src="..\EntryPointDriver\bin\$Configuration$\**\EntryPointDriver.dll" target="lib" />
-    <file src="..\EntryPointDriver\bin\$Configuration$\**\EntryPointDriver.pdb" target="lib" />
-    <file src="..\EntryPointDriver\bin\$Configuration$\**\EntryPointDriver.xml" target="lib" />
+    <file src="..\EntryPointDriver\bin\$Configuration$\**\Microsoft.Quantum.CsharpGeneration.EntryPointDriver.dll"
+          target="lib" />
+    <file src="..\EntryPointDriver\bin\$Configuration$\**\Microsoft.Quantum.CsharpGeneration.EntryPointDriver.pdb"
+          target="lib" />
+    <file src="..\EntryPointDriver\bin\$Configuration$\**\Microsoft.Quantum.CsharpGeneration.EntryPointDriver.xml"
+          target="lib" />
   </files>
 </package>
