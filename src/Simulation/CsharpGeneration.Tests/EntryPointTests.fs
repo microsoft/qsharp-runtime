@@ -119,11 +119,11 @@ let private testAssembly testNum defaultSimulator =
     |> generateCsharp defaultSimulator
     |> compileCsharp
 
-/// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output, errors,
-/// and exit code.
+/// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
+/// code.
 let private run (assembly : Assembly) (args : string[]) =
-    let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".EntryPoint")
-    let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
+    let entryPoint = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".EntryPoint")
+    let main = entryPoint.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out
     let previousError = Console.Error
