@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public static Validation<BigInteger> TryParseBigInteger(string value, string optionName) =>
             BigInteger.TryParse(value, out var result)
             ? Validation<BigInteger>.Success(result)
-            : Validation<BigInteger>.Failure(GetArgumentErrorMessage(value, optionName, typeof(BigInteger)));
+            : Validation<BigInteger>.Failure(ArgumentErrorMessage(value, optionName, typeof(BigInteger)));
 
         /// <summary>
         /// Parses a <see cref="QRange"/>.
@@ -75,7 +75,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             Validation<long> TryParseLong(string longValue) =>
                 long.TryParse(longValue, out var result)
                 ? Validation<long>.Success(result)
-                : Validation<long>.Failure(GetArgumentErrorMessage(longValue, optionName, typeof(long)));
+                : Validation<long>.Failure(ArgumentErrorMessage(longValue, optionName, typeof(long)));
 
             return value.Split("..").Select(TryParseLong).Sequence().Bind(values =>
             {
@@ -84,7 +84,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 {
                     2 => Validation<QRange>.Success(new QRange(list[0], list[1])),
                     3 => Validation<QRange>.Success(new QRange(list[0], list[1], list[2])),
-                    _ => Validation<QRange>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QRange)))
+                    _ => Validation<QRange>.Failure(ArgumentErrorMessage(value, optionName, typeof(QRange)))
                 };
             });
         }
@@ -98,7 +98,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public static Validation<QVoid> TryParseQVoid(string value, string optionName) =>
             value.Trim() == QVoid.Instance.ToString()
             ? Validation<QVoid>.Success(QVoid.Instance)
-            : Validation<QVoid>.Failure(GetArgumentErrorMessage(value, optionName, typeof(QVoid)));
+            : Validation<QVoid>.Failure(ArgumentErrorMessage(value, optionName, typeof(QVoid)));
 
         /// <summary>
         /// Parses a <see cref="Result"/>.
@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 ResultValue.One => Result.One,
                 var invalid => throw new Exception($"Invalid result value '{invalid}'.")
             })
-            : Validation<Result>.Failure(GetArgumentErrorMessage(value, optionName, typeof(Result)));
+            : Validation<Result>.Failure(ArgumentErrorMessage(value, optionName, typeof(Result)));
 
         /// <summary>
         /// Returns an error message string for an argument parser.
@@ -123,7 +123,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="optionName">The name of the option.</param>
         /// <param name="type">The expected type of the argument.</param>
         /// <returns>An error message string for an argument parser.</returns>
-        private static string GetArgumentErrorMessage(string arg, string optionName, Type type) =>
+        private static string ArgumentErrorMessage(string arg, string optionName, Type type) =>
             $"Cannot parse argument '{arg}' for option '{optionName}' as expected type {type}.";
     }
 }
