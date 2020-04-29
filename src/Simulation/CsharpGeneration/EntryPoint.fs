@@ -11,8 +11,6 @@ open Microsoft.Quantum.QsCompiler.SyntaxTokens
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.RoslynWrapper
 open System
-open System.IO
-open System.Reflection
 
 
 /// An entry point parameter.
@@ -60,10 +58,10 @@ let private argumentParser qsType =
         match qsType with
         | ArrayType _ -> "ParseArgumentsWith"
         | _ -> "ParseArgumentWith"
-    let parsersIdent = ``ident`` (nonGeneratedNamespace + ".Parsers")
+    let parsersIdent = ident (nonGeneratedNamespace + ".Parsers")
     valueParser qsType
     |> Option.map (fun valueParser ->
-        parsersIdent <.> (``ident`` argParser, [parsersIdent <|.|> ``ident`` valueParser]))
+        parsersIdent <.> (ident argParser, [parsersIdent <|.|> ident valueParser]))
 
 /// Adds suggestions, if any, to the option based on the Q# type.
 let private withSuggestions qsType option =
@@ -74,15 +72,15 @@ let private withSuggestions qsType option =
     match suggestions qsType with
     | [] -> option
     | suggestions ->
-        let args = option :: List.map ``literal`` suggestions
-        ``invoke`` (``ident`` "System.CommandLine.OptionExtensions.WithSuggestions") ``(`` args ``)``
+        let args = option :: List.map literal suggestions
+        invoke (ident "System.CommandLine.OptionExtensions.WithSuggestions") ``(`` args ``)``
 
 /// An expression representing the name of an entry point option given its parameter name.
 let private optionName (paramName : string) =
-    let toKebabCaseIdent = ``ident`` "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
+    let toKebabCaseIdent = ident "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
     if paramName.Length = 1
-    then ``literal`` ("-" + paramName)
-    else ``literal`` "--" <+> ``invoke`` toKebabCaseIdent ``(`` [``literal`` paramName] ``)``
+    then literal ("-" + paramName)
+    else literal "--" <+> invoke toKebabCaseIdent ``(`` [literal paramName] ``)``
 
 /// A property containing a sequence of command-line options corresponding to each parameter given.
 let private parameterOptionsProperty parameters =
@@ -91,18 +89,18 @@ let private parameterOptionsProperty parameters =
     let getOption { Name = name; QsharpType = qsType; CsharpTypeName = typeName; Description = desc } =
         let args =
             match argumentParser qsType.Resolution with
-            | Some parser -> [optionName name; parser; upcast ``false``; ``literal`` desc]
-            | None -> [optionName name; ``literal`` desc]
+            | Some parser -> [optionName name; parser; upcast ``false``; literal desc]
+            | None -> [optionName name; literal desc]
 
         ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` args ``)``
             ``{``
-                [``ident`` "Required" <-- ``true``]
+                [ident "Required" <-- ``true``]
             ``}``
         |> withSuggestions qsType.Resolution
 
     let options = parameters |> Seq.map getOption |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``]
-        ``get`` (``=>`` (``new array`` (Some optionTypeName) options))
+        get (``=>`` (``new array`` (Some optionTypeName) options))
 
 /// A method that creates an instance of the default simulator if it is a custom simulator.
 let private customSimulatorFactory name =
@@ -117,7 +115,7 @@ let private customSimulatorFactory name =
         then ``new`` (``type`` name) ``(`` [] ``)``
         else upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
         
-    ``arrow_method`` "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
+    arrow_method "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
         ``(`` [] ``)``
         [``public``]
         (Some (``=>`` factory))
@@ -130,13 +128,13 @@ let private runMethod context (entryPoint : QsCallable) =
     let factoryName = "factory"
     let parseResultName = "parseResult"
     let runParams = [
-        ``param`` factoryName ``of`` (``type`` "IOperationFactory")
-        ``param`` parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
+        param factoryName ``of`` (``type`` "IOperationFactory")
+        param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
     ]
     
     let argExpr { Name = name; QsharpType = qsType; CsharpTypeName = typeName } =
-        let valueForOption = ``ident`` (sprintf "ValueForOption<%s>" typeName)
-        let value = ``ident`` parseResultName <.> (valueForOption, [optionName name])
+        let valueForOption = ident (sprintf "ValueForOption<%s>" typeName)
+        let value = ident parseResultName <.> (valueForOption, [optionName name])
         match qsType.Resolution with
         | ArrayType itemType ->
             let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
@@ -145,36 +143,36 @@ let private runMethod context (entryPoint : QsCallable) =
         
     let callArgs : ExpressionSyntax seq =
         Seq.concat [
-            Seq.singleton (upcast ``ident`` factoryName)
+            Seq.singleton (upcast ident factoryName)
             Seq.map argExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
 
-    ``arrow_method`` taskTypeName "Run" ``<<`` [] ``>>``
+    arrow_method taskTypeName "Run" ``<<`` [] ``>>``
         ``(`` runParams ``)``
-        [``public``; ``async``]
-        (Some (``=>`` (``await`` (``ident`` entryPointName <.> (``ident`` "Run", callArgs)))))
+        [``public``; async]
+        (Some (``=>`` (await (ident entryPointName <.> (ident "Run", callArgs)))))
 
 /// The main method for the standalone executable.
 let private mainMethod =
     let commandLineArgsName = "args"
-    let runIdent = ``ident`` (nonGeneratedNamespace + ".Driver.Run")
-    let runArgs = [``new`` (``type`` "EntryPoint") ``(`` [] ``)``; upcast ``ident`` commandLineArgsName]
-    ``arrow_method`` "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
-        ``(`` [``param`` commandLineArgsName ``of`` (``type`` "string[]")] ``)``
-        [``private``; ``static``; ``async``]
-        (Some (``=>`` (``await`` (``invoke`` runIdent ``(`` runArgs ``)``))))
+    let runIdent = ident (nonGeneratedNamespace + ".Driver.Run")
+    let runArgs = [``new`` (``type`` "EntryPoint") ``(`` [] ``)``; upcast ident commandLineArgsName]
+    arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
+        ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
+        [``private``; ``static``; async]
+        (Some (``=>`` (await (invoke runIdent ``(`` runArgs ``)``))))
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
     let property name typeName value =
-        ``property-arrow_get`` typeName name [``public``] ``get`` (``=>`` value)
+        ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
     let summaryProperty =
-        property "Summary" "string" (``literal`` ((PrintSummary entryPoint.Documentation false).Trim ()))
+        property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
-    let defaultSimulatorProperty = property "DefaultSimulator" "string" (``literal`` defaultSimulator)
+    let defaultSimulatorProperty = property "DefaultSimulator" "string" (literal defaultSimulator)
     
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let members : MemberDeclarationSyntax list = [
@@ -200,7 +198,7 @@ let generate context (entryPoint : QsCallable) =
     let ns =
         ``namespace`` (generatedNamespace entryPoint.FullName.Namespace.Value)
             ``{``
-                (Seq.map ``using`` SimulationCode.autoNamespaces)
+                (Seq.map using SimulationCode.autoNamespaces)
                 [entryPointClass context entryPoint]
             ``}``
     ``compilation unit`` [] [] [ns]
