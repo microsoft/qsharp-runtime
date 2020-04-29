@@ -67,9 +67,9 @@ let private generateCsharp defaultSimulator (syntaxTree : QsNamespace seq, entry
         | None -> ImmutableDictionary.Empty
     let context = CodegenContext.Create (syntaxTree, assemblyConstants)
     let entryPoint = context.allCallables.[Seq.exactlyOne entryPoints]
-    List.concat [
-        [SimulationCode.generate (NonNullable<_>.New testFile) context]
-        EntryPoint.generate context entryPoint |> List.map snd
+    [
+        SimulationCode.generate (NonNullable<_>.New testFile) context
+        EntryPoint.generate context entryPoint
     ]
 
 /// The full path to a referenced assembly given its short name.
