@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -27,17 +28,20 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The success value of the validation.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if the validation failed.</exception>
-        internal T Value => IsSuccess ? ValueOrDefault : throw new InvalidOperationException();
+        internal T Value =>
+            // Suppress null warning since ValueOrDefault may not be null if IsSuccess is true.
+            (IsSuccess ? ValueOrDefault : throw new InvalidOperationException())!;
 
         /// <summary>
         /// The success value of the validation or a default value if the validation failed.
         /// </summary>
+        [MaybeNull]
         internal T ValueOrDefault { get; }
         
         /// <summary>
         /// The error message of the validation.
         /// </summary>
-        internal string ErrorMessage { get; }
+        internal string? ErrorMessage { get; }
 
         /// <summary>
         /// Creates a new validation.
@@ -45,7 +49,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="isSuccess">True if the validation succeeded.</param>
         /// <param name="value">The success value or a default value</param>
         /// <param name="errorMessage">The error message.</param>
-        private Validation(bool isSuccess, T value, string errorMessage)
+        private Validation(bool isSuccess, T value, string? errorMessage)
         {
             IsSuccess = isSuccess;
             ValueOrDefault = value;
@@ -65,8 +69,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="errorMessage">The error message.</param>
         /// <returns>The failed validation.</returns>
-        internal static Validation<T> Failure(string errorMessage = null) =>
-            new Validation<T>(false, default, errorMessage);
+        internal static Validation<T> Failure(string? errorMessage = null) =>
+            new Validation<T>(false, default!, errorMessage);
     }
 
     /// <summary>
@@ -78,8 +82,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// Sequentially composes two validations, passing the value of the first validation to another
         /// validation-producing function if the first validation is a success.
         /// </summary>
-        /// <typeparam name="T">The type of the first validation's success value.</typeparam>
-        /// <typeparam name="U">The type of the second validation's success value.</typeparam>
+        /// <typeparam name="T1">The type of the first validation's success value.</typeparam>
+        /// <typeparam name="T2">The type of the second validation's success value.</typeparam>
         /// <param name="validation">The first validation.</param>
         /// <param name="bind">
         /// A function that takes the value of the first validation and returns a second validation.
@@ -88,8 +92,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The first validation if the first validation is a failure; otherwise, the return value of calling the bind
         /// function on the first validation's success value.
         /// </returns>
-        internal static Validation<U> Bind<T, U>(this Validation<T> validation, Func<T, Validation<U>> bind) =>
-            validation.IsFailure ? Validation<U>.Failure(validation.ErrorMessage) : bind(validation.Value);
+        internal static Validation<T2> Bind<T1, T2>(this Validation<T1> validation, Func<T1, Validation<T2>> bind) =>
+            validation.IsFailure ? Validation<T2>.Failure(validation.ErrorMessage) : bind(validation.Value);
 
         /// <summary>
         /// Converts an enumerable of validations into a validation of an enumerable.

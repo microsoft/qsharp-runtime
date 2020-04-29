@@ -203,7 +203,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 IEntryPoint<TEntryPoint> entryPoint,
                 IEnumerable<string> aliases,
                 Func<TOption> getDefaultValue,
-                string description = null) => 
+                string? description = null) => 
             IsAliasAvailable(entryPoint, aliases.First())
             ? Validation<Option<TOption>>.Success(
                 new Option<TOption>(
