@@ -24,18 +24,21 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// Creates a command-line option.
         /// </summary>
+        /// <typeparam name="T">The type of the option's argument.</typeparam>
         /// <param name="name">The name of the option.</param>
         /// <param name="description">A description of the option.</param>
-        /// <param name="type">The type of the option's argument.</param>
         /// <returns>An option.</returns>
-        public static Option CreateOption(string name, string description, Type type)
+        public static Option<T> CreateOption<T>(string name, string description)
         {
+            var type = typeof(T);
             var isArray = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>);
             var baseType = isArray ? type.GenericTypeArguments.Single() : type;
             var create = isArray
                 ? typeof(Options).GetMethod(nameof(CreateManyValuedOption), NonPublic | Static)
                 : typeof(Options).GetMethod(nameof(CreateSingleValuedOption), NonPublic | Static);
-            var option = (Option)create.MakeGenericMethod(baseType).Invoke(null, new object[] { name, description });
+            var option = (Option<T>)create
+                .MakeGenericMethod(baseType)
+                .Invoke(null, new object[] { name, description });
             return Suggestions.TryGetValue(baseType, out var suggestions)
                 ? option.WithSuggestions(suggestions.ToArray())
                 : option;

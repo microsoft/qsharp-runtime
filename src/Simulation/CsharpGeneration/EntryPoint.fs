@@ -49,13 +49,9 @@ let private optionName (paramName : string) =
 let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let createOption = ident (sprintf "%s.Options.CreateOption" driverNamespace)
     let option { Name = name; CsharpTypeName = typeName; Description = desc } =
-        let args = [
-            optionName name
-            literal desc
-            upcast SyntaxFactory.TypeOfExpression (``type`` typeName)
-        ]
+        let createOption = ident (sprintf "%s.Options.CreateOption<%s>" driverNamespace typeName)
+        let args = [optionName name; literal desc]
         invoke createOption ``(`` args ``)``
     let options = parameters |> Seq.map option |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``]
