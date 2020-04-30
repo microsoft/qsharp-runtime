@@ -192,6 +192,46 @@ namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
 // ---
 
 //
+// Tuples
+//
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation RedundantOneTuple((x : Int)) : String {
+        return $"{x}";
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation RedundantTwoTuple((x : Int, y : Int)) : String {
+        return $"{x} {y}";
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation OneTuple(x : Int, (y : Int)) : String {
+        return $"{x} {y}";
+    }
+}
+
+// ---
+
+namespace Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint {
+    @EntryPoint()
+    operation TwoTuple(x : Int, (y : Int, z : Int)) : String {
+        return $"{x} {y} {z}";
+    }
+}
+
+// ---
+
+//
 // Name Conversion
 //
 

@@ -75,21 +75,18 @@ let private customSimulatorFactory name =
         [``public``]
         (Some (``=>`` factory))
 
-/// The method that creates the argument tuple for the entry point, given the command-line parsing result.
+/// A method that creates the argument tuple for the entry point, given the command-line parsing result.
 let private createArgument context (entryPoint : QsCallable) =
     let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
     let parseResultName = "parseResult"
-    let valueForParam { Name = name; CsharpTypeName = typeName } =
-        let valueForOption = ident (sprintf "ValueForOption<%s>" typeName)
-        ident parseResultName <.> (valueForOption, [optionName name])
-    // TODO: How are nested tuples handled?
-    let values =
-        parameters context entryPoint.Documentation entryPoint.ArgumentTuple
-        |> Seq.map valueForParam
-    let argTuple : ExpressionSyntax =
-        if Seq.isEmpty values
-        then ``type`` (SimulationCode.roslynTypeName context (ResolvedType.New UnitType)) <|.|> ident "Instance"
-        else tuple (Seq.toList values)
+    let valueForArg (name, typeName) =
+        ident parseResultName <.> (sprintf "ValueForOption<%s>" typeName |> ident, [optionName name])
+    let argTuple =
+        SimulationCode.mapArgumentTuple
+            valueForArg
+            context
+            entryPoint.ArgumentTuple
+            entryPoint.Signature.ArgumentType
     arrow_method inTypeName "CreateArgument" ``<<`` [] ``>>``
         ``(`` [param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")] ``)``
         [``public``]
