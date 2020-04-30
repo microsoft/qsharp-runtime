@@ -45,36 +45,6 @@ let rec private parameters context doc = function
         | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
 
-/// The argument parser for the Q# type.
-let private argumentParser qsType =
-    let rec valueParser = function
-        | ArrayType (itemType : ResolvedType) -> valueParser itemType.Resolution
-        | BigInt -> Some "TryParseBigInteger"
-        | Range -> Some "TryParseQRange"
-        | Result -> Some "TryParseResult"
-        | UnitType -> Some "TryParseQVoid"
-        | _ -> None
-    let argParser =
-        match qsType with
-        | ArrayType _ -> "ParseArgumentsWith"
-        | _ -> "ParseArgumentWith"
-    let parsersIdent = ident (nonGeneratedNamespace + ".Parsers")
-    valueParser qsType
-    |> Option.map (fun valueParser ->
-        parsersIdent <.> (ident argParser, [parsersIdent <|.|> ident valueParser]))
-
-/// Adds suggestions, if any, to the option based on the Q# type.
-let private withSuggestions qsType option =
-    let rec suggestions = function
-        | ArrayType (itemType : ResolvedType) -> suggestions itemType.Resolution
-        | Result -> ["Zero"; "One"]
-        | _ -> []
-    match suggestions qsType with
-    | [] -> option
-    | suggestions ->
-        let args = option :: List.map literal suggestions
-        invoke (ident "System.CommandLine.OptionExtensions.WithSuggestions") ``(`` args ``)``
-
 /// An expression representing the name of an entry point option given its parameter name.
 let private optionName (paramName : string) =
     let toKebabCaseIdent = ident "System.CommandLine.Parsing.StringExtensions.ToKebabCase"
@@ -86,19 +56,15 @@ let private optionName (paramName : string) =
 let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let getOption { Name = name; QsharpType = qsType; CsharpTypeName = typeName; Description = desc } =
-        let args =
-            match argumentParser qsType.Resolution with
-            | Some parser -> [optionName name; parser; upcast ``false``; literal desc]
-            | None -> [optionName name; literal desc]
-
-        ``new init`` (``type`` [sprintf "%s<%s>" optionTypeName typeName]) ``(`` args ``)``
-            ``{``
-                [ident "Required" <-- ``true``]
-            ``}``
-        |> withSuggestions qsType.Resolution
-
-    let options = parameters |> Seq.map getOption |> Seq.toList
+    let createOption = ident (sprintf "%s.Options.CreateOption" nonGeneratedNamespace)
+    let option { Name = name; CsharpTypeName = typeName; Description = desc } =
+        let args = [
+            optionName name
+            literal desc
+            upcast SyntaxFactory.TypeOfExpression (``type`` typeName)
+        ]
+        invoke createOption ``(`` args ``)``
+    let options = parameters |> Seq.map option |> Seq.toList
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``]
         get (``=>`` (``new array`` (Some optionTypeName) options))
 

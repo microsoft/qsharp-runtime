@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// Represents either a success or a failure of a process.
     /// </summary>
     /// <typeparam name="T">The type of the success value.</typeparam>
-    public readonly struct Validation<T>
+    internal readonly struct Validation<T>
     {
         /// <summary>
         /// True if the validation succeeded.
