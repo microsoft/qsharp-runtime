@@ -29,35 +29,20 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <typeparam name="T">The type of the argument.</typeparam>
         /// <returns>The argument parser.</returns>
-        internal static ParseArgument<T> ParseOneArgument<T>() => ParseOneArgumentWith(ValueParser<T>());
+        internal static ParseArgument<T> ParseOneArgument<T>() => argument =>
+        {
+            var values = ParseManyArguments<T>()(argument);
+            return (values == null ? default : values.Single())!;
+        };
 
         /// <summary>
         /// Creates an argument parser for a many-valued argument of the given type.
         /// </summary>
         /// <typeparam name="T">The type of the arguments.</typeparam>
         /// <returns>The argument parser.</returns>
-        internal static ParseArgument<IQArray<T>> ParseManyArguments<T>() => ParseManyArgumentsWith(ValueParser<T>());
-
-        /// <summary>
-        /// Creates an argument parser for a single-valued argument using a parser that operates on the string value.
-        /// </summary>
-        /// <typeparam name="T">The type of the parsed value.</typeparam>
-        /// <param name="parse">The string parser.</param>
-        /// <returns>The argument parser.</returns>
-        private static ParseArgument<T> ParseOneArgumentWith<T>(TryParseValue<T> parse) => argument =>
+        internal static ParseArgument<IQArray<T>> ParseManyArguments<T>() => argument =>
         {
-            var values = ParseManyArgumentsWith(parse)(argument);
-            return (values == null ? default : values.Single())!;
-        };
-        
-        /// <summary>
-        /// Creates an argument parser for a many-valued argument using a parser that operates on each string value.
-        /// </summary>
-        /// <typeparam name="T">The type of the parsed value.</typeparam>
-        /// <param name="parse">The string parser.</param>
-        /// <returns>The argument parser.</returns>
-        private static ParseArgument<IQArray<T>> ParseManyArgumentsWith<T>(TryParseValue<T> parse) => argument =>
-        {
+            var parse = ValueParser<T>();
             var optionName = ((OptionResult)argument.Parent).Token.Value;
             var validation = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
             argument.ErrorMessage = validation.ErrorMessage;
