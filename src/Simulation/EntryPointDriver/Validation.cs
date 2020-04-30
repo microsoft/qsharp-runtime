@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         internal T ValueOrDefault { get; }
         
         /// <summary>
-        /// The error message of the validation.
+        /// The error message of the validation, or null if the validation has no error message.
         /// </summary>
         internal string? ErrorMessage { get; }
 

@@ -26,13 +26,6 @@ let generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPo
 /// The namespace containing the non-generated parts of the entry point driver.
 let private nonGeneratedNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
 
-/// The name of the C# type used by the parameter in its command-line option, given its Q# type.
-let rec private csharpParameterTypeName context (qsType : ResolvedType) =
-    match qsType.Resolution with
-    | ArrayType itemType -> sprintf "System.Collections.Generic.IEnumerable<%s>"
-                                    (csharpParameterTypeName context itemType)
-    | _ -> SimulationCode.roslynTypeName context qsType
-
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
     | QsTupleItem variable ->
@@ -40,7 +33,7 @@ let rec private parameters context doc = function
         | ValidName name ->
             Seq.singleton { Name = name.Value
                             QsharpType = variable.Type
-                            CsharpTypeName = csharpParameterTypeName context variable.Type
+                            CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
                             Description = ParameterDescription doc name.Value }
         | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
@@ -97,26 +90,18 @@ let private runMethod context (entryPoint : QsCallable) =
         param factoryName ``of`` (``type`` "IOperationFactory")
         param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
     ]
-    
-    let argExpr { Name = name; QsharpType = qsType; CsharpTypeName = typeName } =
+    let valueForParam { Name = name; CsharpTypeName = typeName } =
         let valueForOption = ident (sprintf "ValueForOption<%s>" typeName)
-        let value = ident parseResultName <.> (valueForOption, [optionName name])
-        match qsType.Resolution with
-        | ArrayType itemType ->
-            let arrayTypeName = sprintf "QArray<%s>" (SimulationCode.roslynTypeName context itemType)
-            ``new`` (``type`` arrayTypeName) ``(`` [value] ``)``
-        | _ -> value
-        
-    let callArgs : ExpressionSyntax seq =
+        ident parseResultName <.> (valueForOption, [optionName name])
+    let args : ExpressionSyntax seq =
         Seq.concat [
             Seq.singleton (upcast ident factoryName)
-            Seq.map argExpr (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
+            Seq.map valueForParam (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
         ]
-
     arrow_method taskTypeName "Run" ``<<`` [] ``>>``
         ``(`` runParams ``)``
         [``public``; async]
-        (Some (``=>`` (await (ident entryPointName <.> (ident "Run", callArgs)))))
+        (Some (``=>`` (await (ident entryPointName <.> (ident "Run", args)))))
 
 /// The main method for the standalone executable.
 let private mainMethod =
@@ -130,16 +115,13 @@ let private mainMethod =
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
-    let property name typeName value =
-        ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
-    let summaryProperty =
-        property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
+    let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
+    let summaryProperty = property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
     let defaultSimulator =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
     let defaultSimulatorProperty = property "DefaultSimulator" "string" (literal defaultSimulator)
-    
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let members : MemberDeclarationSyntax list = [
         summaryProperty
@@ -149,7 +131,6 @@ let private entryPointClass context (entryPoint : QsCallable) =
         runMethod context entryPoint
         mainMethod
     ]
-
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
     let baseName = sprintf "%s.IEntryPoint<%s>" nonGeneratedNamespace returnTypeName
     ``class`` "EntryPoint" ``<<`` [] ``>>``

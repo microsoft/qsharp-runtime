@@ -30,9 +30,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>An option.</returns>
         public static Option CreateOption(string name, string description, Type type)
         {
-            var isEnumerable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-            var baseType = isEnumerable ? type.GenericTypeArguments.Single() : type;
-            var create = isEnumerable
+            var isArray = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>);
+            var baseType = isArray ? type.GenericTypeArguments.Single() : type;
+            var create = isArray
                 ? typeof(Options).GetMethod(nameof(CreateManyValuedOption), NonPublic | Static)
                 : typeof(Options).GetMethod(nameof(CreateSingleValuedOption), NonPublic | Static);
             var option = (Option)create.MakeGenericMethod(baseType).Invoke(null, new object[] { name, description });
@@ -48,13 +48,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="name">The name of the option.</param>
         /// <param name="description">A description of the option.</param>
         /// <returns>An option.</returns>
-        private static Option<T> CreateSingleValuedOption<T>(string name, string description)
-        {
-            var parser = Parsers.ParseOneArgument<T>();
-            return parser == null
-                ? new Option<T>(name, description) { Required = true }
-                : new Option<T>(name, parser, false, description) { Required = true };
-        }
+        private static Option<T> CreateSingleValuedOption<T>(string name, string description) =>
+            new Option<T>(name, description)
+            {
+                Required = true,
+                Argument = new Argument<T>(Parsers.ParseOneArgument<T>())
+                {
+                    Arity = ArgumentArity.ExactlyOne
+                }
+            };
 
         /// <summary>
         /// Creates a command-line option with a many-valued argument.
@@ -63,12 +65,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="name">The name of the option.</param>
         /// <param name="description">A description of the option.</param>
         /// <returns>An option.</returns>
-        private static Option<IEnumerable<T>> CreateManyValuedOption<T>(string name, string description)
-        {
-            var parser = Parsers.ParseManyArguments<T>();
-            return parser == null
-                ? new Option<IEnumerable<T>>(name, description) { Required = true }
-                : new Option<IEnumerable<T>>(name, parser, false, description) { Required = true };
-        }
+        private static Option<IQArray<T>> CreateManyValuedOption<T>(string name, string description) =>
+            new Option<IQArray<T>>(name, description)
+            {
+                Required = true,
+                Argument = new Argument<IQArray<T>>(Parsers.ParseManyArguments<T>())
+                {
+                    Arity = ArgumentArity.OneOrMore
+                }
+            };
     }
 }

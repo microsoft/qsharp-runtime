@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.CommandLine.Parsing;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using Microsoft.Quantum.Simulation.Core;
@@ -23,28 +23,20 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed value.</returns>
         private delegate Validation<T> TryParseValue<T>(string value, string optionName);
-        
+
         /// <summary>
-        /// Creates an argument parser for a single-valued argument of the given type, if one exists.
+        /// Creates an argument parser for a single-valued argument of the given type.
         /// </summary>
         /// <typeparam name="T">The type of the argument.</typeparam>
-        /// <returns>An argument parser or null if none exists.</returns>
-        internal static ParseArgument<T>? ParseOneArgument<T>()
-        {
-            var parser = TryGetValueParser<T>();
-            return parser == null ? null : ParseOneArgumentWith(parser);
-        }
-        
+        /// <returns>The argument parser.</returns>
+        internal static ParseArgument<T> ParseOneArgument<T>() => ParseOneArgumentWith(ValueParser<T>());
+
         /// <summary>
-        /// Creates an argument parser for a many-valued argument of the given type, if one exists.
+        /// Creates an argument parser for a many-valued argument of the given type.
         /// </summary>
         /// <typeparam name="T">The type of the arguments.</typeparam>
-        /// <returns>An argument parser or null if none exists.</returns>
-        internal static ParseArgument<IEnumerable<T>>? ParseManyArguments<T>()
-        {
-            var parser = TryGetValueParser<T>();
-            return parser == null ? null : ParseManyArgumentsWith(parser);
-        }
+        /// <returns>The argument parser.</returns>
+        internal static ParseArgument<IQArray<T>> ParseManyArguments<T>() => ParseManyArgumentsWith(ValueParser<T>());
 
         /// <summary>
         /// Creates an argument parser for a single-valued argument using a parser that operates on the string value.
@@ -64,26 +56,23 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <typeparam name="T">The type of the parsed value.</typeparam>
         /// <param name="parse">The string parser.</param>
         /// <returns>The argument parser.</returns>
-        private static ParseArgument<IEnumerable<T>> ParseManyArgumentsWith<T>(TryParseValue<T> parse) => argument =>
+        private static ParseArgument<IQArray<T>> ParseManyArgumentsWith<T>(TryParseValue<T> parse) => argument =>
         {
             var optionName = ((OptionResult)argument.Parent).Token.Value;
             var validation = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
-            if (validation.IsFailure)
-            {
-                argument.ErrorMessage = validation.ErrorMessage;
-            }
-            return validation.ValueOrDefault;
+            argument.ErrorMessage = validation.ErrorMessage;
+            return validation.IsSuccess ? new QArray<T>(validation.Value) : default!;
         };
 
         /// <summary>
-        /// Returns the value parser for the given type if one exists.
+        /// Returns the value parser for the given type.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
-        /// <returns>A value parser or null if none exists.</returns>
-        private static TryParseValue<T>? TryGetValueParser<T>()
+        /// <returns>The value parser.</returns>
+        private static TryParseValue<T> ValueParser<T>()
         {
-            // We need to use casts to convince the type system that T really is the same as the concrete type in each
-            // conditional branch.
+            // We need to use casts because the type system does not realize that T really is the same as the concrete
+            // type in each conditional branch.
             var type = typeof(T);
             return
                 type == typeof(BigInteger)
@@ -94,7 +83,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 ? (TryParseValue<T>)(object)(TryParseValue<QVoid>)TryParseQVoid
                 : type == typeof(Result)
                 ? (TryParseValue<T>)(object)(TryParseValue<Result>)TryParseResult
-                : null;
+                : TryParseWithTypeConverter<T>;
         }
 
         /// <summary>
@@ -160,6 +149,31 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             })
             : Validation<Result>.Failure(ArgumentErrorMessage(value, optionName, typeof(Result)));
 
+        /// <summary>
+        /// Parses a string into the given type using the corresponding type converter.
+        /// </summary>
+        /// <param name="value">The string value to parse.</param>
+        /// <param name="optionName">The name of the option that the value was used with.</param>
+        /// <typeparam name="T">The type of the parsed value.</typeparam>
+        /// <returns>A validation of the parsed <typeparamref name="T"/>.</returns>
+        private static Validation<T> TryParseWithTypeConverter<T>(string value, string optionName)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (!converter.CanConvertFrom(typeof(string)))
+            {
+                return Validation<T>.Failure(ArgumentErrorMessage(value, optionName, typeof(T)));
+            }
+            
+            try
+            {
+                return Validation<T>.Success((T)converter.ConvertFromInvariantString(value));
+            }
+            catch (Exception)
+            {
+                return Validation<T>.Failure(ArgumentErrorMessage(value, optionName, typeof(T)));
+            }
+        }
+        
         /// <summary>
         /// Returns an error message string for an argument parser.
         /// </summary>

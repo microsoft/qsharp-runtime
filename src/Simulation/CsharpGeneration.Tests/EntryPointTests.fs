@@ -214,10 +214,10 @@ let ``Accepts Double`` () =
 [<Fact>]
 let ``Accepts Bool`` () =
     let given = test 7
-    given ["-b"] |> yields "True"
     given ["-b"; "false"] |> yields "False"
     given ["-b"; "true"] |> yields "True"
     given ["-b"; "one"] |> fails
+    given ["-b"] |> fails
 
 [<Fact>]
 let ``Accepts Pauli`` () =
