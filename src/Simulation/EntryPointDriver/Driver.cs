@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -57,18 +56,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             TryCreateOption(
-                entryPoint,
-                SimulatorOptions,
-                () => entryPoint.DefaultSimulator,
-                "The name of the simulator to use.").Then(option =>
-                {
-                    option.Argument.AddSuggestions(ImmutableHashSet<string>.Empty
-                        .Add(AssemblyConstants.QuantumSimulator)
-                        .Add(AssemblyConstants.ToffoliSimulator)
-                        .Add(AssemblyConstants.ResourcesEstimator)
-                        .Add(entryPoint.DefaultSimulator));
-                    simulate.AddOption(option);
-                });
+                    entryPoint,
+                    SimulatorOptions,
+                    () => entryPoint.DefaultSimulator,
+                    "The name of the simulator to use.")
+                .Then(simulator => simulate.AddOption(simulator.WithSuggestions(
+                    AssemblyConstants.QuantumSimulator,
+                    AssemblyConstants.ToffoliSimulator,
+                    AssemblyConstants.ResourcesEstimator,
+                    entryPoint.DefaultSimulator)));
             simulate.Handler = CommandHandler.Create(
                 (ParseResult parseResult, string simulator) => Simulate(entryPoint, parseResult, simulator));
 
