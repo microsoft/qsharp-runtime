@@ -40,7 +40,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>The exit code.</returns>
         public async Task<int> Run(string[] args)
         {
-            var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
+            var simulate = new Command("simulate", "(default) Run the program using a local simulator.")
+            {
+                Handler = CommandHandler.Create<ParseResult, string>(Simulate)
+            };
             TryCreateOption(
                     SimulatorOptions,
                     () => entryPoint.DefaultSimulator,
@@ -50,9 +53,13 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     AssemblyConstants.ToffoliSimulator,
                     AssemblyConstants.ResourcesEstimator,
                     entryPoint.DefaultSimulator)));
-            simulate.Handler = CommandHandler.Create<ParseResult, string>(Simulate);
 
-            var root = new RootCommand(entryPoint.Summary) { simulate };
+            var submit = new Command("submit", "Submit the program to Azure Quantum.")
+            {
+                Handler = CommandHandler.Create<ParseResult>(Submit)
+            };
+
+            var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
 
             // Set the simulate command as the default.
@@ -94,9 +101,24 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     DisplayCustomSimulatorError(simulator);
                     return 1;
                 }
-                await DisplayEntryPointResult(parseResult, createSimulator);
+                await RunSimulator(parseResult, createSimulator);
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Submits the entry point to Azure Quantum.
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        private async Task Submit(ParseResult parseResult)
+        {
+            // TODO: Use an actual quantum machine.
+            var machine = new SimulatorMachine();
+            var (value, _) = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
+            if (!(value is QVoid))
+            {
+                Console.WriteLine(value);
+            }
         }
 
         /// <summary>
@@ -104,7 +126,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
-        private async Task DisplayEntryPointResult(ParseResult parseResult, Func<IOperationFactory> createSimulator)
+        private async Task RunSimulator(ParseResult parseResult, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try

@@ -501,7 +501,8 @@ Options:
   -?, -h, --help                                      Show help and usage information
 
 Commands:
-  simulate    (default) Run the program using a local simulator."
+  simulate    (default) Run the program using a local simulator.
+  submit      Submit the program to Azure Quantum."
 
     let given = test 31
     given ["--help"] |> yields message
