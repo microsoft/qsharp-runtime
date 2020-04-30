@@ -122,7 +122,7 @@ let private testAssembly testNum defaultSimulator =
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
 /// code.
 let private run (assembly : Assembly) (args : string[]) =
-    let entryPoint = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".EntryPoint")
+    let entryPoint = assembly.GetType (sprintf "%s.%s" testNamespace EntryPoint.entryPointClassName)
     let main = entryPoint.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out

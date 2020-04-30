@@ -20,11 +20,11 @@ type private Parameter =
       CsharpTypeName : string
       Description : string }
 
-/// The namespace in which to put generated code for the entry point.
-let generatedNamespace entryPointNamespace = entryPointNamespace + ".__QsEntryPoint__"
+/// The name of the generated entry point class.
+let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private nonGeneratedNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+let private driverNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
@@ -49,7 +49,7 @@ let private optionName (paramName : string) =
 let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let createOption = ident (sprintf "%s.Options.CreateOption" nonGeneratedNamespace)
+    let createOption = ident (sprintf "%s.Options.CreateOption" driverNamespace)
     let option { Name = name; CsharpTypeName = typeName; Description = desc } =
         let args = [
             optionName name
@@ -106,8 +106,8 @@ let private runMethod context (entryPoint : QsCallable) =
 /// The main method for the standalone executable.
 let private mainMethod =
     let commandLineArgsName = "args"
-    let runIdent = ident (nonGeneratedNamespace + ".Driver.Run")
-    let runArgs = [``new`` (``type`` "EntryPoint") ``(`` [] ``)``; upcast ident commandLineArgsName]
+    let runIdent = ident (driverNamespace + ".Driver.Run")
+    let runArgs = [``new`` (``type`` entryPointClassName) ``(`` [] ``)``; upcast ident commandLineArgsName]
     arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
         ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
         [``private``; ``static``; async]
@@ -132,8 +132,8 @@ let private entryPointClass context (entryPoint : QsCallable) =
         mainMethod
     ]
     let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
-    let baseName = sprintf "%s.IEntryPoint<%s>" nonGeneratedNamespace returnTypeName
-    ``class`` "EntryPoint" ``<<`` [] ``>>``
+    let baseName = sprintf "%s.IEntryPoint<%s>" driverNamespace returnTypeName
+    ``class`` entryPointClassName``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
@@ -143,7 +143,7 @@ let private entryPointClass context (entryPoint : QsCallable) =
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let generate context (entryPoint : QsCallable) =
     let ns =
-        ``namespace`` (generatedNamespace entryPoint.FullName.Namespace.Value)
+        ``namespace`` entryPoint.FullName.Namespace.Value
             ``{``
                 (Seq.map using SimulationCode.autoNamespaces)
                 [entryPointClass context entryPoint]
