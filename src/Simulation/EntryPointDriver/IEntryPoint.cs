@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -14,8 +13,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// Contains entry point properties needed by the command-line interface and allows the entry point to use
     /// command-line arguments. The implementation of this interface is code-generated.
     /// </remarks>
-    /// <typeparam name="T">The entry point's return type.</typeparam>
-    public interface IEntryPoint<T>
+    /// <typeparam name="T">The entry point's argument type.</typeparam>
+    public interface IEntryPoint<out T>
     {
         /// <summary>
         /// The summary from the entry point's documentation comment.
@@ -42,11 +41,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         IOperationFactory CreateDefaultCustomSimulator();
 
         /// <summary>
-        /// Runs the entry point.
+        /// Creates the argument to the entry point based on the command-line parsing result.
         /// </summary>
-        /// <param name="factory">The operation factory to use.</param>
-        /// <param name="parseResult">The result of parsing the command-line options.</param>
-        /// <returns>The return value of the entry point.</returns>
-        Task<T> Run(IOperationFactory factory, ParseResult parseResult);
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <returns>The argument to the entry point.</returns>
+        T CreateArgument(ParseResult parseResult);
     }
 }

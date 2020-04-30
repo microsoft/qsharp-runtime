@@ -75,39 +75,39 @@ let private customSimulatorFactory name =
         [``public``]
         (Some (``=>`` factory))
 
-/// The method for running the entry point using command-line arguments.
-let private runMethod context (entryPoint : QsCallable) =
-    let entryPointName = sprintf "%s.%s" entryPoint.FullName.Namespace.Value entryPoint.FullName.Name.Value
-    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
-    let taskTypeName = sprintf "System.Threading.Tasks.Task<%s>" returnTypeName
-    let factoryName = "factory"
+/// The method that creates the argument tuple for the entry point, given the command-line parsing result.
+let private createArgument context (entryPoint : QsCallable) =
+    let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
     let parseResultName = "parseResult"
-    let runParams = [
-        param factoryName ``of`` (``type`` "IOperationFactory")
-        param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
-    ]
     let valueForParam { Name = name; CsharpTypeName = typeName } =
         let valueForOption = ident (sprintf "ValueForOption<%s>" typeName)
         ident parseResultName <.> (valueForOption, [optionName name])
-    let args : ExpressionSyntax seq =
-        Seq.concat [
-            Seq.singleton (upcast ident factoryName)
-            Seq.map valueForParam (parameters context entryPoint.Documentation entryPoint.ArgumentTuple)
-        ]
-    arrow_method taskTypeName "Run" ``<<`` [] ``>>``
-        ``(`` runParams ``)``
-        [``public``; async]
-        (Some (``=>`` (await (ident entryPointName <.> (ident "Run", args)))))
+    // TODO: How are nested tuples handled?
+    let values =
+        parameters context entryPoint.Documentation entryPoint.ArgumentTuple
+        |> Seq.map valueForParam
+    let argTuple : ExpressionSyntax =
+        if Seq.isEmpty values
+        then ``type`` (SimulationCode.roslynTypeName context (ResolvedType.New UnitType)) <|.|> ident "Instance"
+        else tuple (Seq.toList values)
+    arrow_method inTypeName "CreateArgument" ``<<`` [] ``>>``
+        ``(`` [param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")] ``)``
+        [``public``]
+        (Some (``=>`` argTuple))
 
 /// The main method for the standalone executable.
-let private mainMethod =
+let private mainMethod context (entryPoint : QsCallable) =
+    let _, callableTypeName = SimulationCode.findClassName context entryPoint
+    let argTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
+    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
+    let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableTypeName; argTypeName; returnTypeName] ``>>``
+    let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
+    let driver = ``new`` driverType ``(`` [entryPointInstance] ``)``
     let commandLineArgsName = "args"
-    let runIdent = ident (driverNamespace + ".Driver.Run")
-    let runArgs = [``new`` (``type`` entryPointClassName) ``(`` [] ``)``; upcast ident commandLineArgsName]
     arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
         ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
         [``private``; ``static``; async]
-        (Some (``=>`` (await (invoke runIdent ``(`` runArgs ``)``))))
+        (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
@@ -124,11 +124,11 @@ let private entryPointClass context (entryPoint : QsCallable) =
         defaultSimulatorProperty
         parameterOptionsProperty parameters
         customSimulatorFactory defaultSimulator
-        runMethod context entryPoint
-        mainMethod
+        createArgument context entryPoint
+        mainMethod context entryPoint
     ]
-    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
-    let baseName = sprintf "%s.IEntryPoint<%s>" driverNamespace returnTypeName
+    let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
+    let baseName = sprintf "%s.IEntryPoint<%s>" driverNamespace inTypeName
     ``class`` entryPointClassName``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
