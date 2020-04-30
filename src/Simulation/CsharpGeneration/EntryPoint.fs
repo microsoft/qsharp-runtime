@@ -76,7 +76,7 @@ let private customSimulatorFactory name =
         (Some (``=>`` factory))
 
 /// A method that creates the argument tuple for the entry point, given the command-line parsing result.
-let private createArgument context (entryPoint : QsCallable) =
+let private createArgument context entryPoint =
     let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
     let parseResultName = "parseResult"
     let valueForArg (name, typeName) =
@@ -92,12 +92,17 @@ let private createArgument context (entryPoint : QsCallable) =
         [``public``]
         (Some (``=>`` argTuple))
 
+/// A tuple of the callable's name, argument type name, and return type name.
+let private callableTypeNames context (callable : QsCallable) =
+    let callableName = sprintf "%s.%s" callable.FullName.Namespace.Value callable.FullName.Name.Value
+    let argTypeName = SimulationCode.roslynTypeName context callable.Signature.ArgumentType
+    let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
+    callableName, argTypeName, returnTypeName
+
 /// The main method for the standalone executable.
-let private mainMethod context (entryPoint : QsCallable) =
-    let _, callableTypeName = SimulationCode.findClassName context entryPoint
-    let argTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
-    let returnTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ReturnType
-    let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableTypeName; argTypeName; returnTypeName] ``>>``
+let private mainMethod context entryPoint =
+    let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
+    let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
     let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
     let driver = ``new`` driverType ``(`` [entryPointInstance] ``)``
     let commandLineArgsName = "args"
@@ -107,25 +112,30 @@ let private mainMethod context (entryPoint : QsCallable) =
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
-let private entryPointClass context (entryPoint : QsCallable) =
+let private entryPointClass context entryPoint =
+    let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
     let summaryProperty = property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
+    let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let defaultSimulator =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
     let defaultSimulatorProperty = property "DefaultSimulator" "string" (literal defaultSimulator)
-    let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
+    let infoProperty =
+        property "Info"
+            (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
+            (ident callableName <|.|> ident "Info")
     let members : MemberDeclarationSyntax list = [
         summaryProperty
-        defaultSimulatorProperty
         parameterOptionsProperty parameters
+        defaultSimulatorProperty
+        infoProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint
         mainMethod context entryPoint
     ]
-    let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
-    let baseName = sprintf "%s.IEntryPoint<%s>" driverNamespace inTypeName
+    let baseName = sprintf "%s.IEntryPoint<%s, %s>" driverNamespace argTypeName returnTypeName
     ``class`` entryPointClassName``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]

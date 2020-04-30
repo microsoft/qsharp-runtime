@@ -25,13 +25,13 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// The entry point.
         /// </summary>
-        private readonly IEntryPoint<TIn> entryPoint;
+        private readonly IEntryPoint<TIn, TOut> entryPoint;
 
         /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
         /// <param name="entryPoint">The entry point.</param>
-        public Driver(IEntryPoint<TIn> entryPoint) => this.entryPoint = entryPoint;
+        public Driver(IEntryPoint<TIn, TOut> entryPoint) => this.entryPoint = entryPoint;
 
         /// <summary>
         /// Runs the entry point using the command-line arguments.

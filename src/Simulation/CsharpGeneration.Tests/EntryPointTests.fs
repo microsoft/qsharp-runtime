@@ -41,7 +41,7 @@ let private testCase =
     |> fun text -> text.Split "// ---"
     |> fun cases num -> cases.[num - 1]
 
-/// Compiles Q# source code into a syntax tree with the list of entry points names.
+/// Compiles the Q# source code.
 let private compileQsharp source =
     let uri name = Uri ("file://" + name)
     let fileManager name content =
@@ -57,16 +57,17 @@ let private compileQsharp source =
         compilation.Diagnostics ()
         |> Seq.filter (fun diagnostic -> diagnostic.Severity = DiagnosticSeverity.Error)
     Assert.Empty errors
-    compilation.BuiltCompilation.Namespaces, compilation.BuiltCompilation.EntryPoints
+    compilation.BuiltCompilation
 
-/// Generates C# source code for the given test case number and default simulator.
-let private generateCsharp defaultSimulator (syntaxTree : QsNamespace seq, entryPoints) =
+/// Generates C# source code from the compiled Q# syntax tree. The given default simulator is set as an assembly
+/// constant.
+let private generateCsharp defaultSimulator (compilation : QsCompilation) =
     let assemblyConstants =
         match defaultSimulator with
         | Some simulator -> ImmutableDictionary.Empty.Add (AssemblyConstants.DefaultSimulator, simulator)
         | None -> ImmutableDictionary.Empty
-    let context = CodegenContext.Create (syntaxTree, assemblyConstants)
-    let entryPoint = context.allCallables.[Seq.exactlyOne entryPoints]
+    let context = CodegenContext.Create (compilation, assemblyConstants)
+    let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
         SimulationCode.generate (NonNullable<_>.New testFile) context
         EntryPoint.generate context entryPoint
