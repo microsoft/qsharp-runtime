@@ -177,8 +177,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 var originalForeground = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Error.WriteLine($"Warning: Option {alias} is overridden by an entry point parameter name.");
-                Console.Error.WriteLine($"         Using default value {defaultValue}.");
+                Console.Error.WriteLine(
+                    $"Warning: Option {alias} is overridden by an entry point parameter name. " +
+                    $"Using default value {defaultValue}.");
                 Console.ForegroundColor = originalForeground;
                 return defaultValue;
             }
