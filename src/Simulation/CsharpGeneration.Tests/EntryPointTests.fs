@@ -94,7 +94,9 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime"
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
+            "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
             "Microsoft.Quantum.QSharp.Core"
+            "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
             "Microsoft.Quantum.Simulation.Simulators"
@@ -117,11 +119,11 @@ let private testAssembly testNum defaultSimulator =
     |> generateCsharp defaultSimulator
     |> compileCsharp
 
-/// Runs the entry point driver in the assembly with the given command-line arguments, and returns the output, errors,
-/// and exit code.
+/// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
+/// code.
 let private run (assembly : Assembly) (args : string[]) =
-    let driver = assembly.GetType (EntryPoint.generatedNamespace testNamespace + ".Driver")
-    let main = driver.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
+    let entryPoint = assembly.GetType (sprintf "%s.%s" testNamespace EntryPoint.entryPointClassName)
+    let main = entryPoint.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out
     let previousError = Console.Error
@@ -212,10 +214,10 @@ let ``Accepts Double`` () =
 [<Fact>]
 let ``Accepts Bool`` () =
     let given = test 7
-    given ["-b"] |> yields "True"
     given ["-b"; "false"] |> yields "False"
     given ["-b"; "true"] |> yields "True"
     given ["-b"; "one"] |> fails
+    given ["-b"] |> fails
 
 [<Fact>]
 let ``Accepts Pauli`` () =

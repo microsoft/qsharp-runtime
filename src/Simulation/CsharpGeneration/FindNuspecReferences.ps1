@@ -19,53 +19,52 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
-$target = "Microsoft.Quantum.CsharpGeneration.nuspec"
+using namespace System.IO
 
-if (Test-Path $target) { 
+$target = 'Microsoft.Quantum.CsharpGeneration.nuspec'
+if (Test-Path $target) {
     Write-Host "$target exists. Skipping generating new one."
     exit
- }
+}
 
-# Start with the nuspec template
-$nuspec = [xml](Get-Content "Microsoft.Quantum.CsharpGeneration.nuspec.template")
-$dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
+$nuspec = [Xml](Get-Content 'Microsoft.Quantum.CsharpGeneration.nuspec.template')
+$dependencies = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
-
-# Recursively find PackageReferences on all ProjectReferences:
-function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
-{
-    $csproj = [xml](Get-Content $PathToCsproj)
-
-    # Find all PackageReferences nodes:
-    $packageDependency = $csproj.Project.ItemGroup.PackageReference | Where-Object { $null -ne $_ }
-    $packageDependency | ForEach-Object {
-        # Identify package's id either from "Include" or "Update" attribute:
-        $id = $_.Include
-        if ($id -eq $null -or $id -eq "") {
-            $id = $_.Update
-        }
-
-        # Check if package already added as dependency, only add if new:
-        $added = $dep.dependency | Where { $_.id -eq $id }
-        if (!$added) {
-            Write-Host "Adding $id"
-            $onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
-            $onedependency.SetAttribute('id', $id)
-            $onedependency.SetAttribute('version', $_.Version)
-        }
-    }
-
-    # Recursively check on project references:
-    $projectDependency = $csproj.Project.ItemGroup.ProjectReference | Where-Object { $null -ne $_ }
-    $projectDependency | ForEach-Object {
-        Add-NuGetDependencyFromCsprojToNuspec $_.Include $dep
+# Adds a dependency to the dependencies element if it does not already exist.
+function Add-Dependency($Id, $Version) {
+    if (-not ($dependencies.dependency | Where-Object { $_.id -eq $Id })) {
+        Write-Host "Adding dependency $Id."
+        $dependency = $nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI)
+        $dependency.SetAttribute('id', $Id)
+        $dependency.SetAttribute('version', $Version)
+        $dependencies.AppendChild($dependency)
     }
 }
 
-# Find all dependencies on Microsoft.Quantum.CsharpGeneration.fsproj
-Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.CsharpGeneration.fsproj" $dep
+# Recursively find PackageReferences on all ProjectReferences.
+function Add-PackageReferenceDependencies($ProjectFileName) {
+    $project = [Xml](Get-Content $ProjectFileName)
 
-# Save into .nuspec file:
-$nuspec.package.metadata.AppendChild($dep)
-$nuspec.Save($target)
+    # Add all package references as dependencies.
+    $project.Project.ItemGroup.PackageReference | Where-Object { $null -ne $_ } | ForEach-Object {
+        $id = if ($_.Include) { $_.Include } else { $_.Update }
+        Add-Dependency $id $_.Version
+    }
 
+    # Recursively add dependencies from all project references.
+    $project.Project.ItemGroup.ProjectReference | Where-Object { $null -ne $_ } | ForEach-Object {
+        Add-PackageReferenceDependencies $_.Include
+    }
+}
+
+# Add dependencies for the projects included in this NuGet package.
+Add-PackageReferenceDependencies 'Microsoft.Quantum.CsharpGeneration.fsproj'
+Add-PackageReferenceDependencies '..\EntryPointDriver\EntryPointDriver.csproj'
+
+# Manually add EntryPointDriver's project references as package references to avoid a build-time dependency cycle.
+# $version$ is replaced with the current package version when the package is built.
+Add-Dependency 'Microsoft.Quantum.Runtime.Core' '$version$'
+Add-Dependency 'Microsoft.Quantum.Simulators' '$version$'
+
+$nuspec.package.metadata.AppendChild($dependencies)
+$nuspec.Save([Path]::Combine((Get-Location), $target))
