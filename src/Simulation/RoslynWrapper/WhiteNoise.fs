@@ -2,9 +2,7 @@
 
 [<AutoOpen>]
 module WhiteNoise =
-    open Microsoft.CodeAnalysis
     open Microsoft.CodeAnalysis.CSharp
-    open Microsoft.CodeAnalysis.CSharp.Syntax
 
     let ``:`` = None
     let ``,`` = None
@@ -31,3 +29,4 @@ module WhiteNoise =
     let ``override`` = SyntaxKind.OverrideKeyword
     let ``static`` = SyntaxKind.StaticKeyword
     let ``readonly`` = SyntaxKind.ReadOnlyKeyword
+    let ``const`` = SyntaxKind.ConstKeyword
