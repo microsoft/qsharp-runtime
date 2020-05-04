@@ -115,6 +115,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             // TODO: Use an actual quantum machine.
             var machine = new SimulatorMachine();
             var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
+            // TODO: Provide output options and show the most frequent output by default. 
             foreach (var (result, frequency) in output.Histogram)
             {
                 Console.WriteLine($"{result} (frequency = {frequency})");
