@@ -10,6 +10,7 @@ open Microsoft.CodeAnalysis
 open Microsoft.Quantum.QsCompiler
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
+open Microsoft.Quantum.QsCompiler.Diagnostics
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
@@ -34,7 +35,7 @@ type Emitter() =
         member this.PreconditionVerification compilation =
             if compilation.EntryPoints.Length > 1 then
                 _Diagnostics <- IRewriteStep.Diagnostic
-                    (Message = "C# generation is not possible because there is more than one entry point.",
+                    (Message = DiagnosticItem.Message (ErrorCode.MultipleEntryPoints, []),
                      Severity = DiagnosticSeverity.Error,
                      Stage = IRewriteStep.Stage.PreconditionVerification) :: _Diagnostics
                 false
@@ -51,7 +52,7 @@ type Emitter() =
 
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
             let targetsQuantumProcessor = 
-                match step.AssemblyConstants.TryGetValue "ResolvedExecutionTarget" with
+                match step.AssemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with
                 | true, target -> target = AssemblyConstants.AlfredProcessor || target = AssemblyConstants.BrunoProcessor || target = AssemblyConstants.ClementineProcessor
                 | _ -> false
 
