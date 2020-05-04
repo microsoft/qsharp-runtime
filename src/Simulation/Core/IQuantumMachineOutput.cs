@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Runtime
         /// Gets a histogram of outputs.
         /// The key is the output and the value is its frequency.
         /// </summary>
-        IReadOnlyDictionary<object, TOutput> Histogram { get; }
+        IReadOnlyDictionary<TOutput, double> Histogram { get; }
 
         /// <summary>
         /// Gets the job associated to the output.
