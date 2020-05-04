@@ -13,6 +13,11 @@ namespace Microsoft.Quantum.Runtime
     public interface IQuantumMachineJob
     {
         /// <summary>
+        /// Gets whether job execution failed.
+        /// </summary>
+        bool Failed { get; }
+
+        /// <summary>
         /// Gets the ID of submitted job.
         /// </summary>
         string Id { get; }
@@ -40,14 +45,13 @@ namespace Microsoft.Quantum.Runtime
         /// <summary>
         /// Cancels the job.
         /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">The cancellation token for the cancel operation.</param>
         Task CancelAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Refreshes the state of the job.
         /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">The cancellation token for the refresh operation.</param>
         Task RefreshAsync(CancellationToken cancellationToken = default);
-
     }
 }
