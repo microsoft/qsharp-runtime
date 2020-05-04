@@ -114,10 +114,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             // TODO: Use an actual quantum machine.
             var machine = new SimulatorMachine();
-            var (value, _) = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            if (!(value is QVoid))
+            var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
+            foreach (var (result, frequency) in output.Histogram)
             {
-                Console.WriteLine(value);
+                Console.WriteLine($"{result} (frequency = {frequency})");
             }
         }
 
