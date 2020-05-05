@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -14,8 +13,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// Contains entry point properties needed by the command-line interface and allows the entry point to use
     /// command-line arguments. The implementation of this interface is code-generated.
     /// </remarks>
-    /// <typeparam name="T">The entry point's return type.</typeparam>
-    public interface IEntryPoint<T>
+    /// <typeparam name="TIn">The entry point's argument type.</typeparam>
+    /// <typeparam name="TOut">The entry point's return type.</typeparam>
+    public interface IEntryPoint<TIn, TOut>
     {
         /// <summary>
         /// The summary from the entry point's documentation comment.
@@ -31,6 +31,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The name of the default simulator to use when simulating the entry point.
         /// </summary>
         string DefaultSimulator { get; }
+        
+        /// <summary>
+        /// Additional information about the entry point.
+        /// </summary>
+        EntryPointInfo<TIn, TOut> Info { get; }
 
         /// <summary>
         /// Creates an instance of the default simulator if it is a custom simulator.
@@ -42,11 +47,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         IOperationFactory CreateDefaultCustomSimulator();
 
         /// <summary>
-        /// Runs the entry point.
+        /// Creates the argument to the entry point based on the command-line parsing result.
         /// </summary>
-        /// <param name="factory">The operation factory to use.</param>
-        /// <param name="parseResult">The result of parsing the command-line options.</param>
-        /// <returns>The return value of the entry point.</returns>
-        Task<T> Run(IOperationFactory factory, ParseResult parseResult);
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <returns>The argument to the entry point.</returns>
+        TIn CreateArgument(ParseResult parseResult);
     }
 }

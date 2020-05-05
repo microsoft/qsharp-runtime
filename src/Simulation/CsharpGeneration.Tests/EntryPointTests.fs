@@ -41,7 +41,7 @@ let private testCase =
     |> fun text -> text.Split "// ---"
     |> fun cases num -> cases.[num - 1]
 
-/// Compiles Q# source code into a syntax tree with the list of entry points names.
+/// Compiles the Q# source code.
 let private compileQsharp source =
     let uri name = Uri ("file://" + name)
     let fileManager name content =
@@ -57,16 +57,17 @@ let private compileQsharp source =
         compilation.Diagnostics ()
         |> Seq.filter (fun diagnostic -> diagnostic.Severity = DiagnosticSeverity.Error)
     Assert.Empty errors
-    compilation.BuiltCompilation.Namespaces, compilation.BuiltCompilation.EntryPoints
+    compilation.BuiltCompilation
 
-/// Generates C# source code for the given test case number and default simulator.
-let private generateCsharp defaultSimulator (syntaxTree : QsNamespace seq, entryPoints) =
+/// Generates C# source code from the compiled Q# syntax tree. The given default simulator is set as an assembly
+/// constant.
+let private generateCsharp defaultSimulator (compilation : QsCompilation) =
     let assemblyConstants =
         match defaultSimulator with
         | Some simulator -> ImmutableDictionary.Empty.Add (AssemblyConstants.DefaultSimulator, simulator)
         | None -> ImmutableDictionary.Empty
-    let context = CodegenContext.Create (syntaxTree, assemblyConstants)
-    let entryPoint = context.allCallables.[Seq.exactlyOne entryPoints]
+    let context = CodegenContext.Create (compilation, assemblyConstants)
+    let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
         SimulationCode.generate (NonNullable<_>.New testFile) context
         EntryPoint.generate context entryPoint
@@ -362,17 +363,40 @@ let ``Requires all options`` () =
     given [] |> fails
 
 
+// Tuples
+
+[<Fact>]
+let ``Accepts redundant one-tuple`` () =
+    let given = test 21
+    given ["-x"; "7"] |> yields "7"
+    
+[<Fact>]
+let ``Accepts redundant two-tuple`` () =
+    let given = test 22
+    given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
+    
+[<Fact>]
+let ``Accepts one-tuple`` () =
+    let given = test 23
+    given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
+
+[<Fact>]    
+let ``Accepts two-tuple`` () =
+    let given = test 24
+    given ["-x"; "7"; "-y"; "8"; "-z"; "9"] |> yields "7 8 9"
+
+
 // Name Conversion
 
 [<Fact>]
 let ``Uses kebab-case`` () =
-    let given = test 21
+    let given = test 25
     given ["--camel-case-name"; "foo"] |> yields "foo"
     given ["--camelCaseName"; "foo"] |> fails
 
 [<Fact>]
 let ``Uses single-dash short names`` () =
-    let given = test 22
+    let given = test 26
     given ["-x"; "foo"] |> yields "foo"
     given ["--x"; "foo"] |> fails
 
@@ -381,7 +405,7 @@ let ``Uses single-dash short names`` () =
 
 [<Fact>]
 let ``Shadows --simulator`` () =
-    let given = test 23
+    let given = test 27
     given ["--simulator"; "foo"] |> yields "foo"
     given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields AssemblyConstants.ResourcesEstimator
     given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
@@ -389,14 +413,14 @@ let ``Shadows --simulator`` () =
 
 [<Fact>]
 let ``Shadows -s`` () =
-    let given = test 24
+    let given = test 28
     given ["-s"; "foo"] |> yields "foo"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "-s"; "foo"] |> yields "foo"
     given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows --version`` () =
-    let given = test 25
+    let given = test 29
     given ["--version"; "foo"] |> yields "foo"
 
 
@@ -415,30 +439,30 @@ BorrowedWidth   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 26
+    let given = test 30
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 26
+    let given = test 30
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 26
+    let given = test 30
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 26
+    let given = test 30
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 26 AssemblyConstants.ResourcesEstimator
+    let given = testWith 30 AssemblyConstants.ResourcesEstimator
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -446,7 +470,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 26 typeof<ToffoliSimulator>.FullName
+    let given = testWith 30 typeof<ToffoliSimulator>.FullName
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -477,9 +501,10 @@ Options:
   -?, -h, --help                                      Show help and usage information
 
 Commands:
-  simulate    (default) Run the program using a local simulator."
+  simulate    (default) Run the program using a local simulator.
+  submit      Submit the program to Azure Quantum."
 
-    let given = test 27
+    let given = test 31
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
