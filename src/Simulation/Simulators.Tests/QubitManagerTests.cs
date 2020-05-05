@@ -46,13 +46,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             qm.Release(qa2);
 
             Qubit q3 = qm.Allocate();
-            Assert.True(q3.Id == 7);
+            Assert.True(q3.Id == 5);
 
             Qubit q4 = qm.Allocate();
             Assert.True(q4.Id == 6);
 
             Qubit q5 = qm.Allocate();
-            Assert.True(q5.Id == 5);
+            Assert.True(q5.Id == 7);
 
             // Test borrowing
             Qubit[] exclusion = new Qubit[4];
