@@ -10,6 +10,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Quantum;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
@@ -44,20 +45,26 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            TryCreateOption(
-                    SimulatorOptions,
-                    () => entryPoint.DefaultSimulator,
-                    "The name of the simulator to use.")
-                .Then(simulator => simulate.AddOption(simulator.WithSuggestions(
+            AddOptionIfAvailable(simulate, SimulatorOptions, entryPoint.DefaultSimulator, 
+                "The name of the simulator to use.",
+                new[]
+                {
                     AssemblyConstants.QuantumSimulator,
                     AssemblyConstants.ToffoliSimulator,
                     AssemblyConstants.ResourcesEstimator,
-                    entryPoint.DefaultSimulator)));
+                    entryPoint.DefaultSimulator
+                });
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
-                Handler = CommandHandler.Create<ParseResult>(Submit)
+                Handler = CommandHandler.Create<ParseResult, AzureQuantumSettings>(Submit)
             };
+            // TODO: Define the aliases as constants.
+            AddOptionIfAvailable<string>(submit, new[] { "--target" }, "The target device ID.");
+            AddOptionIfAvailable<string>(submit, new[] { "--subscription" }, "The Azure subscription ID.");
+            AddOptionIfAvailable<string>(submit, new[] { "--resource-group" }, "The Azure resource group name.");
+            AddOptionIfAvailable<string>(submit, new[] { "--workspace" }, "The Azure workspace name.");
+            AddOptionIfAvailable<string>(submit, new[] { "--storage" }, "The Azure storage account connection string.");
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
@@ -110,16 +117,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
-        private async Task Submit(ParseResult parseResult)
+        /// <param name="settings">The submission settings.</param>
+        private static void Submit(ParseResult parseResult, AzureQuantumSettings settings)
         {
-            // TODO: Use an actual quantum machine.
-            var machine = new SimulatorMachine();
-            var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            // TODO: Provide output options and show the most frequent output by default. 
-            foreach (var (result, frequency) in output.Histogram)
-            {
-                Console.WriteLine($"{result} (frequency = {frequency})");
-            }
+            // TODO
+            Console.WriteLine($"Target: {settings.Target}");
+            Console.WriteLine($"Subscription: {settings.Subscription}");
+            Console.WriteLine($"ResourceGroup: {settings.ResourceGroup}");
+            Console.WriteLine($"Workspace: {settings.Workspace}");
+            Console.WriteLine($"Storage: {settings.Storage}");
         }
 
         /// <summary>
@@ -183,23 +189,55 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         }
 
         /// <summary>
-        /// Tries to create an option by removing aliases that are already in use by the entry point. If the first
-        /// alias, which is considered the primary alias, is in use, then the option is not created.
+        /// Evaluates the given function on the collection of available aliases if the primary (first) alias is
+        /// available.
         /// </summary>
-        /// <typeparam name="T">The type of the option's argument.</typeparam>
-        /// <param name="aliases">The option's aliases.</param>
-        /// <param name="getDefaultValue">A function that returns the option's default value.</param>
-        /// <param name="description">The option's description.</param>
-        /// <returns>A validation of the option.</returns>
-        private Validation<Option<T>> TryCreateOption<T>(
-                IReadOnlyCollection<string> aliases, Func<T> getDefaultValue, string? description = null) =>
+        /// <param name="aliases">The aliases to check for availability.</param>
+        /// <param name="func">The function to evaluate on the available aliases.</param>
+        /// <typeparam name="T">The given function's return type.</typeparam>
+        /// <returns>The return value of the given function or a failure if the first alias is not available.</returns>
+        private Validation<T> TryWithAvailableAliases<T>(
+                IReadOnlyCollection<string> aliases, Func<IReadOnlyCollection<string>, T> func) =>
             IsAliasAvailable(aliases.First())
-            ? Validation<Option<T>>.Success(
-                new Option<T>(
-                    aliases.Where(IsAliasAvailable).ToArray(),
-                    getDefaultValue,
-                    description))
-            : Validation<Option<T>>.Failure();
+                ? Validation<T>.Success(func(aliases.Where(IsAliasAvailable).ToArray()))
+                : Validation<T>.Failure();
+
+        /// <summary>
+        /// Adds the required option to the command using only the aliases that are available, and only if the primary
+        /// (first) alias is available.
+        /// </summary>
+        /// <param name="command">The command to add the option to.</param>
+        /// <param name="aliases">The collection of option aliases.</param>
+        /// <param name="description">The option description.</param>
+        /// <typeparam name="T">The type of the option values.</typeparam>
+        private void AddOptionIfAvailable<T>(
+                Command command, IReadOnlyCollection<string> aliases, string? description = default) =>
+            TryWithAvailableAliases(aliases, validAliases =>
+                    new Option<T>(validAliases.ToArray(), description) { Required = true })
+                .Then(command.AddOption);
+
+        /// <summary>
+        /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
+        /// alias is available.
+        /// </summary>
+        /// <param name="command">The command to add the option to.</param>
+        /// <param name="aliases">The collection of option aliases.</param>
+        /// <param name="defaultValue">The default value of the option.</param>
+        /// <param name="description">The option description.</param>
+        /// <param name="suggestions">The suggestions for the option's values.</param>
+        /// <typeparam name="T">The type of the option values.</typeparam>
+        private void AddOptionIfAvailable<T>(
+                Command command,
+                IReadOnlyCollection<string> aliases,
+                T defaultValue,
+                string? description = default,
+                string[]? suggestions = default) =>
+            TryWithAvailableAliases(aliases, validAliases =>
+                    new Option<T>(validAliases.ToArray(), () => defaultValue, description))
+                .Then(option =>
+                    command.AddOption(suggestions is null || !suggestions.Any()
+                        ? option
+                        : option.WithSuggestions(suggestions)));
 
         /// <summary>
         /// Displays an error message for using a non-default custom simulator.
@@ -234,6 +272,43 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "--" + CommandLineArguments.SimulatorOption.Item1,
             "-" + CommandLineArguments.SimulatorOption.Item2
         });
+    }
+
+    /// <summary>
+    /// Settings for a submission to Azure Quantum.
+    /// </summary>
+    internal sealed class AzureQuantumSettings
+    {
+        /// <summary>
+        /// The target device ID.
+        /// </summary>
+        public string? Target { get; set; }
+        
+        /// <summary>
+        /// The Azure subscription ID.
+        /// </summary>
+        public string? Subscription { get; set; }
+        
+        /// <summary>
+        /// The Azure resource group name.
+        /// </summary>
+        public string? ResourceGroup { get; set; }
+        
+        /// <summary>
+        /// The Azure workspace name.
+        /// </summary>
+        public string? Workspace { get; set; }
+        
+        /// <summary>
+        /// The Azure storage account connection string.
+        /// </summary>
+        public string? Storage { get; set; }
+        
+        /// <summary>
+        /// Converts these settings into a <see cref="Workspace"/>.
+        /// </summary>
+        /// <returns>The <see cref="Workspace"/> corresponding to these settings.</returns>
+        internal Workspace ToWorkspace() => new Workspace(Subscription, ResourceGroup, Workspace, Storage);
     }
     
     /// <summary>

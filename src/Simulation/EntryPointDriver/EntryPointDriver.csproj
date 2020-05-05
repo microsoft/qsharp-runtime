@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Quantum.Client" Version="0.11.2005.424-beta" />
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2004.1717-alpha" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
   </ItemGroup>
