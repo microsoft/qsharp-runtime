@@ -10,19 +10,22 @@ variables:
 
 jobs:
 - job: macOS
-  pool: 'Hosted macOS'
+  pool:
+    vmImage: 'macOS-latest'
   steps:
   - template: steps-xplat.yml
 
 
 - job: Linux
-  pool: 'Hosted Ubuntu 1604'
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - template: steps-xplat.yml
 
 
 - job: Windows
-  pool: 'Hosted VS2017'
+  pool:
+    vmImage: 'windows-latest'
   dependsOn:
   - macOS
   - Linux
