@@ -57,7 +57,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
-                Handler = CommandHandler.Create<ParseResult, AzureQuantumSettings>(Submit)
+                Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
             // TODO: Define the aliases as constants.
             AddOptionIfAvailable<string>(submit, new[] { "--target" }, "The target device ID.");
@@ -67,10 +67,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable<string>(submit, new[] { "--storage" }, "The Azure storage account connection string.");
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
-            foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
+            foreach (var option in entryPoint.Options)
+            {
+                root.AddGlobalOption(option);
+            }
 
             // Set the simulate command as the default.
-            foreach (var option in simulate.Options) { root.AddOption(option); }
+            foreach (var option in simulate.Options)
+            {
+                root.AddOption(option);
+            }
             root.Handler = simulate.Handler;
 
             return await new CommandLineBuilder(root)
@@ -99,10 +105,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 var (isCustom, createSimulator) =
                     simulator == AssemblyConstants.QuantumSimulator
-                    ? (false, () => new QuantumSimulator())
-                    : simulator == AssemblyConstants.ToffoliSimulator
-                    ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
-                    : (true, entryPoint.CreateDefaultCustomSimulator);
+                        ? (false, () => new QuantumSimulator())
+                        : simulator == AssemblyConstants.ToffoliSimulator
+                        ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
+                        : (true, entryPoint.CreateDefaultCustomSimulator);
                 if (isCustom && simulator != entryPoint.DefaultSimulator)
                 {
                     DisplayCustomSimulatorError(simulator);
@@ -118,7 +124,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The submission settings.</param>
-        private static void Submit(ParseResult parseResult, AzureQuantumSettings settings)
+        private static void Submit(ParseResult parseResult, AzureSettings settings)
         {
             // TODO
             Console.WriteLine($"Target: {settings.Target}");
@@ -213,8 +219,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private void AddOptionIfAvailable<T>(
                 Command command, IReadOnlyCollection<string> aliases, string? description = default) =>
             TryWithAvailableAliases(aliases, validAliases =>
-                    new Option<T>(validAliases.ToArray(), description) { Required = true })
-                .Then(command.AddOption);
+                new Option<T>(validAliases.ToArray(), description) { Required = true }).Then(command.AddOption);
 
         /// <summary>
         /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
@@ -233,11 +238,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 string? description = default,
                 string[]? suggestions = default) =>
             TryWithAvailableAliases(aliases, validAliases =>
-                    new Option<T>(validAliases.ToArray(), () => defaultValue, description))
-                .Then(option =>
-                    command.AddOption(suggestions is null || !suggestions.Any()
-                        ? option
-                        : option.WithSuggestions(suggestions)));
+                new Option<T>(validAliases.ToArray(), () => defaultValue, description)).Then(option =>
+                command.AddOption(suggestions is null || !suggestions.Any()
+                    ? option
+                    : option.WithSuggestions(suggestions)));
 
         /// <summary>
         /// Displays an error message for using a non-default custom simulator.
@@ -277,7 +281,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// <summary>
     /// Settings for a submission to Azure Quantum.
     /// </summary>
-    internal sealed class AzureQuantumSettings
+    internal sealed class AzureSettings
     {
         /// <summary>
         /// The target device ID.
