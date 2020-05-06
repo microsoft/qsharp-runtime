@@ -36,8 +36,8 @@ if (MSVC)
   add_definitions("/Zi")
 
   # build with no VC runtime depedencies:
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-  set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   /MTd")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Qspectre /guard:cf")
+  set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   /MTd /Qspectre /guard:cf")
 else (MSVC)
   set(CMAKE_CXX_FLAGS "-static-libgcc")
 endif (MSVC)
