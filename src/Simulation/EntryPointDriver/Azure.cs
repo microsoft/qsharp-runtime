@@ -45,10 +45,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             if (settings.Target == "quantum.simulator")
             {
-                return new SimulatorMachine();
+                return new SimulatorMachine(settings.Shots);
             }
             else if (!(settings.Target is null) && settings.Target.StartsWith("ionq."))
             {
+                // TODO: Number of shots?
                 var ionQType = Type.GetType(
                     "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
                     throwOnError: true);
@@ -103,6 +104,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The Azure storage account connection string.
         /// </summary>
         public string? Storage { get; set; }
+        
+        /// <summary>
+        /// The number of times the program is executed on the target machine.
+        /// </summary>
+        public int Shots { get; set; }
 
         /// <summary>
         /// Converts these settings into a Microsoft.Azure.Quantum.Workspace object.

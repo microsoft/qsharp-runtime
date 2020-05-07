@@ -66,6 +66,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable<string>(submit, new[] { "--resource-group" }, "The Azure resource group name.");
             AddOptionIfAvailable<string>(submit, new[] { "--workspace" }, "The Azure workspace name.");
             AddOptionIfAvailable<string>(submit, new[] { "--storage" }, "The Azure storage account connection string.");
+            // TODO: Validate that shots is non-negative.
+            AddOptionIfAvailable(submit, new [] { "--shots" }, 500,
+                "The number of times the program is executed on the target machine.");
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
