@@ -71,7 +71,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            // TODO: Prevent the submit command from being used if required options are shadowed.
             AddOptionsIfAvailable(submit,
                 TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
             AddOptionIfAvailable(submit, ShotsOption,
@@ -161,7 +160,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
         /// <summary>
         /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
-        /// alias is available.
+        /// alias is available. If a required option is not available, the command is disabled.
         /// </summary>
         /// <param name="command">The command to add the option to.</param>
         /// <param name="option">The option to add.</param>
@@ -181,6 +180,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     validOption.AddValidator(validator);
                 }
                 command.AddOption(validOption.WithSuggestions(option.GetSuggestions().ToArray()));
+            }
+            else if (option.Required)
+            {
+                command.AddValidator(commandResult =>
+                    $"The required option {option.RawAliases.First()} conflicts with an entry point parameter name.");
             }
         }
 
