@@ -73,6 +73,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             };
             AddOptionsIfAvailable(submit,
                 TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
+            AddOptionIfAvailable(submit, HistogramOption);
             AddOptionIfAvailable(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
@@ -121,7 +122,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 ResourceGroup = settings.ResourceGroup,
                 Workspace = settings.Workspace,
                 Storage = settings.Storage,
-                Shots = DefaultIfShadowed(ShotsOption, settings.Shots)
+                Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
+                Histogram = DefaultIfShadowed(HistogramOption, settings.Histogram)
             });
         
         /// <summary>
@@ -215,37 +217,43 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The target option.
         /// </summary>
         internal static Option<string> TargetOption => new Option<string>(
-            new[] { "--target" }, "The target device ID.") { Required = true };
+            "--target", "The target device ID.") { Required = true };
 
         /// <summary>
         /// The subscription option.
         /// </summary>
         internal static Option<string> SubscriptionOption => new Option<string>(
-            new[] { "--subscription" }, "The Azure subscription ID.") { Required = true };
+            "--subscription", "The Azure subscription ID.") { Required = true };
 
         /// <summary>
         /// The resource group option.
         /// </summary>
         internal static Option<string> ResourceGroupOption => new Option<string>(
-            new[] { "--resource-group" }, "The Azure resource group name.") { Required = true };
+            "--resource-group", "The Azure resource group name.") { Required = true };
 
         /// <summary>
         /// The workspace option.
         /// </summary>
         internal static Option<string> WorkspaceOption => new Option<string>(
-            new[] { "--workspace" }, "The Azure workspace name.") { Required = true };
+            "--workspace", "The Azure workspace name.") { Required = true };
 
         /// <summary>
         /// The storage option.
         /// </summary>
         internal static Option<string> StorageOption => new Option<string>(
-            new[] { "--storage" }, "The Azure storage account connection string.") { Required = true };
+            "--storage", "The Azure storage account connection string.") { Required = true };
 
         /// <summary>
         /// The shots option.
         /// </summary>
         internal static Option<int> ShotsOption => new Option<int>(
-            new[] { "--shots" }, () => 500, "The number of times the program is executed on the target machine.");
+            "--shots", () => 500, "The number of times the program is executed on the target machine.");
+        
+        /// <summary>
+        /// The histogram option.
+        /// </summary>
+        internal static Option<bool> HistogramOption => new Option<bool>(
+            "--histogram", () => false, "Show a histogram of all outputs instead of the most frequent output.");
     }
 
     /// <summary>

@@ -2,7 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.CommandLine.Parsing;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Runtime;
 
@@ -30,11 +32,18 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 DisplayUnknownTargetError(settings.Target);
                 return 1;
             }
+            
             var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            // TODO: Provide output options and show the most frequent output by default. 
-            foreach (var (result, frequency) in output.Histogram)
+            if (settings.Histogram)
             {
-                Console.WriteLine($"{result} (frequency = {frequency})");
+                foreach (var (result, frequency) in output.Histogram)
+                {
+                    Console.WriteLine($"{result} (frequency = {frequency})");
+                }
+            }
+            else
+            {
+                Console.WriteLine(MostFrequentOutput(output.Histogram));
             }
             return 0;
         }
@@ -64,6 +73,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 return null;
             }
         }
+
+        /// <summary>
+        /// Returns the most frequent output in the histogram.
+        /// </summary>
+        /// <param name="histogram">The histogram.</param>
+        /// <typeparam name="T">The output type.</typeparam>
+        /// <returns>The most frequent output in the histogram.</returns>
+        private static T MostFrequentOutput<T>(IReadOnlyDictionary<T, double> histogram) => histogram
+            .Aggregate((a, b) => a.Value > b.Value ? a : b)
+            .Key;
 
         /// <summary>
         /// Displays an error message for attempting to use an unknown target machine.
@@ -112,6 +131,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
+        
+        /// <summary>
+        /// Show a histogram of all outputs instead of the most frequent output.
+        /// </summary>
+        public bool Histogram { get; set; }
 
         /// <summary>
         /// Converts these settings into a Microsoft.Azure.Quantum.Workspace object.
