@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -46,28 +45,19 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            AddOptionIfAvailable(simulate, SimulatorOptions, entryPoint.DefaultSimulator, 
-                "The name of the simulator to use.",
-                suggestions: new[]
-                {
-                    AssemblyConstants.QuantumSimulator,
-                    AssemblyConstants.ToffoliSimulator,
-                    AssemblyConstants.ResourcesEstimator,
-                    entryPoint.DefaultSimulator
-                });
+            AddOptionIfAvailable(simulate, SimulatorOption(entryPoint.DefaultSimulator));
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            // TODO: Define the aliases as constants.
-            AddOptionIfAvailable<string>(submit, new[] { "--target" }, "The target device ID.");
-            AddOptionIfAvailable<string>(submit, new[] { "--subscription" }, "The Azure subscription ID.");
-            AddOptionIfAvailable<string>(submit, new[] { "--resource-group" }, "The Azure resource group name.");
-            AddOptionIfAvailable<string>(submit, new[] { "--workspace" }, "The Azure workspace name.");
-            AddOptionIfAvailable<string>(submit, new[] { "--storage" }, "The Azure storage account connection string.");
-            AddOptionIfAvailable(submit, new[] { "--shots" }, 500,
-                "The number of times the program is executed on the target machine.",
+            // TODO: Prevent the submit command from being used if required options are shadowed.
+            AddOptionIfAvailable(submit, TargetOption);
+            AddOptionIfAvailable(submit, SubscriptionOption);
+            AddOptionIfAvailable(submit, ResourceGroupOption);
+            AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, StorageOption);
+            AddOptionIfAvailable(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
                     : default);
@@ -100,7 +90,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>The exit code.</returns>
         private async Task<int> Simulate(ParseResult parseResult, string simulator)
         {
-            simulator = DefaultIfShadowed(SimulatorOptions.First(), simulator, entryPoint.DefaultSimulator);
+            simulator = DefaultIfShadowed(SimulatorOption(entryPoint.DefaultSimulator), simulator);
             return await Simulation<TCallable, TIn, TOut>.Simulate(entryPoint, parseResult, simulator);
         }
 
@@ -112,12 +102,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
-                Target = DefaultIfShadowed("--target", settings.Target, default),
-                Subscription = DefaultIfShadowed("--subscription", settings.Subscription, default),
-                ResourceGroup = DefaultIfShadowed("--resource-group", settings.ResourceGroup, default),
-                Workspace = DefaultIfShadowed("--workspace", settings.Workspace, default),
-                Storage = DefaultIfShadowed("--storage", settings.Storage, default),
-                Shots = DefaultIfShadowed("--shots", settings.Shots, 500)
+                Target = settings.Target,
+                Subscription = settings.Subscription,
+                ResourceGroup = settings.ResourceGroup,
+                Workspace = settings.Workspace,
+                Storage = settings.Storage,
+                Shots = DefaultIfShadowed(ShotsOption, settings.Shots)
             });
         
         /// <summary>
@@ -126,20 +116,19 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="alias">The alias to check.</param>
         /// <returns>True if the alias is available for use by the driver.</returns>
         private bool IsAliasAvailable(string alias) =>
-            !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
+            !entryPoint.Options.SelectMany(option => option.Aliases).Contains(alias);
 
         /// <summary>
-        /// Returns the default value and displays a warning if the alias is shadowed by an entry point option, and
-        /// returns the original value otherwise.
+        /// Returns the default value and displays a warning if the primary (first) alias is shadowed by an entry point
+        /// option, and returns the original value otherwise.
         /// </summary>
         /// <typeparam name="T">The type of the option values.</typeparam>
-        /// <param name="alias">The primary option alias corresponding to the value.</param>
+        /// <param name="option">The option.</param>
         /// <param name="value">The value of the option given on the command line.</param>
-        /// <param name="defaultValue">The default value for the option.</param>
         /// <returns>The default value or the original value.</returns>
-        private T DefaultIfShadowed<T>(string alias, T value, T defaultValue)
+        private T DefaultIfShadowed<T>(Option option, T value)
         {
-            if (IsAliasAvailable(alias))
+            if (IsAliasAvailable(option.Aliases.First()))
             {
                 return value;
             }
@@ -148,84 +137,103 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 var originalForeground = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Error.WriteLine(
-                    $"Warning: Option {alias} is overridden by an entry point parameter name. " +
-                    $"Using default value {defaultValue}.");
+                    $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
+                    $"Using default value {option.Argument.GetDefaultValue()}.");
                 Console.ForegroundColor = originalForeground;
-                return defaultValue;
+                return (T)option.Argument.GetDefaultValue();
             }
         }
-
-        /// <summary>
-        /// Evaluates the given function on the collection of available aliases if the primary (first) alias is
-        /// available.
-        /// </summary>
-        /// <param name="aliases">The aliases to check for availability.</param>
-        /// <param name="func">The function to evaluate on the available aliases.</param>
-        /// <typeparam name="T">The given function's return type.</typeparam>
-        /// <returns>The return value of the given function or a failure if the first alias is not available.</returns>
-        private Validation<T> TryWithAvailableAliases<T>(
-                IReadOnlyCollection<string> aliases, Func<IReadOnlyCollection<string>, T> func) =>
-            IsAliasAvailable(aliases.First())
-                ? Validation<T>.Success(func(aliases.Where(IsAliasAvailable).ToArray()))
-                : Validation<T>.Failure();
-
-        /// <summary>
-        /// Adds the required option to the command using only the aliases that are available, and only if the primary
-        /// (first) alias is available.
-        /// </summary>
-        /// <param name="command">The command to add the option to.</param>
-        /// <param name="aliases">The collection of option aliases.</param>
-        /// <param name="description">The option description.</param>
-        /// <typeparam name="T">The type of the option values.</typeparam>
-        private void AddOptionIfAvailable<T>(
-                Command command, IReadOnlyCollection<string> aliases, string? description = default) =>
-            TryWithAvailableAliases(aliases, validAliases =>
-                new Option<T>(validAliases.ToArray(), description) { Required = true }).Then(command.AddOption);
 
         /// <summary>
         /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
         /// alias is available.
         /// </summary>
         /// <param name="command">The command to add the option to.</param>
-        /// <param name="aliases">The collection of option aliases.</param>
-        /// <param name="defaultValue">The default value of the option.</param>
-        /// <param name="description">The option description.</param>
-        /// <param name="validator">The option validator.</param>
-        /// <param name="suggestions">The suggestions for the option's values.</param>
-        /// <typeparam name="T">The type of the option values.</typeparam>
+        /// <param name="option">The option to add.</param>
+        /// <param name="validator">A validator for the option.</param>
+        /// <typeparam name="T">The type of the option's argument.</typeparam>
         private void AddOptionIfAvailable<T>(
-                Command command,
-                IReadOnlyCollection<string> aliases,
-                T defaultValue,
-                string? description = default,
-                ValidateSymbol<OptionResult>? validator = default,
-                string[]? suggestions = default) =>
-            TryWithAvailableAliases(aliases, validAliases =>
-                new Option<T>(validAliases.ToArray(), () => defaultValue, description)).Then(option =>
+            Command command, Option<T> option, ValidateSymbol<OptionResult>? validator = default)
+        {
+            if (IsAliasAvailable(option.Aliases.First()))
             {
+                var validAliases = option.Aliases.Where(IsAliasAvailable).ToArray();
+                var validOption = option.Argument.HasDefaultValue
+                    ? new Option<T>(validAliases, () => (T)option.Argument.GetDefaultValue(), option.Description)
+                    : new Option<T>(validAliases, option.Description);
                 if (!(validator is null))
                 {
-                    option.AddValidator(validator);
+                    validOption.AddValidator(validator);
                 }
-                command.AddOption(suggestions is null || !suggestions.Any()
-                    ? option
-                    : option.WithSuggestions(suggestions));
-            });
+                command.AddOption(validOption.WithSuggestions(option.GetSuggestions().ToArray()));
+            }
+        }
     }
 
     /// <summary>
-    /// Static members for <see cref="Driver{TCallable,TIn,TOut}"/> that do not depend on its type parameters.
+    /// Static members for <see cref="Driver{TCallable,TIn,TOut}"/>.
     /// </summary>
     internal static class Driver
     {
         /// <summary>
-        /// The option aliases for the simulator option.
+        /// Returns the simulator option that uses the default simulator as its default value.
         /// </summary>
-        internal static readonly IReadOnlyCollection<string> SimulatorOptions = Array.AsReadOnly(new[]
-        {
-            "--" + CommandLineArguments.SimulatorOption.Item1,
-            "-" + CommandLineArguments.SimulatorOption.Item2
-        });
+        /// <param name="defaultSimulator">The default simulator.</param>
+        /// <returns>The simulator option.</returns>
+        internal static Option<string> SimulatorOption(string defaultSimulator) => new Option<string>(
+                new[]
+                {
+                    "--" + CommandLineArguments.SimulatorOption.Item1,
+                    "-" + CommandLineArguments.SimulatorOption.Item2
+                },
+                () => defaultSimulator,
+                "The name of the simulator to use.")
+            {
+                Required = true
+            }
+            .WithSuggestions(
+                AssemblyConstants.QuantumSimulator,
+                AssemblyConstants.ToffoliSimulator,
+                AssemblyConstants.ResourcesEstimator,
+                defaultSimulator);
+
+        // TODO: Define the aliases as constants.
+
+        /// <summary>
+        /// The target option.
+        /// </summary>
+        internal static Option<string> TargetOption => new Option<string>(
+            new[] { "--target" }, "The target device ID.") { Required = true };
+
+        /// <summary>
+        /// The subscription option.
+        /// </summary>
+        internal static Option<string> SubscriptionOption => new Option<string>(
+            new[] { "--subscription" }, "The Azure subscription ID.") { Required = true };
+
+        /// <summary>
+        /// The resource group option.
+        /// </summary>
+        internal static Option<string> ResourceGroupOption => new Option<string>(
+            new[] { "--resource-group" }, "The Azure resource group name.") { Required = true };
+
+        /// <summary>
+        /// The workspace option.
+        /// </summary>
+        internal static Option<string> WorkspaceOption => new Option<string>(
+            new[] { "--workspace" }, "The Azure workspace name.") { Required = true };
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static Option<string> StorageOption => new Option<string>(
+            new[] { "--storage" }, "The Azure storage account connection string.") { Required = true };
+
+        /// <summary>
+        /// The shots option.
+        /// </summary>
+        internal static Option<int> ShotsOption => new Option<int>(
+            new[] { "--shots" }, () => 500, "The number of times the program is executed on the target machine.");
     }
 
     /// <summary>
