@@ -172,7 +172,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             if (IsAliasAvailable(option.Aliases.First()))
             {
-                var validAliases = option.Aliases.Where(IsAliasAvailable).ToArray();
+                var validAliases = option.RawAliases.Where(IsAliasAvailable).ToArray();
                 var validOption = option.Argument.HasDefaultValue
                     ? new Option<T>(validAliases, () => (T)option.Argument.GetDefaultValue(), option.Description)
                     : new Option<T>(validAliases, option.Description);
