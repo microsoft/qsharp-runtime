@@ -21,7 +21,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         internal static async Task Submit<TIn, TOut>(
             IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, AzureSettings settings)
         {
-            // TODO: DefaultIfShadowed for settings
             var machineType = Type.GetType(
                 "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
                 throwOnError: true);
