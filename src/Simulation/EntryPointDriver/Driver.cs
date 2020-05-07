@@ -104,7 +104,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The submission settings.</param>
-        private async Task Submit(ParseResult parseResult, AzureSettings settings) =>
+        private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
             // TODO: DefaultIfShadowed
             await Azure.Submit(entryPoint, parseResult, settings);
         

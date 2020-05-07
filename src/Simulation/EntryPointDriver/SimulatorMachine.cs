@@ -35,6 +35,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// The output of executing the <see cref="SimulatorMachine"/>.
+    /// </summary>
+    /// <typeparam name="T">The output result type.</typeparam>
     internal class SimulatorMachineOutput<T> : IQuantumMachineOutput<T>
     {
         public IReadOnlyDictionary<T, double> Histogram { get; }
@@ -43,6 +47,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
         public int Shots => 1;
 
+        /// <summary>
+        /// Creates a new output from the result.
+        /// </summary>
+        /// <param name="result">The result.</param>
         internal SimulatorMachineOutput(T result) => Histogram = ImmutableDictionary<T, double>.Empty.Add(result, 1);
     }
 }

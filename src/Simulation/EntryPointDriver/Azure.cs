@@ -18,20 +18,59 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="settings">The submission settings.</param>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
-        internal static async Task Submit<TIn, TOut>(
+        internal static async Task<int> Submit<TIn, TOut>(
             IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, AzureSettings settings)
         {
-            var machineType = Type.GetType(
-                "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
-                throwOnError: true);
-            var machine = (IQuantumMachine)Activator.CreateInstance(
-                machineType, settings.Target, settings.Storage, settings.ToWorkspace());
+            var machine = CreateMachine(settings);
+            if (machine is null)
+            {
+                DisplayUnknownTargetError(settings.Target);
+                return 1;
+            }
             var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
             // TODO: Provide output options and show the most frequent output by default. 
             foreach (var (result, frequency) in output.Histogram)
             {
                 Console.WriteLine($"{result} (frequency = {frequency})");
             }
+            return 0;
+        }
+
+        /// <summary>
+        /// Creates a quantum machine based on the Azure Quantum submission settings.
+        /// </summary>
+        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <returns>A quantum machine.</returns>
+        private static IQuantumMachine? CreateMachine(AzureSettings settings)
+        {
+            if (settings.Target == "quantum.simulator")
+            {
+                return new SimulatorMachine();
+            }
+            else if (!(settings.Target is null) && settings.Target.StartsWith("ionq."))
+            {
+                var ionQType = Type.GetType(
+                    "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
+                    throwOnError: true);
+                return (IQuantumMachine)Activator.CreateInstance(
+                    ionQType, settings.Target, settings.Storage, settings.ToWorkspace());
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Displays an error message for attempting to use an unknown target machine.
+        /// </summary>
+        /// <param name="target">The target machine.</param>
+        private static void DisplayUnknownTargetError(string? target)
+        {
+            var originalForeground = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Error.WriteLine($"The target '{target}' was not recognized.");
+            Console.ForegroundColor = originalForeground;
         }
     }
     
