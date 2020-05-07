@@ -12,10 +12,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// <summary>
     /// A quantum machine that runs the entry point using a local quantum simulator.
     /// </summary>
-    /// <remarks>
-    /// TODO: This class is only for testing the <see cref="IQuantumMachine"/> interface. It should be removed once an
-    /// actual quantum machine implementation can be used.
-    /// </remarks>
     internal class SimulatorMachine : IQuantumMachine
     {
         public string ProviderId => nameof(SimulatorMachine);

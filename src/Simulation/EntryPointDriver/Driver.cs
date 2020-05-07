@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             };
             AddOptionIfAvailable(simulate, SimulatorOptions, entryPoint.DefaultSimulator, 
                 "The name of the simulator to use.",
-                new[]
+                suggestions: new[]
                 {
                     AssemblyConstants.QuantumSimulator,
                     AssemblyConstants.ToffoliSimulator,
@@ -66,9 +66,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable<string>(submit, new[] { "--resource-group" }, "The Azure resource group name.");
             AddOptionIfAvailable<string>(submit, new[] { "--workspace" }, "The Azure workspace name.");
             AddOptionIfAvailable<string>(submit, new[] { "--storage" }, "The Azure storage account connection string.");
-            // TODO: Validate that shots is non-negative.
-            AddOptionIfAvailable(submit, new [] { "--shots" }, 500,
-                "The number of times the program is executed on the target machine.");
+            AddOptionIfAvailable(submit, new[] { "--shots" }, 500,
+                "The number of times the program is executed on the target machine.",
+                result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
+                    ? $"The number of shots is {value}, but it must be a positive number."
+                    : default);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -181,6 +183,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="aliases">The collection of option aliases.</param>
         /// <param name="defaultValue">The default value of the option.</param>
         /// <param name="description">The option description.</param>
+        /// <param name="validator">The option validator.</param>
         /// <param name="suggestions">The suggestions for the option's values.</param>
         /// <typeparam name="T">The type of the option values.</typeparam>
         private void AddOptionIfAvailable<T>(
@@ -188,12 +191,19 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 IReadOnlyCollection<string> aliases,
                 T defaultValue,
                 string? description = default,
+                ValidateSymbol<OptionResult>? validator = default,
                 string[]? suggestions = default) =>
             TryWithAvailableAliases(aliases, validAliases =>
                 new Option<T>(validAliases.ToArray(), () => defaultValue, description)).Then(option =>
+            {
+                if (!(validator is null))
+                {
+                    option.AddValidator(validator);
+                }
                 command.AddOption(suggestions is null || !suggestions.Any()
                     ? option
-                    : option.WithSuggestions(suggestions)));
+                    : option.WithSuggestions(suggestions));
+            });
     }
 
     /// <summary>
