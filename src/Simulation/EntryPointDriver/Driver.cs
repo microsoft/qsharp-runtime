@@ -110,8 +110,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The submission settings.</param>
         private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
-            // TODO: DefaultIfShadowed
-            await Azure.Submit(entryPoint, parseResult, settings);
+            await Azure.Submit(entryPoint, parseResult, new AzureSettings
+            {
+                Target = DefaultIfShadowed("--target", settings.Target, default),
+                Subscription = DefaultIfShadowed("--subscription", settings.Subscription, default),
+                ResourceGroup = DefaultIfShadowed("--resource-group", settings.ResourceGroup, default),
+                Workspace = DefaultIfShadowed("--workspace", settings.Workspace, default),
+                Storage = DefaultIfShadowed("--storage", settings.Storage, default),
+                Shots = DefaultIfShadowed("--shots", settings.Shots, 500)
+            });
         
         /// <summary>
         /// Returns true if the alias is not already used by an entry point option.
