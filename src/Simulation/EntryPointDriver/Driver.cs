@@ -29,6 +29,26 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private readonly IEntryPoint<TIn, TOut> entryPoint;
 
         /// <summary>
+        /// The simulator option.
+        /// </summary>
+        private Option<string> SimulatorOption => new Option<string>(
+                new[]
+                {
+                    "--" + CommandLineArguments.SimulatorOption.Item1,
+                    "-" + CommandLineArguments.SimulatorOption.Item2
+                },
+                () => entryPoint.DefaultSimulator,
+                "The name of the simulator to use.")
+            {
+                Required = true
+            }
+            .WithSuggestions(
+                AssemblyConstants.QuantumSimulator,
+                AssemblyConstants.ToffoliSimulator,
+                AssemblyConstants.ResourcesEstimator,
+                entryPoint.DefaultSimulator);
+        
+        /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
         /// <param name="entryPoint">The entry point.</param>
@@ -45,7 +65,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            AddOptionIfAvailable(simulate, SimulatorOption(entryPoint.DefaultSimulator));
+            AddOptionIfAvailable(simulate, SimulatorOption);
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
@@ -88,11 +108,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private async Task<int> Simulate(ParseResult parseResult, string simulator)
-        {
-            simulator = DefaultIfShadowed(SimulatorOption(entryPoint.DefaultSimulator), simulator);
-            return await Simulation<TCallable, TIn, TOut>.Simulate(entryPoint, parseResult, simulator);
-        }
+        private async Task<int> Simulate(ParseResult parseResult, string simulator) =>
+            await Simulation<TCallable, TIn, TOut>.Simulate(
+                entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -175,28 +193,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// </summary>
     internal static class Driver
     {
-        /// <summary>
-        /// Returns the simulator option that uses the default simulator as its default value.
-        /// </summary>
-        /// <param name="defaultSimulator">The default simulator.</param>
-        /// <returns>The simulator option.</returns>
-        internal static Option<string> SimulatorOption(string defaultSimulator) => new Option<string>(
-                new[]
-                {
-                    "--" + CommandLineArguments.SimulatorOption.Item1,
-                    "-" + CommandLineArguments.SimulatorOption.Item2
-                },
-                () => defaultSimulator,
-                "The name of the simulator to use.")
-            {
-                Required = true
-            }
-            .WithSuggestions(
-                AssemblyConstants.QuantumSimulator,
-                AssemblyConstants.ToffoliSimulator,
-                AssemblyConstants.ResourcesEstimator,
-                defaultSimulator);
-
         // TODO: Define the aliases as constants.
 
         /// <summary>
