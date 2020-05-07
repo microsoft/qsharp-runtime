@@ -72,11 +72,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
             // TODO: Prevent the submit command from being used if required options are shadowed.
-            AddOptionIfAvailable(submit, TargetOption);
-            AddOptionIfAvailable(submit, SubscriptionOption);
-            AddOptionIfAvailable(submit, ResourceGroupOption);
-            AddOptionIfAvailable(submit, WorkspaceOption);
-            AddOptionIfAvailable(submit, StorageOption);
+            AddOptionsIfAvailable(submit,
+                TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
             AddOptionIfAvailable(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
@@ -184,6 +181,21 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     validOption.AddValidator(validator);
                 }
                 command.AddOption(validOption.WithSuggestions(option.GetSuggestions().ToArray()));
+            }
+        }
+
+        /// <summary>
+        /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
+        /// alias is available.
+        /// </summary>
+        /// <param name="command">The command to add the option to.</param>
+        /// <param name="options">The options to add.</param>
+        /// <typeparam name="T">The type of the option's argument.</typeparam>
+        private void AddOptionsIfAvailable<T>(Command command, params Option<T>[] options)
+        {
+            foreach (var option in options)
+            {
+                AddOptionIfAvailable(command, option);
             }
         }
     }
