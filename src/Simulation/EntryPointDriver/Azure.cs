@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
                     throwOnError: true);
                 return (IQuantumMachine)Activator.CreateInstance(
-                    ionQType, settings.Target, settings.Storage, settings.ToWorkspace());
+                    ionQType, settings.Target, settings.Storage, settings.CreateWorkspace());
             }
             else if (settings.Target == "nothing")
             {
@@ -131,10 +131,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public bool IdOnly { get; set; }
 
         /// <summary>
-        /// Converts these settings into a Microsoft.Azure.Quantum.Workspace object.
+        /// Creates a workspace object based on the settings.
         /// </summary>
-        /// <returns>The workspace object corresponding to these settings.</returns>
-        internal object ToWorkspace()
+        /// <returns>The workspace object based on the settings.</returns>
+        internal object CreateWorkspace()
         {
             var workspaceType = Type.GetType(
                 "Microsoft.Azure.Quantum.Workspace, Microsoft.Azure.Quantum.Client", throwOnError: true);
