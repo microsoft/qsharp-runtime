@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
 using System.CommandLine.Parsing;
 using System.Linq;
@@ -10,6 +9,8 @@ using Microsoft.Quantum.Runtime;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
+    using System;
+    
     /// <summary>
     /// Provides entry point submission to Azure Quantum.
     /// </summary>
@@ -36,10 +37,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
             if (settings.Histogram)
             {
-                foreach (var (result, frequency) in output.Histogram)
-                {
-                    Console.WriteLine($"{result} (frequency = {frequency})");
-                }
+                DisplayHistogram(output.Histogram);
             }
             else
             {
@@ -83,6 +81,57 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private static T MostFrequentOutput<T>(IReadOnlyDictionary<T, double> histogram) => histogram
             .Aggregate((a, b) => a.Value > b.Value ? a : b)
             .Key;
+
+        /// <summary>
+        /// Displays the histogram.
+        /// </summary>
+        /// <param name="histogram">The histogram.</param>
+        /// <typeparam name="T">The type of the results in the histogram.</typeparam>
+        private static void DisplayHistogram<T>(IReadOnlyDictionary<T, double> histogram)
+        {
+            const int barWidth = 20;
+            var maxFrequency = histogram.Values.Max();
+
+            string Bar(double frequency) =>
+                new string('█', Convert.ToInt32(Math.Round(frequency / maxFrequency * barWidth)));
+
+            var results = CreateTableColumn("Result", histogram.Keys);
+            var bars = CreateTableColumn("Frequency", histogram.Values.Select(Bar));
+            var numbers = CreateTableColumn("", histogram.Values);
+            DisplayTable(results, bars, numbers);
+        }
+
+        /// <summary>
+        /// Creates a table column.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="items">The items in the column.</param>
+        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <returns>A table column.</returns>
+        private static IReadOnlyList<string> CreateTableColumn<T>(string name, IEnumerable<T> items)
+        {
+            var divider = new string('-', name.Length);
+            var column = new[] { name, divider }
+                .Concat(items.Select(item => item?.ToString() ?? ""))
+                .ToList();
+            var width = column.Max(item => item.Length);
+            return column.Select(row => row.PadRight(width)).ToList();
+        }
+
+        /// <summary>
+        /// Displays the table.
+        /// </summary>
+        /// <param name="columns">The columns in the table.</param>
+        private static void DisplayTable(params IReadOnlyList<string>[] columns)
+        {
+            var height = columns.Max(column => column.Count);
+            foreach (var row in Enumerable.Range(0, height))
+            {
+                Console.WriteLine(string.Join(
+                    "  ",
+                    columns.Select(column => column.ElementAtOrDefault(row) ?? "")));
+            }
+        }
 
         /// <summary>
         /// Displays an error message for attempting to use an unknown target machine.
