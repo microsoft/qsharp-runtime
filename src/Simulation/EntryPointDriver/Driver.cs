@@ -132,7 +132,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="alias">The alias to check.</param>
         /// <returns>True if the alias is available for use by the driver.</returns>
         private bool IsAliasAvailable(string alias) =>
-            !entryPoint.Options.SelectMany(option => option.Aliases).Contains(alias);
+            !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
         /// Returns the default value and displays a warning if the primary (first) alias is shadowed by an entry point
@@ -144,7 +144,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>The default value or the original value.</returns>
         private T DefaultIfShadowed<T>(Option option, T value)
         {
-            if (IsAliasAvailable(option.Aliases.First()))
+            if (IsAliasAvailable(option.RawAliases.First()))
             {
                 return value;
             }
@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private void AddOptionIfAvailable<T>(
             Command command, Option<T> option, ValidateSymbol<OptionResult>? validator = default)
         {
-            if (IsAliasAvailable(option.Aliases.First()))
+            if (IsAliasAvailable(option.RawAliases.First()))
             {
                 var validAliases = option.RawAliases.Where(IsAliasAvailable).ToArray();
                 var validOption = option.Argument.HasDefaultValue
