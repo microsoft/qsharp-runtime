@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             };
             AddOptionsIfAvailable(submit,
                 TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
-            AddOptionIfAvailable(submit, HistogramOption);
+            AddOptionIfAvailable(submit, IdOnlyOption);
             AddOptionIfAvailable(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
@@ -120,7 +120,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Workspace = settings.Workspace,
                 Storage = settings.Storage,
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
-                Histogram = DefaultIfShadowed(HistogramOption, settings.Histogram)
+                IdOnly = DefaultIfShadowed(IdOnlyOption, settings.IdOnly)
             });
         
         /// <summary>
@@ -246,12 +246,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         internal static Option<int> ShotsOption => new Option<int>(
             "--shots", () => 500, "The number of times the program is executed on the target machine.");
-        
+
         /// <summary>
-        /// The histogram option.
+        /// The ID-only option.
         /// </summary>
-        internal static Option<bool> HistogramOption => new Option<bool>(
-            "--histogram", () => false, "Show a histogram of all outputs instead of the most frequent output.");
+        internal static Option<bool> IdOnlyOption => new Option<bool>(
+            "--id-only", () => false, "Show only the job ID after the job is submitted.");
     }
 
     /// <summary>
