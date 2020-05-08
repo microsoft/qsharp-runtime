@@ -177,6 +177,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 var validOption = option.Argument.HasDefaultValue
                     ? new Option<T>(validAliases, () => (T)option.Argument.GetDefaultValue(), option.Description)
                     : new Option<T>(validAliases, option.Description);
+                validOption.Required = option.Required;
                 if (!(validator is null))
                 {
                     validOption.AddValidator(validator);
