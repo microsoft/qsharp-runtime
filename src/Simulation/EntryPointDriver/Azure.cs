@@ -110,7 +110,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>A table column.</returns>
         private static IReadOnlyList<string> CreateTableColumn<T>(string name, IEnumerable<T> items)
         {
-            var divider = new string('-', name.Length);
+            var divider = new string('─', name.Length);
             var column = new[] { name, divider }
                 .Concat(items.Select(item => item?.ToString() ?? ""))
                 .ToList();
