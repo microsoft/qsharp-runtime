@@ -53,7 +53,7 @@ class Fused
       for (auto c : cs)
         cmask |= (1ull << c);
       
-      printf("@@@DBG Fused size=%d nQs=%d nCs=%d csSize=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls(), cs.size());
+      printf("@@@DBG Fused size=%d nQs=%d nCs=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls());
 
       switch (qs.size())
       {
@@ -100,19 +100,36 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-      if (fusedgates.num_qubits()+fusedgates.num_controls()+cs.size()>8 || fusedgates.size() > 15)
-        flush(wfn);
-      Fusion newgates = fusedgates;
-      newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+#if 0 //@@@DBG: Original
+        if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
+            flush(wfn);
+        Fusion newgates = fusedgates;
+
+        newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
       
       if (newgates.num_qubits() > 4)
       {
-        flush(wfn);
-        fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+          flush(wfn);
+          fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
       }
       else
-        fusedgates = newgates;
+          fusedgates = newgates;
     }
+#else //@@@DBG: Playing
+        Fusion newgates = fusedgates;
+
+        newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+
+        if (newgates.num_qubits()+newgates.num_controls() > 10)
+        {
+            flush(wfn);
+            fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+        }
+        else
+            fusedgates = newgates;
+    }
+#endif
+
     
     template <class T, class A, class M>
     void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
