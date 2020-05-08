@@ -39,9 +39,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 },
                 () => entryPoint.DefaultSimulator,
                 "The name of the simulator to use.")
-            {
-                Required = true
-            }
             .WithSuggestions(
                 AssemblyConstants.QuantumSimulator,
                 AssemblyConstants.ToffoliSimulator,
