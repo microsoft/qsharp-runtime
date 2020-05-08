@@ -62,16 +62,17 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            AddOptionIfAvailable(simulate, SimulatorOption);
+            AddOptionIfAvailable<string>(simulate, SimulatorOption);
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            AddOptionsIfAvailable(submit,
+            AddOptionsIfAvailable<string>(submit,
                 TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
-            AddOptionIfAvailable(submit, IdOnlyOption);
-            AddOptionIfAvailable(submit, ShotsOption,
+            AddOptionIfAvailable<string?>(submit, AccessOption);
+            AddOptionIfAvailable<bool>(submit, IdOnlyOption);
+            AddOptionIfAvailable<int>(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
                     : default);
@@ -119,6 +120,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 ResourceGroup = settings.ResourceGroup,
                 Workspace = settings.Workspace,
                 Storage = settings.Storage,
+                Access = DefaultIfShadowed(AccessOption, settings.Access),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 IdOnly = DefaultIfShadowed(IdOnlyOption, settings.IdOnly)
             });
@@ -166,7 +168,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="validator">A validator for the option.</param>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
         private void AddOptionIfAvailable<T>(
-            Command command, Option<T> option, ValidateSymbol<OptionResult>? validator = default)
+            Command command, Option option, ValidateSymbol<OptionResult>? validator = default)
         {
             if (IsAliasAvailable(option.RawAliases.First()))
             {
@@ -195,11 +197,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="command">The command to add the option to.</param>
         /// <param name="options">The options to add.</param>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
-        private void AddOptionsIfAvailable<T>(Command command, params Option<T>[] options)
+        private void AddOptionsIfAvailable<T>(Command command, params Option[] options)
         {
             foreach (var option in options)
             {
-                AddOptionIfAvailable(command, option);
+                AddOptionIfAvailable<T>(command, option);
             }
         }
     }
@@ -241,6 +243,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         internal static Option<string> StorageOption => new Option<string>(
             "--storage", "The Azure storage account connection string.") { Required = true };
 
+        /// <summary>
+        /// The access option.
+        /// </summary>
+        internal static Option<string?> AccessOption => new Option<string?>(
+            "--access", () => default, "The Azure account access token.");
+        
         /// <summary>
         /// The shots option.
         /// </summary>

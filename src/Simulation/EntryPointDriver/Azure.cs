@@ -116,6 +116,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Storage { get; set; }
         
         /// <summary>
+        /// The Azure account access token.
+        /// </summary>
+        public string? Access { get; set; }
+        
+        /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
@@ -133,10 +138,20 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             var workspaceType = Type.GetType(
                 "Microsoft.Azure.Quantum.Workspace, Microsoft.Azure.Quantum.Client", throwOnError: true);
-            var tokenCredentialType = Type.GetType("Azure.Core.TokenCredential, Azure.Core", throwOnError: true);
-            var constructor = workspaceType.GetConstructor(new[]
-                { typeof(string), typeof(string), typeof(string), tokenCredentialType, typeof(Uri) });
-            return constructor.Invoke(new object?[] { Subscription, ResourceGroup, Workspace, null, null });
+            if (Access is null)
+            {
+                // We can't use Activator.CreateInstance because the constructor is ambiguous when the last two
+                // arguments are null.
+                var tokenCredentialType = Type.GetType("Azure.Core.TokenCredential, Azure.Core", throwOnError: true);
+                var constructor = workspaceType.GetConstructor(new[]
+                    { typeof(string), typeof(string), typeof(string), tokenCredentialType, typeof(Uri) });
+                return constructor.Invoke(new object?[] { Subscription, ResourceGroup, Workspace, null, null });
+            }
+            else
+            {
+                return Activator.CreateInstance(
+                    workspaceType, Subscription, ResourceGroup, Workspace, Access, null);
+            }
         }
     }
 }
