@@ -96,27 +96,27 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Target { get; set; }
         
         /// <summary>
-        /// The Azure subscription ID.
+        /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
         
         /// <summary>
-        /// The Azure resource group name.
+        /// The resource group name.
         /// </summary>
         public string? ResourceGroup { get; set; }
         
         /// <summary>
-        /// The Azure workspace name.
+        /// The workspace name.
         /// </summary>
         public string? Workspace { get; set; }
         
         /// <summary>
-        /// The Azure storage account connection string.
+        /// The storage account connection string.
         /// </summary>
         public string? Storage { get; set; }
         
         /// <summary>
-        /// The Azure account access token.
+        /// The account access token.
         /// </summary>
         public string? Access { get; set; }
         

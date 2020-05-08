@@ -223,31 +223,31 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The subscription option.
         /// </summary>
         internal static Option<string> SubscriptionOption => new Option<string>(
-            "--subscription", "The Azure subscription ID.") { Required = true };
+            "--subscription", "The subscription ID.") { Required = true };
 
         /// <summary>
         /// The resource group option.
         /// </summary>
         internal static Option<string> ResourceGroupOption => new Option<string>(
-            "--resource-group", "The Azure resource group name.") { Required = true };
+            "--resource-group", "The resource group name.") { Required = true };
 
         /// <summary>
         /// The workspace option.
         /// </summary>
         internal static Option<string> WorkspaceOption => new Option<string>(
-            "--workspace", "The Azure workspace name.") { Required = true };
+            "--workspace", "The workspace name.") { Required = true };
 
         /// <summary>
         /// The storage option.
         /// </summary>
         internal static Option<string> StorageOption => new Option<string>(
-            "--storage", "The Azure storage account connection string.") { Required = true };
+            "--storage", "The storage account connection string.") { Required = true };
 
         /// <summary>
         /// The access option.
         /// </summary>
         internal static Option<string?> AccessOption => new Option<string?>(
-            "--access", () => default, "The Azure account access token.");
+            "--access", () => default, "The account access token.");
         
         /// <summary>
         /// The shots option.
