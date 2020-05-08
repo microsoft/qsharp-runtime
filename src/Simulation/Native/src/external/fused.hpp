@@ -53,6 +53,8 @@ class Fused
       for (auto c : cs)
         cmask |= (1ull << c);
       
+      printf("@@@DBG Fused size=%d nQs=%d nCs=%d csSize=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls(), cs.size());
+
       switch (qs.size())
       {
         case 1:

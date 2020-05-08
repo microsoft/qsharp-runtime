@@ -1,0 +1,1 @@
+robocopy /NJH /NJS /NP /NDL C:\depot\Git\qsharp-runtime\src\Simulation\Native\build\%1 C:\depot\Git\msr-quarc\wecker\QDK\MolecularHydrogen\bin\Debug\netcoreapp3.0\runtimes\win-x64\native Microsoft.Quantum.Simulator.Runtime.dll
