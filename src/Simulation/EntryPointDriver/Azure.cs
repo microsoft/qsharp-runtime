@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Console.WriteLine("Job submitted. To track your job status and see the results use:");
                 Console.WriteLine();
                 // TODO: Show the friendly URL.
-                Console.WriteLine(job.Uri);
+                Console.WriteLine(job.Id);
             }
             return 0;
         }
