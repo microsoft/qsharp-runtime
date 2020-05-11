@@ -481,6 +481,9 @@ let ``Supports default custom simulator`` () =
     given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
 
+// TODO: Add tests for the "submit" command.
+
+
 // Help
 
 [<Fact>]
