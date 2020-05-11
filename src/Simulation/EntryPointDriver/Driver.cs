@@ -246,7 +246,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "The number of times the program is executed on the target machine.",
             validator: result =>
                 int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
-                    ? $"The number of shots is {value}, but it must be a positive number."
+                    ? "The number of shots must be a positive number."
                     : default);
 
         /// <summary>
