@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string Target => "Nothing";
 
         public Task<IQuantumMachineOutput<TOut>> ExecuteAsync<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input) =>
-            throw new NotImplementedException();
+            throw new NotSupportedException();
 
         public Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input) =>
             Task.FromResult<IQuantumMachineJob>(new DefaultJob());
@@ -41,11 +41,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
             public Uri Uri => new Uri("https://example.com/" + Id);
 
-            public Task CancelAsync(CancellationToken cancellationToken = default) => 
-                throw new NotImplementedException();
+            public Task CancelAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
-            public Task RefreshAsync(CancellationToken cancellationToken = default) => 
-                throw new NotImplementedException();
+            public Task RefreshAsync(CancellationToken cancellationToken = default) =>
+                throw new NotSupportedException();
         }
     }
 }
