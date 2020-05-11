@@ -58,7 +58,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             if (!(settings.Target is null) && settings.Target.StartsWith("ionq."))
             {
-                // TODO: Number of shots?
+                // TODO: Give the number of shots to the quantum machine.
                 var ionQType = Type.GetType(
                     "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
                     throwOnError: true);
