@@ -3,7 +3,6 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Canon;
 
     internal operation BasisChangeZtoY(target : Qubit) : Unit is Adj + Ctl {
         H(target);
