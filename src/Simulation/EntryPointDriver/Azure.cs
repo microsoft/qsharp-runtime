@@ -30,18 +30,21 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 DisplayUnknownTargetError(settings.Target);
                 return 1;
             }
-            
+
             var job = await machine.SubmitAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            if (settings.IdOnly)
+            switch (settings.Output)
             {
-                Console.WriteLine(job.Id);
-            }
-            else
-            {
-                Console.WriteLine("Job submitted. To track your job status and see the results use:");
-                Console.WriteLine();
-                // TODO: Show the friendly URL.
-                Console.WriteLine(job.Id);
+                case OutputFormat.FriendlyUri:
+                    Console.WriteLine("Job submitted. To track your job status and see the results use:");
+                    Console.WriteLine();
+                    // TODO: Show the friendly URI.
+                    Console.WriteLine(job.Id);
+                    break;
+                case OutputFormat.Id:
+                    Console.WriteLine(job.Id);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Invalid output format '{settings.Output}'.");
             }
             return 0;
         }
@@ -83,6 +86,22 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             Console.Error.WriteLine($"The target '{target}' was not recognized.");
             Console.ForegroundColor = originalForeground;
         }
+    }
+
+    /// <summary>
+    /// The information to show in the output after the job is submitted.
+    /// </summary>
+    internal enum OutputFormat
+    {
+        /// <summary>
+        /// Show a friendly message with a URI that can be used to see the job results.
+        /// </summary>
+        FriendlyUri,
+        
+        /// <summary>
+        /// Show only the job ID.
+        /// </summary>
+        Id
     }
     
     /// <summary>
@@ -129,11 +148,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
-        
+
         /// <summary>
-        /// Show only the job ID after the job is submitted.
+        /// The information to show in the output after the job is submitted.
         /// </summary>
-        public bool IdOnly { get; set; }
+        public OutputFormat Output { get; set; }
 
         /// <summary>
         /// Creates a workspace object based on the settings.

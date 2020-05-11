@@ -72,7 +72,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 TargetOption, StorageOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption);
             AddOptionIfAvailable<string?>(submit, AadTokenOption);
             AddOptionIfAvailable<Uri?>(submit, BaseUriOption);
-            AddOptionIfAvailable<bool>(submit, IdOnlyOption);
+            AddOptionIfAvailable<OutputFormat>(submit, OutputOption);
             AddOptionIfAvailable<int>(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
                     ? $"The number of shots is {value}, but it must be a positive number."
@@ -124,7 +124,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
-                IdOnly = DefaultIfShadowed(IdOnlyOption, settings.IdOnly)
+                Output = DefaultIfShadowed(OutputOption, settings.Output)
             });
         
         /// <summary>
@@ -264,10 +264,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "--shots", () => 500, "The number of times the program is executed on the target machine.");
 
         /// <summary>
-        /// The ID-only option.
+        /// The output option.
         /// </summary>
-        internal static Option<bool> IdOnlyOption => new Option<bool>(
-            "--id-only", () => false, "Show only the job ID after the job is submitted.");
+        internal static Option<OutputFormat> OutputOption => new Option<OutputFormat>(
+            "--output", () => OutputFormat.FriendlyUri,
+            "The information to show in the output after the job is submitted.");
     }
 
     /// <summary>
