@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             };
             AddOptionsIfAvailable<string>(submit,
                 TargetOption, StorageOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption);
-            AddOptionIfAvailable<string?>(submit, AccessOption);
+            AddOptionIfAvailable<string?>(submit, AadTokenOption);
             AddOptionIfAvailable<Uri?>(submit, BaseUriOption);
             AddOptionIfAvailable<bool>(submit, IdOnlyOption);
             AddOptionIfAvailable<int>(submit, ShotsOption,
@@ -121,7 +121,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Subscription = settings.Subscription,
                 ResourceGroup = settings.ResourceGroup,
                 Workspace = settings.Workspace,
-                Access = DefaultIfShadowed(AccessOption, settings.Access),
+                AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 IdOnly = DefaultIfShadowed(IdOnlyOption, settings.IdOnly)
@@ -246,10 +246,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "--workspace", "The workspace name.") { Required = true };
 
         /// <summary>
-        /// The access option.
+        /// The AAD token option.
         /// </summary>
-        internal static Option<string?> AccessOption => new Option<string?>(
-            "--access", () => default, "The account access token.");
+        internal static Option<string?> AadTokenOption => new Option<string?>(
+            "--aad-token", () => default, "The Azure Active Directory authentication token.");
         
         /// <summary>
         /// The base URI option.

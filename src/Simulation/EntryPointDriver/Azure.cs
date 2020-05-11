@@ -116,9 +116,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Workspace { get; set; }
         
         /// <summary>
-        /// The account access token.
+        /// The Azure Active Directory authentication token.
         /// </summary>
-        public string? Access { get; set; }
+        public string? AadToken { get; set; }
         
         /// <summary>
         /// The workspace base URI.
@@ -143,7 +143,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             var workspaceType = Type.GetType(
                 "Microsoft.Azure.Quantum.Workspace, Microsoft.Azure.Quantum.Client", throwOnError: true);
-            if (Access is null)
+            if (AadToken is null)
             {
                 // We can't use Activator.CreateInstance because the constructor is ambiguous when the last two
                 // arguments are null.
@@ -154,7 +154,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             else
             {
-                return Activator.CreateInstance(workspaceType, Subscription, ResourceGroup, Workspace, Access, BaseUri);
+                return Activator.CreateInstance(
+                    workspaceType, Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
             }
         }
     }
