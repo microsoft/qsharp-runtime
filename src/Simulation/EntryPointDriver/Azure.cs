@@ -96,6 +96,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Target { get; set; }
         
         /// <summary>
+        /// The storage account connection string.
+        /// </summary>
+        public string? Storage { get; set; }
+        
+        /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
@@ -111,14 +116,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Workspace { get; set; }
         
         /// <summary>
-        /// The storage account connection string.
-        /// </summary>
-        public string? Storage { get; set; }
-        
-        /// <summary>
         /// The account access token.
         /// </summary>
         public string? Access { get; set; }
+        
+        /// <summary>
+        /// The workspace base URI.
+        /// </summary>
+        public Uri? BaseUri { get; set; }
         
         /// <summary>
         /// The number of times the program is executed on the target machine.
@@ -145,12 +150,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 var tokenCredentialType = Type.GetType("Azure.Core.TokenCredential, Azure.Core", throwOnError: true);
                 var constructor = workspaceType.GetConstructor(new[]
                     { typeof(string), typeof(string), typeof(string), tokenCredentialType, typeof(Uri) });
-                return constructor.Invoke(new object?[] { Subscription, ResourceGroup, Workspace, null, null });
+                return constructor.Invoke(new object?[] { Subscription, ResourceGroup, Workspace, null, BaseUri });
             }
             else
             {
-                return Activator.CreateInstance(
-                    workspaceType, Subscription, ResourceGroup, Workspace, Access, null);
+                return Activator.CreateInstance(workspaceType, Subscription, ResourceGroup, Workspace, Access, BaseUri);
             }
         }
     }

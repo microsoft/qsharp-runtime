@@ -69,8 +69,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
             AddOptionsIfAvailable<string>(submit,
-                TargetOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption, StorageOption);
+                TargetOption, StorageOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption);
             AddOptionIfAvailable<string?>(submit, AccessOption);
+            AddOptionIfAvailable<Uri?>(submit, BaseUriOption);
             AddOptionIfAvailable<bool>(submit, IdOnlyOption);
             AddOptionIfAvailable<int>(submit, ShotsOption,
                 result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
@@ -116,11 +117,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
                 Target = settings.Target,
+                Storage = settings.Storage,
                 Subscription = settings.Subscription,
                 ResourceGroup = settings.ResourceGroup,
                 Workspace = settings.Workspace,
-                Storage = settings.Storage,
                 Access = DefaultIfShadowed(AccessOption, settings.Access),
+                BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 IdOnly = DefaultIfShadowed(IdOnlyOption, settings.IdOnly)
             });
@@ -220,6 +222,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "--target", "The target device ID.") { Required = true };
 
         /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static Option<string> StorageOption => new Option<string>(
+            "--storage", "The storage account connection string.") { Required = true };
+        
+        /// <summary>
         /// The subscription option.
         /// </summary>
         internal static Option<string> SubscriptionOption => new Option<string>(
@@ -238,16 +246,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "--workspace", "The workspace name.") { Required = true };
 
         /// <summary>
-        /// The storage option.
-        /// </summary>
-        internal static Option<string> StorageOption => new Option<string>(
-            "--storage", "The storage account connection string.") { Required = true };
-
-        /// <summary>
         /// The access option.
         /// </summary>
         internal static Option<string?> AccessOption => new Option<string?>(
             "--access", () => default, "The account access token.");
+        
+        /// <summary>
+        /// The base URI option.
+        /// </summary>
+        internal static Option<Uri?> BaseUriOption => new Option<Uri?>(
+            "--base-uri", () => default, "The workspace base URI.");
         
         /// <summary>
         /// The shots option.
