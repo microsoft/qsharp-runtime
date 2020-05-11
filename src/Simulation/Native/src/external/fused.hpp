@@ -29,6 +29,7 @@ namespace SIMULATOR
 
 class Fused
   {
+
   public:
     Fused() {}
 
@@ -53,7 +54,8 @@ class Fused
       for (auto c : cs)
         cmask |= (1ull << c);
       
-      printf("@@@DBG Fused size=%d nQs=%d nCs=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls());
+      static int dbgNfused = 0; //@@@DBG stats
+      printf("@@@DBG Fused size=%d nQs=%d nCs=%d total=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls(),++dbgNfused);
 
       switch (qs.size())
       {
@@ -120,7 +122,7 @@ class Fused
 
         newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
 
-        if (newgates.num_qubits()+newgates.num_controls() > 10)
+        if (newgates.num_qubits()+newgates.num_controls() > 6)
         {
             flush(wfn);
             fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
