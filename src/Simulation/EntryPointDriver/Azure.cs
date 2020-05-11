@@ -140,7 +140,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? AadToken { get; set; }
         
         /// <summary>
-        /// The workspace base URI.
+        /// The base URI of the Azure Quantum endpoint.
         /// </summary>
         public Uri? BaseUri { get; set; }
         

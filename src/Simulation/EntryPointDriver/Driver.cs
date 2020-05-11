@@ -235,7 +235,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The base URI option.
         /// </summary>
         internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
-            new[] { "--base-uri" }, default, "The workspace base URI.");
+            new[] { "--base-uri" }, default, "The base URI of the Azure Quantum endpoint.");
 
         /// <summary>
         /// The shots option.
