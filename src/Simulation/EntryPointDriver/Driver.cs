@@ -31,25 +31,31 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// The simulator option.
         /// </summary>
-        private Option<string> SimulatorOption => new Option<string>(
+        private OptionInfo<string> SimulatorOption { get; }
+
+        /// <summary>
+        /// Creates a new driver for the entry point.
+        /// </summary>
+        /// <param name="entryPoint">The entry point.</param>
+        public Driver(IEntryPoint<TIn, TOut> entryPoint)
+        {
+            this.entryPoint = entryPoint;
+            SimulatorOption = new OptionInfo<string>(
                 new[]
                 {
                     "--" + CommandLineArguments.SimulatorOption.Item1,
                     "-" + CommandLineArguments.SimulatorOption.Item2
                 },
-                () => entryPoint.DefaultSimulator,
-                "The name of the simulator to use.")
-            .WithSuggestions(
-                AssemblyConstants.QuantumSimulator,
-                AssemblyConstants.ToffoliSimulator,
-                AssemblyConstants.ResourcesEstimator,
-                entryPoint.DefaultSimulator);
-        
-        /// <summary>
-        /// Creates a new driver for the entry point.
-        /// </summary>
-        /// <param name="entryPoint">The entry point.</param>
-        public Driver(IEntryPoint<TIn, TOut> entryPoint) => this.entryPoint = entryPoint;
+                entryPoint.DefaultSimulator,
+                "The name of the simulator to use.",
+                suggestions: new[]
+                {
+                    AssemblyConstants.QuantumSimulator,
+                    AssemblyConstants.ToffoliSimulator,
+                    AssemblyConstants.ResourcesEstimator,
+                    entryPoint.DefaultSimulator
+                });
+        }
 
         /// <summary>
         /// Runs the entry point using the command-line arguments.
@@ -62,21 +68,21 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            AddOptionIfAvailable<string>(simulate, SimulatorOption);
+            AddOptionIfAvailable(simulate, SimulatorOption);
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            AddOptionsIfAvailable<string>(submit,
-                TargetOption, StorageOption, SubscriptionOption, ResourceGroupOption, WorkspaceOption);
-            AddOptionIfAvailable<string?>(submit, AadTokenOption);
-            AddOptionIfAvailable<Uri?>(submit, BaseUriOption);
-            AddOptionIfAvailable<OutputFormat>(submit, OutputOption);
-            AddOptionIfAvailable<int>(submit, ShotsOption,
-                result => int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
-                    ? $"The number of shots is {value}, but it must be a positive number."
-                    : default);
+            AddOptionIfAvailable(submit, TargetOption);
+            AddOptionIfAvailable(submit, StorageOption);
+            AddOptionIfAvailable(submit, SubscriptionOption);
+            AddOptionIfAvailable(submit, ResourceGroupOption);
+            AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, AadTokenOption);
+            AddOptionIfAvailable(submit, BaseUriOption);
+            AddOptionIfAvailable(submit, OutputOption);
+            AddOptionIfAvailable(submit, ShotsOption);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -143,9 +149,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="option">The option.</param>
         /// <param name="value">The value of the option given on the command line.</param>
         /// <returns>The default value or the original value.</returns>
-        private T DefaultIfShadowed<T>(Option option, T value)
+        private T DefaultIfShadowed<T>(OptionInfo<T> option, T value)
         {
-            if (IsAliasAvailable(option.RawAliases.First()))
+            if (IsAliasAvailable(option.Aliases.First()))
             {
                 return value;
             }
@@ -155,9 +161,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Error.WriteLine(
                     $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
-                    $"Using default value {option.Argument.GetDefaultValue()}.");
+                    $"Using default value {option.DefaultValue}.");
                 Console.ForegroundColor = originalForeground;
-                return (T)option.Argument.GetDefaultValue();
+                return option.DefaultValue;
             }
         }
 
@@ -167,43 +173,17 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="command">The command to add the option to.</param>
         /// <param name="option">The option to add.</param>
-        /// <param name="validator">A validator for the option.</param>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
-        private void AddOptionIfAvailable<T>(
-            Command command, Option option, ValidateSymbol<OptionResult>? validator = default)
+        private void AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
-            if (IsAliasAvailable(option.RawAliases.First()))
+            if (IsAliasAvailable(option.Aliases.First()))
             {
-                var validAliases = option.RawAliases.Where(IsAliasAvailable).ToArray();
-                var validOption = option.Argument.HasDefaultValue
-                    ? new Option<T>(validAliases, () => (T)option.Argument.GetDefaultValue(), option.Description)
-                    : new Option<T>(validAliases, option.Description);
-                validOption.Required = option.Required;
-                if (!(validator is null))
-                {
-                    validOption.AddValidator(validator);
-                }
-                command.AddOption(validOption.WithSuggestions(option.GetSuggestions().ToArray()));
+                command.AddOption(option.Create(option.Aliases.Where(IsAliasAvailable)));
             }
             else if (option.Required)
             {
                 command.AddValidator(commandResult =>
-                    $"The required option {option.RawAliases.First()} conflicts with an entry point parameter name.");
-            }
-        }
-
-        /// <summary>
-        /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
-        /// alias is available.
-        /// </summary>
-        /// <param name="command">The command to add the option to.</param>
-        /// <param name="options">The options to add.</param>
-        /// <typeparam name="T">The type of the option's argument.</typeparam>
-        private void AddOptionsIfAvailable<T>(Command command, params Option[] options)
-        {
-            foreach (var option in options)
-            {
-                AddOptionIfAvailable<T>(command, option);
+                    $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.");
             }
         }
     }
@@ -218,56 +198,63 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// The target option.
         /// </summary>
-        internal static Option<string> TargetOption => new Option<string>(
-            "--target", "The target device ID.") { Required = true };
+        internal static readonly OptionInfo<string> TargetOption = new OptionInfo<string>(
+            new[] { "--target" }, "The target device ID.");
 
         /// <summary>
         /// The storage option.
         /// </summary>
-        internal static Option<string> StorageOption => new Option<string>(
-            "--storage", "The storage account connection string.") { Required = true };
+        internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
+            new[] { "--storage" }, "The storage account connection string.");
         
         /// <summary>
         /// The subscription option.
         /// </summary>
-        internal static Option<string> SubscriptionOption => new Option<string>(
-            "--subscription", "The subscription ID.") { Required = true };
+        internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
+            new[] { "--subscription" }, "The subscription ID.");
 
         /// <summary>
         /// The resource group option.
         /// </summary>
-        internal static Option<string> ResourceGroupOption => new Option<string>(
-            "--resource-group", "The resource group name.") { Required = true };
+        internal static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
+            new[] { "--resource-group" }, "The resource group name.");
 
         /// <summary>
         /// The workspace option.
         /// </summary>
-        internal static Option<string> WorkspaceOption => new Option<string>(
-            "--workspace", "The workspace name.") { Required = true };
+        internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
+            new[] { "--workspace" }, "The workspace name.");
 
         /// <summary>
         /// The AAD token option.
         /// </summary>
-        internal static Option<string?> AadTokenOption => new Option<string?>(
-            "--aad-token", () => default, "The Azure Active Directory authentication token.");
+        internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
+            new[] { "--aad-token" }, default, "The Azure Active Directory authentication token.");
         
         /// <summary>
         /// The base URI option.
         /// </summary>
-        internal static Option<Uri?> BaseUriOption => new Option<Uri?>(
-            "--base-uri", () => default, "The workspace base URI.");
-        
+        internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
+            new[] { "--base-uri" }, default, "The workspace base URI.");
+
         /// <summary>
         /// The shots option.
         /// </summary>
-        internal static Option<int> ShotsOption => new Option<int>(
-            "--shots", () => 500, "The number of times the program is executed on the target machine.");
+        internal static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
+            new[] { "--shots" },
+            500,
+            "The number of times the program is executed on the target machine.",
+            validator: result =>
+                int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
+                    ? $"The number of shots is {value}, but it must be a positive number."
+                    : default);
 
         /// <summary>
         /// The output option.
         /// </summary>
-        internal static Option<OutputFormat> OutputOption => new Option<OutputFormat>(
-            "--output", () => OutputFormat.FriendlyUri,
+        internal static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
+            new[] { "--output" },
+            OutputFormat.FriendlyUri,
             "The information to show in the output after the job is submitted.");
     }
 
