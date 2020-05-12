@@ -99,7 +99,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>The option.</returns>
         internal Option<T> Create(IEnumerable<string> aliases)
         {
-            var option = new Option<T>(aliases.ToArray(), defaultValue, description) { Required = Required };
+            var option = Required
+                ? new Option<T>(aliases.ToArray(), description) { Required = true }
+                : new Option<T>(aliases.ToArray(), defaultValue, description);
             if (!(validator is null))
             {
                 option.AddValidator(validator);
