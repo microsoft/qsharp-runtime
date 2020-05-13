@@ -72,6 +72,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
+                IsHidden = true,
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
             AddOptionIfAvailable(submit, TargetOption);
