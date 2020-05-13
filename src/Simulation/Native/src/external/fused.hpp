@@ -30,8 +30,22 @@ namespace SIMULATOR
 class Fused
   {
 
+    mutable int dbgNfused;
+    mutable int dbgSize;
+    mutable int dbgNqs;
+    mutable int dbgNcs;
+    mutable int dbgNgates;
+
   public:
-    Fused() {}
+    Fused() {
+        dbgNfused   = 0;
+        dbgSize     = 0;
+        dbgNqs      = 0;
+        dbgNcs      = 0;
+        dbgNgates   = 0;
+
+        omp_set_num_threads(4); //@@@DBG Let's force it
+    }
 
     inline void reset()
     {
@@ -54,8 +68,19 @@ class Fused
       for (auto c : cs)
         cmask |= (1ull << c);
       
-      static int dbgNfused = 0; //@@@DBG stats
-      printf("@@@DBG Fused size=%d nQs=%d nCs=%d total=%d\n", fusedgates.size(), fusedgates.num_qubits(),fusedgates.num_controls(),++dbgNfused);
+      dbgNfused++;
+      dbgSize += fusedgates.size();
+      dbgNqs += fusedgates.num_qubits();
+      dbgNcs += fusedgates.num_controls();
+      if (dbgNfused % 10000 == 0) {
+          double nFused = (float)dbgNfused;
+          printf("@@@DBG Fused size=%.2f nQs=%.2f nCs=%.2f flushes=%.0fK gates=%.0fK\n", 
+              ((float)dbgSize/nFused), 
+              ((float)dbgNqs / nFused),
+              ((float)dbgNcs / nFused),
+              nFused/1000.,
+              (float)dbgNgates/1000.);
+      }
 
       switch (qs.size())
       {
@@ -102,6 +127,8 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
+        dbgNgates++;
+
 #if 0 //@@@DBG: Original
         if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
             flush(wfn);
@@ -116,21 +143,20 @@ class Fused
       }
       else
           fusedgates = newgates;
-    }
 #else //@@@DBG: Playing
         Fusion newgates = fusedgates;
 
         newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
 
-        if (newgates.num_qubits()+newgates.num_controls() > 6)
+        if (newgates.num_qubits() > 4)
         {
             flush(wfn);
             fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
         }
         else
             fusedgates = newgates;
-    }
 #endif
+    }
 
     
     template <class T, class A, class M>
