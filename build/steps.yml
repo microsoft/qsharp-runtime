@@ -5,15 +5,15 @@ steps:
 - template: steps-init.yml
 
 
+- powershell: ./build.ps1
+  displayName: "Building Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+
+
 - powershell: ./manifest.ps1
   displayName: "List built assemblies"
   workingDirectory: $(System.DefaultWorkingDirectory)/build
   condition: succeededOrFailed()
-
-
-- powershell: ./build.ps1
-  displayName: "Building Q# runtime"
-  workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 
 - powershell: ./test.ps1
