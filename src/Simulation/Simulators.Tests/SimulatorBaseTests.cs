@@ -47,11 +47,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             // are actually called.
             var calledOnAllocate = false;
             var calledOnRelease = false;
-            subject.OnAllocateQubits += count => {
+            subject.OnAllocateQubits += count =>
+            {
                 output.WriteLine($"Allocate count = {count}");
                 calledOnAllocate = true;
             };
-            subject.OnReleaseQubits += register => {
+            subject.OnReleaseQubits += register =>
+            {
                 output.WriteLine($"Release qubits = {register}");
                 calledOnRelease = true;
             };
@@ -170,8 +172,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             subject.Register(typeof(Intrinsic.X), typeof(DummyX));
             var customX = subject.Get<Intrinsic.X>();
-
             Assert.Equal(typeof(DummyX), customX.GetType());
+
+            subject.Register(typeof(Intrinsic.M), typeof(DummyM));
+            var customM = subject.Get<Intrinsic.M>();
+            Assert.Equal(typeof(DummyM), customM.GetType());
         }
 
         /// <summary>
@@ -284,7 +289,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var baseCount = 32L;
             var allocCount = 10L;
 
-            var (initialUse, initialBorrow, afterUse, afterBorrow, subBorrow, innerBorrow) = 
+            var (initialUse, initialBorrow, afterUse, afterBorrow, subBorrow, innerBorrow) =
                 Circuits.GetAvailableTest.Run(sim, allocCount).Result;
 
             Assert.Equal(baseCount, initialUse);
@@ -326,6 +331,23 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             public override Func<Qubit, QVoid> Body => throw new NotImplementedException();
 
             public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledBody => throw new NotImplementedException();
+        }
+
+        /// <summary>
+        // This class has no implementation, is just used to make sure
+        // a user can register their own Operation overrides:
+        /// </summary>
+        public class DummyM : Intrinsic.M
+        {
+            public DummyM(IOperationFactory m) : base(m)
+            {
+            }
+
+            public override Func<Qubit, Result> Body => throw new NotImplementedException();
+
+            public override void Init()
+            {
+            }
         }
 
         /// <summary>
@@ -387,7 +409,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public override void Init()
             {
-                this.B =  this.Factory.Get<ICallable, B>();
+                this.B = this.Factory.Get<ICallable, B>();
             }
 
             string ICallable.FullName => "A";
