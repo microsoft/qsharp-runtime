@@ -67,6 +67,8 @@ namespace Microsoft.Quantum.Simulation.Common
             Type key = (original.IsGenericType && original.ContainsGenericParameters) ? original.GetGenericTypeDefinition() : original;
 
             this.opsOverrides[key] = replace;
+            // Always clear the cache to ensure the override takes precedence.
+            this.opsCache.Remove(key);
         }
 
         public virtual T CreateInstance(Type t)

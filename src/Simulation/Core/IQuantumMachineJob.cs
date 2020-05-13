@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Runtime
         /// <summary>
         /// Gets whether the job execution completed successfully.
         /// </summary>
-        bool Succeeded { get;  }
+        bool Succeeded { get; }
 
         /// <summary>
         /// Gets an URI to access the job.
