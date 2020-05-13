@@ -22,7 +22,7 @@ inline void kernel_core(V& psi, std::size_t I, std::size_t d0, M const& m, M con
 template <class V, class M>
 void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 {
-     std::size_t n = psi.size();
+	std::size_t n = psi.size();
 	std::size_t d0 = 1ULL << id0;
 	auto m = matrix;
 	std::size_t dsorted[] = {d0};

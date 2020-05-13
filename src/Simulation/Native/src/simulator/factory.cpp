@@ -37,15 +37,18 @@ namespace Microsoft
       {
         if (haveFMA() && haveAVX2())
         {
-          return SimulatorAVX2::createSimulator(maxlocal);
+            printf("@@@DBG: Using AVX2 kernel\n");
+            return SimulatorAVX2::createSimulator(maxlocal);
         }
         else if(haveAVX())
         {
-           return SimulatorAVX::createSimulator(maxlocal);
+            printf("@@@DBG: Using AVX kernel\n");
+            return SimulatorAVX::createSimulator(maxlocal);
         }
         else
         {
-           return SimulatorGeneric::createSimulator(maxlocal);
+            printf("@@@DBG: Using Generic kernel\n");
+            return SimulatorGeneric::createSimulator(maxlocal);
         }
 
       }

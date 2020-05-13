@@ -427,4 +427,17 @@ int main()
     // test_dump();
     // test_dump_qubits();
     return 0;
+#if 0 // @@@DBG code for timing tests
+    auto sim_id = init();
+
+    const int nQs = 15;
+    for (int q=0; q<nQs; q++) allocateQubit(sim_id, q);
+
+    for (int i = 0; i < 10000; i++) {
+        H(sim_id, 0);
+        for (int q = 1; q < nQs; q++) CX(sim_id, q - 1, q);
+    }
+
+    destroy(sim_id);
+#endif
 }
