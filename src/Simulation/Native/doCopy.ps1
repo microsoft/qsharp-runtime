@@ -1,7 +1,7 @@
 param([string]$bld = "Release")
 
 "================== COPYING $bld"
-$dll = "Microsoft.Quantum.Simulator.Runtime.dll"
+$dll = "Microsoft.Quantum.Simulator.Runtime.*"  # DLL and PDB
 $srcDir = "C:\depot\Git\qsharp-runtime\src\Simulation\Native\build\$bld"
 foreach ($dest in "H2O","Ham","integer-factorization") {
     foreach ($typ in "Release","Debug") {

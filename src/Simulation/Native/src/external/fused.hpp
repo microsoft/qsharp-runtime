@@ -31,24 +31,38 @@ namespace SIMULATOR
 
 class Fused
   {
-
+    //@@@DBG: Everything in here is added for debugging
     mutable int dbgNfused;
     mutable int dbgSize;
     mutable int dbgNqs;
     mutable int dbgNcs;
     mutable int dbgNgates;
+    mutable double dbgElapsed;
     std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
   public:
-    Fused() {
+      Fused() {
+
         dbgNfused   = 0;
         dbgSize     = 0;
         dbgNqs      = 0;
         dbgNcs      = 0;
         dbgNgates   = 0;
+        dbgElapsed  = 0.0;
 
-        omp_set_num_threads(4); //@@@DBG Let's force it $env:OMP_NUM_THREADS=4
-        omp_set_nested(0);      //@@@DBG Get rid of nested parallels $env:OMP_NESTED="FALSE"
+        //@@@DBW: Added to guarantee that we don't use too many threads
+        char* val = getenv("OMP_NUM_THREADS");
+        if (val == NULL) {
+            int nProcs = omp_get_num_procs();
+            int nMax = omp_get_max_threads();
+            if (nMax == nProcs) {
+                int nUse = nProcs;
+                if (nProcs > 4) nUse /= 2;
+                else if (nProcs > 1) nUse--;
+                omp_set_num_threads(nUse);
+            }
+        }
+        printf("@@@DBG: OMP_NUM_THREADS=%d\n", omp_get_max_threads());
     }
 
     inline void reset()
@@ -77,17 +91,19 @@ class Fused
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
       
-      if (dbgNfused % 10000 == 0) {
+      std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> elapsed = curr - start;
+      if (elapsed.count()-dbgElapsed >= 5.0) {
+          dbgElapsed = elapsed.count();
           double nFused = (float)dbgNfused;
-          std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
-          std::chrono::duration<double> elapsed = curr - start;
-          printf("@@@DBG Fused size=%.2f nQs=%.2f nCs=%.2f flushes=%5.0fK gates=%6.0fK elap=%6.1f\n",
+          printf("@@@DBG Fused size=%.2f nQs=%.2f nCs=%.2f flushes=%5.0fK gates=%6.0fK elap=%6.1f kgps=%6.1f\n",
               ((float)dbgSize/nFused), 
               ((float)dbgNqs / nFused),
               ((float)dbgNcs / nFused),
               nFused/1000.,
               (float)dbgNgates/1000.,
-              elapsed.count());
+              dbgElapsed,
+              (float)dbgNgates/(1000.*dbgElapsed));
       }
 
       switch (qs.size())
@@ -137,7 +153,7 @@ class Fused
     {
         dbgNgates++;
 
-#if 1 //@@@DBG: Original
+#if 0 //@@@DBG: Original
         if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
             flush(wfn);
         Fusion newgates = fusedgates;

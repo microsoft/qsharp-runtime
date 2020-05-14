@@ -8,6 +8,7 @@
 #include <vector>
 #include <complex>
 #include <array>
+#include <omp.h>
 
 // some convenience functions
 
@@ -414,6 +415,7 @@ void test_permute_basis_adjoint()
 
 int main()
 {
+#if 0 //@@@DBG added for timing tests below
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -427,17 +429,30 @@ int main()
     // test_dump();
     // test_dump_qubits();
     return 0;
-#if 0 // @@@DBG code for timing tests
-    auto sim_id = init();
+#else // @@@DBG code for timing tests
+    for (int numThreads = 1; numThreads < 5; numThreads++) {
+        for (int simTyp = 1; simTyp < 4; simTyp++) {
+            omp_set_num_threads(numThreads);
+            auto sim_id = initDBG(simTyp);
 
-    const int nQs = 15;
-    for (int q=0; q<nQs; q++) allocateQubit(sim_id, q);
+            const int nQs = 15;
+            for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-    for (int i = 0; i < 10000; i++) {
-        H(sim_id, 0);
-        for (int q = 1; q < nQs; q++) CX(sim_id, q - 1, q);
+            srand(1);
+            for (int i = 0; i < 30000; i++) {
+                int q0 = rand() % nQs;
+                H(sim_id, q0);
+                X(sim_id, q0);
+                for (int j = 0; j < 10; j++) {
+                    q0 = (q0 + nQs + (rand() % 3) - 1) % nQs;
+                    int q1 = (q0 + 1) % nQs;
+                    CX(sim_id, q0, q1);
+                    CX(sim_id, q1, q0);
+                }
+            }
+
+            destroy(sim_id);
+        }
     }
-
-    destroy(sim_id);
 #endif
 }
