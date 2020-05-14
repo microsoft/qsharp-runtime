@@ -24,6 +24,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         internal static async Task<int> Submit<TIn, TOut>(
             IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, AzureSettings settings)
         {
+            if (settings.Verbose)
+            {
+                Console.WriteLine(settings);
+                Console.WriteLine();
+            }
+
             var machine = CreateMachine(settings);
             if (machine is null)
             {
@@ -97,13 +103,13 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// Show a friendly message with a URI that can be used to see the job results.
         /// </summary>
         FriendlyUri,
-        
+
         /// <summary>
         /// Show only the job ID.
         /// </summary>
         Id
     }
-    
+
     /// <summary>
     /// Settings for a submission to Azure Quantum.
     /// </summary>
@@ -113,37 +119,37 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The target device ID.
         /// </summary>
         public string? Target { get; set; }
-        
+
         /// <summary>
         /// The storage account connection string.
         /// </summary>
         public string? Storage { get; set; }
-        
+
         /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
-        
+
         /// <summary>
         /// The resource group name.
         /// </summary>
         public string? ResourceGroup { get; set; }
-        
+
         /// <summary>
         /// The workspace name.
         /// </summary>
         public string? Workspace { get; set; }
-        
+
         /// <summary>
         /// The Azure Active Directory authentication token.
         /// </summary>
         public string? AadToken { get; set; }
-        
+
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
         /// </summary>
         public Uri? BaseUri { get; set; }
-        
+
         /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
@@ -153,6 +159,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The information to show in the output after the job is submitted.
         /// </summary>
         public OutputFormat Output { get; set; }
+
+        /// <summary>
+        /// Show additional information about the submission.
+        /// </summary>
+        public bool Verbose { get; set; }
 
         /// <summary>
         /// Creates a workspace object based on the settings.
@@ -177,5 +188,18 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     workspaceType, Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
             }
         }
+
+        public override string ToString() =>
+            string.Join(System.Environment.NewLine,
+                $"Target: {Target}",
+                $"Storage: {Storage}",
+                $"Subscription: {Subscription}",
+                $"Resource Group: {ResourceGroup}",
+                $"Workspace: {Workspace}",
+                $"AAD Token: {AadToken}",
+                $"Base URI: {BaseUri}",
+                $"Shots: {Shots}",
+                $"Output: {Output}",
+                $"Verbose: {Verbose}");
     }
 }

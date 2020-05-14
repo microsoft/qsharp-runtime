@@ -510,3 +510,28 @@ Commands:
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
+
+[<Fact>]
+let ``Shows help text for submit command`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message = name |> sprintf "Usage:
+  %s submit [options]
+
+Options:
+  --target <target> (REQUIRED)                        The target device ID.
+  --storage <storage> (REQUIRED)                      The storage account connection string.
+  --subscription <subscription> (REQUIRED)            The subscription ID.
+  --resource-group <resource-group> (REQUIRED)        The resource group name.
+  --workspace <workspace> (REQUIRED)                  The workspace name.
+  --aad-token <aad-token>                             The Azure Active Directory authentication token.
+  --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
+  --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
+  --shots <shots>                                     The number of times the program is executed on the target machine.
+  --verbose                                           Show additional information about the submission.
+  -n <n> (REQUIRED)                                   A number.
+  --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+  --my-cool-bool (REQUIRED)                           A neat bit.
+  -?, -h, --help                                      Show help and usage information"
+  
+    let given = test 31
+    given ["submit"; "--help"] |> yields message
