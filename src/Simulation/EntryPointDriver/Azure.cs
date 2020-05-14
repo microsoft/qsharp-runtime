@@ -31,13 +31,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 return 1;
             }
 
+            // TODO: Specify the number of shots. The IQuantumMachine interface should be updated.
             var job = await machine.SubmitAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
             switch (settings.Output)
             {
                 case OutputFormat.FriendlyUri:
                     Console.WriteLine("Job submitted. To track your job status and see the results use:");
                     Console.WriteLine();
-                    // TODO: Show the friendly URI.
+                    // TODO: Show the friendly URI. The friendly URI is not yet available from the job.
                     Console.WriteLine(job.Id);
                     break;
                 case OutputFormat.Id:
@@ -58,7 +59,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             if (!(settings.Target is null) && settings.Target.StartsWith("ionq."))
             {
-                // TODO: Give the number of shots to the quantum machine.
                 var ionQType = Type.GetType(
                     "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
                     throwOnError: true);
