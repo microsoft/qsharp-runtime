@@ -481,7 +481,79 @@ let ``Supports default custom simulator`` () =
     given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
 
-// TODO: Add tests for the "submit" command.
+// Azure Quantum Submission
+
+/// Standard command-line arguments for the "submit" command using the "nothing" target.
+let private standardSubmitArgs =
+    ["submit"
+     "--target"
+     "nothing"
+     "--storage"
+     "myStorage"
+     "--subscription"
+     "mySubscription"
+     "--resource-group"
+     "myResourceGroup"
+     "--workspace"
+     "myWorkspace"]
+
+[<Fact>]
+let ``Submit can submit a job`` () =
+    let given = test 1
+    given standardSubmitArgs |> yields "Job submitted. To track your job status and see the results use:
+
+00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit can show only the ID`` () =
+    let given = test 1
+    given (standardSubmitArgs @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit uses default values`` () =
+    let given = test 1
+    given (standardSubmitArgs @ ["--verbose"]) |> yields "Target: nothing
+Storage: myStorage
+Subscription: mySubscription
+Resource Group: myResourceGroup
+Workspace: myWorkspace
+AAD Token:
+Base URI:
+Shots: 500
+Output: FriendlyUri
+Verbose: True
+
+Job submitted. To track your job status and see the results use:
+
+00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit allows overriding default values`` () =
+    let given = test 1
+    given (standardSubmitArgs @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
+    |> yields "Target: nothing
+Storage: myStorage
+Subscription: mySubscription
+Resource Group: myResourceGroup
+Workspace: myWorkspace
+AAD Token: myToken
+Base URI: myBaseUri
+Shots: 750
+Output: FriendlyUri
+Verbose: True
+
+Job submitted. To track your job status and see the results use:
+
+00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit requires a positive number of shots`` () =
+    let given = test 1
+    given (standardSubmitArgs @ ["--shots"; "1"]) |> yields "Job submitted. To track your job status and see the results use:
+
+00000000-0000-0000-0000-0000000000000"
+    given (standardSubmitArgs @ ["--shots"; "0"]) |> fails
+    given (standardSubmitArgs @ ["--shots"; "-1"]) |> fails
 
 
 // Help
