@@ -23,7 +23,6 @@
     <PackageReference Include="Azure.Identity" Version="1.1.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.2.0" />
     <PackageReference Include="Bond.CSharp" Version="8.2.0" />
-    <PackageReference Include="Microsoft.Quantum.Runtime.Core" Version="0.11.2005.822-beta" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.21" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure" Version="3.3.19" />
     <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.10.0-preview" />
@@ -41,6 +40,10 @@
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 
 </Project>
