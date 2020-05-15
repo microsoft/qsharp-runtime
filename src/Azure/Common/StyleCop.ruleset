@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Microsoft Managed Recommended Rules" Description="These rules focus on the most critical problems in your code, including potential security holes, application crashes, and other important logic and design errors. It is recommended to include this rule set in any custom rule set you create for your projects." ToolsVersion="10.0">
+  <Localization ResourceAssembly="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.dll" ResourceBaseName="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.Localized">
+    <Name Resource="MinimumRecommendedRules_Name" />
+    <Description Resource="MinimumRecommendedRules_Description" />
+  </Localization>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA0001" Action="None" /> <!-- XML Comment Analysis Disabled due to project configuration -->
+    <Rule Id="SA1101" Action="None" /> <!-- Prefix local calls with this -->
+    <Rule Id="SA1127" Action="None" /> <!-- Generic type constraints should be on their own line -->
+    <Rule Id="SA1204" Action="None" /> <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1600" Action="None" /> <!-- Elements should be documented -->
+    <Rule Id="SA1601" Action="None" /> <!-- Partial elements should be documented -->
+    <Rule Id="SA1602" Action="None" /> <!-- Enumeration items should be documented -->
+    <Rule Id="SA1614" Action="None" /> <!-- Element parameter documentation should have text -->
+    <Rule Id="SA1616" Action="None" /> <!-- Element return value documentation should have text -->
+    <Rule Id="SA1622" Action="None" /> <!-- Generic type parameter documentation should have text -->
+    <Rule Id="SA1623" Action="None" /> <!-- Property's documentation summary text must begin with gets or sets -->
+  </Rules>
+</RuleSet>
