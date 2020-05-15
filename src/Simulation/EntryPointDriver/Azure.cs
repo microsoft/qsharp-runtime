@@ -4,6 +4,7 @@
 using System;
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
+using Microsoft.Azure.Quantum;
 using Microsoft.Quantum.Runtime;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -55,25 +56,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
         /// <returns>A quantum machine.</returns>
-        private static IQuantumMachine? CreateMachine(AzureSettings settings)
-        {
-            if (!(settings.Target is null) && settings.Target.StartsWith("ionq."))
-            {
-                var ionQType = Type.GetType(
-                    "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ",
-                    throwOnError: true);
-                return (IQuantumMachine)Activator.CreateInstance(
-                    ionQType, settings.Target, settings.Storage, settings.CreateWorkspace());
-            }
-            else if (settings.Target == "nothing")
-            {
-                return new NothingMachine();
-            }
-            else
-            {
-                return null;
-            }
-        }
+        private static IQuantumMachine? CreateMachine(AzureSettings settings) =>
+            settings.Target == "nothing"
+                ? new NothingMachine()
+                : QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage);
 
         /// <summary>
         /// Displays an error message for attempting to use an unknown target machine.
@@ -155,27 +141,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public OutputFormat Output { get; set; }
 
         /// <summary>
-        /// Creates a workspace object based on the settings.
+        /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
-        /// <returns>The workspace object based on the settings.</returns>
-        internal object CreateWorkspace()
-        {
-            var workspaceType = Type.GetType(
-                "Microsoft.Azure.Quantum.Workspace, Microsoft.Azure.Quantum.Client", throwOnError: true);
-            if (AadToken is null)
-            {
-                // We can't use Activator.CreateInstance because the constructor is ambiguous when the last two
-                // arguments are null.
-                var tokenCredentialType = Type.GetType("Azure.Core.TokenCredential, Azure.Core", throwOnError: true);
-                var constructor = workspaceType.GetConstructor(new[]
-                    { typeof(string), typeof(string), typeof(string), tokenCredentialType, typeof(Uri) });
-                return constructor.Invoke(new object?[] { Subscription, ResourceGroup, Workspace, null, BaseUri });
-            }
-            else
-            {
-                return Activator.CreateInstance(
-                    workspaceType, Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
-            }
-        }
+        /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
+        internal Workspace CreateWorkspace() =>
+            AadToken is null
+                ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
+                : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
     }
 }
