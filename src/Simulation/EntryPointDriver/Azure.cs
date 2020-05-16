@@ -151,6 +151,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         public bool Verbose { get; set; }
 
+        /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
