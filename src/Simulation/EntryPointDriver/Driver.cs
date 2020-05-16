@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.Simulators;
 using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -20,6 +18,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
     /// </summary>
+    /// <typeparam name="TCallable">The entry point's callable type.</typeparam>
+    /// <typeparam name="TIn">The entry point's argument type.</typeparam>
+    /// <typeparam name="TOut">The entry point's return type.</typeparam>
     public sealed class Driver<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
     {
         /// <summary>
@@ -28,10 +29,33 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private readonly IEntryPoint<TIn, TOut> entryPoint;
 
         /// <summary>
+        /// The simulator option.
+        /// </summary>
+        private OptionInfo<string> SimulatorOption { get; }
+
+        /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
         /// <param name="entryPoint">The entry point.</param>
-        public Driver(IEntryPoint<TIn, TOut> entryPoint) => this.entryPoint = entryPoint;
+        public Driver(IEntryPoint<TIn, TOut> entryPoint)
+        {
+            this.entryPoint = entryPoint;
+            SimulatorOption = new OptionInfo<string>(
+                new[]
+                {
+                    "--" + CommandLineArguments.SimulatorOption.Item1,
+                    "-" + CommandLineArguments.SimulatorOption.Item2
+                },
+                entryPoint.DefaultSimulator,
+                "The name of the simulator to use.",
+                suggestions: new[]
+                {
+                    AssemblyConstants.QuantumSimulator,
+                    AssemblyConstants.ToffoliSimulator,
+                    AssemblyConstants.ResourcesEstimator,
+                    entryPoint.DefaultSimulator
+                });
+        }
 
         /// <summary>
         /// Runs the entry point using the command-line arguments.
@@ -44,26 +68,34 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             {
                 Handler = CommandHandler.Create<ParseResult, string>(Simulate)
             };
-            TryCreateOption(
-                    SimulatorOptions,
-                    () => entryPoint.DefaultSimulator,
-                    "The name of the simulator to use.")
-                .Then(simulator => simulate.AddOption(simulator.WithSuggestions(
-                    AssemblyConstants.QuantumSimulator,
-                    AssemblyConstants.ToffoliSimulator,
-                    AssemblyConstants.ResourcesEstimator,
-                    entryPoint.DefaultSimulator)));
+            AddOptionIfAvailable(simulate, SimulatorOption);
 
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
-                Handler = CommandHandler.Create<ParseResult>(Submit)
+                IsHidden = true,
+                Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
+            AddOptionIfAvailable(submit, TargetOption);
+            AddOptionIfAvailable(submit, StorageOption);
+            AddOptionIfAvailable(submit, SubscriptionOption);
+            AddOptionIfAvailable(submit, ResourceGroupOption);
+            AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, AadTokenOption);
+            AddOptionIfAvailable(submit, BaseUriOption);
+            AddOptionIfAvailable(submit, OutputOption);
+            AddOptionIfAvailable(submit, ShotsOption);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
-            foreach (var option in entryPoint.Options) { root.AddGlobalOption(option); }
+            foreach (var option in entryPoint.Options)
+            {
+                root.AddGlobalOption(option);
+            }
 
             // Set the simulate command as the default.
-            foreach (var option in simulate.Options) { root.AddOption(option); }
+            foreach (var option in simulate.Options)
+            {
+                root.AddOption(option);
+            }
             root.Handler = simulate.Handler;
 
             return await new CommandLineBuilder(root)
@@ -79,74 +111,29 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private async Task<int> Simulate(ParseResult parseResult, string simulator)
-        {
-            simulator = DefaultIfShadowed(SimulatorOptions.First(), simulator, entryPoint.DefaultSimulator);
-            if (simulator == AssemblyConstants.ResourcesEstimator)
-            {
-                var resourcesEstimator = new ResourcesEstimator();
-                await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
-                Console.WriteLine(resourcesEstimator.ToTSV());
-            }
-            else
-            {
-                var (isCustom, createSimulator) =
-                    simulator == AssemblyConstants.QuantumSimulator
-                    ? (false, () => new QuantumSimulator())
-                    : simulator == AssemblyConstants.ToffoliSimulator
-                    ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
-                    : (true, entryPoint.CreateDefaultCustomSimulator);
-                if (isCustom && simulator != entryPoint.DefaultSimulator)
-                {
-                    DisplayCustomSimulatorError(simulator);
-                    return 1;
-                }
-                await RunSimulator(parseResult, createSimulator);
-            }
-            return 0;
-        }
+        private async Task<int> Simulate(ParseResult parseResult, string simulator) =>
+            await Simulation<TCallable, TIn, TOut>.Simulate(
+                entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
-        private async Task Submit(ParseResult parseResult)
-        {
-            // TODO: Use an actual quantum machine.
-            var machine = new SimulatorMachine();
-            var output = await machine.ExecuteAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            // TODO: Provide output options and show the most frequent output by default. 
-            foreach (var (result, frequency) in output.Histogram)
+        /// <param name="settings">The submission settings.</param>
+        private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
+            await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
-                Console.WriteLine($"{result} (frequency = {frequency})");
-            }
-        }
-
-        /// <summary>
-        /// Runs the entry point on a simulator and displays its return value.
-        /// </summary>
-        /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
-        private async Task RunSimulator(ParseResult parseResult, Func<IOperationFactory> createSimulator)
-        {
-            var simulator = createSimulator();
-            try
-            {
-                var value = await simulator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
-                if (!(value is QVoid))
-                {
-                    Console.WriteLine(value);
-                }
-            }
-            finally
-            {
-                if (simulator is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
-            }
-        }
-
+                Target = settings.Target,
+                Storage = settings.Storage,
+                Subscription = settings.Subscription,
+                ResourceGroup = settings.ResourceGroup,
+                Workspace = settings.Workspace,
+                AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
+                BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
+                Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
+                Output = DefaultIfShadowed(OutputOption, settings.Output)
+            });
+        
         /// <summary>
         /// Returns true if the alias is not already used by an entry point option.
         /// </summary>
@@ -156,17 +143,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
-        /// Returns the default value and displays a warning if the alias is shadowed by an entry point option, and
-        /// returns the original value otherwise.
+        /// Returns the default value and displays a warning if the primary (first) alias is shadowed by an entry point
+        /// option, and returns the original value otherwise.
         /// </summary>
         /// <typeparam name="T">The type of the option values.</typeparam>
-        /// <param name="alias">The primary option alias corresponding to the value.</param>
+        /// <param name="option">The option.</param>
         /// <param name="value">The value of the option given on the command line.</param>
-        /// <param name="defaultValue">The default value for the option.</param>
         /// <returns>The default value or the original value.</returns>
-        private T DefaultIfShadowed<T>(string alias, T value, T defaultValue)
+        private T DefaultIfShadowed<T>(OptionInfo<T> option, T value)
         {
-            if (IsAliasAvailable(alias))
+            if (IsAliasAvailable(option.Aliases.First()))
             {
                 return value;
             }
@@ -175,67 +161,104 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 var originalForeground = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Error.WriteLine(
-                    $"Warning: Option {alias} is overridden by an entry point parameter name. " +
-                    $"Using default value {defaultValue}.");
+                    $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
+                    $"Using default value {option.DefaultValue}.");
                 Console.ForegroundColor = originalForeground;
-                return defaultValue;
+                return option.DefaultValue;
             }
         }
 
         /// <summary>
-        /// Tries to create an option by removing aliases that are already in use by the entry point. If the first
-        /// alias, which is considered the primary alias, is in use, then the option is not created.
+        /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
+        /// alias is available. If a required option is not available, the command is disabled.
         /// </summary>
+        /// <param name="command">The command to add the option to.</param>
+        /// <param name="option">The option to add.</param>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
-        /// <param name="aliases">The option's aliases.</param>
-        /// <param name="getDefaultValue">A function that returns the option's default value.</param>
-        /// <param name="description">The option's description.</param>
-        /// <returns>A validation of the option.</returns>
-        private Validation<Option<T>> TryCreateOption<T>(
-                IReadOnlyCollection<string> aliases, Func<T> getDefaultValue, string? description = null) =>
-            IsAliasAvailable(aliases.First())
-            ? Validation<Option<T>>.Success(
-                new Option<T>(
-                    aliases.Where(IsAliasAvailable).ToArray(),
-                    getDefaultValue,
-                    description))
-            : Validation<Option<T>>.Failure();
-
-        /// <summary>
-        /// Displays an error message for using a non-default custom simulator.
-        /// </summary>
-        /// <param name="name">The name of the custom simulator.</param>
-        private static void DisplayCustomSimulatorError(string name)
+        private void AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
-            var originalForeground = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"The simulator '{name}' could not be found.");
-            Console.ForegroundColor = originalForeground;
-            Console.Error.WriteLine();
-            Console.Error.WriteLine(
-                $"If '{name}' is a custom simulator, it must be set in the DefaultSimulator project property:");
-            Console.Error.WriteLine();
-            Console.Error.WriteLine("<PropertyGroup>");
-            Console.Error.WriteLine($"  <DefaultSimulator>{name}</DefaultSimulator>");
-            Console.Error.WriteLine("</PropertyGroup>");
+            if (IsAliasAvailable(option.Aliases.First()))
+            {
+                command.AddOption(option.Create(option.Aliases.Where(IsAliasAvailable)));
+            }
+            else if (option.Required)
+            {
+                command.AddValidator(commandResult =>
+                    $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.");
+            }
         }
     }
 
     /// <summary>
-    /// Static members for <see cref="Driver{TCallable,TIn,TOut}"/> that do not depend on its type parameters.
+    /// Static members for <see cref="Driver{TCallable,TIn,TOut}"/>.
     /// </summary>
     internal static class Driver
     {
+        // TODO: Define the aliases as constants.
+
         /// <summary>
-        /// The option aliases for the simulator option.
+        /// The target option.
         /// </summary>
-        internal static readonly IReadOnlyCollection<string> SimulatorOptions = Array.AsReadOnly(new[]
-        {
-            "--" + CommandLineArguments.SimulatorOption.Item1,
-            "-" + CommandLineArguments.SimulatorOption.Item2
-        });
+        internal static readonly OptionInfo<string> TargetOption = new OptionInfo<string>(
+            new[] { "--target" }, "The target device ID.");
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
+            new[] { "--storage" }, "The storage account connection string.");
+        
+        /// <summary>
+        /// The subscription option.
+        /// </summary>
+        internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
+            new[] { "--subscription" }, "The subscription ID.");
+
+        /// <summary>
+        /// The resource group option.
+        /// </summary>
+        internal static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
+            new[] { "--resource-group" }, "The resource group name.");
+
+        /// <summary>
+        /// The workspace option.
+        /// </summary>
+        internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
+            new[] { "--workspace" }, "The workspace name.");
+
+        /// <summary>
+        /// The AAD token option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
+            new[] { "--aad-token" }, default, "The Azure Active Directory authentication token.");
+        
+        /// <summary>
+        /// The base URI option.
+        /// </summary>
+        internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
+            new[] { "--base-uri" }, default, "The base URI of the Azure Quantum endpoint.");
+
+        /// <summary>
+        /// The shots option.
+        /// </summary>
+        internal static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
+            new[] { "--shots" },
+            500,
+            "The number of times the program is executed on the target machine.",
+            validator: result =>
+                int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
+                    ? "The number of shots must be a positive number."
+                    : default);
+
+        /// <summary>
+        /// The output option.
+        /// </summary>
+        internal static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
+            new[] { "--output" },
+            OutputFormat.FriendlyUri,
+            "The information to show in the output after the job is submitted.");
     }
-    
+
     /// <summary>
     /// A modification of the command-line <see cref="HelpBuilder"/> class.
     /// </summary>

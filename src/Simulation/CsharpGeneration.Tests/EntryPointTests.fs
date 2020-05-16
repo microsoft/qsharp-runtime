@@ -481,6 +481,9 @@ let ``Supports default custom simulator`` () =
     given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
 
+// TODO: Add tests for the "submit" command.
+
+
 // Help
 
 [<Fact>]
@@ -501,8 +504,7 @@ Options:
   -?, -h, --help                                      Show help and usage information
 
 Commands:
-  simulate    (default) Run the program using a local simulator.
-  submit      Submit the program to Azure Quantum."
+  simulate    (default) Run the program using a local simulator."
 
     let given = test 31
     given ["--help"] |> yields message
