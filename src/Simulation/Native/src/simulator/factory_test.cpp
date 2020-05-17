@@ -4,10 +4,6 @@
 #include "simulator/factory.hpp"
 #include <iostream>
 
-namespace Microsoft::Quantum {
-    int dbgFusedSpan;   //@@@DBG
-}
-
 using namespace Microsoft::Quantum::Simulator;
 
 int main(int argc, char** argv)

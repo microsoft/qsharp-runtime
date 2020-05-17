@@ -9,7 +9,11 @@
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
-
+namespace Microsoft {
+    namespace Quantum {
+        int dbgFusedSpan = 4; //@@@DBG
+    }
+}
 void test_exp()
 {
     SimulatorType sim;

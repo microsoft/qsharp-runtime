@@ -15,7 +15,6 @@
 #include "capi.hpp"
 
 // some convenience functions
-
 void CX(unsigned sim_id, unsigned c, unsigned q)
 {
     MCX(sim_id,1,&c,q);
@@ -450,8 +449,6 @@ int main()
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                 if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
-                Microsoft::Quantum::dbgFusedSpan = fuseSpan;
-
                 if (envNT == NULL) omp_set_num_threads(numThreads);
                 auto sim_id = initDBG(simTyp,fuseSpan);
 
@@ -472,7 +469,7 @@ int main()
                     }
                     std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                     std::chrono::duration<double> elapsed = curr - start;
-                    if (elapsed.count() >= 25.0) break;
+                    if (elapsed.count() >= 22.0) break;
                 }
 
                 destroy(sim_id);

@@ -12,14 +12,6 @@
 #define _In_reads_(n)
 #endif
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern int dbgFusedSpan; //@@@DBG
-}
-}
-
 extern "C" {
 // non-quantum
 

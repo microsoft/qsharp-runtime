@@ -21,13 +21,11 @@
 #endif
 
 #include <chrono>
-
 namespace Microsoft
 {
 namespace Quantum
 {
-
-  extern int dbgFusedSpan;
+    extern int dbgFusedSpan;
 
 namespace SIMULATOR
 {
@@ -65,7 +63,7 @@ class Fused
                 omp_set_num_threads(nUse);
             }
         }
-        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d\n", omp_get_max_threads(), Microsoft::Quantum::dbgFusedSpan);
+        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d\n", omp_get_max_threads(), dbgFusedSpan);
     }
 
     inline void reset()
@@ -176,7 +174,7 @@ class Fused
 
         newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
 
-        if (newgates.num_qubits() > Microsoft::Quantum::dbgFusedSpan)
+        if (newgates.num_qubits() > dbgFusedSpan)
         {
             flush(wfn);
             fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);

@@ -6,14 +6,6 @@
 #include "simulator/factory.hpp"
 using namespace Microsoft::Quantum::Simulator;
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    int dbgFusedSpan = 4; //@@@DBG
-}
-}
-
 extern "C" {
 
 // init and cleanup

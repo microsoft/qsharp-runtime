@@ -29,6 +29,8 @@ namespace Microsoft
 {
   namespace Quantum
   {
+      int dbgFusedSpan = 4;
+
     namespace Simulator
     {
       mutex_type _mutex;
@@ -36,6 +38,8 @@ namespace Microsoft
       //@@@DBG: added force and fusedSpan
       SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=4)
       {
+          dbgFusedSpan = fusedSpan;
+
         if (force > 0) {
             switch (force) {
             case 1:
