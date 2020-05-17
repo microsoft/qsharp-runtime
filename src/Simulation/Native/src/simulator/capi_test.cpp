@@ -435,9 +435,11 @@ int main()
 #else // @@@DBG code for timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n",omp_get_max_threads(),omp_get_num_procs(),omp_get_num_threads());
 
-//#pragma omp parallel for schedule(static)
-//    for (int i=0; i<10;i++) {
-//        printf("@@@DBG; Thread %d of %d\n",omp_get_thread_num(),omp_get_num_threads());
+//    #pragma omp parallel for collapse(2) schedule(static)
+//    for (int i=0; i<4;i++) {
+//        for (int j=0; j<4;j++) {
+//            printf("@@@DBG; (%d,%d) Thread %d of %d\n",i,j,omp_get_thread_num(),omp_get_num_threads());
+//        }
 //    }
 
     char* envNT = getenv("OMP_NUM_THREADS");
@@ -447,9 +449,8 @@ int main()
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                 if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
-                switch (simTyp) {
-                case 1: Microsoft::Quantum::dbgFusedSpan = fuseSpan; break;
-                }
+                Microsoft::Quantum::dbgFusedSpan = fuseSpan;
+
                 if (envNT == NULL) omp_set_num_threads(numThreads);
                 auto sim_id = initDBG(simTyp,fuseSpan);
 
