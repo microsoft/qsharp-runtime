@@ -9,6 +9,7 @@
 #include <complex>
 #include <array>
 #include <omp.h>
+#include <chrono>
 
 #include "util/cpuid.hpp" //@@@DBG
 #include "capi.hpp"
@@ -458,7 +459,8 @@ int main()
                 for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                 srand(1);
-                for (int i = 0; i < 30000; i++) {
+                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+                for (int i = 0; i < 50000; i++) {
                     int q0 = rand() % nQs;
                     H(sim_id, q0);
                     X(sim_id, q0);
@@ -468,6 +470,9 @@ int main()
                         CX(sim_id, q0, q1);
                         CX(sim_id, q1, q0);
                     }
+                    std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
+                    std::chrono::duration<double> elapsed = curr - start;
+                    if (elapsed.count() >= 25.0) break;
                 }
 
                 destroy(sim_id);

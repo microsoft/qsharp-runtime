@@ -41,7 +41,7 @@ class Fused
     mutable int dbgNcs;
     mutable int dbgNgates;
     mutable double dbgElapsed;
-    std::chrono::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
   public:
       Fused() {
@@ -94,7 +94,7 @@ class Fused
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
       
-      std::chrono::system_clock::time_point curr = std::chrono::high_resolution_clock::now();
+      std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = curr - start;
       if (elapsed.count()-dbgElapsed >= 5.0) {
           dbgElapsed = elapsed.count();
