@@ -26,6 +26,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
+
+  extern int dbgFusedSpan;
+
 namespace SIMULATOR
 {
 
@@ -38,7 +41,7 @@ class Fused
     mutable int dbgNcs;
     mutable int dbgNgates;
     mutable double dbgElapsed;
-    std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+    std::chrono::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
   public:
       Fused() {
@@ -62,7 +65,7 @@ class Fused
                 omp_set_num_threads(nUse);
             }
         }
-        printf("@@@DBG: OMP_NUM_THREADS=%d\n", omp_get_max_threads());
+        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d\n", omp_get_max_threads(), Microsoft::Quantum::dbgFusedSpan);
     }
 
     inline void reset()
@@ -91,7 +94,7 @@ class Fused
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
       
-      std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
+      std::chrono::system_clock::time_point curr = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = curr - start;
       if (elapsed.count()-dbgElapsed >= 5.0) {
           dbgElapsed = elapsed.count();
@@ -104,6 +107,7 @@ class Fused
               (float)dbgNgates/1000.,
               dbgElapsed,
               (float)dbgNgates/(1000.*dbgElapsed));
+          fflush(stdout);
       }
 
       switch (qs.size())
@@ -172,7 +176,7 @@ class Fused
 
         newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
 
-        if (newgates.num_qubits() > 4)
+        if (newgates.num_qubits() > Microsoft::Quantum::dbgFusedSpan)
         {
             flush(wfn);
             fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);

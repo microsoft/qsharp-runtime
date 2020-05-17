@@ -10,6 +10,9 @@
 #include <array>
 #include <omp.h>
 
+#include "util/cpuid.hpp" //@@@DBG
+#include "capi.hpp"
+
 // some convenience functions
 
 void CX(unsigned sim_id, unsigned c, unsigned q)
@@ -430,28 +433,45 @@ int main()
     // test_dump_qubits();
     return 0;
 #else // @@@DBG code for timing tests
-    for (int numThreads = 1; numThreads < 5; numThreads++) {
-        for (int simTyp = 1; simTyp < 4; simTyp++) {
-            omp_set_num_threads(numThreads);
-            auto sim_id = initDBG(simTyp);
+    printf("@@@DBG max=%d procs=%d thrds=%d\n",omp_get_max_threads(),omp_get_num_procs(),omp_get_num_threads());
 
-            const int nQs = 15;
-            for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+//#pragma omp parallel for schedule(static)
+//    for (int i=0; i<10;i++) {
+//        printf("@@@DBG; Thread %d of %d\n",omp_get_thread_num(),omp_get_num_threads());
+//    }
 
-            srand(1);
-            for (int i = 0; i < 30000; i++) {
-                int q0 = rand() % nQs;
-                H(sim_id, q0);
-                X(sim_id, q0);
-                for (int j = 0; j < 10; j++) {
-                    q0 = (q0 + nQs + (rand() % 3) - 1) % nQs;
-                    int q1 = (q0 + 1) % nQs;
-                    CX(sim_id, q0, q1);
-                    CX(sim_id, q1, q0);
+    char* envNT = getenv("OMP_NUM_THREADS");
+    for (int fuseSpan = 0; fuseSpan < 5; fuseSpan++) {
+        for (int numThreads = 1; numThreads < 5; numThreads++) {
+            for (int simTyp = 1; simTyp < 4; simTyp++) {
+                if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+                if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+
+                switch (simTyp) {
+                case 1: Microsoft::Quantum::dbgFusedSpan = fuseSpan; break;
                 }
-            }
+                if (envNT == NULL) omp_set_num_threads(numThreads);
+                auto sim_id = initDBG(simTyp,fuseSpan);
 
-            destroy(sim_id);
+                const int nQs = 15;
+                for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+
+                srand(1);
+                for (int i = 0; i < 30000; i++) {
+                    int q0 = rand() % nQs;
+                    H(sim_id, q0);
+                    X(sim_id, q0);
+                    for (int j = 0; j < 10; j++) {
+                        q0 = (q0 + nQs + (rand() % 3) - 1) % nQs;
+                        int q1 = (q0 + 1) % nQs;
+                        CX(sim_id, q0, q1);
+                        CX(sim_id, q1, q0);
+                    }
+                }
+
+                destroy(sim_id);
+            }
+        if (envNT != NULL) break;
         }
     }
 #endif

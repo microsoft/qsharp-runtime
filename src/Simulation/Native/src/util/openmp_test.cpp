@@ -5,9 +5,12 @@
 #include <mutex>
 #include <cassert>
 
+namespace Microsoft::Quantum {
+    int dbgFusedSpan;   //@@@DBG
+}
+
 int main()
 {
-
     using namespace Microsoft::Quantum::openmp;
 
     init();

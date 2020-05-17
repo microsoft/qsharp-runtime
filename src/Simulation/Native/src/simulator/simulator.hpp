@@ -16,10 +16,10 @@ namespace Microsoft
 {
 namespace Quantum
 {
+    
 namespace SIMULATOR
 {
 
-  
   template <class WFN>
   class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
   {

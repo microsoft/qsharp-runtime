@@ -6,6 +6,14 @@
 #include "simulator/factory.hpp"
 using namespace Microsoft::Quantum::Simulator;
 
+namespace Microsoft
+{
+namespace Quantum
+{
+    int dbgFusedSpan = 4; //@@@DBG
+}
+}
+
 extern "C" {
 
 // init and cleanup
@@ -15,9 +23,9 @@ MICROSOFT_QUANTUM_DECL unsigned init()
 }
 
 //@@@DBG: Debugging version with force
-MICROSOFT_QUANTUM_DECL unsigned initDBG(int force)
+MICROSOFT_QUANTUM_DECL unsigned initDBG(int force,int fusedSpan)
 {
-    return Microsoft::Quantum::Simulator::createDBG(0u,force);
+    return Microsoft::Quantum::Simulator::createDBG(0ul,force,fusedSpan);
 }
 
 MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned id)

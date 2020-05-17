@@ -33,8 +33,8 @@ namespace Microsoft
     {
       mutex_type _mutex;
 
-      //@@@DBG: added force
-      SimulatorInterface* createSimulator(unsigned maxlocal,int force=0)
+      //@@@DBG: added force and fusedSpan
+      SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=4)
       {
         if (force > 0) {
             switch (force) {
@@ -93,7 +93,7 @@ namespace Microsoft
       }
 
       //@@@DBG: for benchmarks
-      MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force)
+      MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force,int fusedSpan)
       {
           std::lock_guard<mutex_type> lock(_mutex);
 
@@ -109,12 +109,12 @@ namespace Microsoft
 
           if (emptySlot == -1)
           {
-              psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force)));
+              psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan)));
               emptySlot = psis.size() - 1;
           }
           else
           {
-              psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force));
+              psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan));
           }
 
           return static_cast<unsigned>(emptySlot);

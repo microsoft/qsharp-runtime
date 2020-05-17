@@ -9,7 +9,7 @@
 /* #undef USE_SINGLE_PRECISION */
 
 // check if we have AVX intrinsics
-#define HAVE_INTRINSICS
+/* #undef HAVE_INTRINSICS */
 
 // check if we have AVX-512 intrinsics
 /* #undef HAVE_AVX512 */
@@ -17,7 +17,7 @@
 // check if we want to use fused kernels
 #define USE_GATE_FUSION
 
-/* #undef BUILD_SHARED_LIBS */
+#define BUILD_SHARED_LIBS
 
 
 #if defined (_MSC_VER) && defined (BUILD_SHARED_LIBS)

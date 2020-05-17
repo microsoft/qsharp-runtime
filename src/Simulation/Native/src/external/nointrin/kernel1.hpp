@@ -41,7 +41,7 @@ void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 	}
 
 
-#ifndef _MSC_VER
+#ifndef _MSC_VER_OR_WSL
 	if (ctrlmask == 0){
 		#pragma omp for collapse(LOOP_COLLAPSE1) schedule(static)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){

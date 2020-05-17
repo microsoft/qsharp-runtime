@@ -380,3 +380,5 @@ ASALocalRun/
 /src/Simulation/Native/src/CTestTestfile.cmake
 /src/Simulation/Native/CTestTestfile.cmake
 /src/Simulation/Native/cmake_install.cmake
+src/Simulation/Native/cpuid_test
+*_test
