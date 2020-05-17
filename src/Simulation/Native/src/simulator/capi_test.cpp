@@ -459,7 +459,7 @@ int main()
                 for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                 srand(1);
-                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+                std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                 for (int i = 0; i < 50000; i++) {
                     int q0 = rand() % nQs;
                     H(sim_id, q0);
@@ -470,7 +470,7 @@ int main()
                         CX(sim_id, q0, q1);
                         CX(sim_id, q1, q0);
                     }
-                    std::chrono::steady_clock::time_point curr = std::chrono::high_resolution_clock::now();
+                    std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                     std::chrono::duration<double> elapsed = curr - start;
                     if (elapsed.count() >= 25.0) break;
                 }
