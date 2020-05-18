@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
@@ -10,9 +9,7 @@ namespace Microsoft.Quantum.Runtime
     /// <summary>
     /// Interface that a quantum machine must implement.
     /// </summary>
-    /// <typeparam name="TJob">Type of job that handles the execution of a program in the quantum machine.</typeparam>
-    /// <typeparam name="TRawResult">Type of result the quantum machine returns.</typeparam>
-    public interface IQuantumMachine<TJob, TRawResult>
+    public interface IQuantumMachine
     {
         /// <summary>
         /// Gets the ID of the quantum machine provider.
@@ -29,14 +26,14 @@ namespace Microsoft.Quantum.Runtime
         /// <summary>
         /// Executes a Q# program.
         /// Submits a job to execute it and continuously checks whether it has been completed.
-        /// Once its execution completes, returns its output.
+        /// Once its execution completes, returns an object that implements the IQuantumMachineOutput interface through which the execution output can be obtained.
         /// </summary>
         /// <param name="info">Information about the Q# program</param>
         /// <param name="input">Input for the Q# program</param>
         /// <typeparam name="TInput">Type of input the quantum program receives.</typeparam>
         /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
-        /// <returns>Sampled output of the quantum program</returns>
-        Task<Tuple<TOutput, TRawResult>> ExecuteAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
+        /// <returns>An object that implements the IQuantumMachineOutput interface.</returns>
+        Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
 
         /// <summary>
         /// Submits a job to execute a Q# program.
@@ -46,7 +43,7 @@ namespace Microsoft.Quantum.Runtime
         /// <param name="input">Input for the Q# program</param>
         /// <typeparam name="TInput">Type of input the quantum program receives.</typeparam>
         /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
-        /// <returns>A Job instance. Status and results from the execution can be retrieved from this instance.</returns>
-        Task<TJob> SubmitAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
+        /// <returns>An object that implements the IQuantumMachineJob interface through which data about the job can be obtained.</returns>
+        Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(EntryPointInfo<TInput, TOutput> info, TInput input);
     }
 }
