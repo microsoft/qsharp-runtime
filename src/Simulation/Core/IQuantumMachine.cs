@@ -193,5 +193,17 @@ namespace Microsoft.Quantum.Runtime
             TInput input,
             IQuantumMachineSubmissionContext submissionContext,
             ConfigureJob configureJobCallback);
+
+        /// <summary>
+        /// Validates whether a Q# program can be executed in the quantum machine.
+        /// </summary>
+        /// <param name="info">Information about the Q# program.</param>
+        /// <param name="input">Input for the Q# program.</param>
+        /// <typeparam name="TInput">Type of input the quantum program receives.</typeparam>
+        /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
+        /// <returns>A (bool, string) tuple in which the first element represents whether the Q# program can be executed in the quantum machine and the second element is a string that provides details in case the Q# program is invalid.</returns>
+        (bool IsValid, string Message) Validate<TInput, TOutput>(
+            EntryPointInfo<TInput, TOutput> info,
+            TInput input);
     }
 }
