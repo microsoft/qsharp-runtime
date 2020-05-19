@@ -382,3 +382,7 @@ ASALocalRun/
 /src/Simulation/Native/cmake_install.cmake
 src/Simulation/Native/cpuid_test
 *_test
+
+CMakeCache.txt
+libMicrosoft.Quantum.Simulator.Runtime.so
+
