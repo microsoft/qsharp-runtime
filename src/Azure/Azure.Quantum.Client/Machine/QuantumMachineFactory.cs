@@ -26,12 +26,21 @@ namespace Microsoft.Azure.Quantum
                 ? "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
                 : null;
 
-            // First try to load the signed assembly with the correct version, then try the unsigned one.
-            var machineType =
-                machineName is null
-                ? null
-                : Type.GetType($"{machineName}, Version={typeof(IWorkspace).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5")
-                ?? Type.GetType(machineName, throwOnError: true);
+            Type machineType = null;
+            if (machineName != null)
+            {
+                // First try to load the signed assembly with the correct version, then try the unsigned one.
+                try
+                {
+                    machineType = Type.GetType($"{machineName}, Version={typeof(IWorkspace).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5");
+                }
+                catch
+                {
+                    machineType = null;
+                }
+
+                machineType ??= Type.GetType(machineName, throwOnError: true);
+            }
 
             return machineType is null
                 ? null
