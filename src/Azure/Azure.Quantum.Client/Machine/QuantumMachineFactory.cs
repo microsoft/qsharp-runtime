@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="targetName">The execution target for job submission.</param>
         /// <param name="storageAccountConnectionString">The connection string for the Azure storage account.</param>
         /// <returns>A quantum machine for job submission targeting <c>targetName</c>.</returns>
-        public static IQuantumMachine? CreateMachine(Workspace workspace, string targetName, string storageAccountConnectionString)
+        public static IQuantumMachine? CreateMachine(IWorkspace workspace, string targetName, string storageAccountConnectionString)
         {
             var machineName =
                 targetName is null
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Quantum
             var machineType =
                 machineName is null
                 ? null
-                : Type.GetType($"{machineName}, Version={typeof(Workspace).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5")
+                : Type.GetType($"{machineName}, Version={typeof(IWorkspace).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5")
                 ?? Type.GetType(machineName, throwOnError: true);
 
             return machineType is null
