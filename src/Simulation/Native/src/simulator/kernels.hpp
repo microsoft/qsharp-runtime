@@ -44,7 +44,7 @@ void swap(std::vector<T, A>& wfn, unsigned q1, unsigned q2)
     std::size_t maskj = ((offset2 >> 1) - 1) ^ maskk;  // bits [q1...q2-2]
     std::size_t maski = ~((offset2 >> 1) - 1);  // bits [q2-1...]
 
-#ifndef _MSC_VER_OR_WSL
+#ifndef _MSC_VER
 #pragma omp parallel for schedule(static)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i += 2 * offset2)
         for (std::intptr_t j = 0; j < static_cast<std::intptr_t>(offset2); j += 2 * offset1)
@@ -124,7 +124,7 @@ bool isclassical(std::vector<std::complex<T>, A> const& wfn,
     bool have1 = false;
 
     std::size_t maski = ~(offset - 1);
-#ifndef _MSC_VER_OR_WSL
+#ifndef _MSC_VER
 #pragma omp parallel for schedule(static) reduction(|| : have0, have1)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i += 2 * offset)
         for (std::intptr_t j = 0; j < static_cast<std::intptr_t>(offset); ++j)
@@ -169,7 +169,7 @@ double probability(std::vector<std::complex<T>, A> const& wfn, unsigned q)
     std::size_t offset = 1ull << q;
     T prob = 0.;
     std::size_t maski = ~(offset - 1);
-#ifndef _MSC_VER_OR_WSL
+#ifndef _MSC_VER
 #pragma omp parallel for schedule(static) reduction(+ : prob)
     for (std::intptr_t i = offset; i < static_cast<std::intptr_t>(wfn.size()); i += 2 * offset)
         for (std::intptr_t d = 0; d < static_cast<std::intptr_t>(offset); ++d)

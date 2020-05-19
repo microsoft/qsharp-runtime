@@ -194,13 +194,13 @@ HAVE_INTRINSICS:BOOL=OFF
 Microsoft.Quantum.Simulator.Runtime_LIB_DEPENDS:STATIC=
 
 //CXX compiler flags for OpenMP parallelization
-OpenMP_CXX_FLAGS:STRING=-fopenmp -O3 -DNDEBUG -mfma -mavx2
+OpenMP_CXX_FLAGS:STRING=-fopenmp -O3 -DNDEBUG -mfma -mavx2 -pg -g
 
 //CXX compiler libraries for OpenMP parallelization
 OpenMP_CXX_LIB_NAMES:STRING=gomp;pthread
 
 //C compiler flags for OpenMP parallelization
-OpenMP_C_FLAGS:STRING=-fopenmp -O3 -DNDEBUG -mfma -mavx2
+OpenMP_C_FLAGS:STRING=-fopenmp -O3 -DNDEBUG -mfma -mavx2 -pg -g
 
 //C compiler libraries for OpenMP parallelization
 OpenMP_C_LIB_NAMES:STRING=gomp;pthread
@@ -230,6 +230,8 @@ quantum-simulator_SOURCE_DIR:STATIC=/mnt/c/depot/Git/qsharp-runtime/src/Simulati
 
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
+//MODIFIED property for variable: CMAKE_BUILD_TYPE
+CMAKE_BUILD_TYPE-MODIFIED:INTERNAL=ON
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=/mnt/c/depot/Git/qsharp-runtime/src/Simulation/Native
 //Major version of cmake used to create the current loaded cache
@@ -374,9 +376,9 @@ CMAKE_VERBOSE_MAKEFILE-MODIFIED:INTERNAL=ON
 //Details about finding OpenMP
 FIND_PACKAGE_MESSAGE_DETAILS_OpenMP:INTERNAL=[TRUE][TRUE][c ][v()]
 //Details about finding OpenMP_C
-FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_C:INTERNAL=[-fopenmp -O3 -DNDEBUG -mfma -mavx2][/usr/lib/gcc/x86_64-linux-gnu/7/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.so][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_C:INTERNAL=[-fopenmp -O3 -DNDEBUG -mfma -mavx2 -pg -g][/usr/lib/gcc/x86_64-linux-gnu/7/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.so][v()]
 //Details about finding OpenMP_CXX
-FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_CXX:INTERNAL=[-fopenmp -O3 -DNDEBUG -mfma -mavx2][/usr/lib/gcc/x86_64-linux-gnu/7/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.so][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_CXX:INTERNAL=[-fopenmp -O3 -DNDEBUG -mfma -mavx2 -pg -g][/usr/lib/gcc/x86_64-linux-gnu/7/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.so][v()]
 //Result of TRY_COMPILE
 OpenMP_COMPILE_RESULT_CXX_fopenmp:INTERNAL=TRUE
 //Result of TRY_COMPILE

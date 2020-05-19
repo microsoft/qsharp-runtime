@@ -225,7 +225,7 @@ void kernel(V& psi, unsigned id3, unsigned id2, unsigned id1, unsigned id0, M co
 	}
 
 
-#ifndef _MSC_VER_OR_WSL
+#ifndef _MSC_VER
 	if (ctrlmask == 0){
 		#pragma omp parallel for collapse(LOOP_COLLAPSE4) schedule(static)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){

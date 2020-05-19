@@ -29,7 +29,6 @@ namespace Quantum
 
 namespace SIMULATOR
 {
-
 class Fused
   {
     //@@@DBG: Everything in here is added for debugging
@@ -43,7 +42,6 @@ class Fused
 
   public:
       Fused() {
-
         dbgNfused   = 0;
         dbgSize     = 0;
         dbgNqs      = 0;

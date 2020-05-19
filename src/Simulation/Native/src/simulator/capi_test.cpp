@@ -435,13 +435,7 @@ int main()
 #else // @@@DBG code for timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n",omp_get_max_threads(),omp_get_num_procs(),omp_get_num_threads());
 
-//    #pragma omp parallel for collapse(2) schedule(static)
-//    for (int i=0; i<4;i++) {
-//        for (int j=0; j<4;j++) {
-//            printf("@@@DBG; (%d,%d) Thread %d of %d\n",i,j,omp_get_thread_num(),omp_get_num_threads());
-//        }
-//    }
-
+#if 0
     char* envNT = getenv("OMP_NUM_THREADS");
     for (int fuseSpan = 0; fuseSpan < 5; fuseSpan++) {
         for (int numThreads = 1; numThreads < 5; numThreads++) {
@@ -477,5 +471,26 @@ int main()
         if (envNT != NULL) break;
         }
     }
+#else
+    double thrd1elapsed = 1.0;
+    for (int thrds = 1; thrds < 2; thrds++) {
+        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+        omp_set_num_threads(thrds);
+        #pragma omp parallel for schedule(static) //static *dyanmic guided auto runtime
+        for (int i = 0; i < 80; i++) {
+            //printf("@@@DBG: loop:%3d thrd:%d\n",i,omp_get_thread_num());
+            for (int j = 0; j < 1000000; j++) {
+                double v = exp(sin((double)(rand()+1)));
+                double w = v * v / (127.4 * (double)(rand() + 1));
+                double x = sqrt(w);
+            }
+        }
+        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed = curr - start;
+        double elap = elapsed.count(); // *8.0 / (double)thrds;
+        if (thrds == 1) thrd1elapsed = elap;
+        printf("@@@DBG threads: %d Elapsed: %.2f Factor: %.2f\n", thrds, elap, thrd1elapsed/elap);
+    }
+#endif
 #endif
 }
