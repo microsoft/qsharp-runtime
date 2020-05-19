@@ -17,21 +17,26 @@ namespace Microsoft.Azure.Quantum
         /// <returns>A quantum machine for job submission targeting <c>targetName</c>.</returns>
         public static IQuantumMachine? CreateMachine(Workspace workspace, string targetName, string storageAccountConnectionString)
         {
-            if (string.IsNullOrEmpty(targetName))
-            {
-                return null;
-            }
-
             var machineName =
-                targetName.StartsWith("ionq.")
+                targetName is null
+                ? null
+                : targetName.StartsWith("ionq.")
                 ? "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ"
                 : targetName.StartsWith("honeywell.")
                 ? "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
                 : null;
-            return machineName is null
+
+            // First try to load the signed assembly with the correct version, then try the unsigned one.
+            var machineType =
+                machineName is null
+                ? null
+                : Type.GetType($"{machineName}, Version={typeof(Workspace).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5")
+                ?? Type.GetType(machineName, throwOnError: true);
+
+            return machineType is null
                 ? null
                 : (IQuantumMachine)Activator.CreateInstance(
-                    Type.GetType(machineName, throwOnError: true),
+                    machineType,
                     targetName,
                     storageAccountConnectionString,
                     workspace);
