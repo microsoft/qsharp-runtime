@@ -438,7 +438,7 @@ int main()
 #if 1
     char* envNT = getenv("OMP_NUM_THREADS");
     for (int fuseSpan = 0; fuseSpan < 3; fuseSpan++) {
-        for (int numThreads = 0; numThreads < 6; numThreads++) {
+        for (int numThreads = 1; numThreads < 6; numThreads++) {
             for (int simTyp = 1; simTyp < 4; simTyp++) {
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                 if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
