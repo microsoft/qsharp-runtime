@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QsharpExe", "src\Simulation
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryPointDriver", "src\Simulation\EntryPointDriver\EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EntryPointDriver.Tests", "src\Simulation\EntryPointDriver.Tests\EntryPointDriver.Tests.fsproj", "{E2F30496-19D8-46A8-9BC0-26936FFE70D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -317,6 +319,22 @@ Global
 		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{944FE7EF-9220-4CC6-BB20-CE517195B922}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.Release|x64.Build.0 = Release|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -340,6 +358,7 @@ Global
 		{A1E878CB-ADF1-457A-9223-06F96ED8F7A6} = {99E234BC-997E-4E63-9F5C-3C3977543404}
 		{DF654202-0008-4CDE-B35E-018CEFD0FC68} = {A1E878CB-ADF1-457A-9223-06F96ED8F7A6}
 		{1467128C-90E4-4723-B5C7-9469B83F54A6} = {A1E878CB-ADF1-457A-9223-06F96ED8F7A6}
+		{E2F30496-19D8-46A8-9BC0-26936FFE70D2} = {A567C185-A429-418B-AFDE-6F1785BA4A77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
