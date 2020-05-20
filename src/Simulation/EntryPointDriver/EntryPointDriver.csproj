@@ -10,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- We use package references (instead of project references) to projects in this repository so that it is easier
-       - to test the entry point driver with packaged versions of the Azure Quantum providers.
-       -->
-    <PackageReference Include="Microsoft.Azure.Quantum.Client" Version="0.11.2005.1905-beta" />
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2004.1717-alpha" />
-    <PackageReference Include="Microsoft.Quantum.Runtime.Core" Version="0.11.2005.1905-beta" />
-    <PackageReference Include="Microsoft.Quantum.Simulators" Version="0.11.2005.1905-beta" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulation.Simulators.csproj" />
+    <ProjectReference Include="..\..\Azure\Azure.Quantum.Client\Microsoft.Azure.Quantum.Client.csproj" />
   </ItemGroup>
 </Project>
