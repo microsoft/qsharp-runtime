@@ -477,11 +477,12 @@ int main()
         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
         omp_set_num_threads(thrds);
         double rslts[8] = { 0,0,0,0,0,0,0,0 };
-        #pragma omp parallel
-        #pragma omp for schedule(static) //static *dyanmic guided auto runtime
-        for (int i = 0; i < 80000000; i++) {
+        int outer = 800000;
+        int inner = 2000;
+        #pragma omp parallel for schedule(static,outer/100)
+        for (int i = 0; i < outer; i++) {
             double x = 1.0;
-            for (int j = 0; j < 20; j++) x += sqrt((double)j);
+            for (int j = 0; j < inner; j++) x += sqrt((double)j);
             rslts[omp_get_thread_num()] += x;
         }
         std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
