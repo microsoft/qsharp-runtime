@@ -435,10 +435,10 @@ int main()
 #else // @@@DBG code for timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n",omp_get_max_threads(),omp_get_num_procs(),omp_get_num_threads());
 
-#if 0
+#if 1
     char* envNT = getenv("OMP_NUM_THREADS");
-    for (int fuseSpan = 0; fuseSpan < 5; fuseSpan++) {
-        for (int numThreads = 1; numThreads < 5; numThreads++) {
+    for (int fuseSpan = 0; fuseSpan < 3; fuseSpan++) {
+        for (int numThreads = 0; numThreads < 6; numThreads++) {
             for (int simTyp = 1; simTyp < 4; simTyp++) {
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                 if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
@@ -451,7 +451,7 @@ int main()
 
                 srand(1);
                 std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-                for (int i = 0; i < 50000; i++) {
+                for (int i = 0; i < 100000; i++) {
                     int q0 = rand() % nQs;
                     H(sim_id, q0);
                     X(sim_id, q0);
