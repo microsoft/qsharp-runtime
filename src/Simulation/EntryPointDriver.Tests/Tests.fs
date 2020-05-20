@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint
+module Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests
 
 open System
 open System.Collections.Immutable
@@ -24,16 +24,16 @@ open Microsoft.Quantum.Simulation.Simulators
 
 
 /// The path to the Q# file that provides the Microsoft.Quantum.Core namespace.
-let private coreFile = Path.Combine ("Circuits", "Core.qs") |> Path.GetFullPath
+let private coreFile = Path.GetFullPath "Core.qs"
 
 /// The path to the Q# file that provides the Microsoft.Quantum.Intrinsic namespace.
-let private intrinsicFile = Path.Combine ("Circuits", "Intrinsic.qs") |> Path.GetFullPath
+let private intrinsicFile = Path.GetFullPath "Intrinsic.qs"
 
 /// The path to the Q# file that contains the test cases.
-let private testFile = Path.Combine ("Circuits", "EntryPointTests.qs") |> Path.GetFullPath
+let private testFile = Path.GetFullPath "Tests.qs"
 
 /// The namespace used for the test cases.
-let private testNamespace = "Microsoft.Quantum.CsharpGeneration.Testing.EntryPoint"
+let private testNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests"
 
 /// The test case for the given test number.
 let private testCase =
