@@ -12,6 +12,8 @@
 #include <chrono>
 
 #include "util/cpuid.hpp" //@@@DBG
+#include "util/par_for.hpp" //@@@DBG
+
 #include "capi.hpp"
 
 // some convenience functions
@@ -418,7 +420,7 @@ void test_permute_basis_adjoint()
 
 int main()
 {
-#if 0 //@@@DBG added for timing tests below
+#if 0 // Original tests
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -432,12 +434,12 @@ int main()
     // test_dump();
     // test_dump_qubits();
     return 0;
-#else // @@@DBG code for timing tests
-    printf("@@@DBG max=%d procs=%d thrds=%d\n",omp_get_max_threads(),omp_get_num_procs(),omp_get_num_threads());
+#endif
 
-#if 1
+#if 0 // Simulator timing tests
+    printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
     char* envNT = getenv("OMP_NUM_THREADS");
-    for (int fuseSpan = 0; fuseSpan < 3; fuseSpan++) {
+    for (int fuseSpan = 0; fuseSpan < 5; fuseSpan++) {
         for (int numThreads = 1; numThreads < 6; numThreads++) {
             for (int simTyp = 1; simTyp < 4; simTyp++) {
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
@@ -471,7 +473,9 @@ int main()
         if (envNT != NULL) break;
         }
     }
-#else
+#endif
+
+#if 0 // OpenMP test
     double thrd1elapsed = 1.0;
     for (int thrds = 1; thrds < 9; thrds++) {
         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -492,5 +496,30 @@ int main()
         printf("@@@DBG threads: %d Elapsed: %.2f Factor: %.2f\n", thrds, elap, thrd1elapsed/elap);
     }
 #endif
+    
+#if 1 // Threads test
+    double thrd1elapsed = 1.0;
+    for (int thrds = 1; thrds < 9; thrds++) {
+        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+        omp_set_num_threads(thrds);
+        std::vector<double> rslts = { 0,0,0,0,0,0,0,0 };
+        int outer = 800000;
+        int inner = 2000;
+
+        auto thrdFnc= [](int& inner, std::vector<double> &rslts) {
+            return [&](unsigned i) {
+                double x = 1.0;
+                for (int j = 0; j < inner; j++) x += sqrt((double)j);
+                rslts[i % 8] = x;
+            };
+        };
+        pl::async_par_for(0,outer,thrdFnc(inner,rslts),thrds);
+
+        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed = curr - start;
+        double elap = elapsed.count();
+        if (thrds == 1) thrd1elapsed = elap;
+        printf("@@@DBG threads: %d Elapsed: %.2f Factor: %.2f\n", thrds, elap, thrd1elapsed / elap);
+    }
 #endif
 }
