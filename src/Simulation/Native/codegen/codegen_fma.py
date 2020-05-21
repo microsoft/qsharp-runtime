@@ -243,7 +243,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append("#ifndef _MSC_VER\n")
   kernelarray.append("\t"*indent + "if (ctrlmask == 0){\n")
   indent += 1
-  kernelarray.append("\t"*indent + "#pragma omp for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
+  kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
   indent = indent + 1
   for i in range(1,nc+1):
     kernelarray.append("\t"*indent + "for (std::size_t i"+str(i)+" = 0; i"+str(i)+" < dsorted["+str(i-1) + "]; i"+str(i)+" += 2 * dsorted["+str(i)+"]){\n")
@@ -278,7 +278,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   indent = 1
   kernelarray.append("\t"*indent + "else{\n")
   indent += 1
-  kernelarray.append("\t"*indent + "#pragma omp for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
+  kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
   indent = indent + 1
   for i in range(1,nc+1):
     kernelarray.append("\t"*indent + "for (std::size_t i"+str(i)+" = 0; i"+str(i)+" < dsorted["+str(i-1) + "]; i"+str(i)+" += 2 * dsorted["+str(i)+"]){\n")
@@ -315,44 +315,31 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append("".join(add))
 
 
+################ @@@DBW: Start of _MSC_VER code block ##################
   kernelarray.append("#else\n")
-  indent = 1
-  kernelarray.append("\t" + "std::intptr_t zero = 0;\n")
-  kernelarray.append("\t" + "std::intptr_t dmask = dsorted[0]");
-  for i in range(n-1):
-       kernelarray.append(" + dsorted["+str(i+1)+"]")
-  kernelarray.append(";\n")
-  kernelarray.append("\n\t"*indent + "if (ctrlmask == 0){\n")
-  indent += 1
-  kernelarray.append("\t"*indent + "#pragma omp parallel for schedule(static)\n" + "\t"*indent + "for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
-  indent += 1
-  kernelarray.append("\t"*indent+"if ((i & dmask) == zero)\n")
-  indent += 1
-  kernelarray.append("\t"*indent + "kernel_core(psi, i")
-  for i in range(n):
-    kernelarray.append(", dsorted[" + str(n-1-i) + "]")
-  if only_one_matrix:
-    kernelarray.append(", mm);\n")
-  else:
-    kernelarray.append(", mm, mmt);\n")
+  kernelarray.append("    std::intptr_t zero = 0;\n")
+  kernelarray.append("    std::intptr_t dmask = dsorted[0]");
+  for i in range(n-1):        kernelarray.append(" + dsorted["+str(i+1)+"]")
+  kernelarray.append(         ";\n")
+  kernelarray.append("\n");
+  kernelarray.append("    if (ctrlmask == 0){\n")
+  kernelarray.append("        #pragma omp parallel for schedule(static)\n");
+  kernelarray.append("        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
+  kernelarray.append("            if ((i & dmask) == zero)\n")
+  kernelarray.append("                kernel_core(psi, i")
+  for i in range(n):                    kernelarray.append(", dsorted[" + str(n-1-i) + "]")
+  if only_one_matrix:                   kernelarray.append(", mm);\n")
+  else:                                 kernelarray.append(", mm, mmt);\n")
   # if controlmask != 0
-  indent = 1
-  indent=1
-  kernelarray.append("\t"*indent + "} else {\n")
-  indent += 1
-  kernelarray.append("\t"*indent + "#pragma omp parallel for schedule(static)\n" + "\t"*indent + "for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
-  indent += 1
-  kernelarray.append("\t"*indent+"if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)\n")
-  indent += 1
-  kernelarray.append("\t"*indent + "kernel_core(psi, i")
-  for i in range(n):
-    kernelarray.append(", dsorted[" + str(n-1-i) + "]")
-  if only_one_matrix:
-    kernelarray.append(", mm);\n")
-  else:
-    kernelarray.append(", mm, mmt);\n")
-  indent=1
-  kernelarray.append("\t"*indent + "}\n")
+  kernelarray.append("     } else {\n")
+  kernelarray.append("        #pragma omp parallel for schedule(static)\n")
+  kernelarray.append("        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
+  kernelarray.append("            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)\n")
+  kernelarray.append("                kernel_core(psi, i")
+  for i in range(n):                    kernelarray.append(", dsorted[" + str(n-1-i) + "]")
+  if only_one_matrix:                   kernelarray.append(", mm);\n")
+  else:                                 kernelarray.append(", mm, mmt);\n")
+  kernelarray.append("     }\n")
   kernelarray.append("#endif\n")
 
   kernelarray.append("}\n")
