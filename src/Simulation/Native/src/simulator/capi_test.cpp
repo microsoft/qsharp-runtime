@@ -503,8 +503,8 @@ int main()
         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
         omp_set_num_threads(thrds);
         std::vector<double> rslts = { 0,0,0,0,0,0,0,0 };
-        int outer = 800000;
-        int inner = 2000;
+        int inner = 800000;
+        int outer = 2000;
 
         auto thrdFnc= [](int& inner, std::vector<double> &rslts) {
             return [&](unsigned i) {

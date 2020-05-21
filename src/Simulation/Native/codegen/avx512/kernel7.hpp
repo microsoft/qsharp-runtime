@@ -402,15 +402,19 @@ void kernel(V& psi, unsigned id6, unsigned id5, unsigned id4, unsigned id3, unsi
     std::intptr_t dmask = dsorted[0] + dsorted[1] + dsorted[2] + dsorted[3] + dsorted[4] + dsorted[5] + dsorted[6];
 
     if (ctrlmask == 0){
-        #pragma omp parallel for schedule(static)
-        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-            if ((i & dmask) == zero)
-                kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
+        auto thrdFnc= [](intptr_t& dmask, std::intptr_t& zero,V &psi,M const& m) {
+            return [&](unsigned i) {
+                if ((i & dmask) == zero)
+                    kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], m);
+            }
+        pl::async_par_for(0,outer,thrdFnc(dmask,zero,psi,m,mt),thrds);
      } else {
-        #pragma omp parallel for schedule(static)
-        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
-                kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
+        auto thrdFnc= [](intptr_t& ctrlmask,intptr_t& dmask, std::intptr_t& zero,V &psi,M const& m) {
+            return [&](unsigned i) {
+                if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
+                    kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], m);
+            }
+        pl::async_par_for(0,outer,thrdFnc(ctrlmask,dmask,zero,psi,m,mt),thrds);
      }
 #endif
 }
