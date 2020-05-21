@@ -347,7 +347,11 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   return kernel
 
 def generate_includes(N):
-  return "#include <cassert>\n#include <iostream>\n#include <vector>\n#include <complex>\n#include <cstdlib>\n#include <omp.h>\n#include \"alignedallocator.hpp\"\n#include \"timing.hpp\"\n#include \"cintrin.hpp\"\n#include <algorithm>\n#include <functional>\n\nusing namespace std;\n#define LOOP_COLLAPSE" + str(N) + " " + str(N+1) + "\n"
+  return "#include <cassert>\n#include <iostream>\n#include <vector>\n#include <complex>\n#include <cstdlib>\n#include <omp.h>\n" + \
+    "#include \"alignedallocator.hpp\"\n#include \"timing.hpp\"\n#include \"cintrin.hpp\"\n" + \
+    "#include <algorithm>\n#include <functional>\n\n" + \
+    "#include \"util/par_for.hpp\"\n" + \
+    "using namespace std;\n#define LOOP_COLLAPSE" + str(N) + " " + str(N+1) + "\n"
 
 def generate_main(n):
   N = str(1 << n)
