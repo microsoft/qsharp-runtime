@@ -12,7 +12,6 @@
 #include <chrono>
 
 #include "util/cpuid.hpp" //@@@DBG
-#include "util/par_for.hpp" //@@@DBG
 
 #include "capi.hpp"
 
@@ -436,24 +435,25 @@ int main()
     return 0;
 #endif
 
-#if 0 // Simulator timing tests
+#if 1 // Simulator timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
     char* envNT = getenv("OMP_NUM_THREADS");
-    for (int fuseSpan = 0; fuseSpan < 5; fuseSpan++) {
-        for (int numThreads = 1; numThreads < 6; numThreads++) {
-            for (int simTyp = 1; simTyp < 4; simTyp++) {
+    for (int fuseSpan = 0; fuseSpan < 1; fuseSpan++) { // 0,5
+        for (int numThreads = 1; numThreads < 4; numThreads++) { // 1,6
+            for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
                 if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                 if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
                 if (envNT == NULL) omp_set_num_threads(numThreads);
                 auto sim_id = initDBG(simTyp,fuseSpan);
 
-                const int nQs = 15;
+                const int nQs = 20;
                 for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                 srand(1);
                 std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                 for (int i = 0; i < 100000; i++) {
+#if 1
                     int q0 = rand() % nQs;
                     H(sim_id, q0);
                     X(sim_id, q0);
@@ -463,9 +463,12 @@ int main()
                         CX(sim_id, q0, q1);
                         CX(sim_id, q1, q0);
                     }
+#else
+                    for (int j = 0; j < 10; j++) H(sim_id,nQs / 2);
+#endif
                     std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                     std::chrono::duration<double> elapsed = curr - start;
-                    if (elapsed.count() >= 22.0) break;
+                    if (elapsed.count() >= 20.1) break;
                 }
 
                 destroy(sim_id);
@@ -494,32 +497,6 @@ int main()
         double elap = elapsed.count();
         if (thrds == 1) thrd1elapsed = elap;
         printf("@@@DBG threads: %d Elapsed: %.2f Factor: %.2f\n", thrds, elap, thrd1elapsed/elap);
-    }
-#endif
-    
-#if 1 // Threads test
-    double thrd1elapsed = 1.0;
-    for (int thrds = 1; thrds < 9; thrds++) {
-        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-        omp_set_num_threads(thrds);
-        std::vector<double> rslts = { 0,0,0,0,0,0,0,0 };
-        int inner = 800000;
-        int outer = 2000;
-
-        auto thrdFnc= [](int& inner, std::vector<double> &rslts) {
-            return [&](unsigned i) {
-                double x = 1.0;
-                for (int j = 0; j < inner; j++) x += sqrt((double)j);
-                rslts[i % 8] = x;
-            };
-        };
-        pl::async_par_for(0,outer,thrdFnc(inner,rslts),thrds);
-
-        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed = curr - start;
-        double elap = elapsed.count();
-        if (thrds == 1) thrd1elapsed = elap;
-        printf("@@@DBG threads: %d Elapsed: %.2f Factor: %.2f\n", thrds, elap, thrd1elapsed / elap);
     }
 #endif
 }

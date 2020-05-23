@@ -18,14 +18,13 @@ inline void kernel_core(V& psi, std::size_t I, std::size_t d0, M const& m)
 	tmp[1] = fma(v[0], m[3], tmp[1]);
 	psi[I] = tmp[0];
 	psi[I + d0] = tmp[1];
-
 }
 
 // bit indices id[.] are given from high to low (e.g. control first for CNOT)
 template <class V, class M>
 void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 {
-	 std::size_t n = psi.size();
+	std::size_t n = psi.size();
 	std::size_t d0 = 1ULL << id0;
 	auto m = matrix;
 	std::size_t dsorted[] = {d0};
@@ -39,7 +38,6 @@ void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 			}
 		}
 	}
-
 
 #ifndef _MSC_VER
 	if (ctrlmask == 0){

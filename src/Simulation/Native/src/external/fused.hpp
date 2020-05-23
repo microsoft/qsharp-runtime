@@ -40,7 +40,7 @@ class Fused
     mutable double dbgElapsed;
     mutable double dbgET1;
     mutable double dbgET2;
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    mutable std::chrono::system_clock::time_point prev  = std::chrono::system_clock::now();
 
   public:
       Fused() {
@@ -57,12 +57,8 @@ class Fused
         if (val == NULL) {
             int nProcs = omp_get_num_procs();
             int nMax = omp_get_max_threads();
-            if (nMax == nProcs) {
-                int nUse = nProcs;
-                if (nProcs > 4) nUse /= 2;
-                else if (nProcs > 1) nUse--;
-                omp_set_num_threads(nUse);
-            }
+            if (nMax == nProcs && nMax > 3) nMax = 3;
+            omp_set_num_threads(nMax);
         }
         printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d\n", omp_get_max_threads(), dbgFusedSpan);
     }
@@ -97,27 +93,6 @@ class Fused
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
       
-      std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-      std::chrono::duration<double> elapsed = curr - start;
-      double rptTime = elapsed.count() - dbgElapsed;
-      if (rptTime >= 5.0) {
-          dbgElapsed = elapsed.count();
-          double nFused = (float)dbgNfused;
-          printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0fK gates=%4.0fK elap=%5.1f kgps=%5.1f (fus=%5.1f%%, ker=%5.1f%%)\n",
-              ((float)dbgSize/nFused), 
-              ((float)dbgNqs / nFused),
-              ((float)dbgNcs / nFused),
-              nFused/1000.,
-              (float)dbgNgates/1000.,
-              dbgElapsed,
-              (float)dbgNgates/(1000.*dbgElapsed),
-              dbgET1*100.0/rptTime,
-              dbgET2*100.0/rptTime);
-          fflush(stdout);
-          dbgET1 = 0.0;
-          dbgET2 = 0.0;
-      }
-
       dbgT1 = std::chrono::system_clock::now();
       switch (qs.size())
       {
@@ -137,11 +112,49 @@ class Fused
           ::kernel(wfn, qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
           break;
       }
+
       dbgT2 = std::chrono::system_clock::now();
       dbgE = dbgT2 - dbgT1;
       dbgET2 += dbgE.count();
 
       fusedgates = Fusion();
+
+      std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+      std::chrono::duration<double> elapsed = curr - prev;
+      dbgElapsed = elapsed.count();
+      if (dbgElapsed >= 5.0) {
+          double nFused = (float)dbgNfused;
+          if (nFused < 1000.0 || dbgNgates < 1000.0) {
+              printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0f  gates=%4.0f  elap=%5.1f  gps=%7.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
+                  ((float)dbgSize / nFused),
+                  ((float)dbgNqs / nFused),
+                  ((float)dbgNcs / nFused),
+                  nFused,
+                  (float)dbgNgates,
+                  dbgElapsed,
+                  (float)dbgNgates / dbgElapsed,
+                  dbgET1 * 100.0 / dbgElapsed,
+                  dbgET2 * 100.0 / dbgElapsed);
+          }
+          else {
+              printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0fK gates=%4.0fK elap=%5.1f kgps=%7.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
+                  ((float)dbgSize / nFused),
+                  ((float)dbgNqs / nFused),
+                  ((float)dbgNcs / nFused),
+                  nFused / 1000.,
+                  (float)dbgNgates / 1000.,
+                  dbgElapsed,
+                  (float)dbgNgates / (1000. * dbgElapsed),
+                  dbgET1 * 100.0 / dbgElapsed,
+                  dbgET2 * 100.0 / dbgElapsed);
+          }
+          fflush(stdout);
+          dbgET1    = 0.0;
+          dbgET2    = 0.0;
+          prev      = curr;
+          dbgNgates = 0;
+      }
+
     }
     
     template <class T, class A1, class A2>

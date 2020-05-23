@@ -131,19 +131,15 @@ void kernel(V& psi, unsigned id2, unsigned id1, unsigned id0, M const& matrix, s
     std::intptr_t dmask = dsorted[0] + dsorted[1] + dsorted[2];
 
     if (ctrlmask == 0){
-        auto thrdFnc= [](intptr_t& dmask, std::intptr_t& zero,V &psi,M const& m,M const& mt) {
-            return [&](unsigned i) {
-                if ((i & dmask) == zero)
-                    kernel_core(psi, i, dsorted[2], dsorted[1], dsorted[0], m, mt);
-            }
-        pl::async_par_for(0,outer,thrdFnc(dmask,zero,psi,m,mt),thrds);
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & dmask) == zero)
+                kernel_core(psi, i, dsorted[2], dsorted[1], dsorted[0], mm, mmt);
      } else {
-        auto thrdFnc= [](intptr_t& ctrlmask,intptr_t& dmask, std::intptr_t& zero,V &psi,M const& m,M const& mt) {
-            return [&](unsigned i) {
-                if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
-                    kernel_core(psi, i, dsorted[2], dsorted[1], dsorted[0], m, mt);
-            }
-        pl::async_par_for(0,outer,thrdFnc(ctrlmask,dmask,zero,psi,m,mt),thrds);
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
+                kernel_core(psi, i, dsorted[2], dsorted[1], dsorted[0], mm, mmt);
      }
 #endif
 }
