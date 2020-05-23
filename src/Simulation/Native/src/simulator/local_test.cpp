@@ -12,6 +12,7 @@ using namespace Microsoft::Quantum::SIMULATOR;
 namespace Microsoft {
     namespace Quantum {
         int dbgFusedSpan = 4; //@@@DBG
+        int dbgFusedLimit = 99;
     }
 }
 void test_exp()

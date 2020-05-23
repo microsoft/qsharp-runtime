@@ -26,6 +26,7 @@ namespace Microsoft
 namespace Quantum
 {
     extern int dbgFusedSpan;
+    extern int dbgFusedLimit;
 
 namespace SIMULATOR
 {
@@ -60,7 +61,7 @@ class Fused
             if (nMax == nProcs && nMax > 3) nMax = 3;
             omp_set_num_threads(nMax);
         }
-        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d\n", omp_get_max_threads(), dbgFusedSpan);
+        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedLimit=%d\n", omp_get_max_threads(), dbgFusedSpan, dbgFusedLimit);
     }
 
     inline void reset()
@@ -201,7 +202,7 @@ class Fused
 
         newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
 
-        if (newgates.num_qubits() > dbgFusedSpan)
+        if (newgates.num_qubits() > dbgFusedSpan || fusedgates.size() > dbgFusedLimit)
         {
             flush(wfn);
             fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
