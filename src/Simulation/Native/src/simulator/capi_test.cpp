@@ -440,7 +440,7 @@ int main()
     char* envNT = getenv("OMP_NUM_THREADS");
     int fuseLimits[] = {0,1,2,5,10,50,100};
     for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 0,5
-        for (int flIdx = 0; flIdx < 7; flIdx++) { // 0,7
+        for (int flIdx = 0; flIdx < 7; flIdx += 1) { // 0,7
             for (int numThreads = 1; numThreads < 2; numThreads++) { // 1,6
                 for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
@@ -449,7 +449,7 @@ int main()
                     if (envNT == NULL) omp_set_num_threads(numThreads);
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
 
-                    const int nQs = 8;
+                    const int nQs = 18;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     srand(1);
