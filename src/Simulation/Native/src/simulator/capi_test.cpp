@@ -437,9 +437,11 @@ int main()
 
 #if 1 // Simulator timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
-    char* envNT = getenv("OMP_NUM_THREADS");
+    char* envNT = NULL;
+    size_t len;
+    errno_t err     = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
     int fuseLimits[] = {0,1,2,5,10,50,100};
-    for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 0,5
+    for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
         for (int flIdx = 0; flIdx < 7; flIdx += 1) { // 0,7
             for (int numThreads = 1; numThreads < 2; numThreads++) { // 1,6
                 for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
@@ -449,7 +451,7 @@ int main()
                     if (envNT == NULL) omp_set_num_threads(numThreads);
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
 
-                    const int nQs = 18;
+                    const int nQs = 13;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     srand(1);
