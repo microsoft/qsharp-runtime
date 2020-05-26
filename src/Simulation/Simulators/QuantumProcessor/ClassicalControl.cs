@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
         }
 
 
-        public class QuantumProcessorApplyIfElse : Extensions.ApplyIfElseIntrinsic
+        public class QuantumProcessorApplyIfElse : Quantum.ClassicalControl.ApplyIfElseIntrinsic
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -96,7 +96,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyIfElseA : Extensions.ApplyIfElseIntrinsicA
+        public class QuantumProcessorApplyIfElseA : Quantum.ClassicalControl.ApplyIfElseIntrinsicA
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -115,7 +115,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyIfElseC : Extensions.ApplyIfElseIntrinsicC
+        public class QuantumProcessorApplyIfElseC : Quantum.ClassicalControl.ApplyIfElseIntrinsicC
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -141,7 +141,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyIfElseCA : Extensions.ApplyIfElseIntrinsicCA
+        public class QuantumProcessorApplyIfElseCA : Quantum.ClassicalControl.ApplyIfElseIntrinsicCA
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -190,7 +190,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
 
 
-        public class QuantumProcessorApplyConditionally : Extensions.ApplyConditionallyIntrinsic
+        public class QuantumProcessorApplyConditionally : Quantum.ClassicalControl.ApplyConditionallyIntrinsic
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -203,7 +203,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyConditionallyA : Extensions.ApplyConditionallyIntrinsicA
+        public class QuantumProcessorApplyConditionallyA : Quantum.ClassicalControl.ApplyConditionallyIntrinsicA
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -222,7 +222,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyConditionallyC : Extensions.ApplyConditionallyIntrinsicC
+        public class QuantumProcessorApplyConditionallyC : Quantum.ClassicalControl.ApplyConditionallyIntrinsicC
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -249,7 +249,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
         }
 
-        public class QuantumProcessorApplyConditionallyCA : Extensions.ApplyConditionallyIntrinsicCA
+        public class QuantumProcessorApplyConditionallyCA : Quantum.ClassicalControl.ApplyConditionallyIntrinsicCA
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
