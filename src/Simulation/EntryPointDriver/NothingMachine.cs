@@ -18,11 +18,71 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
         public string Target => "Nothing";
 
-        public Task<IQuantumMachineOutput<TOut>> ExecuteAsync<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input) =>
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info, TInput input) =>
             throw new NotSupportedException();
 
-        public Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input) =>
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineSubmissionContext submissionContext) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input, 
+                IQuantumMachineSubmissionContext submissionContext,
+                IQuantumMachine.ConfigureJob configureJobCallback) => 
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineExecutionContext executionContext) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineExecutionContext executionContext, 
+                IQuantumMachine.ConfigureJob configureJobCallback) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineSubmissionContext submissionContext,
+                IQuantumMachineExecutionContext executionContext) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineSubmissionContext submissionContext,
+                IQuantumMachineExecutionContext executionContext,
+                IQuantumMachine.ConfigureJob configureJobCallback) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info, TInput input) =>
             Task.FromResult<IQuantumMachineJob>(new DefaultJob());
+
+        public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input,
+                IQuantumMachineSubmissionContext submissionContext) =>
+            throw new NotSupportedException();
+
+        public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info,
+                TInput input, 
+                IQuantumMachineSubmissionContext submissionContext, 
+                IQuantumMachine.ConfigureJob configureJobCallback) =>
+            throw new NotSupportedException();
+
+        public (bool IsValid, string Message) Validate<TInput, TOutput>(
+                EntryPointInfo<TInput, TOutput> info, TInput input) => 
+            throw new NotSupportedException();
 
         /// <summary>
         /// A quantum machine job with default properties.
