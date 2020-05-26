@@ -455,26 +455,25 @@ int main()
                     if (envNT == NULL) omp_set_num_threads(numThreads);
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
 
-                    const int nQs = 15;
+                    const int nQs = 26;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                     for (int i = 0; i < 1000000; i++) {
-                        for (unsigned k = 0; k < nQs-1; k++) {
-                            for (int j = 0; j < 5; j++) {
-                                if (k == 0) H(sim_id,k);
-                                else        MCX(sim_id, 1, &k, k - 1);
-                            }
-                        }
-                        for (unsigned k = nQs-1; k > 0; k--) {
-                            for (int j = 0; j < 5; j++) {
-                                MCX(sim_id, 1, &k, k - 1);
+                        for (int dir = 0; dir < 2; dir++) {
+                            for (int k = 0; k < 5; k++) {
+                                unsigned c = k;
+                                if (dir == 1) c = (nQs - 1) - k;
+                                for (int j = 0; j < 5; j++) {
+                                    if (k == 0) H(sim_id, c);
+                                    else        MCX(sim_id, 1, &c, c - 1);
+                                }
                             }
                         }
 
                         std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                         std::chrono::duration<double> elapsed = curr - start;
-                        if (elapsed.count() >= 20.1) break;
+                        if (elapsed.count() >= 40.0) break;
                     }
 
                     destroy(sim_id);

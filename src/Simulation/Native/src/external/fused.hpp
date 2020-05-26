@@ -129,7 +129,7 @@ class Fused
       std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
-      if (dbgElapsed >= 5.0) {
+      if (dbgElapsed >= 10.0) {
           double nFused = (float)dbgNfused;
           if (nFused < 1000.0 || dbgNgates < 1000.0) {
               printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0f  gates=%4.0f  elap=%5.1f  gps=%7.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
