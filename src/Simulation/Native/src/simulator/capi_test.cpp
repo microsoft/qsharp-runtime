@@ -439,48 +439,39 @@ int main()
     printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
     char* envNT = NULL;
     size_t len;
-    errno_t err     = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
+#ifdef _MSC_VER
+    errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
+#else
+    envNT = getenv("OMP_NUM_THREADS");
+#endif
     int fuseLimits[] = {0,1,2,5,10,50,100};
     for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
-        for (int flIdx = 0; flIdx < 7; flIdx += 1) { // 0,7
-            for (int numThreads = 1; numThreads < 2; numThreads++) { // 1,6
-                for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
+        for (int flIdx = 6; flIdx < 7; flIdx++) { // 0,7
+            for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
+                for (int simTyp = 1; simTyp < 4; simTyp++) { // 1,4
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                     if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
                     if (envNT == NULL) omp_set_num_threads(numThreads);
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
 
-                    const int nQs = 13;
+                    const int nQs = 15;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-                    srand(1);
                     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                     for (int i = 0; i < 1000000; i++) {
-#if 0
-                        int q0 = rand() % nQs;
-                        H(sim_id, q0);
-                        X(sim_id, q0);
-                        for (int j = 0; j < 10; j++) {
-                            q0 = (q0 + nQs + (rand() % 3) - 1) % nQs;
-                            int q1 = (q0 + 1) % nQs;
-                            CX(sim_id, q0, q1);
-                            CX(sim_id, q1, q0);
+                        for (unsigned k = 0; k < nQs-1; k++) {
+                            for (int j = 0; j < 5; j++) {
+                                if (k == 0) H(sim_id,k);
+                                else        MCX(sim_id, 1, &k, k - 1);
+                            }
                         }
-#else
-                        unsigned cs[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-                        for (int j = 0; j < 100; j++) {
-                            switch (fuseSpan) {
-                            case 0:
-                            case 1:
-                                X(sim_id, 0);
-                                break;
-                            default:
-                                MCX(sim_id, fuseSpan-1, cs, fuseSpan-1);
-                                break;
+                        for (unsigned k = nQs-1; k > 0; k--) {
+                            for (int j = 0; j < 5; j++) {
+                                MCX(sim_id, 1, &k, k - 1);
+                            }
                         }
-                    }
-#endif
+
                         std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                         std::chrono::duration<double> elapsed = curr - start;
                         if (elapsed.count() >= 20.1) break;

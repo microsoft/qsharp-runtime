@@ -56,7 +56,11 @@ class Fused
         //@@@DBW: Added to guarantee that we don't use too many threads
         char* envNT = NULL;
         size_t len;
+#ifdef _MSC_VER
         errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
+#else
+        envNT = getenv("OMP_NUM_THREADS");
+#endif
         if (envNT == NULL) {
             int nProcs = omp_get_num_procs();
             int nMax = omp_get_max_threads();
@@ -199,13 +203,12 @@ class Fused
       }
       else
           fusedgates = newgates;
-#else //@@@DBG: Playing
-        //Fusion newgates = fusedgates;   //@@@DBW: This actuall causes a constructor... bad bad bad
+#else //@@@DBG: Re-write (newgates = fusedgates was the problem... constructor/destructor)
 
-        fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-        if (fusedgates.num_qubits()+fusedgates.num_controls() > (unsigned)dbgFusedSpan || 
-            fusedgates.size() >= (unsigned)dbgFusedLimit) 
+        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
+        if (fusedgates.predict(qs, cs) > dbgFusedSpan || fusedgates.size() >= dbgFusedLimit)
             flush(wfn);
+        fusedgates.insert(convertMatrix(mat), qs, cs);
 #endif
     }
 
