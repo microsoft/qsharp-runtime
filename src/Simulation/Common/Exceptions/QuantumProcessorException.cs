@@ -7,8 +7,8 @@ namespace Microsoft.Quantum.Simulation.Common.Exceptions
 {
     public class QuantumProcessorException : Exception
     {
-        public QuantumProcessorException()
-            : base("An exception occurred while invoking a quantum processor.")
+        public QuantumProcessorException(string message = "An exception occurred while invoking a quantum processor.")
+            : base(message)
         {
         }
     }
