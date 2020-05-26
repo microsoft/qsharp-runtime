@@ -14,9 +14,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// </summary>
     internal class NothingMachine : IQuantumMachine
     {
-        public string ProviderId => nameof(NothingMachine);
+        public string ProviderId { get; } = nameof(NothingMachine);
 
-        public string Target => "Nothing";
+        public string Target { get; } = "Nothing";
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
                 EntryPointInfo<TInput, TOutput> info, TInput input) =>
@@ -81,8 +81,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             throw new NotSupportedException();
 
         public (bool IsValid, string Message) Validate<TInput, TOutput>(
-                EntryPointInfo<TInput, TOutput> info, TInput input) => 
-            throw new NotSupportedException();
+            EntryPointInfo<TInput, TOutput> info, TInput input) => (true, string.Empty);
 
         /// <summary>
         /// A quantum machine job with default properties.
@@ -99,7 +98,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 
             public bool Failed { get; } = true;
 
-            public Uri Uri => new Uri("https://example.com/" + Id);
+            public Uri Uri => new Uri($"https://www.example.com/{Id}");
 
             public Task CancelAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
 

@@ -8,6 +8,7 @@ using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
@@ -84,6 +85,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable(submit, BaseUriOption);
             AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, ShotsOption);
+            AddOptionIfAvailable(submit, DryRunOption);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -98,6 +100,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             root.Handler = simulate.Handler;
 
+            Console.OutputEncoding = Encoding.UTF8;
             return await new CommandLineBuilder(root)
                 .UseDefaults()
                 .UseHelpBuilder(context => new QsHelpBuilder(context.Console))
@@ -131,9 +134,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
-                Output = DefaultIfShadowed(OutputOption, settings.Output)
+                Output = DefaultIfShadowed(OutputOption, settings.Output),
+                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun)
             });
-        
+
         /// <summary>
         /// Returns true if the alias is not already used by an entry point option.
         /// </summary>
@@ -257,6 +261,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             new[] { "--output" },
             OutputFormat.FriendlyUri,
             "The information to show in the output after the job is submitted.");
+
+        /// <summary>
+        /// The dry run option.
+        /// </summary>
+        internal static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
+            new[] { "--dry-run" },
+            false,
+            "Validate the program and options, but do not submit to Azure Quantum.");
     }
 
     /// <summary>

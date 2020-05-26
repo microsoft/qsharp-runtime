@@ -32,23 +32,44 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 return 1;
             }
 
-            // TODO: Specify the number of shots. The IQuantumMachine interface should be updated.
-            var job = await machine.SubmitAsync(entryPoint.Info, entryPoint.CreateArgument(parseResult));
-            switch (settings.Output)
+            var input = entryPoint.CreateArgument(parseResult);
+            if (settings.DryRun)
+            {
+                var (isValid, message) = machine.Validate(entryPoint.Info, input);
+                Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    Console.WriteLine(message);
+                }
+                return isValid ? 0 : 1;
+            }
+            else
+            {
+                // TODO: Specify the number of shots.
+                var job = await machine.SubmitAsync(entryPoint.Info, input);
+                DisplayJob(job, settings.Output);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Displays the job using the output format.
+        /// </summary>
+        /// <param name="job">The job.</param>
+        /// <param name="format">The output format.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the output format is invalid.</exception>
+        private static void DisplayJob(IQuantumMachineJob job, OutputFormat format)
+        {
+            switch (format)
             {
                 case OutputFormat.FriendlyUri:
-                    Console.WriteLine("Job submitted. To track your job status and see the results use:");
-                    Console.WriteLine();
                     // TODO: Show the friendly URI. The friendly URI is not yet available from the job.
-                    Console.WriteLine(job.Id);
-                    break;
                 case OutputFormat.Id:
                     Console.WriteLine(job.Id);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException($"Invalid output format '{settings.Output}'.");
+                    throw new ArgumentOutOfRangeException($"Invalid output format '{format}'.");
             }
-            return 0;
         }
 
         /// <summary>
@@ -139,6 +160,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The information to show in the output after the job is submitted.
         /// </summary>
         public OutputFormat Output { get; set; }
+
+        /// <summary>
+        /// Validate the program and options, but do not submit to Azure Quantum.
+        /// </summary>
+        public bool DryRun { get; set; }
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
