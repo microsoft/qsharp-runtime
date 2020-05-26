@@ -1,0 +1,288 @@
+@@@DBG max=8 procs=8 thrds=1
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.23 nQs=1.00 nCs=0.94 flushes=  35  gates=  44  elap= 10.0  gps=  4.390 (fus=  0.0%, ker= 78.9%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes=  80  gates=  53  elap= 10.1  gps=  5.225 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 120  gates=  48  elap= 10.1  gps=  4.773 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 157  gates=  45  elap= 10.0  gps=  4.494 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.22 nQs=1.00 nCs=0.95 flushes=  93  gates= 114  elap= 10.0  gps= 11.393 (fus=  0.0%, ker= 80.0%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 210  gates= 137  elap= 10.0  gps= 13.680 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 326  gates= 140  elap= 10.1  gps= 13.929 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 443  gates= 141  elap= 10.0  gps= 14.040 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes=  97  gates= 118  elap= 10.0  gps= 11.745 (fus=  0.0%, ker= 82.1%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 200  gates= 123  elap= 10.0  gps= 12.260 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 321  gates= 145  elap= 10.0  gps= 14.453 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 462  gates= 165  elap= 10.0  gps= 16.436 (fus=  0.0%, ker=100.0%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes=  75  gates=  92  elap= 10.0  gps=  9.198 (fus=  0.0%, ker= 81.8%)
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes= 149  gates=  90  elap= 10.2  gps=  8.862 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 205  gates=  64  elap= 10.1  gps=  6.368 (fus=  0.3%, ker= 99.6%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 264  gates=  71  elap= 10.0  gps=  7.079 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.22 nQs=1.00 nCs=0.95 flushes= 130  gates= 159  elap= 10.0  gps= 15.897 (fus=  0.0%, ker= 76.5%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 301  gates= 203  elap= 10.0  gps= 20.217 (fus=  1.1%, ker= 98.9%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 469  gates= 200  elap= 10.0  gps= 19.957 (fus=  0.7%, ker= 99.3%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 649  gates= 212  elap= 10.0  gps= 21.117 (fus=  0.5%, ker= 99.5%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes= 136  gates= 165  elap= 10.1  gps= 16.389 (fus=  0.5%, ker= 79.1%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 343  gates= 247  elap= 10.0  gps= 24.603 (fus=  0.4%, ker= 99.6%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 578  gates= 279  elap= 10.0  gps= 27.834 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 819  gates= 285  elap= 10.0  gps= 28.475 (fus=  0.0%, ker=100.0%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.24 nQs=1.00 nCs=0.94 flushes=  68  gates=  85  elap= 10.0  gps=  8.489 (fus=  0.3%, ker= 81.3%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 139  gates=  83  elap= 10.1  gps=  8.245 (fus=  0.6%, ker= 99.3%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 227  gates= 104  elap= 10.1  gps= 10.266 (fus=  0.3%, ker= 99.7%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 298  gates=  87  elap= 10.1  gps=  8.640 (fus=  0.4%, ker= 99.6%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes= 172  gates= 209  elap= 10.0  gps= 20.832 (fus=  0.5%, ker= 77.2%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 411  gates= 283  elap= 10.0  gps= 28.238 (fus=  1.2%, ker= 98.7%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 685  gates= 326  elap= 10.0  gps= 32.524 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 933  gates= 296  elap= 10.0  gps= 29.564 (fus=  0.2%, ker= 99.8%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 217  gates= 262  elap= 10.0  gps= 26.100 (fus=  0.1%, ker= 80.8%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 475  gates= 306  elap= 10.0  gps= 30.560 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 762  gates= 343  elap= 10.0  gps= 34.159 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes=1038  gates= 328  elap= 10.0  gps= 32.723 (fus=  0.0%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.21 nQs=1.00 nCs=0.95 flushes=  95  gates= 116  elap= 10.0  gps= 11.551 (fus=  0.0%, ker= 81.5%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 207  gates= 132  elap= 10.1  gps= 13.114 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 317  gates= 134  elap= 10.1  gps= 13.279 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 429  gates= 132  elap= 10.0  gps= 13.169 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 257  gates= 310  elap= 10.0  gps= 30.986 (fus=  0.0%, ker= 81.6%)
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 570  gates= 373  elap= 10.0  gps= 37.240 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 880  gates= 366  elap= 10.0  gps= 36.586 (fus=  0.2%, ker= 99.7%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes=1189  gates= 369  elap= 10.0  gps= 36.825 (fus=  0.0%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=1 fusedLimit=100
+@@@DBG sz=1.20 nQs=1.00 nCs=0.95 flushes= 258  gates= 311  elap= 10.0  gps= 31.049 (fus=  0.0%, ker= 82.0%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 564  gates= 362  elap= 10.0  gps= 36.077 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes= 853  gates= 345  elap= 10.0  gps= 34.386 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.19 nQs=1.00 nCs=0.95 flushes=1166  gates= 373  elap= 10.0  gps= 37.235 (fus=  0.0%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.65 nQs=1.13 nCs=0.77 flushes=  31  gates= 176  elap= 10.1  gps= 17.376 (fus=  0.0%, ker= 82.2%)
+@@@DBG sz=5.62 nQs=1.12 nCs=0.77 flushes=  64  gates= 185  elap= 10.1  gps= 18.285 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.60 nQs=1.12 nCs=0.77 flushes= 100  gates= 200  elap= 10.1  gps= 19.829 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.77 flushes= 132  gates= 175  elap= 10.0  gps= 17.463 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.61 nQs=1.12 nCs=0.77 flushes=  82  gates= 461  elap= 10.1  gps= 45.803 (fus=  0.0%, ker= 79.0%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.77 flushes= 194  gates= 620  elap= 10.0  gps= 61.918 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 313  gates= 660  elap= 10.0  gps= 65.915 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 426  gates= 630  elap= 10.0  gps= 62.838 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.59 nQs=1.12 nCs=0.78 flushes=  94  gates= 526  elap= 10.0  gps= 52.491 (fus=  0.0%, ker= 81.8%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 197  gates= 570  elap= 10.0  gps= 56.910 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 307  gates= 615  elap= 10.0  gps= 61.258 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 427  gates= 665  elap= 10.0  gps= 66.243 (fus=  0.0%, ker=100.0%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.62 nQs=1.12 nCs=0.77 flushes=  64  gates= 361  elap= 10.2  gps= 35.330 (fus=  0.0%, ker= 82.1%)
+@@@DBG sz=5.58 nQs=1.12 nCs=0.78 flushes= 129  gates= 360  elap= 10.1  gps= 35.601 (fus=  0.3%, ker= 99.7%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 175  gates= 255  elap= 10.1  gps= 25.344 (fus=  0.9%, ker= 99.1%)
+@@@DBG sz=5.58 nQs=1.12 nCs=0.77 flushes= 226  gates= 285  elap= 10.0  gps= 28.481 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.57 nQs=1.11 nCs=0.77 flushes= 140  gates= 781  elap= 10.0  gps= 77.788 (fus=  0.1%, ker= 79.5%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 298  gates= 880  elap= 10.0  gps= 87.734 (fus=  0.6%, ker= 99.4%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 499  gates=1115  elap= 10.0  gps=111.259 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 702  gates=1125  elap= 10.0  gps=112.500 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.58 nQs=1.12 nCs=0.77 flushes= 172  gates= 961  elap= 10.1  gps= 95.557 (fus=  0.0%, ker= 81.8%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 320  gates= 820  elap= 10.1  gps= 80.792 (fus=  0.3%, ker= 99.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 518  gates=1100  elap= 10.0  gps=109.756 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 748  gates=1280  elap= 10.0  gps=127.568 (fus=  0.0%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.61 nQs=1.12 nCs=0.77 flushes=  82  gates= 461  elap= 10.1  gps= 45.707 (fus=  0.0%, ker= 82.3%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 171  gates= 490  elap= 10.1  gps= 48.590 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.77 flushes= 221  gates= 280  elap= 10.1  gps= 27.628 (fus=  0.6%, ker= 99.4%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 276  gates= 305  elap= 10.1  gps= 30.288 (fus=  0.3%, ker= 99.6%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.58 nQs=1.12 nCs=0.77 flushes= 172  gates= 961  elap= 10.0  gps= 96.018 (fus=  0.2%, ker= 77.4%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 415  gates=1350  elap= 10.0  gps=134.479 (fus=  1.1%, ker= 98.8%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 635  gates=1220  elap= 10.0  gps=121.454 (fus=  0.6%, ker= 99.3%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 840  gates=1140  elap= 10.0  gps=113.806 (fus=  1.3%, ker= 98.6%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 166  gates= 926  elap= 10.0  gps= 92.377 (fus=  1.1%, ker= 78.7%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 373  gates=1150  elap= 10.0  gps=114.478 (fus=  1.4%, ker= 98.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 571  gates=1100  elap= 10.0  gps=109.993 (fus=  1.3%, ker= 98.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 769  gates=1100  elap= 10.0  gps=109.741 (fus=  1.6%, ker= 98.4%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.64 nQs=1.13 nCs=0.76 flushes=  55  gates= 311  elap= 10.1  gps= 30.787 (fus=  0.7%, ker= 81.7%)
+@@@DBG sz=5.58 nQs=1.12 nCs=0.77 flushes= 113  gates= 320  elap= 10.0  gps= 31.951 (fus=  2.3%, ker= 97.7%)
+@@@DBG sz=5.57 nQs=1.11 nCs=0.78 flushes= 175  gates= 345  elap= 10.2  gps= 33.820 (fus=  1.4%, ker= 98.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 240  gates= 360  elap= 10.1  gps= 35.537 (fus=  1.2%, ker= 98.7%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 161  gates= 896  elap= 10.0  gps= 89.453 (fus=  2.5%, ker= 75.7%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 376  gates=1195  elap= 10.0  gps=119.374 (fus=  1.4%, ker= 98.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 583  gates=1150  elap= 10.0  gps=114.984 (fus=  4.3%, ker= 95.6%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 800  gates=1205  elap= 10.0  gps=120.220 (fus=  1.6%, ker= 98.3%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=2 fusedLimit=100
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 196  gates=1091  elap= 10.0  gps=108.987 (fus=  0.4%, ker= 78.8%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 467  gates=1505  elap= 10.0  gps=150.136 (fus=  0.9%, ker= 99.0%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 677  gates=1170  elap= 10.0  gps=116.944 (fus=  1.9%, ker= 98.0%)
+@@@DBG sz=5.56 nQs=1.11 nCs=0.78 flushes= 874  gates=1095  elap= 10.0  gps=109.418 (fus=  3.6%, ker= 96.4%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=3 fusedLimit=100
+@@@DBG sz=11.00 nQs=3.00 nCs=0.00 flushes=   5  gates=  56  elap= 10.3  gps=  5.413 (fus=  0.0%, ker= 80.7%)
+@@@DBG sz=10.45 nQs=3.00 nCs=0.00 flushes=  11  gates=  60  elap= 10.9  gps=  5.521 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.28 nQs=3.00 nCs=0.00 flushes=  18  gates=  70  elap= 11.3  gps=  6.217 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.21 nQs=3.00 nCs=0.00 flushes=  24  gates=  60  elap= 11.1  gps=  5.401 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.16 nQs=3.00 nCs=0.00 flushes=  32  gates= 326  elap= 10.0  gps= 32.485 (fus=  0.0%, ker= 73.4%)
+@@@DBG sz=10.06 nQs=3.00 nCs=0.00 flushes=  78  gates= 460  elap= 10.0  gps= 45.933 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.04 nQs=3.00 nCs=0.00 flushes= 125  gates= 470  elap= 10.0  gps= 46.857 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 169  gates= 440  elap= 10.0  gps= 43.798 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.14 nQs=3.00 nCs=0.00 flushes=  36  gates= 366  elap= 10.1  gps= 36.379 (fus=  0.0%, ker= 78.6%)
+@@@DBG sz=10.06 nQs=3.00 nCs=0.00 flushes=  82  gates= 460  elap= 10.1  gps= 45.434 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.04 nQs=3.00 nCs=0.00 flushes= 133  gates= 510  elap= 10.0  gps= 50.814 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 175  gates= 420  elap= 10.1  gps= 41.672 (fus=  0.0%, ker=100.0%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.45 nQs=3.00 nCs=0.00 flushes=  11  gates= 116  elap= 10.6  gps= 10.995 (fus=  0.1%, ker= 81.0%)
+@@@DBG sz=10.24 nQs=3.00 nCs=0.00 flushes=  21  gates= 100  elap= 10.1  gps=  9.946 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=10.17 nQs=3.00 nCs=0.00 flushes=  30  gates=  90  elap= 10.4  gps=  8.654 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.12 nQs=3.00 nCs=0.00 flushes=  41  gates= 110  elap= 10.4  gps= 10.626 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.07 nQs=3.00 nCs=0.00 flushes=  68  gates= 686  elap= 10.1  gps= 67.832 (fus=  0.0%, ker= 81.5%)
+@@@DBG sz=10.04 nQs=3.00 nCs=0.00 flushes= 140  gates= 720  elap= 10.0  gps= 71.689 (fus=  0.3%, ker= 99.6%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 230  gates= 900  elap= 10.1  gps= 89.473 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 332  gates=1020  elap= 10.1  gps=101.178 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.08 nQs=3.00 nCs=0.00 flushes=  63  gates= 636  elap= 10.1  gps= 63.038 (fus=  0.1%, ker= 79.5%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 143  gates= 800  elap= 10.1  gps= 79.544 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 216  gates= 730  elap= 10.0  gps= 72.788 (fus=  0.3%, ker= 99.7%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 289  gates= 730  elap= 10.0  gps= 72.985 (fus=  0.1%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.45 nQs=3.00 nCs=0.00 flushes=  11  gates= 116  elap= 10.8  gps= 10.779 (fus=  0.1%, ker= 79.2%)
+@@@DBG sz=10.20 nQs=3.00 nCs=0.00 flushes=  25  gates= 140  elap= 10.6  gps= 13.203 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.11 nQs=3.00 nCs=0.00 flushes=  44  gates= 190  elap= 10.3  gps= 18.416 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.08 nQs=3.00 nCs=0.00 flushes=  59  gates= 150  elap= 10.6  gps= 14.178 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.07 nQs=3.00 nCs=0.00 flushes=  76  gates= 766  elap= 10.0  gps= 76.272 (fus=  0.9%, ker= 77.9%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 177  gates=1010  elap= 10.1  gps=100.474 (fus=  1.1%, ker= 98.8%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 287  gates=1100  elap= 10.1  gps=108.995 (fus=  1.3%, ker= 98.7%)
+@@@DBG sz=10.01 nQs=3.00 nCs=0.00 flushes= 379  gates= 920  elap= 10.0  gps= 91.566 (fus=  0.4%, ker= 99.5%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.06 nQs=3.00 nCs=0.00 flushes=  79  gates= 796  elap= 10.0  gps= 79.413 (fus=  0.3%, ker= 79.9%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 172  gates= 930  elap= 10.1  gps= 92.454 (fus=  1.4%, ker= 98.6%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 270  gates= 980  elap= 10.0  gps= 97.903 (fus=  0.6%, ker= 99.4%)
+@@@DBG sz=10.01 nQs=3.00 nCs=0.00 flushes= 371  gates=1010  elap= 10.0  gps=100.542 (fus=  0.8%, ker= 99.2%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.29 nQs=3.00 nCs=0.00 flushes=  17  gates= 176  elap= 10.0  gps= 17.541 (fus=  0.0%, ker= 80.4%)
+@@@DBG sz=10.13 nQs=3.00 nCs=0.00 flushes=  38  gates= 210  elap= 10.4  gps= 20.286 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.09 nQs=3.00 nCs=0.00 flushes=  58  gates= 200  elap= 10.1  gps= 19.877 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=10.07 nQs=3.00 nCs=0.00 flushes=  75  gates= 170  elap= 10.6  gps= 16.089 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.06 nQs=3.00 nCs=0.00 flushes=  89  gates= 896  elap= 10.1  gps= 89.150 (fus=  2.9%, ker= 76.4%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 197  gates=1080  elap= 10.1  gps=107.363 (fus=  1.3%, ker= 98.7%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 309  gates=1120  elap= 10.1  gps=111.431 (fus=  0.8%, ker= 99.1%)
+@@@DBG sz=10.01 nQs=3.00 nCs=0.00 flushes= 422  gates=1130  elap= 10.1  gps=112.390 (fus=  0.9%, ker= 99.0%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=3 fusedLimit=100
+@@@DBG sz=10.06 nQs=3.00 nCs=0.00 flushes=  77  gates= 776  elap= 10.1  gps= 77.048 (fus=  0.5%, ker= 75.8%)
+@@@DBG sz=10.03 nQs=3.00 nCs=0.00 flushes= 189  gates=1120  elap= 10.0  gps=111.602 (fus=  3.3%, ker= 96.7%)
+@@@DBG sz=10.02 nQs=3.00 nCs=0.00 flushes= 291  gates=1020  elap= 10.0  gps=101.497 (fus=  2.8%, ker= 97.2%)
+@@@DBG sz=10.01 nQs=3.00 nCs=0.00 flushes= 393  gates=1020  elap= 10.1  gps=101.286 (fus=  1.4%, ker= 98.5%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=4 fusedLimit=100
+@@@DBG sz=15.00 nQs=3.67 nCs=0.00 flushes=   3  gates=  46  elap= 11.3  gps=  4.068 (fus=  0.0%, ker= 80.7%)
+@@@DBG sz=15.00 nQs=3.83 nCs=0.00 flushes=   6  gates=  45  elap= 10.0  gps=  4.499 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.50 nQs=3.80 nCs=0.00 flushes=  10  gates=  55  elap= 10.6  gps=  5.195 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.64 nQs=3.86 nCs=0.00 flushes=  14  gates=  60  elap= 12.2  gps=  4.921 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.38 nQs=3.84 nCs=0.00 flushes=  32  gates= 461  elap= 10.2  gps= 45.287 (fus=  0.0%, ker= 81.8%)
+@@@DBG sz=14.35 nQs=3.86 nCs=0.00 flushes=  69  gates= 530  elap= 10.1  gps= 52.627 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.31 nQs=3.85 nCs=0.00 flushes= 108  gates= 555  elap= 10.2  gps= 54.344 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.32 nQs=3.86 nCs=0.00 flushes= 146  gates= 545  elap= 10.1  gps= 54.039 (fus=  0.0%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=1 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.38 nQs=3.84 nCs=0.00 flushes=  32  gates= 461  elap= 10.1  gps= 45.757 (fus=  0.0%, ker= 81.4%)
+@@@DBG sz=14.37 nQs=3.86 nCs=0.00 flushes=  71  gates= 560  elap= 10.2  gps= 55.074 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.33 nQs=3.86 nCs=0.00 flushes= 104  gates= 470  elap= 10.1  gps= 46.599 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.31 nQs=3.85 nCs=0.00 flushes= 137  gates= 470  elap= 10.2  gps= 46.214 (fus=  0.0%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=4 fusedLimit=100
+@@@DBG sz=15.00 nQs=3.75 nCs=0.00 flushes=   4  gates=  61  elap= 11.6  gps=  5.254 (fus=  0.1%, ker= 81.1%)
+@@@DBG sz=15.00 nQs=3.88 nCs=0.00 flushes=   8  gates=  60  elap= 10.4  gps=  5.794 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.62 nQs=3.85 nCs=0.00 flushes=  13  gates=  70  elap= 11.9  gps=  5.899 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.40 nQs=3.86 nCs=0.00 flushes=  42  gates= 606  elap= 10.2  gps= 59.431 (fus=  0.3%, ker= 81.4%)
+@@@DBG sz=14.33 nQs=3.86 nCs=0.00 flushes= 104  gates= 885  elap= 10.1  gps= 87.457 (fus=  0.2%, ker= 99.8%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 171  gates= 955  elap= 10.2  gps= 93.968 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.30 nQs=3.86 nCs=0.00 flushes= 244  gates=1045  elap= 10.1  gps=103.499 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=2 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.35 nQs=3.85 nCs=0.00 flushes=  62  gates= 891  elap= 10.1  gps= 88.277 (fus=  0.0%, ker= 81.8%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 136  gates=1055  elap= 10.1  gps=104.502 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.30 nQs=3.86 nCs=0.00 flushes= 207  gates=1015  elap= 10.0  gps=101.370 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=14.29 nQs=3.86 nCs=0.00 flushes= 276  gates= 985  elap= 10.0  gps= 98.053 (fus=  0.0%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=4 fusedLimit=100
+@@@DBG sz=15.00 nQs=3.86 nCs=0.00 flushes=   7  gates= 106  elap= 11.2  gps=  9.488 (fus=  0.0%, ker= 82.6%)
+@@@DBG sz=14.67 nQs=3.87 nCs=0.00 flushes=  15  gates= 115  elap= 11.0  gps= 10.478 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.35 nQs=3.83 nCs=0.00 flushes=  23  gates= 110  elap= 10.2  gps= 10.805 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.35 nQs=3.84 nCs=0.00 flushes=  31  gates= 115  elap= 10.4  gps= 11.039 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.38 nQs=3.86 nCs=0.00 flushes=  64  gates= 921  elap= 10.0  gps= 91.939 (fus=  0.0%, ker= 81.0%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 143  gates=1125  elap= 10.1  gps=110.957 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.29 nQs=3.85 nCs=0.00 flushes= 212  gates= 985  elap= 10.1  gps= 97.944 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=14.30 nQs=3.86 nCs=0.00 flushes= 286  gates=1060  elap= 10.0  gps=105.988 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=3 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.38 nQs=3.86 nCs=0.00 flushes=  64  gates= 921  elap= 10.0  gps= 91.772 (fus=  0.1%, ker= 80.9%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 142  gates=1110  elap= 10.1  gps=110.077 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 220  gates=1115  elap= 10.0  gps=111.430 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.30 nQs=3.86 nCs=0.00 flushes= 298  gates=1115  elap= 10.1  gps=110.871 (fus=  0.1%, ker= 99.9%)
+@@@DBG: Generic
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedLimit=100
+@@@DBG sz=15.00 nQs=3.86 nCs=0.00 flushes=   7  gates= 106  elap= 10.0  gps= 10.597 (fus=  0.0%, ker= 81.2%)
+@@@DBG sz=14.41 nQs=3.82 nCs=0.00 flushes=  17  gates= 140  elap= 11.3  gps= 12.346 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.42 nQs=3.85 nCs=0.00 flushes=  26  gates= 130  elap= 10.9  gps= 11.948 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=14.43 nQs=3.86 nCs=0.00 flushes=  35  gates= 130  elap= 10.7  gps= 12.132 (fus=  0.0%, ker=100.0%)
+@@@DBG: AVX
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.31 nQs=3.85 nCs=0.00 flushes=  72  gates=1031  elap= 10.0  gps=102.869 (fus=  0.1%, ker= 80.7%)
+@@@DBG sz=14.30 nQs=3.85 nCs=0.00 flushes= 157  gates=1215  elap= 10.0  gps=121.297 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.31 nQs=3.86 nCs=0.00 flushes= 245  gates=1260  elap= 10.1  gps=124.686 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.29 nQs=3.86 nCs=0.00 flushes= 332  gates=1240  elap= 10.1  gps=123.222 (fus=  0.1%, ker= 99.9%)
+@@@DBG: AVX2
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedLimit=100
+@@@DBG sz=14.32 nQs=3.85 nCs=0.00 flushes=  73  gates=1046  elap= 10.1  gps=103.473 (fus=  0.1%, ker= 81.2%)
+@@@DBG sz=14.31 nQs=3.86 nCs=0.00 flushes= 160  gates=1245  elap= 10.1  gps=123.855 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.29 nQs=3.85 nCs=0.00 flushes= 247  gates=1240  elap= 10.1  gps=123.094 (fus=  0.1%, ker= 99.9%)
+@@@DBG sz=14.30 nQs=3.86 nCs=0.00 flushes= 334  gates=1245  elap= 10.1  gps=123.653 (fus=  0.1%, ker= 99.9%)
