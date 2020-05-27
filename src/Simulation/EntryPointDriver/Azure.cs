@@ -39,6 +39,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
                 if (!string.IsNullOrWhiteSpace(message))
                 {
+                    Console.WriteLine();
                     Console.WriteLine(message);
                 }
                 return isValid ? 0 : 1;
