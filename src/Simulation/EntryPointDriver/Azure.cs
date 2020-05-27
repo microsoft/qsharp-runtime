@@ -72,7 +72,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     DisplayWithColor(
                         ConsoleColor.Red,
                         Console.Error,
-                        "Something went wrong when performing translation to the intermediate representation used for the target quantum machine.");
+                        "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.");
 
                     Console.WriteLine();
                     Console.WriteLine(translationEx.Message);
