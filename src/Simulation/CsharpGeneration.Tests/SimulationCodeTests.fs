@@ -2328,7 +2328,7 @@ namespace N1
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.emptyOperation";
 
-        public static AlfredEntryPointInfo<QVoid, QVoid> Info => new AlfredEntryPointInfo<QVoid, QVoid>(typeof(emptyOperation));
+        public static HoneywellEntryPointInfo<QVoid, QVoid> Info => new HoneywellEntryPointInfo<QVoid, QVoid>(typeof(emptyOperation));
 
         public override void Init() { }
         
@@ -2340,7 +2340,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass emptyOperation AssemblyConstants.AlfredProcessor
+        |> testOneClass emptyOperation AssemblyConstants.HoneywellProcessor
 
         """
     public abstract partial class randomAbstractOperation : Unitary<(Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, ICallable
@@ -2367,7 +2367,7 @@ namespace N1
         String ICallable.Name => "randomAbstractOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.randomAbstractOperation";
 
-        public static BrunoEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new BrunoEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
+        public static IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
 
         public override void Init() { }
 
@@ -2379,7 +2379,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass randomAbstractOperation AssemblyConstants.BrunoProcessor
+        |> testOneClass randomAbstractOperation AssemblyConstants.IonQProcessor
 
         """
     [SourceLocation("%%%", OperationFunctor.Body, 108, 113)]
@@ -2395,7 +2395,7 @@ namespace N1
         String ICallable.Name => "oneQubitOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.oneQubitOperation";
 
-        public static ClementineEntryPointInfo<Qubit, QVoid> Info => new ClementineEntryPointInfo<Qubit, QVoid>(typeof(oneQubitOperation));
+        public static QCIEntryPointInfo<Qubit, QVoid> Info => new QCIEntryPointInfo<Qubit, QVoid>(typeof(oneQubitOperation));
 
         protected IUnitary<Qubit> X { get; set; }
 
@@ -2449,7 +2449,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass oneQubitOperation AssemblyConstants.ClementineProcessor
+        |> testOneClass oneQubitOperation AssemblyConstants.QCIProcessor
         
     [<Fact>]
     let ``buildOperationClass - generics`` () = 
@@ -2481,7 +2481,7 @@ namespace N1
         String ICallable.Name => "genCtrl3";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genCtrl3";
 
-        public static AlfredEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new AlfredEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
+        public static HoneywellEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new HoneywellEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
 
         public override void Init() { }
 
@@ -2493,7 +2493,7 @@ namespace N1
         }
     }
 """   
-        |> testOneClass genCtrl3 AssemblyConstants.AlfredProcessor
+        |> testOneClass genCtrl3 AssemblyConstants.HoneywellProcessor
         
         """
     [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
@@ -2522,7 +2522,7 @@ namespace N1
         String ICallable.Name => "composeImpl";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.composeImpl";
 
-        public static BrunoEntryPointInfo<(ICallable, ICallable, __B__), QVoid> Info => new BrunoEntryPointInfo<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
+        public static IonQEntryPointInfo<(ICallable, ICallable, __B__), QVoid> Info => new IonQEntryPointInfo<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
 
         public override Func<(ICallable,ICallable,__B__), QVoid> Body => (__in__) =>
         {
@@ -2542,7 +2542,7 @@ namespace N1
         }
     }
 """   
-        |> testOneClass composeImpl AssemblyConstants.BrunoProcessor
+        |> testOneClass composeImpl AssemblyConstants.IonQProcessor
         
     [<Fact>]
     let ``buildOperationClass - abstract function`` () = 
@@ -2556,7 +2556,7 @@ namespace N1
         String ICallable.Name => "genF1";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.genF1";
 
-        public static ClementineEntryPointInfo<__A__, QVoid> Info => new ClementineEntryPointInfo<__A__, QVoid>(typeof(genF1<__A__>));
+        public static QCIEntryPointInfo<__A__, QVoid> Info => new QCIEntryPointInfo<__A__, QVoid>(typeof(genF1<__A__>));
 
         public override void Init() { }
 
@@ -2568,7 +2568,7 @@ namespace N1
         }
     }
 """
-        |> testOneClass genF1 AssemblyConstants.ClementineProcessor
+        |> testOneClass genF1 AssemblyConstants.QCIProcessor
         
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
