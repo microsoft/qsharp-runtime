@@ -34,6 +34,8 @@ function Test-One {
 
 Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
 
+Test-One '../src/Simulation/EntryPointDriver.Tests/Tests.EntryPointDriver.fsproj'
+
 Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
 Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'

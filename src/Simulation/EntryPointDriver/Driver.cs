@@ -87,6 +87,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, ShotsOption);
             AddOptionIfAvailable(submit, DryRunOption);
+            AddOptionIfAvailable(submit, VerboseOption);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -136,7 +137,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 Output = DefaultIfShadowed(OutputOption, settings.Output),
-                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun)
+                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun),
+                Verbose = DefaultIfShadowed(VerboseOption, settings.Verbose)
             });
 
         /// <summary>
@@ -267,6 +269,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             new[] { "--dry-run" },
             false,
             "Validate the program and options, but do not submit to Azure Quantum.");
+
+        /// <summary>
+        /// The verbose option.
+        /// </summary>
+        internal static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
+            new[] { "--verbose" }, false, "Show additional information about the submission.");
 
         /// <summary>
         /// Displays a message to the console using the given color and text writer.

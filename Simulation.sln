@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QsharpExe", "src\Simulation
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryPointDriver", "src\Simulation\EntryPointDriver\EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EntryPointDriver.Tests", "src\Simulation\EntryPointDriver.Tests\EntryPointDriver.Tests.fsproj", "{E2F30496-19D8-46A8-9BC0-26936FFE70D2}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests.EntryPointDriver", "src\Simulation\EntryPointDriver.Tests\Tests.EntryPointDriver.fsproj", "{E2F30496-19D8-46A8-9BC0-26936FFE70D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
