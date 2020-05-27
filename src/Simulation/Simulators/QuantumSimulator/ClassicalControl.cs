@@ -87,7 +87,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         #region ApplyIfElse
 
-        public class QSimApplyIfElse : Quantum.ClassicalControl.ApplyIfElseIntrinsic
+        public class QSimApplyIfElse : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsic
         {
             private QuantumSimulator Simulator { get; }
 
@@ -103,7 +103,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseA : Quantum.ClassicalControl.ApplyIfElseIntrinsicA
+        public class QSimApplyIfElseA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -125,7 +125,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseC : Quantum.ClassicalControl.ApplyIfElseIntrinsicC
+        public class QSimApplyIfElseC : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicC
         {
             private QuantumSimulator Simulator { get; }
 
@@ -148,7 +148,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseCA : Quantum.ClassicalControl.ApplyIfElseIntrinsicCA
+        public class QSimApplyIfElseCA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicCA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -188,7 +188,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         #region ApplyConditionally
 
-        public class QSimApplyConditionally : Quantum.ClassicalControl.ApplyConditionallyIntrinsic
+        public class QSimApplyConditionally : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsic
         {
             private QuantumSimulator Simulator { get; }
 
@@ -204,7 +204,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyA : Quantum.ClassicalControl.ApplyConditionallyIntrinsicA
+        public class QSimApplyConditionallyA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -226,7 +226,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyC : Quantum.ClassicalControl.ApplyConditionallyIntrinsicC
+        public class QSimApplyConditionallyC : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicC
         {
             private QuantumSimulator Simulator { get; }
 
@@ -249,7 +249,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyCA : Quantum.ClassicalControl.ApplyConditionallyIntrinsicCA
+        public class QSimApplyConditionallyCA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicCA
         {
             private QuantumSimulator Simulator { get; }
 
