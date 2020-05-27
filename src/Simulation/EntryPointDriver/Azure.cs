@@ -67,17 +67,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     Console.WriteLine(azureQuantumEx.Message);
                     return 1;
                 }
-                catch (QuantumMachineClientException quantumMachineClientEx)
-                {
-                    DisplayWithColor(
-                        ConsoleColor.Red,
-                        Console.Error,
-                        "Something went wrong related to the quantum machine client.");
-
-                    Console.WriteLine();
-                    Console.WriteLine(quantumMachineClientEx.Message);
-                    return 1;
-                }
                 catch (QuantumProcessorTranslationException translationEx)
                 {
                     DisplayWithColor(
