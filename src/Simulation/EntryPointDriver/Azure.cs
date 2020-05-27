@@ -5,7 +5,9 @@ using System;
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
+using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
+using Microsoft.Quantum.Simulation.Common.Exceptions;
 using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
@@ -48,9 +50,46 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             else
             {
-                var job = await machine.SubmitAsync(
+                try
+                {
+                    var job = await machine.SubmitAsync(
                     entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
-                DisplayJob(job, settings.Output);
+                    DisplayJob(job, settings.Output);
+                }
+                catch (AzureQuantumException azureQuantumEx)
+                {
+                    DisplayWithColor(
+                        ConsoleColor.Red,
+                        Console.Error,
+                        "Something went wrong related to Azure quantum.");
+
+                    Console.WriteLine();
+                    Console.WriteLine(azureQuantumEx.Message);
+                    return 1;
+                }
+                catch (QuantumMachineClientException quantumMachineClientEx)
+                {
+                    DisplayWithColor(
+                        ConsoleColor.Red,
+                        Console.Error,
+                        "Something went wrong related to the quantum machine client.");
+
+                    Console.WriteLine();
+                    Console.WriteLine(quantumMachineClientEx.Message);
+                    return 1;
+                }
+                catch (QuantumProcessorTranslationException translationEx)
+                {
+                    DisplayWithColor(
+                        ConsoleColor.Red,
+                        Console.Error,
+                        "Something went wrong when performing translation to the intermediate representation used for the target quantum machine.");
+
+                    Console.WriteLine();
+                    Console.WriteLine(translationEx.Message);
+                    return 1;
+                }
+
                 return 0;
             }
         }
