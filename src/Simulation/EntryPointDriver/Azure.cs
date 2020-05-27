@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 try
                 {
                     var job = await machine.SubmitAsync(
-                    entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
+                        entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
                     DisplayJob(job, settings.Output);
                 }
                 catch (AzureQuantumException azureQuantumEx)
