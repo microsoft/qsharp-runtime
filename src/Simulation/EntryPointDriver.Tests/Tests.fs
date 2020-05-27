@@ -143,12 +143,12 @@ let private run (assembly : Assembly) (args : string[]) =
         CultureInfo.DefaultThreadCurrentCulture <- previousCulture
 
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
-/// output.
+/// output. The standard error and out streams of the actual output are concatenated in that order.
 let private yields expected (assembly, args) =
     let normalize text = Regex.Replace(text, @"\s+", " ").Trim()
     let out, error, exitCode = run assembly args
     Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
-    Assert.Equal (normalize expected, normalize out)
+    Assert.Equal (normalize expected, normalize (error + out))
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
@@ -406,8 +406,13 @@ let ``Uses single-dash short names`` () =
 [<Fact>]
 let ``Shadows --simulator`` () =
     let given = test 27
-    given ["--simulator"; "foo"] |> yields "foo"
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator] |> yields AssemblyConstants.ResourcesEstimator
+    given ["--simulator"; "foo"]
+    |> yields "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
+               foo"
+    given ["--simulator"; AssemblyConstants.ResourcesEstimator]
+    |> yields (sprintf "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
+                        %s"
+                       AssemblyConstants.ResourcesEstimator)
     given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
     given ["-s"; "foo"] |> fails
 
@@ -427,15 +432,16 @@ let ``Shadows --version`` () =
 // Simulators
 
 // The expected output from the resources estimator.
-let private resourceSummary = "Metric          Sum
-CNOT            0
-QubitClifford   1
-R               0
-Measure         1
-T               0
-Depth           0
-Width           1
-BorrowedWidth   0"
+let private resourceSummary =
+    "Metric          Sum
+     CNOT            0
+     QubitClifford   1
+     R               0
+     Measure         1
+     T               0
+     Depth           0
+     Width           1
+     BorrowedWidth   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
@@ -500,9 +506,9 @@ let private standardSubmitArgs =
 [<Fact>]
 let ``Submit can submit a job`` () =
     let given = test 1
-    given standardSubmitArgs |> yields "Job submitted. To track your job status and see the results use:
-
-00000000-0000-0000-0000-0000000000000"
+    given standardSubmitArgs
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
@@ -512,46 +518,47 @@ let ``Submit can show only the ID`` () =
 [<Fact>]
 let ``Submit uses default values`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--verbose"]) |> yields "Target: nothing
-Storage: myStorage
-Subscription: mySubscription
-Resource Group: myResourceGroup
-Workspace: myWorkspace
-AAD Token:
-Base URI:
-Shots: 500
-Output: FriendlyUri
-Verbose: True
+    given (standardSubmitArgs @ ["--verbose"])
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               Target: nothing
+               Storage: myStorage
+               Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               AAD Token:
+               Base URI:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
 
-Job submitted. To track your job status and see the results use:
-
-00000000-0000-0000-0000-0000000000000"
+               00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test 1
     given (standardSubmitArgs @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
-    |> yields "Target: nothing
-Storage: myStorage
-Subscription: mySubscription
-Resource Group: myResourceGroup
-Workspace: myWorkspace
-AAD Token: myToken
-Base URI: myBaseUri
-Shots: 750
-Output: FriendlyUri
-Verbose: True
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               Target: nothing
+               Storage: myStorage
+               Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               AAD Token: myToken
+               Base URI: myBaseUri
+               Shots: 750
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
 
-Job submitted. To track your job status and see the results use:
-
-00000000-0000-0000-0000-0000000000000"
+               00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--shots"; "1"]) |> yields "Job submitted. To track your job status and see the results use:
-
-00000000-0000-0000-0000-0000000000000"
+    given (standardSubmitArgs @ ["--shots"; "1"])
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               00000000-0000-0000-0000-0000000000000"
     given (standardSubmitArgs @ ["--shots"; "0"]) |> fails
     given (standardSubmitArgs @ ["--shots"; "-1"]) |> fails
 
@@ -561,22 +568,24 @@ let ``Submit requires a positive number of shots`` () =
 [<Fact>]
 let ``Uses documentation`` () =
     let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
-    let message = (name, name) ||> sprintf "%s:
-  This test checks that the entry point documentation appears correctly in the command line help message.
+    let message =
+        (name, name)
+        ||> sprintf "%s:
+                     This test checks that the entry point documentation appears correctly in the command line help message.
 
-Usage:
-  %s [options] [command]
+                     Usage:
+                       %s [options] [command]
 
-Options:
-  -n <n> (REQUIRED)                                   A number.
-  --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-  --my-cool-bool (REQUIRED)                           A neat bit.
-  -s, --simulator <simulator>                         The name of the simulator to use.
-  --version                                           Show version information
-  -?, -h, --help                                      Show help and usage information
+                     Options:
+                       -n <n> (REQUIRED)                                   A number.
+                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                       --my-cool-bool (REQUIRED)                           A neat bit.
+                       -s, --simulator <simulator>                         The name of the simulator to use.
+                       --version                                           Show version information
+                       -?, -h, --help                                      Show help and usage information
 
-Commands:
-  simulate    (default) Run the program using a local simulator."
+                     Commands:
+                       simulate    (default) Run the program using a local simulator."
 
     let given = test 31
     given ["--help"] |> yields message
@@ -586,24 +595,27 @@ Commands:
 [<Fact>]
 let ``Shows help text for submit command`` () =
     let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
-    let message = name |> sprintf "Usage:
-  %s submit [options]
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s submit [options]
 
-Options:
-  --target <target> (REQUIRED)                        The target device ID.
-  --storage <storage> (REQUIRED)                      The storage account connection string.
-  --subscription <subscription> (REQUIRED)            The subscription ID.
-  --resource-group <resource-group> (REQUIRED)        The resource group name.
-  --workspace <workspace> (REQUIRED)                  The workspace name.
-  --aad-token <aad-token>                             The Azure Active Directory authentication token.
-  --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
-  --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
-  --shots <shots>                                     The number of times the program is executed on the target machine.
-  --verbose                                           Show additional information about the submission.
-  -n <n> (REQUIRED)                                   A number.
-  --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-  --my-cool-bool (REQUIRED)                           A neat bit.
-  -?, -h, --help                                      Show help and usage information"
-  
+                    Options:
+                      --target <target> (REQUIRED)                        The target device ID.
+                      --storage <storage> (REQUIRED)                      The storage account connection string.
+                      --subscription <subscription> (REQUIRED)            The subscription ID.
+                      --resource-group <resource-group> (REQUIRED)        The resource group name.
+                      --workspace <workspace> (REQUIRED)                  The workspace name.
+                      --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
+                      --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
+                      --shots <shots>                                     The number of times the program is executed on the target machine.
+                      --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
+                      --verbose                                           Show additional information about the submission.
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      -?, -h, --help                                      Show help and usage information"
+
     let given = test 31
     given ["submit"; "--help"] |> yields message

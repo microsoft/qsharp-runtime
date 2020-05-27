@@ -202,6 +202,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 $"Base URI: {BaseUri}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
+                $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
     }
 }
