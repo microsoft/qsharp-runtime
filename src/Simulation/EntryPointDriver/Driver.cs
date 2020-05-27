@@ -7,7 +7,9 @@ using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
@@ -84,6 +86,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             AddOptionIfAvailable(submit, BaseUriOption);
             AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, ShotsOption);
+            AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
@@ -99,6 +102,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             root.Handler = simulate.Handler;
 
+            Console.OutputEncoding = Encoding.UTF8;
             return await new CommandLineBuilder(root)
                 .UseDefaults()
                 .UseHelpBuilder(context => new QsHelpBuilder(context.Console))
@@ -133,9 +137,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 Output = DefaultIfShadowed(OutputOption, settings.Output),
+                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun),
                 Verbose = DefaultIfShadowed(VerboseOption, settings.Verbose)
             });
-        
+
         /// <summary>
         /// Returns true if the alias is not already used by an entry point option.
         /// </summary>
@@ -160,12 +165,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             else
             {
-                var originalForeground = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Error.WriteLine(
+                DisplayWithColor(ConsoleColor.Yellow, Console.Error,
                     $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
                     $"Using default value {option.DefaultValue}.");
-                Console.ForegroundColor = originalForeground;
                 return option.DefaultValue;
             }
         }
@@ -261,10 +263,32 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             "The information to show in the output after the job is submitted.");
 
         /// <summary>
+        /// The dry run option.
+        /// </summary>
+        internal static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
+            new[] { "--dry-run" },
+            false,
+            "Validate the program and options, but do not submit to Azure Quantum.");
+
+        /// <summary>
         /// The verbose option.
         /// </summary>
         internal static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
             new[] { "--verbose" }, false, "Show additional information about the submission.");
+
+        /// <summary>
+        /// Displays a message to the console using the given color and text writer.
+        /// </summary>
+        /// <param name="color">The text color.</param>
+        /// <param name="writer">The text writer for the console output stream.</param>
+        /// <param name="message">The message to display.</param>
+        internal static void DisplayWithColor(ConsoleColor color, TextWriter writer, string message)
+        {
+            var originalForeground = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            writer.WriteLine(message);
+            Console.ForegroundColor = originalForeground;
+        }
     }
 
     /// <summary>
