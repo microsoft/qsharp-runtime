@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
+using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
@@ -85,10 +86,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="name">The name of the custom simulator.</param>
         private static void DisplayCustomSimulatorError(string name)
         {
-            var originalForeground = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"The simulator '{name}' could not be found.");
-            Console.ForegroundColor = originalForeground;
+            DisplayWithColor(ConsoleColor.Red, Console.Error, $"The simulator '{name}' could not be found.");
             Console.Error.WriteLine();
             Console.Error.WriteLine(
                 $"If '{name}' is a custom simulator, it must be set in the DefaultSimulator project property:");
