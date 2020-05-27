@@ -45,8 +45,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             else
             {
-                // TODO: Specify the number of shots.
-                var job = await machine.SubmitAsync(entryPoint.Info, input);
+                var job = await machine.SubmitAsync(
+                    entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
                 DisplayJob(job, settings.Output);
                 return 0;
             }
@@ -92,6 +92,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine($"The target '{target}' was not recognized.");
             Console.ForegroundColor = originalForeground;
+        }
+
+        /// <summary>
+        /// The quantum machine submission context.
+        /// </summary>
+        private sealed class SubmissionContext : IQuantumMachineSubmissionContext
+        {
+            public string? FriendlyName { get; set; }
+
+            public int Shots { get; set; }
         }
     }
 

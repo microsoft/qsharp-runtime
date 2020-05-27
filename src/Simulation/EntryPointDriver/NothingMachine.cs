@@ -71,14 +71,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 EntryPointInfo<TInput, TOutput> info,
                 TInput input,
                 IQuantumMachineSubmissionContext submissionContext) =>
-            throw new NotSupportedException();
+            SubmitAsync(info, input);
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
                 EntryPointInfo<TInput, TOutput> info,
                 TInput input, 
                 IQuantumMachineSubmissionContext submissionContext, 
                 IQuantumMachine.ConfigureJob configureJobCallback) =>
-            throw new NotSupportedException();
+            SubmitAsync(info, input);
 
         public (bool IsValid, string Message) Validate<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) => (true, string.Empty);
