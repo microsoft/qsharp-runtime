@@ -7,6 +7,7 @@ using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -162,12 +163,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             else
             {
-                var originalForeground = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Error.WriteLine(
+                DisplayWithColor(ConsoleColor.Yellow, Console.Error,
                     $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
                     $"Using default value {option.DefaultValue}.");
-                Console.ForegroundColor = originalForeground;
                 return option.DefaultValue;
             }
         }
@@ -269,6 +267,20 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             new[] { "--dry-run" },
             false,
             "Validate the program and options, but do not submit to Azure Quantum.");
+
+        /// <summary>
+        /// Displays a message to the console using the given color and text writer.
+        /// </summary>
+        /// <param name="color">The text color.</param>
+        /// <param name="writer">The text writer for the console output stream.</param>
+        /// <param name="message">The message to display.</param>
+        internal static void DisplayWithColor(ConsoleColor color, TextWriter writer, string message)
+        {
+            var originalForeground = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            writer.WriteLine(message);
+            Console.ForegroundColor = originalForeground;
+        }
     }
 
     /// <summary>

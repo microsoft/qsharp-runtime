@@ -6,6 +6,7 @@ using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Quantum.Runtime;
+using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
 {
@@ -28,7 +29,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             var machine = CreateMachine(settings);
             if (machine is null)
             {
-                DisplayUnknownTargetError(settings.Target);
+                DisplayWithColor(ConsoleColor.Red, Console.Error,
+                    $"The target '{settings.Target}' was not recognized.");
                 return 1;
             }
 
@@ -64,7 +66,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             switch (format)
             {
                 case OutputFormat.FriendlyUri:
-                    // TODO: Show the friendly URI. The friendly URI is not yet available from the job.
+                    // TODO:
+                    DisplayWithColor(ConsoleColor.Yellow, Console.Error,
+                        "The friendly URI for viewing job results is not available yet. Showing the job ID instead.");
+                    Console.WriteLine(job.Id);
+                    break;
                 case OutputFormat.Id:
                     Console.WriteLine(job.Id);
                     break;
@@ -82,18 +88,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             settings.Target == "nothing"
                 ? new NothingMachine()
                 : QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage);
-
-        /// <summary>
-        /// Displays an error message for attempting to use an unknown target machine.
-        /// </summary>
-        /// <param name="target">The target machine.</param>
-        private static void DisplayUnknownTargetError(string? target)
-        {
-            var originalForeground = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"The target '{target}' was not recognized.");
-            Console.ForegroundColor = originalForeground;
-        }
 
         /// <summary>
         /// The quantum machine submission context.
