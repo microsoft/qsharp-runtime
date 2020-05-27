@@ -63,8 +63,8 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                         Console.Error,
                         "Something went wrong related to Azure quantum.");
 
-                    Console.WriteLine();
-                    Console.WriteLine(azureQuantumEx.Message);
+                    Console.Error.WriteLine();
+                    Console.Error.WriteLine(azureQuantumEx.Message);
                     return 1;
                 }
                 catch (QuantumProcessorTranslationException translationEx)
