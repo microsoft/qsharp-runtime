@@ -142,10 +142,12 @@ let private run (assembly : Assembly) (args : string[]) =
         Console.SetOut previousOut
         CultureInfo.DefaultThreadCurrentCulture <- previousCulture
 
+/// Replaces every sequence of whitespace characters in the string with a single space.
+let private normalize s = Regex.Replace(s, @"\s+", " ").Trim()
+
 /// Asserts that running the entry point in the assembly with the given arguments succeeds and yields the expected
 /// output. The standard error and out streams of the actual output are concatenated in that order.
 let private yields expected (assembly, args) =
-    let normalize text = Regex.Replace(text, @"\s+", " ").Trim()
     let out, error, exitCode = run assembly args
     Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
     Assert.Equal (normalize expected, normalize (error + out))
@@ -154,6 +156,13 @@ let private yields expected (assembly, args) =
 let private fails (assembly, args) =
     let out, error, exitCode = run assembly args
     Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
+
+/// Asserts that running the entry point in the assembly with the given arguments fails and the error message starts
+/// with the expected message.
+let private failsWith expected (assembly, args) =
+    let out, error, exitCode = run assembly args
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
+    Assert.StartsWith (normalize expected, normalize error)
 
 /// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
 /// or fails.
@@ -489,36 +498,37 @@ let ``Supports default custom simulator`` () =
 
 // Azure Quantum Submission
 
+/// Standard command-line arguments for the "submit" command without specifying a target.
+let private submitWithoutTarget = 
+    [ "submit"
+      "--storage"
+      "myStorage"
+      "--subscription"
+      "mySubscription"
+      "--resource-group"
+      "myResourceGroup"
+      "--workspace"
+      "myWorkspace" ]
+
 /// Standard command-line arguments for the "submit" command using the "nothing" target.
-let private standardSubmitArgs =
-    ["submit"
-     "--target"
-     "nothing"
-     "--storage"
-     "myStorage"
-     "--subscription"
-     "mySubscription"
-     "--resource-group"
-     "myResourceGroup"
-     "--workspace"
-     "myWorkspace"]
+let private submitWithTestTarget = submitWithoutTarget @ ["--target"; "nothing"]
 
 [<Fact>]
 let ``Submit can submit a job`` () =
     let given = test 1
-    given standardSubmitArgs
+    given submitWithTestTarget
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
+    given (submitWithTestTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--verbose"])
+    given (submitWithTestTarget @ ["--verbose"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: nothing
                Storage: myStorage
@@ -537,7 +547,7 @@ let ``Submit uses default values`` () =
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
+    given (submitWithTestTarget @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: nothing
                Storage: myStorage
@@ -556,11 +566,16 @@ let ``Submit allows overriding default values`` () =
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test 1
-    given (standardSubmitArgs @ ["--shots"; "1"])
+    given (submitWithTestTarget @ ["--shots"; "1"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
-    given (standardSubmitArgs @ ["--shots"; "0"]) |> fails
-    given (standardSubmitArgs @ ["--shots"; "-1"]) |> fails
+    given (submitWithTestTarget @ ["--shots"; "0"]) |> fails
+    given (submitWithTestTarget @ ["--shots"; "-1"]) |> fails
+
+[<Fact>]
+let ``Submit fails with unknown target`` () =
+    let given = test 1
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
 
 
 // Help
