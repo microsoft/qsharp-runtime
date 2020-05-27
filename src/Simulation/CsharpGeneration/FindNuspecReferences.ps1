@@ -65,6 +65,7 @@ Add-PackageReferenceDependencies '..\EntryPointDriver\EntryPointDriver.csproj'
 # $version$ is replaced with the current package version when the package is built.
 Add-Dependency 'Microsoft.Quantum.Runtime.Core' '$version$'
 Add-Dependency 'Microsoft.Quantum.Simulators' '$version$'
+Add-Dependency 'Microsoft.Azure.Quantum.Client' '$version$'
 
 $nuspec.package.metadata.AppendChild($dependencies)
 $nuspec.Save([Path]::Combine((Get-Location), $target))
