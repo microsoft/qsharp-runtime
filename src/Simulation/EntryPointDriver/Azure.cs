@@ -118,10 +118,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
         /// <returns>A quantum machine.</returns>
-        private static IQuantumMachine? CreateMachine(AzureSettings settings) =>
-            settings.Target == "nothing"
-                ? new NothingMachine()
-                : QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage);
+        private static IQuantumMachine? CreateMachine(AzureSettings settings) => settings.Target switch
+        {
+            NothingMachine.TargetId => new NothingMachine(),
+            ErrorMachine.TargetId => new ErrorMachine(),
+            _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
+        };
 
         /// <summary>
         /// The quantum machine submission context.

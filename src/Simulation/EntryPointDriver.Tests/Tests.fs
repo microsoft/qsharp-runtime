@@ -157,12 +157,12 @@ let private fails (assembly, args) =
     let out, error, exitCode = run assembly args
     Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
 
-/// Asserts that running the entry point in the assembly with the given arguments fails and the error message starts
-/// with the expected message.
+/// Asserts that running the entry point in the assembly with the given arguments fails and the output starts with the
+/// expected message. The standard error and out streams of the actual output are concatenated in that order.
 let private failsWith expected (assembly, args) =
     let out, error, exitCode = run assembly args
     Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
-    Assert.StartsWith (normalize expected, normalize error)
+    Assert.StartsWith (normalize expected, normalize (error + out))
 
 /// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
 /// or fails.
@@ -510,27 +510,30 @@ let private submitWithoutTarget =
       "--workspace"
       "myWorkspace" ]
 
-/// Standard command-line arguments for the "submit" command using the "nothing" target.
-let private submitWithTestTarget = submitWithoutTarget @ ["--target"; "nothing"]
+/// Standard command-line arguments for the "submit" command using the "test.nothing" target.
+let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
+
+/// Standard command-line arguments for the "submit" command using the "test.error" target.
+let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
 
 [<Fact>]
 let ``Submit can submit a job`` () =
     let given = test 1
-    given submitWithTestTarget
+    given submitWithNothingTarget
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
+    given (submitWithNothingTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--verbose"])
+    given (submitWithNothingTarget @ ["--verbose"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Target: nothing
+               Target: test.nothing
                Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -547,9 +550,9 @@ let ``Submit uses default values`` () =
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
+    given (submitWithNothingTarget @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Target: nothing
+               Target: test.nothing
                Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -566,16 +569,25 @@ let ``Submit allows overriding default values`` () =
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--shots"; "1"])
+    given (submitWithNothingTarget @ ["--shots"; "1"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
-    given (submitWithTestTarget @ ["--shots"; "0"]) |> fails
-    given (submitWithTestTarget @ ["--shots"; "-1"]) |> fails
+    given (submitWithNothingTarget @ ["--shots"; "0"]) |> fails
+    given (submitWithNothingTarget @ ["--shots"; "-1"]) |> fails
 
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test 1
     given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
+
+[<Fact>]
+let ``Submit supports dry run option`` () =
+    let given = test 1
+    given (submitWithNothingTarget @ ["--dry-run"]) |> yields "✔️  The program is valid!"
+    given (submitWithErrorTarget @ ["--dry-run"])
+    |> failsWith "❌  The program is invalid.
+
+                  This quantum machine always has an error."
 
 
 // Help
