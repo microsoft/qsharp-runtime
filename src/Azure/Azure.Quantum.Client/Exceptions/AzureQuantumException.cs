@@ -7,8 +7,18 @@ namespace Microsoft.Azure.Quantum.Exceptions
 {
     public class AzureQuantumException : Exception
     {
-        public AzureQuantumException(string message = "An exception related to the Azure quantum service or storage occurred.")
+        public AzureQuantumException()
+            : base("An exception related to the Azure quantum occurred.")
+        {
+        }
+
+        public AzureQuantumException(string message)
             : base(message)
+        {
+        }
+
+        public AzureQuantumException(string message, Exception inner)
+            : base(message, inner)
         {
         }
     }
