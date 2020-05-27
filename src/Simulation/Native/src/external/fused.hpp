@@ -99,7 +99,7 @@ class Fused
       dbgSize += fusedgates.size();
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
-      
+
       dbgT1 = std::chrono::system_clock::now();
       switch (qs.size())
       {

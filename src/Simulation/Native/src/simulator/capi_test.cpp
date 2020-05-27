@@ -445,17 +445,17 @@ int main()
     envNT = getenv("OMP_NUM_THREADS");
 #endif
     int fuseLimits[] = {0,1,2,5,10,50,100};
-    for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
+    for (int fuseSpan = 4; fuseSpan < 5; fuseSpan++) { // 1,5
         for (int flIdx = 6; flIdx < 7; flIdx++) { // 0,7
-            for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
-                for (int simTyp = 1; simTyp < 4; simTyp++) { // 1,4
+            for (int numThreads = 1; numThreads < 2; numThreads++) { // 1,5
+                for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                     if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
                     if (envNT == NULL) omp_set_num_threads(numThreads);
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
 
-                    const int nQs = 26;
+                    const int nQs = 15;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
