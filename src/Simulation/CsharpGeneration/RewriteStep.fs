@@ -53,7 +53,7 @@ type Emitter() =
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
             let targetsQuantumProcessor = 
                 match step.AssemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with
-                | true, target -> target = AssemblyConstants.AlfredProcessor || target = AssemblyConstants.BrunoProcessor || target = AssemblyConstants.ClementineProcessor
+                | true, target -> target = AssemblyConstants.HoneywellProcessor || target = AssemblyConstants.IonQProcessor || target = AssemblyConstants.QCIProcessor
                 | _ -> false
 
             let allSources = GetSourceFiles.Apply compilation.Namespaces 
