@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                     DisplayWithColor(
                         ConsoleColor.Red,
                         Console.Error,
-                        "Something went wrong related to Azure quantum.");
+                        "Something went wrong when submitting the program to the Azure Quantum service.");
 
                     Console.Error.WriteLine();
                     Console.Error.WriteLine(azureQuantumEx.Message);
