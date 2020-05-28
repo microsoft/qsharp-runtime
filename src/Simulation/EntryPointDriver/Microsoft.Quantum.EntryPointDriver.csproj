@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+    <Description>The standard command-line interface for standalone Q# console applications.</Description>
   </PropertyGroup>
 
   <ItemGroup>
