@@ -11,7 +11,6 @@ namespace Microsoft.Azure.Quantum.Utility
         {
             internal const string ApplicationId = "84ba0947-6c53-4dd2-9ca9-b3694761521b";
 
-            // TODO: Confirm audience
             internal const string Audience = "https://quantum.microsoft.com/Jobs.ReadWrite";
 
             // Cache settings
