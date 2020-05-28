@@ -1,6 +1,5 @@
-// <copyright file="MockHelper.cs" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
+// Licensed under the MIT License.
 
 using System.Net.Http;
 using System.Threading;
