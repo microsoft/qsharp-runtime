@@ -176,6 +176,24 @@ let private testWith testNum defaultSimulator =
     let assembly = testAssembly testNum (Some defaultSimulator)
     fun args -> assembly, Array.ofList args
 
+/// Standard command-line arguments for the "submit" command without specifying a target.
+let private submitWithoutTarget = 
+    [ "submit"
+      "--storage"
+      "myStorage"
+      "--subscription"
+      "mySubscription"
+      "--resource-group"
+      "myResourceGroup"
+      "--workspace"
+      "myWorkspace" ]
+
+/// Standard command-line arguments for the "submit" command using the "test.nothing" target.
+let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
+
+/// Standard command-line arguments for the "submit" command using the "test.error" target.
+let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
+
 
 // No Option
 
@@ -437,6 +455,22 @@ let ``Shadows --version`` () =
     let given = test 29
     given ["--version"; "foo"] |> yields "foo"
 
+[<Fact>]
+let ``Shadows --target`` () =
+    let given = test 30
+    given ["--target"; "foo"] |> yields "foo"
+    given submitWithNothingTarget
+    |> failsWith "The required option --target conflicts with an entry point parameter name."
+
+[<Fact>]
+let ``Shadows --shots`` () =
+    let given = test 31
+    given ["--shots"; "7"] |> yields "7"
+    given (submitWithNothingTarget @ ["--shots"; "7"])
+    |> yields "Warning: Option --shots is overridden by an entry point parameter name. Using default value 500.
+               The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               00000000-0000-0000-0000-0000000000000"
+
 
 // Simulators
 
@@ -454,30 +488,30 @@ let private resourceSummary =
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 30 AssemblyConstants.ResourcesEstimator
+    let given = testWith 32 AssemblyConstants.ResourcesEstimator
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -485,7 +519,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 30 typeof<ToffoliSimulator>.FullName
+    let given = testWith 32 typeof<ToffoliSimulator>.FullName
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -497,24 +531,6 @@ let ``Supports default custom simulator`` () =
 
 
 // Azure Quantum Submission
-
-/// Standard command-line arguments for the "submit" command without specifying a target.
-let private submitWithoutTarget = 
-    [ "submit"
-      "--storage"
-      "myStorage"
-      "--subscription"
-      "mySubscription"
-      "--resource-group"
-      "myResourceGroup"
-      "--workspace"
-      "myWorkspace" ]
-
-/// Standard command-line arguments for the "submit" command using the "test.nothing" target.
-let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
-
-/// Standard command-line arguments for the "submit" command using the "test.error" target.
-let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
 
 [<Fact>]
 let ``Submit can submit a job`` () =
@@ -643,7 +659,7 @@ let ``Uses documentation`` () =
                      Commands:
                        simulate    (default) Run the program using a local simulator."
 
-    let given = test 31
+    let given = test 33
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
@@ -673,5 +689,5 @@ let ``Shows help text for submit command`` () =
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
 
-    let given = test 31
+    let given = test 33
     given ["submit"; "--help"] |> yields message
