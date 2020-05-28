@@ -53,21 +53,10 @@ class Fused
         dbgElapsed  = 0.0;
         dbgET1      = 0.0;
         dbgET2      = 0.0;
-        //@@@DBW: Added to guarantee that we don't use too many threads
-        char* envNT = NULL;
-        size_t len;
-#ifdef _MSC_VER
-        errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
-#else
-        envNT = getenv("OMP_NUM_THREADS");
-#endif
-        if (envNT == NULL) {
-            int nProcs = omp_get_num_procs();
-            int nMax = omp_get_max_threads();
-            if (nMax == nProcs && nMax > 3) nMax = 3;
-            omp_set_num_threads(nMax);
-        }
-        printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedLimit=%d\n", omp_get_max_threads(), dbgFusedSpan, dbgFusedLimit);
+
+        wfnCapacity     = 0u; //@@@DBG used to optimize parameters
+        maxFusedSpan    =-1;
+        maxFusedDepth   = 99;
     }
 
     inline void reset()
@@ -205,9 +194,36 @@ class Fused
           fusedgates = newgates;
 #else //@@@DBG: Re-write (newgates = fusedgates was the problem... constructor/destructor)
 
+        if (wfnCapacity != wfn.capacity()) {
+            wfnCapacity     = wfn.capacity();
+            char* envNT = NULL;
+            size_t len;
+#ifdef _MSC_VER
+            errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
+#else
+            envNT = getenv("OMP_NUM_THREADS");
+#endif
+            if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
+                int nMaxThrds = 4;
+                if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
+                int nProcs = omp_get_num_procs();
+                if (nProcs < 3) nMaxThrds = nProcs;
+                omp_set_num_threads(nMaxThrds);
+            }
+
+            maxFusedDepth = dbgFusedLimit;
+            if (maxFusedDepth < 0) maxFusedDepth = 99;
+
+            maxFusedSpan = dbgFusedSpan;
+            if (maxFusedSpan < 0) {
+                maxFusedSpan = 3;
+                if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
+            }
+            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, wfnCapacity);
+        }
+
         Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
-        if (fusedgates.predict(qs, cs) > dbgFusedSpan || fusedgates.size() >= dbgFusedLimit)
-            flush(wfn);
+        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth)  flush(wfn);
         fusedgates.insert(convertMatrix(mat), qs, cs);
 #endif
     }
@@ -221,6 +237,9 @@ class Fused
     }
   private:
     mutable Fusion fusedgates;
+    mutable size_t wfnCapacity;
+    mutable int    maxFusedSpan;
+    mutable int    maxFusedDepth;
   };
   
   
