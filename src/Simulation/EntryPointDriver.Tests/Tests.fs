@@ -149,19 +149,19 @@ let private normalize s = Regex.Replace(s, @"\s+", " ").Trim()
 /// output. The standard error and out streams of the actual output are concatenated in that order.
 let private yields expected (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
+    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode error out)
     Assert.Equal (normalize expected, normalize (error + out))
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" error out)
 
 /// Asserts that running the entry point in the assembly with the given arguments fails and the output starts with the
 /// expected message. The standard error and out streams of the actual output are concatenated in that order.
 let private failsWith expected (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" error out)
     Assert.StartsWith (normalize expected, normalize (error + out))
 
 /// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
@@ -588,6 +588,27 @@ let ``Submit supports dry run option`` () =
     |> failsWith "❌  The program is invalid.
 
                   This quantum machine always has an error."
+
+[<Fact>]
+let ``Submit has required options`` () =
+    // Returns the "power set" of a list: every possible combination of elements in the list without changing the order.
+    let rec powerSet = function
+        | [] -> [[]]
+        | x :: xs ->
+            let next = powerSet xs
+            List.map (fun list -> x :: list) next @ next
+    let given = test 1
+
+    // Try every possible combination of arguments. The command should succeed only when all of the arguments are
+    // included.
+    let commandName = List.head submitWithNothingTarget
+    let allArgs = submitWithNothingTarget |> List.tail |> List.chunkBySize 2
+    for args in powerSet allArgs do
+        given (commandName :: List.concat args)
+        |> if List.length args = List.length allArgs
+           then yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+                        00000000-0000-0000-0000-0000000000000"
+           else fails
 
 
 // Help
