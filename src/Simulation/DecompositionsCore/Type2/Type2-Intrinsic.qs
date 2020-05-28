@@ -23,25 +23,6 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     /// # Summary
-    /// Applies the Ising $XX$ gate.
-    ///
-    /// TODO - describe XX gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: We need to decide if this should be kept internal and moved to Type2-Internals.qs or consider
-    /// making it public and also adding it to the Qsharp.Core as a language feature (possibly as a decomposition on top of Exp)
-    /// If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingXX(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
-    }
-
-    /// # Summary
     /// Applies the Pauli $Y$ gate.
     ///
     /// \begin{align}
@@ -58,25 +39,6 @@ namespace Microsoft.Quantum.Intrinsic {
     operation Y(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
-    }
-
-    /// # Summary
-    /// Applies the Ising $YY$ gate.
-    ///
-    /// TODO - describe YY gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: We need to decide if this should be kept internal and moved to Type2-Internals.qs or consider
-    /// making it public and also adding it to the Qsharp.Core as a language feature (possibly as a decomposition on top of Exp)
-    /// If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingYY(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
     }
 
     /// # Summary
@@ -97,25 +59,6 @@ namespace Microsoft.Quantum.Intrinsic {
         body intrinsic;
         adjoint self;
     } 
-
-    /// # Summary
-    /// Applies the Ising $ZZ$ gate.
-    ///
-    /// TODO - describe ZZ gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: We need to decide if this should be kept internal and moved to Type2-Internals.qs or consider
-    /// making it public and also adding it to the Qsharp.Core as a language feature (possibly as a decomposition on top of Exp)
-    /// If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingZZ(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
-    }
 
     /// # Summary
     /// Applies the Hadamard transformation to a single qubit.

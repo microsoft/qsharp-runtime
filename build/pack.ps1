@@ -64,7 +64,7 @@ Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.
 Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
 Pack-Dotnet '../src/Simulation/QsharpBase/Microsoft.Quantum.QSharp.Base.csproj'
 Pack-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
-Pack-Dotnet '../src/Simulation/Targeting/IonQ/Microsoft.Quantum.IonQ.Core.csproj'
+Pack-Dotnet '../src/Simulation/DecompositionsCore/Type2/Microsoft.Quantum.Decompositions.Core.Type2.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'

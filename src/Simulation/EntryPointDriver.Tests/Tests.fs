@@ -96,6 +96,7 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
             "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+            "Microsoft.Quantum.QSharp.Base"
             "Microsoft.Quantum.QSharp.Core"
             "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"

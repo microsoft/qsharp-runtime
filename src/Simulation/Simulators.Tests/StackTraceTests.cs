@@ -97,8 +97,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                     for (int i = 0; i < stackFrames.Length; ++i)
                     {
-                        Assert.StartsWith(@"https://github.com/", stackFrames[i].GetURLFromPDB());
-                        Assert.EndsWith($"#L{stackFrames[i].FailedLineNumber}", stackFrames[i].GetURLFromPDB());
+                        Console.WriteLine(stackFrames[i].GetURLFromPDB());
+                        Assert.StartsWith(@"https://", stackFrames[i].GetURLFromPDB());
+                        // Only check for correct line numbers if they are included in the trace.
+                        if (stackFrames[i].GetURLFromPDB().Contains("#L"))
+                        {
+                            Assert.EndsWith($"#L{stackFrames[i].FailedLineNumber}", stackFrames[i].GetURLFromPDB());
+                        }
                     }
 
                     StringBuilder builder = new StringBuilder();

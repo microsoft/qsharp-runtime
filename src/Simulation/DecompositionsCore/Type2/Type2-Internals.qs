@@ -12,17 +12,17 @@ namespace Microsoft.Quantum.Intrinsic {
             R(paulis[0], -2.0 * theta, qubits[0]);
         }
         elif ( Length(paulis) == 2 ) {
-            if (paulis[0] != paulis[1] and paulis[0] != PauliI) { fail $"Type 2 Decompositions support only rotation around XX, YY, ZZ given {paulis}"; }
+            if (paulis[0] != paulis[1] or paulis[0] == PauliI) { fail $"Type 2 Decompositions support only rotation around XX, YY, ZZ given {paulis}"; }
             within {
                 CircuitUtils.MapPauli(qubits[1],paulis[0],paulis[1]);
             }
             apply {
                 if (paulis[1] == PauliX) {
-                    ApplyIsingXX(theta, qubits[0], qubits[1]);
+                    ApplyIsingXX(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[1] == PauliY) {
-                    ApplyIsingYY(theta, qubits[0], qubits[1]);
+                    ApplyIsingYY(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[1] == PauliZ) {
-                    ApplyIsingZZ(theta, qubits[0], qubits[1]);
+                    ApplyIsingZZ(theta / 2.0, qubits[0], qubits[1]);
                 } else {
                     fail "Type2 decompositions do not support PauliI";
                 }
@@ -79,11 +79,11 @@ namespace Microsoft.Quantum.Intrinsic {
             }
             apply {
                 if (paulis[0] == PauliX) {
-                    ApplyIsingXX(theta, qubits[0], qubits[1]);
+                    ApplyIsingXX(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliY) {
-                    ApplyIsingYY(theta, qubits[0], qubits[1]);
+                    ApplyIsingYY(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliZ) {
-                    ApplyIsingZZ(theta, qubits[0], qubits[1]);
+                    ApplyIsingZZ(theta / 2.0, qubits[0], qubits[1]);
                 } else {
                     fail "Type2 decompositions do not support PauliI";
                 }
@@ -104,6 +104,57 @@ namespace Microsoft.Quantum.Intrinsic {
                 }
             }
         }
+    }
+
+    /// # Summary
+    /// Applies the Ising $XX$ gate.
+    ///
+    /// TODO - describe XX gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    internal operation ApplyIsingXX(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
+        body intrinsic;
+    }
+
+    /// # Summary
+    /// Applies the Ising $YY$ gate.
+    ///
+    /// TODO - describe YY gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    internal operation ApplyIsingYY(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
+        body intrinsic;
+    }
+
+    /// # Summary
+    /// Applies the Ising $ZZ$ gate.
+    ///
+    /// TODO - describe ZZ gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    internal operation ApplyIsingZZ(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
+        body intrinsic;
     }
 
 }
