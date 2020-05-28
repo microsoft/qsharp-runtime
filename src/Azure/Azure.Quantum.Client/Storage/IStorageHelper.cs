@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Bond;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Microsoft.Azure.Quantum.Storage
@@ -20,7 +19,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="destination">The destination.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Serialization protocol of the downloaded BLOB.</returns>
-        Task<ProtocolType> DownloadBlobAsync(
+        Task DownloadBlobAsync(
             string containerName,
             string blobName,
             Stream destination,
@@ -32,14 +31,12 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="containerName">Name of the container.</param>
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="input">The input.</param>
-        /// <param name="protocol">Serialization protocol of the BLOB to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>async task.</returns>
         Task UploadBlobAsync(
             string containerName,
             string blobName,
             Stream input,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default);
 
         /// <summary>

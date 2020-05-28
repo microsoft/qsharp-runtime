@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Bond;
 using Microsoft.Azure.Quantum.Utility;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -43,7 +42,6 @@ namespace Microsoft.Azure.Quantum.Storage
         public async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
             Stream input,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
@@ -51,7 +49,6 @@ namespace Microsoft.Azure.Quantum.Storage
                 containerName,
                 Constants.Storage.InputBlobName,
                 input,
-                protocol,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
@@ -79,7 +76,6 @@ namespace Microsoft.Azure.Quantum.Storage
         public async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
             string jobId,
             Stream mapping,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
@@ -87,7 +83,6 @@ namespace Microsoft.Azure.Quantum.Storage
                 containerName,
                 Constants.Storage.MappingBlobName,
                 mapping,
-                protocol,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
@@ -111,7 +106,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="destination">The destination stream.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Serialization protocol of the downloaded execution output.</returns>
-        public Task<ProtocolType> DownloadJobOutputAsync(
+        public Task DownloadJobOutputAsync(
             string jobId,
             Stream destination,
             CancellationToken cancellationToken = default)

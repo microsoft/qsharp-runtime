@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Bond;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -36,7 +35,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="destination">The destination.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Serialization protocol of the downloaded BLOB.</returns>
-        public async Task<ProtocolType> DownloadBlobAsync(
+        public async Task DownloadBlobAsync(
             string containerName,
             string blobName,
             Stream destination,
@@ -44,7 +43,6 @@ namespace Microsoft.Azure.Quantum.Storage
         {
             BlobClient blob = await this.GetBlobClient(containerName, blobName, false, cancellationToken);
             await blob.DownloadToAsync(destination, cancellationToken);
-            return ProtocolType.COMPACT_PROTOCOL;
         }
 
         /// <summary>
@@ -60,7 +58,6 @@ namespace Microsoft.Azure.Quantum.Storage
             string containerName,
             string blobName,
             Stream input,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             BlobClient blob = await this.GetBlobClient(containerName, blobName, true, cancellationToken);
