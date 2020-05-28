@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\EntryPointDriver\EntryPointDriver.csproj" />
+    <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
   </ItemGroup>
 
   <Target Name="BeforeCsharpCompile">
@@ -36,4 +36,3 @@
   </Target>
 
 </Project>
-

@@ -95,12 +95,12 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime"
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
-            "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+            "Microsoft.Quantum.EntryPointDriver"
             "Microsoft.Quantum.QSharp.Core"
             "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
-            "Microsoft.Quantum.Simulation.Simulators"
+            "Microsoft.Quantum.Simulators"
         ]
         |> List.map (fun name -> upcast MetadataReference.CreateFromFile (referencedAssembly name))
 
