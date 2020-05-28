@@ -4,7 +4,7 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Linq;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Information about a command-line option.

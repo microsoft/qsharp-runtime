@@ -7,7 +7,7 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// The interface between the entry point and the command-line program.

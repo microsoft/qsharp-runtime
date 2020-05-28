@@ -13,9 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.

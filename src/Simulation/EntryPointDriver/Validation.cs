@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Quantum.QsCompiler.CompilationBuilder;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Represents either a success or a failure of a process.

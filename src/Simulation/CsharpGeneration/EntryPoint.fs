@@ -24,7 +24,7 @@ type private Parameter =
 let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private driverNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Provides entry point simulation.
