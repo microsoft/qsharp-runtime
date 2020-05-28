@@ -1,6 +1,6 @@
-// <copyright file="LazyAsync.cs" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
+// Licensed under the MIT License.
+//
 // Based on https://gist.github.com/johnazariah/ab269f7e005d538ed706b7a9cdb15bf1
 
 using System;
