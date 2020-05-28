@@ -25,6 +25,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="settings">The submission settings.</param>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
+        /// <returns>The exit code.</returns>
         internal static async Task<int> Submit<TIn, TOut>(
             IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, AzureSettings settings)
         {
@@ -43,50 +44,67 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
 
             var input = entryPoint.CreateArgument(parseResult);
-            if (settings.DryRun)
+            return settings.DryRun
+                ? Validate(machine, entryPoint, input)
+                : await SubmitJob(machine, entryPoint, input, settings);
+        }
+
+        /// <summary>
+        /// Submits a job to Azure Quantum.
+        /// </summary>
+        /// <param name="machine">The quantum machine target.</param>
+        /// <param name="entryPoint">The program entry point.</param>
+        /// <param name="input">The program input.</param>
+        /// <param name="settings">The submission settings.</param>
+        /// <typeparam name="TIn">The input type.</typeparam>
+        /// <typeparam name="TOut">The output type.</typeparam>
+        /// <returns>The exit code.</returns>
+        private static async Task<int> SubmitJob<TIn, TOut>(
+            IQuantumMachine machine, IEntryPoint<TIn, TOut> entryPoint, TIn input, AzureSettings settings)
+        {
+            try
             {
-                var (isValid, message) = machine.Validate(entryPoint.Info, input);
-                Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
-                if (!string.IsNullOrWhiteSpace(message))
-                {
-                    Console.WriteLine();
-                    Console.WriteLine(message);
-                }
-                return isValid ? 0 : 1;
-            }
-            else
-            {
-                try
-                {
-                    var job = await machine.SubmitAsync(
-                        entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
-                    DisplayJob(job, settings.Output);
-                }
-                catch (AzureQuantumException azureQuantumEx)
-                {
-                    DisplayWithColor(
-                        ConsoleColor.Red,
-                        Console.Error,
-                        "Something went wrong when submitting the program to the Azure Quantum service.");
-
-                    Console.Error.WriteLine();
-                    Console.Error.WriteLine(azureQuantumEx.Message);
-                    return 1;
-                }
-                catch (QuantumProcessorTranslationException translationEx)
-                {
-                    DisplayWithColor(
-                        ConsoleColor.Red,
-                        Console.Error,
-                        "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.");
-
-                    Console.Error.WriteLine();
-                    Console.Error.WriteLine(translationEx.Message);
-                    return 1;
-                }
-
+                var job = await machine.SubmitAsync(
+                    entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
+                DisplayJob(job, settings.Output);
                 return 0;
             }
+            catch (AzureQuantumException ex)
+            {
+                DisplayError(
+                    "Something went wrong when submitting the program to the Azure Quantum service.", 
+                    ex.Message);
+                return 1;
+            }
+            catch (QuantumProcessorTranslationException ex)
+            {
+                DisplayError(
+                    "Something went wrong when performing translation to the intermediate representation used by the " +
+                    "target quantum machine.",
+                    ex.Message);
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Validates the program for the quantum machine target.
+        /// </summary>
+        /// <param name="machine">The quantum machine target.</param>
+        /// <param name="entryPoint">The program entry point.</param>
+        /// <param name="input">The program input.</param>
+        /// <typeparam name="TIn">The input type.</typeparam>
+        /// <typeparam name="TOut">The output type.</typeparam>
+        /// <returns>The exit code.</returns>
+        private static int Validate<TIn, TOut>(IQuantumMachine machine, IEntryPoint<TIn, TOut> entryPoint, TIn input)
+        {
+            var (isValid, message) = machine.Validate(entryPoint.Info, input);
+            Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine();
+                Console.WriteLine(message);
+            }
+            return isValid ? 0 : 1;
         }
 
         /// <summary>
@@ -111,6 +129,18 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 default:
                     throw new ArgumentOutOfRangeException($"Invalid output format '{format}'.");
             }
+        }
+
+        /// <summary>
+        /// Displays an error to the console.
+        /// </summary>
+        /// <param name="summary">A summary of the error.</param>
+        /// <param name="message">The full error message.</param>
+        private static void DisplayError(string summary, string message)
+        {
+            DisplayWithColor(ConsoleColor.Red, Console.Error, summary);
+            Console.Error.WriteLine();
+            Console.Error.WriteLine(message);
         }
 
         /// <summary>

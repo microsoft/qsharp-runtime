@@ -610,6 +610,14 @@ let ``Submit has required options`` () =
                         00000000-0000-0000-0000-0000000000000"
            else fails
 
+[<Fact>]
+let ``Submit catches exceptions`` () =
+    let given = test 1
+    given submitWithErrorTarget
+    |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
+
+                  This quantum machine always has an error."
+
 
 // Help
 
