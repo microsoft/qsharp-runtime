@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <RootNamespace>Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

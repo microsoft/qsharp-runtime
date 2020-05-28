@@ -34,7 +34,7 @@ function Test-One {
 
 Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
 
-Test-One '../src/Simulation/EntryPointDriver.Tests/Tests.EntryPointDriver.fsproj'
+Test-One '../src/Simulation/EntryPointDriver.Tests/Microsoft.Quantum.EntryPointDriver.Tests.fsproj'
 
 Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
@@ -42,8 +42,6 @@ Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simul
 
 Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
 
-if (-not $all_ok) 
-{
+if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
 }
-
