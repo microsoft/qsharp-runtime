@@ -40,7 +40,7 @@ Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
 Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
 
-Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
+Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulators.csproj'
 
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
