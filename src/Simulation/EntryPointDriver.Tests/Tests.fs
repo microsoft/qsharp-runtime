@@ -100,7 +100,7 @@ let private compileCsharp (sources : string seq) =
             "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
-            "Microsoft.Quantum.Simulators"
+            "Microsoft.Quantum.Simulation.Simulators"
         ]
         |> List.map (fun name -> upcast MetadataReference.CreateFromFile (referencedAssembly name))
 
