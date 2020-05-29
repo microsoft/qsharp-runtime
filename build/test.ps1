@@ -42,6 +42,8 @@ Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simul
 
 Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulators.csproj'
 
+Test-One '../src/Azure/Azure.Quantum.Client.Test/Microsoft.Azure.Quantum.Client.Test.csproj'
+
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
 }
