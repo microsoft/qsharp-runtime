@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\..\Azure\Azure.Quantum.Client\Microsoft.Azure.Quantum.Client.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
 </Project>
