@@ -34,7 +34,7 @@ function Test-One {
 
 Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
 
-Test-One '../src/Simulation/EntryPointDriver.Tests/Microsoft.Quantum.EntryPointDriver.Tests.fsproj'
+Test-One '../src/Simulation/EntryPointDriver.Tests/Tests.Microsoft.Quantum.EntryPointDriver.fsproj'
 
 Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
 
