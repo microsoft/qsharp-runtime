@@ -93,6 +93,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         void CheckQubit(Qubit q1)
         {
             if (q1 == null) throw new ArgumentNullException(nameof(q1), "Trying to perform a primitive operation on a null Qubit");
+            q1.IsMeasured = false;
         }
 
         /// <summary>
@@ -105,12 +106,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             bool[] used = new bool[((QSimQubitManager)QubitManager).MaxId];
 
             CheckQubitInUse(q1, used);
+            q1.IsMeasured = false;
 
             if (ctrls != null && ctrls.Length > 0)
             {
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    q.IsMeasured = false;
                 }
             }
 
@@ -133,6 +136,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             foreach (var q in targets)
             {
                 CheckQubitInUse(q, used);
+                q.IsMeasured = false;
             }
 
             return used;
@@ -152,6 +156,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    q.IsMeasured = false;
                 }
             }
 

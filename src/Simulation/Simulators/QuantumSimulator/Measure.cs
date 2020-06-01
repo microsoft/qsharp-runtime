@@ -27,12 +27,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 var (paulis, qubits) = _args;
 
                 Simulator.CheckQubits(qubits);
-
                 if (paulis.Length != qubits.Length)
                 {
                     throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
                 }
-
+                foreach (Qubit q in qubits)
+                {
+                    q.IsMeasured = true;
+                }
                 return Measure(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult();
             };
         }
