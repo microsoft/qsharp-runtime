@@ -55,17 +55,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return true;
             }
 
-            bool equal = true;
             for (int i = 0; i < measurementResults.Count; i++)
             {
                 if (measurementResults[i] != comparisonResults[i])
                 {
-                    equal = false;
-                    break;
+                    return false;
                 }
             }
 
-            return equal;
+            return true;
         }
 
         private static OperationFunctor AdjustForNoControls(OperationFunctor type, IQArray<Qubit>? ctrls)
