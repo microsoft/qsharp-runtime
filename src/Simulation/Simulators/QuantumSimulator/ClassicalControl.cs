@@ -10,6 +10,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
     {
         #region Static Methods
 
+        /// <summary>
+        /// Runs the given functor of the given operation with the given control qubits.
+        /// </summary>
         private static void RunClause(ICallable op, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
             switch (type)
@@ -21,6 +24,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
+        /// <summary>
+        /// This is a wrapper for an if-statement that will run either onZero if the
+        /// given measurement result is Zero, or onOne otherwise.
+        /// </summary>
         private static QVoid ExecuteConditionalStatement(Result measurementResult, ICallable onZero, ICallable onOne, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
             if (measurementResult == Result.Zero)
@@ -34,6 +41,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         }
 
+        /// <summary>
+        /// This is a wrapper for an if-statement that will run either onEqualOp if the
+        /// given measurement result are pairwise-equal to the given comparison results,
+        /// or onNonEqualOp otherwise. Pairwise-equality between the qubit arrays is
+        /// determined by the AreEqual static method.
+        /// </summary>
         private static QVoid ExecuteConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
             if (AreEqual(measurementResults, comparisonResults))
@@ -47,6 +60,17 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         }
 
+        /// <summary>
+        /// Determines if the given measurement results are pairwise-equal with the given comparison results.
+        /// Pairwise-equality is where each element of the first array is equal to its corresponding element
+        /// in the second array. For example:
+        /// measurementResults[0] == comparisonResults[0] AND measurementResults[1] == comparisonResults[1] AND ...
+        /// All pairwise comparisons must result in equality for the two arrays to be pairwise-equal.
+        ///
+        /// If either array is null or their lengths are unequal, this defaults to returning 'true'. This
+        /// is done to be consistent with the logic found in QuantumProcessorBase.cs under the
+        /// StartConditionalStatement method.
+        /// </summary>
         private static bool AreEqual(IQArray<Result> measurementResults, IQArray<Result> comparisonResults)
         {
             if (measurementResults == null || comparisonResults == null || measurementResults.Count != comparisonResults.Count)
@@ -66,6 +90,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return true;
         }
 
+        /// <summary>
+        /// If a controlled functor is being used with no controls, this will change it
+        /// to the appropriate non-controlled functor. Otherwise, the given functor is returned.
+        /// </summary>
         private static OperationFunctor AdjustForNoControls(OperationFunctor type, IQArray<Qubit>? ctrls)
         {
             if (ctrls == null || ctrls.Count == 0)
@@ -85,7 +113,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         #region ApplyIfElse
 
-        public class QSimApplyIfElse : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsic
+        public class QSimApplyIfElse : QuantumProcessor.Extensions.ApplyIfElseIntrinsic
         {
             private QuantumSimulator Simulator { get; }
 
@@ -101,7 +129,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicA
+        public class QSimApplyIfElseA : QuantumProcessor.Extensions.ApplyIfElseIntrinsicA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -123,7 +151,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseC : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicC
+        public class QSimApplyIfElseC : QuantumProcessor.Extensions.ApplyIfElseIntrinsicC
         {
             private QuantumSimulator Simulator { get; }
 
@@ -146,7 +174,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyIfElseCA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicCA
+        public class QSimApplyIfElseCA : QuantumProcessor.Extensions.ApplyIfElseIntrinsicCA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -186,7 +214,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         #region ApplyConditionally
 
-        public class QSimApplyConditionally : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsic
+        public class QSimApplyConditionally : QuantumProcessor.Extensions.ApplyConditionallyIntrinsic
         {
             private QuantumSimulator Simulator { get; }
 
@@ -202,7 +230,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicA
+        public class QSimApplyConditionallyA : QuantumProcessor.Extensions.ApplyConditionallyIntrinsicA
         {
             private QuantumSimulator Simulator { get; }
 
@@ -224,7 +252,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyC : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicC
+        public class QSimApplyConditionallyC : QuantumProcessor.Extensions.ApplyConditionallyIntrinsicC
         {
             private QuantumSimulator Simulator { get; }
 
@@ -247,7 +275,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimApplyConditionallyCA : Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicCA
+        public class QSimApplyConditionallyCA : QuantumProcessor.Extensions.ApplyConditionallyIntrinsicCA
         {
             private QuantumSimulator Simulator { get; }
 

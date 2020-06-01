@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
+namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: update namespace to a more appropriate name
 {
     open Microsoft.Quantum.Intrinsic;
 
