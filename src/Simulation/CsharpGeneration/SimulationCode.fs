@@ -932,9 +932,9 @@ module SimulationCode =
     let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
         let propertyType = 
             match globalContext.ExecutionTarget with
-            | target when target = AssemblyConstants.AlfredProcessor     -> sprintf "AlfredEntryPointInfo<%s, %s>"     operationInput operationOutput
-            | target when target = AssemblyConstants.BrunoProcessor      -> sprintf "BrunoEntryPointInfo<%s, %s>"      operationInput operationOutput
-            | target when target = AssemblyConstants.ClementineProcessor -> sprintf "ClementineEntryPointInfo<%s, %s>" operationInput operationOutput
+            | target when target = AssemblyConstants.HoneywellProcessor -> sprintf "HoneywellEntryPointInfo<%s, %s>" operationInput operationOutput
+            | target when target = AssemblyConstants.IonQProcessor      -> sprintf "IonQEntryPointInfo<%s, %s>"      operationInput operationOutput
+            | target when target = AssemblyConstants.QCIProcessor       -> sprintf "QCIEntryPointInfo<%s, %s>"       operationInput operationOutput
             | _                    -> sprintf "EntryPointInfo<%s, %s>"      operationInput operationOutput
         let operationType = simpleBase operationName
         let newInstanceArgs = [``invoke`` (``ident`` "typeof") ``(`` [operationType.Type] ``)``]
@@ -1046,6 +1046,22 @@ module SimulationCode =
         args
         |> flatOne [] 
 
+    /// Maps the name and type of each named item in the argument tuple.
+    let internal mapArgumentTuple mapping context arguments (argumentType : ResolvedType) =
+        let rec buildTuple = function
+            | QsTupleItem one ->
+                match one.VariableName with
+                | ValidName n -> mapping (n.Value, roslynTypeName context one.Type) :> ExpressionSyntax
+                | InvalidName -> mapping ("", roslynTypeName context one.Type) :> ExpressionSyntax
+            | QsTuple many ->
+                many |> Seq.map buildTuple |> List.ofSeq |> ``tuple``
+        if isTuple argumentType.Resolution
+        then buildTuple arguments
+        else match flatArgumentsList context arguments with 
+             | [] -> ``ident`` "QVoid" <|.|> ``ident`` "Instance"
+             | [name, typeName] -> mapping (name, typeName) :> ExpressionSyntax
+             | flatArgs -> flatArgs |> List.map mapping |> ``tuple``
+
     let buildRun context className arguments argumentType returnType : MemberDeclarationSyntax =
         let inType =  roslynTypeName context argumentType 
         let outType = roslynTypeName context returnType
@@ -1053,24 +1069,9 @@ module SimulationCode =
         let task = sprintf "System.Threading.Tasks.Task<%s>" outType
         let flatArgs = arguments |> flatArgumentsList context
         let opFactoryTypes =  [ className; inType; outType ]
-
-        let runArgs = 
-            if (isTuple argumentType.Resolution) then 
-                let rec buildTuple = function
-                    | QsTupleItem one ->
-                        match one.VariableName with
-                        | ValidName n -> ``ident`` n.Value  :> ExpressionSyntax
-                        | InvalidName -> ``ident`` ""       :> ExpressionSyntax
-                    | QsTuple many ->       
-                        many |> Seq.map buildTuple |> List.ofSeq |> ``tuple``
-                buildTuple arguments
-            else
-                match flatArgs with 
-                | []        -> (``ident`` "QVoid") <|.|> (``ident`` "Instance")
-                | [(id, _)] -> ``ident`` id :> ExpressionSyntax
-                | _         -> flatArgs |> List.map (fst >> ``ident``)  |> ``tuple``
        
         let uniqueArgName = "__m__"
+        let runArgs = mapArgumentTuple (fst >> ``ident``) context arguments argumentType
         let body = 
             [ 
                 ``return`` (Some ((``ident`` uniqueArgName) <.> (``generic`` "Run" ``<<`` opFactoryTypes ``>>``, [ runArgs ])))

@@ -8,9 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\EntryPoint\Driver.cs" />
-    <EmbeddedResource Include="Resources\EntryPoint\Parsers.cs" />
-    <EmbeddedResource Include="Resources\EntryPoint\Validation.cs" />
     <Compile Include="..\Common\DelaySign.fs" Link="DelaySign.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="SimulationCode.fs" />
@@ -24,11 +21,10 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2004.1717-alpha" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.10.2005.2604-alpha" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj" />
   </ItemGroup>
-
 </Project>
