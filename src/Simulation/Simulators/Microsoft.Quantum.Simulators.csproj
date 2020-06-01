@@ -7,7 +7,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
-    <AssemblyName>Microsoft.Quantum.Simulation.Simulators</AssemblyName>
     <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
   </PropertyGroup>
 
