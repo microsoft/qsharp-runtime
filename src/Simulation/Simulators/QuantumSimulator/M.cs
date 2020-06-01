@@ -27,9 +27,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override Func<Qubit, Result> Body => (q) =>
             {
                 Simulator.CheckQubit(q);
+                //setting qubit as measured to allow for release
                 q.IsMeasured = true;
-                //MeasurableQubit qubit = (MeasurableQubit)q;
-                //qubit.IsMeasured = true;
                 return M(Simulator.Id, (uint)q.Id).ToResult();
             };
         }

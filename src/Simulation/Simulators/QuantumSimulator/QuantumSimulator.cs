@@ -93,6 +93,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         void CheckQubit(Qubit q1)
         {
             if (q1 == null) throw new ArgumentNullException(nameof(q1), "Trying to perform a primitive operation on a null Qubit");
+            //setting qubit as not measured to not allow release in case of gate operation on qubit
             q1.IsMeasured = false;
         }
 
@@ -113,6 +114,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    //setting qubit as not measured to not allow release in case of gate operation on qubit
                     q.IsMeasured = false;
                 }
             }
@@ -136,6 +138,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             foreach (var q in targets)
             {
                 CheckQubitInUse(q, used);
+                //setting qubit as not measured to not allow release in case of gate operation on qubit
                 q.IsMeasured = false;
             }
 
@@ -156,6 +159,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    //setting qubit as not measured to not allow release in case of gate operation on qubit
                     q.IsMeasured = false;
                 }
             }

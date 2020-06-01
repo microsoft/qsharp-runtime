@@ -14,6 +14,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     public partial class QuantumSimulatorTests
     {
+        //test to check that qubit cannot be released if it is not in zero state
         [Fact]
         public async Task ZeroStateQubitReleaseTest()
         {
@@ -22,6 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
         }
 
+        //test to check that qubit can be released if measured
         [Fact]
         public async Task MeasuredQubitReleaseTest()
         {
