@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     /// ## axis
     /// Pauli matrix, P
     /// ## angle
-    /// Rotation algle, φ
+    /// Rotation angle, φ
     /// ## target
     /// the qubit operation is acting on
     operation Interface_R (axis : Pauli, angle : Double, target : Qubit) : Unit {
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     /// 
     /// # Remarks
     /// The list of id's corresponding to Cliffords is given by:
-    /// Idenity - 0
+    /// Identity - 0
     /// H - 1
     /// S - 2
     /// H followed by S ( as circuit ) - 3
@@ -79,5 +79,3 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     }
     
 }
-
-
