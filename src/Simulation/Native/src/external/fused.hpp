@@ -27,6 +27,7 @@ namespace Quantum
 {
     extern int dbgFusedSpan;
     extern int dbgFusedLimit;
+    extern int dbgNumThreads;
 
 namespace SIMULATOR
 {
@@ -208,6 +209,7 @@ class Fused
                 if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
                 int nProcs = omp_get_num_procs();
                 if (nProcs < 3) nMaxThrds = nProcs;
+                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG allow for debugging from aboe
                 omp_set_num_threads(nMaxThrds);
             }
 

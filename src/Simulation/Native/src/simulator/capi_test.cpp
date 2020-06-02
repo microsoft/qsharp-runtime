@@ -437,38 +437,29 @@ int main()
 
 #if 1 // Simulator timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
-    char* envNT = NULL;
-    size_t len;
-#ifdef _MSC_VER
-    errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
-#else
-    envNT = getenv("OMP_NUM_THREADS");
-#endif
     int fuseLimits[] = {0,1,2,5,10,50,100};
-    for (int fuseSpan = 4; fuseSpan < 5; fuseSpan++) { // 1,5
-        for (int flIdx = 6; flIdx < 7; flIdx++) { // 0,7
-            for (int numThreads = 1; numThreads < 2; numThreads++) { // 1,5
-                for (int simTyp = 1; simTyp < 2; simTyp++) { // 1,4
+    for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
+        for (int flIdx = 6; flIdx < 7; flIdx++) { // 6,7
+            for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
+                for (int simTyp = 1; simTyp < 4; simTyp++) { // 1,4
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                     if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
-                    if (envNT == NULL) omp_set_num_threads(numThreads);
-                    auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx]);
+                    auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx],numThreads);
 
-                    const int nQs = 15;
+                    const int nQs = 26;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                     for (int i = 0; i < 1000000; i++) {
-                        for (int dir = 0; dir < 2; dir++) {
-                            for (int k = 0; k < 5; k++) {
-                                unsigned c = k;
-                                if (dir == 1) c = (nQs - 1) - k;
-                                for (int j = 0; j < 5; j++) {
-                                    if (k == 0) H(sim_id, c);
-                                    else        MCX(sim_id, 1, &c, c - 1);
-                                }
-                            }
+                        for (int k = 0; k < nQs; k++) {
+                            unsigned c = k - 1;
+                            if (k > 0) 
+                                for (int j=0; j < 5; j++) 
+                                    MCX(sim_id, 1, &c, k);
+                            if (k % 5 == 0)
+                                for (int j=0; j < 5; j++)
+                                    H(sim_id, k);
                         }
 
                         std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
@@ -478,7 +469,6 @@ int main()
 
                     destroy(sim_id);
                 }
-                if (envNT != NULL) break;
             }
         }
     }

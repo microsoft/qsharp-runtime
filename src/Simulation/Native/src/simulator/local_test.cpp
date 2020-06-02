@@ -13,6 +13,7 @@ namespace Microsoft {
     namespace Quantum {
         int dbgFusedSpan = 4; //@@@DBG
         int dbgFusedLimit = 99;
+        int dbgNumThreads = 0;
     }
 }
 void test_exp()

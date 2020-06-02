@@ -4,27 +4,27 @@ import sys
 logName = sys.argv[1]
 reFN    = re.compile(r"[./\\]*(\w+)_(\d+)\.")
 reSim   = re.compile(' (Generic|AVX|AVX2)$')
-rePars  = re.compile(r'OMP_NUM_THREADS=(\d) fusedSpan=(\d) fusedLimit=(\d+)')
+rePars  = re.compile(r'OMP_NUM_THREADS=(\d) fusedSpan=(\d) fusedDepth=(\d+) wfnCapacity=(\d+)')
 reInfo  = re.compile(r'sz=([.\d]+) nQs=([.\d]+) nCs=([.\d]+) flushes= *(\d+).*gates= *(\d+).*elap= *(\d+).*gps= *([.\d]+).*fus= *([.\d]+).*ker= *([.\d]+)')
 found   = reFN.search(logName)
 env     = found.group(1)
 qs      = found.group(2)
 fp      = open(logName,'r')
 gpss    = []
-print(f'"env","sim","qs","threads","span","sz","nQs+nCs","gps"')
+print(f'"env","sim","qs","threads","span","sz","gps"')
 while True:
     inp = fp.readline()
     if inp == "": 
         if len(gpss) > 0:
             gps = max(gpss)
-            print(f"{env},{sim},{qs},{threads},{span},{sz},{nQs+nCs:.2f},{gps:.1f}")
+            print(f"{env},{sim},{qs},{threads},{span},{sz},{gps:.1f}")
             gpss = []
         break
     found   = reSim.search(inp)
     if found:
         if len(gpss) > 0:
             gps = max(gpss)
-            print(f"{env},{sim},{qs},{threads},{span},{sz},{nQs+nCs:.2f},{gps:.1f}")
+            print(f"{env},{sim},{qs},{threads},{span},{sz},{gps:.1f}")
             gpss = []
         sim     = found.group(1)
         continue
@@ -33,6 +33,7 @@ while True:
         threads     = found.group(1)
         span        = found.group(2)
         limit       = found.group(3)
+        wfnSiz      = found.group(4)
         continue
     found   = reInfo.search(inp)
     if found:
