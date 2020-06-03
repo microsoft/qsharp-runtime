@@ -64,8 +64,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         {
             try
             {
-                var job = await machine.SubmitAsync(
-                    entryPoint.Info, input, new SubmissionContext { Shots = settings.Shots });
+                var job = await machine.SubmitAsync(entryPoint.Info, input, new SubmissionContext
+                {
+                    FriendlyName = settings.JobName,
+                    Shots = settings.Shots
+                });
                 DisplayJob(job, settings.Output);
                 return 0;
             }
@@ -223,6 +226,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public Uri? BaseUri { get; set; }
 
         /// <summary>
+        /// The name of the submitted job.
+        /// </summary>
+        public string? JobName { get; set; }
+
+        /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
@@ -260,6 +268,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 $"Workspace: {Workspace}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
+                $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
                 $"Dry Run: {DryRun}",

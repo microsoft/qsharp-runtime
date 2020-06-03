@@ -556,6 +556,7 @@ let ``Submit uses default values`` () =
                Workspace: myWorkspace
                AAD Token:
                Base URI:
+               Job Name:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -566,7 +567,17 @@ let ``Submit uses default values`` () =
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test 1
-    given (submitWithNothingTarget @ ["--verbose"; "--aad-token"; "myToken"; "--base-uri"; "myBaseUri"; "--shots"; "750"])
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--aad-token"
+        "myToken"
+        "--base-uri"
+        "myBaseUri"
+        "--job-name"
+        "myJobName"
+        "--shots"
+        "750"
+    ])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: test.nothing
                Storage: myStorage
@@ -575,6 +586,7 @@ let ``Submit allows overriding default values`` () =
                Workspace: myWorkspace
                AAD Token: myToken
                Base URI: myBaseUri
+               Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -680,8 +692,9 @@ let ``Shows help text for submit command`` () =
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
-                      --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
+                      --job-name <job-name>                               The name of the submitted job.
                       --shots <shots>                                     The number of times the program is executed on the target machine.
+                      --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
                       -n <n> (REQUIRED)                                   A number.
