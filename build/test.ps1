@@ -32,17 +32,7 @@ function Test-One {
     }
 }
 
-Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
-
-Test-One '../src/Simulation/EntryPointDriver.Tests/Tests.Microsoft.Quantum.EntryPointDriver.fsproj'
-
-Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
-
-Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
-
-Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulators.csproj'
-
-Test-One '../src/Azure/Azure.Quantum.Client.Test/Microsoft.Azure.Quantum.Client.Test.csproj'
+Test-One '../Simulation.sln'
 
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."

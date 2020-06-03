@@ -84,8 +84,9 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, WorkspaceOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
-            AddOptionIfAvailable(submit, OutputOption);
+            AddOptionIfAvailable(submit, JobNameOption);
             AddOptionIfAvailable(submit, ShotsOption);
+            AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
 
@@ -135,6 +136,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Workspace = settings.Workspace,
                 AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
+                JobName = DefaultIfShadowed(JobNameOption, settings.JobName),
                 Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
                 Output = DefaultIfShadowed(OutputOption, settings.Output),
                 DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun),
@@ -242,6 +244,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
             new[] { "--base-uri" }, default, "The base URI of the Azure Quantum endpoint.");
 
+        /// <summary>
+        /// The job name option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
+            new[] { "--job-name" }, default, "The name of the submitted job.");
+        
         /// <summary>
         /// The shots option.
         /// </summary>
