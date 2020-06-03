@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the Pauli $X$ gate.
@@ -17,6 +18,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.X")
     operation X(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
@@ -36,6 +38,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.Y")
     operation Y(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
@@ -55,6 +58,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.Z")
     operation Z(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
@@ -75,6 +79,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.H")
     operation H(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
@@ -94,6 +99,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.S")
     operation S(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }
@@ -113,6 +119,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.T")
     operation T(qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }
@@ -138,6 +145,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// First qubit to be swapped.
     /// ## qubit2
     /// Second qubit to be swapped.
+    @EnableTestingViaName("Test.Decompositions.SWAP")
     operation SWAP(qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;
@@ -165,6 +173,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// When called with `pauli = PauliI`, this operation applies
     /// a *global phase*. This phase can be significant
     /// when used with the `Controlled` functor.
+    @EnableTestingViaName("Test.Decompositions.R")
     operation R(pauli : Pauli, theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }
@@ -188,6 +197,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Output
     /// `Zero` if the $+1$ eigenvalue is observed, and `One` if
     /// the $-1$ eigenvalue is observed.
+    @EnableTestingViaName("Test.Decompositions.M")
     operation M(qubit : Qubit) : Result {
         body intrinsic;
     }
@@ -199,7 +209,62 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
+    @EnableTestingViaName("Test.Decompositions.Reset")
     operation Reset(qubit : Qubit) : Unit {
+        body intrinsic;
+    }
+
+    /// # Summary
+    /// Applies the Ising $XX$ gate.
+    ///
+    /// TODO - describe XX gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    @EnableTestingViaName("Test.Decompositions.IsingXX")
+    operation IsingXX(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
+        body intrinsic;
+    }
+
+    /// # Summary
+    /// Applies the Ising $YY$ gate.
+    ///
+    /// TODO - describe YY gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    @EnableTestingViaName("Test.Decompositions.IsingYY")
+    operation IsingYY(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
+        body intrinsic;
+    }
+
+    /// # Summary
+    /// Applies the Ising $ZZ$ gate.
+    ///
+    /// TODO - describe ZZ gate.
+    ///
+    /// # Input
+    /// ## theta
+    /// The angle about which the qubits are rotated.
+    /// ## qubit0
+    /// The first qubit input to the gate.
+    /// ## qubit1
+    /// The second qubit input to the gate.
+    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
+    @EnableTestingViaName("Test.Decompositions.IsingZZ")
+    operation IsingZZ(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
         body intrinsic;
     }
 

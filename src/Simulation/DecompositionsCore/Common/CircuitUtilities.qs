@@ -1,9 +1,10 @@
-namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
-    open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Targeting.Decompositions.Utilities as Utils;
+namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Decompositions.Utilities as Utils;
+    open Microsoft.Quantum.Diagnostics;
 
     /// Applies a unitary operation such that
     /// `SpreadZ(...); Exp([PauliZ],theta,[from]) ; Adjoint SpreadZ(...);` is equivalent to `Exp([PauliZ,..,PauliZ],theta,[from] + to)`
+    @EnableTestingViaName("Test.Decompositions.SpreadZ")
     internal operation SpreadZ(from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
             CNOT(to[0], from);
@@ -17,6 +18,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
 
     /// Applies a unitary operation such that
     /// `MapPauli(...); R(from,...) ; Adjoint MapPauli(...);` is equivalent to `R(to,...)`
+    @EnableTestingViaName("Test.Decompositions.MapPauli")
     internal operation MapPauli(qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
         if (from == to) {
         }
@@ -48,6 +50,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
     /// almostCCX(c1,c2,t); U(c1,c2) must be equivalent to CCX(c1,c2,t) for some two-qubit unitary operation U(c1,c2) given target qubit starts 
     /// in zero state, ( for Adjoint it is asserted that target qubit is returned to zero state)
+    @EnableTestingViaName("Test.Decompositions.ApplyWithLessControlsA")
     internal operation ApplyWithLessControlsA<'T>(op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T), almostCCX : ((Qubit,Qubit,Qubit) => Unit is Adj)) : Unit is Adj {
         let numControls = Length(controls);
         let numControlPairs = numControls / 2;
@@ -65,6 +68,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
 
     /// almostCCX(c1,c2,t); U(c1,c2) must be equivalent to CCX(c1,c2,t) for some two-qubit unitary operation U(c1,c2) given target qubit starts 
     /// in zero state, ( for Adjoint it is asserted that target qubit is returned to zero state)
+    @EnableTestingViaName("Test.Decompositions.ApplyUsingSinglyControlledVersion")
     internal operation ApplyUsingSinglyControlledVersion<'T>(op : ('T => Unit is Adj), controlledOp : ((Qubit,'T) => Unit is Adj), arg : 'T , almostCCX : ((Qubit,Qubit,Qubit) => Unit is Adj)) : Unit is Adj + Ctl {
         body(...) {
             op(arg);
@@ -80,6 +84,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
         }
     }
 
+    @EnableTestingViaName("Test.Decompositions.DispatchR1Frac")
     internal operation DispatchR1Frac(numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
         if (power >= 0 ) { // when power is negative the operations is (1,exp(i pi*2^|n|*k)) and exp(i pi*2^|n|*k) = 1
             let (kModPositive,n) = Utils.ReducedDyadicFractionPeriodic(numerator,power); // k is odd, or (k,n) are both 0
@@ -107,6 +112,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
         }
     }
 
+    @EnableTestingViaName("Test.Decompositions.ApplyGlobalPhaseWithR1")
     internal operation ApplyGlobalPhaseWithR1(theta : Double) : Unit is Adj + Ctl {
         body(...) {}
         controlled(ctrls, ... ) {
@@ -117,6 +123,7 @@ namespace Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit {
         }
     }
 
+    @EnableTestingViaName("Test.Decompositions.ApplyGlobalPhaseFracWithR1Frac")
     internal operation ApplyGlobalPhaseFracWithR1Frac(numerator : Int, power : Int) : Unit is Adj + Ctl {
         body(...) {}
         controlled(ctrls, ... ) {

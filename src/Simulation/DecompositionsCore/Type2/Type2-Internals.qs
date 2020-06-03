@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Targeting.Decompositions as CoreDecomp;
-    open Microsoft.Quantum.Targeting.Decompositions.Utilities as Utils;
-    open Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit as CircuitUtils;
+    open Microsoft.Quantum.Decompositions.Utilities as Utils;
+    open Microsoft.Quantum.Diagnostics;
 
+    @EnableTestingViaName("Test.Decompositions.ExpNoId")
     internal operation ExpNoId(paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Ctl {
         if (Length(paulis) != Length(qubits)) { fail "Arrays 'paulis' and 'qubits' must have the same length"; }
         if (Length(paulis) == 1) {
@@ -14,15 +14,15 @@ namespace Microsoft.Quantum.Intrinsic {
         elif ( Length(paulis) == 2 ) {
             if (paulis[0] != paulis[1] or paulis[0] == PauliI) { fail $"Type 2 Decompositions support only rotation around XX, YY, ZZ given {paulis}"; }
             within {
-                CircuitUtils.MapPauli(qubits[1],paulis[0],paulis[1]);
+                MapPauli(qubits[1],paulis[0],paulis[1]);
             }
             apply {
                 if (paulis[1] == PauliX) {
-                    ApplyIsingXX(theta / 2.0, qubits[0], qubits[1]);
+                    IsingXX(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[1] == PauliY) {
-                    ApplyIsingYY(theta / 2.0, qubits[0], qubits[1]);
+                    IsingYY(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[1] == PauliZ) {
-                    ApplyIsingZZ(theta / 2.0, qubits[0], qubits[1]);
+                    IsingZZ(theta / 2.0, qubits[0], qubits[1]);
                 } else {
                     fail "Type2 decompositions do not support PauliI";
                 }
@@ -31,12 +31,12 @@ namespace Microsoft.Quantum.Intrinsic {
         else { // Length(paulis) > 2 
             within {
                 for (i in 0 .. Length(paulis) - 1) {
-                    CircuitUtils.MapPauli(qubits[i],PauliZ,paulis[i]);
+                    MapPauli(qubits[i],PauliZ,paulis[i]);
                 }
             }
             apply {
                 within {
-                    CircuitUtils.SpreadZ(qubits[1], qubits[ 2 .. Length(qubits) - 1]);
+                    SpreadZ(qubits[1], qubits[ 2 .. Length(qubits) - 1]);
                 }
                 apply {
                     ExpNoId([PauliZ,PauliZ], theta, [qubits[0], qubits[1]]);
@@ -45,6 +45,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.Decompositions.ApplyGlobalPhase")
     internal operation ApplyGlobalPhase(theta : Double) : Unit is Ctl + Adj {
         body(...) {}
         controlled(controls, (...)) {
@@ -58,11 +59,13 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.Decompositions.TS")
     internal operation TS(target : Qubit) : Unit is Adj + Ctl {
         T(target);
         S(target);
     }
 
+    @EnableTestingViaName("Test.Decompositions.ExpNoIdFrac")
     internal operation ExpNoIdFrac(paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Ctl {
         if (Length(paulis) != Length(qubits)) { fail "Arrays 'paulis' and 'qubits' must have the same length"; }
 
@@ -75,15 +78,15 @@ namespace Microsoft.Quantum.Intrinsic {
         }
         elif (Length(paulis) == 2) {
             within {
-                CircuitUtils.MapPauli(qubits[1], paulis[0], paulis[1]);
+                MapPauli(qubits[1], paulis[0], paulis[1]);
             }
             apply {
                 if (paulis[0] == PauliX) {
-                    ApplyIsingXX(theta / 2.0, qubits[0], qubits[1]);
+                    IsingXX(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliY) {
-                    ApplyIsingYY(theta / 2.0, qubits[0], qubits[1]);
+                    IsingYY(theta / 2.0, qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliZ) {
-                    ApplyIsingZZ(theta / 2.0, qubits[0], qubits[1]);
+                    IsingZZ(theta / 2.0, qubits[0], qubits[1]);
                 } else {
                     fail "Type2 decompositions do not support PauliI";
                 }
@@ -92,69 +95,18 @@ namespace Microsoft.Quantum.Intrinsic {
         else { // Length(paulis) > 2 
             within {
                 for (i in 0 .. Length(paulis) - 1) {
-                    CircuitUtils.MapPauli(qubits[i], PauliZ, paulis[i]);
+                    MapPauli(qubits[i], PauliZ, paulis[i]);
                 }
             }
             apply {
                 within {
-                    CircuitUtils.SpreadZ(qubits[1], qubits[2 .. Length(qubits) - 1]);
+                    SpreadZ(qubits[1], qubits[2 .. Length(qubits) - 1]);
                 }
                 apply {
                     ExpNoId([PauliZ,PauliZ], theta, [qubits[0], qubits[1]]);
                 }
             }
         }
-    }
-
-    /// # Summary
-    /// Applies the Ising $XX$ gate.
-    ///
-    /// TODO - describe XX gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingXX(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
-    }
-
-    /// # Summary
-    /// Applies the Ising $YY$ gate.
-    ///
-    /// TODO - describe YY gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingYY(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
-    }
-
-    /// # Summary
-    /// Applies the Ising $ZZ$ gate.
-    ///
-    /// TODO - describe ZZ gate.
-    ///
-    /// # Input
-    /// ## theta
-    /// The angle about which the qubits are rotated.
-    /// ## qubit0
-    /// The first qubit input to the gate.
-    /// ## qubit1
-    /// The second qubit input to the gate.
-    /// NOTE: If made public, consider a more concise name to match other quantum gate equivalent operations.
-    internal operation ApplyIsingZZ(theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
-        body intrinsic;
     }
 
 }

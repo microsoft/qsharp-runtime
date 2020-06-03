@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Targeting.Decompositions as CoreDecomp;
-    open Microsoft.Quantum.Targeting.Decompositions.Utilities as Utils;
-    open Microsoft.Quantum.Targeting.Decompositions.Utilities.Circuit as CircuitUtils;
+    open Microsoft.Quantum.Decompositions.Utilities as Utils;
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Performs the identity operation (no-op) on a single qubit.
@@ -12,6 +11,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// This is a no-op. It is provided for completeness and because
     /// sometimes it is useful to call the identity in an algorithm or to pass it as a parameter.
+    @EnableTestingViaName("Test.Decompositions.I")
     operation I(target : Qubit) : Unit
     is Adj + Ctl {
         body (...) { }
@@ -42,6 +42,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliX, theta, qubit);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.Rx")
     operation Rx(theta : Double, qubit : Qubit) : Unit is Ctl + Adj {
         body(...) {
             R(PauliX, theta, qubit);
@@ -75,6 +76,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliY, theta, qubit);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.Ry")
     operation Ry(theta : Double, qubit : Qubit) : Unit is Ctl + Adj {
         body(...) {
             R(PauliY, theta, qubit);
@@ -108,6 +110,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliZ, theta, qubit);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.Rz")
     operation Rz(theta : Double, qubit : Qubit) : Unit is Ctl + Adj {
         body(...) {
             R(PauliZ, theta, qubit);
@@ -144,6 +147,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled X([control], target);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.CNOT")
     operation CNOT(control : Qubit, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Controlled X([control], target);
@@ -167,6 +171,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled X([control1, control2], target);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.CCNOT")
     operation CCNOT(control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Controlled X([control1, control2], target);
@@ -195,6 +200,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// R(PauliZ, theta, qubit);
     /// R(PauliI, -theta, qubit);
     /// ```
+    @EnableTestingViaName("Test.Decompositions.R1")
     operation R1(theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         body(...) {
             ApplyGlobalPhase( theta / 2.0 );
@@ -212,6 +218,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubits
     /// An array of qubits whose states are to be reset to $\ket{0}$.
+    @EnableTestingViaName("Test.Decompositions.ResetAll")
     operation ResetAll(qubits : Qubit[]) : Unit {
         for (qubit in qubits) {
             Reset(qubit);
@@ -237,6 +244,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// target register is to be rotated.
     /// ## qubits
     /// Register to apply the given rotation to.
+    @EnableTestingViaName("Test.Decompositions.Exp")
     operation Exp(paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
         body(...) {
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'target' must have the same length"; }
@@ -278,8 +286,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// the qubit is to be rotated.
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.R1Frac")
     operation R1Frac(numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
-         CircuitUtils.DispatchR1Frac(numerator, power, qubit);
+         DispatchR1Frac(numerator, power, qubit);
     }
 
     /// # Summary
@@ -308,18 +317,19 @@ namespace Microsoft.Quantum.Intrinsic {
     /// the qubit is to be rotated.
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.Decompositions.RFrac")
     operation RFrac(pauli : Pauli, numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
         if (pauli == PauliI) {
-            CircuitUtils.ApplyGlobalPhaseFracWithR1Frac(numerator, power);
+            ApplyGlobalPhaseFracWithR1Frac(numerator, power);
         }
         else {
             if (power >= 0) { // when power is negative the operation is exp(i P pi*2^|n|*k) = I
 
                 within {
-                    CircuitUtils.MapPauli(qubit, PauliZ, pauli);
+                    MapPauli(qubit, PauliZ, pauli);
                 }
                 apply {
-                    CircuitUtils.ApplyGlobalPhaseFracWithR1Frac(numerator, power);
+                    ApplyGlobalPhaseFracWithR1Frac(numerator, power);
                     R1Frac(-numerator, power - 1, qubit);
                 }
 
@@ -356,6 +366,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// the qubit register is to be rotated.
     /// ## qubits
     /// Register to apply the given rotation to.
+    @EnableTestingViaName("Test.Decompositions.ExpFrac")
     operation ExpFrac(paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {
         body(...) {
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'target' must have the same length"; }
@@ -366,7 +377,7 @@ namespace Microsoft.Quantum.Intrinsic {
                 let newQubits = Utils.ArrayFromIndiciesQ(qubits, indices);
 
                 if (Length(indices) != 0) { ExpNoIdFrac(newPaulis, numerator, power , newQubits); }
-                else { CircuitUtils.ApplyGlobalPhaseFracWithR1Frac(numerator, power); }
+                else { ApplyGlobalPhaseFracWithR1Frac(numerator, power); }
             }
         }
         adjoint(...) {
@@ -409,9 +420,10 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
+    @EnableTestingViaName("Test.Decompositions.Measure")
     operation Measure(bases : Pauli[], qubits : Qubit[]) : Result {
         if (Length(bases) == 1) {
-            CircuitUtils.MapPauli(qubits[0], PauliZ, bases[0]);
+            MapPauli(qubits[0], PauliZ, bases[0]);
             return M(qubits[0]);
         }
         else {
@@ -429,5 +441,61 @@ namespace Microsoft.Quantum.Intrinsic {
                 return M(q);
             }
         }
+    }
+
+    /// # Summary
+    /// Measures a single qubit in the Z basis.
+    ///
+    /// # Description
+    /// Performs a single-qubit measurement in the $Z$-basis.
+    ///
+    /// # Input
+    /// ## target
+    /// A single qubit to be measured.
+    ///
+    /// # Output
+    /// The result of measuring `target` in the Pauli $Z$ basis.
+    operation MResetZ (target : Qubit) : Result {
+        let r = M(target);
+        Reset(target);
+        return r;
+    }
+
+
+    /// # Summary
+    /// Measures a single qubit in the X basis.
+    ///
+    /// # Description
+    /// Performs a single-qubit measurement in the $X$-basis.
+    ///
+    /// # Input
+    /// ## target
+    /// A single qubit to be measured.
+    ///
+    /// # Output
+    /// The result of measuring `target` in the Pauli $X$ basis.
+    operation MResetX (target : Qubit) : Result {
+        let r = Measure([PauliX], [target]);
+        Reset(target);
+        return r;
+    }
+
+
+    /// # Summary
+    /// Measures a single qubit in the Y basis.
+    ///
+    /// # Description
+    /// Performs a single-qubit measurement in the $Y$-basis.
+    ///
+    /// # Input
+    /// ## target
+    /// A single qubit to be measured.
+    ///
+    /// # Output
+    /// The result of measuring `target` in the Pauli $Y$ basis.
+    operation MResetY (target : Qubit) : Result {
+        let r = Measure([PauliY], [target]);
+        Reset(target);
+        return r;
     }
 }
