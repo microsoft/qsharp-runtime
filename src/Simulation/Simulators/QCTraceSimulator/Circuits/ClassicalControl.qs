@@ -3,48 +3,50 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
 {
+    open Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation;
+
     // Private helper operations.
     operation ApplyIfElseIntrinsic(measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
         body (...) {
-            // ToDo
+            Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
     }
 
-    operation ApplyIfElseIntrinsicA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit {
+    operation ApplyIfElseIntrinsicA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit is Adj {
         body (...) {
-            // ToDo
+            Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
         
         adjoint (...) {
-            // ToDo
+            Interface_ApplyIfElseA(measurementResult, onResultZeroOp, onResultOneOp);
         }
     }
 
-    operation ApplyIfElseIntrinsicC(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit {
+    operation ApplyIfElseIntrinsicC(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit is Ctl {
         body (...) {
-            // ToDo
+            Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
 
         controlled (ctrls, ...) {
-            // ToDo
+            Interface_ApplyIfElseC(ctrls, measurementResult, onResultZeroOp, onResultOneOp);
         }
     }
 
-    operation ApplyIfElseIntrinsicCA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit {
+    operation ApplyIfElseIntrinsicCA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
         body (...) {
-            // ToDo
+            Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
         
         adjoint (...) {
-            // ToDo
+            Interface_ApplyIfElseA(measurementResult, onResultZeroOp, onResultOneOp);
         }
 
         controlled (ctrls, ...) {
-            // ToDo
+            Interface_ApplyIfElseC(ctrls, measurementResult, onResultZeroOp, onResultOneOp);
         }
 
         controlled adjoint (ctrls, ...) {
-            // ToDo
+            Interface_ApplyIfElseCA(ctrls, measurementResult, onResultZeroOp, onResultOneOp);
         }
     }
 
@@ -52,48 +54,46 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
     // Private helper operations.
     operation ApplyConditionallyIntrinsic(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
         body (...) {
-            // ToDo
+            Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
     }
 
     operation ApplyConditionallyIntrinsicA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit is Adj {
         body (...) {
-            // ToDo
+            Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
         
         adjoint (...) {
-            // ToDo
+            Interface_ApplyConditionallyA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
     }
 
     operation ApplyConditionallyIntrinsicC(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit is Ctl {
         body (...) {
-            // ToDo
+            Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
 
         controlled (ctrls, ...) {
-            // ToDo
+            Interface_ApplyConditionallyC(ctrls, measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
     }
 
     operation ApplyConditionallyIntrinsicCA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
         body (...) {
-            // ToDo
+            Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
         
         adjoint (...) {
-            // ToDo
+            Interface_ApplyConditionallyA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
 
         controlled (ctrls, ...) {
-            // ToDo
+            Interface_ApplyConditionallyC(ctrls, measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
 
         controlled adjoint (ctrls, ...) {
-            // ToDo
+            Interface_ApplyConditionallyCA(ctrls, measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
     }
     
 }
-
-

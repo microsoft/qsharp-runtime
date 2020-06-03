@@ -78,4 +78,36 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
         body intrinsic;
     }
     
+    operation Interface_ApplyIfElse (measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyIfElseA (measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyIfElseC (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyIfElseCA (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyConditionally (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyConditionallyA (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyConditionallyC (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit {
+        body intrinsic;
+    }
+
+    operation Interface_ApplyConditionallyCA (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit {
+        body intrinsic;
+    }
+
 }
