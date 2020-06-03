@@ -90,7 +90,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
                     var i = tracerCore.GetInstance(op);
                     Assert.NotNull(i);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     missing.Add(op);
                 }
