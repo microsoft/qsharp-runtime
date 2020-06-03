@@ -4,7 +4,7 @@
 namespace Microsoft.Quantum.Diagnostics {
 
     /// # Summary
-    /// Compiler recognized attribute used to mark a unit test.
+    /// Compiler-recognized attribute used to mark a unit test.
     /// 
     /// # Input
     /// ## ExecutionTarget
@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Diagnostics {
     newtype Test = (ExecutionTarget : String);
 
     /// # Summary
-    /// Compiler recognized attribute via which an alternative name can be defined 
+    /// Compiler-recognized attribute via which an alternative name can be defined 
     /// that may be used when loading a type or callable for testing purposes.
     /// 
     /// # Input
