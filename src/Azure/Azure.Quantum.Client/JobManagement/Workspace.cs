@@ -195,7 +195,7 @@ namespace Microsoft.Azure.Quantum
             catch (Exception ex)
             {
                 throw new WorkspaceClientException(
-                    $"Could not cancel job",
+                    "Could not cancel job",
                     SubscriptionId,
                     ResourceGroupName,
                     WorkspaceName,
