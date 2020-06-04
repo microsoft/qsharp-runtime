@@ -78,35 +78,69 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
         body intrinsic;
     }
     
-    operation Interface_ApplyIfElse (measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
+    /// <summary>
+    /// Performs the onResultZeroOp when measurementResult is Zero, else performs the onResultOneOp.
+    /// </summary>
+    internal operation Interface_ApplyIfElse (measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyIfElseA (measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit {
+    /// <summary>
+    /// Performs the onResultZeroOp when measurementResult is Zero, else performs the onResultOneOp.
+    /// onReusltZeroOp and onResultOneOp must both be adjointable.
+    /// </summary>
+    internal operation Interface_ApplyIfElseA (measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyIfElseC (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit {
+    /// <summary>
+    /// Performs the onResultZeroOp when measurementResult is Zero, else performs the onResultOneOp.
+    /// onReusltZeroOp and onResultOneOp must both be controllable.
+    /// </summary>
+    internal operation Interface_ApplyIfElseC (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyIfElseCA (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit {
+    /// <summary>
+    /// Performs the onResultZeroOp when measurementResult is Zero, else performs the onResultOneOp.
+    /// onReusltZeroOp and onResultOneOp must both be controllable and adjointable.
+    /// </summary>
+    internal operation Interface_ApplyIfElseCA (ctrls : Qubit[], measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyConditionally (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
+    /// <summary>
+    /// Performs the onEqualOp when each element of measurementResults is equal to the corresponding
+    /// element of resultsValues, else performs onNonEqualOp.
+    /// </summary>
+    internal operation Interface_ApplyConditionally (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyConditionallyA (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit {
+    /// <summary>
+    /// Performs the onEqualOp when each element of measurementResults is equal to the corresponding
+    /// element of resultsValues, else performs onNonEqualOp.
+    /// onEqualOp and onNonEqualOp must both be adjointable.
+    /// </summary>
+    internal operation Interface_ApplyConditionallyA (measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyConditionallyC (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit {
+    /// <summary>
+    /// Performs the onEqualOp when each element of measurementResults is equal to the corresponding
+    /// element of resultsValues, else performs onNonEqualOp.
+    /// onEqualOp and onNonEqualOp must both be controllable.
+    /// </summary>
+    internal operation Interface_ApplyConditionallyC (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit {
         body intrinsic;
     }
 
-    operation Interface_ApplyConditionallyCA (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit {
+    /// <summary>
+    /// Performs the onEqualOp when each element of measurementResults is equal to the corresponding
+    /// element of resultsValues, else performs onNonEqualOp.
+    /// onEqualOp and onNonEqualOp must both be controllable and adjointable.
+    /// </summary>
+    internal operation Interface_ApplyConditionallyCA (ctrls : Qubit[], measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit {
         body intrinsic;
     }
 
