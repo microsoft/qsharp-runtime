@@ -33,12 +33,7 @@ namespace Microsoft.Azure.Quantum.Storage
             }
             catch (Exception ex)
             {
-                throw new StorageClientException(
-                    "An error related to the cloud storage account occurred",
-                    connectionString,
-                    string.Empty,
-                    string.Empty,
-                    ex);
+                throw CreateException(ex, "An error related to the cloud storage account occurred");
             }
         }
 
@@ -63,12 +58,7 @@ namespace Microsoft.Azure.Quantum.Storage
             }
             catch (Exception ex)
             {
-                throw new StorageClientException(
-                    "Could not download BLOB",
-                    connectionString,
-                    containerName,
-                    blobName,
-                    ex);
+                throw CreateException(ex, "Could not download BLOB", containerName, blobName);
             }
 
             return ProtocolType.COMPACT_PROTOCOL;
@@ -97,12 +87,7 @@ namespace Microsoft.Azure.Quantum.Storage
             }
             catch (Exception ex)
             {
-                throw new StorageClientException(
-                    "Could not upload BLOB",
-                    connectionString,
-                    containerName,
-                    blobName,
-                    ex);
+                throw CreateException(ex, "Could not upload BLOB", containerName, blobName);
             }
         }
 
@@ -133,14 +118,8 @@ namespace Microsoft.Azure.Quantum.Storage
             }
             catch (Exception ex)
             {
-                throw new StorageClientException(
-                    "Could not get BLOB shared access signature URI",
-                    connectionString,
-                    containerName,
-                    blobName,
-                    ex);
+                throw CreateException(ex, "Could not get BLOB shared access signature URI", containerName, blobName);
             }
-
         }
 
         /// <summary>
@@ -165,13 +144,22 @@ namespace Microsoft.Azure.Quantum.Storage
             }
             catch (Exception ex)
             {
-                throw new StorageClientException(
-                    "Could not get BLOB container shared access signature URI",
-                    connectionString,
-                    containerName,
-                    string.Empty,
-                    ex);
+                throw CreateException(ex, "Could not get BLOB container shared access signature URI", containerName);
             }
+        }
+
+        private StorageClientException CreateException (
+            Exception inner,
+            string message,
+            string containerName = "",
+            string blobName = "")
+        {
+            return new StorageClientException(
+                message,
+                connectionString,
+                containerName,
+                blobName,
+                inner);
         }
 
         private async Task<BlobClient> GetBlobClient(
