@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Quantum
             catch (Exception ex)
             {
                 throw new WorkspaceClientException(
-                    $"Could not create an access token provider",
+                    "Could not create an access token provider",
                     SubscriptionId,
                     ResourceGroupName,
                     WorkspaceName,
