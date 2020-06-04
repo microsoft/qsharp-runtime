@@ -19,12 +19,12 @@ function Test-One {
     Param($project)
 
     Write-Host "##[info]Testing $project..."
-    dotnet test (Join-Path $PSScriptRoot $project) `
-        -c $Env:BUILD_CONFIGURATION `
-        -v $Env:BUILD_VERBOSITY `
-        --logger trx `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
-        /property:Version=$Env:ASSEMBLY_VERSION
+    Invoke-Expression ("dotnet test (Join-Path $PSScriptRoot $project) " +
+        "-c $Env:BUILD_CONFIGURATION " +
+        "-v $Env:BUILD_VERBOSITY " +
+        "--logger trx " +
+        "$(if ($Env:ASSEMBLY_CONSTANTS){"/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS"}) " +
+        "/property:Version=$Env:ASSEMBLY_VERSION")
 
     if  ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to test $project"
@@ -36,5 +36,5 @@ Test-One '../Simulation.sln'
 
 if (-not $all_ok) 
 {
-    throw "At least one project failed to compile. Check the logs."
+    throw "At least one project failed during testing. Check the logs."
 }

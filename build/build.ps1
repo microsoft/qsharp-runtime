@@ -21,12 +21,12 @@ function Build-One {
     );
 
     Write-Host "##[info]Building $project ($action)..."
-    dotnet $action (Join-Path $PSScriptRoot $project) `
-        -c $Env:BUILD_CONFIGURATION `
-        -v $Env:BUILD_VERBOSITY `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
-        /property:Version=$Env:ASSEMBLY_VERSION `
-        /property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR
+    Invoke-Expression ("dotnet $action $(Join-Path $PSScriptRoot $project) " +
+        "-c $Env:BUILD_CONFIGURATION " +
+        "-v $Env:BUILD_VERBOSITY " +
+        "$(if ($Env:ASSEMBLY_CONSTANTS){"/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS"}) " +
+        "/property:Version=$Env:ASSEMBLY_VERSION " +
+        "/property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR")
 
     if  ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build $project."

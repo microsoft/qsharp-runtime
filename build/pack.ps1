@@ -36,15 +36,15 @@ function Pack-One() {
 
 function Pack-Dotnet() {
     Param($project, $option1="", $option2="", $option3="")
-    dotnet pack $project `
-        -o $Env:NUGET_OUTDIR `
-        -c $Env:BUILD_CONFIGURATION `
-        -v detailed `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
-        /property:Version=$Env:NUGET_VERSION `
-        $option1 `
-        $option2 `
-        $option3
+    Invoke-Expression ("dotnet pack $project " +
+        "-o $Env:NUGET_OUTDIR " +
+        "-c $Env:BUILD_CONFIGURATION " +
+        "-v detailed " +
+        "$(if ($Env:ASSEMBLY_CONSTANTS){"/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS"}) " +
+        "/property:Version=$Env:NUGET_VERSION " +
+        "$option1 " +
+        "$option2 " +
+        "$option3")
 
     if  ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to pack $project."
