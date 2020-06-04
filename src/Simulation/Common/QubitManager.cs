@@ -259,7 +259,6 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Allocate(long numToAllocate)
         {
-            IgnorableAssert.Assert(numToAllocate >= 0, "Attempt to allocate negative number of qubits.");
             if (numToAllocate < 0)
             {
                 throw new ArgumentException("Attempt to allocate negative number of qubits.");
@@ -297,7 +296,6 @@ namespace Microsoft.Quantum.Simulation.Common
             else
             {
                 long Occupied = (usedOnlyForBorrowing ? AllocatedForBorrowing : Allocated);
-                IgnorableAssert.Assert(qubits[qubit.Id] == Occupied, "Attempt to free qubit that has not been allocated.");
                 if (qubits[qubit.Id] != Occupied)
                 {
                     throw new ArgumentException("Attempt to free qubit that has not been allocated.");
@@ -337,7 +335,7 @@ namespace Microsoft.Quantum.Simulation.Common
         protected virtual void DisableOneQubit(Qubit qubit)
         {
             // Note: Borrowed qubits cannot be disabled.
-            IgnorableAssert.Assert(qubits[qubit.Id] == Allocated, "Attempt to disable qubit that has not been allocated.");
+            Debug.Assert(qubits[qubit.Id] == Allocated);
             qubits[qubit.Id] = Disabled;
             numDisabledQubits++;
 
@@ -416,7 +414,6 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Borrow(long numToBorrow, IEnumerable<Qubit> excludedQubitsSortedById) // Note, excluded could be an array of Ids for efficiency, if it is convenient for compiler.
         {
-            IgnorableAssert.Assert(numToBorrow >= 0, "Attempt to borrow negative number of qubits.");
             if (numToBorrow < 0)
             {
                 throw new ArgumentException("Attempt to borrow negative number of qubits.");
