@@ -93,14 +93,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not create an access token provider",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    string.Empty,
-                    ex);
+                throw CreateException(ex, "Could not create an access token provider");
             }
 
             Ensure.NotNull(accessTokenProvider, nameof(accessTokenProvider));
@@ -117,14 +110,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not create an Azure quantum service client",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    string.Empty,
-                    ex);
+                throw CreateException(ex, "Could not create an Azure quantum service client");
             }
         }
 
@@ -163,14 +149,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not submit job",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    jobDefinition.Details.Id,
-                    ex);
+                throw CreateException(ex, "Could not submit job", jobDefinition.Details.Id);
             }
         }
 
@@ -194,14 +173,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not cancel job",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    jobId,
-                    ex);
+                throw CreateException(ex, "Could not cancel job", jobId);
             }
         }
 
@@ -227,14 +199,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not get job",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    jobId,
-                    ex);
+                throw CreateException(ex, "Could not get job", jobId);
             }
         }
 
@@ -257,15 +222,23 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw new WorkspaceClientException(
-                    "Could not list jobs",
-                    SubscriptionId,
-                    ResourceGroupName,
-                    WorkspaceName,
-                    BaseUri,
-                    string.Empty,
-                    ex);
+                throw CreateException(ex, "Could not list jobs");
             }
+        }
+
+        private WorkspaceClientException CreateException(
+            Exception inner,
+            string message,
+            string jobId = "")
+        {
+            return new WorkspaceClientException(
+                message,
+                SubscriptionId,
+                ResourceGroupName,
+                WorkspaceName,
+                BaseUri,
+                jobId,
+                inner);
         }
     }
 }
