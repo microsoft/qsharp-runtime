@@ -166,7 +166,7 @@ namespace Microsoft.Azure.Quantum.Storage
             catch (Exception ex)
             {
                 throw new StorageClientException(
-                    "Could not get BLOB container sas URI",
+                    "Could not get BLOB container shared access signature URI",
                     connectionString,
                     containerName,
                     string.Empty,
