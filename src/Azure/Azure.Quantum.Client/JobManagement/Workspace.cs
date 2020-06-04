@@ -164,7 +164,7 @@ namespace Microsoft.Azure.Quantum
             catch (Exception ex)
             {
                 throw new WorkspaceClientException(
-                    $"Could not submit job",
+                    "Could not submit job",
                     SubscriptionId,
                     ResourceGroupName,
                     WorkspaceName,
