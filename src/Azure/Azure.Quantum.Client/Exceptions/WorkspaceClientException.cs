@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Azure.Quantum.Authentication;
 using System;
 
 namespace Microsoft.Azure.Quantum.Exceptions
@@ -38,10 +37,10 @@ namespace Microsoft.Azure.Quantum.Exceptions
             Exception inner)
             : base(
                   $"{BaseMessage}: {message}{Environment.NewLine}" +
-                  $"SubscriptionId: {subscriptionId}" +
-                  $"ResourceGroupName: {resourceGroupName}" +
-                  $"WorkspaceName: {workspaceName}" +
-                  $"BaseUri: {baseUri}" +
+                  $"SubscriptionId: {subscriptionId}{Environment.NewLine}" +
+                  $"ResourceGroupName: {resourceGroupName}{Environment.NewLine}" +
+                  $"WorkspaceName: {workspaceName}{Environment.NewLine}" +
+                  $"BaseUri: {baseUri}{Environment.NewLine}" +
                   $"JobId: {jobId}",
                   inner)
         {

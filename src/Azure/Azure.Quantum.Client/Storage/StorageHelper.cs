@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Bond;
+using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -25,7 +26,20 @@ namespace Microsoft.Azure.Quantum.Storage
         public StorageHelper(string connectionString)
         {
             this.connectionString = connectionString;
-            this.storageAccount = CloudStorageAccount.Parse(connectionString);
+
+            try
+            {
+                this.storageAccount = CloudStorageAccount.Parse(connectionString);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "An error related to the cloud storage account occurred",
+                    connectionString,
+                    string.Empty,
+                    string.Empty,
+                    ex);
+            }
         }
 
         /// <summary>
@@ -42,8 +56,21 @@ namespace Microsoft.Azure.Quantum.Storage
             Stream destination,
             CancellationToken cancellationToken = default)
         {
-            BlobClient blob = await this.GetBlobClient(containerName, blobName, false, cancellationToken);
-            await blob.DownloadToAsync(destination, cancellationToken);
+            try
+            {
+                BlobClient blob = await this.GetBlobClient(containerName, blobName, false, cancellationToken);
+                await blob.DownloadToAsync(destination, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "Could not download BLOB",
+                    connectionString,
+                    containerName,
+                    blobName,
+                    ex);
+            }
+
             return ProtocolType.COMPACT_PROTOCOL;
         }
 
@@ -63,8 +90,20 @@ namespace Microsoft.Azure.Quantum.Storage
             ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
-            BlobClient blob = await this.GetBlobClient(containerName, blobName, true, cancellationToken);
-            await blob.UploadAsync(input, overwrite: true, cancellationToken);
+            try
+            {
+                BlobClient blob = await this.GetBlobClient(containerName, blobName, true, cancellationToken);
+                await blob.UploadAsync(input, overwrite: true, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "Could not upload BLOB",
+                    connectionString,
+                    containerName,
+                    blobName,
+                    ex);
+            }
         }
 
         /// <summary>
@@ -81,14 +120,27 @@ namespace Microsoft.Azure.Quantum.Storage
             TimeSpan expiryInterval,
             SharedAccessBlobPermissions permissions)
         {
-            SharedAccessBlobPolicy adHocSAS = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
+            try
+            {
+                SharedAccessBlobPolicy adHocSAS = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
 
-            CloudBlob blob = this.storageAccount
-                .CreateCloudBlobClient()
-                .GetContainerReference(containerName)
-                .GetBlobReference(blobName);
+                CloudBlob blob = this.storageAccount
+                    .CreateCloudBlobClient()
+                    .GetContainerReference(containerName)
+                    .GetBlobReference(blobName);
 
-            return blob.Uri + blob.GetSharedAccessSignature(adHocSAS);
+                return blob.Uri + blob.GetSharedAccessSignature(adHocSAS);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "Could not get BLOB sas URI",
+                    connectionString,
+                    containerName,
+                    blobName,
+                    ex);
+            }
+
         }
 
         /// <summary>
@@ -103,11 +155,23 @@ namespace Microsoft.Azure.Quantum.Storage
             TimeSpan expiryInterval,
             SharedAccessBlobPermissions permissions)
         {
-            SharedAccessBlobPolicy adHocPolicy = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
+            try
+            {
+                SharedAccessBlobPolicy adHocPolicy = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
 
-            // Generate the shared access signature on the container, setting the constraints directly on the signature.
-            CloudBlobContainer container = this.storageAccount.CreateCloudBlobClient().GetContainerReference(containerName);
-            return container.Uri + container.GetSharedAccessSignature(adHocPolicy, null);
+                // Generate the shared access signature on the container, setting the constraints directly on the signature.
+                CloudBlobContainer container = this.storageAccount.CreateCloudBlobClient().GetContainerReference(containerName);
+                return container.Uri + container.GetSharedAccessSignature(adHocPolicy, null);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "Could not get BLOB container sas URI",
+                    connectionString,
+                    containerName,
+                    string.Empty,
+                    ex);
+            }
         }
 
         private async Task<BlobClient> GetBlobClient(
