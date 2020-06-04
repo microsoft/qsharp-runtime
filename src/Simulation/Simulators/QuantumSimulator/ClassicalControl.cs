@@ -19,8 +19,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 case OperationFunctor.Body: op.Apply(QVoid.Instance); break;
                 case OperationFunctor.Adjoint: ((IAdjointable)op).Adjoint.Apply(QVoid.Instance); break;
-                case OperationFunctor.Controlled: ((IControllable)op).Controlled.Apply(ctrls); break;
-                case OperationFunctor.ControlledAdjoint: ((IUnitary)op).Controlled.Adjoint.Apply(ctrls); break;
+                case OperationFunctor.Controlled: ((IControllable)op).Controlled.Apply((ctrls, QVoid.Instance)); break;
+                case OperationFunctor.ControlledAdjoint: ((IUnitary)op).Controlled.Adjoint.Apply((ctrls, QVoid.Instance)); break;
             }
         }
 
