@@ -228,7 +228,7 @@ namespace Microsoft.Azure.Quantum
             catch (Exception ex)
             {
                 throw new WorkspaceClientException(
-                    $"Could not get job",
+                    "Could not get job",
                     SubscriptionId,
                     ResourceGroupName,
                     WorkspaceName,
