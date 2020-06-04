@@ -118,7 +118,7 @@ namespace Microsoft.Azure.Quantum
             catch (Exception ex)
             {
                 throw new WorkspaceClientException(
-                    $"Could not create an Azure quantum service client",
+                    "Could not create an Azure quantum service client",
                     SubscriptionId,
                     ResourceGroupName,
                     WorkspaceName,
