@@ -123,17 +123,33 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.True(n_q.Length == 0);
             }
 
-            // Test allocating qubits over capacity
-            OperationsTestHelper.IgnoreDebugAssert(() =>
+            // NOTE: The below tests trigger exceptions, which but the QubitManager into a bad
+            // state where it shouldn't be reused. Creating a separate QubitManager in a small
+            // scope to test the exceptions avoids having one test case pollute the other.
+
+            // Test for over allocating and over borrowing.
             {
+                QubitManager qm_small = new QubitManager(2);
                 IQArray<Qubit> n_q;
+                Assert.Throws<NotEnoughQubits>(() => n_q = qm_small.Allocate(5));
+            }
+            {
+                QubitManager qm_small = new QubitManager(2);
+                IQArray<Qubit> n_q;
+                Assert.Throws<NotEnoughQubits>(() => n_q = qm_small.Borrow(5, null));
+            }
 
-                Assert.Throws<NotEnoughQubits>(() => n_q = qm.Allocate(10));
-                Assert.Throws<NotEnoughQubits>(() => n_q = qm.Borrow(25, exclusion));
-
-                Assert.Throws<ArgumentException>(() => n_q = qm.Allocate(-2));
-                Assert.Throws<ArgumentException>(() => n_q = qm.Borrow(-2, exclusion));
-            });
+            // Test for negative input to allocate and borrow.
+            {
+                QubitManager qm_small = new QubitManager(20);
+                IQArray<Qubit> n_q;
+                Assert.Throws<ArgumentException>(() => n_q = qm_small.Allocate(-2));
+            }
+            {
+                QubitManager qm_small = new QubitManager(20);
+                IQArray<Qubit> n_q;
+                Assert.Throws<ArgumentException>(() => n_q = qm_small.Borrow(-2, null));
+            }
         }
 
         /// <summary>
