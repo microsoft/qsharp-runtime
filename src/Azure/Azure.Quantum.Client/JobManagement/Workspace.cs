@@ -4,16 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Azure.Quantum.Client;
 using Microsoft.Azure.Quantum.Client.Models;
-using Microsoft.Azure.Quantum.Storage;
+using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Azure.Quantum.Utility;
-using Microsoft.Quantum.Runtime;
 
 namespace Microsoft.Azure.Quantum
 {
@@ -23,6 +21,11 @@ namespace Microsoft.Azure.Quantum
     /// <seealso cref="Microsoft.Azure.Quantum.Client.IWorkspace" />
     public class Workspace : IWorkspace
     {
+        private readonly Uri BaseUri;
+        private readonly string ResourceGroupName;
+        private readonly string SubscriptionId;
+        private readonly string WorkspaceName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Workspace"/> class.
         /// </summary>
@@ -76,21 +79,39 @@ namespace Microsoft.Azure.Quantum
             IAccessTokenProvider accessTokenProvider,
             Uri baseUri = null)
         {
+            BaseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
             Ensure.NotNullOrWhiteSpace(subscriptionId, nameof(subscriptionId));
+            SubscriptionId = subscriptionId;
             Ensure.NotNullOrWhiteSpace(resourceGroupName, nameof(resourceGroupName));
+            ResourceGroupName = resourceGroupName;
             Ensure.NotNullOrWhiteSpace(workspaceName, nameof(workspaceName));
+            WorkspaceName = workspaceName;
 
-            accessTokenProvider = accessTokenProvider ?? new CustomAccessTokenProvider(subscriptionId);
+            try
+            {
+                accessTokenProvider = accessTokenProvider ?? new CustomAccessTokenProvider(subscriptionId);
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not create an access token provider");
+            }
 
             Ensure.NotNull(accessTokenProvider, nameof(accessTokenProvider));
 
-            this.JobsClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
+            try
             {
-                BaseUri = baseUri ?? new Uri(Constants.DefaultBaseUri),
-                SubscriptionId = subscriptionId,
-                ResourceGroupName = resourceGroupName,
-                WorkspaceName = workspaceName,
-            }.Jobs;
+                this.JobsClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
+                {
+                    BaseUri = BaseUri,
+                    SubscriptionId = subscriptionId,
+                    ResourceGroupName = resourceGroupName,
+                    WorkspaceName = workspaceName,
+                }.Jobs;
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not create an Azure quantum service client");
+            }
         }
 
         /// <summary>
@@ -117,12 +138,19 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNull(jobDefinition, nameof(jobDefinition));
             Ensure.NotNullOrWhiteSpace(jobDefinition.Details.Id, nameof(jobDefinition.Details.Id));
 
-            JobDetails jobDetails = await this.JobsClient.PutAsync(
-                jobId: jobDefinition.Details.Id,
-                jobDefinition: jobDefinition.Details,
-                cancellationToken: cancellationToken);
+            try
+            {
+                JobDetails jobDetails = await this.JobsClient.PutAsync(
+                    jobId: jobDefinition.Details.Id,
+                    jobDefinition: jobDefinition.Details,
+                    cancellationToken: cancellationToken);
 
-            return new CloudJob(this, jobDetails);
+                return new CloudJob(this, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not submit job", jobDefinition.Details.Id);
+            }
         }
 
         /// <summary>
@@ -135,11 +163,18 @@ namespace Microsoft.Azure.Quantum
         {
             Ensure.NotNullOrWhiteSpace(jobId, nameof(jobId));
 
-            JobDetails jobDetails = await this.JobsClient.DeleteAsync(
-                jobId: jobId,
-                cancellationToken: cancellationToken);
+            try
+            {
+                JobDetails jobDetails = await this.JobsClient.DeleteAsync(
+                    jobId: jobId,
+                    cancellationToken: cancellationToken);
 
-            return new CloudJob(this, jobDetails);
+                return new CloudJob(this, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not cancel job", jobId);
+            }
         }
 
         /// <summary>
@@ -154,11 +189,18 @@ namespace Microsoft.Azure.Quantum
         {
             Ensure.NotNullOrWhiteSpace(jobId, nameof(jobId));
 
-            JobDetails jobDetails = await this.JobsClient.GetAsync(
-                jobId: jobId,
-                cancellationToken: cancellationToken);
+            try
+            {
+                JobDetails jobDetails = await this.JobsClient.GetAsync(
+                    jobId: jobId,
+                    cancellationToken: cancellationToken);
 
-            return new CloudJob(this, jobDetails);
+                return new CloudJob(this, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not get job", jobId);
+            }
         }
 
         /// <summary>
@@ -170,11 +212,33 @@ namespace Microsoft.Azure.Quantum
         /// </returns>
         public async Task<IEnumerable<CloudJob>> ListJobsAsync(CancellationToken cancellationToken = default)
         {
-            var jobs = await this.JobsClient.ListAsync(
-                cancellationToken: cancellationToken);
+            try
+            {
+                var jobs = await this.JobsClient.ListAsync(
+                    cancellationToken: cancellationToken);
 
-            return jobs
-                .Select(details => new CloudJob(this, details));
+                return jobs
+                    .Select(details => new CloudJob(this, details));
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not list jobs");
+            }
+        }
+
+        private WorkspaceClientException CreateException(
+            Exception inner,
+            string message,
+            string jobId = "")
+        {
+            return new WorkspaceClientException(
+                message,
+                SubscriptionId,
+                ResourceGroupName,
+                WorkspaceName,
+                BaseUri,
+                jobId,
+                inner);
         }
     }
 }
