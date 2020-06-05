@@ -10,17 +10,17 @@
 namespace Microsoft.Quantum.Core {
     
     /// # Summary
-    /// Compiler recognized attribute used to mark user defined types as attributes. 
+    /// Compiler-recognized attribute used to mark user-defined types as attributes. 
     @Attribute()
     newtype Attribute = Unit;
 
     /// # Summary
-    /// Compiler recognized attribute used to mark the entry point of an executable.
+    /// Compiler-recognized attribute used to mark the entry point of an executable.
     @Attribute()
     newtype EntryPoint = Unit;
 
     /// # Summary
-    /// Compiler recognized attribute used to mark a type or callable as deprecated.
+    /// Compiler-recognized attribute used to mark a type or callable as deprecated.
     /// 
     /// # Input
     /// ## NewName

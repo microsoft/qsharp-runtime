@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.Azure.Quantum.Client;
 using Microsoft.Azure.Quantum.Client.Models;
+using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Rest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace Microsoft.Azure.Quantum.Test
                 receivedJob = workspace.SubmitJob(job);
                 Assert.Fail();
             }
-            catch (ValidationException)
+            catch (WorkspaceClientException)
             {
                 jobDetails.ContainerUri = "https://uri";
             }
@@ -50,7 +51,7 @@ namespace Microsoft.Azure.Quantum.Test
                 receivedJob = workspace.SubmitJob(job);
                 Assert.Fail();
             }
-            catch (ValidationException)
+            catch (WorkspaceClientException)
             {
                 jobDetails.ProviderId = TestConstants.ProviderId;
             }
