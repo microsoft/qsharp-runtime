@@ -8,7 +8,7 @@ $all_ok = $True
 
 Write-Host "##[info]Build Native simulator"
 cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION
-if  ($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
     $script:all_ok = $False
 }
@@ -24,11 +24,11 @@ function Build-One {
     Invoke-Expression ("dotnet $action $(Join-Path $PSScriptRoot $project) " +
         "-c $Env:BUILD_CONFIGURATION " +
         "-v $Env:BUILD_VERBOSITY " +
-        "$(if ($Env:ASSEMBLY_CONSTANTS){"/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS"}) " +
+        "$(if ($Env:ASSEMBLY_CONSTANTS) { "/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS" }) " +
         "/property:Version=$Env:ASSEMBLY_VERSION " +
         "/property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR")
 
-    if  ($LastExitCode -ne 0) {
+    if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build $project."
         $script:all_ok = $False
     }
@@ -38,8 +38,7 @@ Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
 
-if (-not $all_ok) 
-{
+if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
 }
 
