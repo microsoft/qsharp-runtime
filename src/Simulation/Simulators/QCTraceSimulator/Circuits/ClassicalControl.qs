@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         body (...) {
             Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
-        
+
         adjoint (...) {
             Interface_ApplyIfElseA(measurementResult, onResultZeroOp, onResultOneOp);
         }
@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         body (...) {
             Interface_ApplyIfElse(measurementResult, onResultZeroOp, onResultOneOp);
         }
-        
+
         adjoint (...) {
             Interface_ApplyIfElseA(measurementResult, onResultZeroOp, onResultOneOp);
         }
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         body (...) {
             Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
-        
+
         adjoint (...) {
             Interface_ApplyConditionallyA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
         body (...) {
             Interface_ApplyConditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
-        
+
         adjoint (...) {
             Interface_ApplyConditionallyA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
@@ -95,5 +95,5 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits
             Interface_ApplyConditionallyCA(ctrls, measurementResults, resultsValues, onEqualOp, onNonEqualOp);
         }
     }
-    
+
 }
