@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         #region ApplyIfElse
 
-        internal class TracerApplyIfElse : Interface_ApplyIfElse
+        public class TracerApplyIfElse : Interface_ApplyIfElse
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -130,7 +130,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyIfElseA : Interface_ApplyIfElseA
+        public class TracerApplyIfElseA : Interface_ApplyIfElseA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -146,7 +146,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyIfElseC : Interface_ApplyIfElseC
+        public class TracerApplyIfElseC : Interface_ApplyIfElseC
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -163,7 +163,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyIfElseCA : Interface_ApplyIfElseCA
+        public class TracerApplyIfElseCA : Interface_ApplyIfElseCA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -184,7 +184,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         #region ApplyConditionally
 
-        internal class TracerApplyConditionally : Interface_ApplyConditionally
+        public class TracerApplyConditionally : Interface_ApplyConditionally
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -200,7 +200,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyConditionallyA : Interface_ApplyConditionallyA
+        public class TracerApplyConditionallyA : Interface_ApplyConditionallyA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -216,7 +216,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyConditionallyC : Interface_ApplyConditionallyC
+        public class TracerApplyConditionallyC : Interface_ApplyConditionallyC
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -233,7 +233,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        internal class TracerApplyConditionallyCA : Interface_ApplyConditionallyCA
+        public class TracerApplyConditionallyCA : Interface_ApplyConditionallyCA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
