@@ -21,12 +21,17 @@ function Build-One {
     );
 
     Write-Host "##[info]Building $project ($action)..."
-    Invoke-Expression ("dotnet $action $(Join-Path $PSScriptRoot $project) " +
-        "-c $Env:BUILD_CONFIGURATION " +
-        "-v $Env:BUILD_VERBOSITY " +
-        "$(if ($Env:ASSEMBLY_CONSTANTS) { "/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS" }) " +
-        "/property:Version=$Env:ASSEMBLY_VERSION " +
-        "/property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR")
+    if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
+        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
+    }  else {
+        $args = @();
+    }
+    dotnet $action $(Join-Path $PSScriptRoot $project) `
+        -c $Env:BUILD_CONFIGURATION `
+        -v $Env:BUILD_VERBOSITY  `
+        @args `
+        /property:Version=$Env:ASSEMBLY_VERSION `
+        /property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR;
 
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build $project."
@@ -41,4 +46,3 @@ Build-One 'build' '../Simulation.sln'
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
 }
-
