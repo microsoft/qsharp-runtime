@@ -1629,22 +1629,28 @@ module SimulationCode =
         let context = {globalContext with fileName = Some dllName.Value} 
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
 
-        let getNameCollisions (nsName : NonNullable<string>, elems : QsNamespaceElement list) = 
+        let getNameCollisions (_, elems : QsNamespaceElement list) = 
             let tryGetCollision = function 
-                | QsCallable c -> 
-                    // FIXME: need to look for the original name ...
-                    match context.allCallables.TryGetValue c.FullName with 
-                    | true, collision -> QsCallable collision |> Some
-                    | _ -> None
                 | QsCustomType t -> 
-                    // FIXME: need to look for the original name ...
-                    match context.allUdts.TryGetValue t.FullName with 
-                    | true, collision -> QsCustomType collision |> Some
-                    | _ -> None
-            nsName, elems |> List.choose tryGetCollision
+                    match SymbolResolution.TryGetOriginalName t.Attributes with 
+                    | Value origName -> 
+                        match context.allUdts.TryGetValue origName with 
+                        | true, collision -> Some (origName.Namespace, QsCustomType collision)
+                        | _ -> None
+                    | Null -> None
+                | QsCallable c -> 
+                    match SymbolResolution.TryGetOriginalName c.Attributes with 
+                    | Value origName -> 
+                        match context.allCallables.TryGetValue origName with 
+                        | true, collision -> Some (origName.Namespace, QsCallable collision)
+                        | _ -> None
+                    | Null -> None
+            elems |> List.choose tryGetCollision
 
         if localElements.Any() then 
-            let collisions = localElements |> List.map getNameCollisions 
+            let collisions = 
+                (localElements |> Seq.collect getNameCollisions).ToLookup(fst, snd)
+                |> Seq.map (fun g -> g.Key, g |> Seq.toList) |> Seq.toList
             buildSyntaxTree (localElements @ collisions) context
             |> formatSyntaxTree
         else null

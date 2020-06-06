@@ -1,20 +1,31 @@
-﻿namespace Quantum.UnitTests {
+﻿namespace Microsoft.Quantum.Testing.LoadViaTestName {
 
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
 
+    internal function FactI(expected : Int, got : Int) : Unit {
+        if (expected != got) {
+            fail $"Expected: {expected}, got: {got}";
+        }
+    }
+
+    internal function FactS(expected : String, got : String) : Unit {
+        if (expected != got) {
+            fail $"Expected: {expected}, got: {got}";
+        }
+    }
 
     @Test("QuantumSimulator")
     operation LoadBothViaTestNames () : Unit {
         
-        Fact(1, Library1.LibraryId());
-        Fact(2, Library2.LibraryId());
+        FactI(1, Library1.LibraryId());
+        FactI(2, Library2.LibraryId());
     }
 
     @Test("QuantumSimulator")
     operation LoadOneViaTestName () : Unit {
 
-        Fact("Library1", DllName());
-        Fact("Library2", Library2.DllName());
+        FactS("Library1", Microsoft.Quantum.Library.DllName());
+        FactS("Library2", Library2.DllName());
     }
 }
