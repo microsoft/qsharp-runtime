@@ -1628,8 +1628,22 @@ module SimulationCode =
             |> asOption
         let context = {globalContext with fileName = Some dllName.Value} 
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
+
+        let getNameCollisions (nsName : NonNullable<string>, elems : QsNamespaceElement list) = 
+            let tryGetCollision = function 
+                | QsCallable c -> 
+                    match context.allCallables.TryGetValue c.FullName with 
+                    | true, collision -> QsCallable collision |> Some
+                    | _ -> None
+                | QsCustomType t -> 
+                    match context.allUdts.TryGetValue t.FullName with 
+                    | true, collision -> QsCustomType collision |> Some
+                    | _ -> None
+            nsName, elems |> List.choose tryGetCollision
+
         if localElements.Any() then 
-            buildSyntaxTree localElements context
+            let collisions = localElements |> List.map getNameCollisions 
+            buildSyntaxTree (localElements @ collisions) context
             |> formatSyntaxTree
         else null
 
