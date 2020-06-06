@@ -1632,10 +1632,12 @@ module SimulationCode =
         let getNameCollisions (nsName : NonNullable<string>, elems : QsNamespaceElement list) = 
             let tryGetCollision = function 
                 | QsCallable c -> 
+                    // FIXME: need to look for the original name ...
                     match context.allCallables.TryGetValue c.FullName with 
                     | true, collision -> QsCallable collision |> Some
                     | _ -> None
                 | QsCustomType t -> 
+                    // FIXME: need to look for the original name ...
                     match context.allUdts.TryGetValue t.FullName with 
                     | true, collision -> QsCustomType collision |> Some
                     | _ -> None
