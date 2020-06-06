@@ -7,8 +7,15 @@ namespace Quantum.Library {
     
     // Used for a unit test; 
     // do not change the name or namespace of this callable!
-    @EnableTestingViaName("Library2.Hello")
-    operation Hello() : Unit {
-        Message("Hello from Library2!");
+    @EnableTestingViaName("Library2.LibraryId")
+    function LibraryId() : Int {
+        return 2;
+    }
+
+    // Used for a unit test; 
+    // do not change the name or namespace of this callable!
+    @EnableTestingViaName("Library2.DllName")
+    function DllName() : String {
+        return "Libary2";
     }
 }

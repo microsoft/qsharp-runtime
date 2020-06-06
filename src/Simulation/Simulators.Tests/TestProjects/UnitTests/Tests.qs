@@ -3,10 +3,18 @@
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
 
+
     @Test("QuantumSimulator")
-    operation LoadBothCollisionsViaTestNames () : Unit {
+    operation LoadBothViaTestNames () : Unit {
         
-        Library1.Hello();
-        Library2.Hello();
+        Fact(1, Library1.LibraryId());
+        Fact(2, Library2.LibraryId());
+    }
+
+    @Test("QuantumSimulator")
+    operation LoadOneViaTestName () : Unit {
+
+        Fact("Library1", DllName());
+        Fact("Library2", Library2.DllName());
     }
 }
