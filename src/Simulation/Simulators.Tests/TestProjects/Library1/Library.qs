@@ -15,6 +15,11 @@ namespace Microsoft.Quantum.Library {
     newtype MyString = (Text : String);
 
     // Used for a unit test; 
+    // do not change the name or namespace of this type!
+    @EnableTestingViaName("Library1.Token")
+    newtype Token = Unit;
+
+    // Used for a unit test; 
     // do not change the name or namespace of this callable!
     @EnableTestingViaName("Library1.LibraryId")
     function LibraryId() : Int {
@@ -26,5 +31,13 @@ namespace Microsoft.Quantum.Library {
     function DllName() : String {
         return "Library1";
     }
+
+    // Used for a unit test; 
+    // do not change the name or namespace of this callable!
+    @EnableTestingViaName("Library1.Hello")
+    operation Hello(dummy : Token) : String {
+        return "Hello from Library1!";
+    }
+
 
 }

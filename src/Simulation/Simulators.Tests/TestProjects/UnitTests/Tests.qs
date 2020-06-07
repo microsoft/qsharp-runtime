@@ -71,4 +71,14 @@
         FactMyString1("Library1", s1);
         FactMyString2("Library2", s2);
     }
+
+    @Test("QuantumSimulator")
+    operation ConflictingWithSource () : Unit {
+
+        let h1 = Library1.Hello(Library1.Token());
+        let h2 = Microsoft.Quantum.Library.Hello(Microsoft.Quantum.Library.Token());
+        FactS("Hello from Library1!", h1);
+        return h2;
+    }
+
 }

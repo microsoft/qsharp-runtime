@@ -1635,14 +1635,18 @@ module SimulationCode =
                     match SymbolResolution.TryGetOriginalName t.Attributes with 
                     | Value origName -> 
                         match context.allUdts.TryGetValue origName with 
-                        | true, collision -> Some (origName.Namespace, QsCustomType collision)
+                        | true, collision -> 
+                            if context.GenerateCodeForSource collision.SourceFile then None
+                            else Some (origName.Namespace, QsCustomType collision)
                         | _ -> None
                     | Null -> None
                 | QsCallable c -> 
                     match SymbolResolution.TryGetOriginalName c.Attributes with 
                     | Value origName -> 
                         match context.allCallables.TryGetValue origName with 
-                        | true, collision -> Some (origName.Namespace, QsCallable collision)
+                        | true, collision -> 
+                            if context.GenerateCodeForSource collision.SourceFile then None
+                            else Some (origName.Namespace, QsCallable collision)
                         | _ -> None
                     | Null -> None
             elems |> List.choose tryGetCollision
