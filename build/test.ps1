@@ -8,7 +8,7 @@ Write-Host "##[info]Test Native simulator"
 pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
 cmake --build . --config $Env:BUILD_CONFIGURATION
 ctest -C $Env:BUILD_CONFIGURATION
-if  ($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
     $script:all_ok = $False
 }
@@ -19,14 +19,19 @@ function Test-One {
     Param($project)
 
     Write-Host "##[info]Testing $project..."
-    dotnet test (Join-Path $PSScriptRoot $project) `
+    if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
+        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
+    }  else {
+        $args = @();
+    }
+    dotnet test $(Join-Path $PSScriptRoot $project) `
         -c $Env:BUILD_CONFIGURATION `
         -v $Env:BUILD_VERBOSITY `
         --logger trx `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
+        @args `
         /property:Version=$Env:ASSEMBLY_VERSION
 
-    if  ($LastExitCode -ne 0) {
+    if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to test $project"
         $script:all_ok = $False
     }
@@ -34,7 +39,6 @@ function Test-One {
 
 Test-One '../Simulation.sln'
 
-if (-not $all_ok) 
-{
-    throw "At least one project failed to compile. Check the logs."
+if (-not $all_ok) {
+    throw "At least one project failed during testing. Check the logs."
 }
