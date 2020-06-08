@@ -23,6 +23,9 @@
     <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="TestProjects\ClassicControlSupportTest\ClassicControlSupportTest.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,12 +41,17 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
       <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
+      <_ClassicControlDir>$(MSBuildThisFileDirectory)TestProjects\ClassicControlSupportTest\built\</_ClassicControlDir>
+      <ExecutionTarget>$(MSBuildThisFileDirectory)..\TestTargets\Simulation\Example\bin\$(Configuration)\netcoreapp3.1\Example.dll</ExecutionTarget>
     </PropertyGroup>
     <ItemGroup>
       <_ExeFiles Include="$(_ExeDir)*" />
+      <_ClassicControlFiles Include="$(_ClassicControlDir)*" />
     </ItemGroup>
-    <MakeDir Directories="$(OutputPath)TestExe" />    
+    <MakeDir Directories="$(OutputPath)TestExe" />
+    <MakeDir Directories="$(OutputPath)TestClassicControl" />
     <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(_ClassicControlFiles)" DestinationFolder="$(OutputPath)TestClassicControl" ContinueOnError="false" />
   </Target>
 
 </Project>
