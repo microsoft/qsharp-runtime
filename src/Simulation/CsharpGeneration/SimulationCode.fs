@@ -1628,8 +1628,34 @@ module SimulationCode =
             |> asOption
         let context = {globalContext with fileName = Some dllName.Value} 
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
+
+        let getNameCollisions (_, elems : QsNamespaceElement list) = 
+            let tryGetCollision = function 
+                | QsCustomType t -> 
+                    match SymbolResolution.TryGetOriginalName t.Attributes with 
+                    | Value origName -> 
+                        match context.allUdts.TryGetValue origName with 
+                        | true, collision -> 
+                            if context.GenerateCodeForSource collision.SourceFile then None
+                            else Some (origName.Namespace, QsCustomType collision)
+                        | _ -> None
+                    | Null -> None
+                | QsCallable c -> 
+                    match SymbolResolution.TryGetOriginalName c.Attributes with 
+                    | Value origName -> 
+                        match context.allCallables.TryGetValue origName with 
+                        | true, collision -> 
+                            if context.GenerateCodeForSource collision.SourceFile then None
+                            else Some (origName.Namespace, QsCallable collision)
+                        | _ -> None
+                    | Null -> None
+            elems |> List.choose tryGetCollision
+
         if localElements.Any() then 
-            buildSyntaxTree localElements context
+            let collisions = 
+                (localElements |> Seq.collect getNameCollisions).ToLookup(fst, snd)
+                |> Seq.map (fun g -> g.Key, g |> Seq.toList) |> Seq.toList
+            buildSyntaxTree (localElements @ collisions) context
             |> formatSyntaxTree
         else null
 

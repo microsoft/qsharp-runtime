@@ -10,14 +10,14 @@ Write-Host "##[info]Copy Native simulator xplat binaries"
 pushd ../src/Simulation/Native
 If (-not (Test-Path 'osx')) { mkdir 'osx' }
 If (-not (Test-Path 'linux')) { mkdir 'linux' }
-$DROP="$Env:DROP_NATIVE/src/Simulation/Native/build"
+$DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build"
 If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
 If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
 popd
 
 
 function Pack-One() {
-    Param($project, $option1="", $option2="", $option3="")
+    Param($project, $option1 = "", $option2 = "", $option3 = "")
     nuget pack $project `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
@@ -28,25 +28,30 @@ function Pack-One() {
         $option2 `
         $option3
 
-    if  ($LastExitCode -ne 0) {
+    if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to pack $project"
         $script:all_ok = $False
     }
 }
 
 function Pack-Dotnet() {
-    Param($project, $option1="", $option2="", $option3="")
+    Param($project, $option1 = "", $option2 = "", $option3 = "")
+    if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
+        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
+    }  else {
+        $args = @();
+    }
     dotnet pack $project `
         -o $Env:NUGET_OUTDIR `
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
+        @args `
         /property:Version=$Env:NUGET_VERSION `
         $option1 `
         $option2 `
         $option3
 
-    if  ($LastExitCode -ne 0) {
+    if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to pack $project."
         $script:all_ok = $False
     }
@@ -63,7 +68,6 @@ Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
-if (-not $all_ok) 
-{
+if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."
 }

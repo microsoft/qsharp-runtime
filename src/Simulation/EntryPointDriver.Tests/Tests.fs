@@ -149,20 +149,20 @@ let private normalize s = Regex.Replace(s, @"\s+", " ").Trim()
 /// output. The standard error and out streams of the actual output are concatenated in that order.
 let private yields expected (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode out error)
+    Assert.True (0 = exitCode, sprintf "Expected exit code 0, but got %d with:\n\n%s\n\n%s" exitCode error out)
     Assert.Equal (normalize expected, normalize (error + out))
 
 /// Asserts that running the entry point in the assembly with the given arguments fails.
 let private fails (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" error out)
 
-/// Asserts that running the entry point in the assembly with the given arguments fails and the error message starts
-/// with the expected message.
+/// Asserts that running the entry point in the assembly with the given arguments fails and the output starts with the
+/// expected message. The standard error and out streams of the actual output are concatenated in that order.
 let private failsWith expected (assembly, args) =
     let out, error, exitCode = run assembly args
-    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" out error)
-    Assert.StartsWith (normalize expected, normalize error)
+    Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" error out)
+    Assert.StartsWith (normalize expected, normalize (error + out))
 
 /// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
 /// or fails.
@@ -175,6 +175,24 @@ let private test testNum =
 let private testWith testNum defaultSimulator =
     let assembly = testAssembly testNum (Some defaultSimulator)
     fun args -> assembly, Array.ofList args
+
+/// Standard command-line arguments for the "submit" command without specifying a target.
+let private submitWithoutTarget = 
+    [ "submit"
+      "--storage"
+      "myStorage"
+      "--subscription"
+      "mySubscription"
+      "--resource-group"
+      "myResourceGroup"
+      "--workspace"
+      "myWorkspace" ]
+
+/// Standard command-line arguments for the "submit" command using the "test.nothing" target.
+let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
+
+/// Standard command-line arguments for the "submit" command using the "test.error" target.
+let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
 
 
 // No Option
@@ -437,6 +455,22 @@ let ``Shadows --version`` () =
     let given = test 29
     given ["--version"; "foo"] |> yields "foo"
 
+[<Fact>]
+let ``Shadows --target`` () =
+    let given = test 30
+    given ["--target"; "foo"] |> yields "foo"
+    given submitWithNothingTarget
+    |> failsWith "The required option --target conflicts with an entry point parameter name."
+
+[<Fact>]
+let ``Shadows --shots`` () =
+    let given = test 31
+    given ["--shots"; "7"] |> yields "7"
+    given (submitWithNothingTarget @ ["--shots"; "7"])
+    |> yields "Warning: Option --shots is overridden by an entry point parameter name. Using default value 500.
+               The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               00000000-0000-0000-0000-0000000000000"
+
 
 // Simulators
 
@@ -454,30 +488,30 @@ let private resourceSummary =
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 30
+    let given = test 32
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 30 AssemblyConstants.ResourcesEstimator
+    let given = testWith 32 AssemblyConstants.ResourcesEstimator
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -485,7 +519,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 30 typeof<ToffoliSimulator>.FullName
+    let given = testWith 32 typeof<ToffoliSimulator>.FullName
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -498,39 +532,24 @@ let ``Supports default custom simulator`` () =
 
 // Azure Quantum Submission
 
-/// Standard command-line arguments for the "submit" command without specifying a target.
-let private submitWithoutTarget = 
-    [ "submit"
-      "--storage"
-      "myStorage"
-      "--subscription"
-      "mySubscription"
-      "--resource-group"
-      "myResourceGroup"
-      "--workspace"
-      "myWorkspace" ]
-
-/// Standard command-line arguments for the "submit" command using the "nothing" target.
-let private submitWithTestTarget = submitWithoutTarget @ ["--target"; "nothing"]
-
 [<Fact>]
 let ``Submit can submit a job`` () =
     let given = test 1
-    given submitWithTestTarget
+    given submitWithNothingTarget
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
+    given (submitWithNothingTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--verbose"])
+    given (submitWithNothingTarget @ ["--verbose"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Target: nothing
+               Target: test.nothing
                Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -548,7 +567,7 @@ let ``Submit uses default values`` () =
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test 1
-    given (submitWithTestTarget @ [
+    given (submitWithNothingTarget @ [
         "--verbose"
         "--aad-token"
         "myToken"
@@ -560,7 +579,7 @@ let ``Submit allows overriding default values`` () =
         "750"
     ])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Target: nothing
+               Target: test.nothing
                Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -578,16 +597,54 @@ let ``Submit allows overriding default values`` () =
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test 1
-    given (submitWithTestTarget @ ["--shots"; "1"])
+    given (submitWithNothingTarget @ ["--shots"; "1"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                00000000-0000-0000-0000-0000000000000"
-    given (submitWithTestTarget @ ["--shots"; "0"]) |> fails
-    given (submitWithTestTarget @ ["--shots"; "-1"]) |> fails
+    given (submitWithNothingTarget @ ["--shots"; "0"]) |> fails
+    given (submitWithNothingTarget @ ["--shots"; "-1"]) |> fails
 
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test 1
     given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
+
+[<Fact>]
+let ``Submit supports dry run option`` () =
+    let given = test 1
+    given (submitWithNothingTarget @ ["--dry-run"]) |> yields "✔️  The program is valid!"
+    given (submitWithErrorTarget @ ["--dry-run"])
+    |> failsWith "❌  The program is invalid.
+
+                  This quantum machine always has an error."
+
+[<Fact>]
+let ``Submit has required options`` () =
+    // Returns the "power set" of a list: every possible combination of elements in the list without changing the order.
+    let rec powerSet = function
+        | [] -> [[]]
+        | x :: xs ->
+            let next = powerSet xs
+            List.map (fun list -> x :: list) next @ next
+    let given = test 1
+
+    // Try every possible combination of arguments. The command should succeed only when all of the arguments are
+    // included.
+    let commandName = List.head submitWithNothingTarget
+    let allArgs = submitWithNothingTarget |> List.tail |> List.chunkBySize 2
+    for args in powerSet allArgs do
+        given (commandName :: List.concat args)
+        |> if List.length args = List.length allArgs
+           then yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+                        00000000-0000-0000-0000-0000000000000"
+           else fails
+
+[<Fact>]
+let ``Submit catches exceptions`` () =
+    let given = test 1
+    given submitWithErrorTarget
+    |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
+
+                  This quantum machine always has an error."
 
 
 // Help
@@ -614,7 +671,7 @@ let ``Uses documentation`` () =
                      Commands:
                        simulate    (default) Run the program using a local simulator."
 
-    let given = test 31
+    let given = test 33
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
@@ -645,5 +702,5 @@ let ``Shows help text for submit command`` () =
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
 
-    let given = test 31
+    let given = test 33
     given ["submit"; "--help"] |> yields message
