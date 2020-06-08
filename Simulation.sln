@@ -63,6 +63,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DecompositionsCore", "Decom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.Decompositions.Type2.Core", "src\Simulation\DecompositionsCore\Type2\Microsoft.Quantum.Decompositions.Core.Type2.csproj", "{C548F9AA-DD12-4C39-BC75-8458CBCDB1D5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DecompositionsCore.Test", "DecompositionsCore.Test", "{2593CE5E-AFD0-4AF0-B816-0E263201E726}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Type2DecompositionsTests", "src\Simulation\DecompositionsCore.Test\Type2\Type2DecompositionsTests.csproj", "{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -427,6 +431,22 @@ Global
 		{C548F9AA-DD12-4C39-BC75-8458CBCDB1D5}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{C548F9AA-DD12-4C39-BC75-8458CBCDB1D5}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{C548F9AA-DD12-4C39-BC75-8458CBCDB1D5}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Debug|x64.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Release|x64.ActiveCfg = Release|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.Release|x64.Build.0 = Release|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -458,6 +478,8 @@ Global
 		{E9E387C0-2881-4F0C-8433-064BB18DB742} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
 		{4DF4699D-5A50-4B3F-8232-5B19CAE23950} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
 		{C548F9AA-DD12-4C39-BC75-8458CBCDB1D5} = {4DF4699D-5A50-4B3F-8232-5B19CAE23950}
+		{2593CE5E-AFD0-4AF0-B816-0E263201E726} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
+		{05C78D61-BAB4-459D-8E7E-72071BFC5FBB} = {2593CE5E-AFD0-4AF0-B816-0E263201E726}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
