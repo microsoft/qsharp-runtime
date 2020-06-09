@@ -549,7 +549,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         }
     }
 
-    operation UsingMeasuredQubitCheck () : Unit 
+    operation ReleaseMeasuredQubitCheck () : Unit 
     {
         using (q = Qubit())
         {
