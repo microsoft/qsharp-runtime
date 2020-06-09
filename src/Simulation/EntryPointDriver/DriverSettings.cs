@@ -10,22 +10,22 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The aliases for the simulator command-line option.
         /// </summary>
-        public IImmutableList<string> SimulatorOptionAliases { get; }
+        internal IImmutableList<string> SimulatorOptionAliases { get; }
 
         /// <summary>
         /// The name of the quantum simulator.
         /// </summary>
-        public string QuantumSimulatorName { get; }
+        internal string QuantumSimulatorName { get; }
 
         /// <summary>
         /// The name of the Toffoli simulator.
         /// </summary>
-        public string ToffoliSimulatorName { get; }
+        internal string ToffoliSimulatorName { get; }
 
         /// <summary>
         /// The name of the resources estimator.
         /// </summary>
-        public string ResourcesEstimatorName { get; }
+        internal string ResourcesEstimatorName { get; }
 
         /// <summary>
         /// Creates a new driver settings instance.
