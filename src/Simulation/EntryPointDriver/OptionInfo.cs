@@ -15,14 +15,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The option aliases.
         /// </summary>
-        internal IReadOnlyCollection<string> Aliases { get; }
+        internal IReadOnlyList<string> Aliases { get; }
 
         /// <summary>
         /// The option's default value if the option has one.
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the option does not have a default value.</exception>
         internal T DefaultValue => defaultValue();
-        
+
         /// <summary>
         /// True if the option is required.
         /// </summary>
@@ -42,12 +42,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The option suggestions.
         /// </summary>
         private readonly IEnumerable<string>? suggestions;
-        
+
         /// <summary>
         /// The option validator.
         /// </summary>
         private readonly ValidateSymbol<OptionResult>? validator;
-        
+
         /// <summary>
         /// Creates an <see cref="OptionInfo{T}"/> for a non-required option.
         /// </summary>
@@ -57,7 +57,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyCollection<string> aliases,
+            IReadOnlyList<string> aliases,
             T defaultValue,
             string description,
             IEnumerable<string>? suggestions = default,
@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             this.suggestions = suggestions;
             this.validator = validator;
         }
-        
+
         /// <summary>
         /// Creates an <see cref="OptionInfo{T}"/> for a required option.
         /// </summary>
@@ -79,7 +79,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyCollection<string> aliases,
+            IReadOnlyList<string> aliases,
             string description,
             IEnumerable<string>? suggestions = default,
             ValidateSymbol<OptionResult>? validator = default)

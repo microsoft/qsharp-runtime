@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Microsoft.Quantum.QsCompiler.CompilationBuilder;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -19,7 +18,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// True if the validation succeeded.
         /// </summary>
         internal bool IsSuccess { get; }
-        
+
         /// <summary>
         /// True if the validation failed.
         /// </summary>
@@ -38,7 +37,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         [MaybeNull]
         internal T ValueOrDefault { get; }
-        
+
         /// <summary>
         /// The error message of the validation, or null if the validation has no error message.
         /// </summary>
@@ -107,24 +106,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </returns>
         internal static Validation<IEnumerable<T>> Sequence<T>(this IEnumerable<Validation<T>> validations)
         {
-            var (successes, failures) = validations.Partition(validation => validation.IsSuccess);
+            var results = validations.ToLookup(validation => validation.IsSuccess);
+            var successes = results[true];
+            var failures = results[false];
             return failures.Any()
                 ? Validation<IEnumerable<T>>.Failure(failures.First().ErrorMessage)
                 : Validation<IEnumerable<T>>.Success(successes.Select(validation => validation.Value));
-        }
-
-        /// <summary>
-        /// Calls the action on the validation value if the validation is a success.
-        /// </summary>
-        /// <typeparam name="T">The type of the validation's success value.</typeparam>
-        /// <param name="validation">The validation.</param>
-        /// <param name="onSuccess">The action to call if the validation is a success.</param>
-        internal static void Then<T>(this Validation<T> validation, Action<T> onSuccess)
-        {
-            if (validation.IsSuccess)
-            {
-                onSuccess(validation.Value);
-            }
         }
     }
 }

@@ -24,17 +24,17 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The summary from the entry point's documentation comment.
         /// </summary>
         string Summary { get; }
-        
+
         /// <summary>
         /// The command-line options corresponding to the entry point's parameters.
         /// </summary>
         IEnumerable<Option> Options { get; }
-        
+
         /// <summary>
         /// The name of the default simulator to use when simulating the entry point.
         /// </summary>
-        string DefaultSimulator { get; }
-        
+        string DefaultSimulatorName { get; }
+
         /// <summary>
         /// Additional information about the entry point.
         /// </summary>

@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
 
@@ -26,6 +25,11 @@ namespace Microsoft.Quantum.EntryPointDriver
     public sealed class Driver<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
     {
         /// <summary>
+        /// The driver settings.
+        /// </summary>
+        private readonly DriverSettings settings;
+
+        /// <summary>
         /// The entry point.
         /// </summary>
         private readonly IEntryPoint<TIn, TOut> entryPoint;
@@ -38,24 +42,22 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
+        /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoint">The entry point.</param>
-        public Driver(IEntryPoint<TIn, TOut> entryPoint)
+        public Driver(DriverSettings settings, IEntryPoint<TIn, TOut> entryPoint)
         {
+            this.settings = settings;
             this.entryPoint = entryPoint;
             SimulatorOption = new OptionInfo<string>(
-                new[]
-                {
-                    "--" + CommandLineArguments.SimulatorOption.Item1,
-                    "-" + CommandLineArguments.SimulatorOption.Item2
-                },
-                entryPoint.DefaultSimulator,
+                settings.SimulatorOptionAliases,
+                entryPoint.DefaultSimulatorName,
                 "The name of the simulator to use.",
                 suggestions: new[]
                 {
-                    AssemblyConstants.QuantumSimulator,
-                    AssemblyConstants.ToffoliSimulator,
-                    AssemblyConstants.ResourcesEstimator,
-                    entryPoint.DefaultSimulator
+                    settings.QuantumSimulatorName,
+                    settings.ToffoliSimulatorName,
+                    settings.ResourcesEstimatorName,
+                    entryPoint.DefaultSimulatorName
                 });
         }
 
@@ -119,28 +121,28 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         private async Task<int> Simulate(ParseResult parseResult, string simulator) =>
             await Simulation<TCallable, TIn, TOut>.Simulate(
-                entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
+                settings, entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="settings">The submission settings.</param>
-        private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
+        /// <param name="azureSettings">The Azure submission settings.</param>
+        private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
-                Target = settings.Target,
-                Storage = settings.Storage,
-                Subscription = settings.Subscription,
-                ResourceGroup = settings.ResourceGroup,
-                Workspace = settings.Workspace,
-                AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
-                BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
-                JobName = DefaultIfShadowed(JobNameOption, settings.JobName),
-                Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
-                Output = DefaultIfShadowed(OutputOption, settings.Output),
-                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun),
-                Verbose = DefaultIfShadowed(VerboseOption, settings.Verbose)
+                Target = azureSettings.Target,
+                Storage = azureSettings.Storage,
+                Subscription = azureSettings.Subscription,
+                ResourceGroup = azureSettings.ResourceGroup,
+                Workspace = azureSettings.Workspace,
+                AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
+                BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
+                JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
+                Shots = DefaultIfShadowed(ShotsOption, azureSettings.Shots),
+                Output = DefaultIfShadowed(OutputOption, azureSettings.Output),
+                DryRun = DefaultIfShadowed(DryRunOption, azureSettings.DryRun),
+                Verbose = DefaultIfShadowed(VerboseOption, azureSettings.Verbose)
             });
 
         /// <summary>
@@ -213,7 +215,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
             new[] { "--storage" }, "The storage account connection string.");
-        
+
         /// <summary>
         /// The subscription option.
         /// </summary>
@@ -237,7 +239,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
             new[] { "--aad-token" }, default, "The Azure Active Directory authentication token.");
-        
+
         /// <summary>
         /// The base URI option.
         /// </summary>
@@ -249,7 +251,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
             new[] { "--job-name" }, default, "The name of the submitted job.");
-        
+
         /// <summary>
         /// The shots option.
         /// </summary>
@@ -308,7 +310,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a new help builder using the given console.
         /// </summary>
         /// <param name="console">The console to use.</param>
-        internal QsHelpBuilder(IConsole console) : base(console) { }
+        internal QsHelpBuilder(IConsole console) : base(console)
+        {
+        }
 
         protected override string ArgumentDescriptor(IArgument argument)
         {
