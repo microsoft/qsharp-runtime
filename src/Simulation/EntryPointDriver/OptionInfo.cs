@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The option aliases.
         /// </summary>
-        internal IReadOnlyList<string> Aliases { get; }
+        internal IImmutableList<string> Aliases { get; }
 
         /// <summary>
         /// The option's default value if the option has one.
@@ -57,7 +58,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyList<string> aliases,
+            IImmutableList<string> aliases,
             T defaultValue,
             string description,
             IEnumerable<string>? suggestions = default,
@@ -79,7 +80,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyList<string> aliases,
+            IImmutableList<string> aliases,
             string description,
             IEnumerable<string>? suggestions = default,
             ValidateSymbol<OptionResult>? validator = default)

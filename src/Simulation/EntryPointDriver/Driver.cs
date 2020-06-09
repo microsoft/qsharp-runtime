@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -208,55 +209,55 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The target option.
         /// </summary>
         internal static readonly OptionInfo<string> TargetOption = new OptionInfo<string>(
-            new[] { "--target" }, "The target device ID.");
+            ImmutableList.Create("--target"), "The target device ID.");
 
         /// <summary>
         /// The storage option.
         /// </summary>
         internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
-            new[] { "--storage" }, "The storage account connection string.");
+            ImmutableList.Create("--storage"), "The storage account connection string.");
 
         /// <summary>
         /// The subscription option.
         /// </summary>
         internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
-            new[] { "--subscription" }, "The subscription ID.");
+            ImmutableList.Create("--subscription"), "The subscription ID.");
 
         /// <summary>
         /// The resource group option.
         /// </summary>
         internal static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
-            new[] { "--resource-group" }, "The resource group name.");
+            ImmutableList.Create("--resource-group"), "The resource group name.");
 
         /// <summary>
         /// The workspace option.
         /// </summary>
         internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
-            new[] { "--workspace" }, "The workspace name.");
+            ImmutableList.Create("--workspace"), "The workspace name.");
 
         /// <summary>
         /// The AAD token option.
         /// </summary>
         internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
-            new[] { "--aad-token" }, default, "The Azure Active Directory authentication token.");
+            ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
 
         /// <summary>
         /// The base URI option.
         /// </summary>
         internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
-            new[] { "--base-uri" }, default, "The base URI of the Azure Quantum endpoint.");
+            ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
 
         /// <summary>
         /// The job name option.
         /// </summary>
         internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            new[] { "--job-name" }, default, "The name of the submitted job.");
+            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.
         /// </summary>
         internal static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
-            new[] { "--shots" },
+            ImmutableList.Create("--shots"),
             500,
             "The number of times the program is executed on the target machine.",
             validator: result =>
@@ -268,7 +269,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The output option.
         /// </summary>
         internal static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
-            new[] { "--output" },
+            ImmutableList.Create("--output"),
             OutputFormat.FriendlyUri,
             "The information to show in the output after the job is submitted.");
 
@@ -276,7 +277,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The dry run option.
         /// </summary>
         internal static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
-            new[] { "--dry-run" },
+            ImmutableList.Create("--dry-run"),
             false,
             "Validate the program and options, but do not submit to Azure Quantum.");
 
@@ -284,7 +285,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The verbose option.
         /// </summary>
         internal static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
-            new[] { "--verbose" }, false, "Show additional information about the submission.");
+            ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
 
         /// <summary>
         /// Displays a message to the console using the given color and text writer.
