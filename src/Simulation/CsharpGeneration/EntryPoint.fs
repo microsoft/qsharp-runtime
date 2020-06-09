@@ -28,9 +28,7 @@ let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
 
 /// The driver settings object.
 let private driverSettings =
-    let immutableList elements =
-        invoke (ident "System.Collections.Immutable.ImmutableList.Create")
-            ``(`` [``new array`` (Some "") elements] ``)``
+    let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
     let simulatorOptionAliases =
         [ "--" + fst CommandLineArguments.SimulatorOption |> literal
           "-" + snd CommandLineArguments.SimulatorOption |> literal ]
