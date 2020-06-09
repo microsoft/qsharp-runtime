@@ -42,7 +42,6 @@
     <PropertyGroup>
       <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
       <_ClassicalControlDir>$(MSBuildThisFileDirectory)TestProjects\ClassicalControlSupportTest\built\</_ClassicalControlDir>
-      <ExecutionTarget>$(MSBuildThisFileDirectory)..\TestTargets\Simulation\Example\bin\$(Configuration)\netcoreapp3.1\Example.dll</ExecutionTarget>
     </PropertyGroup>
     <ItemGroup>
       <_ExeFiles Include="$(_ExeDir)*" />
