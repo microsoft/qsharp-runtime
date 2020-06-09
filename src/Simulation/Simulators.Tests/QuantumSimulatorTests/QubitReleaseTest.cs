@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new QuantumSimulator();
 
-            //should not throw an exception
+            //should not throw an exception, as Measured qubits are allowed to be released, and the release aspect is handled in the C++ code
             await UsingMeasuredQubitCheck.Run(sim);
         }
     }
