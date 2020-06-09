@@ -28,18 +28,21 @@ let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
 
 /// The driver settings object.
 let private driverSettings =
+    let newDriverSettings = driverNamespace + ".DriverSettings" |> ``type`` |> SyntaxFactory.ObjectCreationExpression
+    let namedArg (name : string) expr = SyntaxFactory.NameColon name |> (SyntaxFactory.Argument expr).WithNameColon
     let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
     let simulatorOptionAliases =
-        [ "--" + fst CommandLineArguments.SimulatorOption |> literal
-          "-" + snd CommandLineArguments.SimulatorOption |> literal ]
+        [ literal <| "--" + fst CommandLineArguments.SimulatorOption 
+          literal <| "-" + snd CommandLineArguments.SimulatorOption ]
         |> immutableList
-    ``new init`` (driverNamespace + ".DriverSettings" |> ``type``) ``(`` [] ``)``
-        ``{``
-            [ ident "SimulatorOptionAliases" <-- simulatorOptionAliases
-              ident "QuantumSimulatorName" <-- literal AssemblyConstants.QuantumSimulator
-              ident "ToffoliSimulatorName" <-- literal AssemblyConstants.ToffoliSimulator
-              ident "ResourcesEstimatorName" <-- literal AssemblyConstants.ResourcesEstimator ]
-        ``}``
+    [ namedArg "simulatorOptionAliases" simulatorOptionAliases
+      namedArg "quantumSimulatorName" <| literal AssemblyConstants.QuantumSimulator
+      namedArg "toffoliSimulatorName" <| literal AssemblyConstants.ToffoliSimulator
+      namedArg "resourcesEstimatorName" <| literal AssemblyConstants.ResourcesEstimator ]
+    |> SyntaxFactory.SeparatedList
+    |> SyntaxFactory.ArgumentList
+    |> newDriverSettings.WithArgumentList
+    :> ExpressionSyntax
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
