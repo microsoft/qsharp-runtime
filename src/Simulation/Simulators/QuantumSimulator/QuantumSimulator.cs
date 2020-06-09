@@ -146,6 +146,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
+        ///     Intended to be used with simulator functions like Dump, Assert, AssertProb
+        ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
+        ///         - none of the qubits are null
+        ///         - there are no duplicated qubits
+        /// </summary>
+        bool[] CheckAndPreserveQubits(IQArray<Qubit> targets)
+        {
+            if (targets == null) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on a null Qubit array.");
+            if (targets.Length == 0) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on an empty Qubit array.");
+
+            bool[] used = new bool[((QSimQubitManager)QubitManager).MaxId];
+
+            foreach (var q in targets)
+            {
+                CheckQubitInUse(q, used);
+            }
+
+            return used;
+        }
+
+        /// <summary>
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
