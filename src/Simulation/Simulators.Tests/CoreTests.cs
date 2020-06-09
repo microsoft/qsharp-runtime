@@ -44,10 +44,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
-        public void ClassicControlSimulatorSupport()
+        public void ClassicalControlSimulatorSupport()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestClassicControl", "ClassicControlSupportTest.dll");
+            var exe = Path.Combine(asmPath, "TestClassicalControl", "ClassicalControlSupportTest.dll");
 
             ProcessRunner.Run("dotnet", $"{exe} --simulator QuantumSimulator", out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
@@ -56,10 +56,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
-        public void ClassicControlResourcesEstimatorSupport()
+        public void ClassicalControlResourcesEstimatorSupport()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestClassicControl", "ClassicControlSupportTest.dll");
+            var exe = Path.Combine(asmPath, "TestClassicalControl", "ClassicalControlSupportTest.dll");
 
             ProcessRunner.Run("dotnet", $"{exe} --simulator ResourcesEstimator", out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
