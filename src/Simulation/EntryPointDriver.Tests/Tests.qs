@@ -284,7 +284,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests {
+namespace Microsoft.Quantum.EntryPointDriver.Tests {
     @EntryPoint()
     operation ShadowTarget(target : String) : String {
         return target;
@@ -293,7 +293,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests {
+namespace Microsoft.Quantum.EntryPointDriver.Tests {
     @EntryPoint()
     operation ShadowShots(shots : Int) : Int {
         return shots;
