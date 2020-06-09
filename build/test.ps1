@@ -8,7 +8,7 @@ Write-Host "##[info]Test Native simulator"
 pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
 cmake --build . --config $Env:BUILD_CONFIGURATION
 ctest -C $Env:BUILD_CONFIGURATION
-if  ($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
     $script:all_ok = $False
 }
@@ -19,33 +19,26 @@ function Test-One {
     Param($project)
 
     Write-Host "##[info]Testing $project..."
-    dotnet test (Join-Path $PSScriptRoot $project) `
+    if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
+        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
+    }  else {
+        $args = @();
+    }
+    dotnet test $(Join-Path $PSScriptRoot $project) `
         -c $Env:BUILD_CONFIGURATION `
         -v $Env:BUILD_VERBOSITY `
         --logger trx `
-        /property:DefineConstants=$Env:ASSEMBLY_CONSTANTS `
+        @args `
         /property:Version=$Env:ASSEMBLY_VERSION
 
-    if  ($LastExitCode -ne 0) {
+    if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to test $project"
         $script:all_ok = $False
     }
 }
 
-Test-One '../src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj'
+Test-One '../Simulation.sln'
 
-Test-One '../src/Simulation/EntryPointDriver.Tests/Tests.EntryPointDriver.fsproj'
-
-Test-One '../src/Simulation/RoslynWrapper.Tests/Tests.RoslynWrapper.fsproj'
-
-Test-One '../src/Simulation/QCTraceSimulator.Tests/Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj'
-
-Test-One '../src/Simulation/Simulators.Tests/Tests.Microsoft.Quantum.Simulation.Simulators.csproj'
-
-Test-One '../src/Azure/Azure.Quantum.Client.Test/Microsoft.Azure.Quantum.Client.Test.csproj'
-
-if (-not $all_ok) 
-{
-    throw "At least one project failed to compile. Check the logs."
+if (-not $all_ok) {
+    throw "At least one project failed during testing. Check the logs."
 }
-

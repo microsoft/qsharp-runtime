@@ -51,18 +51,12 @@ type Emitter() =
                 | _ -> step.Name
 
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
-            let targetsQuantumProcessor = 
-                match step.AssemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with
-                | true, target -> target = AssemblyConstants.HoneywellProcessor || target = AssemblyConstants.IonQProcessor || target = AssemblyConstants.QCIProcessor
-                | _ -> false
-
             let allSources = GetSourceFiles.Apply compilation.Namespaces 
-            let generateCode (fileName : NonNullable<string>) = targetsQuantumProcessor || not ((fileName.Value |> Path.GetFileName).EndsWith ".dll")
 
-            for source in allSources |> Seq.filter generateCode do
+            for source in allSources |> Seq.filter context.GenerateCodeForSource do
                 let content = SimulationCode.generate source context
                 CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
-            for source in allSources |> Seq.filter (not << generateCode) do
+            for source in allSources |> Seq.filter (not << context.GenerateCodeForSource) do
                 let content = SimulationCode.loadedViaTestNames source context
                 if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
