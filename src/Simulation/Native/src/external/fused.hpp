@@ -15,7 +15,7 @@
 #ifdef HAVE_FMA
 #include "external/avx2/kernels.hpp"
 #else
-#include "external/avx2/kernels.hpp"
+#include "external/avx/kernels.hpp"
 #endif
 #endif
 #endif
@@ -30,7 +30,11 @@ namespace SIMULATOR
 class Fused
   {
   public:
-    Fused() {}
+      Fused() {
+        wfnCapacity     = 0u; // used to optimize runtime parameters
+        maxFusedSpan    =-1;  // determine span to use at runtime
+        maxFusedDepth   = 99; // determine max depth to use at runtime
+    }
 
     inline void reset()
     {
@@ -48,7 +52,7 @@ class Fused
       Fusion::IndexVector qs, cs;
       
       fusedgates.perform_fusion(m, qs, cs);
-      
+
       std::size_t cmask = 0;
       for (auto c : cs)
         cmask |= (1ull << c);
@@ -71,7 +75,7 @@ class Fused
           ::kernel(wfn, qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
           break;
       }
-      
+
       fusedgates = Fusion();
     }
     
@@ -98,20 +102,42 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-      if (fusedgates.num_qubits()+fusedgates.num_controls()+cs.size()>8 || fusedgates.size() > 15)
-        flush(wfn);
-      Fusion newgates = fusedgates;
-      newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-      
-      if (newgates.num_qubits() > 4)
-      {
-        flush(wfn);
-        fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-      }
-      else
-        fusedgates = newgates;
+      // Major runtime logic change here
+
+        // Have to update capacity as the WFN grows
+        if (wfnCapacity != wfn.capacity()) {
+            wfnCapacity     = wfn.capacity();
+            char* envNT = NULL;
+            size_t len;
+#ifdef _MSC_VER
+            errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
+#else
+            envNT = getenv("OMP_NUM_THREADS");
+#endif
+            if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
+                int nMaxThrds = 4;
+                if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
+                int nProcs = omp_get_num_procs();
+                if (nProcs < 3) nMaxThrds = nProcs;
+                omp_set_num_threads(nMaxThrds);
+            }
+
+            // This is now pretty much unlimited, could be set in the future
+            maxFusedDepth = 99;
+
+            // Default for large problems (optimized with benchmarks)
+            maxFusedSpan = 3;
+
+            // Reduce size for small problems (optimized with benchmarks)
+            if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
+        }
+
+        // New rules of when to stop fusing
+        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
+        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth)  flush(wfn);
+        fusedgates.insert(convertMatrix(mat), qs, cs);
     }
-    
+
     template <class T, class A, class M>
     void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
     {
@@ -120,6 +146,11 @@ class Fused
     }
   private:
     mutable Fusion fusedgates;
+
+    //: New runtime optimizatin settings
+    mutable size_t wfnCapacity;
+    mutable int    maxFusedSpan;
+    mutable int    maxFusedDepth;
   };
   
   
