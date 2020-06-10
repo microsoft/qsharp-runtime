@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Intrinsic {
         elif ( Length(paulis) == 2 ) {
             if (paulis[0] != paulis[1] or paulis[0] == PauliI) { fail $"Type 2 Decompositions support only rotation around XX, YY, ZZ given {paulis}"; }
             within {
-                MapPauli(qubits[1],paulis[0],paulis[1]);
+                MapPauli(qubits[1], paulis[0], paulis[1]);
             }
             apply {
                 if (paulis[1] == PauliX) {
@@ -31,12 +31,12 @@ namespace Microsoft.Quantum.Intrinsic {
         else { // Length(paulis) > 2 
             within {
                 for (i in 0 .. Length(paulis) - 1) {
-                    MapPauli(qubits[i],PauliZ,paulis[i]);
+                    MapPauli(qubits[i], PauliZ, paulis[i]);
                 }
             }
             apply {
                 within {
-                    SpreadZ(qubits[1], qubits[ 2 .. Length(qubits) - 1]);
+                    SpreadZ(qubits[1], qubits[2 .. Length(qubits) - 1]);
                 }
                 apply {
                     ExpNoId([PauliZ,PauliZ], theta, [qubits[0], qubits[1]]);

@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.Decompositions.Utilities {
         if (numerator == 0) { return (0,0); }
         mutable num = numerator;
         mutable denPow = denominatorPowerOfTwo;
-        while( num % 2 == 0 ) {
+        while(num % 2 == 0) {
             set num /= 2;
             set denPow += 1;
         }

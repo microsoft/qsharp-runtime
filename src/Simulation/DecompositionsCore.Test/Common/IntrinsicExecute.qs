@@ -67,7 +67,7 @@ namespace IntrinsicTesting {
         }
     }
 
-    operation ExecuteWithAdjointAndControlled<'TupleT>(op : ('TupleT => Unit is Adj + Ctl), tupleMapper : (Qubit[] -> (Qubit[], 'TupleT) ), tupleSize : Int ) : Unit {
+    operation ExecuteWithAdjointAndControlled<'TupleT>(op : ('TupleT => Unit is Adj + Ctl), tupleMapper : (Qubit[] -> (Qubit[], 'TupleT)), tupleSize : Int) : Unit {
         let op_composed = ApplyComposedA(Controlled op, tupleMapper, _);
         Microsoft.Quantum.Intrinsic.Message($"Executing {op}");
 
