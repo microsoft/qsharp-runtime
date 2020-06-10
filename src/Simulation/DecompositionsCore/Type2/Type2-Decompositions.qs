@@ -251,7 +251,8 @@ namespace Microsoft.Quantum.Intrinsic {
             let (newPaulis, newQubits) = Utils.RemovePauliI(paulis, qubits);
 
             if (Length(newPaulis) != 0) {
-                ExpNoId(newPaulis, theta , newQubits);
+                if (Length(newPaulis) == 2 and newPaulis[0] != newPaulis[1]) { fail $"Type 2 Decompositions support only rotation around XX, YY, ZZ given {paulis}"; }
+                ExpNoIdUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
             }
             else {
                 ApplyGlobalPhase(theta);
@@ -376,8 +377,15 @@ namespace Microsoft.Quantum.Intrinsic {
                 let newPaulis = Utils.ArrayFromIndiciesP(paulis, indices);
                 let newQubits = Utils.ArrayFromIndiciesQ(qubits, indices);
 
-                if (Length(indices) != 0) { ExpNoIdFrac(newPaulis, numerator, power , newQubits); }
-                else { ApplyGlobalPhaseFracWithR1Frac(numerator, power); }
+                if (Length(indices) != 0) {
+                    let (kModPositive,n) = Utils.ReducedDyadicFractionPeriodic(numerator, power); // k is odd, in the range [1,2*2^n-1] or (k,n) are both 0
+                    let numeratorD = Microsoft.Quantum.Math.PI() * Microsoft.Quantum.Convert.IntAsDouble(kModPositive);
+                    let theta = numeratorD * Microsoft.Quantum.Math.PowD(2.0, Microsoft.Quantum.Convert.IntAsDouble(-n));
+                    ExpNoIdUtil(newPaulis, theta, newQubits, RFrac(_, numerator, power, _));
+                }
+                else {
+                    ApplyGlobalPhaseFracWithR1Frac(numerator, power);
+                }
             }
         }
         adjoint(...) {
