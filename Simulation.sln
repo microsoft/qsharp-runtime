@@ -59,6 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "src\Simulation
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassicalControlSupportTest", "src\Simulation\Simulators.Tests\TestProjects\ClassicalControlSupportTest\ClassicalControlSupportTest.csproj", "{C8AA461A-B910-4357-82E0-79BB7DDB2EC2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HoneywellExe", "src\Simulation\Simulators.Tests\TestProjects\HoneywellExe\HoneywellExe.csproj", "{53222241-6E71-4F90-9608-11ECC5DF06A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -407,6 +409,22 @@ Global
 		{C8AA461A-B910-4357-82E0-79BB7DDB2EC2}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{C8AA461A-B910-4357-82E0-79BB7DDB2EC2}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{C8AA461A-B910-4357-82E0-79BB7DDB2EC2}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Debug|x64.Build.0 = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Release|x64.ActiveCfg = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.Release|x64.Build.0 = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{53222241-6E71-4F90-9608-11ECC5DF06A8}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -435,6 +453,7 @@ Global
 		{A85277B3-4E07-4E15-8F0C-07CC855A3BCB} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 		{46278108-D247-4EFC-AC34-23D4A676F62F} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 		{C8AA461A-B910-4357-82E0-79BB7DDB2EC2} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
+		{53222241-6E71-4F90-9608-11ECC5DF06A8} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
