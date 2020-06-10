@@ -398,7 +398,7 @@ void subsytemwavefunction_by_pivot(std::vector<T, A1> const& wfn,
 
     std::vector<size_t> chunks;
     
-#pragma omp parallel
+//@@@DBW remove nested parallel omp directive
     {
 #pragma omp single
         chunks = split_interval_in_chunks(max, omp_get_num_threads());
@@ -446,7 +446,7 @@ bool istensorproduct(std::vector<T, A1> const& wfn,
     std::size_t compl_st = compl_bits.to_ullong();
 
     std::atomic<bool> go(true);
-#pragma omp parallel
+//@@@DBW remove nested omp parallel
     {
         int thread_id = omp_get_thread_num();
         if (thread_id < chunks.size() - 1)
