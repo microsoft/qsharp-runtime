@@ -243,7 +243,6 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append("#ifndef _MSC_VER\n")
   kernelarray.append("\t"*indent + "if (ctrlmask == 0){\n")
   indent += 1
-  kernelarray.append("\t"*indent + "//@@@DBW Was missing parallel directive\n")
   kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
   indent = indent + 1
   for i in range(1,nc+1):
@@ -279,7 +278,6 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   indent = 1
   kernelarray.append("\t"*indent + "else{\n")
   indent += 1
-  kernelarray.append("\t"*indent + "//@@@DBW Was missing parallel directive\n")
   kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
   indent = indent + 1
   for i in range(1,nc+1):
@@ -317,7 +315,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append("".join(add))
 
 
-################ @@@DBW: Start of _MSC_VER code block ##################
+################ Start of _MSC_VER code block ##################
   kernelarray.append("#else\n")
   kernelarray.append("    std::intptr_t zero = 0;\n")
   kernelarray.append("    std::intptr_t dmask = dsorted[0]");

@@ -212,7 +212,6 @@ void kernel(V& psi, unsigned id5, unsigned id4, unsigned id3, unsigned id2, unsi
 
 #ifndef _MSC_VER
 	if (ctrlmask == 0){
-		//@@@DBW Was missing parallel directive
 		#pragma omp parallel for collapse(LOOP_COLLAPSE6) schedule(static)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){
 			for (std::size_t i1 = 0; i1 < dsorted[0]; i1 += 2 * dsorted[1]){
@@ -231,7 +230,6 @@ void kernel(V& psi, unsigned id5, unsigned id4, unsigned id3, unsigned id2, unsi
 		}
 	}
 	else{
-		//@@@DBW Was missing parallel directive
 		#pragma omp parallel for collapse(LOOP_COLLAPSE6) schedule(static)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){
 			for (std::size_t i1 = 0; i1 < dsorted[0]; i1 += 2 * dsorted[1]){

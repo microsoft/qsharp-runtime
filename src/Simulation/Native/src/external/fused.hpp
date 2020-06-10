@@ -15,7 +15,7 @@
 #ifdef HAVE_FMA
 #include "external/avx2/kernels.hpp"
 #else
-#include "external/avx/kernels.hpp" //@@@DBW: This was mistakenly avx2
+#include "external/avx/kernels.hpp"
 #endif
 #endif
 #endif
@@ -31,9 +31,9 @@ class Fused
   {
   public:
       Fused() {
-        wfnCapacity     = 0u; //@@@DBW used to optimize runtime parameters
-        maxFusedSpan    =-1;  //@@@DBW determine span to use at runtime
-        maxFusedDepth   = 99; //@@@DBW determine max depth to use at runtime
+        wfnCapacity     = 0u; // used to optimize runtime parameters
+        maxFusedSpan    =-1;  // determine span to use at runtime
+        maxFusedDepth   = 99; // determine max depth to use at runtime
     }
 
     inline void reset()
@@ -102,7 +102,7 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-      //@@@DBW Major runtime logic change here
+      // Major runtime logic change here
 
         // Have to update capacity as the WFN grows
         if (wfnCapacity != wfn.capacity()) {
@@ -147,7 +147,7 @@ class Fused
   private:
     mutable Fusion fusedgates;
 
-    //@@@DBW: New runtime optimizatin settings
+    //: New runtime optimizatin settings
     mutable size_t wfnCapacity;
     mutable int    maxFusedSpan;
     mutable int    maxFusedDepth;

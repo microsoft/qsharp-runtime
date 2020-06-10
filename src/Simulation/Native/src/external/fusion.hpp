@@ -59,7 +59,7 @@ public:
 	}
 	
 
-	//@@@DBW: This saves a class instance create/destroy on every gate insert
+	// This saves a class instance create/destroy on every gate insert
 	// Need a quick way to decide if we're going to grow too wide
 	int predict(IndexVector index_list, IndexVector const& ctrl_list = {}) {
 		int cnt = num_qubits() + num_controls();

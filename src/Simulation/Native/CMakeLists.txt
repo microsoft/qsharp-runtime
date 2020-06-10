@@ -24,7 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 # Configuration options (choose one to turn on)
-# @@@DBW: This should default to on
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(ENABLE_OPENMP  "Enable OpenMP Parallelization" ON)
 option(USE_SINGLE_PRECISION "Use single-precision floating point operations" OFF)
