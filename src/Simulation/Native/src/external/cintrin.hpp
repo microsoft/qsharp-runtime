@@ -36,8 +36,8 @@ inline void permute_qubits_and_matrix(I *delta_list, unsigned n, M & matrix){
 
 inline std::complex<double> fma(std::complex<double> const& c1, std::complex<double> const& c2, std::complex<double> const& a){
 	//@@@DBW: Expanded complex FMA to hard coded access (much faster)
-	double r = (c1._Val[0] * c2._Val[0] - c1._Val[1] * c2._Val[1]) + a._Val[0];
-	double i = (c1._Val[0] * c2._Val[1] + c1._Val[1] * c2._Val[0]) + a._Val[1];
+	double r = (c1.real() * c2.real() - c1.imag() * c2.imag()) + a.real();
+	double i = (c1.real() * c2.imag() + c1.imag() * c2.real()) + a.imag();
 	return std::complex<double>(r, i);
 }
 
