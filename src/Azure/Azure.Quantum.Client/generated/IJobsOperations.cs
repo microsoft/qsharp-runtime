@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.Quantum.Client
+namespace Microsoft.Quantum
 {
     using Microsoft.Rest;
     using Microsoft.Rest.Azure;

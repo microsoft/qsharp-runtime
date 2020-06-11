@@ -8,9 +8,8 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.Quantum.Client.Models
+namespace Microsoft.Quantum.Models
 {
-    using Microsoft.Rest;
     using Newtonsoft.Json;
     using System.Collections;
     using System.Collections.Generic;
@@ -204,30 +203,5 @@ namespace Microsoft.Azure.Quantum.Client.Models
         [JsonProperty(PropertyName = "errorData")]
         public RestError ErrorData { get; private set; }
 
-        /// <summary>
-        /// Validate the object.
-        /// </summary>
-        /// <exception cref="ValidationException">
-        /// Thrown if validation fails
-        /// </exception>
-        public virtual void Validate()
-        {
-            if (ContainerUri == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "ContainerUri");
-            }
-            if (InputDataFormat == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "InputDataFormat");
-            }
-            if (ProviderId == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "ProviderId");
-            }
-            if (Target == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "Target");
-            }
-        }
     }
 }

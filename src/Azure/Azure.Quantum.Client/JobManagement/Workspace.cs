@@ -10,10 +10,10 @@ namespace Microsoft.Azure.Quantum
     using System.Threading.Tasks;
     using global::Azure.Core;
     using Microsoft.Azure.Quantum.Authentication;
-    using Microsoft.Azure.Quantum.Client;
-    using Microsoft.Azure.Quantum.Client.Models;
     using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
+    using Microsoft.Quantum;
+    using Microsoft.Quantum.Models;
 
     /// <summary>
     /// Workspace class.

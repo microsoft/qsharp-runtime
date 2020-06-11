@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.Quantum.Client.Models;
-using Microsoft.Azure.Quantum.Utility;
-using Microsoft.Quantum.Runtime;
-
 namespace Microsoft.Azure.Quantum
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Azure.Quantum.Utility;
+    using Microsoft.Quantum.Models;
+    using Microsoft.Quantum.Runtime;
+
     /// <summary>
     /// Cloud job class.
     /// </summary>

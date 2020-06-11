@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.Quantum.Client
+namespace Microsoft.Quantum
 {
     using Microsoft.Rest;
     using Microsoft.Rest.Azure;
@@ -84,6 +84,11 @@ namespace Microsoft.Azure.Quantum.Client
         /// Gets the IProvidersOperations.
         /// </summary>
         IProvidersOperations Providers { get; }
+
+        /// <summary>
+        /// Gets the IStorageOperations.
+        /// </summary>
+        IStorageOperations Storage { get; }
 
     }
 }

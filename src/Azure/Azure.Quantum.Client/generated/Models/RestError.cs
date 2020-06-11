@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.Quantum.Client.Models
+namespace Microsoft.Quantum.Models
 {
     using Microsoft.Rest;
     using Microsoft.Rest.Serialization;
@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
     /// <summary>
     /// An Error response.
     /// </summary>
-    [JsonTransformation]
+    [Rest.Serialization.JsonTransformation]
     public partial class RestError
     {
         /// <summary>
