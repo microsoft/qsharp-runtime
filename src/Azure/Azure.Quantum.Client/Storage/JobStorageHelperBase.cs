@@ -86,8 +86,9 @@ namespace Microsoft.Azure.Quantum.Storage
         /// Gets the container client.
         /// </summary>
         /// <param name="containerName">Name of the container.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Container client.</returns>
-        protected abstract Task<BlobContainerClient> GetContainerClient(string containerName);
+        protected abstract Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default);
 
         protected static string GetContainerName(string jobId)
         {

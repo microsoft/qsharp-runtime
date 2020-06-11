@@ -100,13 +100,13 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                this.JobsClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
+                this.QuantumClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
                 {
                     BaseUri = this.baseUri,
                     SubscriptionId = subscriptionId,
                     ResourceGroupName = resourceGroupName,
                     WorkspaceName = workspaceName,
-                }.Jobs;
+                };
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Quantum
         /// <value>
         /// The jobs client.
         /// </value>
-        internal IJobsOperations JobsClient { get; set; }
+        internal IQuantumClient QuantumClient { get; set; }
 
         /// <summary>
         /// Submits the job.
@@ -140,7 +140,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.PutAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.PutAsync(
                     jobId: jobDefinition.Details.Id,
                     jobDefinition: jobDefinition.Details,
                     cancellationToken: cancellationToken);
@@ -165,7 +165,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.DeleteAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.DeleteAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
@@ -191,7 +191,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.GetAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.GetAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
@@ -214,7 +214,7 @@ namespace Microsoft.Azure.Quantum
         {
             try
             {
-                var jobs = await this.JobsClient.ListAsync(
+                var jobs = await this.QuantumClient.Jobs.ListAsync(
                     cancellationToken: cancellationToken);
 
                 return jobs
@@ -224,6 +224,27 @@ namespace Microsoft.Azure.Quantum
             {
                 throw CreateException(ex, "Could not list jobs");
             }
+        }
+
+        /// <summary>
+        /// Gets as SAS Uri for the linked storage account.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <param name="blobName">Name of the BLOB.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// Sas Uri.
+        /// </returns>
+        public async Task<string> GetSasUriAsync(string containerName, string blobName = null, CancellationToken cancellationToken = default)
+        {
+            BlobDetails details = new BlobDetails
+            {
+                ContainerName = containerName,
+                BlobName = blobName,
+            };
+
+            var response = await this.QuantumClient.Storage.SasUriAsync(details, cancellationToken);
+            return response.SasUri;
         }
 
         private WorkspaceClientException CreateException(

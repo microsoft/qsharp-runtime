@@ -10,20 +10,18 @@ namespace Microsoft.Azure.Quantum.Storage
     using Bond;
     using global::Azure.Storage.Blobs;
     using Microsoft.Azure.Quantum.Utility;
-    using Microsoft.Quantum;
-    using Microsoft.Quantum.Models;
 
-    public abstract class LinkedStorageJobHelper : JobStorageHelperBase
+    public class LinkedStorageJobHelper : JobStorageHelperBase
     {
-        private readonly IStorageOperations storageOperations;
+        private readonly IWorkspace workspace;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedStorageJobHelper"/> class.
         /// </summary>
-        /// <param name="storageOperations">The jobs client.</param>
-        public LinkedStorageJobHelper(IStorageOperations storageOperations)
+        /// <param name="workspace">The workspace.</param>
+        public LinkedStorageJobHelper(IWorkspace workspace)
         {
-            this.storageOperations = storageOperations;
+            this.workspace = workspace;
         }
 
         /// <summary>
@@ -91,12 +89,14 @@ namespace Microsoft.Azure.Quantum.Storage
             return (containerClient.Uri.ToString(), mappingUri.ToString());
         }
 
-        protected override async Task<BlobContainerClient> GetContainerClient(string containerName)
+        protected override async Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
         {
             // Calls the service to get a container SAS Uri
-            var containerUri = await storageOperations.SasUriAsync(new BlobDetails { ContainerName = containerName });
+            var containerUri = await this.workspace.GetSasUriAsync(
+                containerName: containerName, 
+                cancellationToken: cancellationToken);
 
-            return new BlobContainerClient(new Uri(containerUri.SasUri));
+            return new BlobContainerClient(new Uri(containerUri));
         }
     }
 }

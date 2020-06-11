@@ -14,10 +14,9 @@ namespace Microsoft.Azure.Quantum.Storage
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
-    public abstract class JobStorageHelper : JobStorageHelperBase
+    public class JobStorageHelper : JobStorageHelperBase
     {
         private readonly string connectionString;
-        private readonly CloudStorageAccount storageAccount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JobStorageHelper"/> class.
@@ -29,7 +28,7 @@ namespace Microsoft.Azure.Quantum.Storage
 
             try
             {
-                this.storageAccount = CloudStorageAccount.Parse(connectionString);
+                _ = CloudStorageAccount.Parse(connectionString);
             }
             catch (Exception ex)
             {
@@ -122,7 +121,7 @@ namespace Microsoft.Azure.Quantum.Storage
             return (containerUri, mappingUri);
         }
 
-        protected override Task<BlobContainerClient> GetContainerClient(string containerName)
+        protected override Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
             return Task.FromResult(blobServiceClient.GetBlobContainerClient(containerName));
