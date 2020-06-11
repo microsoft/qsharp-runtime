@@ -1,30 +1,30 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Core;
-using Microsoft.Azure.Quantum.Authentication;
-using Microsoft.Azure.Quantum.Client;
-using Microsoft.Azure.Quantum.Client.Models;
-using Microsoft.Azure.Quantum.Exceptions;
-using Microsoft.Azure.Quantum.Utility;
-
 namespace Microsoft.Azure.Quantum
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using global::Azure.Core;
+    using Microsoft.Azure.Quantum.Authentication;
+    using Microsoft.Azure.Quantum.Client;
+    using Microsoft.Azure.Quantum.Client.Models;
+    using Microsoft.Azure.Quantum.Exceptions;
+    using Microsoft.Azure.Quantum.Utility;
+
     /// <summary>
     /// Workspace class.
     /// </summary>
     /// <seealso cref="Microsoft.Azure.Quantum.Client.IWorkspace" />
     public class Workspace : IWorkspace
     {
-        private readonly Uri BaseUri;
-        private readonly string ResourceGroupName;
-        private readonly string SubscriptionId;
-        private readonly string WorkspaceName;
+        private readonly Uri baseUri;
+        private readonly string resourceGroupName;
+        private readonly string subscriptionId;
+        private readonly string workspaceName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Workspace"/> class.
@@ -79,13 +79,13 @@ namespace Microsoft.Azure.Quantum
             IAccessTokenProvider accessTokenProvider,
             Uri baseUri = null)
         {
-            BaseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
+            this.baseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
             Ensure.NotNullOrWhiteSpace(subscriptionId, nameof(subscriptionId));
-            SubscriptionId = subscriptionId;
+            this.subscriptionId = subscriptionId;
             Ensure.NotNullOrWhiteSpace(resourceGroupName, nameof(resourceGroupName));
-            ResourceGroupName = resourceGroupName;
+            this.resourceGroupName = resourceGroupName;
             Ensure.NotNullOrWhiteSpace(workspaceName, nameof(workspaceName));
-            WorkspaceName = workspaceName;
+            this.workspaceName = workspaceName;
 
             try
             {
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Quantum
             {
                 this.JobsClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
                 {
-                    BaseUri = BaseUri,
+                    BaseUri = this.baseUri,
                     SubscriptionId = subscriptionId,
                     ResourceGroupName = resourceGroupName,
                     WorkspaceName = workspaceName,
@@ -233,10 +233,10 @@ namespace Microsoft.Azure.Quantum
         {
             return new WorkspaceClientException(
                 message,
-                SubscriptionId,
-                ResourceGroupName,
-                WorkspaceName,
-                BaseUri,
+                subscriptionId,
+                resourceGroupName,
+                workspaceName,
+                baseUri,
                 jobId,
                 inner);
         }
