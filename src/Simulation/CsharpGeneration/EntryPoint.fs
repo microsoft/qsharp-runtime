@@ -24,7 +24,25 @@ type private Parameter =
 let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private driverNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
+
+/// The driver settings object.
+let private driverSettings =
+    let newDriverSettings = driverNamespace + ".DriverSettings" |> ``type`` |> SyntaxFactory.ObjectCreationExpression
+    let namedArg (name : string) expr = SyntaxFactory.NameColon name |> (SyntaxFactory.Argument expr).WithNameColon
+    let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
+    let simulatorOptionAliases =
+        [ literal <| "--" + fst CommandLineArguments.SimulatorOption 
+          literal <| "-" + snd CommandLineArguments.SimulatorOption ]
+        |> immutableList
+    [ namedArg "simulatorOptionAliases" simulatorOptionAliases
+      namedArg "quantumSimulatorName" <| literal AssemblyConstants.QuantumSimulator
+      namedArg "toffoliSimulatorName" <| literal AssemblyConstants.ToffoliSimulator
+      namedArg "resourcesEstimatorName" <| literal AssemblyConstants.ResourcesEstimator ]
+    |> SyntaxFactory.SeparatedList
+    |> SyntaxFactory.ArgumentList
+    |> newDriverSettings.WithArgumentList
+    :> ExpressionSyntax
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
@@ -104,7 +122,7 @@ let private mainMethod context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
     let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-    let driver = ``new`` driverType ``(`` [entryPointInstance] ``)``
+    let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
     let commandLineArgsName = "args"
     arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
         ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
@@ -121,7 +139,7 @@ let private entryPointClass context entryPoint =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
         |> snd
         |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
-    let defaultSimulatorProperty = property "DefaultSimulator" "string" (literal defaultSimulator)
+    let defaultSimulatorNameProperty = property "DefaultSimulatorName" "string" (literal defaultSimulator)
     let infoProperty =
         property "Info"
             (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
@@ -129,7 +147,7 @@ let private entryPointClass context entryPoint =
     let members : MemberDeclarationSyntax list = [
         summaryProperty
         parameterOptionsProperty parameters
-        defaultSimulatorProperty
+        defaultSimulatorNameProperty
         infoProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint
