@@ -183,13 +183,13 @@ namespace Microsoft.Azure.Quantum.Test
                 workspaceName: TestConstants.WorkspaceName)
             {
                 // Mock jobs client (only needed for unit tests)
-                JobsClient = new QuantumClient(MockHelper.GetHttpClientMock(), true)
+                QuantumClient = new QuantumClient(MockHelper.GetHttpClientMock(), true)
                 {
                     SubscriptionId = TestConstants.SubscriptionId,
                     ResourceGroupName = TestConstants.ResourceGroupName,
                     WorkspaceName = TestConstants.WorkspaceName,
                     BaseUri = new Uri(TestConstants.Endpoint),
-                }.Jobs,
+                },
             };
         }
 
