@@ -96,6 +96,10 @@ namespace Microsoft.Quantum
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "blobDetails");
             }
+            if (blobDetails != null)
+            {
+                blobDetails.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;

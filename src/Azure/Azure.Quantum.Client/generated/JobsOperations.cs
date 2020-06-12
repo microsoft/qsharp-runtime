@@ -465,6 +465,10 @@ namespace Microsoft.Quantum
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "jobDefinition");
             }
+            if (jobDefinition != null)
+            {
+                jobDefinition.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
