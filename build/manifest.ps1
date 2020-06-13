@@ -25,7 +25,7 @@
         ".\src\simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
         ".\src\simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
         ".\src\simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulators.dll",
-        ".\src\simulation\DocumentationGenerationStep\bin\$Env:BUILD_CONFIGURATIOND\netstandard2.1\Microsoft.Quantum.Experimental.DocumentationGeneration.dll",
+        ".\src\simulation\DocumentationGenerationStep\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Experimental.DocumentationGeneration.dll",
         ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Xunit.dll"
     ) | ForEach-Object { Get-Item (Join-Path $PSScriptRoot (Join-Path ".." $_)) };
 } | Write-Output;
