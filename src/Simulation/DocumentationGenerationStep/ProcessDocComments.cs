@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 
 #nullable enable
 
-namespace Microsoft.Quantum.Demos.CompilerExtensions.Demo
+namespace Microsoft.Quantum.Documentation
 {
     public class ProcessDocComments
     : SyntaxTreeTransformation<ProcessDocComments.TransformationState>
