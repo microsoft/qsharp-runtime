@@ -15,7 +15,6 @@
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />
-    <ProjectReference Include="..\..\..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
