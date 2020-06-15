@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Quantum.Models
+namespace Microsoft.Azure.Quantum.Client.Models
 {
     using Newtonsoft.Json;
     using System.Collections;

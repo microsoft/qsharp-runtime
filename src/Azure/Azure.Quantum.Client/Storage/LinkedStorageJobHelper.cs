@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Quantum.Storage
                 .GetBlobClient(Constants.Storage.InputBlobName)
                 .Uri;
 
-            return (containerClient.Uri.ToString(), inputUri.ToString());
+            return (GetUriPath(containerClient.Uri), GetUriPath(inputUri));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.Quantum.Storage
                 .GetBlobClient(Constants.Storage.MappingBlobName)
                 .Uri;
 
-            return (containerClient.Uri.ToString(), mappingUri.ToString());
+            return (GetUriPath(containerClient.Uri), GetUriPath(mappingUri));
         }
 
         protected override async Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
@@ -97,6 +97,11 @@ namespace Microsoft.Azure.Quantum.Storage
                 cancellationToken: cancellationToken);
 
             return new BlobContainerClient(new Uri(containerUri));
+        }
+
+        private string GetUriPath(Uri uri)
+        {
+            return uri.GetLeftPart(UriPartial.Path);
         }
     }
 }

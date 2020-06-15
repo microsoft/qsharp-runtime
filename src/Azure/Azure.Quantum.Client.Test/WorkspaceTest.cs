@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Azure.Quantum.Client;
+using Microsoft.Azure.Quantum.Client.Models;
 using Microsoft.Azure.Quantum.Exceptions;
-using Microsoft.Quantum;
-using Microsoft.Quantum.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 

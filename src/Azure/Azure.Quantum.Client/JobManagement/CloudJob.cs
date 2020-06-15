@@ -6,8 +6,8 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Azure.Quantum.Client.Models;
     using Microsoft.Azure.Quantum.Utility;
-    using Microsoft.Quantum.Models;
     using Microsoft.Quantum.Runtime;
 
     /// <summary>
