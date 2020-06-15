@@ -22,6 +22,10 @@ namespace Microsoft
     {
       MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
+    namespace SimulatorAVX512
+    {
+        MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+    }
   }
 }
 
