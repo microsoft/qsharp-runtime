@@ -448,7 +448,7 @@ int main()
 
                     auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx],numThreads);
 
-                    const int nQs = 15;
+                    const int nQs = 26;
                     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
                     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
