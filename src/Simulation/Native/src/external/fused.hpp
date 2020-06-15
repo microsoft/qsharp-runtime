@@ -221,7 +221,7 @@ class Fused
                 maxFusedSpan = 3;
                 if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
             }
-            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, wfnCapacity);
+            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
         }
 
         Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
