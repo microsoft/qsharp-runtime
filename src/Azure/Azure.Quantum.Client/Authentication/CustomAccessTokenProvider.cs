@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <returns>A <see cref="Task"/> encapsulating the access token.</returns>
         public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
         {
-            var application = applicationLazy.Value;
+            var application = await applicationLazy.Value;
 
             try
             {
