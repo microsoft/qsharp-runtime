@@ -4,12 +4,11 @@
 using System;
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Provides entry point simulation.
@@ -22,14 +21,15 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// Simulates the entry point.
         /// </summary>
+        /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoint">The entry point.</param>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
         internal static async Task<int> Simulate(
-            IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, string simulator)
+            DriverSettings settings, IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, string simulator)
         {
-            if (simulator == AssemblyConstants.ResourcesEstimator)
+            if (simulator == settings.ResourcesEstimatorName)
             {
                 var resourcesEstimator = new ResourcesEstimator();
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
@@ -38,12 +38,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             else
             {
                 var (isCustom, createSimulator) =
-                    simulator == AssemblyConstants.QuantumSimulator
+                    simulator == settings.QuantumSimulatorName
                         ? (false, () => new QuantumSimulator())
-                        : simulator == AssemblyConstants.ToffoliSimulator
+                        : simulator == settings.ToffoliSimulatorName
                         ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
                         : (true, entryPoint.CreateDefaultCustomSimulator);
-                if (isCustom && simulator != entryPoint.DefaultSimulator)
+                if (isCustom && simulator != entryPoint.DefaultSimulatorName)
                 {
                     DisplayCustomSimulatorError(simulator);
                     return 1;
@@ -52,7 +52,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             }
             return 0;
         }
-        
+
         /// <summary>
         /// Runs the entry point on a simulator and displays its return value.
         /// </summary>
@@ -79,7 +79,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 }
             }
         }
-        
+
         /// <summary>
         /// Displays an error message for using a non-default custom simulator.
         /// </summary>

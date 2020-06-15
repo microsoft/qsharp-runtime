@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests
+module Microsoft.Quantum.EntryPointDriver.Tests
 
 open System
 open System.Collections.Immutable
@@ -33,7 +33,7 @@ let private intrinsicFile = Path.GetFullPath "Intrinsic.qs"
 let private testFile = Path.GetFullPath "Tests.qs"
 
 /// The namespace used for the test cases.
-let private testNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests"
+let private testNamespace = "Microsoft.Quantum.EntryPointDriver.Tests"
 
 /// The test case for the given test number.
 let private testCase =
@@ -95,12 +95,12 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime"
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
-            "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+            "Microsoft.Quantum.EntryPointDriver"
             "Microsoft.Quantum.QSharp.Core"
             "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
-            "Microsoft.Quantum.Simulation.Simulators"
+            "Microsoft.Quantum.Simulators"
         ]
         |> List.map (fun name -> upcast MetadataReference.CreateFromFile (referencedAssembly name))
 
