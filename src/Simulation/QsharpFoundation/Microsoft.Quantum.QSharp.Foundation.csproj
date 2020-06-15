@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <Authors>Microsoft</Authors>
-    <Description>Base support for the Q# programming language.</Description>
+    <Description>Foundation implementation for the Q# programming language.</Description>
     <PackageReleaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
