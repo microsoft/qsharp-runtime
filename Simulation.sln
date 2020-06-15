@@ -57,6 +57,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library2", "src\Simulation\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\Simulation\Simulators.Tests\TestProjects\UnitTests\UnitTests.csproj", "{46278108-D247-4EFC-AC34-23D4A676F62F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "simulation", "simulation", "{A50D5CD0-FA72-48EF-AC24-F41FB8205DAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QsharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj", "{7E873A90-5291-4DB7-AE87-E75EA904E284}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -389,6 +393,22 @@ Global
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.Release|x64.Build.0 = Release|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{7E873A90-5291-4DB7-AE87-E75EA904E284}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -416,6 +436,8 @@ Global
 		{7256B986-6705-42FC-9F57-485D72D9DE51} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 		{A85277B3-4E07-4E15-8F0C-07CC855A3BCB} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 		{46278108-D247-4EFC-AC34-23D4A676F62F} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
+		{A50D5CD0-FA72-48EF-AC24-F41FB8205DAE} = {99E234BC-997E-4E63-9F5C-3C3977543404}
+		{7E873A90-5291-4DB7-AE87-E75EA904E284} = {A50D5CD0-FA72-48EF-AC24-F41FB8205DAE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
