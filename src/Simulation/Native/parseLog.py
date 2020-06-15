@@ -3,7 +3,7 @@ import sys
 
 logName = sys.argv[1]
 reFN    = re.compile(r"[./\\]*(\w+)_(\d+)\.")
-reSim   = re.compile(' (Generic|AVX|AVX2)$')
+reSim   = re.compile(' (Generic|AVX|AVX2|AVX512)$')
 rePars  = re.compile(r'OMP_NUM_THREADS=(\d) fusedSpan=(\d) fusedDepth=(\d+) wfnCapacity=(\d+)')
 reInfo  = re.compile(r'sz=([.\d]+) nQs=([.\d]+) nCs=([.\d]+) flushes= *(\d+).*gates= *(\d+).*elap= *(\d+).*gps= *([.\d]+).*fus= *([.\d]+).*ker= *([.\d]+)')
 found   = reFN.search(logName)

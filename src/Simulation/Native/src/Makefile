@@ -317,6 +317,33 @@ simulator/simulatoravx2.cpp.s:
 	cd /mnt/c/depot/Git/qsharp-runtime/src/Simulation/Native && $(MAKE) -f src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/build.make src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/simulator/simulatoravx2.cpp.s
 .PHONY : simulator/simulatoravx2.cpp.s
 
+simulator/simulatoravx512.o: simulator/simulatoravx512.cpp.o
+
+.PHONY : simulator/simulatoravx512.o
+
+# target to build an object file
+simulator/simulatoravx512.cpp.o:
+	cd /mnt/c/depot/Git/qsharp-runtime/src/Simulation/Native && $(MAKE) -f src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/build.make src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/simulator/simulatoravx512.cpp.o
+.PHONY : simulator/simulatoravx512.cpp.o
+
+simulator/simulatoravx512.i: simulator/simulatoravx512.cpp.i
+
+.PHONY : simulator/simulatoravx512.i
+
+# target to preprocess a source file
+simulator/simulatoravx512.cpp.i:
+	cd /mnt/c/depot/Git/qsharp-runtime/src/Simulation/Native && $(MAKE) -f src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/build.make src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/simulator/simulatoravx512.cpp.i
+.PHONY : simulator/simulatoravx512.cpp.i
+
+simulator/simulatoravx512.s: simulator/simulatoravx512.cpp.s
+
+.PHONY : simulator/simulatoravx512.s
+
+# target to generate assembly for a file
+simulator/simulatoravx512.cpp.s:
+	cd /mnt/c/depot/Git/qsharp-runtime/src/Simulation/Native && $(MAKE) -f src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/build.make src/CMakeFiles/Microsoft.Quantum.Simulator.Runtime.dir/simulator/simulatoravx512.cpp.s
+.PHONY : simulator/simulatoravx512.cpp.s
+
 util/openmp.o: util/openmp.cpp.o
 
 .PHONY : util/openmp.o
@@ -373,6 +400,9 @@ help:
 	@echo "... simulator/simulatoravx2.o"
 	@echo "... simulator/simulatoravx2.i"
 	@echo "... simulator/simulatoravx2.s"
+	@echo "... simulator/simulatoravx512.o"
+	@echo "... simulator/simulatoravx512.i"
+	@echo "... simulator/simulatoravx512.s"
 	@echo "... util/openmp.o"
 	@echo "... util/openmp.i"
 	@echo "... util/openmp.s"

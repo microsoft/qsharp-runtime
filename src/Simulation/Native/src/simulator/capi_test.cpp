@@ -441,7 +441,8 @@ int main()
     for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
         for (int flIdx = 6; flIdx < 7; flIdx++) { // 6,7
             for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
-                for (int simTyp = 1; simTyp < 4; simTyp++) { // 1,4
+                for (int simTyp = 4; simTyp < 5; simTyp++) { // 1,5
+                    if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                     if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 

@@ -39,7 +39,7 @@ namespace Microsoft
       {
 #ifndef _MSC_VER
         //__builtin_cpu_init();
-        return false; // __builtin_cpu_supports("avx512bw");
+          return (__builtin_cpu_supports("avx512f") != 0 && __builtin_cpu_supports("avx512cd") != 0);
 #else
         int cpuInfo[4];
         __cpuid(cpuInfo,0);

@@ -22,6 +22,10 @@ namespace Microsoft
     {
       MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
+    namespace SimulatorAVX512
+    {
+        MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+    }
   }
 }
 
@@ -54,11 +58,17 @@ namespace Microsoft
             case 3: 
                 printf("@@@DBG: AVX2\n");
                 return SimulatorAVX2::createSimulator(maxlocal);
-
+            case 4:
+                printf("@@@DBG: AVX512\n");
+                return SimulatorAVX512::createSimulator(maxlocal);
             }
         }
 
-        if (haveFMA() && haveAVX2())
+        if (haveAVX512())
+        {
+            return SimulatorAVX512::createSimulator(maxlocal);
+        }
+        else if (haveFMA() && haveAVX2())
         {
             return SimulatorAVX2::createSimulator(maxlocal);
         }
