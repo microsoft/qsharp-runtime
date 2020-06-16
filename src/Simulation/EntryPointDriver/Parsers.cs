@@ -8,7 +8,7 @@ using System.Linq;
 using System.Numerics;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Parsers for command-line arguments.

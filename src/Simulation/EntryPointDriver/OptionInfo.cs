@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Linq;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Information about a command-line option.
@@ -15,14 +16,14 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <summary>
         /// The option aliases.
         /// </summary>
-        internal IReadOnlyCollection<string> Aliases { get; }
+        internal IImmutableList<string> Aliases { get; }
 
         /// <summary>
         /// The option's default value if the option has one.
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the option does not have a default value.</exception>
         internal T DefaultValue => defaultValue();
-        
+
         /// <summary>
         /// True if the option is required.
         /// </summary>
@@ -42,12 +43,12 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The option suggestions.
         /// </summary>
         private readonly IEnumerable<string>? suggestions;
-        
+
         /// <summary>
         /// The option validator.
         /// </summary>
         private readonly ValidateSymbol<OptionResult>? validator;
-        
+
         /// <summary>
         /// Creates an <see cref="OptionInfo{T}"/> for a non-required option.
         /// </summary>
@@ -57,7 +58,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyCollection<string> aliases,
+            IImmutableList<string> aliases,
             T defaultValue,
             string description,
             IEnumerable<string>? suggestions = default,
@@ -70,7 +71,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
             this.suggestions = suggestions;
             this.validator = validator;
         }
-        
+
         /// <summary>
         /// Creates an <see cref="OptionInfo{T}"/> for a required option.
         /// </summary>
@@ -79,7 +80,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <param name="suggestions">The option suggestions.</param>
         /// <param name="validator">The option validator.</param>
         internal OptionInfo(
-            IReadOnlyCollection<string> aliases,
+            IImmutableList<string> aliases,
             string description,
             IEnumerable<string>? suggestions = default,
             ValidateSymbol<OptionResult>? validator = default)
