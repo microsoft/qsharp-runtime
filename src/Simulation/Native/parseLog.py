@@ -5,7 +5,7 @@ logName = sys.argv[1]
 reFN    = re.compile(r"[./\\]*(\w+)_(\d+)\.")
 reSim   = re.compile(' (Generic|AVX|AVX2|AVX512)$')
 rePars  = re.compile(r'OMP_NUM_THREADS=(\d) fusedSpan=(\d) fusedDepth=(\d+) wfnCapacity=(\d+)')
-reInfo  = re.compile(r'sz=([.\d]+) nQs=([.\d]+) nCs=([.\d]+) flushes= *(\d+).*gates= *(\d+).*elap= *(\d+).*gps= *([.\d]+).*fus= *([.\d]+).*ker= *([.\d]+)')
+reInfo  = re.compile(r'sz=([.\d]+) nQs=([.\d]+) nCs=([.\d]+) flushes= *(\d+).*gates= *(\d+).*elap= *(\d+).*(.)gps= *([.\d]+).*fus= *([.\d]+).*ker= *([.\d]+)')
 found   = reFN.search(logName)
 env     = found.group(1)
 qs      = found.group(2)
@@ -43,9 +43,11 @@ while True:
         flushes     = found.group(4)
         gates       = found.group(5)
         elap        = found.group(6)
-        gps         = float(found.group(7))
-        fusions     = found.group(8)
-        kernel      = found.group(9)
+        if (found.group(7) == 'k'): mul = 1000.0
+        else:                       mul = 1.0
+        gps         = float(found.group(8)) * mul
+        fusions     = found.group(9)
+        kernel      = found.group(10)
         gpss.append(gps)
         continue
 

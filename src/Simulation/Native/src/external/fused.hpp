@@ -108,6 +108,12 @@ class Fused
         case 5:
           ::kernel(wfn, qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
           break;
+        case 6:
+            ::kernel(wfn, qs[5], qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
+            break;
+        case 7:
+            ::kernel(wfn, qs[6], qs[5], qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
+            break;
       }
 
       dbgT2 = std::chrono::system_clock::now();
@@ -120,31 +126,17 @@ class Fused
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
       if (dbgElapsed >= 10.0) {
-          double nFused = (float)dbgNfused;
-          if (nFused < 1000.0 || dbgNgates < 1000.0) {
-              printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0f  gates=%4.0f  elap=%5.1f  gps=%7.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
-                  ((float)dbgSize / nFused),
-                  ((float)dbgNqs / nFused),
-                  ((float)dbgNcs / nFused),
-                  nFused,
-                  (float)dbgNgates,
-                  dbgElapsed,
-                  (float)dbgNgates / dbgElapsed,
-                  dbgET1 * 100.0 / dbgElapsed,
-                  dbgET2 * 100.0 / dbgElapsed);
-          }
-          else {
-              printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0fK gates=%4.0fK elap=%5.1f kgps=%7.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
-                  ((float)dbgSize / nFused),
-                  ((float)dbgNqs / nFused),
-                  ((float)dbgNcs / nFused),
-                  nFused / 1000.,
-                  (float)dbgNgates / 1000.,
-                  dbgElapsed,
-                  (float)dbgNgates / (1000. * dbgElapsed),
-                  dbgET1 * 100.0 / dbgElapsed,
-                  dbgET2 * 100.0 / dbgElapsed);
-          }
+            double nFused = (float)dbgNfused;
+            printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%4.0f gates=%8.0f  elap=%5.1f gps=%9.3f (fus=%5.1f%%, ker=%5.1f%%)\n",
+                ((float)dbgSize / nFused),
+                ((float)dbgNqs / nFused),
+                ((float)dbgNcs / nFused),
+                nFused,
+                (float)dbgNgates,
+                dbgElapsed,
+                (float)dbgNgates / dbgElapsed,
+                dbgET1 * 100.0 / dbgElapsed,
+                dbgET2 * 100.0 / dbgElapsed);
           fflush(stdout);
           dbgET1    = 0.0;
           dbgET2    = 0.0;
