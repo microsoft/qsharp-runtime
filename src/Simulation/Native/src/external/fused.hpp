@@ -134,7 +134,8 @@ class Fused
 
         // New rules of when to stop fusing
         Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
-        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth)  flush(wfn);
+        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth) flush(wfn);
+        
         fusedgates.insert(convertMatrix(mat), qs, cs);
     }
 

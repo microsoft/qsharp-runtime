@@ -279,7 +279,7 @@ class Wavefunction
         //std::cout << *this << "\n";
         //std::copy(qubitmap_.begin(), qubitmap_.end(), std::ostream_iterator<T>(std::cout, "\n"));
         //std::cout << wfn_[0] << " " << qubitmap_[0];
-        auto qid = qubit(g);
+        //auto qid = qubit(g);
         reorderWFN(qubit(g), 0);
         fused_.apply(wfn_, g.matrix(), qubit(g));
     }
@@ -291,10 +291,11 @@ class Wavefunction
         std::vector<qubit_t> pcs = qubits(cs);
         for (unsigned i = 0; i < pcs.size(); i++)
         {
-            reorderWFN(qubit(pcs[i]), i);
+            reorderWFN(pcs[i], i);
         }
         reorderWFN(qubit(g), pcs.size());
-        fused_.apply_controlled(wfn_, g.matrix(), pcs, qubit(g));
+        pcs = qubits(cs);
+        fused_.apply_controlled(wfn_, g.matrix(), pcs, qubit(g)); 
     }
 
     /// generic application of a controlled gate
