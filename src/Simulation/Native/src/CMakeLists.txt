@@ -10,7 +10,7 @@ set(FMAFLAGS "")
 else(MSVC)
 SET(AVXFLAGS "-mavx")
 set(AVX2FLAGS "-mfma -mavx2")
-set(AVX512FLAGS "-mavx512f -mavx512cd")
+set(AVX512FLAGS "-mavx512f -mavx512cd -mfma")
 set(FMAFLAGS )
 endif(MSVC)
 

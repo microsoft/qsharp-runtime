@@ -438,10 +438,10 @@ int main()
 #if 1 // Simulator timing tests
     printf("@@@DBG max=%d procs=%d thrds=%d\n", omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
     int fuseLimits[] = {0,1,2,5,10,50,100};
-    for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) { // 1,5
+    for (int fuseSpan = 5; fuseSpan < 8; fuseSpan++) { // 1,5
         for (int flIdx = 6; flIdx < 7; flIdx++) { // 6,7
             for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
-                for (int simTyp = 4; simTyp < 5; simTyp++) { // 1,5
+                for (int simTyp = 1; simTyp < 5; simTyp++) { // 1,5
                     if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                     if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
