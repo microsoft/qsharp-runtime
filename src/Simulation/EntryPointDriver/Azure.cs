@@ -8,9 +8,9 @@ using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Provides entry point submission to Azure Quantum.

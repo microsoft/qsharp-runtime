@@ -8,7 +8,7 @@ using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using static System.Reflection.BindingFlags;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Creates command-line options.
