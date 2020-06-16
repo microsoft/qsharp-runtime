@@ -12,24 +12,32 @@ env     = found.group(1)
 fp      = open(logName,'r')
 gpss    = []
 print(f'"env","sim","qs","threads","span","sz","gps"')
+sim     = ""
+totalQs = -1
+threads = -1
+span    = -1
+sz      = -1
+
+def dumpGpss():
+    global gpss,env,sim,totalQs,threads,span,sz
+    if len(gpss) > 0:
+        gps = max(gpss)
+        print(f"{env},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
+        gpss = []
+
 while True:
     inp = fp.readline()
     if inp == "": 
-        if len(gpss) > 0:
-            gps = max(gpss)
-            print(f"{env},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
-            gpss = []
+        dumpGpss()
         break
     found   = reNQs.search(inp)
     if found:
+        dumpGpss()
         totalQs     = found.group(1)
         continue
     found   = reSim.search(inp)
     if found:
-        if len(gpss) > 0:
-            gps = max(gpss)
-            print(f"{env},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
-            gpss = []
+        dumpGpss()
         sim     = found.group(1)
         continue
     found   = rePars.search(inp)

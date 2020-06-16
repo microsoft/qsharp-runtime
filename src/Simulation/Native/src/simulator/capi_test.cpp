@@ -441,6 +441,7 @@ int main()
     for (int qIdx = 0; qIdx < 2; qIdx++) { // 0,2
         int nQs = qCount[qIdx];
         printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d\n", nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
+        fflush(stdout);
         for (int fuseSpan = 1; fuseSpan < 8; fuseSpan++) { // 1,8
             for (int flIdx = 6; flIdx < 7; flIdx++) { // 6,7
                 for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
