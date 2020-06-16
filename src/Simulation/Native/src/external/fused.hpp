@@ -127,7 +127,7 @@ class Fused
       dbgElapsed = elapsed.count();
       if (dbgElapsed >= 10.0) {
             double nFused = (float)dbgNfused;
-            printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flushes=%8.2g gates=%8.2g  elap=%5.1f gps=%10.4g (fus=%5.1f%%, ker=%5.1f%%)\n",
+            printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flsh=%8.2g gts=%8.2g elap=%5.1f gps=%10.4g (fus=%5.1f%%, ker=%5.1f%%)\n",
                 ((float)dbgSize / nFused),
                 ((float)dbgNqs / nFused),
                 ((float)dbgNcs / nFused),
