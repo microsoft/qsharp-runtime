@@ -6,7 +6,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
 
-    @Test("QCTraceSimulator")
+    @Test("ResourcesEstimator")
     /// # Summary
     /// Checks for regression against microsoft/qsharp-runtime#256.
     operation CheckRandomInCorrectRange() : Unit {
