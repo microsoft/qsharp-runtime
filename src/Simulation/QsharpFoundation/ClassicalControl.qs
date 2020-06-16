@@ -3,8 +3,6 @@
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: update namespace to a more appropriate name
 {
-    open Microsoft.Quantum.Intrinsic;
-
     operation NoOp() : Unit is Ctl + Adj {}
 
     // Private helper operations.
