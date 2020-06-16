@@ -89,6 +89,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         ///     Makes sure the target qubit of an operation is valid. In particular it checks that the qubit instance is not null.
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         void CheckQubit(Qubit q1)
         {
@@ -101,6 +102,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> ctrls, Qubit q1)
         {
@@ -127,6 +129,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> targets)
         {
@@ -170,6 +173,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> ctrls, IQArray<Qubit> targets)
         {
