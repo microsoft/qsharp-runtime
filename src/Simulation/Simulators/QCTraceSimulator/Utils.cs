@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 
@@ -214,32 +216,36 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// <param name="uniformZeroOneSample"> Number between Zero and one, uniformly distributed</param>
         public static long SampleDistribution(IQArray<double> unnormalizedDistribution, double uniformZeroOneSample)
         {
-            double total = 0.0;
-            foreach (double prob in unnormalizedDistribution)
+            if (unnormalizedDistribution.Any(prob => prob < 0.0))
             {
-                if (prob < 0)
-                {
-                    throw new ExecutionFailException("Random expects array of non-negative doubles.");
-                }
-                total += prob;
+                throw new ExecutionFailException("Random expects array of non-negative doubles.");
             }
 
+            var total = unnormalizedDistribution.Sum();
             if (total == 0)
             {
                 throw new ExecutionFailException("Random expects array of non-negative doubles with positive sum.");
             }
 
-            double sample = uniformZeroOneSample * total;
-            double sum = unnormalizedDistribution[0];
-            for (int i = 0; i < unnormalizedDistribution.Length - 1; ++i)
-            {
-                if (sum >= sample)
-                {
-                    return i;
-                }
-                sum += unnormalizedDistribution[i];
-            }
-            return unnormalizedDistribution.Length;
+            var sample = uniformZeroOneSample * total;
+
+            return unnormalizedDistribution
+                // Get the unnormalized CDF of the distribution.
+                .SelectAggregates((double acc, double x) => acc + x)
+                // Look for the first index at which the CDF is bigger
+                // than the random sample of 𝑈(0, 1) that we were given
+                // as a parameter.
+                .Select((cumulativeProb, idx) => (cumulativeProb, idx))
+                .Where(item => item.cumulativeProb >= sample)
+                // Cast that index to long, and default to returning
+                // the last item.
+                .Select(
+                    item => (long)item.idx
+                )
+                .DefaultIfEmpty(
+                    unnormalizedDistribution.Length - 1
+                )
+                .First();
         }
     }
 }
