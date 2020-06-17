@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PkgMicrosoft_Quantum_CsharpGeneration>$(MSBuildThisFileDirectory)/lib/netstandard2.1/</PkgMicrosoft_Quantum_CsharpGeneration>
+  </PropertyGroup>
+
+</Project>
