@@ -209,7 +209,7 @@ namespace Microsoft.Quantum.Intrinsic {
     
     
     /// # Summary
-    /// Applies the π/4 phase gate to a single qubit.
+    /// Applies the π/2 phase shift gate to a single qubit.
     ///
     /// \begin{align}
     ///     S \mathrel{:=}
@@ -229,7 +229,7 @@ namespace Microsoft.Quantum.Intrinsic {
     
     
     /// # Summary
-    /// Applies the π/8 gate to a single qubit.
+    /// Applies the π/4 phase shift gate to a single qubit.
     ///
     /// \begin{align}
     ///     T \mathrel{:=}
