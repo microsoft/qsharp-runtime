@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         for (idxTrial in 0..99) {
             let sample = Random([1.0, 2.0, 2.0]);
 
-            Fact(0 <= sample <= 2, $"sample was {sample}, not in range [0, 2]");
+            Fact(0 <= sample and sample <= 2, $"sample was {sample}, not in range [0, 2]");
         }
     }
 }
