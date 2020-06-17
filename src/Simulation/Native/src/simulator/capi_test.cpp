@@ -438,7 +438,7 @@ int main()
 #if 1 // Simulator timing tests
     int fuseLimits[]    = {0,1,2,5,10,50,100};
     int qCount[]        = {15,26};
-    for (int qIdx = 1; qIdx < 2; qIdx++) {                                  // #### 0,2
+    for (int qIdx = 0; qIdx < 2; qIdx++) {                                  // #### 0,2
         for (int doRange = 0; doRange < 3; doRange++) {                     // #### 0,3
             int nQs = qCount[qIdx];
             int circStart = 0;
