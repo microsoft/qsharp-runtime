@@ -438,14 +438,19 @@ int main()
 #if 1 // Simulator timing tests
     int fuseLimits[]    = {0,1,2,5,10,50,100};
     int qCount[]        = {15,26};
-    for (int qIdx = 0; qIdx < 2; qIdx++) { // 0,2
+    for (int qIdx = 1; qIdx < 2; qIdx++) {                                  // #### 0,2
         int nQs = qCount[qIdx];
+        int circStart   = 0;
+        int circStop    = nQs;
+        int doRange     = 1;                                                // #### 0=low, 1=all, 2=high
+        if (doRange==0) { circStop = 7;  }
+        if (doRange==2) { circStart = nQs - 7; }
         printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d\n", nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());
         fflush(stdout);
-        for (int fuseSpan = 1; fuseSpan < 8; fuseSpan++) { // 1,8
-            for (int flIdx = 6; flIdx < 7; flIdx++) { // 6,7
-                for (int numThreads = 1; numThreads < 5; numThreads++) { // 1,5
-                    for (int simTyp = 1; simTyp < 5; simTyp++) { // 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
+        for (int fuseSpan = 1; fuseSpan < 8; fuseSpan++) {                  // #### 1,8
+            for (int flIdx = 6; flIdx < 7; flIdx++) {                       // #### 6,7
+                for (int numThreads = 4; numThreads < 5; numThreads++) {    // #### 1,5
+                    for (int simTyp = 4; simTyp < 5; simTyp++) {            // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
                         if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
                         if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                         if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
@@ -454,9 +459,14 @@ int main()
 
                         for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
+                        for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                            unsigned c = k - 1;
+                            MCX(sim_id, 1, &c, k);
+                        }
+
                         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
                         for (int i = 0; i < 1000000; i++) {
-                            for (int k = 0; k < nQs; k++) {
+                            for (int k = circStart; k < circStop; k++) {
                                 unsigned c = k - 1;
                                 if (k > 0)
                                     for (int j = 0; j < 5; j++)
@@ -468,7 +478,7 @@ int main()
 
                             std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                             std::chrono::duration<double> elapsed = curr - start;
-                            if (elapsed.count() >= 20.0) break;
+                            if (elapsed.count() >= 25.0) break;
                         }
 
                         destroy(sim_id);

@@ -2,3 +2,5 @@
 build
 /.vs
 /vs2017
+*.csv
+foo*.*
