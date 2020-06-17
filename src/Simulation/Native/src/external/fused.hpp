@@ -218,7 +218,6 @@ class Fused
 
         Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
         if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth) flush(wfn);
-        
         fusedgates.insert(convertMatrix(mat), qs, cs);
 #endif
     }
