@@ -91,6 +91,11 @@ namespace Microsoft.Azure.Quantum.Client
         public virtual IProvidersOperations Providers { get; private set; }
 
         /// <summary>
+        /// Gets the IStorageOperations.
+        /// </summary>
+        public virtual IStorageOperations Storage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the QuantumClient class.
         /// </summary>
         /// <param name='httpClient'>
@@ -333,6 +338,7 @@ namespace Microsoft.Azure.Quantum.Client
         {
             Jobs = new JobsOperations(this);
             Providers = new ProvidersOperations(this);
+            Storage = new StorageOperations(this);
             BaseUri = new System.Uri("https://app-jobscheduler-prod.azurewebsites.net");
             AcceptLanguage = "en-US";
             LongRunningOperationRetryTimeout = 30;

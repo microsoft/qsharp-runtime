@@ -47,8 +47,8 @@ namespace Microsoft.Azure.Quantum
                 : (IQuantumMachine)Activator.CreateInstance(
                     machineType,
                     targetName,
-                    storageAccountConnectionString,
-                    workspace);
+                    workspace,
+                    storageAccountConnectionString);
         }
     }
 }
