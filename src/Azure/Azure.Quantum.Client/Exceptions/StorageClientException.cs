@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-
 namespace Microsoft.Azure.Quantum.Exceptions
 {
+    using System;
+
     /// <summary>
     /// The exception that is thrown when an error related to the Azure storage client occurs.
     /// </summary>
@@ -46,19 +46,16 @@ namespace Microsoft.Azure.Quantum.Exceptions
         /// Initializes a new instance of the <see cref="StorageClientException"/> class with a specified error message, a reference to another exception that caused this one and more detailes that are specific to the storage client.
         /// </summary>
         /// <param name="message">Error message that explains the reason for the exception.</param>
-        /// <param name="connectionString">Connection string used by the storage client.</param>
         /// <param name="containerName">Name of the container involved in the operation that caused the exception.</param>
         /// <param name="blobName">Name of the BLOB involved in the operation that caused the exception.</param>
         /// <param name="inner">Exception that is the cause of the current one.</param>
         public StorageClientException(
             string message,
-            string connectionString,
             string containerName,
             string blobName,
             Exception inner)
             : base(
                   $"{BaseMessage}: {message}{Environment.NewLine}" +
-                  $"ConnectionString: {connectionString}{Environment.NewLine}" +
                   $"ContainerName: {containerName}{Environment.NewLine}" +
                   $"BlobName: {blobName}",
                   inner)
