@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -113,6 +112,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
                 table.Columns.Add(new DataColumn { DataType = typeof(string), ColumnName = "Metric" });
                 table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = "Sum" });
+                table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = "Max" });
                 table.PrimaryKey = new DataColumn[] { table.Columns[0] };
 
                 foreach (var l in CoreConfig.Listeners)
@@ -121,11 +121,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     if (l is ICallGraphStatistics collector)
                     {
                         var results = collector.Results.ToTable();
-                        Debug.Assert(results.rows.Count() == 1);
+                        //Debug.Assert(results.rows.Count() == 1);
                         Debug.Assert(results.keyColumnNames.Length > 2 && results.keyColumnNames[2] == "Caller");
 
-                        var root = results.rows.FirstOrDefault(r => r.KeyRow[2] == CallGraphEdge.CallGraphRootHashed);
-
+                        var roots = results.rows.Where(r => r.KeyRow[2] == CallGraphEdge.CallGraphRootHashed);
                         var s_idx = Array.FindIndex(results.statisticsNames, n => n == "Sum");
 
                         for (var m_idx = 0; m_idx < results.metricNames.Length; m_idx++)
@@ -133,12 +132,21 @@ namespace Microsoft.Quantum.Simulation.Simulators
                             var label = GetMetricLabel(results.metricNames[m_idx]);
                             if (label == null) continue;
 
-                            var row = table.NewRow();
+                            DataRow row = table.NewRow();
                             row["Metric"] = label;
 
                             if (m_idx >= 0 && s_idx >= 0)
                             {
-                                row["Sum"] = root.DataRow[m_idx, s_idx];
+                                Double sum = 0;
+                                Double max = 0; // all our metrics are positive
+                                foreach (var r in roots)
+                                {
+                                    Double metric_value = r.DataRow[m_idx, s_idx];
+                                    sum += metric_value;
+                                    max = System.Math.Max(max, metric_value);
+                                }
+                                row["Sum"] = sum;
+                                row["Max"] = max;
                             }
 
                             table.Rows.Add(row);
