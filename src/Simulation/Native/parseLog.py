@@ -3,9 +3,9 @@ import sys
 
 logName = sys.argv[1]
 reFN    = re.compile(r"^(\S+)\.")
-reNQs   = re.compile(r"nQs=(\d+) max=")
+reNQs   = re.compile(r"nQs=(\d+) .*range=(\d+)")
 reSim   = re.compile(' (Generic|AVX|AVX2|AVX512)$')
-rePars  = re.compile(r'OMP_NUM_THREADS=(\d) fusedSpan=(\d) fusedDepth=(\d+) wfnCapacity=(\d+)')
+rePars  = re.compile(r'OMP_NUM_THREADS=(\d+) fusedSpan=(\d) fusedDepth=(\d+) wfnCapacity=(\d+)')
 reInfo  = re.compile(r'sz=([.\d]+) nQs=([.\d]+) nCs=([.\d]+) flsh= *([.\de+-]+).*gts= *([.\de+-]+).*elap= *(\d+).*(.)gps= *([.\de+-]+).*fus= *([.\d]+).*ker= *([.\d]+)')
 found   = reFN.search(logName)
 env     = found.group(1)
@@ -17,12 +17,16 @@ totalQs = -1
 threads = -1
 span    = -1
 sz      = -1
+rng     = 1
 
 def dumpGpss():
-    global gpss,env,sim,totalQs,threads,span,sz
+    global gpss,env,sim,totalQs,threads,span,sz,rng
     if len(gpss) > 0:
         gps = max(gpss)
-        print(f"{env},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
+        if rng == 0:    nam = env + "Low"
+        elif rng == 2:  nam = env + "Hgh"
+        else:           nam = env
+        print(f"{nam},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
         gpss = []
 
 while True:
@@ -34,6 +38,7 @@ while True:
     if found:
         dumpGpss()
         totalQs     = found.group(1)
+        rng         = int(found.group(2))
         continue
     found   = reSim.search(inp)
     if found:
