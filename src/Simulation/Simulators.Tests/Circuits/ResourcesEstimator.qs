@@ -16,4 +16,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             ResetAll([q[1], q[0]]);
         }
     }
+
+    // This operation has to choose between optimizing depth
+    // or width of the cirquit.
+    operation DepthVersusWidth () : Unit
+    {
+        using(q = Qubit()) {
+            T(q);
+        }
+        using(q = Qubit()) {
+            T(q);
+        }
+    }
 }

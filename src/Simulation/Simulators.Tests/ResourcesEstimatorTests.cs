@@ -74,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0, data.Rows.Find("CNOT")["Sum"]);
             Assert.Equal(0.0, data.Rows.Find("R")["Sum"]);
             Assert.Equal(2.0, data.Rows.Find("QubitClifford")["Sum"]);
-            Assert.Equal(3.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(3.0, data.Rows.Find("WidthLowerBound")["Sum"]);
         }
 
         /// <summary>
@@ -100,6 +100,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var cliffords = rows.First(r => r.StartsWith("QubitClifford")).Split('\t');
             Assert.Equal(2, cliffords.Length);
             Assert.Equal("2", cliffords[1]);
+        }
+
+        /// <summary>
+        /// Documents that the width and depth statistics reflect independent lower
+        /// bounds for each.
+        /// </summary>
+        [Fact]
+        public void VerifyDepthAndWidthTest()
+        {
+            var sim = new ResourcesEstimator();
+
+            DepthVersusWidth.Run(sim).Wait();
+            var data = sim.Data;
+
+            // It's impossible to distribute two T operators over circuit of depth one
+            // and width one. The results reflect _independent_ lower bounds for each metric.
+            Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("WidthLowerBound")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("DepthLowerBound")["Sum"]);
         }
     }
 }
