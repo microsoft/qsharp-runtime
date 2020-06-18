@@ -1,4 +1,4 @@
-// (C) 2018 ETH Zurich, ITP, Thomas Häner and Damian Steiger
+// (C) 2018 ETH Zurich, ITP, Thomas HΣner and Damian Steiger
 
 template <class V, class M>
 inline void kernel_core(V& psi, std::size_t I, std::size_t d0, std::size_t d1, std::size_t d2, std::size_t d3, std::size_t d4, std::size_t d5, std::size_t d6, M const& m)
@@ -453,7 +453,7 @@ void kernel(V& psi, unsigned id6, unsigned id5, unsigned id4, unsigned id3, unsi
 
 #ifndef _MSC_VER
 	if (ctrlmask == 0){
-		#pragma omp parallel for collapse(LOOP_COLLAPSE7) schedule(static)
+		#pragma omp parallel for collapse(LOOP_COLLAPSE7) schedule(static) proc_bind(spread)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){
 			for (std::size_t i1 = 0; i1 < dsorted[0]; i1 += 2 * dsorted[1]){
 				for (std::size_t i2 = 0; i2 < dsorted[1]; i2 += 2 * dsorted[2]){
@@ -494,20 +494,20 @@ void kernel(V& psi, unsigned id6, unsigned id5, unsigned id4, unsigned id3, unsi
 		}
 	}
 #else
-	std::intptr_t zero = 0;
-	std::intptr_t dmask = dsorted[0] + dsorted[1] + dsorted[2] + dsorted[3] + dsorted[4] + dsorted[5] + dsorted[6];
+    std::intptr_t zero = 0;
+    std::intptr_t dmask = dsorted[0] + dsorted[1] + dsorted[2] + dsorted[3] + dsorted[4] + dsorted[5] + dsorted[6];
 
-	if (ctrlmask == 0){
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & dmask) == zero)
-				kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
-	} else {
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
-				kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
-	}
+    if (ctrlmask == 0){
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & dmask) == zero)
+                kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
+     } else {
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
+                kernel_core(psi, i, dsorted[6], dsorted[5], dsorted[4], dsorted[3], dsorted[2], dsorted[1], dsorted[0], mm);
+     }
 #endif
 }
 
