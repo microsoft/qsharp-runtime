@@ -96,7 +96,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 var (location, qubits) = __in;
 
                 if (location == null) { throw new ArgumentNullException(nameof(location)); }
-                Simulator.CheckQubits(qubits);
+                Simulator.CheckAndPreserveQubits(qubits);
 
                 return Simulator.Dump(location, qubits);
             };
