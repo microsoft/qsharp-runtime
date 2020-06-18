@@ -438,8 +438,8 @@ int main()
 #if 1 // Simulator timing tests
     int fuseLimits[]    = {0,1,2,5,10,50,100};
     int qCount[]        = {15,26};
-    for (int qIdx = 0; qIdx < 2; qIdx++) {                                  // #### 0,2
-        for (int doRange = 0; doRange < 3; doRange++) {                     // #### 0,3
+    for (int qIdx = 1; qIdx < 2; qIdx++) {                                  // #### 0,2 Number of qubits (15 or 26)
+        for (int doRange = 0; doRange < 3; doRange++) {                     // #### 0,3 Location of qubits in WFN
             int nQs = qCount[qIdx];
             int circStart = 0;
             int circStop = nQs;
@@ -448,10 +448,10 @@ int main()
             printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d\n", 
                 nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange);
             fflush(stdout);
-            for (int fuseSpan = 1; fuseSpan < 8; fuseSpan++) {                  // #### 1,8
-                for (int flIdx = 6; flIdx < 7; flIdx++) {                       // #### 6,7
-                    for (int numThreads = 1; numThreads < 17; numThreads++) {   // #### 1,5 (or 17 for big machine)
-                        for (int simTyp = 1; simTyp < 5; simTyp++) {            // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
+            for (int fuseSpan = 4; fuseSpan < 8; fuseSpan++) {                  // #### 1,8 Span Size
+                for (int flIdx = 6; flIdx < 7; flIdx++) {                       // #### 6,7 Span Depth
+                    for (int numThreads = 8; numThreads < 17; numThreads++) {   // #### 1,5 (or 17 for big machine)
+                        for (int simTyp = 3; simTyp < 5; simTyp++) {            // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
                             if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
                             if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
                             if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
