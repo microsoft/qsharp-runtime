@@ -107,15 +107,27 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         /// bounds for each.
         /// </summary>
         [Fact]
-        public void VerifyDepthAndWidthTest()
+        public void DepthDifferentQubitsTest()
         {
             var sim = new ResourcesEstimator();
 
+            // using(q = Qubit[3]) { T(q[0]); T(q[1]); T(q[3]); T(q[0]); }
+            DepthDifferentQubits.Run(sim).Wait();
+            var data = sim.Data;
+
+            Assert.Equal(4.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(3.0, data.Rows.Find("WidthLowerBound")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("DepthLowerBound")["Sum"]);
+        }
+        [Fact]
+        public void DepthVersusWidthTest()
+        {
+            var sim = new ResourcesEstimator();
+
+            // using(q = Qubit()) { T(q); } using(q = Qubit()) { T(q); } (yes, twice)
             DepthVersusWidth.Run(sim).Wait();
             var data = sim.Data;
 
-            // It's impossible to distribute two T operators over circuit of depth one
-            // and width one. The results reflect _independent_ lower bounds for each metric.
             Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("WidthLowerBound")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("DepthLowerBound")["Sum"]);

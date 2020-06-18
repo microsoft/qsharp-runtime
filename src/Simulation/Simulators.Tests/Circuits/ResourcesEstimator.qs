@@ -17,8 +17,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
-    // This operation has to choose between optimizing depth
-    // or width of the cirquit.
+    // Tests for Depth and Width lower bounds
+    operation DepthDifferentQubits () : Unit
+    {
+        using(q = Qubit[3]) {
+            T(q[0]);
+            T(q[1]);
+            T(q[2]);
+            T(q[0]);
+        }
+    }
     operation DepthVersusWidth () : Unit
     {
         using(q = Qubit()) {
