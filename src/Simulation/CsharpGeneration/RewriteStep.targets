@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="BeforeQsharpCompile">
+    <Message
+      Text="HELLO FROM C# GENERATION!"
+      Importance="High" />
+    <WriteLinesToFile 
+      File="$(MSBuildProjectDirectory)/HELLO.txt" 
+      Lines="HELLO FROM C# GENERATION" 
+      Overwrite="false"/>
+    <WriteLinesToFile
+      Condition="'$(QscBuildConfigOutputPath)' != ''"
+      File="$(QscBuildConfigOutputPath)HELLO.txt" 
+      Lines="HELLO FROM C# GENERATION" 
+      Overwrite="false"/>
+  </Target>
+
+</Project>
