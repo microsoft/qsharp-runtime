@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <Microsoft_Quantum_CsharpGeneration>$(MSBuildThisFileDirectory)/lib/netstandard2.1/</Microsoft_Quantum_CsharpGeneration>
+    <PkgMicrosoft_Quantum_CsharpGeneration>$(MSBuildThisFileDirectory)/lib/netstandard2.1/</PkgMicrosoft_Quantum_CsharpGeneration>
   </PropertyGroup>
 
 </Project>
