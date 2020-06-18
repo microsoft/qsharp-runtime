@@ -89,28 +89,35 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         ///     Makes sure the target qubit of an operation is valid. In particular it checks that the qubit instance is not null.
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         void CheckQubit(Qubit q1)
         {
             if (q1 == null) throw new ArgumentNullException(nameof(q1), "Trying to perform a primitive operation on a null Qubit");
+            //setting qubit as not measured to not allow release in case of gate operation on qubit
+            q1.IsMeasured = false;
         }
 
         /// <summary>
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> ctrls, Qubit q1)
         {
             bool[] used = new bool[((QSimQubitManager)QubitManager).MaxId];
 
             CheckQubitInUse(q1, used);
+            q1.IsMeasured = false;
 
             if (ctrls != null && ctrls.Length > 0)
             {
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    //setting qubit as not measured to not allow release in case of gate operation on qubit
+                    q.IsMeasured = false;
                 }
             }
 
@@ -122,8 +129,32 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> targets)
+        {
+            if (targets == null) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on a null Qubit array.");
+            if (targets.Length == 0) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on an empty Qubit array.");
+
+            bool[] used = new bool[((QSimQubitManager)QubitManager).MaxId];
+
+            foreach (var q in targets)
+            {
+                CheckQubitInUse(q, used);
+                //setting qubit as not measured to not allow release in case of gate operation on qubit
+                q.IsMeasured = false;
+            }
+
+            return used;
+        }
+
+        /// <summary>
+        ///     Intended to be used with simulator functions like Dump, Assert, AssertProb
+        ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
+        ///         - none of the qubits are null
+        ///         - there are no duplicated qubits
+        /// </summary>
+        bool[] CheckAndPreserveQubits(IQArray<Qubit> targets)
         {
             if (targets == null) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on a null Qubit array.");
             if (targets.Length == 0) throw new ArgumentNullException(nameof(targets), "Trying to perform an intrinsic operation on an empty Qubit array.");
@@ -142,6 +173,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     Makes sure all qubits are valid as parameter of an intrinsic quantum operation. In particular it checks that 
         ///         - none of the qubits are null
         ///         - there are no duplicated qubits
+        ///     Also sets the isMeasured flag to false for each qubit
         /// </summary>
         bool[] CheckQubits(IQArray<Qubit> ctrls, IQArray<Qubit> targets)
         {
@@ -152,6 +184,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 foreach (var q in ctrls)
                 {
                     CheckQubitInUse(q, used);
+                    //setting qubit as not measured to not allow release in case of gate operation on qubit
+                    q.IsMeasured = false;
                 }
             }
 

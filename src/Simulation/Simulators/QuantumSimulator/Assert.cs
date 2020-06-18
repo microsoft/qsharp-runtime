@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 var (paulis, qubits, result, msg) = _args;
 
-                this.Simulator.CheckQubits(qubits);
+                this.Simulator.CheckAndPreserveQubits(qubits);
 
                 if (paulis.Length != qubits.Length)
                 {
