@@ -21,8 +21,8 @@
   </metadata>
   
   <files>
-    <file src="RewriteStep.props" target="build\RewriteStep.props" />
-    <file src="RewriteStep.targets" target="build\RewriteStep.targets" />
+    <file src="RewriteStep.props" target="build\Microsoft.Quantum.CsharpGeneration.props" />
+    <file src="RewriteStep.targets" target="build\Microsoft.Quantum.CsharpGeneration.targets" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
   </files>
