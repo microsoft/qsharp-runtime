@@ -5,10 +5,6 @@
     <Message
       Text="HELLO FROM C# GENERATION!"
       Importance="High" />
-    <WriteLinesToFile 
-      File="$(MSBuildProjectDirectory)/HELLO.txt" 
-      Lines="HELLO FROM C# GENERATION" 
-      Overwrite="false"/>
     <WriteLinesToFile
       Condition="'$(QscBuildConfigOutputPath)' != ''"
       File="$(QscBuildConfigOutputPath)HELLO.txt" 
