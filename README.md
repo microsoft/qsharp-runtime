@@ -59,7 +59,7 @@ To build on other platforms:
 2. Run [bootstrap.sh](./bootstrap.sh)
     * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
-3. From the command line, run these two commands:
+3. From the command line, run:
     * `dotnet build Simulation.sln`
 
 The `Simulation.sln` solution does not include the full-state simulator. To integrate any changes with the rest of the simulation components, you need to manually build it using `make` in the `src\Simulation\Native\build` folder.
@@ -72,7 +72,7 @@ All unit tests are part of the `Simulation.sln` solution. To run the tests:
 * From [Visual Studio](https://docs.microsoft.com/en-us/visualstudio/test/getting-started-with-unit-testing?view=vs-2019#run-unit-tests):
     * Open Test Explorer by choosing Test > Windows > Test Explorer from the top menu bar.
     * Run your unit tests by clicking Run All.
-* From the command line run:
+* From the command line, run:
     * `dotnet test Simulation.sln`
 
 
