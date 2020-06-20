@@ -111,7 +111,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 
     function UdtNamedTupleFieldTest () : Unit {
         let data = NamedTuple((1, 2.0), 3);
-        let ((a,b),c) = data;
+        let (a, b) = data::FirstItem;
+        let c = data::SecondItem;
         AssertEqual(a, 1);
         AssertEqual(b, 2.0);
         AssertEqual(c, 3);
