@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 
     function TakesUdtPartial<'T, 'U> (build : ('T -> 'U), remainingArgs : 'T) : 'U {
         return build(remainingArgs);
-    } 
+    }
 
     operation PassingUDTConstructorTest() : Unit
     {
@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
         AssertEqual(c1, 3);
 
         let partial = P2((_,2), _);
-        let full = TakesUdtPartial(partial, (3,1));        
+        let full = TakesUdtPartial(partial, (3,1));
         let ((a2, b2), c2) = full!;
         AssertEqual(a2, 3);
         AssertEqual(b2, 2);
@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
     {
         let partial = P2((_,2), _);
         let full = partial(3, 1);
-        
+
         let ((a, b), c) = full!;
         AssertEqual(a, 3);
         AssertEqual(b, 2);
@@ -43,10 +43,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
     {
         let partial = P1(2, _);
         let full = partial(3);
-        
+
         let (a, b) = full!;
         AssertEqual(5, a+b);
-        
+
         let full2 = partial(10);
         let (x, y) = full2!;
         AssertEqual(12, x + y);
@@ -76,7 +76,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
         return P2((3,_),_);
     }
 
-    function CallReturnedUdtConstructorTest () : Unit 
+    function CallReturnedUdtConstructorTest () : Unit
     {
         let udt1 = (returnUdtConstructor())((1,2),3);
         let ((a1,b1),c1) = udt1!;
