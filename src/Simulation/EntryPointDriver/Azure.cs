@@ -196,11 +196,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? Target { get; set; }
 
         /// <summary>
-        /// The storage account connection string.
-        /// </summary>
-        public string? Storage { get; set; }
-
-        /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
@@ -214,6 +209,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The workspace name.
         /// </summary>
         public string? Workspace { get; set; }
+
+        /// <summary>
+        /// The storage account connection string.
+        /// </summary>
+        public string? Storage { get; set; }
 
         /// <summary>
         /// The Azure Active Directory authentication token.
@@ -262,10 +262,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         public override string ToString() =>
             string.Join(System.Environment.NewLine,
                 $"Target: {Target}",
-                $"Storage: {Storage}",
                 $"Subscription: {Subscription}",
                 $"Resource Group: {ResourceGroup}",
                 $"Workspace: {Workspace}",
+                $"Storage: {Storage}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
                 $"Job Name: {JobName}",
