@@ -7,6 +7,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
 
     newtype P1 = (Int, Int);
     newtype P2 = ((Int, Int), Int);
+    newtype NamedTuple = (FirstItem: (Int, Double), SecondItem: Int);
 
     function TakesUdtPartial<'T, 'U> (build : ('T -> 'U), remainingArgs : 'T) : 'U {
         return build(remainingArgs);
@@ -106,6 +107,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
             AssertEqual(b, 2);
             AssertEqual(c, 3);
         }
+    }
+
+    function UdtNamedTupleFieldTest () : Unit {
+        let data = NamedTuple((1, 2.0), 3);
+        let ((a,b),c) = data;
+        AssertEqual(a, 1);
+        AssertEqual(b, 2.0);
+        AssertEqual(c, 3);
     }
 }
 
