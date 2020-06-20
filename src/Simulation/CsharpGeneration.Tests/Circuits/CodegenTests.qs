@@ -1307,6 +1307,8 @@ namespace Microsoft.Quantum.Compiler.Generics {
             w/ i1 <- 1;    
     }
 
+    newtype NamedTuple = (FirstItem: (Int, Double), SecondItem: Int);
+
     // Access Modifiers
 
     internal function EmptyInternalFunction () : Unit { }

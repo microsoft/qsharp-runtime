@@ -212,6 +212,7 @@ namespace N1
     let udt_Complex                             = findUdt @"udt_Complex"
     let udt_TwoDimArray                         = findUdt @"udt_TwoDimArray"
     let udt_InternalType                        = findUdt @"InternalType"
+    let udt_NamedTuple                          = findUdt @"NamedTuple"
 
     let createTestContext op = globalContext.setCallable op
 
@@ -3138,6 +3139,33 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
 }
 """
         |> testOneUdt udt_InternalType
+
+    [<Fact>]
+    let ``buildUdtClass - named tuple`` () =
+        """
+public class NamedTuple : UDTBase<((Int64,Double),Int64)>, IApplyData
+{
+    public NamedTuple() : base(default(((Int64,Double),Int64)))
+    {
+    }
+
+    public NamedTuple(((Int64,Double),Int64) data) : base(data)
+    {
+    }
+
+    public (Int64,Double) FirstItem => Data.Item1;
+    public Int64 SecondItem => Data.Item2;
+    public (Int64,Double) Item1 => Data.Item1;
+    public Int64 Item2 => Data.Item2;
+    System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
+    public void Deconstruct(out (Int64,Double) item1, out Int64 item2)
+    {
+        item1 = Data.Item1;
+        item2 = Data.Item2;
+    }
+}
+"""
+        |> testOneUdt udt_NamedTuple
 
 
     [<Fact>]
