@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Xunit;
@@ -28,16 +28,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToffoliConstructor()
         {
-            var subject = new ToffoliSimulator();
+            var subject = new Future.ToffoliSimulator();
 
-            Assert.Equal((int)ToffoliSimulator.DEFAULT_QUBIT_COUNT, subject.State.Length);
+            Assert.Equal((int)Future.ToffoliSimulator.DEFAULT_QUBIT_COUNT, subject.State.Length);
             Assert.Equal("Toffoli Simulator", subject.Name);
         }
 
         [Fact]
         public void ToffoliMeasure()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
             var measure = sim.Get<Intrinsic.M>();
 
             var allocate = sim.Get<Intrinsic.Allocate>();
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToffoliX()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
             var x = sim.Get<Intrinsic.X>();
 
             OperationsTestHelper.applyTestShell(sim, x, (q) =>
@@ -87,7 +87,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToffoliXAdjoint()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
             var x = sim.Get<Intrinsic.X>() as IUnitary<Qubit>;
 
             OperationsTestHelper.applyTestShell(sim, x.Adjoint, (q) =>
@@ -107,7 +107,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToffoliXCtrl()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             var x = sim.Get<Intrinsic.X>();
             var measure = sim.Get<Intrinsic.M>();
@@ -138,7 +138,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ToffoliSwap()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             await Circuits.SwapTest.Run(sim);
         }
@@ -146,7 +146,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ToffoliRotations()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             var result = await Circuits.IncrementWithRotationsTest.Run(sim, 4);
             Assert.Equal(5, result);
@@ -155,7 +155,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task Bug2469()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             await Circuits.TestSafeToRunCliffords.Run(sim, false);
         }
@@ -163,7 +163,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ToffoliUsingCheck()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
         }
@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ToffoliBorrowingCheck()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             await Assert.ThrowsAsync<ExecutionFailException>(() => BorrowingQubitCheck.Run(sim));
         }
@@ -179,7 +179,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToffoliFunctors()
         {
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
             var measure = sim.Get<Intrinsic.M>();
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
@@ -235,7 +235,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expectedHeader = "Offset  \tState Data" + NL +
                                  "========\t==========" + NL;
 
-            var sim = new ToffoliSimulator();
+            var sim = new Future.ToffoliSimulator();
 
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
