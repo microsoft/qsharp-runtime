@@ -19,8 +19,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     {
         class OperationCallRecord
         {
-            public HashedString OperationName;
-            public OperationFunctor Variant;
+            public CallGraphTreeEdge CallEdge;
             public long MaxAllocated; // maximal value of allocatedQubits during the operation execution
             public long InputWidth;
             public long QubitsAllocatedAtStart;
@@ -28,8 +27,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             public long MaxBorrowed; // maximal value of currentBorrowWidth during the operation execution
         }
 
-        StatisticsCollector<CallGraphEdge> statisticsCollector;
-        public IStatisticCollectorResults<CallGraphEdge> Results => statisticsCollector;
+        HybridStatisticsCollector statisticsCollector;
+        public IHybridStatisticsCollectorResults Results => statisticsCollector;
 
         Stack<OperationCallRecord> operationCallStack;
 
@@ -37,12 +36,11 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
         public WidthCounter( IDoubleStatistic[] statisticsToCollect = null )
         {
-            statisticsCollector = new StatisticsCollector<CallGraphEdge>(
+            statisticsCollector = new HybridStatisticsCollector(
                 Utils.MethodParametersNames(this,"StatisticsRecord"),
-                statisticsToCollect ?? StatisticsCollector<CallGraphEdge>.DefaultStatistics()
+                statisticsToCollect ?? StatisticsCollector<CallGraphTreeEdge>.DefaultStatistics()
                 );
             operationCallStack = new Stack<OperationCallRecord>();
-            AddToCallStack(CallGraphEdge.CallGraphRootHashed, OperationFunctor.Body);
         }
 
         public class Metrics
@@ -58,14 +56,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             return new double[] { InputWidth, ExtraWidth, ReturnWidth, BorrowedWidth };
         }
 
-        private void AddToCallStack(HashedString operationName, OperationFunctor variant)
+        private void AddToCallStack(CallGraphTreeEdge callEdge)
         {
             operationCallStack.Push(
                 new OperationCallRecord()
                 {
-                    OperationName = operationName,
-                    QubitsAllocatedAtStart = allocatedQubits,
-                    Variant = variant
+                    CallEdge = callEdge,
+                    QubitsAllocatedAtStart = allocatedQubits
                 });
         }
 
@@ -91,7 +88,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             opRec.MaxBorrowed = Max(opRec.MaxBorrowed, opRec.CurrentBorrowWidth);
         }
 
-        public void OnOperationEnd(object[] returnedQubitsTraceData)
+        public void OnOperationEnd(CallGraphTreeEdge callEdge, object[] returnedQubitsTraceData)
         {
             OperationCallRecord or = operationCallStack.Pop();
             Debug.Assert(operationCallStack.Count != 0, "Operation call stack is empty. This likely caused by unbalanced OnOperationStart/End");
@@ -103,14 +100,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 ExtraWidth : or.MaxAllocated - or.QubitsAllocatedAtStart,
                 ReturnWidth : returnedQubitsTraceData.Length,
                 BorrowedWidth : or.MaxBorrowed);
-            CallGraphEdge callGraphEdge = new CallGraphEdge(or.OperationName,  opCaller.OperationName, or.Variant, opCaller.Variant);
 
-            statisticsCollector.AddSample(callGraphEdge, statRecord);
+            statisticsCollector.AddSample(callEdge, statRecord);
         }
 
-        public void OnOperationStart(HashedString name, OperationFunctor variant, object[] qubitsTraceData)
+        public void OnOperationStart(CallGraphTreeEdge callEdge, object[] qubitsTraceData)
         {
-            AddToCallStack(name,variant);
+            AddToCallStack(callEdge);
             operationCallStack.Peek().InputWidth = qubitsTraceData.Length;
             operationCallStack.Peek().QubitsAllocatedAtStart = allocatedQubits;
             operationCallStack.Peek().MaxAllocated = allocatedQubits;

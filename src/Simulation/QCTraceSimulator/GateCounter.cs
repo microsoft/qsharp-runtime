@@ -18,8 +18,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     {
         class OperationCallRecord
         {
-            public HashedString OperationName;
-            public OperationFunctor FunctorSpecialization;
+            public CallGraphTreeEdge CallEdge;
             public double[] GlobalCountersAtOperationStart;
         }
 
@@ -35,10 +34,10 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
         private readonly int primitiveOperationsCount;
 
-        private readonly StatisticsCollector<CallGraphEdge> stats;
+        private readonly HybridStatisticsCollector stats;
 
         public PrimitiveOperationsCounterConfiguration GetConfigurationCopy() { return Utils.DeepClone(configuration); }
-        public IStatisticCollectorResults<CallGraphEdge> Results { get => stats as IStatisticCollectorResults<CallGraphEdge>; }
+        public IHybridStatisticsCollectorResults Results => stats;
 
         /// <param name="statisticsToCollect">
         /// Statistics to be collected. If set to null, the
@@ -50,21 +49,19 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             primitiveOperationsCount = configuration.primitiveOperationsNames.Length;
             globalCounters = new double[primitiveOperationsCount];
             operationCallStack = new Stack<OperationCallRecord>();
-            AddToCallStack(CallGraphEdge.CallGraphRootHashed,OperationFunctor.Body);
-            stats = new StatisticsCollector<CallGraphEdge>(
+            stats = new HybridStatisticsCollector(
                 config.primitiveOperationsNames,
-                statisticsToCollect ?? StatisticsCollector<CallGraphEdge>.DefaultStatistics()
+                statisticsToCollect ?? StatisticsCollector<CallGraphTreeEdge>.DefaultStatistics()
                 );
         }
 
-        private void AddToCallStack( HashedString operationName, OperationFunctor functorSpecialization)
+        private void AddToCallStack(CallGraphTreeEdge callEdge)
         {
             operationCallStack.Push(
                 new OperationCallRecord()
                 {
                     GlobalCountersAtOperationStart = new double[primitiveOperationsCount],
-                    OperationName = operationName,
-                    FunctorSpecialization = functorSpecialization
+                    CallEdge = callEdge
                 });
             globalCounters.CopyTo(operationCallStack.Peek().GlobalCountersAtOperationStart, 0);
         }
@@ -110,24 +107,20 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// <summary>
         /// Part of implementation of <see cref="IQCTraceSimulatorListener"/> interface. See the interface documentation for more details.
         /// </summary>
-        public void OnOperationStart(HashedString name, OperationFunctor variant, object[] qubitsTraceData)
+        public void OnOperationStart(CallGraphTreeEdge callEdge, object[] qubitsTraceData)
         {
-            AddToCallStack(name,variant);
+            AddToCallStack(callEdge);
         }
 
         /// <summary>
         /// Part of implementation of <see cref="IQCTraceSimulatorListener"/> interface. See the interface documentation for more details.
         /// </summary>
-        public void OnOperationEnd(object[] returnedQubitsTraceData)
+        public void OnOperationEnd(CallGraphTreeEdge callEdge, object[] returnedQubitsTraceData)
         {
             OperationCallRecord record = operationCallStack.Pop();
             Debug.Assert(operationCallStack.Count != 0, "Operation call stack must never get empty");
             stats.AddSample(
-                new CallGraphEdge(
-                    record.OperationName,
-                    operationCallStack.Peek().OperationName,
-                    record.FunctorSpecialization,
-                    operationCallStack.Peek().FunctorSpecialization),
+                callEdge,
                 Utils.ArrayDifference(globalCounters, record.GlobalCountersAtOperationStart)
                 );
         }

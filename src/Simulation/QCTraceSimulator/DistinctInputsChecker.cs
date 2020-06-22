@@ -138,7 +138,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// <summary>
         /// Part of implementation of <see cref="IQCTraceSimulatorListener"/> interface. See the interface documentation for more details.
         /// </summary>
-        public void OnOperationEnd(object[] returnedQubitsTraceData)
+        public void OnOperationEnd(CallGraphTreeEdge callEdge, object[] returnedQubitsTraceData)
         {
             if(returnedQubitsTraceData != null)
             {
@@ -153,9 +153,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// <summary>
         /// Part of implementation of <see cref="IQCTraceSimulatorListener"/> interface. See the interface documentation for more details.
         /// </summary>
-        public void OnOperationStart(HashedString name, OperationFunctor variant, object[] qubitsTraceData)
+        public void OnOperationStart(CallGraphTreeEdge callEdge, object[] qubitsTraceData)
         {
-            bool ignore = configuration.OperationsToIgnore?.Contains(name) ?? false;
+            bool ignore = configuration.OperationsToIgnore?.Contains(callEdge.OperationName) ?? false;
             operationToIgnoreStack.Push(ignore);
             if ( !ignore )
             {

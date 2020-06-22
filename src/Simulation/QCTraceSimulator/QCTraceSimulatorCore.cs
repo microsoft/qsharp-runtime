@@ -81,6 +81,10 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         private uint callStackDepth = 0;
         private readonly uint callStackDepthLimit = uint.MaxValue;
 
+        public readonly CallGraphTreeEdge RootCall;
+        private CallGraphTreeEdge CurrentCall;
+        private int NextFreeEdgeId;
+
         public QCTraceSimulatorCore(
             QCTraceSimulatorCoreConfiguration config
             )
@@ -103,7 +107,15 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             }
 
             qubitManager = (IQubitManager) new TraceableQubitManager(qubitDataInitializers);
-            callStackDepthLimit = Math.Max( 1, configuration.CallStackDepthLimit );
+
+            this.CurrentCall = this.RootCall = CallGraphTreeEdge.MakeRoot();
+            this.NextFreeEdgeId = this.RootCall.Id + 1;
+            this.callStackDepthLimit = Math.Max( 1, configuration.CallStackDepthLimit );
+
+            foreach(IQCTraceSimulatorListener listener in listeners)
+            {
+                listener.OnOperationStart(RootCall, new object[] { });
+            }
         }
 
         private static object QubitConstraintInit(long id)
@@ -394,20 +406,22 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             if (listeners.Length > 0 && callStackDepth <= callStackDepthLimit )
             {
                 HashedString hashedOperationName = new HashedString(operation.FullName);
+                // Add this call as a child of the current call, and then set current call to this new call.
+                this.CurrentCall = this.CurrentCall.AddCallTo(hashedOperationName, operation.Variant, this.NextFreeEdgeId++);
                 if (tracingDataInQubitsIsNeeded)
                 {
                     var qubits = new List<Qubit>(inputValue?.Qubits?.Where(q => q != null) ?? Qubit.NO_QUBITS);
                     object[][] tracingData = GetTracingData(qubits);
                     for (int i = 0; i < listeners.Length; ++i)
                     {
-                        listeners[i].OnOperationStart(hashedOperationName, operation.Variant, listenerNeedsTracingData[i] ? tracingData[i] : null );
+                        listeners[i].OnOperationStart(this.CurrentCall, listenerNeedsTracingData[i] ? tracingData[i] : null );
                     }
                 }
                 else
                 {
                     for (int i = 0; i < listeners.Length; ++i)
                     {
-                        listeners[i].OnOperationStart(hashedOperationName, operation.Variant, null);
+                        listeners[i].OnOperationStart(this.CurrentCall, null);
                     }
                 }
             }
@@ -422,24 +436,30 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             qubitManager.OnOperationEnd(operation, resultValue);
             if (listeners.Length > 0 && callStackDepth <= callStackDepthLimit)
             {
+                if (this.CurrentCall.ParentEdge == null
+                        || this.CurrentCall.OperationName != operation.FullName
+                        || this.CurrentCall.FunctorSpecialization != operation.Variant)
+                { 
+                    throw new InvalidOperationException("Invalid call graph state."); 
+                }
                 if (tracingDataInQubitsIsNeeded)
                 {
                     var qubits = new List<Qubit>(resultValue?.Qubits?.Where(q => q != null) ?? Qubit.NO_QUBITS);
                     object[][] tracingData = GetTracingData(qubits);
                     for (int i = 0; i < listeners.Length; ++i)
                     {
-                        listeners[i].OnOperationEnd(tracingData[i]);
+                        listeners[i].OnOperationEnd(this.CurrentCall, tracingData[i]);
                     }
                 }
                 else
                 {
                     for (int i = 0; i < listeners.Length; ++i)
                     {
-                        listeners[i].OnOperationEnd(null);
+                        listeners[i].OnOperationEnd(this.CurrentCall, null);
                     }
                 }
+                this.CurrentCall = CurrentCall.ParentEdge;
             }
-
             callStackDepth -= 1;
         }
     }

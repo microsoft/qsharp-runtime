@@ -49,16 +49,17 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// <summary>
         /// Called before an operation is going to be executed by <see cref="QCTraceSimulatorCore"/>
         /// </summary>
-        /// <param name="name">Name of the operation that is going to be executed</param>
+        /// <param name="edge"><see cref="CallGraphTreeEdge"/>being entered.</param>
         /// <param name="qubitsTraceData"> Data attached to qubits passed to the operation. Each instance of the attached data is created by the call to <see cref="NewTracingData"/>.
         /// If <see cref="NeedsTracingDataInQubits"/> returns false this argument will be null. </param>
-        void OnOperationStart(HashedString name, OperationFunctor variant, object[] qubitsTraceData);
+        void OnOperationStart(CallGraphTreeEdge edge, object[] qubitsTraceData);
 
         /// <summary>
         /// Called after an operation was executed by <see cref="QCTraceSimulatorCore"/>
         /// </summary>
+        /// <param name="edge"><see cref="CallGraphTreeEdge"/> being exited.</param>
         /// <param name="qubitsTraceData"> Data attached to the returned qubits. Each instance of the attached data is created by the call to <see cref="NewTracingData"/></param>
-        void OnOperationEnd(object[] returnedQubitsTraceData);
+        void OnOperationEnd(CallGraphTreeEdge edge, object[] returnedQubitsTraceData);
 
         /// <summary>
         /// Returns an object containing data that the listener would like to attach to the given qubit.

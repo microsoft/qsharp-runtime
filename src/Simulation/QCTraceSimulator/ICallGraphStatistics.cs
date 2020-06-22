@@ -11,6 +11,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     public interface ICallGraphStatistics
     {
-        IStatisticCollectorResults<CallGraphEdge> Results { get; }
+        IHybridStatisticsCollectorResults Results { get; }
     }
 }

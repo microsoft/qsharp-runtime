@@ -1,14 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.Simulation.Core;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
@@ -17,8 +11,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     {
         class OperationCallRecord
         {
-            public HashedString OperationName;
-            public OperationFunctor FunctorSpecialization;
+            public CallGraphTreeEdge callEdge;
             public double MinOperationStartTime;
             public double MaxOperationStartTime;
             public double ReleasedQubitsAvailableTime;
@@ -26,22 +19,18 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             public QubitTimeMetrics[] InputQubitMetrics;
         }
 
-        StatisticsCollector<CallGraphEdge> stats;
+        HybridStatisticsCollector stats;
         Stack<OperationCallRecord> operationCallStack;
 
-        public IStatisticCollectorResults<CallGraphEdge> Results => stats;
+        public IHybridStatisticsCollectorResults Results => stats;
 
         public DepthCounter(IDoubleStatistic[] statisticsToCollect = null)
         {
-            stats = new StatisticsCollector<CallGraphEdge>(
+            stats = new HybridStatisticsCollector(
                 Utils.MethodParametersNames(this, "StatisticsRecord"),
                 statisticsToCollect ?? StatisticsCollector<CallGraphEdge>.DefaultStatistics()
                 );
             operationCallStack = new Stack<OperationCallRecord>();
-
-            OperationCallRecord opRec = new OperationCallRecord();
-            opRec.OperationName = CallGraphEdge.CallGraphRootHashed;
-            operationCallStack.Push(opRec);
         }
 
         public class Metrics
@@ -69,7 +58,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         {
         }
 
-        public void OnOperationEnd(object[] returnedQubitsTraceData)
+        public void OnOperationEnd(CallGraphTreeEdge callEdge, object[] returnedQubitsTraceData)
         {
             double maxReturnedQubitsAvailableTime = 0;
             if ( returnedQubitsTraceData != null )
@@ -85,7 +74,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                     Max(maxReturnedQubitsAvailableTime, opRec.ReturnedQubitsAvailableTime),
                     Max(opRec.ReleasedQubitsAvailableTime, inputQubitsAvailableTime ));
             OperationCallRecord caller = operationCallStack.Peek();
-            HashedString callerName = caller.OperationName;
 
             caller.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, caller.ReleasedQubitsAvailableTime );
             caller.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, caller.ReleasedQubitsAvailableTime );
@@ -95,15 +83,14 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                     Depth : operationEndTime - opRec.MaxOperationStartTime,
                     StartTimeDifference: opRec.MaxOperationStartTime - opRec.MinOperationStartTime );
 
-            stats.AddSample(new CallGraphEdge(opRec.OperationName, callerName,opRec.FunctorSpecialization, caller.FunctorSpecialization), metrics);
+            stats.AddSample(callEdge, metrics);
         }
 
-        public void OnOperationStart(HashedString name, OperationFunctor functorSpecialization, object[] qubitsTraceData)
+        public void OnOperationStart(CallGraphTreeEdge callEdge, object[] qubitsTraceData)
         {
             Debug.Assert(qubitsTraceData != null);
             OperationCallRecord opRec = new OperationCallRecord();
-            opRec.FunctorSpecialization = functorSpecialization;
-            opRec.OperationName = name;
+            opRec.callEdge = callEdge;
             opRec.InputQubitMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
             opRec.MaxOperationStartTime = QubitsMetricsUtils.MaxQubitAvailableTime(opRec.InputQubitMetrics);
             opRec.MinOperationStartTime = QubitsMetricsUtils.MinQubitAvailableTime(opRec.InputQubitMetrics);
