@@ -156,7 +156,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ToffoliSimulator();
 
-            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => ToffoliUsingQubitCheck.Run(sim));
+            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ToffoliSimulator();
 
-            await Assert.ThrowsAsync<ExecutionFailException>(() => ToffoliBorrowingQubitCheck.Run(sim));
+            await Assert.ThrowsAsync<ExecutionFailException>(() => BorrowingQubitCheck.Run(sim));
         }
 
         [Fact]
