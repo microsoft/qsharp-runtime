@@ -16,6 +16,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
                 }
             }
 
+            // identity
+            R(PauliY, 2.0 * PI(), qubits[2]);
+            // controlled identity
+            Controlled Rz(qubits[0..0], (4.0 * PI(), qubits[1]));
+            Controlled RFrac(qubits[0..1], (PauliX, 2, 0, qubits[2]));
+
             CCNOT(qubits[0], qubits[1], qubits[2]);
             CNOT(qubits[0], qubits[1]);
             //Rx(PI(), qubits[0]);
