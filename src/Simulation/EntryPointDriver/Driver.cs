@@ -81,10 +81,10 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
             AddOptionIfAvailable(submit, TargetOption);
-            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, SubscriptionOption);
             AddOptionIfAvailable(submit, ResourceGroupOption);
             AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
             AddOptionIfAvailable(submit, JobNameOption);
@@ -133,10 +133,10 @@ namespace Microsoft.Quantum.EntryPointDriver
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
                 Target = azureSettings.Target,
-                Storage = azureSettings.Storage,
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
+                Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
                 JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
@@ -212,12 +212,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--target"), "The target device ID.");
 
         /// <summary>
-        /// The storage option.
-        /// </summary>
-        internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
-            ImmutableList.Create("--storage"), "The storage account connection string.");
-
-        /// <summary>
         /// The subscription option.
         /// </summary>
         internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
@@ -234,6 +228,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
             ImmutableList.Create("--workspace"), "The workspace name.");
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
+            ImmutableList.Create("--storage"), default, "The storage account connection string.");
 
         /// <summary>
         /// The AAD token option.

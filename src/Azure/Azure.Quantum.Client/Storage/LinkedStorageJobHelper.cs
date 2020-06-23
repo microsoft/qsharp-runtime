@@ -9,33 +9,19 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.Threading.Tasks;
     using Bond;
     using global::Azure.Storage.Blobs;
-    using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
 
-    public class JobStorageHelper : JobStorageHelperBase
+    public class LinkedStorageJobHelper : JobStorageHelperBase
     {
-        private readonly string connectionString;
+        private readonly IWorkspace workspace;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JobStorageHelper"/> class.
+        /// Initializes a new instance of the <see cref="LinkedStorageJobHelper"/> class.
         /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        public JobStorageHelper(string connectionString)
+        /// <param name="workspace">The workspace.</param>
+        public LinkedStorageJobHelper(IWorkspace workspace)
         {
-            this.connectionString = connectionString;
-
-            try
-            {
-                _ = CloudStorageAccount.Parse(connectionString);
-            }
-            catch (Exception ex)
-            {
-                throw new StorageClientException(
-                    "An error related to the cloud storage account occurred",
-                    ex);
-            }
+            this.workspace = workspace;
         }
 
         /// <summary>
@@ -46,7 +32,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="protocol">Serialization protocol of the input to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
-        /// Container uri + Input uri.
+        /// Container uri + Input uri without SAS.
         /// </returns>
         public override async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
@@ -65,20 +51,11 @@ namespace Microsoft.Azure.Quantum.Storage
                 protocol,
                 cancellationToken);
 
-            string containerUri = this.StorageHelper.GetBlobContainerSasUri(
-                this.connectionString,
-                containerName,
-                this.ExpiryInterval,
-                SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.Read);
+            Uri inputUri = containerClient
+                .GetBlobClient(Constants.Storage.InputBlobName)
+                .Uri;
 
-            string inputUri = this.StorageHelper.GetBlobSasUri(
-                this.connectionString,
-                containerName,
-                Constants.Storage.InputBlobName,
-                this.ExpiryInterval,
-                SharedAccessBlobPermissions.Read);
-
-            return (containerUri, inputUri);
+            return (GetUriPath(containerClient.Uri), GetUriPath(inputUri));
         }
 
         /// <summary>
@@ -88,7 +65,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="mapping">The job program output mapping.</param>
         /// <param name="protocol">Serialization protocol of the mapping to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Container uri + Mapping uri.</returns>
+        /// <returns>Container uri + Mapping uri without SAS.</returns>
         public override async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
             string jobId,
             Stream mapping,
@@ -105,26 +82,26 @@ namespace Microsoft.Azure.Quantum.Storage
                 protocol,
                 cancellationToken);
 
-            string containerUri = this.StorageHelper.GetBlobContainerSasUri(
-                this.connectionString,
-                containerName,
-                this.ExpiryInterval,
-                SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.Read);
+            Uri mappingUri = containerClient
+                .GetBlobClient(Constants.Storage.MappingBlobName)
+                .Uri;
 
-            string mappingUri = this.StorageHelper.GetBlobSasUri(
-                this.connectionString,
-                containerName,
-                Constants.Storage.MappingBlobName,
-                this.ExpiryInterval,
-                SharedAccessBlobPermissions.Read);
-
-            return (containerUri, mappingUri);
+            return (GetUriPath(containerClient.Uri), GetUriPath(mappingUri));
         }
 
-        protected override Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
+        protected override async Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
         {
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-            return Task.FromResult(blobServiceClient.GetBlobContainerClient(containerName));
+            // Calls the service to get a container SAS Uri
+            var containerUri = await this.workspace.GetSasUriAsync(
+                containerName: containerName, 
+                cancellationToken: cancellationToken);
+
+            return new BlobContainerClient(new Uri(containerUri));
+        }
+
+        private string GetUriPath(Uri uri)
+        {
+            return uri.GetLeftPart(UriPartial.Path);
         }
     }
 }
