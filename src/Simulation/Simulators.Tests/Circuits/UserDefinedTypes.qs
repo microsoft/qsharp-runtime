@@ -8,6 +8,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
     newtype P1 = (Int, Int);
     newtype P2 = ((Int, Int), Int);
     newtype NamedTuple = (FirstItem: (Int, Double), SecondItem: Int);
+    newtype InnerNamedTuple = ((Fst : Result, Snd : (Int, Int)), Trd : String);
+    
+    operation UdtInnerNamedTupleFieldTest () : Unit {
+        let t = InnerNamedTuple((Zero, (0,1)), "");
+        AssertEqual(Zero, t::Fst);
+        let snd = t::Snd;
+        let (s1, s2) = snd;
+        AssertEqual(0, s1);
+        AssertEqual(1, s2);
+        AssertEqual("", t::Trd);
+    }
+
 
     function TakesUdtPartial<'T, 'U> (build : ('T -> 'U), remainingArgs : 'T) : 'U {
         return build(remainingArgs);
