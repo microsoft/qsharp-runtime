@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
                 simulator.CheckQubit(q1, "q1");
 
-                var (isX, safe) = CheckRotation(basis, 2.0 * angle);
+                var (isX, safe) = CheckRotation(basis, angle / 2.0);
                 if (isX)
                 {
                     simulator.DoX(q1);
@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
                 simulator.CheckControlQubits(ctrls, q1);
 
-                var (isX, safe) = CheckRotation(basis, 2.0 * angle);
+                var (isX, safe) = CheckRotation(basis, angle / 2.0);
                 if (!safe)
                 {
                     throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
