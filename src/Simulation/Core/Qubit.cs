@@ -32,6 +32,8 @@ namespace Microsoft.Quantum.Simulation.Core
             this.Id = id;
         }
 
+        public bool IsMeasured { get; set; } = false;
+
         public int Id { get; private set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -63,13 +63,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 base.ReleaseOneQubit(qubit, usedOnlyForBorrowing);
                 if (qubit != null)
                 {
-                    bool areAllReleasedQubitsZero = ReleaseOne(this.SimulatorId, (uint)qubit.Id);
-                    if (!areAllReleasedQubitsZero && throwOnReleasingQubitsNotInZeroState)
+                    bool isReleasedQubitZero = ReleaseOne(this.SimulatorId, (uint)qubit.Id);
+                    if (!(isReleasedQubitZero || qubit.IsMeasured) && throwOnReleasingQubitsNotInZeroState)
                     {
                         throw new ReleasedQubitsAreNotInZeroState();
                     }
                 }
             }
         }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Xunit;
@@ -144,6 +144,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public async Task ToffoliRotations()
+        {
+            var sim = new ToffoliSimulator();
+
+            var result = await Circuits.IncrementWithRotationsTest.Run(sim, 4);
+            Assert.Equal(5, result);
+        }
+
+        [Fact]
         public async Task Bug2469()
         {
             var sim = new ToffoliSimulator();
@@ -156,7 +165,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ToffoliSimulator();
 
-            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => ToffoliUsingQubitCheck.Run(sim));
+            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
         }
 
         [Fact]
@@ -164,7 +173,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ToffoliSimulator();
 
-            await Assert.ThrowsAsync<ExecutionFailException>(() => ToffoliBorrowingQubitCheck.Run(sim));
+            await Assert.ThrowsAsync<ExecutionFailException>(() => BorrowingQubitCheck.Run(sim));
         }
 
         [Fact]

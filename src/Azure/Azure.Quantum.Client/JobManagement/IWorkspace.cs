@@ -50,5 +50,17 @@ namespace Microsoft.Azure.Quantum
         /// <returns>List of jobs</returns>
         Task<IEnumerable<CloudJob>> ListJobsAsync(
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets as SAS Uri for the storage account associated with the workspace.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <param name="blobName">Name of the BLOB.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Sas Uri.</returns>
+        Task<string> GetSasUriAsync(
+            string containerName,
+            string blobName = null,
+            CancellationToken cancellationToken = default);
     }
 }
