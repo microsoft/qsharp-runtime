@@ -453,7 +453,7 @@ void kernel(V& psi, unsigned id6, unsigned id5, unsigned id4, unsigned id3, unsi
 
 #ifndef _MSC_VER
 	if (ctrlmask == 0){
-		#pragma omp parallel for collapse(LOOP_COLLAPSE7) schedule(static)
+		#pragma omp parallel for collapse(LOOP_COLLAPSE7) schedule(static) proc_bind(spread)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){
 			for (std::size_t i1 = 0; i1 < dsorted[0]; i1 += 2 * dsorted[1]){
 				for (std::size_t i2 = 0; i2 < dsorted[1]; i2 += 2 * dsorted[2]){

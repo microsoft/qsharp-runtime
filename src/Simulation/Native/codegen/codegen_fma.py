@@ -243,7 +243,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append("#ifndef _MSC_VER\n")
   kernelarray.append("\t"*indent + "if (ctrlmask == 0){\n")
   indent += 1
-  kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
+  kernelarray.append("\t"*indent + "#pragma omp parallel for collapse(LOOP_COLLAPSE"+str(n)+") schedule(static) proc_bind(spread)\n" + "\t"*indent + "for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){\n")
   indent = indent + 1
   for i in range(1,nc+1):
     kernelarray.append("\t"*indent + "for (std::size_t i"+str(i)+" = 0; i"+str(i)+" < dsorted["+str(i-1) + "]; i"+str(i)+" += 2 * dsorted["+str(i)+"]){\n")
@@ -323,7 +323,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append(         ";\n")
   kernelarray.append("\n");
   kernelarray.append("    if (ctrlmask == 0){\n")
-  kernelarray.append("        #pragma omp parallel for schedule(static)\n")
+  kernelarray.append("        #pragma omp parallel for schedule(static)\n");
   kernelarray.append("        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
   kernelarray.append("            if ((i & dmask) == zero)\n")
   kernelarray.append("                kernel_core(psi, i")

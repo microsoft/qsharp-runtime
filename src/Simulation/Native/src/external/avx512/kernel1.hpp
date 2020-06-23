@@ -1,4 +1,4 @@
-// (C) 2018 ETH Zurich, ITP, Thomas H�ner and Damian Steiger
+// (C) 2018 ETH Zurich, ITP, Thomas Häner and Damian Steiger
 
 template <class V, class M>
 inline void kernel_core(V& psi, std::size_t I, std::size_t d0, M const& m, M const& mt)
@@ -49,7 +49,7 @@ void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 
 #ifndef _MSC_VER
 	if (ctrlmask == 0){
-		#pragma omp parallel for collapse(LOOP_COLLAPSE1) schedule(static)
+		#pragma omp parallel for collapse(LOOP_COLLAPSE1) schedule(static) proc_bind(spread)
 		for (std::size_t i0 = 0; i0 < n; i0 += 2 * dsorted[0]){
 			for (std::size_t i1 = 0; i1 < dsorted[0]; ++i1){
 				kernel_core(psi, i0 + i1, dsorted[0], mm, mmt);
