@@ -323,7 +323,7 @@ def generate_kernel(n, blocks, only_one_matrix, unroll_loops, avx_len):
   kernelarray.append(         ";\n")
   kernelarray.append("\n");
   kernelarray.append("    if (ctrlmask == 0){\n")
-  kernelarray.append("        #pragma omp parallel for schedule(static)\n");
+  kernelarray.append("        #pragma omp parallel for schedule(static)\n")
   kernelarray.append("        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)\n")
   kernelarray.append("            if ((i & dmask) == zero)\n")
   kernelarray.append("                kernel_core(psi, i")
