@@ -140,7 +140,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
         /// <returns>A pair of flags. The first indicates whether the rotation is
         /// equivalent to X; the second whether or not the rotation is exactly equal
         /// to the identity (no phase), and thus may be controlled.</returns>
-        private (bool, bool) CheckRotation(Pauli axis, double theta) {
+        private (bool isX, bool safe) CheckRotation(Pauli axis, double theta) {
             // Rotations around X of odd multiples of pi/2 are X (up to global phase).
             // Rotations around any axis of multiples of pi are I (up to global phase).
             // Rotations of any angle around I are I.
@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
         /// <returns>A pair of flags. The first indicates whether the rotation is
         /// equivalent to X; the second whether or not the rotation is exactly equal
         /// to the identity (no phase), and thus may be controlled.</returns>
-        private (bool, bool) CheckRotation(Pauli axis, long numerator, long power) {
+        private (bool isX, bool safe) CheckRotation(Pauli axis, long numerator, long power) {
             // Rotations around X of odd multiples of pi/2 are X (up to global phase).
             // Rotations around any axis of multiples of pi are I (up to global phase).
             // Rotations of any angle around I are I.
@@ -231,30 +231,74 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
         }
 
         public override void R(Pauli axis, double theta, Qubit qubit) {
-            var (isX, _) = CheckRotation(axis, theta / 2.0);
-            if (isX) {
+            if (CheckRotation(axis, theta / 2.0).isX) {
                 X(qubit);
             }
         }
 
         public override void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit) {
-            var (_, safe) = CheckRotation(axis, theta / 2.0);
-            if (!safe) {
+            if (!CheckRotation(axis, theta / 2.0).safe) {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
             }
         }
 
         public override void RFrac(Pauli axis, long numerator, long power, Qubit qubit) {
-            var (isX, _) = CheckRotation(axis, numerator, power);
-            if (isX) {
+            if (CheckRotation(axis, numerator, power).isX) {
                 X(qubit);
             }
         }
 
         public override void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit) {
-            var (_, safe) = CheckRotation(axis, numerator, power);
-            if (!safe) {
+            if (!CheckRotation(axis, numerator, power).safe) {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+            }
+        }
+
+        public override void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits) {
+            if (qubits.Length != paulis.Length) {
+                throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
+            }
+
+            foreach (var (qubit, pauli) in qubits.Zip(paulis, (q, p) => (q, p))) {
+                if (CheckRotation(pauli, theta).isX) {
+                    X(qubit);
+                }
+            }
+        }
+
+        public override void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits) {
+            if (qubits.Length != paulis.Length) {
+                throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
+            }
+
+            foreach (var (qubit, pauli) in qubits.Zip(paulis, (q, p) => (q, p))) {
+                if (!CheckRotation(pauli, theta).safe) {
+                   throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+                }
+            }
+        }
+
+        public override void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits) {
+            if (qubits.Length != paulis.Length) {
+                throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
+            }
+
+            foreach (var (qubit, pauli) in qubits.Zip(paulis, (q, p) => (q, p))) {
+                if (CheckRotation(pauli, numerator, power).isX) {
+                    X(qubit);
+                }
+            }
+        }
+
+        public override void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits) {
+            if (qubits.Length != paulis.Length) {
+                throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
+            }
+
+            foreach (var (qubit, pauli) in qubits.Zip(paulis, (q, p) => (q, p))) {
+                if (!CheckRotation(pauli, numerator, power).safe) {
+                   throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+                }
             }
         }
 
@@ -269,6 +313,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
         public override Result M(Qubit qubit) =>
             GetValue(qubit).ToResult();
 
+
+        private Func<Pauli, Qubit, Qubit?> PauliFilter(string operation) =>
+            (Pauli p, Qubit q) =>
+                p switch {
+                    Pauli.PauliI => null,
+                    Pauli.PauliZ => q,
+                    _ => throw new InvalidOperationException($"{operation} on bases other than PauliZ not supported")
+                };
+
+        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits) {
+            if (bases.Length != qubits.Length) {
+                throw new InvalidOperationException($"Both input arrays for Measure (bases, qubits), must be of same size.");
+            }
+
+            var qubitsToMeasure = bases.Zip(qubits, PauliFilter("Measure")).WhereNotNull();
+            var result = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
+            return result.ToResult();
+        }
+
         // Overriding the Assert methods enables the use of statements such as
         // `AssertQubit(Zero, q)` inside a Q# program.
         public override void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result expected, string msg) {
@@ -276,17 +339,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
                 throw new InvalidOperationException($"Both input arrays for Assert (bases, qubits), must be of same size.");
             }
 
-            Qubit? filter(Pauli p, Qubit q) =>
-                p switch {
-                    Pauli.PauliI => null,
-                    Pauli.PauliZ => q,
-                    _ => throw new InvalidOperationException("Assert on bases other than PauliZ not supported")
-                };
-
             // All qubits are considered whose corresponding measurement basis
             // is PauliZ.  Measurement in PauliI basis are ignored, and other
             // bases will raise an exception.
-            var qubitsToMeasure = bases.Zip(qubits, filter).WhereNotNull();
+            var qubitsToMeasure = bases.Zip(qubits, PauliFilter("Assert")).WhereNotNull();
 
             // A multi-qubit measurement in the PauliZ basis corresponds to
             // computing the parity of all involved qubits' measurement values.
@@ -317,15 +373,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
                     throw new ExecutionFailException(msg);
                 }
             } else {
-                Qubit? filter(Pauli p, Qubit q) =>
-                p switch {
-                    Pauli.PauliI => null,
-                    Pauli.PauliZ => q,
-                    _ => throw new InvalidOperationException("Assert on bases other than PauliZ not supported")
-                };
-
                 // Pick out just the Z measurements
-                var qubitsToMeasure = bases.Zip(qubits, filter).WhereNotNull();
+                var qubitsToMeasure = bases.Zip(qubits, PauliFilter("AssertProb")).WhereNotNull();
                 var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit)) ? 0.0 : 1.0;
 
                 if (Abs(actual - probabilityOfZero) > tolerance) {
