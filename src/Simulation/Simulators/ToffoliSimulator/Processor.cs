@@ -19,7 +19,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
     // which is constructed using a specialization `QuantumProcessorBase`.  The
     // specialization overrides methods to specify actions on intrinsic
     // operations in the Q# code.
-    class ToffoliSimulatorProcessor : QuantumProcessorBase {
+    class ToffoliSimulatorProcessor : QuantumProcessorBase
+    {
         // This property controls whether to throw an exception when a qubit is
         // released that is not in the zero state.
         public bool ThrowOnReleasingQubitsNotInZeroState { get; set; } = true;
@@ -42,7 +43,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         private Dictionary<Qubit, Stack<bool>> borrowedQubitStates { get; } = new Dictionary<Qubit, Stack<bool>>();
         private const double Tolerance = 1.0E-10;
 
-        public ToffoliSimulatorProcessor(uint qubitCount, bool throwOnReleasingQubitsNotInZeroState) {
+        public ToffoliSimulatorProcessor(uint qubitCount, bool throwOnReleasingQubitsNotInZeroState)
+        {
             SimulationValues = new BitArray((int)qubitCount);
             ThrowOnReleasingQubitsNotInZeroState = throwOnReleasingQubitsNotInZeroState;
         }
@@ -54,23 +56,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
             SimulationValues[qubit.Id];
 
         // SetValue sets the simulation value at the corresponding index.
-        private void SetValue(Qubit qubit, bool value) {
+        private void SetValue(Qubit qubit, bool value)
+        {
             SimulationValues[qubit.Id] = value;
         }
 
         // InvertValue inverts the simulation value at the corresponding index.
-        private void InvertValue(Qubit qubit) {
+        private void InvertValue(Qubit qubit)
+        {
             SimulationValues[qubit.Id] = !SimulationValues[qubit.Id];
         }
 
         // When allocating a qubit whose index equals or exceeds the current
         // number of simulation values stored in the bit array, the bit array is
         // resized to twice its current size.
-        public override void OnAllocateQubits(IQArray<Qubit> qubits) {
+        public override void OnAllocateQubits(IQArray<Qubit> qubits)
+        {
             if (qubits.Count == 0) return;
 
             var maxId = qubits.Max(q => q.Id);
-            while (maxId >= SimulationValues.Length) {
+            while (maxId >= SimulationValues.Length)
+            {
                 SimulationValues.Length *= 2;
             }
         }
@@ -78,10 +84,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // When releasing qubits that are not in the zero state, their value is
         // reset to false.  If the ThrowOnReleasingQubitsNotInZeroState property
         // is assigned true, an exception is thrown.
-        public override void OnReleaseQubits(IQArray<Qubit> qubits) {
-            foreach (var qubit in qubits) {
-                if (GetValue(qubit)) {
-                    if (ThrowOnReleasingQubitsNotInZeroState) {
+        public override void OnReleaseQubits(IQArray<Qubit> qubits)
+        {
+            foreach (var qubit in qubits)
+            {
+                if (GetValue(qubit))
+                {
+                    if (ThrowOnReleasingQubitsNotInZeroState)
+                    {
                         throw new ReleasedQubitsAreNotInZeroState();
                     }
                     SetValue(qubit, false);
@@ -91,10 +101,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         // The borrowed qubits' states are stored on a stack together with their current value.
         // The value is used for comparison when the qubit is returned.
-        public override void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount) {
-            foreach (var qubit in qubits) {
+        public override void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
+        {
+            foreach (var qubit in qubits)
+            {
                 Stack<bool> stack;
-                if (!borrowedQubitStates.TryGetValue(qubit, out stack)) {
+                if (!borrowedQubitStates.TryGetValue(qubit, out stack))
+                {
                     stack = new Stack<bool>();
                     borrowedQubitStates.Add(qubit, stack);
                 }
@@ -103,14 +116,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         // A qubit must be returned in its original value when borrowed.
-        public override void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount) {
-            foreach (var qubit in qubits) {
+        public override void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
+        {
+            foreach (var qubit in qubits)
+            {
                 var stack = borrowedQubitStates[qubit];
-                if (stack.Pop() != GetValue(qubit)) {
+                if (stack.Pop() != GetValue(qubit))
+                {
                     throw new ExecutionFailException("Borrowed qubit returned not in the original state");
                 }
 
-                if (stack.Count == 0) {
+                if (stack.Count == 0)
+                {
                     borrowedQubitStates.Remove(qubit);
                 }
             }
@@ -118,14 +135,17 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         // An X operation inverts the bit in the `simulationValues` variable at
         // the position of the qubit's index.
-        public override void X(Qubit qubit) {
+        public override void X(Qubit qubit)
+        {
             InvertValue(qubit);
         }
 
         // If the simulation values of all control qubits are assigned true,
         // the simulation value of the target qubit is inverted.
-        public override void ControlledX(IQArray<Qubit> controls, Qubit qubit) {
-            if (controls.All(control => GetValue(control))) {
+        public override void ControlledX(IQArray<Qubit> controls, Qubit qubit)
+        {
+            if (controls.All(control => GetValue(control)))
+            {
                 InvertValue(qubit);
             }
         }
@@ -149,14 +169,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <returns>A pair of flags. The first indicates whether the rotation is
         /// equivalent to X; the second whether or not the rotation is exactly equal
         /// to the identity (no phase), and thus may be controlled.</returns>
-        private (bool isX, bool safe) CheckRotation(Pauli axis, double theta) {
+        private (bool isX, bool safe) CheckRotation(Pauli axis, double theta)
+        {
             // Rotations around X of odd multiples of pi/2 are X (up to global phase).
             // Rotations around any axis of multiples of pi are I (up to global phase).
             // Rotations of any angle around I are I.
             // Rotations around any axis of even multiples of pi are safe to control.
 
             var piOverTwoRatio = Abs(theta) / (PI / 2.0);
-            if (Abs(piOverTwoRatio - Round(piOverTwoRatio)) > Tolerance) {
+            if (Abs(piOverTwoRatio - Round(piOverTwoRatio)) > Tolerance)
+            {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform rotations of multiples of pi/2.");
             }
 
@@ -165,7 +187,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             var equivalentToX = (axis == Pauli.PauliX) && (piOverTwoCount % 2 == 1);
             var safeToControl = piOverTwoCount % 4 == 0;
 
-            if ((axis == Pauli.PauliZ || axis == Pauli.PauliY) && (piOverTwoCount % 2 == 1)) {
+            if ((axis == Pauli.PauliZ || axis == Pauli.PauliY) && (piOverTwoCount % 2 == 1))
+            {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform non-identity rotations around the X axis.");
             }
 
@@ -186,7 +209,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <returns>A pair of flags. The first indicates whether the rotation is
         /// equivalent to X; the second whether or not the rotation is exactly equal
         /// to the identity (no phase), and thus may be controlled.</returns>
-        private (bool isX, bool safe) CheckRotation(Pauli axis, long numerator, long power) {
+        private (bool isX, bool safe) CheckRotation(Pauli axis, long numerator, long power)
+        {
             // Rotations around X of odd multiples of pi/2 are X (up to global phase).
             // Rotations around any axis of multiples of pi are I (up to global phase).
             // Rotations of any angle around I are I.
@@ -196,7 +220,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // The sign of the numerator doesn't matter.
             // Reduce the numerator and power in case there are factors of 2 in the numerator.
             numerator = Abs(numerator);
-            while (power > 0 && numerator % 2 == 0) {
+            while (power > 0 && numerator % 2 == 0)
+            {
                 numerator /= 2;
                 power--;
             }
@@ -205,18 +230,22 @@ namespace Microsoft.Quantum.Simulation.Simulators
             bool safeToControl = false;
 
             // If the power < 0, we're guaranteed to be a multiple of 2*pi, so exactly the identity.
-            if (power < 0) {
+            if (power < 0)
+            {
                 equivalentToX = false;
                 safeToControl = true;
             }
             // If power > 1, then we're an odd multiple of pi/4, so illegal
-            else if (power > 1) {
+            else if (power > 1)
+            {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform rotations of multiples of pi/2.");
             }
             // If power == 1, then we're an odd multiple of pi/2, so X if the axis is X, 
             // I if the axis is I, and illegal otherwise.
-            else if (power == 1) {
-                switch (axis) {
+            else if (power == 1)
+            {
+                switch (axis)
+                {
                     case Pauli.PauliI:
                         equivalentToX = false;
                         safeToControl = false;
@@ -231,7 +260,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 }
             }
             // If power == 0, then we're a multiple of pi, possible an even multiple.
-            else {
+            else
+            {
                 equivalentToX = false;
                 safeToControl = numerator % 2 == 0;
             }
@@ -239,81 +269,106 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return (equivalentToX, safeToControl);
         }
 
-        public override void R(Pauli axis, double theta, Qubit qubit) {
-            if (CheckRotation(axis, theta / 2.0).isX) {
+        public override void R(Pauli axis, double theta, Qubit qubit)
+        {
+            if (CheckRotation(axis, theta / 2.0).isX)
+            {
                 X(qubit);
             }
         }
 
-        public override void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit) {
-            if (!CheckRotation(axis, theta / 2.0).safe) {
+        public override void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
+        {
+            if (!CheckRotation(axis, theta / 2.0).safe)
+            {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
             }
         }
 
-        public override void RFrac(Pauli axis, long numerator, long power, Qubit qubit) {
-            if (CheckRotation(axis, numerator, power).isX) {
+        public override void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
+        {
+            if (CheckRotation(axis, numerator, power).isX)
+            {
                 X(qubit);
             }
         }
 
-        public override void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit) {
-            if (!CheckRotation(axis, numerator, power).safe) {
+        public override void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
+        {
+            if (!CheckRotation(axis, numerator, power).safe)
+            {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
             }
         }
 
-        public override void Exp(IQArray<Pauli> bases, double theta, IQArray<Qubit> qubits) {
-            if (qubits.Length != bases.Length) {
+        public override void Exp(IQArray<Pauli> bases, double theta, IQArray<Qubit> qubits)
+        {
+            if (qubits.Length != bases.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
             }
 
-            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p))) {
-                if (CheckRotation(pauli, theta).isX) {
+            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p)))
+            {
+                if (CheckRotation(pauli, theta).isX)
+                {
                     X(qubit);
                 }
             }
         }
 
-        public override void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> bases, double theta, IQArray<Qubit> qubits) {
-            if (qubits.Length != bases.Length) {
+        public override void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> bases, double theta, IQArray<Qubit> qubits)
+        {
+            if (qubits.Length != bases.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
             }
 
-            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p))) {
-                if (!CheckRotation(pauli, theta).safe) {
-                   throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p)))
+            {
+                if (!CheckRotation(pauli, theta).safe)
+                {
+                    throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
                 }
             }
         }
 
-        public override void ExpFrac(IQArray<Pauli> bases, long numerator, long power, IQArray<Qubit> qubits) {
-            if (qubits.Length != bases.Length) {
+        public override void ExpFrac(IQArray<Pauli> bases, long numerator, long power, IQArray<Qubit> qubits)
+        {
+            if (qubits.Length != bases.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
             }
 
-            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p))) {
-                if (CheckRotation(pauli, numerator, power).isX) {
+            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p)))
+            {
+                if (CheckRotation(pauli, numerator, power).isX)
+                {
                     X(qubit);
                 }
             }
         }
 
-        public override void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> bases, long numerator, long power, IQArray<Qubit> qubits) {
-            if (qubits.Length != bases.Length) {
+        public override void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> bases, long numerator, long power, IQArray<Qubit> qubits)
+        {
+            if (qubits.Length != bases.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Exp (bases, qubits), must be of same size.");
             }
 
-            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p))) {
-                if (!CheckRotation(pauli, numerator, power).safe) {
-                   throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+            foreach (var (qubit, pauli) in qubits.Zip(bases, (q, p) => (q, p)))
+            {
+                if (!CheckRotation(pauli, numerator, power).safe)
+                {
+                    throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
                 }
             }
         }
 
         // If the simulation value of qubit is true, when it's being reset, we
         // restore it to false.
-        public override void Reset(Qubit qubit) {
+        public override void Reset(Qubit qubit)
+        {
             SetValue(qubit, false);
         }
 
@@ -325,14 +380,17 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         private Func<Pauli, Qubit, Qubit?> PauliFilter(string operation) =>
             (Pauli p, Qubit q) =>
-                p switch {
+                p switch
+                {
                     Pauli.PauliI => null,
                     Pauli.PauliZ => q,
-                    _ => throw new InvalidOperationException($"{operation} on bases other than PauliZ not supported")
+                    _ => throw new InvalidOperationException($"{operation} on bases other than PauliI and PauliZ not supported")
                 };
 
-        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits) {
-            if (bases.Length != qubits.Length) {
+        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
+        {
+            if (bases.Length != qubits.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Measure (bases, qubits), must be of same size.");
             }
 
@@ -343,8 +401,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         // Overriding the Assert methods enables the use of statements such as
         // `AssertQubit(Zero, q)` inside a Q# program.
-        public override void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result expected, string msg) {
-            if (bases.Length != qubits.Length) {
+        public override void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result expected, string msg)
+        {
+            if (bases.Length != qubits.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for Assert (bases, qubits), must be of same size.");
             }
 
@@ -359,7 +419,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // We use Aggregate to successively XOR a qubit's simulation value
             // to an accumulator value `accu` that is initialized to `false`.
             var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
-            if (actual.ToResult() != expected) {
+            if (actual.ToResult() != expected)
+            {
                 // If the expected value does not correspond to the actual measurement
                 // value, we throw a Q# specific Exception together with the user
                 // defined message `msg`.
@@ -367,60 +428,78 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public override void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tolerance) {
-            if (bases.Length != qubits.Length) {
+        public override void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tolerance)
+        {
+            if (bases.Length != qubits.Length)
+            {
                 throw new InvalidOperationException($"Both input arrays for AssertProb (bases, qubits), must be of same size.");
             }
 
-            if ((probabilityOfZero + tolerance >= 1.0) && (probabilityOfZero - tolerance <= 0.0)) {
+            if ((probabilityOfZero + tolerance >= 1.0) && (probabilityOfZero - tolerance <= 0.0))
+            {
                 return;
             }
 
             // If there are any X- or Y-basis measurements, then the probability is 50%
-            if (bases.Any(p => p == Pauli.PauliX || p == Pauli.PauliY)) {
-                if (Abs(0.5 - probabilityOfZero) > tolerance) {
+            if (bases.Any(p => p == Pauli.PauliX || p == Pauli.PauliY))
+            {
+                if (Abs(0.5 - probabilityOfZero) > tolerance)
+                {
                     throw new ExecutionFailException(msg);
                 }
-            } else {
+            }
+            else
+            {
                 // Pick out just the Z measurements
                 var qubitsToMeasure = bases.Zip(qubits, PauliFilter("AssertProb")).WhereNotNull();
                 var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit)) ? 0.0 : 1.0;
 
-                if (Abs(actual - probabilityOfZero) > tolerance) {
+                if (Abs(actual - probabilityOfZero) > tolerance)
+                {
                     throw new ExecutionFailException(msg);
                 }
             }
         }
 
-        public override void OnDumpMachine<T>(T location) {
+        public override void OnDumpMachine<T>(T location)
+        {
             if (location == null) { throw new ArgumentNullException(nameof(location)); }
 
             var filename = location is QVoid ? "" : location.ToString();
             DumpState(GetAllocatedIds!().Select(id => (int)id), filename);
         }
 
-        public override void OnDumpRegister<T>(T location, IQArray<Qubit> qubits) {
+        public override void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
+        {
             var ids = qubits.OrderBy(q => q.Id).Select(q => q.Id);
             var filename = location is QVoid ? "" : location.ToString();
             DumpState(ids, filename);
         }
 
-        private void DumpState(IEnumerable<int> ids, String filename) {
+        private void DumpState(IEnumerable<int> ids, String filename)
+        {
             var data = ids.Select(id => SimulationValues[id]).ToArray();
-            Action<Action<string>> dump = DumpFormat switch {
+            Action<Action<string>> dump = DumpFormat switch
+            {
                 ToffoliDumpFormat.Automatic => channel => data.Dump(channel),
                 ToffoliDumpFormat.Bits => channel => data.DumpAsBits(channel),
                 ToffoliDumpFormat.Hex => channel => data.DumpAsHex(channel),
                 _ => throw new ArgumentException($"Invalid format: ${DumpFormat}")
             };
 
-            if (string.IsNullOrWhiteSpace(filename)) {
+            if (string.IsNullOrWhiteSpace(filename))
+            {
                 dump((msg) => Message!(msg));
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     using var file = new System.IO.StreamWriter(filename);
                     dump(file.WriteLine);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     Message!($"[warning] Unable to write state to '{filename}' ({e.Message})");
                 }
             }
