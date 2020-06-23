@@ -12,7 +12,7 @@ using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 
-namespace Microsoft.Quantum.Simulation.Simulators.Future
+namespace Microsoft.Quantum.Simulation.Simulators
 {
 
     // ToffoliSimulator is implemented based on `QuantumProcessorDispatcher`,
