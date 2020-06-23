@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.11.2006.2010-beta">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.11.2006.2118-beta">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
