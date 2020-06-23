@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
+using System.Threading;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Tests.CoreOperations;
@@ -18,36 +18,35 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     /// </summary>
     public class DebuggingToolsTests
     {
-
         [Fact]
-        public void ToStringTests()
+        public void ToStringTests() => Helper.RunWithMultipleSimulators(qsim =>
         {
-            Helper.RunWithMultipleSimulators((qsim) =>
+            var _ = AbstractCallable._;
+
+            var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Extensions.Diagnostics.DumpMachine<>));
+            var trace = qsim.Get<IUnitary>(typeof(Circuits.Generics.Trace<>));
+            var x = qsim.Get<Intrinsic.X>();
+            var q2 = new FreeQubit(2) as Qubit;
+            var Q = new Q(q2);
+            var Qs = new QArray<Qubit>(q2);
+            var qs = new Qs(Qs);
+            var udtOp = new U3(x);
+            var udtQ = new Q(q2);
+            var t1 = new QTuple<(long, QRange, (Qubit, IUnitary))>((1L, new QRange(10, -2, 4), (q2, x)));
+            var t4 = new T4((3L, (1.1, false, Result.One)));
+            var t5 = new T5((Pauli.PauliX, Qs, qs, Q));
+
+            var d_1 = dump.Partial(_);
+            var d_2 = d_1.Partial(_);
+            var x_1 = x.Partial(new Func<Qubit, Qubit>(q => q));
+            var x_2 = x_1.Partial(new Func<Qubit, Qubit>(q => q));
+            var x_3 = x.Partial<OperationPartial<Qubit, Qubit, QVoid>>(_);
+
+            var t_1 = trace.Adjoint.Partial(_);
+            var t_2 = t_1.Controlled.Partial(_);
+
+            WithInvariantCulture(() =>
             {
-                var _ = AbstractCallable._;
-
-                var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Extensions.Diagnostics.DumpMachine<>));
-                var trace = qsim.Get<IUnitary>(typeof(Circuits.Generics.Trace<>));
-                var x = qsim.Get<Intrinsic.X>();
-                var q2 = new FreeQubit(2) as Qubit;
-                var Q = new Q(q2);
-                var Qs = new QArray<Qubit>(q2);
-                var qs = new Qs(Qs);
-                var udtOp = new U3(x);
-                var udtQ = new Q(q2);
-                var t1 = new QTuple<(long, QRange, (Qubit, IUnitary))>((1L, new QRange(10, -2, 4), (q2, x)));
-                var t4 = new T4((3L, (1.1, false, Result.One)));
-                var t5 = new T5((Pauli.PauliX, Qs, qs, Q));
-
-                var d_1 = dump.Partial(_);
-                var d_2 = d_1.Partial(_);
-                var x_1 = x.Partial(new Func<Qubit, Qubit>(q => q));
-                var x_2 = x_1.Partial(new Func<Qubit, Qubit>(q => q));
-                var x_3 = x.Partial<OperationPartial<Qubit, Qubit, QVoid>>(_);
-
-                var t_1 = trace.Adjoint.Partial(_);
-                var t_2 = t_1.Controlled.Partial(_);
-
                 Assert.Equal("()", QVoid.Instance.ToString());
                 Assert.Equal("_", _.ToString());
                 Assert.Equal("U3(X)", udtOp.ToString());
@@ -75,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.Equal("(Adjoint Trace){_}", t_1.ToString());
                 Assert.Equal("(Adjoint (Controlled (Adjoint Trace){_}){_})", t_2.Adjoint.ToString());
             });
-        }
+        });
 
         [Fact]
         public void QSharpTypeTests()
@@ -276,6 +275,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 TestOneProxy("(_, PauliX, Zero)", g_2);
                 TestOneProxy("<mapper>", g_3);
             });
+        }
+
+        /// <summary>
+        /// Changes the current thread culture to the invariant culture, runs the action, and then restores the original
+        /// thread culture.
+        /// </summary>
+        /// <param name="action">The action to run within the invariant culture.</param>
+        private static void WithInvariantCulture(System.Action action)
+        {
+            var culture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            action();
+            Thread.CurrentThread.CurrentCulture = culture;
         }
     }
 }
