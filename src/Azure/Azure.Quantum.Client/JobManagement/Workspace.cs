@@ -1,30 +1,30 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Core;
-using Microsoft.Azure.Quantum.Authentication;
-using Microsoft.Azure.Quantum.Client;
-using Microsoft.Azure.Quantum.Client.Models;
-using Microsoft.Azure.Quantum.Exceptions;
-using Microsoft.Azure.Quantum.Utility;
-
 namespace Microsoft.Azure.Quantum
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using global::Azure.Core;
+    using Microsoft.Azure.Quantum.Authentication;
+    using Microsoft.Azure.Quantum.Client;
+    using Microsoft.Azure.Quantum.Client.Models;
+    using Microsoft.Azure.Quantum.Exceptions;
+    using Microsoft.Azure.Quantum.Utility;
+
     /// <summary>
     /// Workspace class.
     /// </summary>
     /// <seealso cref="Microsoft.Azure.Quantum.Client.IWorkspace" />
     public class Workspace : IWorkspace
     {
-        private readonly Uri BaseUri;
-        private readonly string ResourceGroupName;
-        private readonly string SubscriptionId;
-        private readonly string WorkspaceName;
+        private readonly Uri baseUri;
+        private readonly string resourceGroupName;
+        private readonly string subscriptionId;
+        private readonly string workspaceName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Workspace"/> class.
@@ -79,13 +79,13 @@ namespace Microsoft.Azure.Quantum
             IAccessTokenProvider accessTokenProvider,
             Uri baseUri = null)
         {
-            BaseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
+            this.baseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
             Ensure.NotNullOrWhiteSpace(subscriptionId, nameof(subscriptionId));
-            SubscriptionId = subscriptionId;
+            this.subscriptionId = subscriptionId;
             Ensure.NotNullOrWhiteSpace(resourceGroupName, nameof(resourceGroupName));
-            ResourceGroupName = resourceGroupName;
+            this.resourceGroupName = resourceGroupName;
             Ensure.NotNullOrWhiteSpace(workspaceName, nameof(workspaceName));
-            WorkspaceName = workspaceName;
+            this.workspaceName = workspaceName;
 
             try
             {
@@ -100,13 +100,13 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                this.JobsClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
+                this.QuantumClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
                 {
-                    BaseUri = BaseUri,
+                    BaseUri = this.baseUri,
                     SubscriptionId = subscriptionId,
                     ResourceGroupName = resourceGroupName,
                     WorkspaceName = workspaceName,
-                }.Jobs;
+                };
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Quantum
         /// <value>
         /// The jobs client.
         /// </value>
-        internal IJobsOperations JobsClient { get; set; }
+        internal IQuantumClient QuantumClient { get; set; }
 
         /// <summary>
         /// Submits the job.
@@ -140,7 +140,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.PutAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.PutAsync(
                     jobId: jobDefinition.Details.Id,
                     jobDefinition: jobDefinition.Details,
                     cancellationToken: cancellationToken);
@@ -165,7 +165,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.DeleteAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.DeleteAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
@@ -191,7 +191,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.JobsClient.GetAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.GetAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
@@ -214,7 +214,7 @@ namespace Microsoft.Azure.Quantum
         {
             try
             {
-                var jobs = await this.JobsClient.ListAsync(
+                var jobs = await this.QuantumClient.Jobs.ListAsync(
                     cancellationToken: cancellationToken);
 
                 return jobs
@@ -226,6 +226,27 @@ namespace Microsoft.Azure.Quantum
             }
         }
 
+        /// <summary>
+        /// Gets as SAS Uri for the linked storage account.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <param name="blobName">Name of the BLOB.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// Sas Uri.
+        /// </returns>
+        public async Task<string> GetSasUriAsync(string containerName, string blobName = null, CancellationToken cancellationToken = default)
+        {
+            BlobDetails details = new BlobDetails
+            {
+                ContainerName = containerName,
+                BlobName = blobName,
+            };
+
+            var response = await this.QuantumClient.Storage.SasUriAsync(details, cancellationToken);
+            return response.SasUri;
+        }
+
         private WorkspaceClientException CreateException(
             Exception inner,
             string message,
@@ -233,10 +254,10 @@ namespace Microsoft.Azure.Quantum
         {
             return new WorkspaceClientException(
                 message,
-                SubscriptionId,
-                ResourceGroupName,
-                WorkspaceName,
-                BaseUri,
+                subscriptionId,
+                resourceGroupName,
+                workspaceName,
+                baseUri,
                 jobId,
                 inner);
         }
