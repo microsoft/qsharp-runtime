@@ -272,6 +272,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
         // Overriding the Assert methods enables the use of statements such as
         // `AssertQubit(Zero, q)` inside a Q# program.
         public override void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result expected, string msg) {
+            if (bases.Length != qubits.Length) {
+                throw new InvalidOperationException($"Both input arrays for Assert (bases, qubits), must be of same size.");
+            }
+
             Qubit? filter(Pauli p, Qubit q) =>
                 p switch {
                     Pauli.PauliI => null,
@@ -295,6 +299,38 @@ namespace Microsoft.Quantum.Simulation.Simulators.Future
                 // value, we throw a Q# specific Exception together with the user
                 // defined message `msg`.
                 throw new ExecutionFailException(msg);
+            }
+        }
+
+        public override void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tolerance) {
+            if (bases.Length != qubits.Length) {
+                throw new InvalidOperationException($"Both input arrays for AssertProb (bases, qubits), must be of same size.");
+            }
+
+            if ((probabilityOfZero + tolerance >= 1.0) && (probabilityOfZero - tolerance <= 0.0)) {
+                return;
+            }
+
+            // If there are any X- or Y-basis measurements, then the probability is 50%
+            if (bases.Any(p => p == Pauli.PauliX || p == Pauli.PauliY)) {
+                if (Abs(0.5 - probabilityOfZero) > tolerance) {
+                    throw new ExecutionFailException(msg);
+                }
+            } else {
+                Qubit? filter(Pauli p, Qubit q) =>
+                p switch {
+                    Pauli.PauliI => null,
+                    Pauli.PauliZ => q,
+                    _ => throw new InvalidOperationException("Assert on bases other than PauliZ not supported")
+                };
+
+                // Pick out just the Z measurements
+                var qubitsToMeasure = bases.Zip(qubits, filter).WhereNotNull();
+                var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit)) ? 0.0 : 1.0;
+
+                if (Abs(actual - probabilityOfZero) > tolerance) {
+                    throw new ExecutionFailException(msg);
+                }
             }
         }
 
