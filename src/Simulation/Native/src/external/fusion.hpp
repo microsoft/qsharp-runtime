@@ -58,6 +58,18 @@ public:
 		handle_controls(empty_matrix, empty_vec, {}); // remove all current control qubits (this is a GLOBAL factor)
 	}
 	
+
+	// This saves a class instance create/destroy on every gate insert
+	// Need a quick way to decide if we're going to grow too wide
+	int predict(IndexVector index_list, IndexVector const& ctrl_list = {}) {
+		int cnt = num_qubits() + num_controls();
+		for (auto idx : index_list)
+			if (set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
+		for (auto idx : ctrl_list)
+			if (set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
+		return cnt;
+	}
+
 	void insert(Matrix matrix, IndexVector index_list, IndexVector const& ctrl_list = {}){
 		for (auto idx : index_list)
 			set_.emplace(idx);
@@ -97,7 +109,8 @@ public:
 			for (unsigned i = 0; i < idx.size(); ++i)
 				idx2mat[i] = static_cast<unsigned>(((std::equal_range(index_list.begin(), index_list.end(), idx[i])).first - index_list.begin()));
 			
-			for (std::size_t k = 0; k < (1ULL<<N); ++k){ // loop over big matrix columns
+			#pragma omp parallel for schedule(static)
+			for (int k = 0; k < (1ULL<<N); ++k){ // loop over big matrix columns //@@@DBG std::size_t
 				// check if column index satisfies control-mask
 				// if not: leave it unchanged
 				std::vector<Complex> oldcol(1ULL<<N);

@@ -1,33 +1,28 @@
-// (C) 2018 ETH Zurich, ITP, Thomas Häner and Damian Steiger
+// (C) 2018 ETH Zurich, ITP, Thomas H�ner and Damian Steiger
 
 template <class V, class M>
 inline void kernel_core(V& psi, std::size_t I, std::size_t d0, std::size_t d1, M const& m, M const& mt)
 {
-	__m256d v[1];
+	__m512d v[1];
 
-	v[0] = load1(&psi[I]);
+	v[0] = load1x4(&psi[I]);
 
-	__m256d tmp[2] = {_mm256_setzero_pd(), _mm256_setzero_pd()};
+	__m512d tmp[1] = {_mm512_setzero_pd()};
 
 	tmp[0] = fma(v[0], m[0], mt[0], tmp[0]);
-	tmp[1] = fma(v[0], m[1], mt[1], tmp[1]);
 
-	v[0] = load1(&psi[I + d0]);
+	v[0] = load1x4(&psi[I + d0]);
+
+	tmp[0] = fma(v[0], m[1], mt[1], tmp[0]);
+
+	v[0] = load1x4(&psi[I + d1]);
 
 	tmp[0] = fma(v[0], m[2], mt[2], tmp[0]);
-	tmp[1] = fma(v[0], m[3], mt[3], tmp[1]);
 
-	v[0] = load1(&psi[I + d1]);
+	v[0] = load1x4(&psi[I + d0 + d1]);
 
-	tmp[0] = fma(v[0], m[4], mt[4], tmp[0]);
-	tmp[1] = fma(v[0], m[5], mt[5], tmp[1]);
-
-	v[0] = load1(&psi[I + d0 + d1]);
-
-	tmp[0] = fma(v[0], m[6], mt[6], tmp[0]);
-	tmp[1] = fma(v[0], m[7], mt[7], tmp[1]);
-	store((double*)&psi[I + d0], (double*)&psi[I], tmp[0]);
-	store((double*)&psi[I + d0 + d1], (double*)&psi[I + d1], tmp[1]);
+	tmp[0] = fma(v[0], m[3], mt[3], tmp[0]);
+	store((double*)&psi[I + d0 + d1], (double*)&psi[I + d1], (double*)&psi[I + d0], (double*)&psi[I], tmp[0]);
 
 }
 
@@ -42,20 +37,20 @@ void kernel(V& psi, unsigned id1, unsigned id0, M const& matrix, std::size_t ctr
 	std::size_t dsorted[] = {d0, d1};
 	permute_qubits_and_matrix(dsorted, 2, m);
 
-	__m256d mm[8];
+	__m512d mm[4];
 	for (unsigned b = 0; b < 4; ++b){
-		for (unsigned r = 0; r < 2; ++r){
+		for (unsigned r = 0; r < 1; ++r){
 			for (unsigned c = 0; c < 1; ++c){
-				mm[b*2+r*1+c] = loada(&m[2*r+0][c+b*1], &m[2*r+1][c+b*1]);
+				mm[b*1+r*1+c] = loada(&m[4*r+0][c+b*1], &m[4*r+1][c+b*1], &m[4*r+2][c+b*1], &m[4*r+3][c+b*1]);
 			}
 		}
 	}
 
-	__m256d mmt[8];
+	__m512d mmt[4];
 	for (unsigned b = 0; b < 4; ++b){
-		for (unsigned r = 0; r < 2; ++r){
+		for (unsigned r = 0; r < 1; ++r){
 			for (unsigned c = 0; c < 1; ++c){
-				mmt[b*2+r*1+c] = loadbm(&m[2*r+0][c+b*1], &m[2*r+1][c+b*1]);
+				mmt[b*1+r*1+c] = loadbm(&m[4*r+0][c+b*1], &m[4*r+1][c+b*1], &m[4*r+2][c+b*1], &m[4*r+3][c+b*1]);
 			}
 		}
 	}
@@ -84,20 +79,20 @@ void kernel(V& psi, unsigned id1, unsigned id0, M const& matrix, std::size_t ctr
 		}
 	}
 #else
-	std::intptr_t zero = 0;
-	std::intptr_t dmask = dsorted[0] + dsorted[1];
+    std::intptr_t zero = 0;
+    std::intptr_t dmask = dsorted[0] + dsorted[1];
 
-	if (ctrlmask == 0){
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & dmask) == zero)
-				kernel_core(psi, i, dsorted[1], dsorted[0], mm, mmt);
-	} else {
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
-				kernel_core(psi, i, dsorted[1], dsorted[0], mm, mmt);
-	}
+    if (ctrlmask == 0){
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & dmask) == zero)
+                kernel_core(psi, i, dsorted[1], dsorted[0], mm, mmt);
+     } else {
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
+                kernel_core(psi, i, dsorted[1], dsorted[0], mm, mmt);
+     }
 #endif
 }
 

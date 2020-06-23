@@ -1,4 +1,4 @@
-// (C) 2018 ETH Zurich, ITP, Thomas Häner and Damian Steiger
+// (C) 2018 ETH Zurich, ITP, Thomas H�ner and Damian Steiger
 
 template <class V, class M>
 inline void kernel_core(V& psi, std::size_t I, std::size_t d0, M const& m, M const& mt)
@@ -66,20 +66,20 @@ void kernel(V& psi, unsigned id0, M const& matrix, std::size_t ctrlmask)
 		}
 	}
 #else
-	std::intptr_t zero = 0;
-	std::intptr_t dmask = dsorted[0];
+    std::intptr_t zero = 0;
+    std::intptr_t dmask = dsorted[0];
 
-	if (ctrlmask == 0){
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & dmask) == zero)
-				kernel_core(psi, i, dsorted[0], mm, mmt);
-	} else {
-		#pragma omp parallel for schedule(static)
-		for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
-			if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
-				kernel_core(psi, i, dsorted[0], mm, mmt);
-	}
+    if (ctrlmask == 0){
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & dmask) == zero)
+                kernel_core(psi, i, dsorted[0], mm, mmt);
+     } else {
+        #pragma omp parallel for schedule(static)
+        for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(n); ++i)
+            if ((i & ctrlmask) == ctrlmask && (i & dmask) == zero)
+                kernel_core(psi, i, dsorted[0], mm, mmt);
+     }
 #endif
 }
 

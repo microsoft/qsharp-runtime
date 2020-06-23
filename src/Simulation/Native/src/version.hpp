@@ -1,0 +1,11 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+#pragma once
+
+/* #undef MICROSOFT_QUANTUM_SIMULATOR_VERSION */
+/* #undef MICROSOFT_QUANTUM_SIMULATOR_VERSION_MAJOR */
+/* #undef MICROSOFT_QUANTUM_SIMULATOR_VERSION_MINOR */
+/* #undef MICROSOFT_QUANTUM_SIMULATOR_VERSION_PATCH */
+/* #undef MICROSOFT_QUANTUM_SIMULATOR_VERSION_STRING */
+#define MICROSOFT_QUANTUM_SIMULATOR_YEAR "2020"
