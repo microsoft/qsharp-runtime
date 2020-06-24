@@ -3,7 +3,9 @@
 
 #nullable enable
 
+using System;
 using System.Collections;
+using System.Linq;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.QuantumProcessor;
@@ -58,6 +60,40 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get => processor.DumpFormat;
             set => processor.DumpFormat = value;
+        }
+
+        // Random implementation of ToffoliSimulator differs from QuantumProcessorDispatcher
+        public class ToffoliSimulatorRandom : Quantum.Intrinsic.Random
+        {
+            private Random random = new Random();
+
+            public ToffoliSimulatorRandom(ToffoliSimulator m) : base(m) {}
+
+            public override Func<IQArray<double>, long> Body => probs =>
+            {
+                if (probs.Any(d => d < 0.0))
+                {
+                    throw new ArgumentOutOfRangeException("probs", "All probabilities must be greater than or equal to zero");
+                }
+                var sum = probs.Sum();
+                if (sum <= 0.0)
+                {
+                    throw new ArgumentOutOfRangeException("probs", "At least one probability must be greater than zero");
+                }
+
+                var threshhold = random.NextDouble() * sum;
+                for (int i = 0; i < probs.Length; i++)
+                {
+                    threshhold -= probs[i];
+                    if (threshhold <= 0.0)
+                    {
+                        return i;
+                    }
+                }
+
+                // This line should never be reached.
+                return probs.Length - 1;
+            };
         }
     }
 
