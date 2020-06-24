@@ -78,11 +78,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
             else if (name == MetricsNames.WidthCounter.ExtraWidth)
             {
-                return "WidthLowerBound";
-            }
-            else if (name == MetricsNames.DepthCounter.Depth)
-            {
-                return "DepthLowerBound";
+                return "Width";
             }
             else
             {
@@ -160,7 +156,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         /// Returns <see cref="Data"/> in TSV format where the key is the Metric name,
-        /// and the value is the statistics in tab-separated format.
+        /// and the value is the statistics in tab-seperated format.
         /// </summary>
         public virtual string ToTSV()
         {

@@ -74,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0, data.Rows.Find("CNOT")["Sum"]);
             Assert.Equal(0.0, data.Rows.Find("R")["Sum"]);
             Assert.Equal(2.0, data.Rows.Find("QubitClifford")["Sum"]);
-            Assert.Equal(3.0, data.Rows.Find("WidthLowerBound")["Sum"]);
+            Assert.Equal(3.0, data.Rows.Find("Width")["Sum"]);
         }
 
         /// <summary>
@@ -103,8 +103,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         /// <summary>
-        /// Documents that the width and depth statistics reflect independent lower
-        /// bounds for each.
+        /// Shows that T gates on different qubits are counted for depth purposes as 
+        /// executing in parallel.
         /// </summary>
         [Fact]
         public void DepthDifferentQubitsTest()
@@ -116,9 +116,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var data = sim.Data;
 
             Assert.Equal(4.0, data.Rows.Find("T")["Sum"]);
-            Assert.Equal(3.0, data.Rows.Find("WidthLowerBound")["Sum"]);
-            Assert.Equal(2.0, data.Rows.Find("DepthLowerBound")["Sum"]);
+            Assert.Equal(3.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
         }
+
+        /// <summary>
+        /// Documents that the width and depth statistics reflect independent lower
+        /// bounds for each (two T gates cannot be combined into a circuit of depth
+        /// one and width one).
+        /// </summary>
         [Fact]
         public void DepthVersusWidthTest()
         {
@@ -129,8 +135,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var data = sim.Data;
 
             Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
-            Assert.Equal(1.0, data.Rows.Find("WidthLowerBound")["Sum"]);
-            Assert.Equal(1.0, data.Rows.Find("DepthLowerBound")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("Depth")["Sum"]);
         }
     }
 }
