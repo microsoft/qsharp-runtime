@@ -109,6 +109,25 @@ void test_teleport()
     destroy(sim_id);
 }
 
+std::vector<std::vector<std::int32_t>> loadPrb(int circStart, int circStop) {
+    std::vector<std::vector<std::int32_t>> rslt;
+    for (int k = circStart; k < circStop; k++) {
+        unsigned c = k - 1;
+        if (k > 0)
+            for (int j = 0; j < 5; j++) {
+                std::vector<std::int32_t> nums = { k - 1, k };
+                rslt.push_back(nums);
+            }
+        if (k % 5 == 0) {
+            for (int j = 0; j < 5; j++) {
+                std::vector<std::int32_t> nums = { k };
+                rslt.push_back(nums);
+            }
+        }
+    }
+    return rslt;
+}
+
 std::vector<std::int32_t> splitNums(const std::string& str, char delim = ',') {
     std::vector<std::int32_t> nums;
     size_t start;
@@ -170,84 +189,90 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     return rslt;
 }
 
+int numQs(vector<vector<int32_t>> prb) {
+    int mx = -1;
+    for (auto i : prb)
+        for (auto j : i)
+            if (j > mx) mx = j;
+    return (mx + 1);
+}
+
 int main()
 {
-    auto orig   = loadTest("..\\..\\..\\shor_4.log", false);
-    auto clus   = loadTest("..\\..\\..\\shor_4.log", true);
+    int                     nQs,circStart,circStop;
+    vector<vector<int32_t>> prb;
 
-    int fuseLimits[]    = {0,1,2,5,10,50,100};
-    int qCount[]        = {15,26};
-    for (int qIdx = 0; qIdx < 2; qIdx++) {                                  // #### 0,2 Number of qubits (15 or 26)
-        for (int doRange = 1; doRange < 2; doRange++) {                     // #### 0,3 Location of qubits in WFN
-            int nQs = qCount[qIdx];
-            int circStart = 0;
-            int circStop = nQs;
-            if (doRange == 0) { circStop = 7; }
-            if (doRange == 2) { circStart = nQs - 7; }
-            printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d\n", 
-                nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange);
+    for (int doRange = 1; doRange < 2; doRange++) {                             // #### 0,3 Location of qubits in WFN
+        for (int prbIdx = 2; prbIdx < 4; prbIdx++) {                            // #### 0=15qs 1=26qs, 2,3=shor_4_4 3=shor_4_4
+            switch (prbIdx) {
+            case 0:
+            case 1:
+                if (prbIdx == 0) nQs    = 15;
+                else             nQs    = 26;
+                circStart               = 0;
+                circStop                = nQs;
+                if (doRange == 0) { circStop  = 7; }
+                if (doRange == 2) { circStart = nQs - 7; }
+                prb             = loadPrb(circStart,circStop);
+                break;
+            case 2:
+                prb = loadTest("..\\..\\..\\shor_4_4.log", false);
+                nQs = numQs(prb);
+                break;
+            case 3:
+                prb = loadTest("..\\..\\..\\shor_4_4.log", true);
+                nQs = numQs(prb);
+                break;
+            }
+            printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d\n", 
+                nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx);
             fflush(stdout);
-            for (int fuseSpan = 6; fuseSpan < 8; fuseSpan++) {                  // #### 1,8 Span Size
-                for (int flIdx = 6; flIdx < 7; flIdx++) {                       // #### 6,7 Span Depth in fuseLimits[]
-                    for (int numThreads = 4; numThreads < 5; numThreads++) {   // #### 1,5 (or 1,17 for big machine)
-                        for (int simTyp = 4; simTyp < 5; simTyp++) {            // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
-                            if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
-                            if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
-                            if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+            for (int fuseSpan = 4; fuseSpan < 5; fuseSpan++) {                  // #### 1,8 Span Size
+                for (int numThreads = 4; numThreads < 5; numThreads++) {        // #### 1,5 (or 1,17 for big machine)
+                    for (int simTyp = 4; simTyp < 5; simTyp++) {                // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
+                        if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
+                        if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+                        if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
-                            auto sim_id = initDBG(simTyp, fuseSpan, fuseLimits[flIdx], numThreads);
+                        auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads);
 
-                            for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+                        for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-                            for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
-                                unsigned c = k - 1;
-                                MCX(sim_id, 1, &c, k);
-                            }
-
-                            std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-#if 0
-                            for (int i = 0; i < 1000000; i++) {
-                                for (int k = circStart; k < circStop; k++) {
-                                    unsigned c = k - 1;
-                                    if (k > 0)
-                                        for (int j = 0; j < 5; j++)
-                                            MCX(sim_id, 1, &c, k);
-                                    if (k % 5 == 0)
-                                        for (int j = 0; j < 5; j++)
-                                            H(sim_id, k);
-                                }
-#else
-                            for (int i=0; i<1000; i++) {
-                                for (int i = 0; i < orig.size(); i++) {
-                                    auto qs = orig[i];
-                                    switch (qs.size()) {
-                                    case 0: // Need to force a flush (end of cluster)
-                                        break;
-                                    case 1:
-                                        H(sim_id, qs[0]);
-                                        break;
-                                    case 2:
-                                        CX(sim_id, qs[0], qs[1]);
-                                        break;
-                                    case 3:
-                                    {
-                                        uint32_t cs[] = { qs[0], qs[1] };
-                                        MCX(sim_id, 2, cs, qs[2]);
-                                    }
-                                    break;
-                                    default:
-                                        throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
-                                    }
-                                }
-#endif
-
-                                std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-                                std::chrono::duration<double> elapsed = curr - start;
-                                if (elapsed.count() >= 25.0) break;
-                            }
-
-                            destroy(sim_id);
+                        for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                            unsigned c = k - 1;
+                            MCX(sim_id, 1, &c, k);
                         }
+
+                        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+                        for (int i=0; i<100000; i++) {
+                            for (int i = 0; i < prb.size(); i++) {
+                                auto qs = prb[i];
+                                switch (qs.size()) {
+                                case 0: // Need to force a flush (end of cluster)
+                                    break;
+                                case 1:
+                                    H(sim_id, qs[0]);
+                                    break;
+                                case 2:
+                                    CX(sim_id, qs[0], qs[1]);
+                                    break;
+                                case 3:
+                                {
+                                    uint32_t cs[] = { qs[0], qs[1] };
+                                    MCX(sim_id, 2, cs, qs[2]);
+                                }
+                                break;
+                                default:
+                                    throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                                }
+                            }
+
+                            std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                            std::chrono::duration<double> elapsed = curr - start;
+                            if (elapsed.count() >= 25.0) break;
+                        }
+
+                        destroy(sim_id);
                     }
                 }
             }
