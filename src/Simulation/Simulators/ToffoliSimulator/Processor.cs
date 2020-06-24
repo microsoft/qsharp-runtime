@@ -158,6 +158,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
             SetValue(qubit2, tmp);
         }
 
+        public override void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
+        {
+            if (controls.All(control => GetValue(control)))
+            {
+                var tmp = GetValue(qubit1);
+                SetValue(qubit1, GetValue(qubit2));
+                SetValue(qubit2, tmp);
+            }
+        }
+
         /// <summary>
         /// Make sure that a rotation is either the identity or an X, up to global phase.
         /// Assumes that the rotation is exp(i*theta*sigma(axis)), where sigma(axis) is
