@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimAssertProb : Quantum.Intrinsic.AssertProb
+        public class QSimAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "JointEnsembleProbability")]
             private static extern double JointEnsembleProbability(uint id, uint n, Pauli[] b, uint[] q);
