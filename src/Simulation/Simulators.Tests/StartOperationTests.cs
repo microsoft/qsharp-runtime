@@ -110,8 +110,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.Equal(0, tracker.GetNumberOfCalls("Microsoft.Quantum.Tests.StartOperation.UDT2", OperationFunctor.Controlled));
                 Assert.Equal(0, tracker.GetNumberOfCalls("Microsoft.Quantum.Tests.StartOperation.UDT2", OperationFunctor.ControlledAdjoint));
 
-                Assert.Equal(basic * 4 + 2, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X"));
-                Assert.Equal(basicBody * 4 + 2, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X", OperationFunctor.Body));
+                // Reset is differently implemented in ToffoliSimulator and does not call X explicitly.
+                var offset = s switch {
+                    ToffoliSimulator _ => 0,
+                    _ => 2
+                };
+
+                Assert.Equal(basic * 4 + offset, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X"));
+                Assert.Equal(basicBody * 4 + offset, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X", OperationFunctor.Body));
                 Assert.Equal(basicAdjoint * 4, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X", OperationFunctor.Adjoint));
                 Assert.Equal(basicCtrl * 4, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X", OperationFunctor.Controlled));
                 Assert.Equal(basicCtrlAdjoint * 4, tracker.GetNumberOfCalls("Microsoft.Quantum.Intrinsic.X", OperationFunctor.ControlledAdjoint));
