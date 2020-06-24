@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Diagnostics {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Canon;
