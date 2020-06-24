@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             ProcessRunner.Run("dotnet", exe, out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
             Assert.Equal(1, exitCode);
-            Assert.Contains("NotImplementedException", error.ToString());
+            Assert.Contains("UnsupportedOperationException", error.ToString());
 
             ProcessRunner.Run("dotnet", $"{exe} --simulator QuantumSimulator", out var _, out error, out exitCode, out ex);
             Assert.Null(ex);
