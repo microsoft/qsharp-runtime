@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Diagnostics {
+namespace Microsoft.Quantum.Arrays {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Canon;
 
