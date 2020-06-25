@@ -90,6 +90,49 @@ class Wavefunction
 
     void flush() const
     {
+        Fusion fg = fused_.getFusedGates();
+        auto items = fg.getItems();
+        auto sets = fg.getSet();
+        auto ctrlSets = fg.getCtrlSet();
+        if (items.size() > 0) {
+            std::vector<unsigned> indices;
+            std::set<unsigned> indicesSet; //make optimal
+            for (int i = 0; i < items.size(); i++) {
+                auto tempIndices = items[i].get_indices();
+                for (unsigned j = 0; j < tempIndices.size(); j++) {
+                    if (indicesSet.count(tempIndices[j]) == 0) {
+                        indices.push_back(tempIndices[j]);
+                        indicesSet.insert(tempIndices[j]);
+                    }
+                }
+            }
+            for (auto it = ctrlSets.begin(); it != ctrlSets.end(); ++it) {
+                if (indicesSet.count(*it) == 0) {
+                    indices.push_back(*it);
+                    indicesSet.insert(*it);
+                }
+            }
+            std::vector<qubit_t> indexLocs = qubits(indices);
+            for (unsigned i = 0; i < indexLocs.size(); i++)
+            {
+                auto currLoc = indexLocs[i];
+                reorderWFN(currLoc, i);
+                indexLocs = qubits(indices);
+            }
+            std::map<unsigned, unsigned> old2newDict;
+            for (unsigned i = 0; i < indices.size(); i++) {
+                old2newDict[indices[i]] = indexLocs[i];
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                items[i].setIdx(old2newDict);
+            }
+            fg.setItems(items);
+            fg.setSet(old2newDict);
+            fg.setCtrlSet(old2newDict);
+            fused_.setFusedGates(fg);
+        }
+        
         fused_.flush(wfn_);
     }
 
@@ -243,15 +286,15 @@ class Wavefunction
         rng_.seed(s);
     }
 
-    void reorderWFN(unsigned qubitLoc, unsigned newPos)
+    void reorderWFN(unsigned qubitLoc, unsigned newPos) const
     {
         //qubitmap_[qid]; //get location of qubit in wfn
         //0,1,2 ->H(1)->1,0,2->X(2)_>2,0,1
         //get id of qubit located at newPos - getting index from the element
-        std::vector<qubit_t>::iterator itr1 = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
-        unsigned newPosId = std::distance(qubitmap_.begin(), itr1);
-        std::vector<qubit_t>::iterator itr2 = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
-        unsigned qid = std::distance(qubitmap_.begin(), itr2);
+        auto itr1 = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
+        auto newPosId = std::distance(qubitmap_.begin(), itr1);
+        auto itr2 = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
+        auto qid = std::distance(qubitmap_.begin(), itr2);
         //swap qubits in wfn between qubitLoc and newPos
         if (newPos != qubitLoc)
         {
@@ -280,8 +323,12 @@ class Wavefunction
         //std::copy(qubitmap_.begin(), qubitmap_.end(), std::ostream_iterator<T>(std::cout, "\n"));
         //std::cout << wfn_[0] << " " << qubitmap_[0];
         //auto qid = qubit(g);
-        reorderWFN(qubit(g), 0);
-        fused_.apply(wfn_, g.matrix(), qubit(g));
+        //reorderWFN(qubit(g), 0);
+        std::vector<qubit_t> cs;
+        if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+            flush();
+        }
+        fused_.apply(wfn_, g.matrix(), g.qubit());
     }
     
     /// generic application of a multiply controlled gate
@@ -289,13 +336,16 @@ class Wavefunction
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
-        for (unsigned i = 0; i < pcs.size(); i++)
+        /*for (unsigned i = 0; i < pcs.size(); i++)
         {
             reorderWFN(pcs[i], i);
         }
         reorderWFN(qubit(g), pcs.size());
-        pcs = qubits(cs);
-        fused_.apply_controlled(wfn_, g.matrix(), pcs, qubit(g)); 
+        pcs = qubits(cs);*/
+        if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+            flush();
+        }
+        fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());
     }
 
     /// generic application of a controlled gate
@@ -319,7 +369,8 @@ class Wavefunction
     template <class A>
     bool subsytemwavefunction(std::vector<unsigned> const& qs, std::vector<T, A>& qubitswfn, double tolerance)
     {
-        return fused_.subsytemwavefunction(wfn_, qubits(qs), qubitswfn, tolerance);
+        flush(); // we have to flush before we can extract the state
+        return kernels::subsytemwavefunction(wfn_, qubits(qs), qubitswfn, tolerance);
     }
 
 
@@ -383,7 +434,7 @@ class Wavefunction
   private:
     unsigned num_qubits_;             // for convenience
     mutable WavefunctionStorage wfn_; // storing the wave function
-    std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
+    mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
 	  int usage_;
 
     // randomness support
