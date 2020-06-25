@@ -179,8 +179,6 @@ let private testWith testNum defaultSimulator =
 /// Standard command-line arguments for the "submit" command without specifying a target.
 let private submitWithoutTarget = 
     [ "submit"
-      "--storage"
-      "myStorage"
       "--subscription"
       "mySubscription"
       "--resource-group"
@@ -476,15 +474,15 @@ let ``Shadows --shots`` () =
 
 // The expected output from the resources estimator.
 let private resourceSummary =
-    "Metric          Sum
-     CNOT            0
-     QubitClifford   1
-     R               0
-     Measure         1
-     T               0
-     Depth           0
-     Width           1
-     BorrowedWidth   0"
+    "Metric          Sum Max
+     CNOT            0   0
+     QubitClifford   1   1
+     R               0   0
+     Measure         1   1
+     T               0   0
+     Depth           0   0
+     Width           1   1
+     BorrowedWidth   0   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
@@ -550,10 +548,10 @@ let ``Submit uses default values`` () =
     given (submitWithNothingTarget @ ["--verbose"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: test.nothing
-               Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Storage:
                AAD Token:
                Base URI:
                Job Name:
@@ -569,6 +567,8 @@ let ``Submit allows overriding default values`` () =
     let given = test 1
     given (submitWithNothingTarget @ [
         "--verbose"
+        "--storage"
+        "myStorage"
         "--aad-token"
         "myToken"
         "--base-uri"
@@ -580,10 +580,10 @@ let ``Submit allows overriding default values`` () =
     ])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: test.nothing
-               Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
                Job Name: myJobName
@@ -686,10 +686,10 @@ let ``Shows help text for submit command`` () =
 
                     Options:
                       --target <target> (REQUIRED)                        The target device ID.
-                      --storage <storage> (REQUIRED)                      The storage account connection string.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
+                      --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --job-name <job-name>                               The name of the submitted job.
