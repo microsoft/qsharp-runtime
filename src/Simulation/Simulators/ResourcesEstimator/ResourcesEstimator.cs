@@ -121,7 +121,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     if (l is ICallGraphStatistics collector)
                     {
                         var results = collector.Results.ToTable();
-                        //Debug.Assert(results.rows.Count() == 1);
                         Debug.Assert(results.keyColumnNames.Length > 2 && results.keyColumnNames[2] == "Caller");
 
                         var roots = results.rows.Where(r => r.KeyRow[2] == CallGraphEdge.CallGraphRootHashed);

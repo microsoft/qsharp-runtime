@@ -94,10 +94,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             var cols = rows[0].Split('\t');
             Assert.Equal("Metric", cols[0].Trim());
-            Assert.Equal(2, cols.Length);
+            Assert.Equal(3, cols.Length);
 
             var cliffords = rows.First(r => r.StartsWith("QubitClifford")).Split('\t');
-            Assert.Equal(2, cliffords.Length);
+            Assert.Equal(3, cliffords.Length);
             Assert.Equal("2", cliffords[1]);
         }
 
