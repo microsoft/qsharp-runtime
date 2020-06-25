@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Implementation of the AssertProb operation for the Toffoli simulator.
         /// </summary>
-        public class AssertProb : Intrinsic.AssertProb
+        public class AssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private ToffoliSimulator simulator;
 

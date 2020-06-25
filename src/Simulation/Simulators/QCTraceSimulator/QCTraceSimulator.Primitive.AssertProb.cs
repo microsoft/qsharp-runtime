@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
     public partial class QCTraceSimulatorImpl
     {
-        public class TracerAssertProb : Intrinsic.AssertProb
+        public class TracerAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private readonly QCTraceSimulatorCore core;
             public TracerAssertProb(QCTraceSimulatorImpl m) : base(m){

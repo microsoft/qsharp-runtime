@@ -1,12 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Bug3758
-{
-    open Microsoft.Quantum.Primitive;
+namespace Bug3758 {
+    open Microsoft.Quantum.Intrinsic;
 
-    function Reverse<'T> (array : 'T[]) : 'T[]
-    {
+    function Reverse<'T> (array : 'T[]) : 'T[] {
         let nElements = Length(array);
         return array[nElements-1..-1..0];
     }
@@ -22,43 +20,31 @@ namespace Bug3758
     
     /// # Summary
     /// An example operation used for testing input transformations.
-    operation TransformationReferenceForward(register : Qubit[]) : Unit {
-        body (...) {
-            X(register[0]);
-            H(register[1]);
-            X(register[2]);
-        }
-        adjoint auto;
-        controlled auto;
-        controlled adjoint auto;
+    operation TransformationReferenceForward(register : Qubit[]) : Unit is Adj + Ctl {
+        X(register[0]);
+        H(register[1]);
+        X(register[2]);
     }
 
     /// # Summary
     /// An example operation used for testing input transformations.
-    operation TransformationReferenceReverse(register : Qubit[]) : Unit {
-        body (...) {
-            X(register[2]);
-            H(register[1]);
-            X(register[0]);
-        }
-        adjoint auto;
-        controlled auto;
-        controlled adjoint auto;
+    operation TransformationReferenceReverse(register : Qubit[]) : Unit is Adj + Ctl {
+        X(register[2]);
+        H(register[1]);
+        X(register[0]);
     }
 }
 
 
 
-namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
-{
+namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Bug3758;
-    open Microsoft.Quantum.Extensions.Testing;
+    open Microsoft.Quantum.Diagnostics;
 
     operation TransformedOperationTest() : Unit {
-        AssertOperationsEqualReferenced(
+        AssertOperationsEqualReferenced(3,
             TransformedOperation(Reverse<Qubit>, TransformationReferenceReverse),
-            TransformationReferenceForward,
-            3
+            TransformationReferenceForward
         );
     }
 }
