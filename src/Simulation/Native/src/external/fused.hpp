@@ -41,7 +41,14 @@ class Fused
       fusedgates = Fusion();
     }
 
+    Fusion getFusedGates() const {
+        return fusedgates;
+    }
     
+    void setFusedGates(Fusion newFG) const {
+        fusedgates = newFG;
+    }
+
     template <class T, class A>
     void flush(std::vector<T, A>& wfn) const
     {
@@ -85,7 +92,6 @@ class Fused
                               std::vector<T, A2>& qubitswfn,
                               double tolerance)
     {
-      flush(wfn); // we have to flush before we can extract the state
       return kernels::subsytemwavefunction(wfn, qs, qubitswfn, tolerance);
     }
     
@@ -102,11 +108,25 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-      // Major runtime logic change here
+        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
+        fusedgates.insert(convertMatrix(mat), qs, cs);
+    }
 
-        // Have to update capacity as the WFN grows
+    template <class T, class A, class M>
+    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
+    {
+      std::vector<unsigned> cs;
+      apply_controlled(wfn, mat, cs, q);
+    }
+
+    template <class T, class A, class M>
+    bool shouldFlush(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
+    {
+        // Major runtime logic change here
+
+          // Have to update capacity as the WFN grows
         if (wfnCapacity != wfn.capacity()) {
-            wfnCapacity     = wfn.capacity();
+            wfnCapacity = wfn.capacity();
             char* envNT = NULL;
             size_t len;
 #ifdef _MSC_VER
@@ -133,16 +153,9 @@ class Fused
         }
 
         // New rules of when to stop fusing
-        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
-        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth) flush(wfn);
-        fusedgates.insert(convertMatrix(mat), qs, cs);
-    }
+        Fusion::IndexVector qs = std::vector<unsigned>(1, q);
 
-    template <class T, class A, class M>
-    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
-    {
-      std::vector<unsigned> cs;
-      apply_controlled(wfn, mat, cs, q);
+        return (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth);
     }
   private:
     mutable Fusion fusedgates;

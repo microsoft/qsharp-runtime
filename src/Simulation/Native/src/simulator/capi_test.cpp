@@ -106,15 +106,23 @@ void test_gates()
 
     allocateQubit(sim_id, 0);
     allocateQubit(sim_id, 1);
+    /*allocateQubit(sim_id, 2);
+    allocateQubit(sim_id, 3);*/
     ////simpler test
     //X(sim_id, 0);
     //X(sim_id, 1);
     //CX(sim_id, 0, 1);
     //X(sim_id, 0);
+    //assert(M(sim_id, 1) == false);
     CRx(sim_id, 1.0, 0, 1);
 
     assert(M(sim_id, 1) == false);
 
+    //R(sim_id, 1, 3.14159265358979323846, 1);
+    //R(sim_id,1, 3.14159265358979323846, 0);
+    //CRx(sim_id, 3.14159265358979323846, 0, 1); 
+    //
+    //assert(M(sim_id, 1) == false);
     X(sim_id, 0);
     CRx(sim_id, 1.0, 0, 1);
 
@@ -128,7 +136,18 @@ void test_gates()
 
     assert(M(sim_id, 1) == true);
 
+    /*X(sim_id, 2);
+    X(sim_id, 0);
+    X(sim_id, 3);
     X(sim_id, 1);
+    CX(sim_id, 1, 2);
+
+    assert(M(sim_id, 2) == false);
+
+    X(sim_id, 2);
+    X(sim_id, 0);
+    X(sim_id, 3);
+    X(sim_id, 1);*/
 
     release(sim_id, 0);
     release(sim_id, 1);
