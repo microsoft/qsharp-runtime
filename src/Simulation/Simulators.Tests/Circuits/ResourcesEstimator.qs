@@ -35,6 +35,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Rx(0.42, b);
             CNOT(b, c);
             return M(c);
+
+    // Tests for Depth and Width lower bounds
+    operation DepthDifferentQubits () : Unit
+    {
+        using(q = Qubit[3]) {
+            T(q[0]);
+            T(q[1]);
+            T(q[2]);
+            T(q[0]);
+        }
+    }
+    operation DepthVersusWidth () : Unit
+    {
+        using(q = Qubit()) {
+            T(q);
+        }
+        using(q = Qubit()) {
+            T(q);
         }
     }
 }

@@ -31,6 +31,14 @@ namespace Microsoft.Quantum.Simulation.Common
         public event Action<string>? OnLog = null;
         public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
 
+        
+        /// <summary>
+        ///     An event fired whenever a simulator has additional diagnostic data
+        ///     available for display (e.g. state information, assertion details,
+        ///     execution traces).
+        /// </summary>
+        public event Action<object>? OnDisplayableDiagnostic = null;
+
         public IQubitManager? QubitManager { get; }
 
         public abstract string Name { get; }
@@ -180,6 +188,17 @@ namespace Microsoft.Quantum.Simulation.Common
         public void EnableExceptionPrinting()
         {
             OnException += WriteStackTraceToLog;
+        }
+
+        /// <summary>
+        ///     Sends diagnostic data to any listening display handlers.
+        ///     Display handlers may discard any unrecognized data, such that
+        ///     no guarantee is made as to any particular action taken as a result
+        ///     of calling this method.
+        /// </summary>
+        protected void MaybeDisplayDiagnostic(object data)
+        {
+            OnDisplayableDiagnostic?.Invoke(data);
         }
 
 
