@@ -74,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             if (qubits.Count == 0) return;
 
-            var maxId = qubits.Max(q => q.Id);
+            long maxId = qubits.Max(q => q.Id);
             while (maxId >= SimulationValues.Length)
             {
                 SimulationValues.Length *= 2;
@@ -153,7 +153,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // SWAP interchanges the simulation values at two locations.
         public override void SWAP(Qubit qubit1, Qubit qubit2)
         {
-            var tmp = GetValue(qubit1);
+            bool tmp = GetValue(qubit1);
             SetValue(qubit1, GetValue(qubit2));
             SetValue(qubit2, tmp);
         }
@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             if (controls.All(control => GetValue(control)))
             {
-                var tmp = GetValue(qubit1);
+                bool tmp = GetValue(qubit1);
                 SetValue(qubit1, GetValue(qubit2));
                 SetValue(qubit2, tmp);
             }
@@ -186,7 +186,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // Rotations of any angle around I are I.
             // Rotations around any axis of even multiples of pi are safe to control.
 
-            var piOverTwoRatio = Abs(theta) / (PI / 2.0);
+            double piOverTwoRatio = Abs(theta) / (PI / 2.0);
             if (Abs(piOverTwoRatio - Round(piOverTwoRatio)) > Tolerance)
             {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform rotations of multiples of pi/2.");
@@ -194,8 +194,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             var piOverTwoCount = (int)Round(piOverTwoRatio);
 
-            var equivalentToX = (axis == Pauli.PauliX) && (piOverTwoCount % 2 == 1);
-            var safeToControl = piOverTwoCount % 4 == 0;
+            bool equivalentToX = (axis == Pauli.PauliX) && (piOverTwoCount % 2 == 1);
+            bool safeToControl = piOverTwoCount % 4 == 0;
 
             if ((axis == Pauli.PauliZ || axis == Pauli.PauliY) && (piOverTwoCount % 2 == 1))
             {
@@ -405,7 +405,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
 
             var qubitsToMeasure = bases.Zip(qubits, PauliFilter("Measure")).WhereNotNull();
-            var result = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
+            bool result = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
             return result.ToResult();
         }
 
@@ -428,7 +428,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // (see also https://docs.microsoft.com/quantum/concepts/pauli-measurements#multiple-qubit-measurements)
             // We use Aggregate to successively XOR a qubit's simulation value
             // to an accumulator value `accu` that is initialized to `false`.
-            var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
+            bool actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit));
             if (actual.ToResult() != expected)
             {
                 // If the expected value does not correspond to the actual measurement
@@ -462,7 +462,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 // Pick out just the Z measurements
                 var qubitsToMeasure = bases.Zip(qubits, PauliFilter("AssertProb")).WhereNotNull();
-                var actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit)) ? 0.0 : 1.0;
+                double actual = qubitsToMeasure.Aggregate(false, (accu, qubit) => accu ^ GetValue(qubit)) ? 0.0 : 1.0;
 
                 if (Abs(actual - probabilityOfZero) > tolerance)
                 {
