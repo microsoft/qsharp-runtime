@@ -89,9 +89,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 	}
 
     operation AllocateQubit2 () : Unit {
-        using( q = Qubit() ) {
+        using (q = Qubit()) {
             Microsoft.Quantum.Intrinsic.H(q);
-            Microsoft.Quantum.Intrinsic.Assert([PauliZ],[q],One,"");
+            Microsoft.Quantum.Diagnostics.AssertMeasurement(
+                [PauliZ], [q], One, ""
+            );
         }
     }
 }
