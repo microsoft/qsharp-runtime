@@ -1573,13 +1573,10 @@ module SimulationCode =
         generator.Apply elements
 
     // Returns only those namespaces and their elements that are defined for the given file.
-    let findLocalElements selector fileName syntaxTree =
-        let path =
-            match CompilationBuilder.CompilationUnitManager.TryGetUri fileName with
-            | true, uri -> uri.AbsolutePath |> NonNullable<string>.New
-            | false, _ -> NonNullable<string>.New ""
+    let findLocalElements selector (fileName : NonNullable<string>) syntaxTree =
         syntaxTree
-        |> Seq.map (fun ns -> (ns.Name, (FilterBySourceFile.Apply (ns, path)).Elements |> Seq.choose selector |> Seq.toList))
+        |> Seq.map (fun ns ->
+            (ns.Name, (FilterBySourceFile.Apply (ns, fileName)).Elements |> Seq.choose selector |> Seq.toList))
         |> Seq.sortBy fst
         |> Seq.filter (fun (_,elements) -> not elements.IsEmpty)
         |> Seq.toList
