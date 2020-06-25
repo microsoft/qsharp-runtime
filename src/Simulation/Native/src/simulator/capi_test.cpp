@@ -530,6 +530,23 @@ int numQs(vector<vector<int32_t>> prb) {
 
 int main()
 {
+#if 1
+    std::cerr << "Testing allocate\n";
+    test_allocate();
+    std::cerr << "Testing gates\n";
+    test_gates();
+    std::cerr << "Testing teleport\n";
+    test_teleport();
+    std::cerr << "Testing basis state permutation\n";
+    test_permute_basis();
+    test_permute_basis_adjoint();
+    std::cerr << "Testing dump\n";
+    // test_dump();
+    // test_dump_qubits();
+    return 0;
+#endif
+
+#if 0
     int                     nQs,circStart,circStop;
     vector<vector<int32_t>> prb;
 
@@ -609,7 +626,7 @@ int main()
             }
         }
     }
-
+#endif
 #if 0 // OpenMP test
     double thrd1elapsed = 1.0;
     for (int thrds = 1; thrds < 9; thrds++) {
