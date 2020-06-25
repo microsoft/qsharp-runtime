@@ -77,9 +77,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             if (qubits.Count == 0) return;
 
             long maxId = qubits.Max(q => q.Id);
-            while (maxId >= SimulationValues.Length)
+            if (maxId >= SimulationValues.Length)
             {
-                SimulationValues.Length *= 2;
+                SimulationValues.Length = (int)Ceiling(Log((maxId + 1) / (double)SimulationValues.Length) / Log(2.0));
             }
         }
 
