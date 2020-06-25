@@ -17,6 +17,27 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
+    // When multiple operations are traced by resource estimator,
+    // it should report cumulative statistics in the end.
+    operation Operation_1_of_2() : Unit
+    {
+        using ((a, b) = (Qubit(), Qubit())) {
+            H(a);
+            CNOT(a, b);
+            T(b);
+        }
+    }
+    operation Operation_2_of_2() : Result
+    {
+        using ((a, b, c) = (Qubit(), Qubit(), Qubit())) {
+            X(a);
+            CNOT(a, b);
+            Rx(0.42, b);
+            CNOT(b, c);
+            return M(c);
+        }
+    }
+
     // Tests for Depth and Width lower bounds
     operation DepthDifferentQubits () : Unit
     {
