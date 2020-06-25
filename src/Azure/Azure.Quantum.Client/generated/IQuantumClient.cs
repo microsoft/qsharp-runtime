@@ -85,5 +85,10 @@ namespace Microsoft.Azure.Quantum.Client
         /// </summary>
         IProvidersOperations Providers { get; }
 
+        /// <summary>
+        /// Gets the IStorageOperations.
+        /// </summary>
+        IStorageOperations Storage { get; }
+
     }
 }
