@@ -52,8 +52,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // Three helper functions manipulate the bits in the bit array given a
         // qubit as input. GetValue returns the simulation value at the
         // corresponding index.
-        private bool GetValue(Qubit qubit) =>
-            SimulationValues[qubit.Id];
+        private bool GetValue(Qubit qubit)
+        {
+            return SimulationValues[qubit.Id];
+        }
 
         // SetValue sets the simulation value at the corresponding index.
         private void SetValue(Qubit qubit, bool value)
