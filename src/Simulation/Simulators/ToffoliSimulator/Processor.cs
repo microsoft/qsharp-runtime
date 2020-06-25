@@ -7,6 +7,7 @@ using System;
 using static System.Math;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -274,6 +275,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // If power == 0, then we're a multiple of pi, possible an even multiple.
             else
             {
+                Debug.Assert(power == 0);
+
                 equivalentToX = false;
                 safeToControl = numerator % 2 == 0;
             }
