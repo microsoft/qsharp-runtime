@@ -7,7 +7,15 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Quantum.EntryPointDriver</PackageId>
     <Description>The standard command-line interface for standalone Q# console applications.</Description>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
