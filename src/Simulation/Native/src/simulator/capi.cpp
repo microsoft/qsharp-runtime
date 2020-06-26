@@ -171,4 +171,10 @@ MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void(*callback)(unsig
     psis[id]->dumpIds(callback);
 }
 
+// Force a flush of any fused gates
+MICROSOFT_QUANTUM_DECL void Flush(_In_ unsigned id)
+{
+    psis[id]->flush();
+}
+
 }
