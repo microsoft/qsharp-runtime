@@ -20,18 +20,22 @@ sz      = -1
 rng     = 1
 prb     = -1
 
-prbs = {
-    0: "ladder",
-    1: "ladder",
-    2: "shor_8,4N",
-    3: "shor_8,4C",
-    4: "shor_10,4N",
-    5: "shor_10,4C",
-    6: "shor_12,4N",
-    7: "shor_12,4C",
-    8: "shor_14,4N",
-    9: "shor_14,4C"
-}
+prbs = [
+    "ladder",
+    "ladder",
+    "shor_4,4N",
+    "shor_4,4C",
+    "shor_6,4N",
+    "shor_6,4C",
+    "shor_8,4N",
+    "shor_8,4C",
+    "shor_10,4N",
+    "shor_10,4C",
+    "shor_12,4N",
+    "shor_12,4C",
+    "shor_14,4N",
+    "shor_14,4C"
+]
 def dumpGpss():
     global gpss,env,sim,totalQs,threads,span,sz,rng,prb
     if len(gpss) > 0:

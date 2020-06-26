@@ -208,25 +208,19 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 16;
+    const int testCnt = 10;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
-        {   1,  2,  1,  1,  4},
-        {   1,  2,  1,  4,  4},
-        {   1,  2,  4,  1,  4},
-        {   1,  2,  4,  4,  4},
-        {   1,  3,  1,  1,  4},
-        {   1,  3,  1,  4,  4},
-        {   1,  3,  4,  1,  4},
-        {   1,  3,  4,  4,  4},
-        {   1,  4,  1,  1,  4},
-        {   1,  4,  1,  4,  4},
-        {   1,  4,  4,  1,  4},
-        {   1,  4,  4,  4,  4},
-        {   1,  5,  1,  1,  4},
-        {   1,  5,  1,  4,  4},
-        {   1,  5,  4,  1,  4},
+        {   1, 10,  4,  4,  4}, // 12 bits
+        {   1, 11,  4,  4,  4},
+        {   1,  8,  4,  4,  4}, // 10 bits
+        {   1,  9,  4,  4,  4},
+        {   1,  6,  4,  4,  4}, // 8 bits
+        {   1,  7,  4,  4,  4},
+        {   1,  4,  4,  4,  4}, // 6 bits
         {   1,  5,  4,  4,  4},
+        {   1,  2,  4,  4,  4}, // 4 bits
+        {   1,  3,  4,  4,  4},
     };
 
     for (int tIdx=0; tIdx<testCnt; tIdx++) {
@@ -236,37 +230,22 @@ int main()
         int numThreads  = tests[tIdx][3];
         int simTyp      = tests[tIdx][4];
 
-        switch (prbIdx) {
-        case 0:
-        case 1:
-            if (prbIdx == 0) nQs    = 15;
-            else             nQs    = 26;
-            circStart               = 0;
-            circStop                = nQs;
-            if (doRange == 0) { circStop  = 7; }
+        if (prbIdx < 2) {
+            if (prbIdx == 0) nQs = 15;
+            else             nQs = 26;
+            circStart = 0;
+            circStop = nQs;
+            if (doRange == 0) { circStop = 7; }
             if (doRange == 2) { circStart = nQs - 7; }
-            prb             = loadPrb(circStart,circStop);
+            prb = loadPrb(circStart, circStop);
             break;
-        case 2:
-        case 3:
-            prb = loadTest("shor_8_4.log", (prbIdx & 1) == 0);
+        } else {
+            int bits    = ((prbIdx & 0xFE) + 2);
+            bool doClus = (prbIdx & 1) == 1;
+            char fName[30];
+            sprintf_s(fName,sizeof(fName),"shor_%d_4.log",bits);
+            prb = loadTest(fName,doClus);
             nQs = numQs(prb);
-            break;
-        case 4:
-        case 5:
-            prb = loadTest("shor_10_4.log", (prbIdx & 1) == 0);
-            nQs = numQs(prb);
-            break;
-        case 6:
-        case 7:
-            prb = loadTest("shor_12_4.log", (prbIdx & 1) == 0);
-            nQs = numQs(prb);
-            break;
-        case 8:
-        case 9:
-            prb = loadTest("shor_14_4.log", (prbIdx & 1) == 0);
-            nQs = numQs(prb);
-            break;
         }
         printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d\n", 
             nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx);
@@ -308,11 +287,11 @@ int main()
                 default:
                     throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
                 }
-            }
 
-            std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed = curr - start;
-            if (elapsed.count() >= 25.0) break;
+                std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                std::chrono::duration<double> elapsed = curr - start;
+                if (elapsed.count() >= 100.0) break;
+            }
         }
 
         destroy(sim_id);

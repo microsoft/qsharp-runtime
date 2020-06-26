@@ -125,7 +125,7 @@ class Fused
       std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
-      if (dbgElapsed >= 5.0) {
+      if (dbgElapsed >= 20.0) {
             double nFused = (float)dbgNfused;
             printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flsh=%8.2g gts=%8.2g elap=%5.1f gps=%10.4g (fus=%5.1f%%, ker=%5.1f%%)\n",
                 ((float)dbgSize / nFused),
@@ -217,7 +217,7 @@ class Fused
         }
 
         Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
-        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= maxFusedDepth)  flush(wfn);
+        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= (uint32_t)maxFusedDepth)  flush(wfn);
         fusedgates.insert(convertMatrix(mat), qs, cs);
 #endif
     }
