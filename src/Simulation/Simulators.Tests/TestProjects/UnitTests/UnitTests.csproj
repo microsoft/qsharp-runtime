@@ -14,6 +14,8 @@
     <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulation.Simulators.csproj" />
     <ProjectReference Include="..\HoneywellExe\HoneywellExe.csproj" />
+    <ProjectReference Include="..\IonQExe\IonQExe.csproj" />
+    <ProjectReference Include="..\QCIExe\QCIExe.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />
   </ItemGroup>

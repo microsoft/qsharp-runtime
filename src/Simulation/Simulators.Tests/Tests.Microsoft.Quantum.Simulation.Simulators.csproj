@@ -23,9 +23,6 @@
     <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="TestProjects\ClassicalControlSupportTest\ClassicalControlSupportTest.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
