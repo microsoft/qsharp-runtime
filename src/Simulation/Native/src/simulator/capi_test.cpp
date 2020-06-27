@@ -208,7 +208,7 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 10;
+    const int testCnt = 20;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  2,  4,  4,  4}, // 4 bits
@@ -221,9 +221,19 @@ int main()
         {   1,  9,  4,  4,  4},
         {   1, 10,  4,  4,  4}, // 12 bits
         {   1, 11,  4,  4,  4},
+        {   1,  2,  6,  4,  4}, // 4 bits
+        {   1,  3,  6,  4,  4},
+        {   1,  4,  6,  4,  4}, // 6 bits
+        {   1,  5,  6,  4,  4},
+        {   1,  6,  6,  4,  4}, // 8 bits
+        {   1,  7,  6,  4,  4},
+        {   1,  8,  6,  4,  4}, // 10 bits
+        {   1,  9,  6,  4,  4},
+        {   1, 10,  6,  4,  4}, // 12 bits
+        {   1, 11,  6,  4,  4},
     };
 
-    for (int tIdx=0; tIdx<testCnt; tIdx++) {
+    for (int tIdx=10; tIdx<testCnt; tIdx++) {
         int doRange     = tests[tIdx][0];
         int prbIdx      = tests[tIdx][1];
         int fuseSpan    = tests[tIdx][2];
@@ -243,12 +253,12 @@ int main()
             int bits    = ((prbIdx & 0xFE) + 2);
             bool doClus = (prbIdx & 1) == 1;
             char fName[30];
-            sprintf_s(fName,sizeof(fName),"shor_%d_4.log",bits);
+            sprintf_s(fName,sizeof(fName),"shor_%d_%d.log",bits,fuseSpan);
             prb = loadTest(fName,doClus);
             nQs = numQs(prb);
         }
-        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d\n", 
-            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx);
+        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d\n", 
+            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx,tIdx);
         fflush(stdout);
 
         if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
