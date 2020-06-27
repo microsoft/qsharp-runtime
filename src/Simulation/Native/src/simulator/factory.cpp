@@ -10,21 +10,22 @@ namespace Microsoft
 {
   namespace Quantum
   {
+      //@@@DBW: Removed all the   MICROSOFT_QUANTUM_DECL_IMPORT entries to get rid of a linker warning
     namespace SimulatorGeneric
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX2
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX512
     {
-        MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
   }
 }

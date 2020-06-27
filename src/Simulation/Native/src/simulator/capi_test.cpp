@@ -211,16 +211,16 @@ int main()
     const int testCnt = 10;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
-        {   1, 10,  4,  4,  4}, // 12 bits
-        {   1, 11,  4,  4,  4},
-        {   1,  8,  4,  4,  4}, // 10 bits
-        {   1,  9,  4,  4,  4},
-        {   1,  6,  4,  4,  4}, // 8 bits
-        {   1,  7,  4,  4,  4},
-        {   1,  4,  4,  4,  4}, // 6 bits
-        {   1,  5,  4,  4,  4},
         {   1,  2,  4,  4,  4}, // 4 bits
         {   1,  3,  4,  4,  4},
+        {   1,  4,  4,  4,  4}, // 6 bits
+        {   1,  5,  4,  4,  4},
+        {   1,  6,  4,  4,  4}, // 8 bits
+        {   1,  7,  4,  4,  4},
+        {   1,  8,  4,  4,  4}, // 10 bits
+        {   1,  9,  4,  4,  4},
+        {   1, 10,  4,  4,  4}, // 12 bits
+        {   1, 11,  4,  4,  4},
     };
 
     for (int tIdx=0; tIdx<testCnt; tIdx++) {
@@ -259,9 +259,11 @@ int main()
 
         for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-        for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
-            unsigned c = k - 1;
-            MCX(sim_id, 1, &c, k);
+        if (prbIdx < 2) {
+            for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                unsigned c = k - 1;
+                MCX(sim_id, 1, &c, k);
+            }
         }
 
         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -290,7 +292,7 @@ int main()
 
                 std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                 std::chrono::duration<double> elapsed = curr - start;
-                if (elapsed.count() >= 100.0) break;
+                if (elapsed.count() >= 60.0) break;
             }
         }
 
