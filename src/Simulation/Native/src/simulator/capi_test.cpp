@@ -208,39 +208,53 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 20;
+    const int testCnt = 32;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  2,  4,  4,  4}, // 4 bits
         {   1,  3,  4,  4,  4},
         {   1,  4,  4,  4,  4}, // 6 bits
         {   1,  5,  4,  4,  4},
-        {   1,  6,  4,  4,  4}, // 8 bits
+        {   1,  6,  4,  4,  4}, // 8 bits Shor
         {   1,  7,  4,  4,  4},
-        {   1,  8,  4,  4,  4}, // 10 bits
+        {   1,  8,  4,  4,  4}, // 10 bits Shor
         {   1,  9,  4,  4,  4},
-        {   1, 10,  4,  4,  4}, // 12 bits
+        {   1, 10,  4,  4,  4}, // 12 bits Shor
         {   1, 11,  4,  4,  4},
-        {   1,  2,  6,  4,  4}, // 4 bits
+        {   1,  2,  6,  4,  4}, // 4 bits Shor
         {   1,  3,  6,  4,  4},
-        {   1,  4,  6,  4,  4}, // 6 bits
+        {   1,  4,  6,  4,  4}, // 6 bits Shor
         {   1,  5,  6,  4,  4},
-        {   1,  6,  6,  4,  4}, // 8 bits
+        {   1,  6,  6,  4,  4}, // 8 bits Shor
         {   1,  7,  6,  4,  4},
-        {   1,  8,  6,  4,  4}, // 10 bits
+        {   1,  8,  6,  4,  4}, // 10 bits Shor
         {   1,  9,  6,  4,  4},
-        {   1, 10,  6,  4,  4}, // 12 bits
+        {   1, 10,  6,  4,  4}, // 12 bits Shor
         {   1, 11,  6,  4,  4},
-//        {   1, 12,  6,  4,  4}, // 14 bits
-//        {   1, 13,  6,  4,  4},
+        {   1, 12,  6,  4,  4}, // 14 bits Shor
+        {   1, 13,  6,  4,  4},
+        {   1, 14,  4,  4,  4}, // Suprem_4_4
+        {   1, 15,  4,  4,  4},
+        {   1, 16,  4,  4,  4}, // Suprem_5_4
+        {   1, 17,  4,  4,  4},
+        {   1, 18,  6,  4,  4}, // Suprem_4_6
+        {   1, 19,  6,  4,  4},
+        {   1, 20,  6,  4,  4}, // Suprem_5_6
+        {   1, 21,  6,  4,  4},
+    // Index: 30
+        {   1, 22,  1,  4,  4}, // Suprem_4_4
+        {   1, 23,  1,  4,  4}, // Suprem_5_4
     };
 
-    for (int tIdx=10; tIdx<testCnt; tIdx++) {
+    for (int tIdx=0; tIdx<testCnt; tIdx++) {
         int doRange     = tests[tIdx][0];
         int prbIdx      = tests[tIdx][1];
         int fuseSpan    = tests[tIdx][2];
         int numThreads  = tests[tIdx][3];
         int simTyp      = tests[tIdx][4];
+        char fName[30];
+
+        if (prbIdx < 22) continue;      // Ony do Supremacy tests for now
 
         if (prbIdx < 2) {
             if (prbIdx == 0) nQs = 15;
@@ -249,18 +263,31 @@ int main()
             circStop = nQs;
             if (doRange == 0) { circStop = 7; }
             if (doRange == 2) { circStart = nQs - 7; }
+            sprintf_s(fName, sizeof(fName), "bench");
             prb = loadPrb(circStart, circStop);
-            break;
+        } else if (prbIdx == 22) {
+            sprintf_s(fName, sizeof(fName), "suprem_4_4.log");
+            prb = loadTest(fName, false);
+            nQs = numQs(prb);
+        } else if (prbIdx == 23) {
+            sprintf_s(fName, sizeof(fName), "suprem_5_4.log");
+            prb = loadTest(fName, false);
+            nQs = numQs(prb);
+        } else if (prbIdx >= 14) {
+            int siz = ((prbIdx - 14) / 2 & 1) == 1 ? 5 : 4;
+            bool doClus = (prbIdx & 1) == 1;
+            sprintf_s(fName, sizeof(fName), "suprem_%d_%d.log", siz, fuseSpan);
+            prb = loadTest(fName, doClus);
+            nQs = numQs(prb);
         } else {
             int bits    = ((prbIdx & 0xFE) + 2);
             bool doClus = (prbIdx & 1) == 1;
-            char fName[30];
             sprintf_s(fName,sizeof(fName),"shor_%d_%d.log",bits,fuseSpan);
             prb = loadTest(fName,doClus);
             nQs = numQs(prb);
         }
-        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d\n", 
-            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx,tIdx);
+        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n", 
+            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx,tIdx,fName);
         fflush(stdout);
 
         if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;

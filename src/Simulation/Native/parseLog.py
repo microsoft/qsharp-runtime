@@ -34,7 +34,17 @@ prbs = [
     "shor_12,4N",
     "shor_12,4C",
     "shor_14,4N",
-    "shor_14,4C"
+    "shor_14,4C",
+    "suprem_4,4N",
+    "suprem_4,4C",
+    "suprem_5,4N",
+    "suprem_5,4C",
+    "suprem_4,6N",
+    "suprem_4,6C",
+    "suprem_5,6N",
+    "suprem_5,6C",
+    "suprem_4,1N",
+    "suprem_5,1N",
 ]
 def dumpGpss():
     global gpss,env,sim,totalQs,threads,span,sz,rng,prb
