@@ -59,13 +59,6 @@ function Add-PackageReferenceDependencies($ProjectFileName) {
 
 # Add dependencies for the projects included in this NuGet package.
 Add-PackageReferenceDependencies 'Microsoft.Quantum.CsharpGeneration.fsproj'
-Add-PackageReferenceDependencies '..\EntryPointDriver\EntryPointDriver.csproj'
-
-# Manually add EntryPointDriver's project references as package references to avoid a build-time dependency cycle.
-# $version$ is replaced with the current package version when the package is built.
-Add-Dependency 'Microsoft.Quantum.Runtime.Core' '$version$'
-Add-Dependency 'Microsoft.Quantum.Simulators' '$version$'
-Add-Dependency 'Microsoft.Azure.Quantum.Client' '$version$'
 
 $nuspec.package.metadata.AppendChild($dependencies)
 $nuspec.Save([Path]::Combine((Get-Location), $target))

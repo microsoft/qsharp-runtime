@@ -7,7 +7,7 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// The interface between the entry point and the command-line program.
@@ -24,17 +24,17 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The summary from the entry point's documentation comment.
         /// </summary>
         string Summary { get; }
-        
+
         /// <summary>
         /// The command-line options corresponding to the entry point's parameters.
         /// </summary>
         IEnumerable<Option> Options { get; }
-        
+
         /// <summary>
         /// The name of the default simulator to use when simulating the entry point.
         /// </summary>
-        string DefaultSimulator { get; }
-        
+        string DefaultSimulatorName { get; }
+
         /// <summary>
         /// Additional information about the entry point.
         /// </summary>

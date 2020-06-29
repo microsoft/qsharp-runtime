@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Implementation of the Assert operation for the Toffoli simulator.
         /// </summary>
-        public class Assert : Intrinsic.Assert
+        public class Assert : Microsoft.Quantum.Diagnostics.AssertMeasurement
         {
             private ToffoliSimulator simulator;
 

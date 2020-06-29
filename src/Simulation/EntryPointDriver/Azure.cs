@@ -8,9 +8,9 @@ using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Provides entry point submission to Azure Quantum.
@@ -196,11 +196,6 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public string? Target { get; set; }
 
         /// <summary>
-        /// The storage account connection string.
-        /// </summary>
-        public string? Storage { get; set; }
-
-        /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
@@ -214,6 +209,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The workspace name.
         /// </summary>
         public string? Workspace { get; set; }
+
+        /// <summary>
+        /// The storage account connection string.
+        /// </summary>
+        public string? Storage { get; set; }
 
         /// <summary>
         /// The Azure Active Directory authentication token.
@@ -262,10 +262,10 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         public override string ToString() =>
             string.Join(System.Environment.NewLine,
                 $"Target: {Target}",
-                $"Storage: {Storage}",
                 $"Subscription: {Subscription}",
                 $"Resource Group: {ResourceGroup}",
                 $"Workspace: {Workspace}",
+                $"Storage: {Storage}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
                 $"Job Name: {JobName}",

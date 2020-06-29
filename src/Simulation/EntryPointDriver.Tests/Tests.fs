@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests
+module Microsoft.Quantum.EntryPointDriver.Tests
 
 open System
 open System.Collections.Immutable
@@ -33,7 +33,7 @@ let private intrinsicFile = Path.GetFullPath "Intrinsic.qs"
 let private testFile = Path.GetFullPath "Tests.qs"
 
 /// The namespace used for the test cases.
-let private testNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Tests"
+let private testNamespace = "Microsoft.Quantum.EntryPointDriver.Tests"
 
 /// The test case for the given test number.
 let private testCase =
@@ -95,12 +95,12 @@ let private compileCsharp (sources : string seq) =
             "System.Runtime"
             "System.Runtime.Extensions"
             "System.Runtime.Numerics"
-            "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+            "Microsoft.Quantum.EntryPointDriver"
             "Microsoft.Quantum.QSharp.Core"
             "Microsoft.Quantum.QsDataStructures"
             "Microsoft.Quantum.Runtime.Core"
             "Microsoft.Quantum.Simulation.Common"
-            "Microsoft.Quantum.Simulation.Simulators"
+            "Microsoft.Quantum.Simulators"
         ]
         |> List.map (fun name -> upcast MetadataReference.CreateFromFile (referencedAssembly name))
 
@@ -179,8 +179,6 @@ let private testWith testNum defaultSimulator =
 /// Standard command-line arguments for the "submit" command without specifying a target.
 let private submitWithoutTarget = 
     [ "submit"
-      "--storage"
-      "myStorage"
       "--subscription"
       "mySubscription"
       "--resource-group"
@@ -476,15 +474,15 @@ let ``Shadows --shots`` () =
 
 // The expected output from the resources estimator.
 let private resourceSummary =
-    "Metric          Sum
-     CNOT            0
-     QubitClifford   1
-     R               0
-     Measure         1
-     T               0
-     Depth           0
-     Width           1
-     BorrowedWidth   0"
+    "Metric          Sum Max
+     CNOT            0   0
+     QubitClifford   1   1
+     R               0   0
+     Measure         1   1
+     T               0   0
+     Depth           0   0
+     Width           1   1
+     BorrowedWidth   0   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
@@ -550,10 +548,10 @@ let ``Submit uses default values`` () =
     given (submitWithNothingTarget @ ["--verbose"])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: test.nothing
-               Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Storage:
                AAD Token:
                Base URI:
                Job Name:
@@ -569,6 +567,8 @@ let ``Submit allows overriding default values`` () =
     let given = test 1
     given (submitWithNothingTarget @ [
         "--verbose"
+        "--storage"
+        "myStorage"
         "--aad-token"
         "myToken"
         "--base-uri"
@@ -580,10 +580,10 @@ let ``Submit allows overriding default values`` () =
     ])
     |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Target: test.nothing
-               Storage: myStorage
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
                Job Name: myJobName
@@ -686,10 +686,10 @@ let ``Shows help text for submit command`` () =
 
                     Options:
                       --target <target> (REQUIRED)                        The target device ID.
-                      --storage <storage> (REQUIRED)                      The storage account connection string.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
+                      --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --job-name <job-name>                               The name of the submitted job.

@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
     public partial class QCTraceSimulatorImpl
     {
-        public class TracerAssert : Intrinsic.Assert
+        public class TracerAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement
         {
             private readonly QCTraceSimulatorCore core;
             public TracerAssert(QCTraceSimulatorImpl m) : base(m)
