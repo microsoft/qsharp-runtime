@@ -299,14 +299,14 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
         }
     }
 
-    operation GenericsSupport<'A, 'B, 'C>() : Unit {
-        let r = Zero;
-
-        if (r == Zero) {
-            SubOp1();
-            SubOp2();
-        }
-    }
+    //operation GenericsSupport<'A, 'B, 'C>() : Unit {
+    //    let r = Zero;
+    //
+    //    if (r == Zero) {
+    //        SubOp1();
+    //        SubOp2();
+    //    }
+    //}
 
     operation WithinBlockSupport() : Unit {
         let r = One;

@@ -186,11 +186,11 @@ namespace Microsoft.Quantum.Simulation.Testing.IonQ {
         LiteralOnTheLeft();
     }
 
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation GenericsSupportTest () : Unit {
-        GenericsSupport();
-    }
+    //@Test("QuantumSimulator")
+    //@Test("ResourcesEstimator")
+    //operation GenericsSupportTest () : Unit {
+    //    GenericsSupport<Int, Int, Int>();
+    //}
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
