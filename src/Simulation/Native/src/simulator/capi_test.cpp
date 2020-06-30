@@ -189,6 +189,22 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     return rslt;
 }
 
+void sprintf0(char* buf, int bufSiz, char* fmt) {
+#ifdef _MSC_VER
+    sprintf_s(buf, bufSiz, fmt);
+#else
+    sprintf(buf, fmt);
+#endif
+}
+
+void sprintf2(char* buf, int bufSiz, char* fmt,int arg1, int arg2) {
+#ifdef _MSC_VER
+    sprintf_s(buf, bufSiz, fmt, arg1, arg2);
+#else
+    sprintf(buf, fmt, arg1, arg2);
+#endif
+}
+
 int numQs(vector<vector<int32_t>> prb) {
     int mx = -1;
     for (auto i : prb)
@@ -263,26 +279,26 @@ int main()
             circStop = nQs;
             if (doRange == 0) { circStop = 7; }
             if (doRange == 2) { circStart = nQs - 7; }
-            sprintf_s(fName, sizeof(fName), "bench");
+            sprintf0(fName, sizeof(fName), "bench");
             prb = loadPrb(circStart, circStop);
         } else if (prbIdx == 22) {
-            sprintf_s(fName, sizeof(fName), "suprem_4_4.log");
+            sprintf0(fName, sizeof(fName), "suprem_4_4.log");
             prb = loadTest(fName, false);
             nQs = numQs(prb);
         } else if (prbIdx == 23) {
-            sprintf_s(fName, sizeof(fName), "suprem_5_4.log");
+            sprintf0(fName, sizeof(fName), "suprem_5_4.log");
             prb = loadTest(fName, false);
             nQs = numQs(prb);
         } else if (prbIdx >= 14) {
             int siz = ((prbIdx - 14) / 2 & 1) == 1 ? 5 : 4;
             bool doClus = (prbIdx & 1) == 1;
-            sprintf_s(fName, sizeof(fName), "suprem_%d_%d.log", siz, fuseSpan);
+            sprintf2(fName, sizeof(fName), "suprem_%d_%d.log", siz, fuseSpan);
             prb = loadTest(fName, doClus);
             nQs = numQs(prb);
         } else {
             int bits    = ((prbIdx & 0xFE) + 2);
             bool doClus = (prbIdx & 1) == 1;
-            sprintf_s(fName,sizeof(fName),"shor_%d_%d.log",bits,fuseSpan);
+            sprintf2(fName,sizeof(fName),"shor_%d_%d.log",bits,fuseSpan);
             prb = loadTest(fName,doClus);
             nQs = numQs(prb);
         }
