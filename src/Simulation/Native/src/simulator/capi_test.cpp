@@ -296,7 +296,7 @@ int main()
         int simTyp      = tests[tIdx][4];
         char fName[30];
 
-        if (prbIdx < 22) continue;      // Ony do Supremacy tests for now
+        if (prbIdx < 14) continue;      // Ony do Supremacy tests for now
 
         if (prbIdx < 2) {
             if (prbIdx == 0) nQs = 15;
