@@ -157,8 +157,10 @@ namespace Microsoft.Quantum.Intrinsic {
     
     
     /// # Summary
-    /// Applies the π/4 phase gate to a single qubit.
+    /// Applies the S gate to a single qubit.
     ///
+    /// # Description
+    /// This operation can be simulated by the unitary matrix
     /// \begin{align}
     ///     S \mathrel{:=}
     ///     \begin{bmatrix}
@@ -170,15 +172,17 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    operation S (qubit : Qubit) : Unit
+    operation S(qubit : Qubit) : Unit
     is Adj + Ctl {
         body intrinsic;
     }   
     
     
     /// # Summary
-    /// Applies the π/8 gate to a single qubit.
+    /// Applies the T gate to a single qubit.
     ///
+    /// # Description
+    /// This operation can be simulated by the unitary matrix
     /// \begin{align}
     ///     T \mathrel{:=}
     ///     \begin{bmatrix}
@@ -190,7 +194,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    operation T (qubit : Qubit) : Unit
+    operation T(qubit : Qubit) : Unit
     is Adj + Ctl {
         body intrinsic;
     }   
@@ -225,8 +229,7 @@ namespace Microsoft.Quantum.Intrinsic {
     operation CNOT (control : Qubit, target : Qubit) : Unit
     is Adj + Ctl {
 
-        body (...)
-        {
+        body (...) {
             Controlled X([control], target);
         }
         
@@ -252,8 +255,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     operation CCNOT (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit
     is Adj + Ctl {
-        body (...)
-        {
+        body (...) {
             Controlled X([control1, control2], target);
         }
         
