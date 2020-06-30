@@ -189,11 +189,11 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     return rslt;
 }
 
-void sprintf0(char* buf, int bufSiz, char* fmt) {
+void sprintf0(char* buf, int bufSiz, char* str) {
 #ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, fmt);
+    sprintf_s(buf, bufSiz, str);
 #else
-    sprintf(buf, fmt);
+    sprintf(buf, "%s", str);
 #endif
 }
 
