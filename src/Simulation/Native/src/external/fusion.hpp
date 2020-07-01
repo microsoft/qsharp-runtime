@@ -83,7 +83,9 @@ public:
 	void setSet(std::map<unsigned, unsigned> elemDict) {
 		std::set<Index> tempSet;
 		for (unsigned elem : set_) {
-			tempSet.insert(elemDict[elem]);
+			if (elemDict.find(elem) != elemDict.end()) {
+				tempSet.insert(elemDict[elem]);
+			}
 		}
 		set_.clear();
 		set_.insert(tempSet.begin(), tempSet.end()); //look into using swap instead
@@ -92,7 +94,9 @@ public:
 	void setCtrlSet(std::map<unsigned, unsigned> elemDict) {
 		std::set<Index> tempSet;
 		for (unsigned elem : ctrl_set_) {
-			tempSet.insert(elemDict[elem]);
+			if (elemDict.find(elem) != elemDict.end()) {
+				tempSet.insert(elemDict[elem]);
+			}
 		}
 		ctrl_set_.clear();
 		ctrl_set_.insert(tempSet.begin(), tempSet.end());

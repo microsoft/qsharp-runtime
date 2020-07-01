@@ -90,13 +90,15 @@ class Wavefunction
 
     void flush() const
     {
+        //logic to reorder
         Fusion fg = fused_.getFusedGates();
         auto items = fg.getItems();
         auto sets = fg.getSet();
         auto ctrlSets = fg.getCtrlSet();
+        //getting all qubits to move to lower end of the wfn
         if (items.size() > 0) {
             std::vector<unsigned> indices;
-            std::set<unsigned> indicesSet; //make optimal
+            std::set<unsigned> indicesSet;
             for (int i = 0; i < items.size(); i++) {
                 auto tempIndices = items[i].get_indices();
                 for (unsigned j = 0; j < tempIndices.size(); j++) {
@@ -112,6 +114,7 @@ class Wavefunction
                     indicesSet.insert(*it);
                 }
             }
+            //performing reorder
             std::vector<qubit_t> indexLocs = qubits(indices);
             for (unsigned i = 0; i < indexLocs.size(); i++)
             {
@@ -119,6 +122,7 @@ class Wavefunction
                 reorderWFN(currLoc, i);
                 indexLocs = qubits(indices);
             }
+            //keeping old and new location in order to set it appropriately
             std::map<unsigned, unsigned> old2newDict;
             for (unsigned i = 0; i < indices.size(); i++) {
                 old2newDict[indices[i]] = indexLocs[i];
@@ -288,9 +292,7 @@ class Wavefunction
 
     void reorderWFN(unsigned qubitLoc, unsigned newPos) const
     {
-        //qubitmap_[qid]; //get location of qubit in wfn
-        //0,1,2 ->H(1)->1,0,2->X(2)_>2,0,1
-        //get id of qubit located at newPos - getting index from the element
+        //get id of qubit located at newPos and qubitLoc - getting index from the element
         auto itr1 = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
         auto newPosId = std::distance(qubitmap_.begin(), itr1);
         auto itr2 = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
@@ -319,11 +321,7 @@ class Wavefunction
     template <class Gate>
     void apply(Gate const& g)
     {
-        //std::cout << *this << "\n";
-        //std::copy(qubitmap_.begin(), qubitmap_.end(), std::ostream_iterator<T>(std::cout, "\n"));
-        //std::cout << wfn_[0] << " " << qubitmap_[0];
-        //auto qid = qubit(g);
-        //reorderWFN(qubit(g), 0);
+        //check flush condition
         std::vector<qubit_t> cs;
         if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
             flush();
@@ -336,12 +334,7 @@ class Wavefunction
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
-        /*for (unsigned i = 0; i < pcs.size(); i++)
-        {
-            reorderWFN(pcs[i], i);
-        }
-        reorderWFN(qubit(g), pcs.size());
-        pcs = qubits(cs);*/
+        //check flush condition
         if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
             flush();
         }
