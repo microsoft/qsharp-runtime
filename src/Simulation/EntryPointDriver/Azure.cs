@@ -154,12 +154,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>A quantum machine.</returns>
         private static IQuantumMachine? CreateMachine(AzureSettings settings) => settings.Target switch
         {
+            null => throw new ArgumentNullException(nameof(settings), "Target is null."),
             NothingMachine.TargetId => new NothingMachine(),
             ErrorMachine.TargetId => new ErrorMachine(),
-            _ => QuantumMachineFactory.CreateMachine(
-                settings.CreateWorkspace(),
-                settings.Target ?? throw new ArgumentNullException(nameof(settings), "Target is null."),
-                settings.Storage)
+            _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
         };
 
         /// <summary>
