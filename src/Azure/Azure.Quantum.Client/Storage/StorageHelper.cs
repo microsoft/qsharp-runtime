@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Quantum.Storage
             try
             {
                 // Ensure container is created
-                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
+                await containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: cancellationToken);
 
                 // Upload blob
                 BlobClient blob = containerClient.GetBlobClient(blobName);
