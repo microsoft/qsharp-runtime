@@ -27,68 +27,16 @@ namespace Microsoft.Quantum.Intrinsic {
     }
     
     
-    /// # Summary
-    /// Asserts that measuring the given qubits in the given Pauli basis will
-    /// always have the given result.
-    ///
-    /// # Input
-    /// ## bases
-    /// A measurement effect to assert the probability of, expressed as a
-    /// multi-qubit Pauli operator.
-    /// ## qubits
-    /// A register on which to make the assertion.
-    /// ## result
-    /// The expected result of `Measure(bases, qubits)`.
-    /// ## msg
-    /// A message to be reported if the assertion fails.
-    ///
-    /// # Remarks
-    /// Note that the Adjoint and Controlled versions of this operation will not
-    /// check the condition.
-    ///
-    /// # See Also
-    /// - AssertProb
+    @Deprecated("Microsoft.Quantum.Diagnostics.AssertMeasurement")
     operation Assert (bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
     is Adj + Ctl {
-        body intrinsic;
+        Microsoft.Quantum.Diagnostics.AssertMeasurement(bases, qubits, result, msg);
     }
     
-    
-    /// # Summary
-    /// Asserts that measuring the given qubits in the given Pauli basis will have the given result
-    /// with the given probability, within some tolerance.
-    ///
-    /// # Input
-    /// ## bases
-    /// A measurement effect to assert the probability of, expressed as a
-    /// multi-qubit Pauli operator.
-    /// ## qubits
-    /// A register on which to make the assertion.
-    /// ## result
-    /// An expected result of `Measure(bases, qubits)`.
-    /// ## prob
-    /// The probability with which the given result is expected.
-    /// ## msg
-    /// A message to be reported if the assertion fails.
-    ///
-    /// # Example
-    /// ```qsharp
-    /// using (register = Qubit()) {
-    ///     H(register);
-    ///     AssertProb([PauliZ], [register], One, 0.5,
-    ///         "Measuring in conjugate basis did not give 50/50 results.", 1e-5);
-    /// }
-    /// ```
-    ///
-    /// # Remarks
-    /// Note that the Adjoint and Controlled versions of this operation will not
-    /// check the condition.
-    ///
-    /// # See Also
-    /// - Assert
+    @Deprecated("Microsoft.Quantum.Diagnostics.AssertMeasurementProbability")
     operation AssertProb (bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
     is Adj + Ctl {
-        body intrinsic;
+        Microsoft.Quantum.Diagnostics.AssertMeasurementProbability(bases, qubits, result, prob, msg, tol);
     }
     
     
@@ -209,8 +157,10 @@ namespace Microsoft.Quantum.Intrinsic {
     
     
     /// # Summary
-    /// Applies the π/4 phase gate to a single qubit.
+    /// Applies the S gate to a single qubit.
     ///
+    /// # Description
+    /// This operation can be simulated by the unitary matrix
     /// \begin{align}
     ///     S \mathrel{:=}
     ///     \begin{bmatrix}
@@ -222,15 +172,17 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    operation S (qubit : Qubit) : Unit
+    operation S(qubit : Qubit) : Unit
     is Adj + Ctl {
         body intrinsic;
     }   
     
     
     /// # Summary
-    /// Applies the π/8 gate to a single qubit.
+    /// Applies the T gate to a single qubit.
     ///
+    /// # Description
+    /// This operation can be simulated by the unitary matrix
     /// \begin{align}
     ///     T \mathrel{:=}
     ///     \begin{bmatrix}
@@ -242,7 +194,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    operation T (qubit : Qubit) : Unit
+    operation T(qubit : Qubit) : Unit
     is Adj + Ctl {
         body intrinsic;
     }   
@@ -277,8 +229,7 @@ namespace Microsoft.Quantum.Intrinsic {
     operation CNOT (control : Qubit, target : Qubit) : Unit
     is Adj + Ctl {
 
-        body (...)
-        {
+        body (...) {
             Controlled X([control], target);
         }
         
@@ -304,8 +255,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     operation CCNOT (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit
     is Adj + Ctl {
-        body (...)
-        {
+        body (...) {
             Controlled X([control1, control2], target);
         }
         
