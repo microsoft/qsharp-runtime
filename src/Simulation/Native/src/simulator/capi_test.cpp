@@ -144,12 +144,14 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     std::vector<std::int32_t> empty;
     string line;
     ifstream file(fName);
+    if (!file.is_open()) throw(std::invalid_argument("Can't open input file"));
+
     int phase = 0;
     if (doClusters) phase = 2;
 
-    regex reOrig("^=== Original:");
+    regex reOrig("^=== Original:.*");
     regex reGate("^\\s*(\\d+):\\s+(.+)\\[(.*)\\]");
-    regex reClusters("^=== Clusters .*");
+    regex reClusters("^=== Clusters.*");
     regex reCluster("^==== cluster\\[\\s*(\\d+)\\]:.*");
     smatch sm;
 
@@ -189,7 +191,7 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     return rslt;
 }
 
-void sprintf0(char* buf, int bufSiz,const char* str) {
+void sprintf0(char* buf, int bufSiz, const char* str) {
 #ifdef _MSC_VER
     sprintf_s(buf, bufSiz, str);
 #else
@@ -197,11 +199,19 @@ void sprintf0(char* buf, int bufSiz,const char* str) {
 #endif
 }
 
-void sprintf2(char* buf, int bufSiz,const char* fmt,int arg1, int arg2) {
+void sprintf1(char* buf, int bufSiz,const char* str, const char* arg1) {
 #ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, fmt, arg1, arg2);
+    sprintf_s(buf, bufSiz, str, arg1);
 #else
-    sprintf(buf, fmt, arg1, arg2);
+    sprintf(buf, "%s", str, arg1);
+#endif
+}
+
+void sprintf3(char* buf, int bufSiz,const char* fmt,const char* arg1, int arg2, int arg3) {
+#ifdef _MSC_VER
+    sprintf_s(buf, bufSiz, fmt, arg1, arg2, arg3);
+#else
+    sprintf(buf, fmt, arg1, arg2, arg3);
 #endif
 }
 
@@ -215,7 +225,7 @@ int numQs(vector<vector<int32_t>> prb) {
 
 int main()
 {
-    int                     nQs,circStart,circStop;
+    int                     nQs, circStart, circStop;
     vector<vector<int32_t>> prb;
     /*
             doRange(0,2) - location in wave function (L,C,H)
@@ -227,9 +237,9 @@ int main()
     const int testCnt = 56;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
-        {   1,  2,  4,  4,  4}, // 4 bits
+        {   1,  2,  4,  4,  4}, // 4 bits Shor
         {   1,  3,  4,  4,  4},
-        {   1,  4,  4,  4,  4}, // 6 bits
+        {   1,  4,  4,  4,  4}, // 6 bits Shor
         {   1,  5,  4,  4,  4},
         {   1,  6,  4,  4,  4}, // 8 bits Shor
         {   1,  7,  4,  4,  4},
@@ -249,135 +259,149 @@ int main()
         {   1, 11,  6,  4,  4},
         {   1, 12,  6,  4,  4}, // 14 bits Shor
         {   1, 13,  6,  4,  4},
-    // Index: 22
-        {   1, 14,  4,  4,  4}, // Suprem_4_4
-        {   1, 15,  4,  4,  4},
-        {   1, 16,  4,  4,  4}, // Suprem_5_4
-        {   1, 17,  4,  4,  4},
-        {   1, 18,  6,  4,  4}, // Suprem_4_6
-        {   1, 19,  6,  4,  4},
-        {   1, 20,  6,  4,  4}, // Suprem_5_6
-        {   1, 21,  6,  4,  4},
-    // Index: 30
-        {   1, 22,  1,  4,  4}, // Suprem_4_4
-        {   1, 23,  1,  4,  4}, // Suprem_5_4
-    // Big machine test
-        {   1, 18,  6,  6,  4}, // Suprem_4_6
-        {   1, 19,  6,  6,  4},
-        {   1, 20,  6,  6,  4}, // Suprem_5_6
-        {   1, 21,  6,  6,  4},
-        {   1, 18,  6,  8,  4}, // Suprem_4_6
-        {   1, 19,  6,  8,  4},
-        {   1, 20,  6,  8,  4}, // Suprem_5_6
-        {   1, 21,  6,  8,  4},
-        {   1, 18,  6, 10,  4}, // Suprem_4_6
-        {   1, 19,  6, 10,  4},
-        {   1, 20,  6, 10,  4}, // Suprem_5_6
-        {   1, 21,  6, 10,  4},
-        {   1, 18,  6, 12,  4}, // Suprem_4_6
-        {   1, 19,  6, 12,  4},
-        {   1, 20,  6, 12,  4}, // Suprem_5_6
-        {   1, 21,  6, 12,  4},
-        {   1, 18,  6, 14,  4}, // Suprem_4_6
-        {   1, 19,  6, 14,  4},
-        {   1, 20,  6, 14,  4}, // Suprem_5_6
-        {   1, 21,  6, 14,  4},
-        {   1, 18,  6, 16,  4}, // Suprem_4_6
-        {   1, 19,  6, 16,  4},
-        {   1, 20,  6, 16,  4}, // Suprem_5_6
-        {   1, 21,  6, 16,  4},
+        // Index: 22
+            {   1, 14,  4,  4,  4}, // Suprem_4_4
+            {   1, 15,  4,  4,  4},
+            {   1, 16,  4,  4,  4}, // Suprem_5_4
+            {   1, 17,  4,  4,  4},
+            {   1, 18,  6,  4,  4}, // Suprem_4_6
+            {   1, 19,  6,  4,  4},
+            {   1, 20,  6,  4,  4}, // Suprem_5_6
+            {   1, 21,  6,  4,  4},
+            // Index: 30
+                {   1, 22,  1,  4,  4}, // Suprem_4_4
+                {   1, 23,  1,  4,  4}, // Suprem_5_4
+            // 32: Big machine test
+                {   1, 18,  6,  6,  4}, // Suprem_4_6
+                {   1, 19,  6,  6,  4},
+                {   1, 20,  6,  6,  4}, // Suprem_5_6
+                {   1, 21,  6,  6,  4},
+                {   1, 18,  6,  8,  4}, // Suprem_4_6
+                {   1, 19,  6,  8,  4},
+                {   1, 20,  6,  8,  4}, // Suprem_5_6
+                {   1, 21,  6,  8,  4},
+                {   1, 18,  6, 10,  4}, // Suprem_4_6
+                {   1, 19,  6, 10,  4},
+                {   1, 20,  6, 10,  4}, // Suprem_5_6
+                {   1, 21,  6, 10,  4},
+                {   1, 18,  6, 12,  4}, // Suprem_4_6
+                {   1, 19,  6, 12,  4},
+                {   1, 20,  6, 12,  4}, // Suprem_5_6
+                {   1, 21,  6, 12,  4},
+                {   1, 18,  6, 14,  4}, // Suprem_4_6
+                {   1, 19,  6, 14,  4},
+                {   1, 20,  6, 14,  4}, // Suprem_5_6
+                {   1, 21,  6, 14,  4},
+                {   1, 18,  6, 16,  4}, // Suprem_4_6
+                {   1, 19,  6, 16,  4},
+                {   1, 20,  6, 16,  4}, // Suprem_5_6
+                {   1, 21,  6, 16,  4},
     };
 
-    for (int tIdx=0; tIdx<testCnt; tIdx++) {
-        int doRange     = tests[tIdx][0];
-        int prbIdx      = tests[tIdx][1];
-        int fuseSpan    = tests[tIdx][2];
-        int numThreads  = tests[tIdx][3];
-        int simTyp      = tests[tIdx][4];
-        char fName[30];
+    const char* xtras[3] = { "", "S0", "S1" };
 
-        if (prbIdx < 14) continue;      // Ony do Supremacy tests for now
+    for (int idxXtra = 0; idxXtra < 3; idxXtra++) {
+        const char* xtra = xtras[idxXtra];
+        printf("==== idxXtra: %d\n",idxXtra);
 
-        if (prbIdx < 2) {
-            if (prbIdx == 0) nQs = 15;
-            else             nQs = 26;
-            circStart = 0;
-            circStop = nQs;
-            if (doRange == 0) { circStop = 7; }
-            if (doRange == 2) { circStart = nQs - 7; }
-            sprintf0(fName, sizeof(fName), "bench");
-            prb = loadPrb(circStart, circStop);
-        } else if (prbIdx == 22) {
-            sprintf0(fName, sizeof(fName), "suprem_4_4.log");
-            prb = loadTest(fName, false);
-            nQs = numQs(prb);
-        } else if (prbIdx == 23) {
-            sprintf0(fName, sizeof(fName), "suprem_5_4.log");
-            prb = loadTest(fName, false);
-            nQs = numQs(prb);
-        } else if (prbIdx >= 14) {
-            int siz = ((prbIdx - 14) / 2 & 1) == 1 ? 5 : 4;
-            bool doClus = (prbIdx & 1) == 1;
-            sprintf2(fName, sizeof(fName), "suprem_%d_%d.log", siz, fuseSpan);
-            prb = loadTest(fName, doClus);
-            nQs = numQs(prb);
-        } else {
-            int bits    = ((prbIdx & 0xFE) + 2);
-            bool doClus = (prbIdx & 1) == 1;
-            sprintf2(fName,sizeof(fName),"shor_%d_%d.log",bits,fuseSpan);
-            prb = loadTest(fName,doClus);
-            nQs = numQs(prb);
-        }
-        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n", 
-            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(),doRange,prbIdx,tIdx,fName);
-        fflush(stdout);
+        for (int tIdx = 0; tIdx < testCnt; tIdx++) {
+            int doRange = tests[tIdx][0];
+            int prbIdx = tests[tIdx][1];
+            int fuseSpan = tests[tIdx][2];
+            int numThreads = tests[tIdx][3];
+            int simTyp = tests[tIdx][4];
+            char fName[30];
 
-        if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
-        if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
-        if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+            if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
+            if (prbIdx == 12) continue;     // Don't do 31 qubit test
+            if (prbIdx == 13) continue;     // Don't do 31 qubit test
+            if (tIdx >= 32) break;          // Not on a big machine
 
-        auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads);
-
-        for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
-
-        if (prbIdx < 2) {
-            for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
-                unsigned c = k - 1;
-                MCX(sim_id, 1, &c, k);
+            if (prbIdx < 2) {
+                if (prbIdx == 0) nQs = 15;
+                else             nQs = 26;
+                circStart = 0;
+                circStop = nQs;
+                if (doRange == 0) { circStop = 7; }
+                if (doRange == 2) { circStart = nQs - 7; }
+                sprintf0(fName, sizeof(fName), "bench");
+                prb = loadPrb(circStart, circStop);
             }
-        }
-
-        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-        for (int i=0; i<100000; i++) {
-            for (int i = 0; i < prb.size(); i++) {
-                auto qs = prb[i];
-                switch (qs.size()) {
-                case 0: // Need to force a flush (end of cluster)
-                    Flush(sim_id);
-                    break;
-                case 1:
-                    H(sim_id, qs[0]);
-                    break;
-                case 2:
-                    CX(sim_id, qs[0], qs[1]);
-                    break;
-                case 3:
-                {
-                    uint32_t cs[] = { (uint32_t)qs[0], (uint32_t)qs[1] };
-                    MCX(sim_id, 2, cs, qs[2]);
-                }
-                break;
-                default:
-                    throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
-                }
-
-                std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-                std::chrono::duration<double> elapsed = curr - start;
-                if (elapsed.count() >= 60.0) break;
+            else if (prbIdx == 22) {
+                sprintf1(fName, sizeof(fName), "suprem%s_4_4.log", xtra);
+                prb = loadTest(fName, false);
+                nQs = numQs(prb);
             }
-        }
+            else if (prbIdx == 23) {
+                sprintf1(fName, sizeof(fName), "suprem%s_5_4.log", xtra);
+                prb = loadTest(fName, false);
+                nQs = numQs(prb);
+            }
+            else if (prbIdx >= 14) {
+                int siz = ((prbIdx - 14) / 2 & 1) == 1 ? 5 : 4;
+                bool doClus = (prbIdx & 1) == 1;
+                sprintf3(fName, sizeof(fName), "suprem%s_%d_%d.log", xtra, siz, fuseSpan);
+                prb = loadTest(fName, doClus);
+                nQs = numQs(prb);
+            }
+            else {
+                int bits = ((prbIdx & 0xFE) + 2);
+                bool doClus = (prbIdx & 1) == 1;
+                sprintf3(fName, sizeof(fName), "shor%s_%d_%d.log", xtra, bits, fuseSpan);
+                prb = loadTest(fName, doClus);
+                nQs = numQs(prb);
+            }
+            printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
+                nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
+            fflush(stdout);
 
-        destroy(sim_id);
+            if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
+            if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+            if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+
+            auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads);
+
+            for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+
+            if (prbIdx < 2) {
+                for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                    unsigned c = k - 1;
+                    MCX(sim_id, 1, &c, k);
+                }
+            }
+
+            std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+            for (int i = 0; i < 100000; i++) {
+                for (int i = 0; i < prb.size(); i++) {
+                    auto qs = prb[i];
+                    switch (qs.size()) {
+                    case 0: // Need to force a flush (end of cluster)
+                        Flush(sim_id);
+                        break;
+                    case 1:
+                        H(sim_id, qs[0]);
+                        break;
+                    case 2:
+                        CX(sim_id, qs[0], qs[1]);
+                        break;
+                    case 3:
+                    {
+                        uint32_t cs[] = { (uint32_t)qs[0], (uint32_t)qs[1] };
+                        MCX(sim_id, 2, cs, qs[2]);
+                    }
+                    break;
+                    default:
+                        throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                    }
+
+                    std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                    std::chrono::duration<double> elapsed = curr - start;
+                    if (elapsed.count() >= 60.0) break;
+                }
+            }
+
+            destroy(sim_id);
+        }
     }
 }
 

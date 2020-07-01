@@ -2,6 +2,7 @@ import re
 import sys
 
 logName = sys.argv[1]
+reXtra  = re.compile(r"^==== idxXtra:\s+(\d+)")
 reFN    = re.compile(r"^(\S+)\.")
 reNQs   = re.compile(r"nQs=(\d+) .*range=(\d+).*prb=(\d+)")
 reSim   = re.compile(' (Generic|AVX|AVX2|AVX512)$')
@@ -19,43 +20,59 @@ span    = -1
 sz      = -1
 rng     = 1
 prb     = -1
+xtra    = "???"
 
 prbs = [
-    "ladder",
-    "ladder",
-    "shor_4,4N",
-    "shor_4,4C",
-    "shor_6,4N",
-    "shor_6,4C",
-    "shor_8,4N",
-    "shor_8,4C",
-    "shor_10,4N",
-    "shor_10,4C",
-    "shor_12,4N",
-    "shor_12,4C",
-    "shor_14,4N",
-    "shor_14,4C",
-    "suprem_4,4N",
-    "suprem_4,4C",
-    "suprem_5,4N",
-    "suprem_5,4C",
-    "suprem_4,6N",
-    "suprem_4,6C",
-    "suprem_5,6N",
-    "suprem_5,6C",
-    "suprem_4,1N",
-    "suprem_5,1N",
+    ("ladder",""),
+    ("ladder",""),
+    ("shor_4","std"),
+    ("shor_4","qio"),
+    ("shor_6","std"),
+    ("shor_6","qio"),
+    ("shor_8","std"),
+    ("shor_8","qio"),
+    ("shor_10","std"),
+    ("shor_10","qio"),
+    ("shor_12","std"),
+    ("shor_12","qio"),
+    ("shor_14","std"),
+    ("shor_14","qio"),
+    ("suprem_4","std"),
+    ("suprem_4","qio"),
+    ("suprem_5","std"),
+    ("suprem_5","qio"),
+    ("suprem_4","std"),
+    ("suprem_4","qio"),
+    ("suprem_5","std"),
+    ("suprem_5","qio"),
+    ("suprem_4","std"),
+    ("suprem_5","std"),
 ]
 def dumpGpss():
-    global gpss,env,sim,totalQs,threads,span,sz,rng,prb
+    global gpss,env,sim,totalQs,threads,span,sz,rng,prb,xtra
     if len(gpss) > 0:
-        gps = max(gpss)
-        nam = prbs[prb]
+        gpsAvg  = sum(gpss) / len(gpss)
+        cnt     = 0.0
+        tot     = 0.0
+        for gps in gpss:
+            if gps > gpsAvg/2.0 and gps < gpsAvg*1.5:
+                cnt += 1.0
+                tot += gps
+
+        nam,typ = prbs[prb]
+        if xtra == 1 and typ == "qio": typ = "sim"
+        if xtra == 2 and typ == "qio": typ = "ord"
+        
         if rng == 0:    nam  = f'{env},{nam}L'
         elif rng == 2:  nam  = f'{env},{nam}H'
         else:           nam  = f'{env},{nam}'
 
-        print(f"{nam},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
+        if cnt > 0:
+            gps = tot/cnt
+            print(f"{nam},{typ},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
+        else:
+            print(f"{nam},{typ},{sim},{totalQs},{threads},{span},{sz},{0.0},'<<<<< bad entry")
+        
         gpss = []
 
 while True:
@@ -63,6 +80,10 @@ while True:
     if inp == "": 
         dumpGpss()
         break
+    found   = reXtra.search(inp)
+    if found:
+        xtra        = int(found.group(1))
+        continue
     found   = reNQs.search(inp)
     if found:
         dumpGpss()
