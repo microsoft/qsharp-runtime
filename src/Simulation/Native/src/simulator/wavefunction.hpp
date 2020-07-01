@@ -67,7 +67,7 @@ class Wavefunction
         fused_.reset();
         rng_.seed(std::clock());
         num_qubits_ = 0;
-        wfn_.resize(1);
+        wfn_.resize(1); 
         wfn_[0] = 1.;
         qubitmap_.resize(0);
     }
@@ -433,8 +433,8 @@ class Wavefunction
 
   private:
     unsigned num_qubits_;             // for convenience
-    mutable WavefunctionStorage wfn_; // storing the wave function
-    mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
+    mutable WavefunctionStorage wfn_; // storing the wave function //2 qubits - 4 states: (00)(01)(10)(11) : 1,0,0,0 --(X(0))--> 0,1,0,0
+    mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits //3 qubits: 0::0; 1::1 ; 2::2 --Rel(1)--> 0::0 ; 1::<N/A> ; 2::1
 	  int usage_;
 
     // randomness support
