@@ -3,7 +3,7 @@
 namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
-    /// Settings for the entry point driver.
+    /// General settings for the entry point driver that do not depend on the entry point or compilation target.
     /// </summary>
     public sealed class DriverSettings
     {

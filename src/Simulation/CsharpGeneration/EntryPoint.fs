@@ -133,21 +133,28 @@ let private mainMethod context entryPoint =
 let private entryPointClass context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
-    let summaryProperty = property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
+    let summaryProperty =
+        (PrintSummary entryPoint.Documentation false).Trim ()
+        |> literal
+        |> property "Summary" "string"
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let defaultSimulator =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
-        |> snd
-        |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
-    let defaultSimulatorNameProperty = property "DefaultSimulatorName" "string" (literal defaultSimulator)
+        |> fun (_, value) -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value
+    let defaultSimulatorNameProperty = literal defaultSimulator |> property "DefaultSimulatorName" "string"
+    let defaultExecutionTargetProperty =
+        context.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget
+        |> (fun (_, value) -> if value = null then "" else value)
+        |> literal
+        |> property "DefaultExecutionTarget" "string"
     let infoProperty =
-        property "Info"
-            (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
-            (ident callableName <|.|> ident "Info")
+        property "Info" (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
+                        (ident callableName <|.|> ident "Info")
     let members : MemberDeclarationSyntax list = [
         summaryProperty
         parameterOptionsProperty parameters
         defaultSimulatorNameProperty
+        defaultExecutionTargetProperty
         infoProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint
