@@ -60,8 +60,7 @@ let private compileQsharp source =
     Assert.Empty errors
     compilation.BuiltCompilation
 
-/// Generates C# source code from the compiled Q# syntax tree. The given default simulator is set as an assembly
-/// constant.
+/// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
 let private generateCsharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
@@ -109,7 +108,7 @@ let private compileCsharp (sources : string seq) =
     Assert.Equal (0L, stream.Seek (0L, SeekOrigin.Begin))
     Assembly.Load (stream.ToArray ())
 
-/// The assembly for the given test case and default simulator.
+/// The assembly for the given test case assembly constants.
 let private testAssembly testNum constants =
     testNum
     |> testCase
