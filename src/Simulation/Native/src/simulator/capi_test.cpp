@@ -14,6 +14,7 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include <stdarg.h>
 
 #include "util/cpuid.hpp" //@@@DBG
 #include "capi.hpp"
@@ -191,28 +192,16 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     return rslt;
 }
 
-void sprintf0(char* buf, int bufSiz, const char* str) {
+void mySprintf(char* buf, int bufSiz, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
 #ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, str);
+    vsprintf_s(buf, bufSiz, fmt, args);
 #else
-    sprintf(buf, "%s", str);
+    vsprintf(buf, fmt, args);
 #endif
-}
-
-void sprintf3(char* buf, int bufSiz,const char* fmt,const char* arg1, int arg2, int arg3) {
-#ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, fmt, arg1, arg2, arg3);
-#else
-    sprintf(buf, fmt, arg1, arg2, arg3);
-#endif
-}
-
-void sprintf4(char* buf, int bufSiz, const char* fmt, const char* arg1, int arg2, int arg3, int arg4) {
-#ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, fmt, arg1, arg2, arg3, arg4);
-#else
-    sprintf(buf, fmt, arg1, arg2, arg3, arg4);
-#endif
+    perror(buf);
+    va_end(args);
 }
 
 int numQs(vector<vector<int32_t>> prb) {
@@ -234,7 +223,7 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 30;
+    const int testCnt = 39;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  2,  4,  4,  4}, // 4 bits Shor
@@ -248,25 +237,35 @@ int main()
         {   1,  5,  6,  4,  4}, // 10 bits Shor
         {   1,  6,  6,  4,  4}, // 12 bits Shor
 
-        {   1,  7,  1,  4,  4}, // Suprem_4_4
-        {   1,  7,  4,  4,  4}, // Suprem_4_4
-        {   1,  7,  6,  4,  4}, // Suprem_4_6
-        {   1,  7,  6,  6,  4}, // Suprem_4_6 - big
-        {   1,  7,  6,  8,  4}, // Suprem_4_6 - big
-        {   1,  7,  6, 10,  4}, // Suprem_4_6 - big
-        {   1,  7,  6, 12,  4}, // Suprem_4_6 - big
-        {   1,  7,  6, 14,  4}, // Suprem_4_6 - big
-        {   1,  7,  6, 16,  4}, // Suprem_4_6 - big
+        {   1,  7,  1,  4,  4}, // Suprem_44_4
+        {   1,  7,  4,  4,  4}, // Suprem_44_4
+        {   1,  7,  6,  4,  4}, // Suprem_44_6
+        {   1,  7,  6,  6,  4}, // Suprem_44_6 - big
+        {   1,  7,  6,  8,  4}, // Suprem_44_6 - big
+        {   1,  7,  6, 10,  4}, // Suprem_44_6 - big
+        {   1,  7,  6, 12,  4}, // Suprem_44_6 - big
+        {   1,  7,  6, 14,  4}, // Suprem_44_6 - big
+        {   1,  7,  6, 16,  4}, // Suprem_44_6 - big
 
-        {   1,  8,  1,  4,  4}, // Suprem_5_4
-        {   1,  8,  4,  4,  4}, // Suprem_5_4
-        {   1,  8,  6,  4,  4}, // Suprem_5_6
-        {   1,  8,  6,  6,  4}, // Suprem_5_6 - big
-        {   1,  8,  6,  8,  4}, // Suprem_5_6 - big
-        {   1,  8,  6, 10,  4}, // Suprem_5_6 - big
-        {   1,  8,  6, 12,  4}, // Suprem_5_6 - big
-        {   1,  8,  6, 14,  4}, // Suprem_5_6 - big
-        {   1,  8,  6, 16,  4}, // Suprem_5_6 - big
+        {   1,  8,  1,  4,  4}, // Suprem_55_4
+        {   1,  8,  4,  4,  4}, // Suprem_55_4
+        {   1,  8,  6,  4,  4}, // Suprem_55_6
+        {   1,  8,  6,  6,  4}, // Suprem_55_6 - big
+        {   1,  8,  6,  8,  4}, // Suprem_55_6 - big
+        {   1,  8,  6, 10,  4}, // Suprem_55_6 - big
+        {   1,  8,  6, 12,  4}, // Suprem_55_6 - big
+        {   1,  8,  6, 14,  4}, // Suprem_55_6 - big
+        {   1,  8,  6, 16,  4}, // Suprem_55_6 - big
+
+        {   1,  9,  1,  4,  4}, // Suprem_56_4
+        {   1,  9,  4,  4,  4}, // Suprem_56_4
+        {   1,  9,  6,  4,  4}, // Suprem_56_6
+        {   1,  9,  6,  6,  4}, // Suprem_56_6 - big
+        {   1,  9,  6,  9,  4}, // Suprem_56_6 - big
+        {   1,  9,  6, 10,  4}, // Suprem_56_6 - big
+        {   1,  9,  6, 12,  4}, // Suprem_56_6 - big
+        {   1,  9,  6, 14,  4}, // Suprem_56_6 - big
+        {   1,  9,  6, 16,  4}, // Suprem_56_6 - big
     };
 
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
@@ -285,7 +284,8 @@ int main()
             char fName[30];
 
             if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
-            if (numThreads > 4) continue;   // Not on a big machine
+            //if (numThreads > 4) continue;   // Not on a big machine
+            if (prbIdx != 9) continue;      //@@@DBG just do 5x6 problem
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
@@ -294,21 +294,29 @@ int main()
                 circStop = nQs;
                 if (doRange == 0) { circStop = 7; }
                 if (doRange == 2) { circStart = nQs - 7; }
-                sprintf0(fName, sizeof(fName), "bench");
+                mySprintf(fName, sizeof(fName), "bench");
                 prb = loadPrb(circStart, circStop);
             }
             else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
                 int bits = prbIdx * 2;
-                sprintf3(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
+                mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
                 prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
-            else if (prbIdx >= 7 && prbIdx <= 8) { // Suprem
-                int siz = 4;
-                if (prbIdx == 8) siz = 5;
+            else if (prbIdx >= 7 && prbIdx <= 9) { // Suprem
+                int sizR = 4;
+                int sizC = 4;
+                if (prbIdx == 8) {
+                    sizR = 5;
+                    sizC = 5;
+                }
+                else if (prbIdx == 9) {
+                    sizR = 5;
+                    sizC = 6;
+                }
                 int spanInp = 4;
                 if (fuseSpan > 4) spanInp = fuseSpan;
-                sprintf4(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], siz, siz, spanInp);
+                mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
                 prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
