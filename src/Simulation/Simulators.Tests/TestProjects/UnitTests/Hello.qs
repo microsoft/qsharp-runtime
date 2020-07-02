@@ -1,4 +1,4 @@
-﻿﻿// Used for a unit test;
+﻿// Used for a unit test;
 // do not change the name of this namespace!
 namespace Microsoft.Quantum.Library {
 
