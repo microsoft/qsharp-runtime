@@ -47,15 +47,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProject
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QsharpExe", "src\Simulation\Simulators.Tests\TestProjects\QsharpExe\QsharpExe.csproj", "{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.EntryPointDriver", "src\Simulation\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.EntryPointDriver", "src\Simulation\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests.Microsoft.Quantum.EntryPointDriver", "src\Simulation\EntryPointDriver.Tests\Tests.Microsoft.Quantum.EntryPointDriver.fsproj", "{E2F30496-19D8-46A8-9BC0-26936FFE70D2}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.Microsoft.Quantum.EntryPointDriver", "src\Simulation\EntryPointDriver.Tests\Tests.Microsoft.Quantum.EntryPointDriver.fsproj", "{E2F30496-19D8-46A8-9BC0-26936FFE70D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library1", "src\Simulation\Simulators.Tests\TestProjects\Library1\Library1.csproj", "{7256B986-6705-42FC-9F57-485D72D9DE51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library1", "src\Simulation\Simulators.Tests\TestProjects\Library1\Library1.csproj", "{7256B986-6705-42FC-9F57-485D72D9DE51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library2", "src\Simulation\Simulators.Tests\TestProjects\Library2\Library2.csproj", "{A85277B3-4E07-4E15-8F0C-07CC855A3BCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library2", "src\Simulation\Simulators.Tests\TestProjects\Library2\Library2.csproj", "{A85277B3-4E07-4E15-8F0C-07CC855A3BCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\Simulation\Simulators.Tests\TestProjects\UnitTests\UnitTests.csproj", "{46278108-D247-4EFC-AC34-23D4A676F62F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "src\Simulation\Simulators.Tests\TestProjects\UnitTests\UnitTests.csproj", "{46278108-D247-4EFC-AC34-23D4A676F62F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewTracer", "NewTracer\NewTracer.csproj", "{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -389,6 +391,22 @@ Global
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{46278108-D247-4EFC-AC34-23D4A676F62F}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Debug|x64.Build.0 = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Release|x64.ActiveCfg = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.Release|x64.Build.0 = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{09C7E95D-7C9E-4202-BD0C-18B3377B5DBD}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

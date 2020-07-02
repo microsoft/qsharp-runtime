@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Xunit;
 
@@ -9,12 +10,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
 
     public partial class TracingSimulatorCoreTests
     {
+        //TODO: make as test for processordispatcher
         [Fact]
         public void UtilsTests()
         {
             QArray<Pauli> obs = new QArray<Pauli>(Pauli.PauliI, Pauli.PauliX, Pauli.PauliX);
             QArray<Qubit> qs = new QArray<Qubit>(new TraceableQubit(0, 0), new TraceableQubit(1, 0), new TraceableQubit(2, 0));
-            Utils.PruneObservable(obs, qs, out var obsPr, out var qubitsPr);
+            CommonUtils.PruneObservable(obs, qs, out var obsPr, out var qubitsPr);
             Assert.Equal(2, obsPr.Count);
             Assert.Equal(2, qubitsPr.Count);
 
