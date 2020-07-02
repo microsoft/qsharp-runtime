@@ -1,68 +1,110 @@
-@@@DBG nQs=11 max=8 procs=8 thrds=1 range=1 prb=2 tst=10
+==== sched: ord
+@@@DBG nQs=11 max=8 procs=8 thrds=1 range=1 prb=2 tst=0 fName=shorS1_4_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=2048
+@@@DBG sz=4.49 nQs=2.78 nCs=0.64 flsh= 5.2e+05 gts= 2.3e+06 elap= 15.0 gps= 1.565e+05 (fus= 31.4%, ker= 26.3%)
+@@@DBG sz=4.49 nQs=2.78 nCs=0.64 flsh=   1e+06 gts= 2.3e+06 elap= 15.0 gps= 1.547e+05 (fus= 31.3%, ker= 26.4%)
+@@@DBG sz=4.49 nQs=2.78 nCs=0.64 flsh= 1.5e+06 gts= 2.3e+06 elap= 15.0 gps= 1.503e+05 (fus= 31.8%, ker= 26.3%)
+@@@DBG nQs=15 max=4 procs=8 thrds=1 range=1 prb=3 tst=1 fName=shorS1_6_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=32768
+@@@DBG sz=3.92 nQs=2.83 nCs=0.42 flsh= 2.1e+05 gts= 8.2e+05 elap= 15.0 gps= 5.489e+04 (fus= 12.4%, ker= 69.8%)
+@@@DBG sz=3.92 nQs=2.83 nCs=0.42 flsh= 4.4e+05 gts= 8.8e+05 elap= 15.0 gps= 5.896e+04 (fus= 12.3%, ker= 70.0%)
+@@@DBG sz=3.92 nQs=2.83 nCs=0.42 flsh= 6.4e+05 gts=   8e+05 elap= 15.0 gps= 5.365e+04 (fus= 12.8%, ker= 69.6%)
+@@@DBG sz=3.92 nQs=2.83 nCs=0.42 flsh= 8.5e+05 gts= 8.1e+05 elap= 15.0 gps= 5.418e+04 (fus= 12.6%, ker= 69.7%)
+@@@DBG nQs=19 max=4 procs=8 thrds=1 range=1 prb=4 tst=2 fName=shorS1_8_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=524288
+@@@DBG sz=3.70 nQs=2.89 nCs=0.32 flsh= 2.1e+04 gts= 7.6e+04 elap= 15.0 gps=      5076 (fus=  1.4%, ker= 96.0%)
+@@@DBG sz=3.70 nQs=2.89 nCs=0.32 flsh=   4e+04 gts= 7.3e+04 elap= 15.0 gps=      4883 (fus=  1.4%, ker= 96.0%)
+@@@DBG sz=3.70 nQs=2.89 nCs=0.32 flsh= 5.9e+04 gts=   7e+04 elap= 15.0 gps=      4636 (fus=  2.1%, ker= 95.3%)
+@@@DBG sz=3.70 nQs=2.89 nCs=0.32 flsh= 7.8e+04 gts= 6.9e+04 elap= 15.0 gps=      4593 (fus=  2.6%, ker= 94.7%)
+@@@DBG nQs=23 max=4 procs=8 thrds=1 range=1 prb=5 tst=3 fName=shorS1_10_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=8388608
+@@@DBG sz=3.45 nQs=2.87 nCs=0.26 flsh= 1.4e+03 gts= 4.8e+03 elap= 15.0 gps=     320.7 (fus=  0.1%, ker= 99.0%)
+@@@DBG sz=3.49 nQs=2.87 nCs=0.27 flsh= 2.8e+03 gts= 4.8e+03 elap= 15.0 gps=     322.3 (fus=  0.1%, ker= 99.6%)
+@@@DBG sz=3.47 nQs=2.87 nCs=0.26 flsh= 4.2e+03 gts= 4.9e+03 elap= 15.0 gps=     323.8 (fus=  0.1%, ker= 99.6%)
+@@@DBG sz=3.48 nQs=2.87 nCs=0.26 flsh= 5.6e+03 gts= 4.9e+03 elap= 15.0 gps=     325.4 (fus=  0.1%, ker= 99.6%)
+@@@DBG nQs=27 max=4 procs=8 thrds=1 range=1 prb=6 tst=4 fName=shorS1_12_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=134217728
+@@@DBG sz=3.35 nQs=2.91 nCs=0.18 flsh=      88 gts=   3e+02 elap= 15.1 gps=     19.56 (fus=  0.0%, ker= 89.0%)
+@@@DBG sz=3.30 nQs=2.90 nCs=0.21 flsh= 1.8e+02 gts= 3.1e+02 elap= 15.1 gps=     20.79 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=3.28 nQs=2.88 nCs=0.24 flsh= 2.8e+02 gts= 3.2e+02 elap= 15.0 gps=     21.06 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=3.29 nQs=2.88 nCs=0.24 flsh= 3.8e+02 gts= 3.1e+02 elap= 15.1 gps=     20.69 (fus=  0.0%, ker=100.0%)
+@@@DBG nQs=11 max=4 procs=8 thrds=1 range=1 prb=2 tst=5 fName=shorS1_4_6.log
 @@@DBG: AVX512
 @@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=2048
-@@@DBG sz=18.42 nQs=5.27 nCs=0.60 flsh= 2.8e+04 gts= 5.1e+05 elap= 15.0 gps= 3.419e+04 (fus= 75.9%, ker= 13.4%)
-@@@DBG sz=18.42 nQs=5.27 nCs=0.60 flsh= 5.4e+04 gts= 4.7e+05 elap= 15.1 gps= 3.145e+04 (fus= 76.7%, ker= 13.0%)
-@@@DBG sz=18.42 nQs=5.27 nCs=0.60 flsh= 7.3e+04 gts= 3.6e+05 elap= 15.0 gps= 2.388e+04 (fus= 80.6%, ker= 11.0%)
-@@@DBG sz=18.67 nQs=5.27 nCs=0.60 flsh=   1e+05 gts= 5.2e+05 elap= 15.0 gps= 3.459e+04 (fus= 76.0%, ker= 13.1%)
-@@@DBG nQs=11 max=4 procs=8 thrds=1 range=1 prb=3 tst=11
-@@@DBG: AVX512
-@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=2048
-@@@DBG sz=12.28 nQs=4.68 nCs=0.26 flsh= 5.4e+04 gts= 6.6e+05 elap= 15.0 gps= 4.395e+04 (fus= 70.7%, ker= 15.1%)
-@@@DBG sz=12.28 nQs=4.68 nCs=0.26 flsh= 1.1e+05 gts= 6.5e+05 elap= 15.0 gps=  4.33e+04 (fus= 70.4%, ker= 15.2%)
-@@@DBG sz=12.28 nQs=4.68 nCs=0.26 flsh= 1.6e+05 gts= 6.5e+05 elap= 15.0 gps= 4.339e+04 (fus= 70.4%, ker= 15.1%)
-@@@DBG nQs=15 max=4 procs=8 thrds=1 range=1 prb=4 tst=12
+@@@DBG sz=17.68 nQs=4.54 nCs=0.80 flsh=   3e+04 gts= 5.3e+05 elap= 15.0 gps= 3.526e+04 (fus= 76.3%, ker= 11.9%)
+@@@DBG sz=17.68 nQs=4.54 nCs=0.80 flsh=   6e+04 gts= 5.3e+05 elap= 15.0 gps= 3.531e+04 (fus= 76.8%, ker= 11.5%)
+@@@DBG sz=17.68 nQs=4.54 nCs=0.80 flsh= 9.1e+04 gts= 5.4e+05 elap= 15.0 gps= 3.612e+04 (fus= 76.6%, ker= 11.6%)
+@@@DBG nQs=15 max=4 procs=8 thrds=1 range=1 prb=3 tst=6 fName=shorS1_6_6.log
 @@@DBG: AVX512
 @@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=32768
-@@@DBG sz=10.79 nQs=5.73 nCs=0.25 flsh= 2.3e+04 gts= 2.5e+05 elap= 15.0 gps= 1.652e+04 (fus= 40.3%, ker= 54.1%)
-@@@DBG sz=10.79 nQs=5.73 nCs=0.25 flsh= 4.6e+04 gts= 2.5e+05 elap= 15.0 gps= 1.639e+04 (fus= 39.9%, ker= 54.4%)
-@@@DBG sz=10.79 nQs=5.73 nCs=0.25 flsh= 6.9e+04 gts= 2.5e+05 elap= 15.0 gps= 1.646e+04 (fus= 40.1%, ker= 54.2%)
-@@@DBG sz=10.80 nQs=5.73 nCs=0.25 flsh= 9.2e+04 gts= 2.5e+05 elap= 15.0 gps= 1.657e+04 (fus= 40.0%, ker= 54.3%)
-@@@DBG nQs=15 max=4 procs=8 thrds=1 range=1 prb=5 tst=13
-@@@DBG: AVX512
-@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=32768
-@@@DBG sz=10.74 nQs=4.64 nCs=0.19 flsh= 4.5e+04 gts= 4.9e+05 elap= 15.0 gps= 3.238e+04 (fus= 38.4%, ker= 51.6%)
-@@@DBG sz=10.74 nQs=4.64 nCs=0.19 flsh=   9e+04 gts= 4.8e+05 elap= 15.0 gps= 3.199e+04 (fus= 38.3%, ker= 51.5%)
-@@@DBG sz=10.74 nQs=4.64 nCs=0.19 flsh= 1.4e+05 gts= 4.9e+05 elap= 15.0 gps= 3.245e+04 (fus= 38.3%, ker= 51.6%)
-@@@DBG nQs=19 max=4 procs=8 thrds=1 range=1 prb=6 tst=14
+@@@DBG sz=9.87 nQs=4.68 nCs=0.43 flsh= 4.2e+04 gts= 4.1e+05 elap= 15.0 gps= 2.763e+04 (fus= 41.6%, ker= 49.2%)
+@@@DBG sz=9.87 nQs=4.68 nCs=0.43 flsh= 8.3e+04 gts= 4.1e+05 elap= 15.0 gps= 2.712e+04 (fus= 41.8%, ker= 49.1%)
+@@@DBG sz=9.87 nQs=4.68 nCs=0.43 flsh= 1.2e+05 gts=   4e+05 elap= 15.1 gps= 2.641e+04 (fus= 42.9%, ker= 48.3%)
+@@@DBG nQs=19 max=4 procs=8 thrds=1 range=1 prb=4 tst=7 fName=shorS1_8_6.log
 @@@DBG: AVX512
 @@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=524288
-@@@DBG sz=9.24 nQs=5.66 nCs=0.24 flsh= 3.4e+03 gts= 3.1e+04 elap= 15.0 gps=      2098 (fus=  4.9%, ker= 93.9%)
-@@@DBG sz=9.25 nQs=5.66 nCs=0.24 flsh= 6.8e+03 gts= 3.1e+04 elap= 15.0 gps=      2095 (fus=  4.9%, ker= 93.9%)
-@@@DBG sz=9.25 nQs=5.66 nCs=0.24 flsh=   1e+04 gts= 3.1e+04 elap= 15.0 gps=      2096 (fus=  4.9%, ker= 93.9%)
-@@@DBG sz=9.26 nQs=5.66 nCs=0.24 flsh= 1.4e+04 gts= 3.2e+04 elap= 15.0 gps=      2105 (fus=  5.0%, ker= 93.8%)
-@@@DBG nQs=19 max=4 procs=8 thrds=1 range=1 prb=7 tst=15
-@@@DBG: AVX512
-@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=524288
-@@@DBG sz=9.42 nQs=4.48 nCs=0.21 flsh= 7.2e+03 gts= 6.8e+04 elap= 15.0 gps=      4541 (fus=  3.7%, ker= 94.2%)
-@@@DBG sz=9.43 nQs=4.49 nCs=0.20 flsh= 1.4e+04 gts= 6.8e+04 elap= 15.0 gps=      4554 (fus=  3.7%, ker= 94.2%)
-@@@DBG sz=9.42 nQs=4.48 nCs=0.21 flsh= 2.2e+04 gts= 6.8e+04 elap= 15.0 gps=      4522 (fus=  3.7%, ker= 94.2%)
-@@@DBG sz=9.42 nQs=4.48 nCs=0.21 flsh= 2.9e+04 gts= 6.9e+04 elap= 15.0 gps=      4580 (fus=  3.7%, ker= 94.3%)
-@@@DBG nQs=23 max=4 procs=8 thrds=1 range=1 prb=8 tst=16
+@@@DBG sz=8.23 nQs=4.86 nCs=0.29 flsh= 4.7e+03 gts= 3.9e+04 elap= 15.0 gps=      2590 (fus=  4.9%, ker= 93.3%)
+@@@DBG sz=8.23 nQs=4.86 nCs=0.29 flsh= 1.1e+04 gts= 4.8e+04 elap= 15.0 gps=      3223 (fus=  4.6%, ker= 93.6%)
+@@@DBG sz=8.23 nQs=4.86 nCs=0.29 flsh= 1.6e+04 gts= 4.7e+04 elap= 15.0 gps=      3153 (fus=  4.8%, ker= 93.5%)
+@@@DBG sz=8.23 nQs=4.86 nCs=0.29 flsh= 2.2e+04 gts= 4.9e+04 elap= 15.0 gps=      3271 (fus=  4.9%, ker= 93.4%)
+@@@DBG nQs=23 max=4 procs=8 thrds=1 range=1 prb=5 tst=8 fName=shorS1_10_6.log
 @@@DBG: AVX512
 @@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=8388608
-@@@DBG sz=8.42 nQs=5.74 nCs=0.22 flsh= 2.3e+02 gts= 1.9e+03 elap= 15.0 gps=     129.6 (fus=  0.3%, ker= 99.0%)
-@@@DBG sz=8.71 nQs=5.79 nCs=0.17 flsh= 4.5e+02 gts=   2e+03 elap= 15.1 gps=       133 (fus=  0.3%, ker= 99.6%)
-@@@DBG sz=8.57 nQs=5.77 nCs=0.17 flsh= 6.9e+02 gts= 1.9e+03 elap= 15.0 gps=     128.4 (fus=  0.3%, ker= 99.6%)
-@@@DBG sz=8.54 nQs=5.74 nCs=0.20 flsh= 9.1e+02 gts= 1.9e+03 elap= 15.1 gps=     128.3 (fus=  0.3%, ker= 99.6%)
-@@@DBG nQs=23 max=4 procs=8 thrds=1 range=1 prb=9 tst=17
-@@@DBG: AVX512
-@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=8388608
-@@@DBG sz=9.45 nQs=4.66 nCs=0.11 flsh= 4.6e+02 gts= 4.3e+03 elap= 15.0 gps=     286.3 (fus=  0.3%, ker= 98.9%)
-@@@DBG sz=9.34 nQs=4.57 nCs=0.18 flsh= 9.7e+02 gts= 4.7e+03 elap= 15.0 gps=     314.4 (fus=  0.3%, ker= 99.5%)
-@@@DBG sz=9.34 nQs=4.59 nCs=0.17 flsh= 1.4e+03 gts= 4.3e+03 elap= 15.0 gps=     288.3 (fus=  0.3%, ker= 99.5%)
-@@@DBG sz=9.32 nQs=4.56 nCs=0.19 flsh= 1.9e+03 gts= 4.7e+03 elap= 15.0 gps=       314 (fus=  0.3%, ker= 99.6%)
-@@@DBG nQs=27 max=4 procs=8 thrds=1 range=1 prb=10 tst=18
+@@@DBG sz=7.74 nQs=4.88 nCs=0.25 flsh= 4.3e+02 gts= 3.3e+03 elap= 15.0 gps=     221.7 (fus=  0.3%, ker= 98.9%)
+@@@DBG sz=7.71 nQs=4.90 nCs=0.22 flsh= 8.4e+02 gts= 3.2e+03 elap= 15.0 gps=     210.7 (fus=  0.3%, ker= 99.5%)
+@@@DBG sz=7.70 nQs=4.89 nCs=0.24 flsh= 1.3e+03 gts= 3.2e+03 elap= 15.0 gps=     212.8 (fus=  0.3%, ker= 99.6%)
+@@@DBG sz=7.72 nQs=4.90 nCs=0.23 flsh= 1.7e+03 gts= 3.2e+03 elap= 15.0 gps=     213.9 (fus=  0.3%, ker= 99.6%)
+@@@DBG nQs=27 max=4 procs=8 thrds=1 range=1 prb=6 tst=9 fName=shorS1_12_6.log
 @@@DBG: AVX512
 @@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=134217728
-@@@DBG sz=5.14 nQs=6.00 nCs=0.00 flsh=      14 gts=      73 elap= 15.9 gps=     4.594 (fus=  0.0%, ker= 89.9%)
-@@@DBG sz=8.06 nQs=5.76 nCs=0.18 flsh=      34 gts=   2e+02 elap= 15.8 gps=     12.75 (fus=  0.0%, ker=100.0%)
-@@@DBG sz=7.38 nQs=5.83 nCs=0.13 flsh=      47 gts=      73 elap= 15.6 gps=     4.691 (fus=  0.0%, ker=100.0%)
-@@@DBG sz=8.45 nQs=5.76 nCs=0.19 flsh=      62 gts= 1.8e+02 elap= 15.2 gps=     11.66 (fus=  1.2%, ker= 98.8%)
-@@@DBG nQs=27 max=4 procs=8 thrds=1 range=1 prb=11 tst=19
+@@@DBG sz=7.91 nQs=4.91 nCs=0.19 flsh=      32 gts= 2.5e+02 elap= 15.3 gps=     16.48 (fus=  0.0%, ker= 89.4%)
+@@@DBG sz=6.84 nQs=4.98 nCs=0.11 flsh=      55 gts= 1.2e+02 elap= 15.0 gps=     8.191 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=7.23 nQs=4.98 nCs=0.17 flsh=      82 gts= 2.2e+02 elap= 15.2 gps=     14.24 (fus=  0.0%, ker=100.0%)
+@@@DBG sz=7.33 nQs=4.95 nCs=0.22 flsh= 1.2e+02 gts= 2.8e+02 elap= 19.8 gps=     14.08 (fus=  0.0%, ker=100.0%)
+@@@DBG nQs=16 max=4 procs=8 thrds=1 range=1 prb=7 tst=10 fName=supremS1_4_4.log
 @@@DBG: AVX512
-@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=134217728
-@@@DBG sz=9.47 nQs=4.70 nCs=0.07 flsh=      30 gts= 2.8e+02 elap= 15.3 gps=     18.62 (fus=  0.0%, ker= 89.6%)
-@@@DBG sz=9.23 nQs=4.70 nCs=0.07 flsh=      61 gts= 2.8e+02 elap= 15.3 gps=      18.2 (fus=  0.0%, ker=100.0%)
-@@@DBG sz=8.96 nQs=4.63 nCs=0.12 flsh=      98 gts= 3.2e+02 elap= 15.7 gps=     20.08 (fus=  0.0%, ker=100.0%)
-@@@DBG sz=8.91 nQs=4.65 nCs=0.13 flsh= 1.3e+02 gts= 3.2e+02 elap= 15.1 gps=        21 (fus=  0.0%, ker=100.0%)
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=1 fusedDepth=999 wfnCapacity=65536
+@@@DBG sz=1.76 nQs=1.00 nCs=0.28 flsh= 3.9e+05 gts= 6.9e+05 elap= 15.0 gps= 4.631e+04 (fus=  4.9%, ker= 84.4%)
+@@@DBG sz=1.76 nQs=1.00 nCs=0.28 flsh= 7.7e+05 gts= 6.6e+05 elap= 15.0 gps= 4.409e+04 (fus=  4.9%, ker= 84.4%)
+@@@DBG sz=1.76 nQs=1.00 nCs=0.28 flsh= 1.1e+06 gts= 6.6e+05 elap= 15.0 gps=  4.42e+04 (fus=  4.8%, ker= 84.6%)
+@@@DBG sz=1.76 nQs=1.00 nCs=0.28 flsh= 1.5e+06 gts= 6.4e+05 elap= 15.0 gps= 4.272e+04 (fus=  5.0%, ker= 84.4%)
+@@@DBG nQs=16 max=4 procs=8 thrds=1 range=1 prb=7 tst=11 fName=supremS1_4_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=65536
+@@@DBG sz=17.10 nQs=3.60 nCs=0.00 flsh=   7e+04 gts= 1.2e+06 elap= 15.0 gps= 7.949e+04 (fus= 15.7%, ker= 66.7%)
+@@@DBG sz=17.10 nQs=3.60 nCs=0.00 flsh= 1.3e+05 gts= 1.1e+06 elap= 15.0 gps= 7.345e+04 (fus= 15.7%, ker= 66.6%)
+@@@DBG sz=17.10 nQs=3.60 nCs=0.00 flsh=   2e+05 gts= 1.2e+06 elap= 15.0 gps= 7.916e+04 (fus= 15.7%, ker= 66.8%)
+@@@DBG sz=17.10 nQs=3.60 nCs=0.00 flsh= 2.7e+05 gts= 1.2e+06 elap= 15.0 gps= 7.782e+04 (fus= 15.8%, ker= 66.8%)
+@@@DBG nQs=16 max=4 procs=8 thrds=1 range=1 prb=7 tst=12 fName=supremS1_4_6.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=65536
+@@@DBG sz=21.38 nQs=4.25 nCs=0.00 flsh=   4e+04 gts= 8.5e+05 elap= 15.0 gps=  5.69e+04 (fus= 21.8%, ker= 65.1%)
+@@@DBG sz=21.38 nQs=4.25 nCs=0.00 flsh= 8.1e+04 gts= 8.8e+05 elap= 15.0 gps= 5.847e+04 (fus= 21.8%, ker= 65.2%)
+@@@DBG sz=21.38 nQs=4.25 nCs=0.00 flsh= 1.2e+05 gts= 8.5e+05 elap= 15.0 gps= 5.674e+04 (fus= 21.8%, ker= 65.0%)
+@@@DBG sz=21.38 nQs=4.25 nCs=0.00 flsh= 1.6e+05 gts= 8.8e+05 elap= 15.0 gps= 5.835e+04 (fus= 21.7%, ker= 65.2%)
+@@@DBG nQs=25 max=4 procs=8 thrds=1 range=1 prb=8 tst=19 fName=supremS1_5_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=1 fusedDepth=999 wfnCapacity=33554432
+@@@DBG sz=1.72 nQs=1.00 nCs=0.28 flsh= 6.2e+02 gts= 1.1e+03 elap= 15.0 gps=      71.3 (fus=  0.0%, ker= 97.2%)
+@@@DBG sz=1.72 nQs=1.00 nCs=0.28 flsh= 1.2e+03 gts= 1.1e+03 elap= 15.0 gps=     71.52 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.72 nQs=1.00 nCs=0.28 flsh= 1.9e+03 gts= 1.1e+03 elap= 15.0 gps=     71.56 (fus=  0.0%, ker= 99.9%)
+@@@DBG sz=1.72 nQs=1.00 nCs=0.28 flsh= 2.5e+03 gts= 1.1e+03 elap= 15.0 gps=     71.28 (fus=  0.0%, ker= 99.9%)
+@@@DBG nQs=25 max=4 procs=8 thrds=1 range=1 prb=8 tst=20 fName=supremS1_5_4.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=4 fusedDepth=999 wfnCapacity=33554432
+@@@DBG sz=12.26 nQs=3.27 nCs=0.00 flsh= 2.6e+02 gts= 3.2e+03 elap= 15.1 gps=     210.9 (fus=  0.1%, ker= 97.1%)
+@@@DBG sz=12.22 nQs=3.27 nCs=0.00 flsh= 5.1e+02 gts= 3.1e+03 elap= 15.0 gps=     204.1 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=12.24 nQs=3.27 nCs=0.00 flsh= 7.7e+02 gts= 3.2e+03 elap= 15.1 gps=     209.7 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=12.24 nQs=3.27 nCs=0.00 flsh=   1e+03 gts= 3.2e+03 elap= 15.0 gps=     213.1 (fus=  0.1%, ker= 99.8%)
+@@@DBG nQs=25 max=4 procs=8 thrds=1 range=1 prb=8 tst=21 fName=supremS1_5_6.log
+@@@DBG: AVX512
+@@@DBG: OMP_NUM_THREADS=4 fusedSpan=6 fusedDepth=999 wfnCapacity=33554432
+@@@DBG sz=20.86 nQs=4.92 nCs=0.00 flsh=      92 gts= 1.9e+03 elap= 15.1 gps=     127.4 (fus=  0.1%, ker= 97.1%)
+@@@DBG sz=20.74 nQs=4.92 nCs=0.00 flsh= 1.9e+02 gts= 1.9e+03 elap= 15.0 gps=     129.3 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=20.75 nQs=4.92 nCs=0.00 flsh= 2.8e+02 gts=   2e+03 elap= 15.2 gps=     128.8 (fus=  0.1%, ker= 99.8%)
+@@@DBG sz=20.75 nQs=4.93 nCs=0.00 flsh= 3.7e+02 gts= 1.9e+03 elap= 15.5 gps=     124.3 (fus=  0.1%, ker= 99.8%)

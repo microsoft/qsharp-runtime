@@ -234,90 +234,63 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 56;
+    const int testCnt = 30;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  2,  4,  4,  4}, // 4 bits Shor
-        {   1,  3,  4,  4,  4},
-        {   1,  4,  4,  4,  4}, // 6 bits Shor
-        {   1,  5,  4,  4,  4},
-        {   1,  6,  4,  4,  4}, // 8 bits Shor
-        {   1,  7,  4,  4,  4},
-        {   1,  8,  4,  4,  4}, // 10 bits Shor
-        {   1,  9,  4,  4,  4},
-        {   1, 10,  4,  4,  4}, // 12 bits Shor
-        {   1, 11,  4,  4,  4},
+        {   1,  3,  4,  4,  4}, // 6 bits Shor
+        {   1,  4,  4,  4,  4}, // 8 bits Shor
+        {   1,  5,  4,  4,  4}, // 10 bits Shor
+        {   1,  6,  4,  4,  4}, // 12 bits Shor
         {   1,  2,  6,  4,  4}, // 4 bits Shor
-        {   1,  3,  6,  4,  4},
-        {   1,  4,  6,  4,  4}, // 6 bits Shor
-        {   1,  5,  6,  4,  4},
-        {   1,  6,  6,  4,  4}, // 8 bits Shor
-        {   1,  7,  6,  4,  4},
-        {   1,  8,  6,  4,  4}, // 10 bits Shor
-        {   1,  9,  6,  4,  4},
-        {   1, 10,  6,  4,  4}, // 12 bits Shor
-        {   1, 11,  6,  4,  4},
-        {   1, 12,  6,  4,  4}, // 14 bits Shor
-        {   1, 13,  6,  4,  4},
-        // Index: 22
-            {   1, 14,  4,  4,  4}, // Suprem_4_4
-            {   1, 15,  4,  4,  4},
-            {   1, 16,  4,  4,  4}, // Suprem_5_4
-            {   1, 17,  4,  4,  4},
-            {   1, 18,  6,  4,  4}, // Suprem_4_6
-            {   1, 19,  6,  4,  4},
-            {   1, 20,  6,  4,  4}, // Suprem_5_6
-            {   1, 21,  6,  4,  4},
-            // Index: 30
-                {   1, 22,  1,  4,  4}, // Suprem_4_4
-                {   1, 23,  1,  4,  4}, // Suprem_5_4
-            // 32: Big machine test
-                {   1, 18,  6,  6,  4}, // Suprem_4_6
-                {   1, 19,  6,  6,  4},
-                {   1, 20,  6,  6,  4}, // Suprem_5_6
-                {   1, 21,  6,  6,  4},
-                {   1, 18,  6,  8,  4}, // Suprem_4_6
-                {   1, 19,  6,  8,  4},
-                {   1, 20,  6,  8,  4}, // Suprem_5_6
-                {   1, 21,  6,  8,  4},
-                {   1, 18,  6, 10,  4}, // Suprem_4_6
-                {   1, 19,  6, 10,  4},
-                {   1, 20,  6, 10,  4}, // Suprem_5_6
-                {   1, 21,  6, 10,  4},
-                {   1, 18,  6, 12,  4}, // Suprem_4_6
-                {   1, 19,  6, 12,  4},
-                {   1, 20,  6, 12,  4}, // Suprem_5_6
-                {   1, 21,  6, 12,  4},
-                {   1, 18,  6, 14,  4}, // Suprem_4_6
-                {   1, 19,  6, 14,  4},
-                {   1, 20,  6, 14,  4}, // Suprem_5_6
-                {   1, 21,  6, 14,  4},
-                {   1, 18,  6, 16,  4}, // Suprem_4_6
-                {   1, 19,  6, 16,  4},
-                {   1, 20,  6, 16,  4}, // Suprem_5_6
-                {   1, 21,  6, 16,  4},
+        {   1,  3,  6,  4,  4}, // 6 bits Shor
+        {   1,  4,  6,  4,  4}, // 8 bits Shor
+        {   1,  5,  6,  4,  4}, // 10 bits Shor
+        {   1,  6,  6,  4,  4}, // 12 bits Shor
+
+        {   1,  7,  1,  4,  4}, // Suprem_4_4
+        {   1,  7,  4,  4,  4}, // Suprem_4_4
+        {   1,  7,  6,  4,  4}, // Suprem_4_6
+        {   1,  7,  6,  6,  4}, // Suprem_4_6 - big
+        {   1,  7,  6,  8,  4}, // Suprem_4_6 - big
+        {   1,  7,  6, 10,  4}, // Suprem_4_6 - big
+        {   1,  7,  6, 12,  4}, // Suprem_4_6 - big
+        {   1,  7,  6, 14,  4}, // Suprem_4_6 - big
+        {   1,  7,  6, 16,  4}, // Suprem_4_6 - big
+
+        {   1,  8,  1,  4,  4}, // Suprem_5_4
+        {   1,  8,  4,  4,  4}, // Suprem_5_4
+        {   1,  8,  6,  4,  4}, // Suprem_5_6
+        {   1,  8,  6,  6,  4}, // Suprem_5_6 - big
+        {   1,  8,  6,  8,  4}, // Suprem_5_6 - big
+        {   1,  8,  6, 10,  4}, // Suprem_5_6 - big
+        {   1,  8,  6, 12,  4}, // Suprem_5_6 - big
+        {   1,  8,  6, 14,  4}, // Suprem_5_6 - big
+        {   1,  8,  6, 16,  4}, // Suprem_5s_6 - big
     };
 
-    const char* xtras[3] = { "", "S0", "S1" };
+    const char* scheds[4]   = { "std", "qio", "sim", "ord" };
+    const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
-    for (int idxXtra = 0; idxXtra < 3; idxXtra++) {
-        const char* xtra = xtras[idxXtra];
-        printf("==== idxXtra: %d\n",idxXtra);
+    for (int idxSched = 0; idxSched < 4; idxSched++) {
+        const char* sched = scheds[idxSched];
+        printf("==== sched: %s\n",sched);
 
         for (int tIdx = 0; tIdx < testCnt; tIdx++) {
-            int doRange = tests[tIdx][0];
-            int prbIdx = tests[tIdx][1];
-            int fuseSpan = tests[tIdx][2];
-            int numThreads = tests[tIdx][3];
-            int simTyp = tests[tIdx][4];
+            int doRange     = tests[tIdx][0];
+            int prbIdx      = tests[tIdx][1];
+            int fuseSpan    = tests[tIdx][2];
+            int numThreads  = tests[tIdx][3];
+            int simTyp      = tests[tIdx][4];
             char fName[30];
 
-            if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
-            if (prbIdx == 12) continue;     // Don't do 31 qubit test
-            if (prbIdx == 13) continue;     // Don't do 31 qubit test
-            if (tIdx >= 32) break;          // Not on a big machine
+            if (prbIdx != 8) continue;      // @@@DBG
+            if (fuseSpan != 6) continue;    // @@@DBG
 
-            if (prbIdx < 2) {
+            if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
+            if (numThreads > 4) continue;   // Not on a big machine
+
+            if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
                 else             nQs = 26;
                 circStart = 0;
@@ -327,30 +300,23 @@ int main()
                 sprintf0(fName, sizeof(fName), "bench");
                 prb = loadPrb(circStart, circStop);
             }
-            else if (prbIdx == 22) {
-                sprintf1(fName, sizeof(fName), "suprem%s_4_4.log", xtra);
-                prb = loadTest(fName, false);
+            else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
+                int bits = prbIdx * 2;
+                sprintf3(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
+                prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
-            else if (prbIdx == 23) {
-                sprintf1(fName, sizeof(fName), "suprem%s_5_4.log", xtra);
-                prb = loadTest(fName, false);
+            else if (prbIdx >= 7 && prbIdx <= 8) { // Suprem
+                int siz = 4;
+                if (prbIdx == 8) siz = 5;
+                int spanInp = 4;
+                if (fuseSpan > 4) spanInp = fuseSpan;
+                sprintf3(fName, sizeof(fName), "suprem%s_%d_%d.log", xtras[idxSched], siz, spanInp);
+                prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
-            else if (prbIdx >= 14) {
-                int siz = ((prbIdx - 14) / 2 & 1) == 1 ? 5 : 4;
-                bool doClus = (prbIdx & 1) == 1;
-                sprintf3(fName, sizeof(fName), "suprem%s_%d_%d.log", xtra, siz, fuseSpan);
-                prb = loadTest(fName, doClus);
-                nQs = numQs(prb);
-            }
-            else {
-                int bits = ((prbIdx & 0xFE) + 2);
-                bool doClus = (prbIdx & 1) == 1;
-                sprintf3(fName, sizeof(fName), "shor%s_%d_%d.log", xtra, bits, fuseSpan);
-                prb = loadTest(fName, doClus);
-                nQs = numQs(prb);
-            }
+            else throw(std::invalid_argument("Bad prblem number"));
+
             printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
                 nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
             fflush(stdout);
