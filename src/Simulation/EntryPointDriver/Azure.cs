@@ -121,10 +121,21 @@ namespace Microsoft.Quantum.EntryPointDriver
             switch (format)
             {
                 case OutputFormat.FriendlyUri:
-                    // TODO:
-                    DisplayWithColor(ConsoleColor.Yellow, Console.Error,
-                        "The friendly URI for viewing job results is not available yet. Showing the job ID instead.");
-                    Console.WriteLine(job.Id);
+                    try
+                    {
+                        Console.WriteLine(job.Uri);
+                    }
+                    catch (Exception ex)
+                    {
+                        DisplayWithColor(
+                            ConsoleColor.Yellow,
+                            Console.Error,
+                            $"The friendly URI for viewing job results could not be obtained.{System.Environment.NewLine}" +
+                            $"Error details: {ex.Message}" +
+                            $"Showing the job ID instead.");
+
+                        Console.WriteLine(job.Id);
+                    }
                     break;
                 case OutputFormat.Id:
                     Console.WriteLine(job.Id);
