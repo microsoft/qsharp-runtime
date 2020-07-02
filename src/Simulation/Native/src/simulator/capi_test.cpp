@@ -284,11 +284,8 @@ int main()
             int simTyp      = tests[tIdx][4];
             char fName[30];
 
-            if (prbIdx != 8) continue;      // @@@DBG
-            if (fuseSpan != 6) continue;    // @@@DBG
-
             if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
-            if (numThreads > 4) continue;   // Not on a big machine
+            //if (numThreads > 4) continue;   // Not on a big machine
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
