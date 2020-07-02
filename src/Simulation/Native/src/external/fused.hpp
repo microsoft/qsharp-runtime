@@ -125,7 +125,10 @@ class Fused
       std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
-      if (dbgElapsed >= 15.0) { 
+      double timeInt = log((float)wfn.capacity()) / log(2.0);
+      timeInt = (timeInt * timeInt) / 20.0;
+
+      if (dbgElapsed >= timeInt) { 
             double nFused = (float)dbgNfused;
             printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flsh=%8.2g gts=%8.2g elap=%5.1f gps=%10.4g (fus=%5.1f%%, ker=%5.1f%%)\n",
                 ((float)dbgSize / nFused),
@@ -201,7 +204,7 @@ class Fused
                 if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
                 int nProcs = omp_get_num_procs();
                 if (nProcs < 3) nMaxThrds = nProcs;
-                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG allow for debugging from aboe
+                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG allow for debugging from above
                 omp_set_num_threads(nMaxThrds);
             }
 

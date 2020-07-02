@@ -343,6 +343,10 @@ int main()
                 }
             }
 
+            // Amount of time to let things run below (in fused.hpp)
+            double timeInt = (double)nQs;
+            timeInt = 4.0 * (timeInt*timeInt) / 20.0;
+
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {
                 for (int i = 0; i < prb.size(); i++) {
@@ -369,7 +373,7 @@ int main()
 
                     std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
                     std::chrono::duration<double> elapsed = curr - start;
-                    if (elapsed.count() >= 60.0) break;
+                    if (elapsed.count() >= timeInt) break;
                 }
             }
 
