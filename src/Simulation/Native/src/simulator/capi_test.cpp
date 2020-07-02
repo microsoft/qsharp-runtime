@@ -199,14 +199,6 @@ void sprintf0(char* buf, int bufSiz, const char* str) {
 #endif
 }
 
-void sprintf1(char* buf, int bufSiz,const char* str, const char* arg1) {
-#ifdef _MSC_VER
-    sprintf_s(buf, bufSiz, str, arg1);
-#else
-    sprintf(buf, "%s", str, arg1);
-#endif
-}
-
 void sprintf3(char* buf, int bufSiz,const char* fmt,const char* arg1, int arg2, int arg3) {
 #ifdef _MSC_VER
     sprintf_s(buf, bufSiz, fmt, arg1, arg2, arg3);
