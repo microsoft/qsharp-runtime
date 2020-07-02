@@ -258,7 +258,7 @@ int main()
         {   1,  8,  6, 10,  4}, // Suprem_5_6 - big
         {   1,  8,  6, 12,  4}, // Suprem_5_6 - big
         {   1,  8,  6, 14,  4}, // Suprem_5_6 - big
-        {   1,  8,  6, 16,  4}, // Suprem_5s_6 - big
+        {   1,  8,  6, 16,  4}, // Suprem_5_6 - big
     };
 
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
