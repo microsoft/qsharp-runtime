@@ -207,6 +207,14 @@ void sprintf3(char* buf, int bufSiz,const char* fmt,const char* arg1, int arg2, 
 #endif
 }
 
+void sprintf4(char* buf, int bufSiz, const char* fmt, const char* arg1, int arg2, int arg3, int arg4) {
+#ifdef _MSC_VER
+    sprintf_s(buf, bufSiz, fmt, arg1, arg2, arg3, arg4);
+#else
+    sprintf(buf, fmt, arg1, arg2, arg3, arg4);
+#endif
+}
+
 int numQs(vector<vector<int32_t>> prb) {
     int mx = -1;
     for (auto i : prb)
@@ -277,7 +285,7 @@ int main()
             char fName[30];
 
             if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
-            //if (numThreads > 4) continue;   // Not on a big machine
+            if (numThreads > 4) continue;   // Not on a big machine
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
@@ -300,7 +308,7 @@ int main()
                 if (prbIdx == 8) siz = 5;
                 int spanInp = 4;
                 if (fuseSpan > 4) spanInp = fuseSpan;
-                sprintf3(fName, sizeof(fName), "suprem%s_%d_%d.log", xtras[idxSched], siz, spanInp);
+                sprintf4(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], siz, siz, spanInp);
                 prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
@@ -309,6 +317,8 @@ int main()
             printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
                 nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
             fflush(stdout);
+
+            //continue; //@@@DBG to check problem loop without running
 
             if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
             if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
