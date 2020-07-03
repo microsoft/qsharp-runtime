@@ -345,7 +345,7 @@ int main()
 
             // Amount of time to let things run below (in fused.hpp)
             double timeInt = (double)nQs;
-            timeInt = 5.0 * (timeInt*timeInt) / 30.0;
+            timeInt = 5.0 * (timeInt*timeInt) / 10.0;
 
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {
