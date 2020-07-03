@@ -200,7 +200,7 @@ void mySprintf(char* buf, int bufSiz, const char* fmt, ...) {
 #else
     vsprintf(buf, fmt, args);
 #endif
-    perror(buf);
+    //perror(buf);
     va_end(args);
 }
 
@@ -271,7 +271,7 @@ int main()
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
     const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
-    for (int idxSched = 2; idxSched < 4; idxSched++) { //@@@DBG only do sim and ord
+    for (int idxSched = 0; idxSched < 4; idxSched++) {
         const char* sched = scheds[idxSched];
         printf("==== sched: %s\n",sched);
 
@@ -284,8 +284,7 @@ int main()
             char fName[30];
 
             if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
-            //if (numThreads > 4) continue;   // Not on a big machine
-            if (prbIdx != 9) continue;      //@@@DBG just do 5x5 problem
+            if (numThreads > 4) continue;   // Not on a big machine
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
