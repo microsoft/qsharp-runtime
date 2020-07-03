@@ -285,7 +285,7 @@ int main()
 
             if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
             //if (numThreads > 4) continue;   // Not on a big machine
-            if (prbIdx != 9) continue;      //@@@DBG just do 5x6 problem
+            if (prbIdx != 9) continue;      //@@@DBG just do 5x5 problem
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                 if (prbIdx == 0) nQs = 15;
@@ -345,7 +345,7 @@ int main()
 
             // Amount of time to let things run below (in fused.hpp)
             double timeInt = (double)nQs;
-            timeInt = 4.0 * (timeInt*timeInt) / 20.0;
+            timeInt = 5.0 * (timeInt*timeInt) / 30.0;
 
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {

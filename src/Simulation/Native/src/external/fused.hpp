@@ -126,7 +126,7 @@ class Fused
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
       double timeInt = log((float)wfn.capacity()) / log(2.0);
-      timeInt = (timeInt * timeInt) / 20.0;
+      timeInt = (timeInt * timeInt) / 30.0;
 
       if (dbgElapsed >= timeInt) { 
             double nFused = (float)dbgNfused;
