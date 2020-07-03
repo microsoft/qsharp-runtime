@@ -271,7 +271,7 @@ int main()
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
     const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
-    for (int idxSched = 0; idxSched < 4; idxSched++) {
+    for (int idxSched = 2; idxSched < 4; idxSched++) { //@@@DBG only do sim and ord
         const char* sched = scheds[idxSched];
         printf("==== sched: %s\n",sched);
 
@@ -325,8 +325,6 @@ int main()
             printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
                 nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
             fflush(stdout);
-
-            //continue; //@@@DBG to check problem loop without running
 
             if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
             if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;

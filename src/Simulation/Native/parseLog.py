@@ -30,8 +30,9 @@ prbs = [
     "shor_8"   ,
     "shor_10"  ,
     "shor_12"  ,
-    "suprem_4" ,
-    "suprem_5" ,
+    "suprem_44",
+    "suprem_55",
+    "suprem_56"
 ]
 def dumpGpss():
     global gpss,env,sim,totalQs,threads,span,sz,rng,prb,sched
