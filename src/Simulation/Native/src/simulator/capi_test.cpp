@@ -271,7 +271,7 @@ int main()
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
     const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
-    for (int idxSched = 0; idxSched < 4; idxSched++) {
+    for (int idxSched = 3; idxSched < 4; idxSched++) { //@@@DBG
         const char* sched = scheds[idxSched];
         printf("==== sched: %s\n",sched);
 
@@ -283,7 +283,7 @@ int main()
             int simTyp      = tests[tIdx][4];
             char fName[30];
 
-            if (prbIdx < 2) continue;       // Ony do Shor and Supremacy tests for now
+            if (prbIdx < 7 || prbIdx > 8) continue;  //@@@DBG Just do the small suprem test 
             if (numThreads > 4) continue;   // Not on a big machine
 
             if (prbIdx >= 0 && prbIdx <= 1) { // Bench
@@ -319,7 +319,7 @@ int main()
                 prb = loadTest(fName, idxSched > 0);
                 nQs = numQs(prb);
             }
-            else throw(std::invalid_argument("Bad prblem number"));
+            else throw(std::invalid_argument("Bad problem number"));
 
             printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
                 nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
@@ -342,7 +342,7 @@ int main()
 
             // Amount of time to let things run below (in fused.hpp)
             double timeInt = (double)nQs;
-            timeInt = 5.0 * (timeInt*timeInt) / 10.0;
+            timeInt = 5.0 * (timeInt*timeInt) / 20.0;
 
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {

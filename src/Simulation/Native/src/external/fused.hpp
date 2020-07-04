@@ -65,6 +65,14 @@ class Fused
       fusedgates = Fusion();
     }
 
+    Fusion getFusedGates() const {
+        return fusedgates;
+    }
+    
+    void setFusedGates(Fusion newFG) const {
+        fusedgates = newFG;
+    }
+
     
     template <class T, class A>
     void flush(std::vector<T, A>& wfn) const
@@ -126,7 +134,7 @@ class Fused
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
       double timeInt = log((float)wfn.capacity()) / log(2.0);
-      timeInt = (timeInt * timeInt) / 10.0;
+      timeInt = (timeInt * timeInt) / 20.0;
 
       if (dbgElapsed >= timeInt) { 
             double nFused = (float)dbgNfused;
@@ -173,25 +181,25 @@ class Fused
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
         dbgNgates++;
+        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
+        fusedgates.insert(convertMatrix(mat), qs, cs);
+    }
 
-#if 0 //@@@DBG: Original
-        if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
-            flush(wfn);
-        Fusion newgates = fusedgates;
+    template <class T, class A, class M>
+    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
+    {
+      std::vector<unsigned> cs;
+      apply_controlled(wfn, mat, cs, q);
+    }
 
-        newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-      
-      if (newgates.num_qubits() > 4)
-      {
-          flush(wfn);
-          fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-      }
-      else
-          fusedgates = newgates;
-#else //@@@DBG: Re-write (newgates = fusedgates was the problem... constructor/destructor)
+    template <class T, class A, class M>
+    bool shouldFlush(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
+    {
+        // Major runtime logic change here
 
+      // Have to update capacity as the WFN grows
         if (wfnCapacity != wfn.capacity()) {
-            wfnCapacity     = wfn.capacity();
+            wfnCapacity = wfn.capacity();
             char* envNT = NULL;
             size_t len;
 #ifdef _MSC_VER
@@ -208,33 +216,29 @@ class Fused
                 omp_set_num_threads(nMaxThrds);
             }
 
+            // This is now pretty much unlimited, could be set in the future
             maxFusedDepth = dbgFusedLimit;
             if (maxFusedDepth < 0) maxFusedDepth = 99;
 
             maxFusedSpan = dbgFusedSpan;
             if (maxFusedSpan < 0) {
+                // Default for large problems (optimized with benchmarks)
                 maxFusedSpan = 3;
+                // Reduce size for small problems (optimized with benchmarks)
                 if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
             }
             printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
         }
+        // New rules of when to stop fusing
+        Fusion::IndexVector qs = std::vector<unsigned>(1, q);
 
-        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
-        if (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= (uint32_t)maxFusedDepth)  
-            flush(wfn);
-        fusedgates.insert(convertMatrix(mat), qs, cs);
-#endif
+        return (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= (unsigned)maxFusedDepth);
     }
 
-    
-    template <class T, class A, class M>
-    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
-    {
-      std::vector<unsigned> cs;
-      apply_controlled(wfn, mat, cs, q);
-    }
   private:
     mutable Fusion fusedgates;
+    
+    // New runtime optimization settings
     mutable size_t wfnCapacity;
     mutable int    maxFusedSpan;
     mutable int    maxFusedDepth;

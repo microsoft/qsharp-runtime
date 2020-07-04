@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cassert>
 #include "util/alignedalloc.hpp"
+#include <map>
 
 class Item{
 public:  
@@ -20,6 +21,11 @@ public:
 	Item(Matrix mat, IndexVector idx) : mat_(mat), idx_(idx) {}
 	Matrix& get_matrix() { return mat_; }
 	IndexVector& get_indices() { return idx_; }
+	void setIdx(std::map<unsigned, unsigned> elemDict) {
+		for (unsigned i = 0; i < idx_.size(); i++) {
+			idx_[i] = elemDict[idx_[i]];
+		}
+	}
 private:
 	Matrix mat_;
 	IndexVector idx_;
@@ -58,7 +64,49 @@ public:
 		handle_controls(empty_matrix, empty_vec, {}); // remove all current control qubits (this is a GLOBAL factor)
 	}
 	
+	IndexSet getSet() const {
+		return set_;
+	}
 
+	ItemVector getItems() const {
+		return items_;
+	}
+
+	IndexSet getCtrlSet() const {
+		return ctrl_set_;
+	}
+
+	Complex getGlobalFactor() const {
+		return global_factor_;
+	}
+
+	void setSet(std::map<unsigned, unsigned> elemDict) {
+		std::set<Index> tempSet;
+		for (unsigned elem : set_) {
+			if (elemDict.find(elem) != elemDict.end()) {
+				tempSet.insert(elemDict[elem]);
+			}
+		}
+		set_.clear();
+		set_.insert(tempSet.begin(), tempSet.end()); //look into using swap instead
+	}
+
+	void setCtrlSet(std::map<unsigned, unsigned> elemDict) {
+		std::set<Index> tempSet;
+		for (unsigned elem : ctrl_set_) {
+			if (elemDict.find(elem) != elemDict.end()) {
+				tempSet.insert(elemDict[elem]);
+			}
+		}
+		ctrl_set_.clear();
+		ctrl_set_.insert(tempSet.begin(), tempSet.end());
+	}
+	
+	void setItems(ItemVector newItems) {
+		items_.clear();
+		items_.insert(items_.begin(), newItems.begin(), newItems.end());
+	}
+	// This saves a class instance create/destroy on every gate insert
 	// Need a quick way to decide if we're going to grow too wide
 	int predict(IndexVector index_list, IndexVector const& ctrl_list = {}) {
 		int cnt = num_qubits() + num_controls();
