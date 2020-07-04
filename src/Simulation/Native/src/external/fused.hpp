@@ -28,6 +28,7 @@ namespace Quantum
     extern int dbgFusedSpan;
     extern int dbgFusedLimit;
     extern int dbgNumThreads;
+    extern int dbgReorder;
 
 namespace SIMULATOR
 {

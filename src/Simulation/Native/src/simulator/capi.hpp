@@ -16,7 +16,7 @@ extern "C" {
 // non-quantum
 
 MICROSOFT_QUANTUM_DECL unsigned init();
-MICROSOFT_QUANTUM_DECL unsigned initDBG(int force,int fusedSpan,int fusedLimit,int numThreads); //@@@DBG
+MICROSOFT_QUANTUM_DECL unsigned initDBG(int force,int fusedSpan,int fusedLimit,int numThreads,int reorder); //@@@DBG
 MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid);
 MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s);
 MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned sid, _In_ bool(*callback)(size_t, double, double));

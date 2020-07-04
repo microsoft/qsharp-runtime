@@ -22,6 +22,8 @@ namespace Microsoft
 {
 namespace Quantum
 {
+    extern int dbgReorder;
+
 namespace SIMULATOR
 {
     namespace detail
@@ -96,7 +98,7 @@ class Wavefunction
         auto sets = fg.getSet();
         auto ctrlSets = fg.getCtrlSet();
         //getting all qubits to move to lower end of the wfn
-        if (false && items.size() > 0) {    //@@@DBG
+        if (dbgReorder > 0 && items.size() > 0) {
             std::vector<unsigned> indices;
             std::set<unsigned> indicesSet;
             for (int i = 0; i < items.size(); i++) {

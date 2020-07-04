@@ -37,16 +37,18 @@ namespace Microsoft
       int dbgFusedSpan  = -1;
       int dbgFusedLimit = 99;
       int dbgNumThreads = 0;
+      int dbgReorder    = 0;
     namespace Simulator
     {
       mutex_type _mutex;
 
       //@@@DBG: added force and fusedSpan
-      SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=-1, int fusedLimit=99, int numThreads=0)
+      SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=-1, int fusedLimit=99, int numThreads=0,int reorder=0)
       {
           dbgFusedSpan = fusedSpan;
           dbgFusedLimit = fusedLimit;
           dbgNumThreads = numThreads;
+          dbgReorder = reorder;
 
         if (force > 0) {
             switch (force) {
@@ -111,7 +113,7 @@ namespace Microsoft
       }
 
       //@@@DBG: for benchmarks
-      MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force,int fusedSpan,int fusedLimit,int numThreads)
+      MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force,int fusedSpan,int fusedLimit,int numThreads,int reorder)
       {
           std::lock_guard<mutex_type> lock(_mutex);
 
@@ -127,12 +129,12 @@ namespace Microsoft
 
           if (emptySlot == -1)
           {
-              psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads)));
+              psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads,reorder)));
               emptySlot = psis.size() - 1;
           }
           else
           {
-              psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads));
+              psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads,reorder));
           }
 
           return static_cast<unsigned>(emptySlot);
