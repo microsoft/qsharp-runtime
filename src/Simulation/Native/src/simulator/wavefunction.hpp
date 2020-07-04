@@ -116,27 +116,45 @@ class Wavefunction
                     indicesSet.insert(*it);
                 }
             }
-            //performing reorder
-            std::vector<qubit_t> indexLocs = qubits(indices);
-            for (unsigned i = 0; i < indexLocs.size(); i++)
-            {
-                auto currLoc = indexLocs[i];
-                reorderWFN(currLoc, i);
-                indexLocs = qubits(indices);
-            }
-            //keeping old and new location in order to set it appropriately
-            std::map<unsigned, unsigned> old2newDict;
-            for (unsigned i = 0; i < indices.size(); i++) {
-                old2newDict[indices[i]] = indexLocs[i];
+
+            // Heuristic to decide when to re-order
+            bool doReorder = true;
+            if (dbgReorder == 2) {
+                if (items.size() < 10) doReorder = false;
+                else {
+                    int lowLimit = (int)num_qubits_ / 2;
+                    int lowCnt = 0;
+                    for (int idx : indices) {
+                        if (idx <= lowLimit) lowCnt++;
+                    }
+                    if (lowCnt != 0) doReorder = false;
+                    if (doReorder) printf("@@@DBG lowLimit=%d lowCnt=%d gates=%d\n",lowLimit,lowCnt,(int)items.size());
+                }
             }
 
-            for (int i = 0; i < items.size(); i++) {
-                items[i].setIdx(old2newDict);
+            //performing reorder
+            if (doReorder) {
+                std::vector<qubit_t> indexLocs = qubits(indices);
+                for (unsigned i = 0; i < indexLocs.size(); i++)
+                {
+                    auto currLoc = indexLocs[i];
+                    reorderWFN(currLoc, i);
+                    indexLocs = qubits(indices);
+                }
+                //keeping old and new location in order to set it appropriately
+                std::map<unsigned, unsigned> old2newDict;
+                for (unsigned i = 0; i < indices.size(); i++) {
+                    old2newDict[indices[i]] = indexLocs[i];
+                }
+
+                for (int i = 0; i < items.size(); i++) {
+                    items[i].setIdx(old2newDict);
+                }
+                fg.setItems(items);
+                fg.setSet(old2newDict);
+                fg.setCtrlSet(old2newDict);
+                fused_.setFusedGates(fg);
             }
-            fg.setItems(items);
-            fg.setSet(old2newDict);
-            fg.setCtrlSet(old2newDict);
-            fused_.setFusedGates(fg);
         }
         
         fused_.flush(wfn_);

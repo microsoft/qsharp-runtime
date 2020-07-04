@@ -272,7 +272,7 @@ int main()
     const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
 
-    for (int doReorder = 0; doReorder < 2; doReorder++) {
+    for (int doReorder = 2; doReorder < 3; doReorder++) {
         printf(">>>> reorder: %d\n", doReorder);
         for (int idxSched = 0; idxSched < 4; idxSched++) {
             const char* sched = scheds[idxSched];
