@@ -38,16 +38,12 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
       <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
-      <_ClassicalControlDir>$(MSBuildThisFileDirectory)TestProjects\ClassicalControlSupportTest\built\</_ClassicalControlDir>
     </PropertyGroup>
     <ItemGroup>
       <_ExeFiles Include="$(_ExeDir)*" />
-      <_ClassicalControlFiles Include="$(_ClassicalControlDir)*" />
     </ItemGroup>
     <MakeDir Directories="$(OutputPath)TestExe" />
-    <MakeDir Directories="$(OutputPath)TestClassicalControl" />
     <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
-    <Copy SourceFiles="@(_ClassicalControlFiles)" DestinationFolder="$(OutputPath)TestClassicalControl" ContinueOnError="false" />
   </Target>
 
 </Project>

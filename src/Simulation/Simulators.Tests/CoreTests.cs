@@ -44,30 +44,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
-        public void ClassicalControlSimulatorSupport()
-        {
-            var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestClassicalControl", "ClassicalControlSupportTest.dll");
-
-            ProcessRunner.Run("dotnet", $"{exe} --simulator QuantumSimulator", out var _, out StringBuilder error, out int exitCode, out Exception ex);
-            Assert.Null(ex);
-            Assert.Equal(0, exitCode);
-            Assert.Empty(error.ToString().Trim());
-        }
-
-        [Fact]
-        public void ClassicalControlResourcesEstimatorSupport()
-        {
-            var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestClassicalControl", "ClassicalControlSupportTest.dll");
-
-            ProcessRunner.Run("dotnet", $"{exe} --simulator ResourcesEstimator", out var _, out StringBuilder error, out int exitCode, out Exception ex);
-            Assert.Null(ex);
-            Assert.Equal(0, exitCode);
-            Assert.Empty(error.ToString().Trim());
-        }
-
-        [Fact]
         public void Borrowing()
         {
             OperationsTestHelper.RunWithMultipleSimulators((s) =>
