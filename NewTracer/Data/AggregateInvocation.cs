@@ -1,9 +1,6 @@
 ﻿using NewTracer.CallGraph;
-using Newtonsoft.Json;
 using System;
-using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace NewTracer

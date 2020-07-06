@@ -31,7 +31,7 @@ namespace NewTracer.Utils
         /// </summary>
         public MultiSinkQuantumProcessor(IQuantumProcessor core = null, IEnumerable<IQuantumProcessor> sinks = null)
         {
-            this.Core = core ?? new EmptyProcessor();
+            this.Core = core ?? new QuantumProcessorBase();
             this.Sinks = sinks?.ToList() ?? new List<IQuantumProcessor>();
         }
 
@@ -39,7 +39,7 @@ namespace NewTracer.Utils
         /// Registers sinks for receiving <see cref="IQuantumProcessor"/> method calls. Duplicates are ignored.
         /// </summary>
         /// <param name="sinks"></param>
-        public void RegisterSinks(IEnumerable<IQuantumProcessor> sinks)
+        public virtual void RegisterSinks(IEnumerable<IQuantumProcessor> sinks)
         {
             if (sinks == null) { throw new ArgumentNullException(nameof(sinks)); }
             foreach (IQuantumProcessor sink in sinks)
@@ -60,7 +60,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
+        public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -68,7 +68,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
+        public virtual void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -76,7 +76,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
+        public virtual void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -84,7 +84,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
+        public virtual void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -92,7 +92,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledH(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledH(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -100,7 +100,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
+        public virtual void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -108,7 +108,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
+        public virtual void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -116,7 +116,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
+        public virtual void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -124,7 +124,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
+        public virtual void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -132,7 +132,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledS(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledS(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -140,7 +140,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -148,7 +148,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
+        public virtual void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -156,7 +156,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledT(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledT(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -164,7 +164,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -172,7 +172,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledX(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledX(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -180,7 +180,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledY(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledY(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -188,7 +188,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
+        public virtual void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -196,7 +196,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
+        public virtual void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -204,7 +204,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
+        public virtual void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -212,7 +212,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void H(Qubit qubit)
+        public virtual void H(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -220,7 +220,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnAllocateQubits(IQArray<Qubit> qubits)
+        public virtual void OnAllocateQubits(IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -228,7 +228,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
+        public virtual void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -236,7 +236,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnMessage(string msg)
+        public virtual void OnMessage(string msg)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -244,7 +244,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnOperationEnd(ICallable operation, IApplyData arguments)
+        public virtual void OnOperationEnd(ICallable operation, IApplyData arguments)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -252,7 +252,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnOperationStart(ICallable operation, IApplyData arguments)
+        public virtual void OnOperationStart(ICallable operation, IApplyData arguments)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -260,7 +260,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnReleaseQubits(IQArray<Qubit> qubits)
+        public virtual void OnReleaseQubits(IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -268,7 +268,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
+        public virtual void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -276,7 +276,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void R(Pauli axis, double theta, Qubit qubit)
+        public virtual void R(Pauli axis, double theta, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -284,7 +284,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void R1(double theta, Qubit qubit)
+        public virtual void R1(double theta, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -292,7 +292,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void R1Frac(long numerator, long power, Qubit qubit)
+        public virtual void R1Frac(long numerator, long power, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -300,7 +300,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void Reset(Qubit qubit)
+        public virtual void Reset(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -308,7 +308,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
+        public virtual void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -316,7 +316,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void S(Qubit qubit)
+        public virtual void S(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -324,7 +324,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void SAdjoint(Qubit qubit)
+        public virtual void SAdjoint(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -332,7 +332,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void SWAP(Qubit qubit1, Qubit qubit2)
+        public virtual void SWAP(Qubit qubit1, Qubit qubit2)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -340,7 +340,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void T(Qubit qubit)
+        public virtual void T(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -348,7 +348,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void TAdjoint(Qubit qubit)
+        public virtual void TAdjoint(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -356,7 +356,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void X(Qubit qubit)
+        public virtual void X(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -364,7 +364,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void Y(Qubit qubit)
+        public virtual void Y(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -372,7 +372,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void Z(Qubit qubit)
+        public virtual void Z(Qubit qubit)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -400,7 +400,7 @@ namespace NewTracer.Utils
             return result;
         }
 
-        public void OnFail(ExceptionDispatchInfo exceptionDispatchInfo)
+        public virtual void OnFail(ExceptionDispatchInfo exceptionDispatchInfo)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -408,7 +408,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnDumpMachine<T>(T location)
+        public virtual void OnDumpMachine<T>(T location)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -416,7 +416,7 @@ namespace NewTracer.Utils
             }
         }
 
-        public void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
+        public virtual void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {
@@ -484,7 +484,7 @@ namespace NewTracer.Utils
             return result;
         }
 
-        public void EndConditionalStatement(long statement)
+        public virtual void EndConditionalStatement(long statement)
         {
             foreach (IQuantumProcessor child in this.AllChildProcessors())
             {

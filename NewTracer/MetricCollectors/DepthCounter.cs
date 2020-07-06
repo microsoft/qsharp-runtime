@@ -10,7 +10,7 @@ using static NewTracer.MetricCollectors.DepthCounter;
 
 namespace NewTracer.MetricCollectors
 {
-    public class DepthCounter : IMetricCollector, IQuantumProcessor, IQubitTraceSubscriber
+    public class DepthCounter : QuantumProcessorBase, IMetricCollector, IQuantumProcessor, IQubitTraceSubscriber
     {
         public class DepthState : IStackRecord
         {
@@ -34,7 +34,7 @@ namespace NewTracer.MetricCollectors
 
         public string CollectorName()
         {
-            return "Depth Counter";
+            return "DepthCounter";
         }
 
         public IList<string> Metrics()
@@ -104,55 +104,54 @@ namespace NewTracer.MetricCollectors
         // Primite operations that the DepthCounter expects other operations to be decomposed to.
         //
 
-        // Currently configured as a T-depth tracker. 
+        // Currently configured as a T+CZ depth tracker. 
         //TODO: support configuring depth tracking a la old tracer
 
-        public void Z(Qubit qubit)
+        public override void Z(Qubit qubit)
         {
         }
 
-        public void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
+        public override void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
-            if (controls.Length == 1)
+            if (controls.Length == 1 || controls.Length == 2)
             {
-            }
-            else if (controls.Length == 2)
-            {
+                this.RecordQubitUse(controls.Append(qubit), 1);
             }
             else
             {
                 throw new NotImplementedException();
             }
         }
-        public void H(Qubit qubit)
+        public override void H(Qubit qubit)
         {
+
         }
 
-        public void S(Qubit qubit)
+        public override void S(Qubit qubit)
         {
             this.T(qubit);
         }
 
-        public void SAdjoint(Qubit qubit)
+        public override void SAdjoint(Qubit qubit)
         {
             this.S(qubit);
         }
-        public void T(Qubit qubit)
+        public override void T(Qubit qubit)
         {
             this.RecordQubitUse(qubit, this.GetAvailableTime(qubit), 1);
         }
 
-        public void TAdjoint(Qubit qubit)
+        public override void TAdjoint(Qubit qubit)
         {
             this.T(qubit);
         }
 
-        public void SWAP(Qubit qubit1, Qubit qubit2)
+        public override void SWAP(Qubit qubit1, Qubit qubit2)
         {
             //no-op
         }
 
-        public void R(Pauli axis, double theta, Qubit qubit)
+        public override void R(Pauli axis, double theta, Qubit qubit)
         {
             if (axis == Pauli.PauliZ)
             {
@@ -163,12 +162,12 @@ namespace NewTracer.MetricCollectors
             }
         }
 
-        public Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
+        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
         {
             return null;
         }
 
-        public Result M(Qubit qubit)
+        public override Result M(Qubit qubit)
         {
             return null;
         }
@@ -183,18 +182,32 @@ namespace NewTracer.MetricCollectors
 
         public double GetAvailableTime(Qubit qubit)
         {
-            return (double)(qubit as TraceableQubit).ExtractData(this);
+            TraceableQubit q = qubit as TraceableQubit;
+            return (double)(q?.ExtractData(this) ?? 0.0); //TODO: hack for ancilla qubits - what should be done instead?
+        }
+
+        public void RecordQubitUse(Qubit qubit, double duration)
+        {
+            double availableTime = this.GetAvailableTime(qubit);
+            double finishedAt = availableTime + duration;
+            (qubit as TraceableQubit).SetData(this, finishedAt);
         }
 
         public void RecordQubitUse(Qubit qubit, double time, double duration)
         {
             double availableTime = this.GetAvailableTime(qubit);
-            if (availableTime < time)
+            if (time < availableTime)
             {
                 throw new QubitTimeMetricsException();
             }
             double finishedAt = time + duration;
             (qubit as TraceableQubit).SetData(this, finishedAt);
+        }
+
+        public void RecordQubitUse(IEnumerable<Qubit> qubits, double duration)
+        {
+            double startTime = MaxAvailableTime(qubits);
+            RecordQubitUse(qubits, startTime, duration);
         }
 
         public void RecordQubitUse(IEnumerable<Qubit> qubits, double time, double duration)
@@ -225,213 +238,6 @@ namespace NewTracer.MetricCollectors
             return min != Double.MaxValue ? min : 0;
         }
 
-        #endregion
-
-        //
-        // All other operations must be decomposed to primitives first.
-        // Otherwise a NotImplemntedException will be thrown.
-        //
-
-        #region boilerplate
-
-        public void X(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledX(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Y(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledY(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledH(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledS(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledT(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void R1(double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void R1Frac(long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        //
-        // As this is a listener, all non-gate IQuantumProcessor calls are no-ops
-        //
-
-        public void Reset(Qubit qubit)
-        {
-
-        }
-
-        public void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
-        {
-
-        }
-
-        public void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
-        {
-
-        }
-
-        public void OnOperationStart(ICallable operation, IApplyData arguments)
-        {
-
-        }
-
-        public void OnOperationEnd(ICallable operation, IApplyData arguments)
-        {
-
-        }
-
-        public void OnFail(ExceptionDispatchInfo exceptionDispatchInfo)
-        {
-
-        }
-
-        public void OnAllocateQubits(IQArray<Qubit> qubits)
-        {
-
-        }
-
-        public void OnDumpMachine<T>(T location)
-        {
-
-        }
-
-        public void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
-        {
-
-        }
-
-        public void OnMessage(string msg)
-        {
-
-        }
-
-        public long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
-        {
-            return -1;
-        }
-
-        public long StartConditionalStatement(Result measurementResult, Result resultValue)
-        {
-            return -1;
-        }
-
-        public bool RunThenClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RepeatThenClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RunElseClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RepeatElseClause(long statement)
-        {
-            return false;
-        }
-
-        public void EndConditionalStatement(long statement)
-        {
-
-        }
-
-        public void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
-        {
-
-        }
         #endregion
     }
 }

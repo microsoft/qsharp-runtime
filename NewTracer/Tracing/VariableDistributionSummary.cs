@@ -74,5 +74,10 @@ namespace NewTracer.MetricCollection
                 return this.AsDictionary()[statistic];
             }
         }
+
+        public override string ToString()
+        {
+            return this.AsDictionary().ToString();
+        }
     }
 }

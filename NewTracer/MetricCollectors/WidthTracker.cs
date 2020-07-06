@@ -9,7 +9,7 @@ using static NewTracer.MetricCollectors.WidthTracker;
 
 namespace NewTracer.MetricCollectors
 {
-    public class WidthTracker : IMetricCollector, IQuantumProcessor
+    public class WidthTracker : QuantumProcessorBase, IMetricCollector, IQuantumProcessor
     {
         public class WidthState : IStackRecord
         {
@@ -39,23 +39,23 @@ namespace NewTracer.MetricCollectors
 
         public string CollectorName()
         {
-            return "Width Tracker";
+            return "WidthCounter";
         }
 
         public IList<string> Metrics()
         {
-           return   new string[]
-           {
-                "Input Width",
-                "Extra Width",
-                "Return Width",
-                "Borrowed Width"
-           };
+            return new string[]
+            {
+                "InputWidth",
+                "ExtraWidth",
+                "ReturnWidth",
+                "BorrowedWidth"
+            };
         }
 
         public double[] OutputMetricsOnOperationEnd(IStackRecord savedParentState, IApplyData returned)
         {
-            WidthState endState = (WidthState) savedParentState;
+            WidthState endState = (WidthState)savedParentState;
             endState.AllocatedQubits = CurrentState.AllocatedQubits;
             // Updating parent state
             endState.MaxAllocated = Math.Max(CurrentState.MaxAllocated, endState.MaxAllocated);
@@ -120,246 +120,72 @@ namespace NewTracer.MetricCollectors
 
         #region boilerplate
 
-        public void X(Qubit qubit)
+        public override void Z(Qubit qubit)
         {
-            
+
         }
 
-        public void ControlledX(IQArray<Qubit> controls, Qubit qubit)
+        public override void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
-            
+            if (controls.Length == 1 || controls.Length == 2)
+            {
+
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public override void H(Qubit qubit)
+        {
         }
 
-        public void Y(Qubit qubit)
+        public override void S(Qubit qubit)
         {
-            
+
         }
 
-        public void ControlledY(IQArray<Qubit> controls, Qubit qubit)
+        public override void SAdjoint(Qubit qubit)
         {
-            
+
+        }
+        public override void T(Qubit qubit)
+        {
+
         }
 
-        public void Z(Qubit qubit)
+        public override void TAdjoint(Qubit qubit)
         {
-            
+
         }
 
-        public void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
+        public override void SWAP(Qubit qubit1, Qubit qubit2)
         {
-            
+
         }
 
-        public void SWAP(Qubit qubit1, Qubit qubit2)
+        public override void R(Pauli axis, double theta, Qubit qubit)
         {
-            
+            if (axis == Pauli.PauliZ)
+            {
+
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
-        {
-            
-        }
-
-        public void H(Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledH(IQArray<Qubit> controls, Qubit qubit)
-        {
-            
-        }
-
-        public void S(Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledS(IQArray<Qubit> controls, Qubit qubit)
-        {
-            
-        }
-
-        public void SAdjoint(Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            
-        }
-
-        public void T(Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledT(IQArray<Qubit> controls, Qubit qubit)
-        {
-            
-        }
-
-        public void TAdjoint(Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            
-        }
-
-        public void R(Pauli axis, double theta, Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
-        {
-            
-        }
-
-        public void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            
-        }
-
-        public void R1(double theta, Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
-        {
-            
-        }
-
-        public void R1Frac(long numerator, long power, Qubit qubit)
-        {
-            
-        }
-
-        public void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
-        {
-            
-        }
-
-        public void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            
-        }
-
-        public void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            
-        }
-
-        public void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            
-        }
-
-        public void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            
-        }
-
-        public Result M(Qubit qubit)
-        {
-            return null;   
-        }
-
-        public Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
+        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
         {
             return null;
         }
 
-        public void Reset(Qubit qubit)
+        public override Result M(Qubit qubit)
         {
-            
+            return null;
         }
 
-        public long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
-        {
-            return -1;
-        }
-
-        public long StartConditionalStatement(Result measurementResult, Result resultValue)
-        {
-            return -1;
-        }
-
-        public bool RunThenClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RepeatThenClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RunElseClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RepeatElseClause(long statement)
-        {
-            return false;
-        }
-
-        public void EndConditionalStatement(long statement)
-        {
-            
-        }
-
-        public void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
-        {
-            
-        }
-
-        public void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
-        {
-            
-        }
-
-        public void OnOperationStart(ICallable operation, IApplyData arguments)
-        {
-            
-        }
-
-        public void OnOperationEnd(ICallable operation, IApplyData arguments)
-        {
-            
-        }
-
-        public void OnFail(ExceptionDispatchInfo exceptionDispatchInfo)
-        {
-            
-        }
-
-        public void OnDumpMachine<T>(T location)
-        {
-            
-        }
-
-        public void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
-        {
-            
-        }
-
-        public void OnMessage(string msg)
-        {
-            
-        }
-
-#endregion
+        #endregion
     }
 }

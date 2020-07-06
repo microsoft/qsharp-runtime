@@ -51,11 +51,6 @@ namespace NewTracer.MetricCollection
             }
         }
 
-        public override void H(Qubit qubit)
-        {
-            //
-        }
-
         public override void ControlledH(IQArray<Qubit> controls, Qubit qubit)
         {
             if (controls.Length == 0)

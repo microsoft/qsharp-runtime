@@ -129,7 +129,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         }
 
         /// <summary>
-        /// Part of implementation of <see cref="IQCTraceSimulatorListener"/> interface. See the interface documentation for more details.
+        /// Part of implementation of <see cref="IQCTraceSimulatorListener"/>    interface. See the interface documentation for more details.
         /// </summary>
         public void OnBorrow(object[] qubitsTraceData, long newQubitsAllocated)
         {

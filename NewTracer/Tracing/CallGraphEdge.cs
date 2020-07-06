@@ -81,6 +81,11 @@ namespace NewTracer.CallGraph
             return this.Id;
         }
 
+        public override string ToString()
+        {
+            return this.Operation.ToString();
+        }
+
         /// <summary>
         /// Call graph root is a parentless edge with Id -1 calling <see cref="CallGraphEdge.CallGraphRoot"/>.
         /// </summary>

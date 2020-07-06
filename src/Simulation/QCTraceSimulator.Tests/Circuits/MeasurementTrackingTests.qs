@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         
         
         using (qs = Qubit[2]) {
-            ForceMeasure([PauliZ, PauliX], qs, Zero);
+            Assert([PauliZ, PauliX], qs, Zero, "");
             let res = Measure([PauliZ, PauliX], qs);
             
             if (res != Zero) {
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         
         
         using (qs = Qubit[2]) {
-            ForceMeasure([PauliZ, PauliX], qs, Zero);
+            Assert([PauliZ, PauliX], qs, Zero, "");
             let res = Measure([PauliZ, PauliX], qs);
             let res2 = Measure([PauliZ, PauliX], qs);
             H(qs[0]);
@@ -95,7 +95,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         
         
         using (qs = Qubit[2]) {
-            ForceMeasure([PauliZ, PauliX], qs, Zero);
+            Assert([PauliZ, PauliX], qs, Zero, "");
             H(qs[0]);
             let res = Measure([PauliZ, PauliX], qs);
             H(qs[0]);

@@ -3,8 +3,8 @@
 
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 using NewTracer;
+using NewTracer.MetricCollectors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,7 +34,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         public void DistinctQubitsTests()
         {
             //QCTraceSimulator sim = new QCTraceSimulator( new QCTraceSimulatorConfiguration() { UseDistinctInputsChecker = true } );
-            var sim = GetTraceSimForMetrics(out _); //TODO: configuration
+            //TODO: configuration
+            var distinctChecker = new NewTracer.MetricCollectors.DistinctInputsChecker(true);
+            var sim = NewTracerCore.CreateTracer(new[] { distinctChecker }, true, out _);
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCapturedTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCaptured2Test>(sim));
@@ -45,7 +47,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void UseReleasedQubitsTests()
         {
-            var sim = GetTraceSimForMetrics(out _);
+            var invalidatedChecker = new InvalidatedQubitUseChecker(true);
+            var sim = NewTracerCore.CreateTracer(new[] { invalidatedChecker }, true, out _);
             Assert.Throws<InvalidatedQubitsUseCheckerException>(GetTest<UseReleasedQubitTest>(sim));
         }
 
@@ -139,17 +142,17 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             stopwatch.Start();
             traceSim.Run<TCatState, long, QVoid>(powerOfTwo).Wait();
             stopwatch.Stop();
-            var results = tracerCore.ExtractCurrentResults();
 
-            double cxCount = results.GetOperationMetric<TCatState>(PrimitiveOperationsGroupsNames.CNOT);
+            //TODO: define metric constants
+            double cxCount = tracerCore.GetOperationMetric<TCatState>("CZ");
             Assert.Equal( (1 << powerOfTwo) - 1, (long) cxCount);
 
-            double depth = results.GetOperationMetric<TCatState>(DepthCounter.Metrics.Depth );
+            double depth = tracerCore.GetOperationMetric<TCatState>(DepthCounter.Metrics.Depth );
             Assert.Equal(HTime + powerOfTwo * CXTime, depth);
 
             void AssertEqualMetric( double value, string metric )
             {
-                Assert.Equal(value, results.GetOperationMetric<TCatState>(metric));
+                Assert.Equal(value, tracerCore.GetOperationMetric<TCatState>(metric));
             }
 
             AssertEqualMetric(1u << powerOfTwo, WidthCounter.Metrics.ExtraWidth);
@@ -179,21 +182,22 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         {
             SimulatorBase sim = NewTracerCore.DefaultTracer(out NewTracerCore tracerCore);
             GetTest<ThreeCNOTsTest>(sim)();
-
-            var results = tracerCore.ExtractCurrentResults();
-
             void AssertEqualMetric(double value, string metric)
             {
-                Assert.Equal(value, results.GetOperationMetric<ThreeCNOTsTest>(metric));
+                Assert.Equal(value, tracerCore.GetOperationMetric<ThreeCNOTsTest>(metric));
             }
+            //TODO: define metric constants
             AssertEqualMetric(3, DepthCounter.Metrics.Depth);
-            AssertEqualMetric(3, PrimitiveOperationsGroupsNames.CNOT);
+            AssertEqualMetric(3, "CZ");
             AssertEqualMetric(3, WidthCounter.Metrics.ExtraWidth);
             AssertEqualMetric(0, DepthCounter.Metrics.StartTimeDifference);
 
-            string csvRes = results.ToCSV();
-            output.WriteLine($"Result are:");
-            output.WriteLine(csvRes);
+            Dictionary<string, string> csvRes = tracerCore.ToCSV();
+            foreach (KeyValuePair<string, string> kv in csvRes)
+            {
+                output.WriteLine($"Result of running {kv.Key} are:");
+                output.WriteLine(kv.Value);
+            }
         }
 
         [Fact]
@@ -201,14 +205,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         {
             SimulatorBase sim = GetTraceSimForMetrics(out NewTracerCore core);
             GetTest<TwoCNOTsTest>(sim)();
-            var results = core.ExtractCurrentResults();
 
             void AssertEqualMetric(double value, string metric)
             {
-                Assert.Equal(value, results.GetOperationMetric<TwoCNOTsTest>(metric));
+                Assert.Equal(value, core.GetOperationMetric<TwoCNOTsTest>(metric));
             }
             AssertEqualMetric(2, DepthCounter.Metrics.Depth);
-            AssertEqualMetric(2, PrimitiveOperationsGroupsNames.CNOT);
+            AssertEqualMetric(2, "CZ");
             AssertEqualMetric(3, WidthCounter.Metrics.ExtraWidth);
             AssertEqualMetric(0, DepthCounter.Metrics.StartTimeDifference);
         }

@@ -1,8 +1,5 @@
 ﻿using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NewTracer.CallGraph
 {

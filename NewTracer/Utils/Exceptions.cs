@@ -4,6 +4,19 @@ using System.Text;
 
 namespace NewTracer
 {
+    public class InvalidTracerResultsQuery : System.Exception
+    {
+        public InvalidTracerResultsQuery() : base("Queried operations were not invoked by the tracer.")
+        {
+        }
+    }
+
+    public class QueryingTracerResultsDuringExecutionException : System.Exception
+    {
+        public QueryingTracerResultsDuringExecutionException() : base("Tracer is still executing.")
+        {
+        }
+    }
     /// <summary>
     /// This exception is thrown when the input to an 
     /// operation contains multiple qubits with the same ID.
@@ -13,8 +26,7 @@ namespace NewTracer
         /// <summary>
         /// Creates an instance of <see cref="DistinctInputsCheckerException"/>
         /// </summary>
-        public DistinctInputsCheckerException() :
-            base("Non distinct inputs to the operation.")
+        public DistinctInputsCheckerException() : base("Non distinct inputs to the operation.")
         {
         }
     }
@@ -29,8 +41,7 @@ namespace NewTracer
         /// <summary>
         /// Creates an instance of <see cref="InvalidatedQubitsUseCheckerException"/>
         /// </summary>
-        public InvalidatedQubitsUseCheckerException() :
-            base("Attempt to use released(deallocated) or returned qubit.")
+        public InvalidatedQubitsUseCheckerException() : base("Attempt to use released(deallocated) or returned qubit.")
         {
         }
     }
@@ -43,8 +54,7 @@ namespace NewTracer
         /// <summary>
         /// Creates an instance of <see cref="QubitTimeMetricsException"/>
         /// </summary>
-        public QubitTimeMetricsException() :
-            base("Trying to record an inconsistent time metric")
+        public QubitTimeMetricsException() : base("Trying to record an inconsistent time metric")
         {
         }
     }
@@ -59,8 +69,7 @@ namespace NewTracer
         /// <summary>
         /// Creates an instance of <see cref="UnconstrainedMeasurementException"/>
         /// </summary>
-        public UnconstrainedMeasurementException() :
-            base("Unconstrained measurement outcome")
+        public UnconstrainedMeasurementException() : base("Unconstrained measurement outcome")
         {
         }
     }

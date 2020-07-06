@@ -5,9 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using static NewTracer.MeasurementAssertTracker;
 
 namespace NewTracer
 {
@@ -18,19 +15,18 @@ namespace NewTracer
     /// Provides limited support for measurements when using the tracer as a standalone without a proper
     /// qubit simulator.
     /// </summary>
-    public class MeasurementAssertTracker : IMetricCollector, IQuantumProcessor, IQubitTraceSubscriber
+    public class MeasurementAssertTracker : QuantumProcessorBase, IMetricCollector, IQuantumProcessor, IQubitTraceSubscriber
     {
         public class UnconstrainedMeasurementCount : IStackRecord
         {
-            public double NumUnconstrainedMeasurements { get; set; }
+            public double UnconstrainedMeasurements { get; set; }
         }
 
-        protected UnconstrainedMeasurementCount CurrentState { get; set; }
+        protected UnconstrainedMeasurementCount CurrentState;
+        protected Random RandomGenerator;
+        protected bool ThrowOnUnconstrainedMeasurement;
 
-        private Random RandomGenerator;
-        private bool ThrowOnUnconstrainedMeasurement;
-
-        public MeasurementAssertTracker(bool throwOnUnconstrainedMeasurement = true)
+        public MeasurementAssertTracker(bool throwOnUnconstrainedMeasurement)
         {
             this.RandomGenerator = new Random(); //TODO: how should this be configured?
             this.ThrowOnUnconstrainedMeasurement = throwOnUnconstrainedMeasurement;
@@ -39,14 +35,14 @@ namespace NewTracer
 
         public string CollectorName()
         {
-            return "Measurement Assert Tracker";
+            return "MeasurementAssertTracker";
         }
 
         public IList<string> Metrics()
         {
             return new string[]
             {
-                "NumUnconstrainedMeasurements"
+                "UnconstrainedMeasurements"
             };
         }
 
@@ -55,7 +51,7 @@ namespace NewTracer
             UnconstrainedMeasurementCount prevState = (UnconstrainedMeasurementCount)startState;
             return new double[]
             {
-                    CurrentState.NumUnconstrainedMeasurements - prevState.NumUnconstrainedMeasurements
+                    CurrentState.UnconstrainedMeasurements - prevState.UnconstrainedMeasurements
             };
         }
 
@@ -63,7 +59,7 @@ namespace NewTracer
         {
             return new UnconstrainedMeasurementCount
             {
-                NumUnconstrainedMeasurements = CurrentState.NumUnconstrainedMeasurements
+                UnconstrainedMeasurements = CurrentState.UnconstrainedMeasurements
             };
         }
 
@@ -74,7 +70,7 @@ namespace NewTracer
             if (this.ThrowOnUnconstrainedMeasurement)
             { throw new UnconstrainedMeasurementException(); }
 
-            this.CurrentState.NumUnconstrainedMeasurements++;
+            this.CurrentState.UnconstrainedMeasurements++;
             return Result.Zero;
         }
 
@@ -100,7 +96,13 @@ namespace NewTracer
 
         public void InvalidateConstraint(Qubit qubit)
         {
-            QubitConstraint c = (qubit as TraceableQubit).ExtractData(this) as QubitConstraint;
+            TraceableQubit q = qubit as TraceableQubit;
+            if(q == null)
+            {
+                //TODO: hack for ancilla qubits - what should be done instead?
+                return;
+            }
+            QubitConstraint c = q.ExtractData(this) as QubitConstraint;
             c.OnUseQubit();
         }
 
@@ -112,12 +114,12 @@ namespace NewTracer
             }
         }
 
-        public Result M(Qubit qubit)
+        public override Result M(Qubit qubit)
         {
             return this.Measure(new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(qubit));
         }
 
-        public Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
+        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
         {
 
             if (bases.Count == 0)
@@ -193,12 +195,12 @@ namespace NewTracer
         // Primite operations that the GateCounter expects other operations to be decomposed to.
         //
 
-        public void Z(Qubit qubit)
+        public override void Z(Qubit qubit)
         {
             this.InvalidateConstraint(qubit);
         }
 
-        public void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
+        public override void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
             if (controls.Length == 1 || controls.Length == 2)
             {
@@ -210,36 +212,36 @@ namespace NewTracer
                 throw new NotImplementedException();
             }
         }
-        public void H(Qubit qubit)
+        public override void H(Qubit qubit)
+        {
+            this.InvalidateConstraint(qubit);
+        }
+
+        public override void S(Qubit qubit)
+        {
+            this.InvalidateConstraint(qubit);
+        }
+
+        public override void SAdjoint(Qubit qubit)
+        {
+            this.InvalidateConstraint(qubit);
+        }
+        public override void T(Qubit qubit)
+        {
+            this.InvalidateConstraint(qubit);
+        }
+
+        public override void TAdjoint(Qubit qubit)
+        {
+            this.InvalidateConstraint(qubit);
+        }
+
+        public override void SWAP(Qubit qubit1, Qubit qubit2)
         {
             //no-op
         }
 
-        public void S(Qubit qubit)
-        {
-            this.InvalidateConstraint(qubit);
-        }
-
-        public void SAdjoint(Qubit qubit)
-        {
-            this.InvalidateConstraint(qubit);
-        }
-        public void T(Qubit qubit)
-        {
-            this.InvalidateConstraint(qubit);
-        }
-
-        public void TAdjoint(Qubit qubit)
-        {
-            this.InvalidateConstraint(qubit);
-        }
-
-        public void SWAP(Qubit qubit1, Qubit qubit2)
-        {
-            //no-op
-        }
-
-        public void R(Pauli axis, double theta, Qubit qubit)
+        public override void R(Pauli axis, double theta, Qubit qubit)
         {
             if (axis == Pauli.PauliZ)
             {
@@ -250,232 +252,7 @@ namespace NewTracer
                 throw new NotImplementedException();
             }
         }
-
-        #region boilerplate
-
-        //
-        // All other operations must be decomposed to primitives first.
-        // Otherwise a NotImplemntedException will be thrown.
-        //
-
-        public void X(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledX(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Y(Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledY(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledH(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledS(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledSAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledT(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledTAdjoint(IQArray<Qubit> controls, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void R1(double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void R1Frac(long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExpFrac(IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ControlledExpFrac(IQArray<Qubit> controls, IQArray<Pauli> paulis, long numerator, long power, IQArray<Qubit> qubits)
-        {
-            throw new NotImplementedException();
-        }
-
-        //
-        // As this is a listener, all non-gate IQuantumProcessor calls are no-ops
-        //
-
-        public void Reset(Qubit qubit)
-        {
-
-        }
-
-        public void OnOperationStart(ICallable operation, IApplyData arguments)
-        {
-
-        }
-
-        public void OnOperationEnd(ICallable operation, IApplyData arguments)
-        {
-
-        }
-
-        public void OnFail(ExceptionDispatchInfo exceptionDispatchInfo)
-        {
-
-        }
-
-        public void OnAllocateQubits(IQArray<Qubit> qubits)
-        {
-
-        }
-
-        public void OnReleaseQubits(IQArray<Qubit> qubits)
-        {
-
-        }
-
-        public void OnDumpMachine<T>(T location)
-        {
-
-        }
-
-        public void OnDumpRegister<T>(T location, IQArray<Qubit> qubits)
-        {
-
-        }
-
-        public void OnMessage(string msg)
-        {
-
-        }
-
-        public void EndConditionalStatement(long statement)
-        {
-
-        }
-
-        public void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
-        {
-
-        }
-
-        public void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
-        {
-
-        }
-
-        #endregion
-
-        public long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
-        {
-            //copied from QuantumProcessorBase. how should this be handled instead?
-            if (measurementResults == null) { return 1; };
-            if (resultsValues == null) { return 1; };
-            Debug.Assert(measurementResults.Count == resultsValues.Count);
-            if (measurementResults.Count != resultsValues.Count) { return 1; };
-
-            int equal = 1;
-
-            for (int i = 0; i < measurementResults.Count; i++)
-            {
-                if (measurementResults[i] != resultsValues[i])
-                {
-                    equal = 0;
-                }
-            }
-
-            return equal;
-        }
-
-        public long StartConditionalStatement(Result measurementResult, Result resultValue)
-        {
-            return measurementResult == resultValue ? 1 : 0;
-        }
-
-        public bool RunThenClause(long statement)
-        {
-            return (statement != 0);
-        }
-
-        public bool RepeatThenClause(long statement)
-        {
-            return false;
-        }
-
-        public bool RunElseClause(long statement)
-        {
-            return (statement == 0);
-        }
-
-        public bool RepeatElseClause(long statement)
-        {
-            return false;
-        }
     }
-
 
     /// <summary>
     /// Holds data describing measurement constraint associated to a 
