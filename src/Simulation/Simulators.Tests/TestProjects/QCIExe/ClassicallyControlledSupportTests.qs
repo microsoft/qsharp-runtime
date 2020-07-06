@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
     operation SubOpCA2() : Unit is Ctl + Adj { }
     operation SubOpCA3() : Unit is Ctl + Adj { }
     
-    operation BasicLift () : Unit {
+    operation BasicLift() : Unit {
         let r = Zero;
         if (r == Zero) {
             SubOp1();
@@ -101,7 +101,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
         }
     }
 
-    operation PartialApplication (q : Int, w : Double) : Unit { }
+    operation PartialApplication(q : Int, w : Double) : Unit { }
 
     operation LiftPartialApplication() : Unit {
         let r = Zero;

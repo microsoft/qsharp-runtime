@@ -8,307 +8,307 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation BasicLiftTest () : Unit {
+    operation BasicLiftTest() : Unit {
         BasicLift();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftLoopsTest () : Unit {
+    operation LiftLoopsTest() : Unit {
         LiftLoops();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftSingleNonCallTest () : Unit {
+    operation LiftSingleNonCallTest() : Unit {
         LiftSingleNonCall();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation DontLiftReturnStatementsTest () : Unit {
+    operation DontLiftReturnStatementsTest() : Unit {
         DontLiftReturnStatements();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation DontLiftFunctionsTest () : Unit {
+    operation DontLiftFunctionsTest() : Unit {
         DontLiftFunctions();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftSelfContainedMutableTest () : Unit {
+    operation LiftSelfContainedMutableTest() : Unit {
         LiftSelfContainedMutable();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation DontLiftGeneralMutableTest () : Unit {
+    operation DontLiftGeneralMutableTest() : Unit {
         DontLiftGeneralMutable();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ArgumentsPartiallyResolveTypeParametersTest () : Unit {
+    operation ArgumentsPartiallyResolveTypeParametersTest() : Unit {
         ArgumentsPartiallyResolveTypeParameters();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftFunctorApplicationTest () : Unit {
+    operation LiftFunctorApplicationTest() : Unit {
         LiftFunctorApplication();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftPartialApplicationTest () : Unit {
+    operation LiftPartialApplicationTest() : Unit {
         LiftPartialApplication();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftArrayItemCallTest () : Unit {
+    operation LiftArrayItemCallTest() : Unit {
         LiftArrayItemCall();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiftOneNotBothTest () : Unit {
+    operation LiftOneNotBothTest() : Unit {
         LiftOneNotBoth();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation IfInvalidTest () : Unit {
+    operation IfInvalidTest() : Unit {
         IfInvalid();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ElseInvalidTest () : Unit {
+    operation ElseInvalidTest() : Unit {
         ElseInvalid();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation BothInvalidTest () : Unit {
+    operation BothInvalidTest() : Unit {
         BothInvalid();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyIfZeroTest () : Unit {
+    operation ApplyIfZeroTest() : Unit {
         ApplyIfZero_Test();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyIfOneTest () : Unit {
+    operation ApplyIfOneTest() : Unit {
         ApplyIfOne_Test();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyIfZeroElseOneTest () : Unit {
+    operation ApplyIfZeroElseOneTest() : Unit {
         ApplyIfZeroElseOne();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyIfOneElseZeroTest () : Unit {
+    operation ApplyIfOneElseZeroTest() : Unit {
         ApplyIfOneElseZero();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation IfElifTest () : Unit {
+    operation IfElifTest() : Unit {
         IfElif();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation AndConditionTest () : Unit {
+    operation AndConditionTest() : Unit {
         AndCondition();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation OrConditionTest () : Unit {
+    operation OrConditionTest() : Unit {
         OrCondition();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyConditionallyTest () : Unit {
+    operation ApplyConditionallyTest() : Unit {
         ApplyConditionally();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ApplyConditionallyWithNoOpTest () : Unit {
+    operation ApplyConditionallyWithNoOpTest() : Unit {
         ApplyConditionallyWithNoOp();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation InequalityWithApplyConditionallyTest () : Unit {
+    operation InequalityWithApplyConditionallyTest() : Unit {
         InequalityWithApplyConditionally();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation InequalityWithApplyIfOneElseZeroTest () : Unit {
+    operation InequalityWithApplyIfOneElseZeroTest() : Unit {
         InequalityWithApplyIfOneElseZero();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation InequalityWithApplyIfZeroElseOneTest () : Unit {
+    operation InequalityWithApplyIfZeroElseOneTest() : Unit {
         InequalityWithApplyIfZeroElseOne();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation InequalityWithApplyIfOneTest () : Unit {
+    operation InequalityWithApplyIfOneTest() : Unit {
         InequalityWithApplyIfOne();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation InequalityWithApplyIfZeroTest () : Unit {
+    operation InequalityWithApplyIfZeroTest() : Unit {
         InequalityWithApplyIfZero();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation LiteralOnTheLeftTest () : Unit {
+    operation LiteralOnTheLeftTest() : Unit {
         LiteralOnTheLeft();
     }
 
     //@Test("QuantumSimulator")
     //@Test("ResourcesEstimator")
-    //operation GenericsSupportTest () : Unit {
+    //operation GenericsSupportTest() : Unit {
     //    GenericsSupport<Int, Int, Int>();
     //}
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation WithinBlockSupportTest () : Unit {
+    operation WithinBlockSupportTest() : Unit {
         WithinBlockSupport();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation AdjointSupportProvidedTest () : Unit {
+    operation AdjointSupportProvidedTest() : Unit {
         AdjointSupportProvided();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation AdjointSupportSelfTest () : Unit {
+    operation AdjointSupportSelfTest() : Unit {
         AdjointSupportSelf();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation AdjointSupportInvertTest () : Unit {
+    operation AdjointSupportInvertTest() : Unit {
         AdjointSupportInvert();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledSupportProvidedTest () : Unit {
+    operation ControlledSupportProvidedTest() : Unit {
         ControlledSupportProvided();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledSupportDistributeTest () : Unit {
+    operation ControlledSupportDistributeTest() : Unit {
         ControlledSupportDistribute();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportProvided_ProvidedBodyTest () : Unit {
+    operation ControlledAdjointSupportProvided_ProvidedBodyTest() : Unit {
         ControlledAdjointSupportProvided_ProvidedBody();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportProvided_ProvidedAdjointTest () : Unit {
+    operation ControlledAdjointSupportProvided_ProvidedAdjointTest() : Unit {
         ControlledAdjointSupportProvided_ProvidedAdjoint();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportProvided_ProvidedControlledTest () : Unit {
+    operation ControlledAdjointSupportProvided_ProvidedControlledTest() : Unit {
         ControlledAdjointSupportProvided_ProvidedControlled();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportProvided_ProvidedAllTest () : Unit {
+    operation ControlledAdjointSupportProvided_ProvidedAllTest() : Unit {
         ControlledAdjointSupportProvided_ProvidedAll();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportDistribute_DistributeBodyTest () : Unit {
+    operation ControlledAdjointSupportDistribute_DistributeBodyTest() : Unit {
         ControlledAdjointSupportDistribute_DistributeBody();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportDistribute_DistributeAdjointTest () : Unit {
+    operation ControlledAdjointSupportDistribute_DistributeAdjointTest() : Unit {
         ControlledAdjointSupportDistribute_DistributeAdjoint();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportDistribute_DistributeControlledTest () : Unit {
+    operation ControlledAdjointSupportDistribute_DistributeControlledTest() : Unit {
         ControlledAdjointSupportDistribute_DistributeControlled();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportDistribute_DistributeAllTest () : Unit {
+    operation ControlledAdjointSupportDistribute_DistributeAllTest() : Unit {
         ControlledAdjointSupportDistribute_DistributeAll();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportInvert_InvertBodyTest () : Unit {
+    operation ControlledAdjointSupportInvert_InvertBodyTest() : Unit {
         ControlledAdjointSupportInvert_InvertBody();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportInvert_InvertAdjointTest () : Unit {
+    operation ControlledAdjointSupportInvert_InvertAdjointTest() : Unit {
         ControlledAdjointSupportInvert_InvertAdjoint();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportInvert_InvertControlledTest () : Unit {
+    operation ControlledAdjointSupportInvert_InvertControlledTest() : Unit {
         ControlledAdjointSupportInvert_InvertControlled();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportInvert_InvertAllTest () : Unit {
+    operation ControlledAdjointSupportInvert_InvertAllTest() : Unit {
         ControlledAdjointSupportInvert_InvertAll();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportSelf_SelfBodyTest () : Unit {
+    operation ControlledAdjointSupportSelf_SelfBodyTest() : Unit {
         ControlledAdjointSupportSelf_SelfBody();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation ControlledAdjointSupportSelf_SelfControlledTest () : Unit {
+    operation ControlledAdjointSupportSelf_SelfControlledTest() : Unit {
         ControlledAdjointSupportSelf_SelfControlled();
     }
 
