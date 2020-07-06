@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Output
     /// An integer $i$ with probability $\Pr(i) = p_i / \sum_i p_i$, where $p_i$
     /// is the $i$th element of `probs`.
-    operation Random(probs : Double[]) : Int {
+    operation Random (probs : Double[]) : Int {
         body intrinsic;
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.Quantum.Simulation.Core;
@@ -72,6 +73,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         public static Type? IControllableType(Type t)
         {
             return InterfaceType(t, typeof(IControllable<>));
+        }
+        
+        internal static IEnumerable<TResult> SelectAggregates<TSource, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TResult, TSource, TResult> aggregate,
+            TResult initial = default
+        )
+        {
+            var acc = initial;
+            foreach (var element in source)
+            {
+                acc = aggregate(acc, element);
+                yield return acc;
+            }
         }
     }
 }
