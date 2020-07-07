@@ -312,6 +312,7 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSu
         }
     }
 
+    // ToDo: Uncomment once #17245 is fixed.
     //operation GenericsSupport<'A, 'B, 'C>() : Unit {
     //    let r = Zero;
     //

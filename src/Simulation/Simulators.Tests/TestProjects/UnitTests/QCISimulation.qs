@@ -205,6 +205,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
         LiteralOnTheLeft();
     }
 
+    // ToDo: Uncomment once #17245 is fixed.
     //@Test("QuantumSimulator")
     //@Test("ResourcesEstimator")
     //operation GenericsSupportTest() : Unit {
