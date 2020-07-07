@@ -21,6 +21,12 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
+    operation BranchOnMeasurementTest() : Unit {
+        BranchOnMeasurement();
+    }
+
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
     operation BasicLiftTest() : Unit {
         BasicLift();
     }

@@ -4,6 +4,8 @@
 
 namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportTests {
 
+    open Microsoft.Quantum.Intrinsic;
+
     operation SubOp1() : Unit { }
     operation SubOp2() : Unit { }
     operation SubOp3() : Unit { }
@@ -11,6 +13,17 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
     operation SubOpCA1() : Unit is Ctl + Adj { }
     operation SubOpCA2() : Unit is Ctl + Adj { }
     operation SubOpCA3() : Unit is Ctl + Adj { }
+    
+    operation BranchOnMeasurement() : Unit {
+        using (q = Qubit()) {
+            H(q);
+            let r = M(q);
+            if (r == Zero) {
+                SubOp1();
+            }
+            Reset(q);
+        }
+    }
     
     operation BasicLift() : Unit {
         let r = Zero;
