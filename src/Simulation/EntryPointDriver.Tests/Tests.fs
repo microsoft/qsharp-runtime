@@ -4,6 +4,7 @@
 module Microsoft.Quantum.EntryPointDriver.Tests
 
 open System
+open System.Collections.Generic
 open System.Collections.Immutable
 open System.Globalization
 open System.IO
@@ -59,14 +60,9 @@ let private compileQsharp source =
     Assert.Empty errors
     compilation.BuiltCompilation
 
-/// Generates C# source code from the compiled Q# syntax tree. The given default simulator is set as an assembly
-/// constant.
-let private generateCsharp defaultSimulator (compilation : QsCompilation) =
-    let assemblyConstants =
-        match defaultSimulator with
-        | Some simulator -> ImmutableDictionary.Empty.Add (AssemblyConstants.DefaultSimulator, simulator)
-        | None -> ImmutableDictionary.Empty
-    let context = CodegenContext.Create (compilation, assemblyConstants)
+/// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
+let private generateCsharp constants (compilation : QsCompilation) =
+    let context = CodegenContext.Create (compilation, constants)
     let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
         SimulationCode.generate (NonNullable<_>.New testFile) context
@@ -112,12 +108,12 @@ let private compileCsharp (sources : string seq) =
     Assert.Equal (0L, stream.Seek (0L, SeekOrigin.Begin))
     Assembly.Load (stream.ToArray ())
 
-/// The assembly for the given test case and default simulator.
-let private testAssembly testNum defaultSimulator =
+/// The assembly for the given test case assembly constants.
+let private testAssembly testNum constants =
     testNum
     |> testCase
     |> compileQsharp
-    |> generateCsharp defaultSimulator
+    |> generateCsharp constants
     |> compileCsharp
 
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
@@ -164,17 +160,26 @@ let private failsWith expected (assembly, args) =
     Assert.True (0 <> exitCode, sprintf "Expected non-zero exit code, but got 0 with:\n\n%s\n\n%s" error out)
     Assert.StartsWith (normalize expected, normalize (error + out))
 
-/// A tuple of the test assembly and arguments using the standard default simulator. The tuple can be passed to yields
-/// or fails.
-let private test testNum =
-    let assembly = testAssembly testNum None
+/// A tuple of the test assembly and arguments using the given assembly constants. The tuple can be passed to yields or
+/// fails.
+let private testWithConstants constants testNum =
+    let assembly = testAssembly testNum constants
     fun args -> assembly, Array.ofList args
+
+/// A tuple of the test assembly and arguments with no assembly constants. The tuple can be passed to yields or fails.
+let private test = testWithConstants ImmutableDictionary.Empty
 
 /// A tuple of the test assembly and arguments using the given default simulator. The tuple can be passed to yields or
 /// fails.
-let private testWith testNum defaultSimulator =
-    let assembly = testAssembly testNum (Some defaultSimulator)
-    fun args -> assembly, Array.ofList args
+let private testWithSim defaultSimulator =
+    ImmutableDictionary.CreateRange [KeyValuePair (AssemblyConstants.DefaultSimulator, defaultSimulator)]
+    |> testWithConstants
+
+/// A tuple of the test assembly and arguments using the given default target. The tuple can be passed to yields or
+/// fails.
+let private testWithTarget defaultTarget =
+    ImmutableDictionary.CreateRange [KeyValuePair (AssemblyConstants.ExecutionTarget, defaultTarget)]
+    |> testWithConstants
 
 /// Standard command-line arguments for the "submit" command without specifying a target.
 let private submitWithoutTarget = 
@@ -508,7 +513,7 @@ let ``Rejects unknown simulator`` () =
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWith 32 AssemblyConstants.ResourcesEstimator
+    let given = testWithSim AssemblyConstants.ResourcesEstimator 32
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -516,7 +521,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWith 32 typeof<ToffoliSimulator>.FullName
+    let given = testWithSim typeof<ToffoliSimulator>.FullName 32
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -544,10 +549,35 @@ let ``Submit can show only the ID`` () =
 let ``Submit uses default values`` () =
     let given = test 1
     given (submitWithNothingTarget @ ["--verbose"])
+<<<<<<< HEAD
     |> yields "Target: test.nothing
+=======
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI:
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit uses default values with default target`` () =
+    let given = testWithTarget "test.nothing" 1
+    given (submitWithoutTarget @ ["--verbose"])
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+>>>>>>> master
+               Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
                Storage:
                AAD Token:
                Base URI:
@@ -579,6 +609,39 @@ let ``Submit allows overriding default values`` () =
                Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
+               Target: test.nothing
+               Storage: myStorage
+               AAD Token: myToken
+               Base URI: myBaseUri
+               Job Name: myJobName
+               Shots: 750
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit allows overriding default values with default target`` () =
+    let given = testWithTarget "foo.target" 1
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--storage"
+        "myStorage"
+        "--aad-token"
+        "myToken"
+        "--base-uri"
+        "myBaseUri"
+        "--job-name"
+        "myJobName"
+        "--shots"
+        "750"
+    ])
+    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
+               Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
@@ -679,10 +742,10 @@ let ``Shows help text for submit command`` () =
                       %s submit [options]
 
                     Options:
-                      --target <target> (REQUIRED)                        The target device ID.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
+                      --target <target> (REQUIRED)                        The target device ID.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
@@ -695,6 +758,33 @@ let ``Shows help text for submit command`` () =
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
-
     let given = test 33
+    given ["submit"; "--help"] |> yields message
+
+[<Fact>]
+let ``Shows help text for submit command with default target`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s submit [options]
+
+                    Options:
+                      --subscription <subscription> (REQUIRED)            The subscription ID.
+                      --resource-group <resource-group> (REQUIRED)        The resource group name.
+                      --workspace <workspace> (REQUIRED)                  The workspace name.
+                      --target <target>                                   The target device ID.
+                      --storage <storage>                                 The storage account connection string.
+                      --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
+                      --job-name <job-name>                               The name of the submitted job.
+                      --shots <shots>                                     The number of times the program is executed on the target machine.
+                      --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
+                      --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
+                      --verbose                                           Show additional information about the submission.
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      -?, -h, --help                                      Show help and usage information"
+    let given = testWithTarget "foo.target" 33
     given ["submit"; "--help"] |> yields message
