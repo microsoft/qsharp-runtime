@@ -517,7 +517,7 @@ namespace Microsoft.Quantum.Simulation.Common
         void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg);
 
         /// <summary>
-        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assertprob">Microsoft.Quantum.Intrinsic.Assert</a> is called in Q#.
+        /// Called when <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.assertprob">Microsoft.Quantum.Intrinsic.AssertProb</a> is called in Q#.
         /// </summary>
         /// <remarks>
         /// The names and the order of the parameters is similar to the corresponding Q# operation./

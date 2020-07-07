@@ -7,6 +7,7 @@ open System
 open System.Collections.Immutable
 open System.IO
 open System.Globalization
+open System.Web
 
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp
@@ -218,9 +219,13 @@ namespace N1
 
 
     let testOneFile fileName (expected:string) =
-        let expected = expected.Replace("%%%", (Uri(Path.GetFullPath fileName)).AbsolutePath)
-        let expected = expected.Replace("%%", (Path.GetFullPath fileName).Replace("\\", "\\\\"))
-        let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
+        let fullPath = Path.GetFullPath fileName
+        let escapeCSharpString (s : string) = SymbolDisplay.FormatLiteral (s, false)
+        let expected =
+            expected
+            |> (fun s -> s.Replace("%%%", fullPath |> HttpUtility.JavaScriptStringEncode |> escapeCSharpString))
+            |> (fun s -> s.Replace("%%", fullPath |> escapeCSharpString))
+        let tree = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
         let actual =
             CodegenContext.Create (tree, ImmutableDictionary.Empty)
             |> generate (Path.GetFullPath fileName |> NonNullable<string>.New)
@@ -2307,7 +2312,7 @@ namespace N1
         false |> testOne randomOperation
 
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
-        let expected = expected.Replace("%%%", op.SourceFile.Value)
+        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
         let assemblyConstants =
             new System.Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ExecutionTarget, executionTarget)
             |> Seq.singleton
@@ -3397,7 +3402,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.Inline
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 7, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 7, -1)]
     public partial class HelloWorld : Operation<Int64, Int64>, ICallable
     {
         public HelloWorld(IOperationFactory m) : base(m)
@@ -3454,7 +3459,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.LineNumbers
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 9, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 9, -1)]
     public partial class TestLineInBlocks : Operation<Int64, Result>, ICallable
     {
         public TestLineInBlocks(IOperationFactory m) : base(m)
@@ -3628,7 +3633,7 @@ namespace Microsoft.Quantum.Diagnostics
 #line hidden
 namespace Microsoft.Quantum.Tests.UnitTests
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 22, 26)]
+    [SourceLocation("%%", OperationFunctor.Body, 22, 26)]
     public partial class UnitTest1 : Operation<QVoid, QVoid>, ICallable
     {
         public UnitTest1(IOperationFactory m) : base(m)
@@ -3651,7 +3656,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "QuantumSimulator")]
             [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
-#line 22 "%%%"
+#line 22 "%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.QuantumSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
@@ -3683,7 +3688,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "ToffoliSimulator")]
             [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
-#line 22 "%%%"
+#line 22 "%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
@@ -3721,7 +3726,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
         }
     }
 
-    [SourceLocation("%%%", OperationFunctor.Body, 26, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 26, -1)]
     public partial class UnitTest2 : Operation<QVoid, QVoid>, ICallable
     {
         public UnitTest2(IOperationFactory m) : base(m)
@@ -3744,7 +3749,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "CustomSimulator")]
             [Xunit.Trait("Name", "UnitTest2")]
             public void UnitTest2()
-#line 26 "%%%"
+#line 26 "%%"
             {
                 var sim = new SomeNamespace.CustomSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
