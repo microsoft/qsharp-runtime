@@ -114,6 +114,12 @@ namespace Microsoft.Azure.Quantum
             }
         }
 
+        public string ResourceGroupName { get => resourceGroupName; }
+
+        public string SubscriptionId { get => subscriptionId; }
+
+        public string WorkspaceName { get => workspaceName; }
+
         /// <summary>
         /// Gets or sets the jobs client.
         /// Internal only.

@@ -471,8 +471,7 @@ let ``Shadows --shots`` () =
     given ["--shots"; "7"] |> yields "7"
     given (submitWithNothingTarget @ ["--shots"; "7"])
     |> yields "Warning: Option --shots is overridden by an entry point parameter name. Using default value 500.
-               The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 
 // Simulators
@@ -539,8 +538,7 @@ let ``Supports default custom simulator`` () =
 let ``Submit can submit a job`` () =
     let given = test 1
     given submitWithNothingTarget
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               00000000-0000-0000-0000-0000000000000"
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
@@ -551,8 +549,7 @@ let ``Submit can show only the ID`` () =
 let ``Submit uses default values`` () =
     let given = test 1
     given (submitWithNothingTarget @ ["--verbose"])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -565,14 +562,13 @@ let ``Submit uses default values`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values with default target`` () =
     let given = testWithTarget "test.nothing" 1
     given (submitWithoutTarget @ ["--verbose"])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -585,7 +581,7 @@ let ``Submit uses default values with default target`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values`` () =
@@ -603,8 +599,7 @@ let ``Submit allows overriding default values`` () =
         "--shots"
         "750"
     ])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -617,7 +612,7 @@ let ``Submit allows overriding default values`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values with default target`` () =
@@ -635,8 +630,7 @@ let ``Submit allows overriding default values with default target`` () =
         "--shots"
         "750"
     ])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -649,14 +643,13 @@ let ``Submit allows overriding default values with default target`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test 1
     given (submitWithNothingTarget @ ["--shots"; "1"])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               00000000-0000-0000-0000-0000000000000"
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
     given (submitWithNothingTarget @ ["--shots"; "0"]) |> fails
     given (submitWithNothingTarget @ ["--shots"; "-1"]) |> fails
 
@@ -691,8 +684,7 @@ let ``Submit has required options`` () =
     for args in powerSet allArgs do
         given (commandName :: List.concat args)
         |> if List.length args = List.length allArgs
-           then yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-                        00000000-0000-0000-0000-0000000000000"
+           then yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
            else fails
 
 [<Fact>]
