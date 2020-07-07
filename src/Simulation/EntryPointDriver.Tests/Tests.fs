@@ -549,11 +549,7 @@ let ``Submit can show only the ID`` () =
 let ``Submit uses default values`` () =
     let given = test 1
     given (submitWithNothingTarget @ ["--verbose"])
-<<<<<<< HEAD
-    |> yields "Target: test.nothing
-=======
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -566,15 +562,13 @@ let ``Submit uses default values`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values with default target`` () =
     let given = testWithTarget "test.nothing" 1
     given (submitWithoutTarget @ ["--verbose"])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
->>>>>>> master
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -605,8 +599,7 @@ let ``Submit allows overriding default values`` () =
         "--shots"
         "750"
     ])
-    |> yields "Target: test.nothing
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
@@ -619,7 +612,7 @@ let ``Submit allows overriding default values`` () =
                Dry Run: False
                Verbose: True
 
-               00000000-0000-0000-0000-0000000000000"
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values with default target`` () =
@@ -637,8 +630,7 @@ let ``Submit allows overriding default values with default target`` () =
         "--shots"
         "750"
     ])
-    |> yields "The friendly URI for viewing job results is not available yet. Showing the job ID instead.
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
