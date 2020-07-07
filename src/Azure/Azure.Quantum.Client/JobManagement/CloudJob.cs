@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets an URI to access the job.
         /// </summary>
-        public Uri Uri => throw new NotImplementedException();
+        public Uri Uri => GenerateUri();
 
         /// <summary>
         /// Gets the workspace.
@@ -90,6 +90,17 @@ namespace Microsoft.Azure.Quantum
         {
             CloudJob job = (CloudJob)await this.Workspace.CancelJobAsync(this.Details.Id, cancellationToken);
             this.Details = job.Details;
+        }
+
+        private Uri GenerateUri()
+        {
+            if (!(this.Workspace is Workspace cloudWorkspace))
+            {
+                throw new NotSupportedException($"{typeof(CloudJob)}'s Workspace is not of type {typeof(Workspace)} and does not have enough data to generate URI");
+            }
+
+            var uriStr = $"https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource/subscriptions/{cloudWorkspace.SubscriptionId}/resourceGroups/{cloudWorkspace.ResourceGroupName}/providers/Microsoft.Quantum/Workspaces/{cloudWorkspace.WorkspaceName}/job_management?microsoft_azure_quantum_jobid={Id}";
+            return new Uri(uriStr);
         }
     }
 }
