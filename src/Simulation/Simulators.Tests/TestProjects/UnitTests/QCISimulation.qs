@@ -5,6 +5,19 @@
 namespace Microsoft.Quantum.Simulation.Testing.QCI {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportTests;
+    open Microsoft.Quantum.Simulation.Testing.QCI.MeasurementSupportTests;
+    
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    operation MeasureInMiddleTest() : Unit {
+        MeasureInMiddle();
+    }
+    
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    operation QubitAfterMeasurementTest() : Unit {
+        QubitAfterMeasurement();
+    }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
