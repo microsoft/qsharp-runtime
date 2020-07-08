@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
@@ -75,6 +75,13 @@ namespace Microsoft.Quantum.Simulation.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ControlledOperation<I, O> Controlled => _controlled.Value;
 
+        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) =>
+            new RuntimeMetadata()
+            {
+                Label = ((ICallable)this).Name,
+                Args = args.Value.GetType().ArgsToString(args.Value),
+                Targets = args.GetQubits(),
+            };
 
         public O Apply(I a)
         {

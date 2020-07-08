@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 
 namespace Microsoft.Quantum.Simulation.Core
@@ -109,6 +110,23 @@ namespace Microsoft.Quantum.Simulation.Core
         public override IApplyData __dataIn((IQArray<Qubit>, I) data) => new In((data.Item1, this.BaseOp.__dataIn(data.Item2)));
 
         public override IApplyData __dataOut(QVoid data) => data;
+
+        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        {
+            if (args.Value is ValueTuple<IQArray<Qubit>, I> ctrlArgs)
+            {
+                var (controls, baseArgs) = ctrlArgs;
+                var baseMetadata = this.BaseOp.GetRuntimeMetadata(this.BaseOp.__dataIn(baseArgs));
+                baseMetadata.IsControlled = true;
+                baseMetadata.Controls = controls.Concat(baseMetadata.Controls);
+                return baseMetadata;
+            }
+            else
+            {
+                Console.WriteLine($"Failed to retrieve control bits for {this.ToString()}.");
+                return null;
+            }
+        }
 
 
         public override string ToString() => $"(Controlled {BaseOp?.ToString() ?? "<null>" })";

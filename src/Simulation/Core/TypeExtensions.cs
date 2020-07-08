@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -144,6 +146,38 @@ namespace Microsoft.Quantum.Simulation.Core
             }
         }
 
+        /// <summary>
+        /// Given a <see cref="Type"/> and its arguments, format its non-qubit arguments into a string.
+        /// Returns null if no arguments found.
+        /// </summary>
+        public static string? ArgsToString(this Type t, object args)
+        {
+            var argsStrings = t.GetFields()
+                .Select(f =>
+                {
+                    var argString = null as string;
+
+                    // If field is a tuple, recursively extract its inner arguments and format as a tuple string.
+                    if (f.FieldType.IsTuple())
+                    {
+                        var nestedArgs = f.GetValue(args);
+                        if (nestedArgs != null) argString = f.FieldType.ArgsToString(nestedArgs);
+                    }
+                    // Add field as an argument if it is not a Qubit type
+                    else if (!f.FieldType.IsQubitsContainer())
+                    {
+                        argString = f.GetValue(args)?.ToString();
+                    }
+
+                    return argString;
+                })
+                .WhereNotNull();
+
+            return argsStrings.Any()
+                ? $"({string.Join(",", argsStrings)})"
+                : null;
+        }
+
         private static ConcurrentDictionary<Type, Type> _normalTypesCache = new ConcurrentDictionary<Type, Type>();
 
         /// <summary>
@@ -259,7 +293,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 return OperationVariants(generic.OperationType, op);
             }
 
-             return OperationVariants(t.BaseType, op);
+            return OperationVariants(t.BaseType, op);
         }
 
         public static bool TryQSharpOperationType(Type t, out string typeName)

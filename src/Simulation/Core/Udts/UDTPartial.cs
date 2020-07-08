@@ -62,6 +62,8 @@ namespace Microsoft.Quantum.Simulation.Core
             return (ICallable)Activator.CreateInstance(partialType, new object[] { this, partialTuple });
         }
 
+        public RuntimeMetadata GetRuntimeMetadata(IApplyData args) => throw new NotImplementedException();
+
         internal class DebuggerProxy
         {
             private readonly UDTPartial<P, B, U> u;

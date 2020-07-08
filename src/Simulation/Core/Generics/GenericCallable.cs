@@ -24,6 +24,8 @@ namespace Microsoft.Quantum.Simulation.Core
         O Apply<O>(object args);
 
         ICallable Partial(object partialTuple);
+
+        RuntimeMetadata GetRuntimeMetadata(IApplyData args);
     }
 
     /// <summary>

@@ -29,6 +29,11 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         public abstract void Init();
 
+        /// <summary>
+        /// Retrieves the runtime metadata of the Operation.
+        /// </summary>
+        public virtual RuntimeMetadata GetRuntimeMetadata(IApplyData args) => null;
+
         object IApplyData.Value => null;
 
         IEnumerable<Qubit> IApplyData.Qubits => null;

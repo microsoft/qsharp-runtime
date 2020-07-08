@@ -72,6 +72,13 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public override IApplyData __dataOut(QVoid data) => data;
 
+        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        {
+            var baseMetadata = this.BaseOp.GetRuntimeMetadata(args);
+            baseMetadata.IsAdjoint = true;
+            return baseMetadata;
+        }
+
         public override string ToString() => $"(Adjoint {BaseOp?.ToString() ?? "<null>" })";
         public override string __qsharpType() => this.BaseOp?.__qsharpType();
 

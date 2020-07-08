@@ -141,6 +141,9 @@ namespace Microsoft.Quantum.Simulation.Core
 
         IUnitary<P1> IUnitary<P>.Partial<P1>(Func<P1, P> mapper) => new OperationPartial<P1, P, O>(this, mapper);
 
+        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) =>
+            this.BaseOp.GetRuntimeMetadata(args);
+
         public override string ToString() => $"{this.BaseOp}{{_}}";
         public override string __qsharpType()
         {
