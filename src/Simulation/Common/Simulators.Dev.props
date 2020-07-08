@@ -14,14 +14,6 @@
     <QSimDll Condition="Exists('$(QsimDllWindowsRelease)')">$(QsimDllWindowsRelease)</QSimDll>
     <QSimDll Condition="'$(QsimDll)' == ''">$(QsimDllWindowsDebug)</QSimDll>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Include="$(QSimDll)">
-      <Link>Microsoft.Quantum.Simulator.Runtime.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
