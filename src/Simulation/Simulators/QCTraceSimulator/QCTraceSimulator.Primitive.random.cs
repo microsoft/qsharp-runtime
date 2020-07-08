@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using System;
 
@@ -18,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
             public override Func<IQArray<double>, Int64> Body => (p) =>
             {
-                return SimulatorsUtils.SampleDistribution(p, core.random.NextDouble());
+                return CommonUtils.SampleDistribution(p, core.random.NextDouble());
             };
         }
     }
