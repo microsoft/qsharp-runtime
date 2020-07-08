@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumProcessorDispatcher
+    public partial class QuantumProcessorDispatcher<TProcessor>
     {
         public static long SampleDistribution(IQArray<double> unnormalizedDistribution, double uniformZeroOneSample)
         {

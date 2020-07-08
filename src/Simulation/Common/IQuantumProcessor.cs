@@ -639,4 +639,26 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <param name="msg">The message to be reported.</param>
         void OnMessage(string msg);
     }
+
+    /// <summary>
+    ///      Represents a quantum processor that can return diagnostics to its host program.
+    /// </summary>
+    public interface IDiagnosticDataSource
+    {
+        /// <summary>
+        ///     An event fired whenever a simulator has additional diagnostic data
+        ///     available for display (e.g. state information, assertion details,
+        ///     execution traces).
+        /// </summary>
+        public event Action<object>? OnDisplayableDiagnostic;
+
+        /// <summary>
+        ///     Sends diagnostic data to any listening display handlers.
+        ///     Display handlers may discard any unrecognized data, such that
+        ///     no guarantee is made as to any particular action taken as a result
+        ///     of calling this method.
+        /// </summary>
+        public void MaybeDisplayDiagnostic(object data);
+    }
+
 }

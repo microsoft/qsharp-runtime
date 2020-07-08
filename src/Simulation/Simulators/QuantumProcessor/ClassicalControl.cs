@@ -6,7 +6,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
-    public partial class QuantumProcessorDispatcher
+    public partial class QuantumProcessorDispatcher<TProcessor>
     {
 
         private static void RunClause(ICallable op, OperationFunctor type, IQArray<Qubit>? ctrls)

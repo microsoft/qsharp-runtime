@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
@@ -12,8 +14,10 @@ namespace Microsoft.Quantum.Simulation.Common
     /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
     /// It throws <see cref="UnsupportedOperationException"/> for most APIs.
     /// </summary>
-    public class QuantumProcessorBase : IQuantumProcessor 
+    public class QuantumProcessorBase : IQuantumProcessor, IDiagnosticDataSource
     {
+        public event Action<object>? OnDisplayableDiagnostic = null;
+
         public virtual void X(Qubit qubit)
         {
             throw new UnsupportedOperationException();
@@ -285,6 +289,10 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
+        public void MaybeDisplayDiagnostic(object data)
+        {
+            OnDisplayableDiagnostic?.Invoke(data);
+        }
     }
 
     /// <summary>

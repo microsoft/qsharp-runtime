@@ -8,7 +8,7 @@ using Microsoft.Quantum.Simulation.Core;
 namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
 
-    public partial class QuantumProcessorDispatcher
+    public partial class QuantumProcessorDispatcher<TProcessor>
     {
         public class QuantumProcessorDispatcherR1Frac : Quantum.Intrinsic.R1Frac
         {

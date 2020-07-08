@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     using Microsoft.Quantum.Simulation.Core;
 
-    public partial class QuantumProcessorDispatcher
+    public partial class QuantumProcessorDispatcher<TProcessor>
     {
         public class QuantumProcessorDispatcherReturn : Intrinsic.Return
         {
