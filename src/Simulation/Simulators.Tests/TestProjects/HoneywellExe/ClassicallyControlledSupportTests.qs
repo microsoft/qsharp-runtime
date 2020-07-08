@@ -60,40 +60,11 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSu
             let temp = 2;
         }
     }
-    
-    operation DontLiftReturnStatements() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            SubOp1();
-            return ();
-        }
-    }
-
-    function SubFunc1() : Unit { }
-    function SubFunc2() : Unit { }
-    function SubFunc3() : Unit { }
-
-    function DontLiftFunctions() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            SubFunc1();
-            SubFunc2();
-            SubFunc3();
-        }
-    }
 
     operation LiftSelfContainedMutable() : Unit {
         let r = Zero;
         if (r == Zero) {
             mutable temp = 3;
-            set temp = 4;
-        }
-    }
-
-    operation DontLiftGeneralMutable() : Unit {
-        let r = Zero;
-        mutable temp = 3;
-        if (r == Zero) {
             set temp = 4;
         }
     }
@@ -139,43 +110,6 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSu
         }
         else {
             SubOp3();
-        }
-    }
-
-    operation IfInvalid() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            SubOp1();
-            SubOp2();
-            return ();
-        } else {
-            SubOp2();
-            SubOp3();
-        }
-    }
-
-    operation ElseInvalid() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            SubOp1();
-            SubOp2();
-        } else {
-            SubOp2();
-            SubOp3();
-            return ();
-        }
-    }
-
-    operation BothInvalid() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            SubOp1();
-            SubOp2();
-            return ();
-        } else {
-            SubOp2();
-            SubOp3();
-            return ();
         }
     }
     

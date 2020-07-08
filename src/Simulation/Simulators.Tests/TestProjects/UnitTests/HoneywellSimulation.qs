@@ -45,26 +45,8 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    operation DontLiftReturnStatementsTest() : Unit {
-        DontLiftReturnStatements();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation DontLiftFunctionsTest() : Unit {
-        DontLiftFunctions();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
     operation LiftSelfContainedMutableTest() : Unit {
         LiftSelfContainedMutable();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation DontLiftGeneralMutableTest() : Unit {
-        DontLiftGeneralMutable();
     }
 
     @Test("QuantumSimulator")
@@ -95,24 +77,6 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
     @Test("ResourcesEstimator")
     operation LiftOneNotBothTest() : Unit {
         LiftOneNotBoth();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation IfInvalidTest() : Unit {
-        IfInvalid();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation ElseInvalidTest() : Unit {
-        ElseInvalid();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    operation BothInvalidTest() : Unit {
-        BothInvalid();
     }
 
     @Test("QuantumSimulator")
