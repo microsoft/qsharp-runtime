@@ -167,6 +167,7 @@ namespace N1
     let genMapper                               = findCallable @"genMapper"
     let genIter                                 = findCallable @"genIter"
     let usesGenerics                            = findCallable @"usesGenerics"
+    let callsGenericWithMultipleTypeParams      = findCallable @"callsGenericWithMultipleTypeParams"
     let duplicatedDefinitionsCaller             = findCallable @"duplicatedDefinitionsCaller"
     let nestedArgTuple1                         = findCallable @"nestedArgTuple1"
     let nestedArgTuple2                         = findCallable @"nestedArgTuple2"
@@ -452,6 +453,11 @@ namespace N1
             ((NS1, "noOpResult"     ), "IUnitary<Result>")
         ]
         |> testOne usesGenerics
+
+        [
+            ((NSG, "genericWithMultipleTypeParams"), "ICallable")
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             ((NS2, "Allocate"       ), "Allocate")
@@ -897,13 +903,18 @@ namespace N1
         |> testOne usesGenerics
 
         [
-            template "Z"                                      "IUnitary<Qubit>"                 "Microsoft.Quantum.Intrinsic.Z"
+            template "genericWithMultipleTypeParams"        "ICallable"                         "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
+
+        [
+            template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
             "this.self = this;"
         ]
         |> testOne selfInvokingOperation
 
         [
-            template "self"                                 "ICallable"                       "genRecursion<>"
+            template "self"                                 "ICallable"                         "genRecursion<>"
         ]
         |> testOne genRecursion
 
@@ -933,6 +944,11 @@ namespace N1
         ]
         |> List.sort
         |> testOne usesGenerics
+
+        [
+            template "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "composeImpl<,>"
@@ -978,6 +994,11 @@ namespace N1
             template "IUnitary<Result>"             "MicrosoftQuantumTestingnoOpResult"
         ]
         |> testOne usesGenerics
+
+        [
+            template "ICallable"                    "genericWithMultipleTypeParams"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "IUnitary<Qubit>"              "Z"
@@ -2502,7 +2523,7 @@ namespace N1
         |> testOneClass genCtrl3 AssemblyConstants.HoneywellProcessor
 
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1271, 1277)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
         public composeImpl(IOperationFactory m) : base(m)
@@ -2579,7 +2600,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1314, 1316)]
+[SourceLocation("%%%", OperationFunctor.Body, 1319, 1321)]
 internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
 {
     public EmptyInternalFunction(IOperationFactory m) : base(m)
@@ -2613,7 +2634,7 @@ internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
         |> testOneClass emptyInternalFunction null
 
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1316, 1318)]
+[SourceLocation("%%%", OperationFunctor.Body, 1321, 1323)]
 internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallable
 {
     public EmptyInternalOperation(IOperationFactory m) : base(m)
@@ -2730,7 +2751,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () =
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1301,1310)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1306,1315)]
     public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
     {
         public UpdateUdtItems(IOperationFactorym) : base(m)
