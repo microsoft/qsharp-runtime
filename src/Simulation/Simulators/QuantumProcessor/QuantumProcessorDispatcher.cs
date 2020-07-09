@@ -12,6 +12,9 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
     /// <summary>
     /// Dispatcher (Simulator) that redirects all the calls to a class implementing <see cref="IQuantumProcessor"/> interface.
     /// </summary>
+    /// <typeparam name="TProcessor">
+    ///     Type of the <see cref="IQuantumProcessor" /> implementation to be used by this dispatcher.
+    /// </typeparam>
     public partial class QuantumProcessorDispatcher<TProcessor> : SimulatorBase
     where TProcessor: class, IQuantumProcessor
     {
@@ -33,10 +36,16 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
         }
 
         /// <summary>
-        /// 
+        ///     Constructs a new dispatcher using a given implementation of the <see cref="IQuantumProcessor" />
+        ///     interface.
         /// </summary>
-        /// <param name="quantumProcessor">An instance of a class implementing <see cref="IQuantumProcessor"/> interface to be wrapped. If the parameter is null <see cref="QuantumProcessorBase"/> is used.</param>
-        /// <param name="qubitManager">An instance of a class implementing <see cref="IQubitManager"/> interface. If the parameter is null <see cref="QubitManagerTrackingScope"/> is used.</param>
+        /// <param name="quantumProcessor">
+        ///     An instance of a class implementing <see cref="IQuantumProcessor"/> interface to be used
+        ///     by this dispatcher to implement the required intrinsic operations.
+        /// </param>
+        /// <param name="qubitManager">
+        ///     An instance of a class implementing <see cref="IQubitManager"/> interface. If the parameter is null <see cref="QubitManagerTrackingScope"/> is used.
+        /// </param>
         /// <param name="randomSeed">A seed to be used by Q# <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.random">Microsoft.Quantum.Intrinsic.Random</a> operation.</param>
         public QuantumProcessorDispatcher(TProcessor quantumProcessor, IQubitManager? qubitManager = null, int? randomSeed = null)
             : base(qubitManager ?? new QubitManagerTrackingScope(PreallocatedQubitCount, mayExtendCapacity:true, disableBorrowing:false))
