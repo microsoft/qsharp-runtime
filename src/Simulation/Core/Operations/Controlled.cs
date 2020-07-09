@@ -123,7 +123,7 @@ namespace Microsoft.Quantum.Simulation.Core
             }
             else
             {
-                Console.WriteLine($"Failed to retrieve control bits for {this.ToString()}.");
+                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
                 return null;
             }
         }

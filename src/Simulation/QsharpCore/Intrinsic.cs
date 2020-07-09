@@ -11,28 +11,22 @@ namespace Microsoft.Quantum.Intrinsic
     {
         public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
         {
-            var controls = new List<Qubit>();
-            var targets = new List<Qubit>();
-
-            switch (args.Value)
+            if (args.Value is ValueTuple<Qubit, Qubit> cnotArgs)
             {
-                case ValueTuple<Qubit, Qubit> cnotArgs:
-                    var (ctrl, target) = cnotArgs;
-                    controls.Add(ctrl);
-                    targets.Add(target);
-                    break;
-                default:
-                    Console.WriteLine($"Failed to retrieve arguments of type {args.Value.GetType()} for CNOT.");
-                    break;
+                var (ctrl, target) = cnotArgs;
+                return new RuntimeMetadata()
+                {
+                    Label = "X",
+                    IsControlled = true,
+                    Controls = new List<Qubit>() { ctrl },
+                    Targets = new List<Qubit>() { target },
+                };
             }
-
-            return new RuntimeMetadata()
+            else
             {
-                Label = "X",
-                IsControlled = true,
-                Controls = controls,
-                Targets = targets,
-            };
+                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
+                return null;
+            }
         }
     }
 
@@ -40,28 +34,22 @@ namespace Microsoft.Quantum.Intrinsic
     {
         public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
         {
-            var controls = new List<Qubit>();
-            var targets = new List<Qubit>();
-
-            switch (args.Value)
+            if (args.Value is ValueTuple<Qubit, Qubit, Qubit> ccnotArgs)
             {
-                case ValueTuple<Qubit, Qubit, Qubit> ccnotArgs:
-                    var (ctrl1, ctrl2, target) = ccnotArgs;
-                    controls.Add(ctrl1);
-                    controls.Add(ctrl2);
-                    targets.Add(target);
-                    break;
-                default:
-                    Console.WriteLine("Failed to retrieve arguments for CNOT.");
-                    break;
+                var (ctrl1, ctrl2, target) = ccnotArgs;
+                return new RuntimeMetadata()
+                {
+                    Label = "X",
+                    IsControlled = true,
+                    Controls = new List<Qubit>() { ctrl1, ctrl2 },
+                    Targets = new List<Qubit>() { target },
+                };
             }
-            return new RuntimeMetadata()
+            else
             {
-                Label = "X",
-                IsControlled = true,
-                Controls = controls,
-                Targets = targets,
-            };
+                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
+                return null;
+            }
         }
     }
 
@@ -69,16 +57,20 @@ namespace Microsoft.Quantum.Intrinsic
     {
         public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
         {
-            var targets = new List<Qubit>();
-            var target = args.Value as Qubit;
-            if (target != null) targets.Add(target);
-
-            return new RuntimeMetadata()
+            if (args.Value is Qubit target)
             {
-                Label = ((ICallable)this).Name,
-                IsMeasurement = true,
-                Targets = targets,
-            };
+                return new RuntimeMetadata()
+                {
+                    Label = ((ICallable)this).Name,
+                    IsMeasurement = true,
+                    Targets = new List<Qubit>() { target },
+                };
+            }
+            else
+            {
+                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
+                return null;
+            }            
         }
     }
 
