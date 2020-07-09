@@ -169,12 +169,11 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
         LiteralOnTheLeft();
     }
 
-    // ToDo: Uncomment once #17245 is fixed.
-    //@Test("QuantumSimulator")
-    //@Test("ResourcesEstimator")
-    //operation GenericsSupportTest() : Unit {
-    //    GenericsSupport<Int, Int, Int>();
-    //}
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    operation GenericsSupportTest() : Unit {
+        GenericsSupport<Int, Int, Int>();
+    }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
