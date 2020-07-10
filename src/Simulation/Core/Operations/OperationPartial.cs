@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -141,7 +143,8 @@ namespace Microsoft.Quantum.Simulation.Core
 
         IUnitary<P1> IUnitary<P>.Partial<P1>(Func<P1, P> mapper) => new OperationPartial<P1, P, O>(this, mapper);
 
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) =>
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
             this.BaseOp.GetRuntimeMetadata(args);
 
         public override string ToString() => $"{this.BaseOp}{{_}}";

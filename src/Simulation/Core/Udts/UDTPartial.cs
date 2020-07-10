@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,7 +64,8 @@ namespace Microsoft.Quantum.Simulation.Core
             return (ICallable)Activator.CreateInstance(partialType, new object[] { this, partialTuple });
         }
 
-        public RuntimeMetadata GetRuntimeMetadata(IApplyData args) => throw new NotImplementedException();
+        /// <inheritdoc/>
+        public RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => throw new NotImplementedException();
 
         internal class DebuggerProxy
         {

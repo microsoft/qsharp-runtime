@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.Quantum.Simulation.Core;
@@ -9,7 +11,8 @@ namespace Microsoft.Quantum.Intrinsic
 {
     public partial class CNOT
     {
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
             if (args.Value is ValueTuple<Qubit, Qubit> cnotArgs)
             {
@@ -32,7 +35,8 @@ namespace Microsoft.Quantum.Intrinsic
 
     public partial class CCNOT
     {
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
             if (args.Value is ValueTuple<Qubit, Qubit, Qubit> ccnotArgs)
             {
@@ -55,7 +59,8 @@ namespace Microsoft.Quantum.Intrinsic
 
     public partial class M
     {
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
             if (args.Value is Qubit target)
             {
@@ -76,11 +81,13 @@ namespace Microsoft.Quantum.Intrinsic
 
     public partial class Reset
     {
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) => null;
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => null;
     }
 
     public partial class ResetAll
     {
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) => null;
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => null;
     }
 }

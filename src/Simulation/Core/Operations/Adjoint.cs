@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -72,9 +74,11 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public override IApplyData __dataOut(QVoid data) => data;
 
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args)
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
             var baseMetadata = this.BaseOp.GetRuntimeMetadata(args);
+            if (baseMetadata == null) return null;
             baseMetadata.IsAdjoint = true;
             return baseMetadata;
         }

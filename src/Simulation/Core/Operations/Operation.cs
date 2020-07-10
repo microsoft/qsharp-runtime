@@ -1,5 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -75,7 +77,8 @@ namespace Microsoft.Quantum.Simulation.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ControlledOperation<I, O> Controlled => _controlled.Value;
 
-        public override RuntimeMetadata GetRuntimeMetadata(IApplyData args) =>
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
             new RuntimeMetadata()
             {
                 Label = ((ICallable)this).Name,
