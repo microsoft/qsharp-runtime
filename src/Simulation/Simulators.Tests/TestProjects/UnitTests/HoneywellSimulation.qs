@@ -6,13 +6,13 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSupportTests;
     open Microsoft.Quantum.Simulation.Testing.Honeywell.MeasurementSupportTests;
-    
+
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     operation MeasureInMiddleTest() : Unit {
         MeasureInMiddle();
     }
-    
+
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     operation QubitAfterMeasurementTest() : Unit {
@@ -169,12 +169,11 @@ namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
         LiteralOnTheLeft();
     }
 
-    // ToDo: Uncomment once #17245 is fixed.
-    //@Test("QuantumSimulator")
-    //@Test("ResourcesEstimator")
-    //operation GenericsSupportTest() : Unit {
-    //    GenericsSupport<Int, Int, Int>();
-    //}
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    operation GenericsSupportTest() : Unit {
+        GenericsSupport<Int, Int, Int>();
+    }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
