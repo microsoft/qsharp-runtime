@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
         public IQuantumProcessor QuantumProcessor
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary>

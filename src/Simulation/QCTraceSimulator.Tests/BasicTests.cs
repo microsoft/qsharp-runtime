@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.Simulators.NewTracer;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation;
 using Xunit;
@@ -17,15 +18,15 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void TracerCoreConstructor()
         {
-            QCTraceSimulatorConfiguration tracerCoreConfiguration = new QCTraceSimulatorConfiguration();
+            NewTracerConfiguration tracerCoreConfiguration = new NewTracerConfiguration();
             tracerCoreConfiguration.UsePrimitiveOperationsCounter = true;
-            QCTraceSimulator tracerCore = new QCTraceSimulator(tracerCoreConfiguration);
+            NewTracerSim tracerCore = new NewTracerSim(tracerCoreConfiguration);
         }
 
         [Fact]
         public void GetPrimitiveOperations()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            NewTracerSim tracerCore = new NewTracerSim();
 
             var measureOp = tracerCore.Get<Intrinsic.Measure, Intrinsic.Measure>();
             Assert.NotNull(measureOp);
@@ -49,10 +50,12 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             Assert.NotNull(returnOp);
         }
 
-        [Fact]
+        //TODO: New tracer does not work through operation overrides but via the QuantumProcessorDispatcher.
+        //Test no longer relevant/necessary?
+        [Fact(Skip = "no longer relevant?")]
         public void GetInterfaceOperations()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            NewTracerSim tracerCore = new NewTracerSim();
 
             var CX = tracerCore.Get<Interface_CX, Interface_CX>();
             Assert.NotNull(CX);
@@ -73,7 +76,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void TracerVerifyPrimitivesCompleteness()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            NewTracerSim tracerCore = new NewTracerSim();
 
             var ops =
                 from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()

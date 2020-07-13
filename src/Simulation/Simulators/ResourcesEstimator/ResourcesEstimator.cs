@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
+using Microsoft.Quantum.Simulation.Simulators.NewTracer;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 
 namespace Microsoft.Quantum.Simulation.Simulators
@@ -21,16 +22,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
     ///   <li>Gates width (total number of gates used for the computation)</li>
     /// </ol>
     /// </summary>
-    public partial class ResourcesEstimator : QCTraceSimulator
+    public partial class ResourcesEstimator : NewTracerSim
     {
         /// <summary>
-        /// The ResourceEstimator is based on <see cref="QCTraceSimulator"/>; this returns
+        /// The ResourceEstimator is based on <see cref="NewTracerSim"/>; this returns
         /// the correct configuration expected by the ResourceEstimator and what get used when
         /// a new instance is created with no parameters. It is
         /// optimized for performance and metrics collection.
         /// </summary>
-        public static QCTraceSimulatorConfiguration RecommendedConfig() =>
-            new QCTraceSimulatorConfiguration
+        public static NewTracerConfiguration RecommendedConfig() =>
+            new NewTracerConfiguration
             {
                 CallStackDepthLimit = 1,
 
@@ -56,12 +57,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// It is recommended to use <see cref="RecommendedConfig"/> to create a new config instance
         /// and tweak it, to make sure the data collection is correctly configured.
         /// </summary>
-        public ResourcesEstimator(QCTraceSimulatorConfiguration config) : base(config)
+        public ResourcesEstimator(NewTracerConfiguration config) : base(config)
         {
         }
-
-        // Exposed the underlying CoreConfiguration for unittesting.
-        internal QCTraceSimulatorCoreConfiguration CoreConfig => tCoreConfig;
 
         /// <summary>
         /// Returns the label to use for the given metric. If the metric should be skipped
@@ -108,55 +106,29 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get
             {
-                var table = new DataTable();
+                //TODO: how should this be done instead?
+                string MetricString = "Metric";
+                string SumString = "Sum";
+                string MaxString = "Max";
 
-                table.Columns.Add(new DataColumn { DataType = typeof(string), ColumnName = "Metric" });
-                table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = "Sum" });
-                table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = "Max" });
+                DataTable table = new DataTable();
+
+                table.Columns.Add(new DataColumn { DataType = typeof(string), ColumnName = MetricString });
+                table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = SumString });
+                table.Columns.Add(new DataColumn { DataType = typeof(double), ColumnName = MaxString });
                 table.PrimaryKey = new DataColumn[] { table.Columns[0] };
 
-                foreach (var l in CoreConfig.Listeners)
+                foreach(string metric in this.GetMetricNames())
                 {
-                    // All listeners we expected are ICallGraphStatistics
-                    if (l is ICallGraphStatistics collector)
-                    {
-                        var results = collector.Results.ToTable();
-                        Debug.Assert(results.keyColumnNames.Length > 2 && results.keyColumnNames[2] == "Caller");
+                    string? label = GetMetricLabel(metric);
+                    if (label == null) continue;
 
-                        var roots = results.rows.Where(r => r.KeyRow[2] == CallGraphEdge.CallGraphRootHashed);
-                        var s_idx = Array.FindIndex(results.statisticsNames, n => n == "Sum");
-
-                        for (var m_idx = 0; m_idx < results.metricNames.Length; m_idx++)
-                        {
-                            var label = GetMetricLabel(results.metricNames[m_idx]);
-                            if (label == null) continue;
-
-                            DataRow row = table.NewRow();
-                            row["Metric"] = label;
-
-                            if (m_idx >= 0 && s_idx >= 0)
-                            {
-                                Double sum = 0;
-                                Double max = 0; // all our metrics are positive
-                                foreach (var r in roots)
-                                {
-                                    Double metric_value = r.DataRow[m_idx, s_idx];
-                                    sum += metric_value;
-                                    max = System.Math.Max(max, metric_value);
-                                }
-                                row["Sum"] = sum;
-                                row["Max"] = max;
-                            }
-
-                            table.Rows.Add(row);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Assert(false, "Listener is not a collector");
-                    }
+                    DataRow row = table.NewRow();
+                    row[MetricString] = label;
+                    row[SumString] = this.GetMetricStatistic(metric, SumString);
+                    row[MaxString] = this.GetMetricStatistic(metric, MaxString);
+                    table.Rows.Add(row);
                 }
-
                 return table;
             }
         }
