@@ -76,16 +76,4 @@ namespace Microsoft.Quantum.Intrinsic
             return null;
         }
     }
-
-    public partial class Reset
-    {
-        /// <inheritdoc/>
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => null;
-    }
-
-    public partial class ResetAll
-    {
-        /// <inheritdoc/>
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => null;
-    }
 }
