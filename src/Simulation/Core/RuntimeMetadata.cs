@@ -37,6 +37,11 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// True if operation is composed of multiple operations.
         /// </summary>
+        /// </summary>
+        /// <remarks>
+        /// Currently not used as this is intended for compositeoperations,
+        /// such as <c>ApplyToEach</c>.
+        /// </remarks>
         public bool IsComposite { get; set; }
 
         /// <summary>

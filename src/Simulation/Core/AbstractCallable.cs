@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         /// <summary>
         /// Retrieves the runtime metadata of the Operation. If the Operation has no associated
-        /// runtime metadata, return null.
+        /// runtime metadata, returns <c>null</c>.
         /// </summary>
         public virtual RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => null;
 

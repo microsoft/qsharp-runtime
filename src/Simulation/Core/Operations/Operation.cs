@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Core
             new RuntimeMetadata()
             {
                 Label = ((ICallable)this).Name,
-                Args = args.Value.GetType().ArgsToString(args.Value),
+                Args = args.GetNonQubitArguments(),
                 Targets = args.GetQubits(),
             };
 

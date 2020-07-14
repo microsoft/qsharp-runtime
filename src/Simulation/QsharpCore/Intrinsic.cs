@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic
@@ -14,6 +15,8 @@ namespace Microsoft.Quantum.Intrinsic
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
+            Debug.Assert(args.Value is ValueTuple<Qubit, Qubit>, $"Failed to retrieve runtime metadata for {this.ToString()}.");
+
             if (args.Value is ValueTuple<Qubit, Qubit> cnotArgs)
             {
                 var (ctrl, target) = cnotArgs;
@@ -25,11 +28,8 @@ namespace Microsoft.Quantum.Intrinsic
                     Targets = new List<Qubit>() { target },
                 };
             }
-            else
-            {
-                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
-                return null;
-            }
+
+            return null;
         }
     }
 
@@ -38,6 +38,8 @@ namespace Microsoft.Quantum.Intrinsic
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
+            Debug.Assert(args.Value is ValueTuple<Qubit, Qubit, Qubit>, $"Failed to retrieve runtime metadata for {this.ToString()}.");
+
             if (args.Value is ValueTuple<Qubit, Qubit, Qubit> ccnotArgs)
             {
                 var (ctrl1, ctrl2, target) = ccnotArgs;
@@ -49,11 +51,8 @@ namespace Microsoft.Quantum.Intrinsic
                     Targets = new List<Qubit>() { target },
                 };
             }
-            else
-            {
-                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
-                return null;
-            }
+
+            return null;
         }
     }
 
@@ -62,6 +61,8 @@ namespace Microsoft.Quantum.Intrinsic
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
+            Debug.Assert(args.Value is Qubit, $"Failed to retrieve runtime metadata for {this.ToString()}.");
+
             if (args.Value is Qubit target)
             {
                 return new RuntimeMetadata()
@@ -71,11 +72,8 @@ namespace Microsoft.Quantum.Intrinsic
                     Targets = new List<Qubit>() { target },
                 };
             }
-            else
-            {
-                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
-                return null;
-            }            
+
+            return null;
         }
     }
 

@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
@@ -147,35 +148,52 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// Given a <see cref="Type"/> and its arguments, format its non-qubit arguments into a string.
-        /// Returns null if no arguments found.
+        /// Given an <see cref="object"/>, retrieve its non-qubit fields as a string.
+        /// Returns null if no non-qubit fields found.
         /// </summary>
-        public static string? ArgsToString(this Type t, object args)
+        public static string? GetNonQubitArguments(this object o)
         {
-            var argsStrings = t.GetFields()
-                .Select(f =>
-                {
-                    var argString = null as string;
+            var t = o.GetType();
 
-                    // If field is a tuple, recursively extract its inner arguments and format as a tuple string.
-                    if (f.FieldType.IsTuple())
-                    {
-                        var nestedArgs = f.GetValue(args);
-                        if (nestedArgs != null) argString = f.FieldType.ArgsToString(nestedArgs);
-                    }
-                    // Add field as an argument if it is not a Qubit type
-                    else if (!f.FieldType.IsQubitsContainer())
-                    {
-                        argString = f.GetValue(args)?.ToString();
-                    }
+            // If object is a Qubit, ignore it (i.e. return null)
+            if (o is Qubit) return null;
 
-                    return argString;
-                })
-                .WhereNotNull();
+            // If object is an IApplyData, recursively extract nested fields
+            // and stringify them
+            if (o is IApplyData data)
+            {
+                var argsString = data.Value.GetNonQubitArguments();
+                return argsString.Any() ? argsString : null;
+            }
 
-            return argsStrings.Any()
-                ? $"({string.Join(",", argsStrings)})"
-                : null;
+            // If object is a string, enclose it in quotations
+            if (o is string s)
+            {
+                return (s != null) ? $"\"{s}\"" : null;
+            }
+
+            // If object is a list, recursively extract its inner arguments and
+            // concatenate them into a list string
+            if (typeof(IEnumerable).IsAssignableFrom(t))
+            {
+                var elements = ((IEnumerable)o).Cast<object>()
+                    .Select(x => x.GetNonQubitArguments())
+                    .WhereNotNull();
+                return (elements.Any()) ? $"[{string.Join(", ", elements)}]" : null;
+            }
+
+            // If object is a tuple, recursively extract its inner arguments and
+            // concatenate them into a tuple string
+            if (t.IsTuple())
+            {
+                var items = t.GetFields()
+                    .Select(f => f.GetValue(o).GetNonQubitArguments())
+                    .WhereNotNull();
+                return (items.Any()) ? $"({string.Join(", ", items)})" : null;
+            }
+
+            // Otherwise, return argument as a string
+            return (o != null) ? o.ToString() : null;
         }
 
         private static ConcurrentDictionary<Type, Type> _normalTypesCache = new ConcurrentDictionary<Type, Type>();

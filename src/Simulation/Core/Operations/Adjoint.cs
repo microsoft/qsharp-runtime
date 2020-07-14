@@ -79,7 +79,7 @@ namespace Microsoft.Quantum.Simulation.Core
         {
             var baseMetadata = this.BaseOp.GetRuntimeMetadata(args);
             if (baseMetadata == null) return null;
-            baseMetadata.IsAdjoint = true;
+            baseMetadata.IsAdjoint = !baseMetadata.IsAdjoint;
             return baseMetadata;
         }
 

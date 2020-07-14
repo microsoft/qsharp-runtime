@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Simulation.Core
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).ControlledVariant();
 
-        public override Func<(IQArray<Qubit>, I), QVoid> Body =>  this.BaseOp.ControlledBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> Body => this.BaseOp.ControlledBody;
 
         public override Func<(IQArray<Qubit>, I), QVoid> AdjointBody => this.BaseOp.ControlledAdjointBody;
 
@@ -116,6 +116,8 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
+            Debug.Assert(args.Value is ValueTuple<IQArray<Qubit>, I>, $"Failed to retrieve runtime metadata for {this.ToString()}.");
+
             if (args.Value is ValueTuple<IQArray<Qubit>, I> ctrlArgs)
             {
                 var (controls, baseArgs) = ctrlArgs;
@@ -125,11 +127,8 @@ namespace Microsoft.Quantum.Simulation.Core
                 baseMetadata.Controls = controls.Concat(baseMetadata.Controls);
                 return baseMetadata;
             }
-            else
-            {
-                Console.WriteLine($"Failed to retrieve runtime metadata for {this.ToString()}.");
-                return null;
-            }
+
+            return null;
         }
 
 
