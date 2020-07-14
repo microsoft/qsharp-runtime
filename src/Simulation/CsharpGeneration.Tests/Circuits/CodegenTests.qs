@@ -1262,6 +1262,11 @@ namespace Microsoft.Quantum.Compiler.Generics {
         genIter(genU1<Result>, a);
     }
 
+    operation genericWithMultipleTypeParams<'A, 'B, 'C>() : Unit { }
+
+    operation callsGenericWithMultipleTypeParams () : Unit {
+        genericWithMultipleTypeParams<Double, Int, Int>();
+    }
 
     operation composeImpl<'A, 'B> (second : ('A => Unit), first : ('B => 'A), arg : 'B) : Unit {
 

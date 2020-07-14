@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
     operation SubOpCA1() : Unit is Ctl + Adj { }
     operation SubOpCA2() : Unit is Ctl + Adj { }
     operation SubOpCA3() : Unit is Ctl + Adj { }
-    
+
     operation BranchOnMeasurement() : Unit {
         using (q = Qubit()) {
             H(q);
@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
             Reset(q);
         }
     }
-    
+
     operation BasicLift() : Unit {
         let r = Zero;
         if (r == Zero) {
@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
             }
         }
     }
-    
+
     operation LiftSingleNonCall() : Unit {
         let r = Zero;
         if (r == Zero) {
@@ -112,7 +112,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
             SubOp3();
         }
     }
-    
+
     operation ApplyIfZero_Test() : Unit {
         let r = Zero;
         if (r == Zero) {
@@ -246,15 +246,14 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
         }
     }
 
-    // ToDo: Uncomment once #17245 is fixed.
-    //operation GenericsSupport<'A, 'B, 'C>() : Unit {
-    //    let r = Zero;
-    //
-    //    if (r == Zero) {
-    //        SubOp1();
-    //        SubOp2();
-    //    }
-    //}
+    operation GenericsSupport<'A, 'B, 'C>() : Unit {
+        let r = Zero;
+
+        if (r == Zero) {
+            SubOp1();
+            SubOp2();
+        }
+    }
 
     operation WithinBlockSupport() : Unit {
         let r = One;

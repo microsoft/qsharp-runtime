@@ -23,5 +23,29 @@
   <ItemGroup>
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <None Include="$(QSimDll)">
+      <Link>Microsoft.Quantum.Simulator.Runtime.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+
+    <None Include="..\Native\win10\**\*">
+      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\Native\osx\**\*">
+      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\Native\linux\**\*">
+      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
 </Project>
