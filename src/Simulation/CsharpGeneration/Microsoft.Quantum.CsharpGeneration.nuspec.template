@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Microsoft.Quantum.CsharpGeneration</id>
     <version>$version$</version>
@@ -9,7 +9,7 @@
 
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <iconUrl>https://secure.gravatar.com/avatar/bd1f02955b2853ba0a3b1cdc2434e8ec.png</iconUrl>
+    <icon>images\MS_Quantum_Spot_Dev.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>C# code generation for executing Q# programs on a quantum simulator.</description>
@@ -24,5 +24,6 @@
     <file src="RewriteStep.props" target="build\Microsoft.Quantum.CsharpGeneration.props" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
+    <file src="MS_Quantum_Spot_Dev.png" target="images" />
   </files>
 </package>
