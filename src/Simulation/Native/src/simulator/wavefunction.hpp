@@ -12,6 +12,7 @@
 #include <limits>
 #include <random>
 #include <vector>
+#include <optional>
 
 #include "types.hpp"
 #include "gates.hpp"
@@ -340,6 +341,8 @@ class Wavefunction
     mutable WavefunctionStorage wfn_; // storing the wave function
     std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
 	  int usage_;
+
+    std::optional<int> foo;
 
     // randomness support
     RngEngine rng_;
