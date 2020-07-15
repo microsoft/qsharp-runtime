@@ -28,7 +28,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             RuntimeMetadata? b = null;
             Assert.NotEqual(a, b);
             Assert.NotEqual(b, a);
-            Assert.Equal(null, null);
         }
 
         [Fact]
