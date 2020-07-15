@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var a = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var b = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -63,9 +63,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.False(a == b);
             b.Label = "H";
 
-            b.Args = "(1)";
+            b.FormattedNonQubitArgs = "(1)";
             Assert.False(a == b);
-            b.Args = null;
+            b.FormattedNonQubitArgs = "";
 
             b.IsAdjoint = true;
             Assert.False(a == b);
@@ -175,7 +175,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -202,7 +202,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -224,7 +224,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "Ry",
-                Args = "(2.1)",
+                FormattedNonQubitArgs = "(2.1)",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -246,7 +246,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "M",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = true,
@@ -271,7 +271,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "MResetX",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = true,
@@ -293,7 +293,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "MResetY",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = true,
@@ -315,7 +315,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "MResetZ",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = true,
@@ -340,7 +340,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDTOp",
-                Args = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (2.1))",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -366,7 +366,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -389,7 +389,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -413,7 +413,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -439,7 +439,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -462,7 +462,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDTOp",
-                Args = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (2.1))",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -487,7 +487,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = true,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -509,7 +509,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "X",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = true,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -531,7 +531,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDTOp",
-                Args = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (2.1))",
                 IsAdjoint = true,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -553,7 +553,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -577,7 +577,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = true,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -603,7 +603,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "H",
-                Args = null,
+                FormattedNonQubitArgs = "",
                 IsAdjoint = false,
                 IsControlled = true,
                 IsMeasurement = false,
@@ -632,7 +632,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "Ry",
-                Args = "(2.1)",
+                FormattedNonQubitArgs = "(2.1)",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -655,7 +655,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDT",
-                Args = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (2.1))",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,

@@ -72,7 +72,7 @@ namespace Microsoft.Quantum.Simulation.Core
             return new RuntimeMetadata()
             {
                 Label = typeof(U).Name,
-                Args = baseArgs?.GetNonQubitArgumentsAsString(),
+                FormattedNonQubitArgs = baseArgs?.GetNonQubitArgumentsAsString() ?? "",
             };
         }
 

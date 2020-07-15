@@ -17,9 +17,9 @@ namespace Microsoft.Quantum.Simulation.Core
         public string Label { get; set; } = "";
 
         /// <summary>
-        /// Non-qubit arguments provided to gate.
+        /// Non-qubit arguments provided to gate, formatted as string.
         /// </summary>
-        public string? Args { get; set; }
+        public string FormattedNonQubitArgs { get; set; } = "";
 
         /// <summary>
         /// True if operation is an adjoint operation.
@@ -95,7 +95,7 @@ namespace Microsoft.Quantum.Simulation.Core
                     return false;
             }
             
-            return this.Label == other.Label && this.Args == other.Args &&
+            return this.Label == other.Label && this.FormattedNonQubitArgs == other.FormattedNonQubitArgs &&
                 this.IsAdjoint == other.IsAdjoint && this.IsControlled == other.IsControlled &&
                 this.IsMeasurement == other.IsMeasurement && this.IsComposite == other.IsComposite;
         }
@@ -116,7 +116,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 : 0;
             
             // Combine all other properties and get the resulting hashcode
-            var otherHash = HashCode.Combine(this.Label, this.Args, this.IsAdjoint, this.IsControlled,
+            var otherHash = HashCode.Combine(this.Label, this.FormattedNonQubitArgs, this.IsAdjoint, this.IsControlled,
                 this.IsMeasurement, this.IsComposite);
             
             // Combine them all together to get the final hashcode
