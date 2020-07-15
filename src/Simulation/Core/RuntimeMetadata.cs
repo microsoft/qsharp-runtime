@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         /// </summary>
         /// <remarks>
-        /// Currently not used as this is intended for compositeoperations,
+        /// Currently not used as this is intended for composite operations,
         /// such as <c>ApplyToEach</c>.
         /// </remarks>
         public bool IsComposite { get; set; }
