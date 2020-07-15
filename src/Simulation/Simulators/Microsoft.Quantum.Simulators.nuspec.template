@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Microsoft.Quantum.Simulators</id>
     <version>$version$</version>
@@ -8,7 +8,7 @@
     <owners>QuantumEngineering, Microsoft</owners>
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <iconUrl>https://secure.gravatar.com/avatar/bd1f02955b2853ba0a3b1cdc2434e8ec.png</iconUrl>
+    <icon>images\qdk-nuget-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Classical simulators of quantum computers for the Q# programming language.</description>
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
@@ -26,5 +26,6 @@
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.dll" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.xml" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.pdb" target="lib" />
+    <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>

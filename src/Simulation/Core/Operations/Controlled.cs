@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 
 namespace Microsoft.Quantum.Simulation.Core
@@ -74,7 +77,7 @@ namespace Microsoft.Quantum.Simulation.Core
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).ControlledVariant();
 
-        public override Func<(IQArray<Qubit>, I), QVoid> Body =>  this.BaseOp.ControlledBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> Body => this.BaseOp.ControlledBody;
 
         public override Func<(IQArray<Qubit>, I), QVoid> AdjointBody => this.BaseOp.ControlledAdjointBody;
 
@@ -109,6 +112,24 @@ namespace Microsoft.Quantum.Simulation.Core
         public override IApplyData __dataIn((IQArray<Qubit>, I) data) => new In((data.Item1, this.BaseOp.__dataIn(data.Item2)));
 
         public override IApplyData __dataOut(QVoid data) => data;
+
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
+        {
+            Debug.Assert(args.Value is ValueTuple<IQArray<Qubit>, I>, $"Failed to retrieve runtime metadata for {this.ToString()}.");
+
+            if (args.Value is ValueTuple<IQArray<Qubit>, I> ctrlArgs)
+            {
+                var (controls, baseArgs) = ctrlArgs;
+                var baseMetadata = this.BaseOp.GetRuntimeMetadata(this.BaseOp.__dataIn(baseArgs));
+                if (baseMetadata == null) return null;
+                baseMetadata.IsControlled = true;
+                baseMetadata.Controls = controls.Concat(baseMetadata.Controls);
+                return baseMetadata;
+            }
+
+            return null;
+        }
 
 
         public override string ToString() => $"(Controlled {BaseOp?.ToString() ?? "<null>" })";
