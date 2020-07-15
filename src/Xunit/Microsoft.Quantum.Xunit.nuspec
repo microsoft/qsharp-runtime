@@ -9,7 +9,7 @@
 
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <icon>images\MS_Quantum_Spot_Dev.png</icon>
+    <icon>images\qdk-nuget-icon.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Library for testing Q# programs and algorithms using the xUnit framework.</description>
@@ -27,6 +27,6 @@
   </metadata>
 
   <files>
-    <file src="MS_Quantum_Spot_Dev.png" target="images" />
+    <file src="..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>

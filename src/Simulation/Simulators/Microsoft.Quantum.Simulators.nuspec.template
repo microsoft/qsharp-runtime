@@ -8,7 +8,7 @@
     <owners>QuantumEngineering, Microsoft</owners>
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <icon>images\MS_Quantum_Spot_Dev.png</icon>
+    <icon>images\qdk-nuget-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Classical simulators of quantum computers for the Q# programming language.</description>
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
@@ -26,6 +26,6 @@
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.dll" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.xml" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.pdb" target="lib" />
-    <file src="MS_Quantum_Spot_Dev.png" target="images" />
+    <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>

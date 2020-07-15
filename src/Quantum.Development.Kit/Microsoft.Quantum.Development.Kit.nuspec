@@ -9,7 +9,7 @@
 
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <icon>images\MS_Quantum_Spot_Dev.png</icon>
+    <icon>images\qdk-nuget-icon.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides tools for developing quantum algorithms in the Q# programming language.</description>
@@ -30,7 +30,7 @@
     <file src="Props\*.xaml" target="build" />
     <file src="..\..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
     <file src="..\Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp3.1\publish\**" target="tools\qsc" exclude="**\*.pdb" />
-    <file src="MS_Quantum_Spot_Dev.png" target="images" />
+    <file src="..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 
 </package>

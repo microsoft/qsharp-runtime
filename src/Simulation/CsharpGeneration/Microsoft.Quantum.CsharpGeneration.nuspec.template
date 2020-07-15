@@ -9,7 +9,7 @@
 
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
-    <icon>images\MS_Quantum_Spot_Dev.png</icon>
+    <icon>images\qdk-nuget-icon.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>C# code generation for executing Q# programs on a quantum simulator.</description>
@@ -24,6 +24,6 @@
     <file src="RewriteStep.props" target="build\Microsoft.Quantum.CsharpGeneration.props" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
-    <file src="MS_Quantum_Spot_Dev.png" target="images" />
+    <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>
