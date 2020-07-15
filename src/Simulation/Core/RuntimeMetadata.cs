@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
+    /// <summary>
+    /// Contains the metadata associated with an operation's runtime execution path.
+    /// </summary>
     public class RuntimeMetadata
     {
         /// <summary>
@@ -79,6 +82,11 @@ namespace Microsoft.Quantum.Simulation.Core
 
             if (other is null) return false;
 
+            if (this.Label != other.Label || this.FormattedNonQubitArgs != other.FormattedNonQubitArgs ||
+                this.IsAdjoint != other.IsAdjoint || this.IsControlled != other.IsControlled ||
+                this.IsMeasurement != other.IsMeasurement || this.IsComposite != other.IsComposite)
+                return false;
+
             if (!ListEquals<Qubit>(this.Controls, other.Controls)) return false;
 
             if (!ListEquals<Qubit>(this.Targets, other.Targets)) return false;
@@ -94,17 +102,15 @@ namespace Microsoft.Quantum.Simulation.Core
                     this.Children.Zip(other.Children, ListEquals<RuntimeMetadata>).Contains(false))
                     return false;
             }
-            
-            return this.Label == other.Label && this.FormattedNonQubitArgs == other.FormattedNonQubitArgs &&
-                this.IsAdjoint == other.IsAdjoint && this.IsControlled == other.IsControlled &&
-                this.IsMeasurement == other.IsMeasurement && this.IsComposite == other.IsComposite;
+
+            return true;
         }
 
         public override int GetHashCode()
         {
             // Stringify qubits, concatenate as string, and get resulting hashcode
-            var controlsHash = string.Join(",", this.Controls.Select(q => q.ToString())).GetHashCode();
-            var targetsHash = string.Join(",", this.Targets.Select(q => q.ToString())).GetHashCode();
+            var controlsHash = string.Join(",", this.Controls.Select(q => q?.ToString() ?? "")).GetHashCode();
+            var targetsHash = string.Join(",", this.Targets.Select(q => q?.ToString() ?? "")).GetHashCode();
 
             // Recursively get hashcode of inner `RuntimeMetadata` objects, concatenate into a string,
             // and get resulting hashcode

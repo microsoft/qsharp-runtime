@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void WrongType()
         {
-            RuntimeMetadata a = new RuntimeMetadata { };
+            var a = new RuntimeMetadata { };
             var i = 5;
             Assert.False(a.Equals(i));
         }
@@ -24,10 +24,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void NullEquality()
         {
-            RuntimeMetadata a = new RuntimeMetadata { };
-            Assert.False(a == null);
-            Assert.False(null == a);
-            Assert.True(null == null);
+            var a = new RuntimeMetadata { };
+            RuntimeMetadata? b = null;
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(b, a);
+            Assert.Equal(null, null);
         }
 
         [Fact]
@@ -57,30 +58,37 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Controls = new List<Qubit>() { },
                 Targets = new List<Qubit>() { },
             };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
             b.Label = "X";
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.Label = "H";
 
             b.FormattedNonQubitArgs = "(1)";
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.FormattedNonQubitArgs = "";
 
             b.IsAdjoint = true;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.IsAdjoint = false;
 
             b.IsControlled = true;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.IsControlled = false;
 
             b.IsMeasurement = true;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.IsMeasurement = false;
 
             b.IsComposite = true;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
             b.IsComposite = false;
         }
 
@@ -95,13 +103,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 Controls = new List<Qubit>() { },
             };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
             b.Controls = new List<Qubit>() { new FreeQubit(1) };
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
 
             a.Controls = new List<Qubit>() { new FreeQubit(1) };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
         [Fact]
@@ -115,13 +126,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 Targets = new List<Qubit>() { },
             };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
             b.Targets = new List<Qubit>() { new FreeQubit(1) };
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
 
             a.Targets = new List<Qubit>() { new FreeQubit(1) };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
         [Fact]
@@ -143,23 +157,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     new List<RuntimeMetadata>(),
                 },
             };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
             var aChildren = a.Children.ToList();
             aChildren[0] = new List<RuntimeMetadata>() { new RuntimeMetadata() { Label = "H" } };
             a.Children = aChildren;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
 
             var bChildren = b.Children.ToList();
             bChildren[0] = new List<RuntimeMetadata>() { new RuntimeMetadata() { Label = "X" } };
             b.Children = bChildren;
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
 
             bChildren[0] = new List<RuntimeMetadata>() { new RuntimeMetadata() { Label = "H" } };
-            Assert.True(a == b);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
             b.Children = b.Children.SkipLast(1);
-            Assert.False(a == b);
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
         }
     }
 
@@ -185,10 +204,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            var metadata = op.GetRuntimeMetadata(args);
-            var equals = metadata == expected;
-
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -212,7 +228,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -234,7 +250,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -256,7 +272,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { measureQubit },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
     }
 
@@ -281,7 +297,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { measureQubit },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -303,7 +319,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { measureQubit },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -325,7 +341,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { measureQubit },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
     }
 
@@ -350,7 +366,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
     }
 
@@ -376,7 +392,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -399,7 +415,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -423,7 +439,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -449,30 +465,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
-        }
-
-        [Fact]
-        public void ControlledUDT()
-        {
-            IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-            Qubit target = new FreeQubit(1);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>().Controlled;
-            var args = new QTuple<ValueTuple<IQArray<Qubit>, Circuits.FooUDT>>((controls, new Circuits.FooUDT(("bar", (target, 2.1)))));
-            var expected = new RuntimeMetadata()
-            {
-                Label = "FooUDTOp",
-                FormattedNonQubitArgs = "(\"bar\", (2.1))",
-                IsAdjoint = false,
-                IsControlled = true,
-                IsMeasurement = false,
-                IsComposite = false,
-                Children = null,
-                Controls = controls,
-                Targets = new List<Qubit>() { target },
-            };
-
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
     }
 
@@ -497,7 +490,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -519,29 +512,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
-        }
-
-        [Fact]
-        public void AdjointUDT()
-        {
-            Qubit target = new FreeQubit(0);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>().Adjoint;
-            var args = op.__dataIn(new Circuits.FooUDT(("bar", (target, 2.1))));
-            var expected = new RuntimeMetadata()
-            {
-                Label = "FooUDTOp",
-                FormattedNonQubitArgs = "(\"bar\", (2.1))",
-                IsAdjoint = true,
-                IsControlled = false,
-                IsMeasurement = false,
-                IsComposite = false,
-                Children = null,
-                Controls = new List<Qubit>() { },
-                Targets = new List<Qubit>() { target },
-            };
-
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -563,7 +534,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -587,8 +558,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op1.GetRuntimeMetadata(args) == expected);
-            Assert.True(op2.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op1.GetRuntimeMetadata(args), expected);
+            Assert.Equal(op2.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -613,9 +584,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op1.GetRuntimeMetadata(args) == expected);
-            Assert.True(op2.GetRuntimeMetadata(args) == expected);
-            Assert.True(op3.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op1.GetRuntimeMetadata(args), expected);
+            Assert.Equal(op2.GetRuntimeMetadata(args), expected);
+            Assert.Equal(op3.GetRuntimeMetadata(args), expected);
         }
     }
 
@@ -642,7 +613,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { target },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -665,7 +636,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Targets = new List<Qubit>() { },
             };
 
-            Assert.True(op.GetRuntimeMetadata(args) == expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
     }
 }
