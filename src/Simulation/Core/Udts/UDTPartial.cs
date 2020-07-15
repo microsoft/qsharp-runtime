@@ -65,7 +65,16 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <inheritdoc/>
-        public RuntimeMetadata? GetRuntimeMetadata(IApplyData args) => throw new NotImplementedException();
+        public RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
+        {
+            Debug.Assert(args.Value is P, $"Failed to retrieve runtime metadata for {typeof(U).Name}.");
+            var baseArgs = this.Apply((P) args.Value);
+            return new RuntimeMetadata()
+            {
+                Label = typeof(U).Name,
+                Args = baseArgs?.GetNonQubitArgumentsAsString(),
+            };
+        }
 
         internal class DebuggerProxy
         {

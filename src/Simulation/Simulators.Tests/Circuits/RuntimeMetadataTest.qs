@@ -3,6 +3,8 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
-    operation FooUDT (foo : String, (q : Qubit, d : Double)) : Unit is Ctl + Adj { }
+    newtype FooUDT = (String, (Qubit, Double));
+
+    operation FooUDTOp (foo : FooUDT) : Unit is Ctl + Adj { }
     
 }

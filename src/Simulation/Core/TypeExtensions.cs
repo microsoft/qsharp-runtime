@@ -151,7 +151,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// Given an <see cref="object"/>, retrieve its non-qubit fields as a string.
         /// Returns null if no non-qubit fields found.
         /// </summary>
-        public static string? GetNonQubitArguments(this object o)
+        public static string? GetNonQubitArgumentsAsString(this object o)
         {
             var t = o.GetType();
 
@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Core
             // and stringify them
             if (o is IApplyData data)
             {
-                var argsString = data.Value.GetNonQubitArguments();
+                var argsString = data.Value.GetNonQubitArgumentsAsString();
                 return argsString.Any() ? argsString : null;
             }
 
@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Core
             if (typeof(IEnumerable).IsAssignableFrom(t))
             {
                 var elements = ((IEnumerable)o).Cast<object>()
-                    .Select(x => x.GetNonQubitArguments())
+                    .Select(x => x.GetNonQubitArgumentsAsString())
                     .WhereNotNull();
                 return (elements.Any()) ? $"[{string.Join(", ", elements)}]" : null;
             }
@@ -187,7 +187,7 @@ namespace Microsoft.Quantum.Simulation.Core
             if (t.IsTuple())
             {
                 var items = t.GetFields()
-                    .Select(f => f.GetValue(o).GetNonQubitArguments())
+                    .Select(f => f.GetValue(o).GetNonQubitArgumentsAsString())
                     .WhereNotNull();
                 return (items.Any()) ? $"({string.Join(", ", items)})" : null;
             }

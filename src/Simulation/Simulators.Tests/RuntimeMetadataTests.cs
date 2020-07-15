@@ -332,14 +332,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     public class UDTTests
     {
         [Fact]
-        public void FooUDT()
+        public void FooUDTOp()
         {
             Qubit target = new FreeQubit(0);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDT>();
-            var args = op.__dataIn(("bar", (target, 2.1)));
+            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>();
+            var args = op.__dataIn(new Circuits.FooUDT(("bar", (target, 2.1))));
             var expected = new RuntimeMetadata()
             {
-                Label = "FooUDT",
+                Label = "FooUDTOp",
                 Args = "(\"bar\", (2.1))",
                 IsAdjoint = false,
                 IsControlled = false,
@@ -457,11 +457,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
             Qubit target = new FreeQubit(1);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDT>().Controlled;
-            var args = op.__dataIn((controls, ("bar", (target, 2.1))));
+            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>().Controlled;
+            var args = new QTuple<ValueTuple<IQArray<Qubit>, Circuits.FooUDT>>((controls, new Circuits.FooUDT(("bar", (target, 2.1)))));
             var expected = new RuntimeMetadata()
             {
-                Label = "FooUDT",
+                Label = "FooUDTOp",
                 Args = "(\"bar\", (2.1))",
                 IsAdjoint = false,
                 IsControlled = true,
@@ -526,11 +526,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void AdjointUDT()
         {
             Qubit target = new FreeQubit(0);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDT>().Adjoint;
-            var args = op.__dataIn(("bar", (target, 2.1)));
+            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>().Adjoint;
+            var args = op.__dataIn(new Circuits.FooUDT(("bar", (target, 2.1))));
             var expected = new RuntimeMetadata()
             {
-                Label = "FooUDT",
+                Label = "FooUDTOp",
                 Args = "(\"bar\", (2.1))",
                 IsAdjoint = true,
                 IsControlled = false,
@@ -649,9 +649,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void PartialUDT()
         {
             var target = new FreeQubit(0);
-            var op = new QuantumSimulator().Get<Tests.Circuits.FooUDT>().Partial((double d) =>
-                new ValueTuple<string, ValueTuple<Qubit, double>>("bar", (target, d)));
-            var args = op.__dataIn(2.1);
+            var op = new QuantumSimulator().Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
+                .Partial<double>((double d) => (("bar", (target, d))));
+            var args = new QTuple<double>(2.1);
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDT",
@@ -662,7 +662,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 IsComposite = false,
                 Children = null,
                 Controls = new List<Qubit>() { },
-                Targets = new List<Qubit>() { target },
+                Targets = new List<Qubit>() { },
             };
 
             Assert.True(op.GetRuntimeMetadata(args) == expected);
