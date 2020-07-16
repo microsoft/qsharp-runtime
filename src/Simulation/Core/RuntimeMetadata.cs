@@ -44,8 +44,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// </summary>
         /// </summary>
         /// <remarks>
-        /// Currently not used as this is intended for composite operations,
-        /// such as <c>ApplyToEach</c>.
+        /// This is used in composite operations, such as <c>ApplyToEach</c>.
         /// </remarks>
         public bool IsComposite { get; set; }
 
@@ -53,7 +52,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// Group of operations for each classical branch (<c>true</c> and <c>false</c>).
         /// </summary>
         /// <remarks>
-        /// Currently not used as this is intended for classically-controlled operations.
+        /// This is used in classically-controlled operations.
         /// </remarks>
         public IEnumerable<IEnumerable<RuntimeMetadata>>? Children { get; set; }
 

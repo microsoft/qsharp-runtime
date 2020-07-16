@@ -231,6 +231,29 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void Swap()
+        {
+            var q1 = new FreeQubit(0);
+            var q2 = new FreeQubit(1);
+            var op = new QuantumSimulator().Get<Intrinsic.SWAP>();
+            var args = op.__dataIn((q1, q2));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "SWAP",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { q1, q2 },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
         public void Ry()
         {
             var target = new FreeQubit(0);
@@ -269,6 +292,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Children = null,
                 Controls = new List<Qubit>() { },
                 Targets = new List<Qubit>() { measureQubit },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
+        public void ResetAll()
+        {
+            IQArray<Qubit> targets = new QArray<Qubit>(new[] { new FreeQubit(0) });
+            var op = new QuantumSimulator().Get<Intrinsic.ResetAll>();
+            var args = op.__dataIn(targets);
+            var expected = new RuntimeMetadata()
+            {
+                Label = "ResetAll",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = targets,
             };
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);
