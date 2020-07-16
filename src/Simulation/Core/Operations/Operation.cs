@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Simulation.Core
             {
                 Label = ((ICallable)this).Name,
                 FormattedNonQubitArgs = args.GetNonQubitArgumentsAsString() ?? "",
-                Targets = args.GetQubits(),
+                Targets = args.GetQubits() ?? new List<Qubit>(),
             };
 
         public O Apply(I a)

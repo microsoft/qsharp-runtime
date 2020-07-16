@@ -156,8 +156,8 @@ namespace Microsoft.Quantum.Simulation.Core
         {
             var t = o.GetType();
 
-            // If object is a Qubit or array of Qubits, ignore it (i.e. return null)
-            if (o is Qubit || o is IEnumerable<Qubit>) return null;
+            // If object is a Qubit, QVoid, or array of Qubits, ignore it (i.e. return null)
+            if (o is Qubit || o is QVoid || o is IEnumerable<Qubit>) return null;
 
             // If object is an IApplyData, recursively extract arguments
             if (o is IApplyData data)

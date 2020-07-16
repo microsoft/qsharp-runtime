@@ -387,6 +387,50 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
+
+        [Fact]
+        public void EmptyOperation()
+        {
+            var measureQubit = new FreeQubit(0);
+            var op = new QuantumSimulator().Get<Circuits.Empty>();
+            var args = op.__dataIn(QVoid.Instance);
+            var expected = new RuntimeMetadata()
+            {
+                Label = "Empty",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
+        public void NestedOperation()
+        {
+            var measureQubit = new FreeQubit(0);
+            var op = new QuantumSimulator().Get<Circuits.NestedOp>();
+            var args = op.__dataIn(QVoid.Instance);
+            var expected = new RuntimeMetadata()
+            {
+                Label = "NestedOp",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
     }
 
     public class UDTTests
