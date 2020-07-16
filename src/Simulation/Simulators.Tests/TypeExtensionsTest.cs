@@ -34,6 +34,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void QubitTypes()
+        {
+            var q = new FreeQubit(0);
+            Assert.Null(q.GetNonQubitArgumentsAsString());
+
+            var qs = new QArray<Qubit>(new[] { new FreeQubit(0) });
+            Assert.Null(qs.GetNonQubitArgumentsAsString());
+
+            qs = new QArray<Qubit>(new[] { new FreeQubit(0), new FreeQubit(1) });
+            Assert.Null(qs.GetNonQubitArgumentsAsString());
+
+            var qtuple = new QTuple<Qubit>(q);
+            Assert.Null(qtuple.GetNonQubitArgumentsAsString());
+        }
+
+        [Fact]
         public void TupleTypes()
         {
             Assert.Equal("(1, 2)", (1, 2).GetNonQubitArgumentsAsString());
@@ -41,6 +57,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal("(\"foo\", \"bar\", \"\")", ("foo", "bar", "").GetNonQubitArgumentsAsString());
             Assert.Equal("(\"foo\", (\"bar\", \"car\"))", ("foo", ("bar", "car")).GetNonQubitArgumentsAsString());
             Assert.Equal("((\"foo\"), (\"bar\", \"car\"))", (("foo", new FreeQubit(0)), ("bar", "car")).GetNonQubitArgumentsAsString());
+
+            var qtuple = new QTuple<(Qubit, string)>((new FreeQubit(0), "foo"));
+            Assert.Equal("(\"foo\")", qtuple.GetNonQubitArgumentsAsString());
         }
 
         [Fact]
@@ -54,19 +73,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 (new FreeQubit(1), "bar"),
             };
             Assert.Equal("[(\"foo\"), (\"bar\")]", arr.GetNonQubitArgumentsAsString());
-        }
-
-        [Fact]
-        public void QubitTypes()
-        {
-            var q = new FreeQubit(0);
-            Assert.Null(q.GetNonQubitArgumentsAsString());
-
-            var qs = new QArray<Qubit>(new[] { new FreeQubit(0) });
-            Assert.Null(qs.GetNonQubitArgumentsAsString());
-
-            qs = new QArray<Qubit>(new[] { new FreeQubit(0), new FreeQubit(1) });
-            Assert.Null(qs.GetNonQubitArgumentsAsString());
         }
 
         [Fact]
@@ -98,12 +104,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             data = new ApplyData<(FreeQubit, string)[]>(arr);
             Assert.Equal("[(\"foo\"), (\"bar\")]", data.GetNonQubitArgumentsAsString());
 
+            var qtupleWithString = new QTuple<(Qubit, string)>((new FreeQubit(0), "foo"));
+            data = new ApplyData<QTuple<(Qubit, string)>>(qtupleWithString);
+            Assert.Equal("(\"foo\")", data.GetNonQubitArgumentsAsString());
+
             var q = new FreeQubit(0);
             data = new ApplyData<Qubit>(q);
             Assert.Null(data.GetNonQubitArgumentsAsString());
 
             var qs = new QArray<Qubit>(new[] { new FreeQubit(0), new FreeQubit(1) });
             data = new ApplyData<IQArray<Qubit>>(qs);
+            Assert.Null(data.GetNonQubitArgumentsAsString());
+
+            var qtuple = new QTuple<Qubit>(q);
+            data = new ApplyData<QTuple<Qubit>>(qtuple);
             Assert.Null(data.GetNonQubitArgumentsAsString());
         }
     }
