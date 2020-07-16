@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -155,15 +156,13 @@ namespace Microsoft.Quantum.Simulation.Core
         {
             var t = o.GetType();
 
-            // If object is a Qubit, ignore it (i.e. return null)
-            if (o is Qubit) return null;
+            // If object is a Qubit or array of Qubits, ignore it (i.e. return null)
+            if (o is Qubit || o is IEnumerable<Qubit>) return null;
 
-            // If object is an IApplyData, recursively extract nested fields
-            // and stringify them
+            // If object is an IApplyData, recursively extract arguments
             if (o is IApplyData data)
             {
-                var argsString = data.Value.GetNonQubitArgumentsAsString();
-                return argsString.Any() ? argsString : null;
+                return data.Value.GetNonQubitArgumentsAsString();
             }
 
             // If object is a string, enclose it in quotations

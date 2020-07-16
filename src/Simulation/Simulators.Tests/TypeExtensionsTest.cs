@@ -57,6 +57,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void QubitTypes()
+        {
+            var q = new FreeQubit(0);
+            Assert.Null(q.GetNonQubitArgumentsAsString());
+
+            var qs = new QArray<Qubit>(new[] { new FreeQubit(0) });
+            Assert.Null(qs.GetNonQubitArgumentsAsString());
+
+            qs = new QArray<Qubit>(new[] { new FreeQubit(0), new FreeQubit(1) });
+            Assert.Null(qs.GetNonQubitArgumentsAsString());
+        }
+
+        [Fact]
         public void IApplyDataTypes()
         {
             IApplyData data;
@@ -84,6 +97,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
             data = new ApplyData<(FreeQubit, string)[]>(arr);
             Assert.Equal("[(\"foo\"), (\"bar\")]", data.GetNonQubitArgumentsAsString());
+
+            var q = new FreeQubit(0);
+            data = new ApplyData<Qubit>(q);
+            Assert.Null(data.GetNonQubitArgumentsAsString());
+
+            var qs = new QArray<Qubit>(new[] { new FreeQubit(0), new FreeQubit(1) });
+            data = new ApplyData<IQArray<Qubit>>(qs);
+            Assert.Null(data.GetNonQubitArgumentsAsString());
         }
     }
 }
