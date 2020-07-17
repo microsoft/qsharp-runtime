@@ -20,6 +20,7 @@ IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib    copy %DRO
 IF NOT EXIST win10 mkdir win10
 IF EXIST %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll copy %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll win10\Microsoft.Quantum.Simulator.Runtime.dll
 
+IF NOT EXIST %BUILD_FOLDER% mkdir %BUILD_FOLDER%
 pushd %BUILD_FOLDER%
 
 IF NOT EXIST Release mkdir Release
