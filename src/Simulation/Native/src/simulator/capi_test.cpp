@@ -223,7 +223,7 @@ int main()
                         numThreads(1,4) [upto 16 on big machines]
                             simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
     */
-    const int testCnt = 39;
+    const int testCnt = 44;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  2,  4,  4,  4}, // 4 bits Shor
@@ -266,13 +266,19 @@ int main()
         {   1,  9,  6, 12,  4}, // Suprem_56_6 - big
         {   1,  9,  6, 14,  4}, // Suprem_56_6 - big
         {   1,  9,  6, 16,  4}, // Suprem_56_6 - big
+
+        {   1, 10,  4,  4,  4}, // qulacs benchmark, nQs=5
+        {   1, 11,  4,  4,  4}, // qulacs benchmark, nQs=10
+        {   1, 12,  4,  4,  4}, // qulacs benchmark, nQs=15
+        {   1, 13,  4,  4,  4}, // qulacs benchmark, nQs=20
+        {   1, 14,  4,  4,  4}, // qulacs benchmark, nQs=25
     };
 
     const char* scheds[4]   = { "std", "qio", "sim", "ord" };
     const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
 
 
-    for (int doReorder = 2; doReorder < 3; doReorder++) {
+    for (int doReorder = 0; doReorder < 1; doReorder++) {
         printf(">>>> reorder: %d\n", doReorder);
         for (int idxSched = 0; idxSched < 4; idxSched++) {
             const char* sched = scheds[idxSched];
@@ -286,10 +292,11 @@ int main()
                 int simTyp = tests[tIdx][4];
                 char fName[30];
 
-                if (prbIdx != 8 || numThreads != 4 || fuseSpan != 4 || idxSched != 3) continue; //@@@DBG
+                if (prbIdx < 10 || prbIdx > 14) continue;       // Just do qulacs @@@DBG
+                if (idxSched != 3) continue;                    // Just do ord scheduler
 
-                if (numThreads > 4) continue;   // Not on a big machine
-                if (prbIdx > 8) continue;       // Not on a big machine
+                if (numThreads > 4) continue;                   // Not on a big machine
+                if (prbIdx > 8 && prbIdx < 10) continue;        // Not on a big machine
 
                 if (prbIdx >= 0 && prbIdx <= 1) { // Bench
                     if (prbIdx == 0) nQs = 15;
@@ -321,6 +328,12 @@ int main()
                     int spanInp = 4;
                     if (fuseSpan > 4) spanInp = fuseSpan;
                     mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
+                    prb = loadTest(fName, idxSched > 0);
+                    nQs = numQs(prb);
+                }
+                else if (prbIdx >= 10 && prbIdx <= 14) { // qulacs
+                    int bits = (prbIdx - 9) * 5;
+                    mySprintf(fName, sizeof(fName), "qulacs_%d_%d.log", bits, fuseSpan);
                     prb = loadTest(fName, idxSched > 0);
                     nQs = numQs(prb);
                 }
