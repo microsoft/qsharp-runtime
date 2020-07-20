@@ -168,7 +168,7 @@ namespace Microsoft.Quantum.Simulation.Core
             // If object is an IApplyData, recursively extract arguments
             if (o is IApplyData data)
             {
-                return data.Value.GetNonQubitArgumentsAsString();
+                return data.Value?.GetNonQubitArgumentsAsString();
             }
 
             // If object is a string, enclose it in quotations
