@@ -34,6 +34,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void OperationTypes()
+        {
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
+            Assert.Equal("H", op.GetNonQubitArgumentsAsString());
+
+            var op2 = new QuantumSimulator().Get<Intrinsic.CNOT>();
+            Assert.Equal("CNOT", op2.GetNonQubitArgumentsAsString());
+        }
+
+        [Fact]
         public void QubitTypes()
         {
             var q = new FreeQubit(0);
@@ -58,6 +68,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal("(\"foo\", (\"bar\", \"car\"))", ("foo", ("bar", "car")).GetNonQubitArgumentsAsString());
             Assert.Equal("((\"foo\"), (\"bar\", \"car\"))", (("foo", new FreeQubit(0)), ("bar", "car")).GetNonQubitArgumentsAsString());
 
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
+            var opTuple = new QTuple<(ICallable, string)>((op, "foo"));
+            Assert.Equal("(H, \"foo\")", opTuple.GetNonQubitArgumentsAsString());
+
             var qtuple = new QTuple<(Qubit, string)>((new FreeQubit(0), "foo"));
             Assert.Equal("(\"foo\")", qtuple.GetNonQubitArgumentsAsString());
         }
@@ -68,11 +82,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal("[1, 2, 3]", new[] { 1, 2, 3 }.GetNonQubitArgumentsAsString());
             Assert.Equal("[\"foo\", \"bar\"]", new[] { "foo", "bar" }.GetNonQubitArgumentsAsString());
 
-            var arr = new[] {
+            var opArr = new ICallable[] {
+                new QuantumSimulator().Get<Intrinsic.H>(),
+                new QuantumSimulator().Get<Intrinsic.CNOT>(),
+                new QuantumSimulator().Get<Intrinsic.Ry>(),
+            };
+            Assert.Equal("[H, CNOT, Ry]", opArr.GetNonQubitArgumentsAsString());
+
+            var qTupleArr = new[] {
                 (new FreeQubit(0), "foo"),
                 (new FreeQubit(1), "bar"),
             };
-            Assert.Equal("[(\"foo\"), (\"bar\")]", arr.GetNonQubitArgumentsAsString());
+            Assert.Equal("[(\"foo\"), (\"bar\")]", qTupleArr.GetNonQubitArgumentsAsString());
         }
 
         [Fact]
@@ -87,6 +108,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             data = new ApplyData<string>("Foo");
             Assert.Equal("\"Foo\"", data.GetNonQubitArgumentsAsString());
+
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
+            data = new ApplyData<ICallable>(op);
+            Assert.Equal("H", data.GetNonQubitArgumentsAsString());
 
             data = new ApplyData<ValueTuple<int, string>>((1, "foo"));
             Assert.Equal("(1, \"foo\")", data.GetNonQubitArgumentsAsString());

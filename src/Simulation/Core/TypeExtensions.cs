@@ -159,6 +159,12 @@ namespace Microsoft.Quantum.Simulation.Core
             // If object is a Qubit, QVoid, or array of Qubits, ignore it (i.e. return null)
             if (o is Qubit || o is QVoid || o is IEnumerable<Qubit>) return null;
 
+            // If object is an ICallable, return its name
+            if (o is ICallable op)
+            {
+                return op.Name;
+            }
+
             // If object is an IApplyData, recursively extract arguments
             if (o is IApplyData data)
             {
