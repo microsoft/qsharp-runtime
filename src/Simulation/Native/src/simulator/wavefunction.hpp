@@ -358,6 +358,46 @@ class Wavefunction
         rng_.seed(s);
     }
 
+    std::vector<Cluster> makeClusters(unsigned fuseSpan, std::vector<GateWrapper> gates) const {
+        std::vector<Cluster> curClusters;
+
+        if (gates.size() > 0) {
+            unsigned maxDepth = 999;
+            for (int i = 0; i < gates.size(); i++) {
+                std::vector<unsigned> qids;
+                std::vector<unsigned> controlQids = gates[i].get_controls();
+                if (controlQids.size() > 0) {
+                    qids = controlQids;
+                }
+                qids.push_back(gates[i].get_target());
+                Cluster newCl = Cluster(qids, { gates[i] });
+                curClusters.push_back(newCl);
+            }
+            for (int i = 1; i < fuseSpan + 1; i++) {
+                auto prevClusters = curClusters;
+                curClusters.clear();
+                auto prevCluster = prevClusters[0];
+                prevClusters.erase(prevClusters.begin());
+                while (prevClusters.size() > 0) {
+                    auto foundCompat = prevCluster.nextCluster(prevClusters, i, maxDepth);
+                    Cluster clusterFound = foundCompat.first;
+                    std::vector<unsigned> foundTotQids = foundCompat.second;
+                    if (clusterFound.get_gates().size() == 0) {
+                        curClusters.push_back(prevCluster);
+                        prevCluster = prevClusters[0];
+                        prevClusters.erase(prevClusters.begin());
+                    }
+                    else {
+                        prevCluster.setQids(foundTotQids);
+                        prevCluster.appendGates(clusterFound.get_gates());
+                    }
+                }
+                curClusters.push_back(prevCluster);
+            }
+        }
+        return curClusters;
+    }
+
     void reorder_wavefunction(unsigned qubitLoc, unsigned newPos) const
     {
         
