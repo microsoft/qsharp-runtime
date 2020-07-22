@@ -411,9 +411,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void OperationAsArgument()
+        {
+            var q = new FreeQubit(0);
+            var opArg = new QuantumSimulator().Get<Circuits.HOp>();
+            var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
+            var args = op.__dataIn((opArg, q));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "WrapperOp",
+                FormattedNonQubitArgs = "(HOp)",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { q },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
         public void NestedOperation()
         {
-            var measureQubit = new FreeQubit(0);
             var op = new QuantumSimulator().Get<Circuits.NestedOp>();
             var args = op.__dataIn(QVoid.Instance);
             var expected = new RuntimeMetadata()
