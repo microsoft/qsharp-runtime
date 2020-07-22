@@ -114,7 +114,7 @@ public:
 		return cnt;
 	}
 
-	void insert(Matrix matrix, IndexVector index_list, IndexVector const& ctrl_list = {}){
+	void insert(Matrix matrix, IndexVector index_list, IndexVector const& ctrl_list = {}) const {
 		for (auto idx : index_list)
 			target_set_.emplace(idx);
 		
@@ -184,7 +184,7 @@ public:
 	}
 
 private:
-	void add_controls(Matrix &matrix, IndexVector &indexList, IndexVector const& new_ctrls){
+	void add_controls(Matrix &matrix, IndexVector &indexList, IndexVector const& new_ctrls) const {
 		indexList.reserve(indexList.size()+new_ctrls.size());
 		indexList.insert(indexList.end(), new_ctrls.begin(), new_ctrls.end());
 		
@@ -202,7 +202,7 @@ private:
 		matrix = std::move(newmatrix);
 	}
 	
-	void handle_controls(Matrix &matrix, IndexVector &indexList, IndexVector const& ctrlList){
+	void handle_controls(Matrix &matrix, IndexVector &indexList, IndexVector const& ctrlList) const {
 		auto unhandled_ctrl = ctrl_set_; // will contain all ctrls that are not part of the new command
 		// --> need to be removed from the global mask and the controls incorporated into the old
 		// commands (the ones already in the list).

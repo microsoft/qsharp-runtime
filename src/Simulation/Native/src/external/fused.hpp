@@ -87,7 +87,7 @@ class Fused
     }
     
     template <class M>
-    Fusion::Matrix convertMatrix(M const& m)
+    Fusion::Matrix convertMatrix(M const& m) const
     {
       Fusion::Matrix mat(2, Fusion::Matrix::value_type(2));
       for (unsigned i = 0; i < 2; ++i)
@@ -97,7 +97,7 @@ class Fused
     }
     
     template <class T, class A, class M>
-    void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
+    void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q) const
     {
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
