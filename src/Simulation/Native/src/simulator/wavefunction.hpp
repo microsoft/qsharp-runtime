@@ -455,24 +455,32 @@ class Wavefunction
     {
         //check flush condition
         std::vector<qubit_t> cs;
-        auto mat = g.matrix();
-        if (fused_.shouldFlush(wfn_, cs, g.qubit())) {
+        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        gatelist_.push_back(gateApplied);
+        if (gatelist_.size() > 50) {
             flush();
         }
-        fused_.apply(wfn_, mat, g.qubit());
+        /*if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+            flush();
+        }
+        fused_.apply(wfn_, g.matrix(), g.qubit());*/
     }
-    
+
     /// generic application of a multiply controlled gate
     template <class Gate>
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
-        auto mat = g.matrix();
-        //check flush condition
-        if (fused_.shouldFlush(wfn_, cs, g.qubit())) {
+        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        gatelist_.push_back(gateApplied);
+        if (gatelist_.size() > 50) {
             flush();
         }
-        fused_.apply_controlled(wfn_, mat, cs, g.qubit());
+        //check flush condition
+        /*if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+            flush();
+        }
+        fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());*/
     }
 
     /// generic application of a controlled gate
