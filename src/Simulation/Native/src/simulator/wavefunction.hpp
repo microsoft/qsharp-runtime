@@ -45,6 +45,79 @@ namespace SIMULATOR
         }
     }
 
+    class GateWrapper {
+    public:
+        GateWrapper(std::vector<unsigned> controls, unsigned target, TinyMatrix<ComplexType, 2> mat) : controls_(controls), target_(target), mat_(mat) {}
+        std::vector<unsigned> get_controls() { return controls_; }
+        unsigned get_target() { return target_; }
+        TinyMatrix<ComplexType, 2> get_mat() { return mat_; }
+    private:
+        std::vector<unsigned> controls_;
+        unsigned target_;
+        TinyMatrix<ComplexType, 2> mat_;
+    };
+
+
+    class Cluster {
+    public:
+        Cluster(std::vector<unsigned> qids, std::vector<GateWrapper> gates) : qids_(qids), gates_(gates) {}
+        std::vector<unsigned> get_qids() { return qids_; }
+        std::vector<GateWrapper> get_gates() { return gates_; }
+        void setQids(std::vector<unsigned> qids) {
+            qids_ = qids;
+        }
+        void appendGates(std::vector<GateWrapper> gates) {
+            gates_.insert(gates_.end(), gates.begin(), gates.end());
+        }
+        std::pair<Cluster, std::vector<unsigned>> nextCluster(std::vector<Cluster>& prevClusters, unsigned maxWidth, unsigned maxDepth) {
+            std::set<unsigned> tempCurQids(qids_.begin(), qids_.end());
+            for (int i = 0; i < prevClusters.size(); i++) {
+                if (i > maxDepth) {
+                    break;
+                }
+                auto prevQids = prevClusters[i].get_qids();
+                std::set<unsigned> tempPrevQids(prevQids.begin(), prevQids.end());
+                std::set<unsigned> tempTotQids(qids_.begin(), qids_.end());
+                tempTotQids.insert(tempPrevQids.begin(), tempPrevQids.end());
+                std::vector<unsigned> totQids(tempTotQids.begin(), tempTotQids.end());
+                if (totQids.size() <= maxWidth) {
+                    auto cl = prevClusters[i];
+                    prevClusters.erase(prevClusters.begin() + i);
+                    return std::make_pair(cl, totQids);
+                }
+
+                std::vector<int> qidsIntersection;
+                if (i == prevClusters.size() - 1) {
+                    std::set_intersection(tempPrevQids.begin(), tempPrevQids.end(),
+                        tempCurQids.begin(), tempCurQids.end(),
+                        std::back_inserter(qidsIntersection));
+                }
+                else {
+                    std::vector<unsigned> lookAhead = prevClusters[i + 1].get_qids();
+                    std::set<int> lookAheadQids(lookAhead.begin(), lookAhead.end());
+                    if (i == 0) {
+                        std::set_intersection(tempPrevQids.begin(), tempPrevQids.end(),
+                            tempCurQids.begin(), tempCurQids.end(),
+                            std::back_inserter(qidsIntersection));
+                    }
+                    std::set_intersection(lookAheadQids.begin(), lookAheadQids.end(),
+                        tempCurQids.begin(), tempCurQids.end(),
+                        std::back_inserter(qidsIntersection));
+                }
+                tempCurQids.insert(prevQids.begin(), prevQids.end());
+                if (qidsIntersection.size() > 0) {
+                    break;
+                }
+            }
+            Cluster defCl = Cluster({}, {});
+            std::vector<unsigned> defVec = {};
+            return std::make_pair(defCl, defVec);
+        }
+    private:
+        std::vector<unsigned> qids_;
+        std::vector<GateWrapper> gates_;
+    };
+
 /// A wave function class to store and manipulate the state of qubits
 
 template <class T = ComplexType>
