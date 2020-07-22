@@ -164,53 +164,73 @@ class Wavefunction
 
     void flush() const
     {
-        //logic to reorder
-        Fusion fg = fused_.get_fusedgates();
-        auto itemsToFuse = fg.get_items();
-        auto ctrlSet = fg.get_ctrl_set();
-        //getting all qubits to move to lower end of the wfn
-        if (itemsToFuse.size() > 0) {
-            std::vector<unsigned> unionOfAllQubitsInUse;
-            std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
-            for (int i = 0; i < itemsToFuse.size(); i++) {
-                auto tempIndices = itemsToFuse[i].get_indices();
-                for (unsigned j = 0; j < tempIndices.size(); j++) {
-                    if (indicesSet.count(tempIndices[j]) == 0) {
-                        unionOfAllQubitsInUse.push_back(tempIndices[j]);
-                        indicesSet.insert(tempIndices[j]);
+        if (dbgFusedSpan < 0) dbgFusedSpan = 4;
+        auto clusters = makeClusters(dbgFusedSpan, gatelist_);
+        gatelist_.clear();
+        if (clusters.size() == 0) {
+            fused_.flush(wfn_);
+        }
+        else {
+            for (int i = 0; i < clusters.size(); i++) {
+                Cluster cl = clusters.at(i);
+                for (GateWrapper gate : cl.get_gates()) {
+                    std::vector<unsigned> cs = gate.get_controls();
+                    if (cs.size() == 0) {
+                        fused_.apply(wfn_, gate.get_mat(), gate.get_target());
+                    }
+                    else {
+                        fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
                     }
                 }
-            }
-            for (auto it = ctrlSet.begin(); it != ctrlSet.end(); ++it) {
-                if (indicesSet.count(*it) == 0) {
-                    unionOfAllQubitsInUse.push_back(*it);
-                    indicesSet.insert(*it);
-                }
-            }
-            //performing reorder
-            std::vector<qubit_t> indexLocs = qubits(unionOfAllQubitsInUse);
-            for (unsigned i = 0; i < indexLocs.size(); i++)
-            {
-                auto currLoc = indexLocs[i];
-                reorder_wavefunction(currLoc, i);
-                indexLocs = qubits(unionOfAllQubitsInUse);
-            }
-            //keeping old and new location in order to set it appropriately
-            std::unordered_map<unsigned, unsigned> old2newDict;
-            for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
-            }
+                //logic to reorder
+                Fusion fg = fused_.get_fusedgates();
+                auto itemsToFuse = fg.get_items();
+                auto ctrlSet = fg.get_ctrl_set();
+                //getting all qubits to move to lower end of the wfn
+                if (itemsToFuse.size() > 0) {
+                    std::vector<unsigned> unionOfAllQubitsInUse;
+                    std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
+                    for (int i = 0; i < itemsToFuse.size(); i++) {
+                        auto tempIndices = itemsToFuse[i].get_indices();
+                        for (unsigned j = 0; j < tempIndices.size(); j++) {
+                            if (indicesSet.count(tempIndices[j]) == 0) {
+                                unionOfAllQubitsInUse.push_back(tempIndices[j]);
+                                indicesSet.insert(tempIndices[j]);
+                            }
+                        }
+                    }
+                    for (auto it = ctrlSet.begin(); it != ctrlSet.end(); ++it) {
+                        if (indicesSet.count(*it) == 0) {
+                            unionOfAllQubitsInUse.push_back(*it);
+                            indicesSet.insert(*it);
+                        }
+                    }
+                    //performing reorder
+                    std::vector<qubit_t> indexLocs = qubits(unionOfAllQubitsInUse);
+                    for (unsigned i = 0; i < indexLocs.size(); i++)
+                    {
+                        auto currLoc = indexLocs[i];
+                        reorder_wavefunction(currLoc, i);
+                        indexLocs = qubits(unionOfAllQubitsInUse);
+                    }
+                    //keeping old and new location in order to set it appropriately
+                    std::unordered_map<unsigned, unsigned> old2newDict;
+                    for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
+                        old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
+                    }
 
-            for (int i = 0; i < itemsToFuse.size(); i++) {
-                itemsToFuse[i].set_idx(old2newDict);
+                    for (int i = 0; i < itemsToFuse.size(); i++) {
+                        itemsToFuse[i].set_idx(old2newDict);
+                    }
+                    fg.set_items(std::move(itemsToFuse));
+                    fg.update_target_set(old2newDict);
+                    fg.set_ctrl_set(old2newDict);
+                    fused_.set_fusedgates(fg);
+                }
+
+                fused_.flush(wfn_);
             }
-            fg.set_items(std::move(itemsToFuse));
-            fg.update_target_set(old2newDict);
-            fg.set_ctrl_set(old2newDict);
-            fused_.set_fusedgates(fg);
         }
-        
-        fused_.flush(wfn_);
     }
 
 	/// allocate a qubit and grow the wave function
