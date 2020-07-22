@@ -570,7 +570,8 @@ class Wavefunction
     unsigned num_qubits_;             // for convenience
     mutable WavefunctionStorage wfn_; // storing the wave function
     mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
-	  int usage_;
+	int usage_;
+    mutable std::vector<GateWrapper> gatelist_;
 
     // randomness support
     RngEngine rng_;
