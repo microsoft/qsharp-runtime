@@ -92,47 +92,46 @@ class Wavefunction
     {
         //logic to reorder
         Fusion fg = fused_.getFusedGates();
-        auto items = fg.getItems();
-        auto sets = fg.getSet();
-        auto ctrlSets = fg.getCtrlSet();
+        auto itemsToFuse = fg.getItems();
+        auto ctrlSet = fg.getCtrlSet();
         //getting all qubits to move to lower end of the wfn
-        if (items.size() > 0) {
-            std::vector<unsigned> indices;
-            std::set<unsigned> indicesSet;
-            for (int i = 0; i < items.size(); i++) {
-                auto tempIndices = items[i].get_indices();
+        if (itemsToFuse.size() > 0) {
+            std::vector<unsigned> unionOfAllQubitsInUse;
+            std::set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
+            for (int i = 0; i < itemsToFuse.size(); i++) {
+                auto tempIndices = itemsToFuse[i].get_indices();
                 for (unsigned j = 0; j < tempIndices.size(); j++) {
                     if (indicesSet.count(tempIndices[j]) == 0) {
-                        indices.push_back(tempIndices[j]);
+                        unionOfAllQubitsInUse.push_back(tempIndices[j]);
                         indicesSet.insert(tempIndices[j]);
                     }
                 }
             }
-            for (auto it = ctrlSets.begin(); it != ctrlSets.end(); ++it) {
+            for (auto it = ctrlSet.begin(); it != ctrlSet.end(); ++it) {
                 if (indicesSet.count(*it) == 0) {
-                    indices.push_back(*it);
+                    unionOfAllQubitsInUse.push_back(*it);
                     indicesSet.insert(*it);
                 }
             }
             //performing reorder
-            std::vector<qubit_t> indexLocs = qubits(indices);
+            std::vector<qubit_t> indexLocs = qubits(unionOfAllQubitsInUse);
             for (unsigned i = 0; i < indexLocs.size(); i++)
             {
                 auto currLoc = indexLocs[i];
-                reorderWFN(currLoc, i);
-                indexLocs = qubits(indices);
+                reorderWavefunction(currLoc, i);
+                indexLocs = qubits(unionOfAllQubitsInUse);
             }
             //keeping old and new location in order to set it appropriately
-            std::map<unsigned, unsigned> old2newDict;
-            for (unsigned i = 0; i < indices.size(); i++) {
-                old2newDict[indices[i]] = indexLocs[i];
+            std::unordered_map<unsigned, unsigned> old2newDict;
+            for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
+                old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
             }
 
-            for (int i = 0; i < items.size(); i++) {
-                items[i].setIdx(old2newDict);
+            for (int i = 0; i < itemsToFuse.size(); i++) {
+                itemsToFuse[i].setIdx(old2newDict);
             }
-            fg.setItems(items);
-            fg.setSet(old2newDict);
+            fg.setItems(std::move(itemsToFuse));
+            fg.updateTargetSet(old2newDict);
             fg.setCtrlSet(old2newDict);
             fused_.setFusedGates(fg);
         }
@@ -163,8 +162,6 @@ class Wavefunction
 	/// allocate a qubit and grow the wave function
     void allocateQubit(unsigned id)
     {
-       
-        
         assert(usage_ != 1);
         usage_ = 2;
         flush();
@@ -177,9 +174,6 @@ class Wavefunction
             qubitmap_.push_back(num_qubits_++);
         }
         assert((wfn_.size() >> num_qubits_) == 1);
-        //std::copy(qubitmap_.begin(), qubitmap_.end(), std::ostream_iterator<T>(std::cout, " "));
-        //std::cout << qubitmap_.back() << "\n";
-        //std::cout << wfn_.back() << "\n";
     }
 
     /// release the specified qubit
@@ -290,30 +284,33 @@ class Wavefunction
         rng_.seed(s);
     }
 
-    void reorderWFN(unsigned qubitLoc, unsigned newPos) const
+    void reorderWavefunction(unsigned qubitLoc, unsigned newPos) const
     {
-        //get id of qubit located at newPos and qubitLoc - getting index from the element
-        auto itr1 = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
-        auto newPosId = std::distance(qubitmap_.begin(), itr1);
-        auto itr2 = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
-        auto qid = std::distance(qubitmap_.begin(), itr2);
-        //swap qubits in wfn between qubitLoc and newPos
+        
+        // swap qubits in wfn between qubitLoc and newPos
         if (newPos != qubitLoc)
         {
-            for (unsigned i = 0; i < wfn_.size(); i++)
+            // get id of qubit located at newPos and qubitLoc - getting index from the element
+            auto newQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
+            assert(newQubitLocItr != qubitmap_.end());
+            auto newPosId = std::distance(qubitmap_.begin(), newQubitLocItr);
+            auto origQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
+            assert(origQubitLocItr != qubitmap_.end());
+            auto qid = std::distance(qubitmap_.begin(), origQubitLocItr);
+            for (std::size_t i = 0ull; i < wfn_.size(); i++)
             {
-                unsigned int bit1 = (i >> qubitLoc) & 1;
-                unsigned int bit2 = (i >> newPos) & 1;
-                unsigned int x = (bit1 ^ bit2);
+                std::size_t bit1 = (i >> qubitLoc) & 1ull;
+                std::size_t bit2 = (i >> newPos) & 1ull;
+                std::size_t x = (bit1 ^ bit2);
                 x = (x << qubitLoc) | (x << newPos);
-                unsigned new_i = i ^ x;
+                std::size_t new_i = i ^ x;
                 if (new_i > i)
                 {
                     std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
                 }
             }
-            //swap elemnts in qubitmap located at qid and newPosId
-            std::iter_swap(qubitmap_.begin() + qid, qubitmap_.begin() + newPosId);
+            // swap elements in qubitmap located at qid and newPosId
+            std::iter_swap(origQubitLocItr, newQubitLocItr);
         }
         
     }
@@ -323,10 +320,11 @@ class Wavefunction
     {
         //check flush condition
         std::vector<qubit_t> cs;
-        if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+        auto mat = g.matrix();
+        if (fused_.shouldFlush(wfn_, cs, g.qubit())) {
             flush();
         }
-        fused_.apply(wfn_, g.matrix(), g.qubit());
+        fused_.apply(wfn_, mat, g.qubit());
     }
     
     /// generic application of a multiply controlled gate
@@ -334,11 +332,12 @@ class Wavefunction
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
+        auto mat = g.matrix();
         //check flush condition
-        if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
+        if (fused_.shouldFlush(wfn_, cs, g.qubit())) {
             flush();
         }
-        fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());
+        fused_.apply_controlled(wfn_, mat, cs, g.qubit());
     }
 
     /// generic application of a controlled gate

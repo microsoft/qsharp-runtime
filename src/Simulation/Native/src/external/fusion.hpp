@@ -10,7 +10,7 @@
 #include <iostream>
 #include <cassert>
 #include "util/alignedalloc.hpp"
-#include <map>
+#include <unordered_map>
 
 class Item{
 public:  
@@ -21,8 +21,8 @@ public:
 	Item(Matrix mat, IndexVector idx) : mat_(mat), idx_(idx) {}
 	Matrix& get_matrix() { return mat_; }
 	IndexVector& get_indices() { return idx_; }
-	void setIdx(std::map<unsigned, unsigned> elemDict) {
-		for (unsigned i = 0; i < idx_.size(); i++) {
+	void setIdx(std::unordered_map<unsigned, unsigned> elemDict) {
+		for (size_t i = 0; i < idx_.size(); i++) {
 			idx_[i] = elemDict[idx_[i]];
 		}
 	}
@@ -31,6 +31,7 @@ private:
 	IndexVector idx_;
 };
 
+// Class handling the fusion of gates
 class Fusion{
 public:
 	using Index = unsigned;
@@ -43,7 +44,7 @@ public:
 	Fusion() : global_factor_(1.) {}
 	
 	Index num_qubits() const {
-		return static_cast<Index>(set_.size());
+		return static_cast<Index>(target_set_.size());
 	}
 
 	Index num_controls() const {
@@ -64,8 +65,8 @@ public:
 		handle_controls(empty_matrix, empty_vec, {}); // remove all current control qubits (this is a GLOBAL factor)
 	}
 	
-	IndexSet getSet() const {
-		return set_;
+	IndexSet getTargetSet() const {
+		return target_set_;
 	}
 
 	ItemVector getItems() const {
@@ -80,46 +81,42 @@ public:
 		return global_factor_;
 	}
 
-	void setSet(std::map<unsigned, unsigned> elemDict) {
+	static void remapQubits(std::set<Index>& qubits, const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
 		std::set<Index> tempSet;
-		for (unsigned elem : set_) {
-			if (elemDict.find(elem) != elemDict.end()) {
-				tempSet.insert(elemDict[elem]);
+		for (unsigned elem : qubits) {
+			if (mapFromOldLocToNewLoc.find(elem) != mapFromOldLocToNewLoc.end()) {
+				tempSet.insert(mapFromOldLocToNewLoc.at(elem));
 			}
 		}
-		set_.clear();
-		set_.insert(tempSet.begin(), tempSet.end()); //look into using swap instead
+		qubits.swap(tempSet);
 	}
 
-	void setCtrlSet(std::map<unsigned, unsigned> elemDict) {
-		std::set<Index> tempSet;
-		for (unsigned elem : ctrl_set_) {
-			if (elemDict.find(elem) != elemDict.end()) {
-				tempSet.insert(elemDict[elem]);
-			}
-		}
-		ctrl_set_.clear();
-		ctrl_set_.insert(tempSet.begin(), tempSet.end());
+	void updateTargetSet(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+		remapQubits(target_set_, mapFromOldLocToNewLoc);
+	}
+
+	void setCtrlSet(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+		remapQubits(ctrl_set_, mapFromOldLocToNewLoc);
 	}
 	
-	void setItems(ItemVector newItems) {
-		items_.clear();
-		items_.insert(items_.begin(), newItems.begin(), newItems.end());
+	void setItems(ItemVector&& newItems) {
+		items_.swap(newItems);
 	}
+
 	// This saves a class instance create/destroy on every gate insert
 	// Need a quick way to decide if we're going to grow too wide
 	int predict(IndexVector index_list, IndexVector const& ctrl_list = {}) {
 		int cnt = num_qubits() + num_controls();
 		for (auto idx : index_list)
-			if (set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
+			if (target_set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
 		for (auto idx : ctrl_list)
-			if (set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
+			if (target_set_.count(idx) == 0 && ctrl_set_.count(idx) == 0) cnt++;
 		return cnt;
 	}
 
 	void insert(Matrix matrix, IndexVector index_list, IndexVector const& ctrl_list = {}){
 		for (auto idx : index_list)
-			set_.emplace(idx);
+			target_set_.emplace(idx);
 		
 		if (global_factor_ != 1. && ctrl_list.size() > 0){
 			assert(ctrl_set_.size() == 0);
@@ -132,7 +129,7 @@ public:
 	}
 	
 	void get_indices(IndexVector &indices) const{
-		for (auto idx : set_)
+		for (auto idx : target_set_)
 			indices.push_back(idx);
 	}
 	
@@ -140,7 +137,7 @@ public:
 		if (global_factor_ != 1.)
 			assert(ctrl_set_.size() == 0);
 		
-		for (auto idx : set_)
+		for (auto idx : target_set_)
 			index_list.push_back(idx);
 		
 		unsigned N = num_qubits();
@@ -214,7 +211,7 @@ private:
 			if (ctrl_set_.count(ctrlIdx) == 0){ // need to either add it to the list or to the command
 				if (items_.size() > 0){ // add it to the command
 					add_controls(matrix, indexList, {ctrlIdx});
-					set_.insert(ctrlIdx);
+					target_set_.insert(ctrlIdx);
 				}
 				else // add it to the list
 					ctrl_set_.emplace(ctrlIdx);
@@ -230,16 +227,16 @@ private:
 			for (auto idx : unhandled_ctrl){
 				new_ctrls.push_back(idx);
 				ctrl_set_.erase(idx);
-				set_.insert(idx);
+				target_set_.insert(idx);
 			}
 			for (auto &item : items_)
 				add_controls(item.get_matrix(), item.get_indices(), new_ctrls);
 		}
 	}
 	
-	IndexSet set_;
-	ItemVector items_;
-	IndexSet ctrl_set_;
+	IndexSet target_set_; //set of qubits being acted on
+	ItemVector items_; //queue if gates to be fused
+	IndexSet ctrl_set_; //set of controls
 	Complex global_factor_;
 };
 

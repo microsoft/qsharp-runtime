@@ -45,8 +45,8 @@ class Fused
         return fusedgates;
     }
     
-    void setFusedGates(Fusion newFG) const {
-        fusedgates = newFG;
+    void setFusedGates(Fusion newFusedGates) const {
+        fusedgates = newFusedGates;
     }
 
     template <class T, class A>
@@ -86,15 +86,6 @@ class Fused
       fusedgates = Fusion();
     }
     
-    template <class T, class A1, class A2>
-    bool subsytemwavefunction(std::vector<T, A1>& wfn,
-                              std::vector<unsigned> const& qs,
-                              std::vector<T, A2>& qubitswfn,
-                              double tolerance)
-    {
-      return kernels::subsytemwavefunction(wfn, qs, qubitswfn, tolerance);
-    }
-    
     template <class M>
     Fusion::Matrix convertMatrix(M const& m)
     {
@@ -108,7 +99,7 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
-        Fusion::IndexVector qs      = std::vector<unsigned>(1, q);
+        Fusion::IndexVector qs = std::vector<unsigned>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
     }
 
@@ -119,8 +110,8 @@ class Fused
       apply_controlled(wfn, mat, cs, q);
     }
 
-    template <class T, class A, class M>
-    bool shouldFlush(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
+    template <class T, class A>
+    bool shouldFlush(std::vector<T, A>& wfn, std::vector<unsigned> const& cs, unsigned q)
     {
         // Major runtime logic change here
 
