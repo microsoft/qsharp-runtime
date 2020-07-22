@@ -12,6 +12,7 @@
 #include <limits>
 #include <random>
 #include <vector>
+#include <unordered_set>
 
 #include "types.hpp"
 #include "gates.hpp"
@@ -91,13 +92,13 @@ class Wavefunction
     void flush() const
     {
         //logic to reorder
-        Fusion fg = fused_.getFusedGates();
-        auto itemsToFuse = fg.getItems();
-        auto ctrlSet = fg.getCtrlSet();
+        Fusion fg = fused_.get_fusedgates();
+        auto itemsToFuse = fg.get_items();
+        auto ctrlSet = fg.get_ctrl_set();
         //getting all qubits to move to lower end of the wfn
         if (itemsToFuse.size() > 0) {
             std::vector<unsigned> unionOfAllQubitsInUse;
-            std::set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
+            std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
             for (int i = 0; i < itemsToFuse.size(); i++) {
                 auto tempIndices = itemsToFuse[i].get_indices();
                 for (unsigned j = 0; j < tempIndices.size(); j++) {
@@ -118,7 +119,7 @@ class Wavefunction
             for (unsigned i = 0; i < indexLocs.size(); i++)
             {
                 auto currLoc = indexLocs[i];
-                reorderWavefunction(currLoc, i);
+                reorder_wavefunction(currLoc, i);
                 indexLocs = qubits(unionOfAllQubitsInUse);
             }
             //keeping old and new location in order to set it appropriately
@@ -128,12 +129,12 @@ class Wavefunction
             }
 
             for (int i = 0; i < itemsToFuse.size(); i++) {
-                itemsToFuse[i].setIdx(old2newDict);
+                itemsToFuse[i].set_idx(old2newDict);
             }
-            fg.setItems(std::move(itemsToFuse));
-            fg.updateTargetSet(old2newDict);
-            fg.setCtrlSet(old2newDict);
-            fused_.setFusedGates(fg);
+            fg.set_items(std::move(itemsToFuse));
+            fg.update_target_set(old2newDict);
+            fg.set_ctrl_set(old2newDict);
+            fused_.set_fusedgates(fg);
         }
         
         fused_.flush(wfn_);
@@ -284,7 +285,7 @@ class Wavefunction
         rng_.seed(s);
     }
 
-    void reorderWavefunction(unsigned qubitLoc, unsigned newPos) const
+    void reorder_wavefunction(unsigned qubitLoc, unsigned newPos) const
     {
         
         // swap qubits in wfn between qubitLoc and newPos
@@ -314,6 +315,7 @@ class Wavefunction
         }
         
     }
+
     /// generic application of a gate
     template <class Gate>
     void apply(Gate const& g)

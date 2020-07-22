@@ -18,10 +18,10 @@ public:
 	using IndexVector = std::vector<Index>;
 	using Complex = std::complex<double>;
 	using Matrix = std::vector<std::vector<Complex, Microsoft::Quantum::Simulator::AlignedAlloc<Complex, 64>>>;
-	Item(Matrix mat, IndexVector idx) : mat_(mat), idx_(idx) {}
+	Item(Matrix mat, IndexVector idx) : mat_(std::move(mat)), idx_(idx) {}
 	Matrix& get_matrix() { return mat_; }
 	IndexVector& get_indices() { return idx_; }
-	void setIdx(std::unordered_map<unsigned, unsigned> elemDict) {
+	void set_idx(std::unordered_map<unsigned, unsigned> elemDict) {
 		for (size_t i = 0; i < idx_.size(); i++) {
 			idx_[i] = elemDict[idx_[i]];
 		}
@@ -65,23 +65,23 @@ public:
 		handle_controls(empty_matrix, empty_vec, {}); // remove all current control qubits (this is a GLOBAL factor)
 	}
 	
-	IndexSet getTargetSet() const {
+	IndexSet get_target_set() const& {
 		return target_set_;
 	}
 
-	ItemVector getItems() const {
+	ItemVector get_items() const& {
 		return items_;
 	}
 
-	IndexSet getCtrlSet() const {
+	IndexSet get_ctrl_set() const& {
 		return ctrl_set_;
 	}
 
-	Complex getGlobalFactor() const {
+	Complex get_global_factor() const& {
 		return global_factor_;
 	}
 
-	static void remapQubits(std::set<Index>& qubits, const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
+	static void remap_qubits(std::set<Index>& qubits, const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
 		std::set<Index> tempSet;
 		for (unsigned elem : qubits) {
 			if (mapFromOldLocToNewLoc.find(elem) != mapFromOldLocToNewLoc.end()) {
@@ -91,15 +91,15 @@ public:
 		qubits.swap(tempSet);
 	}
 
-	void updateTargetSet(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
-		remapQubits(target_set_, mapFromOldLocToNewLoc);
+	void update_target_set(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+		remap_qubits(target_set_, mapFromOldLocToNewLoc);
 	}
 
-	void setCtrlSet(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
-		remapQubits(ctrl_set_, mapFromOldLocToNewLoc);
+	void set_ctrl_set(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+		remap_qubits(ctrl_set_, mapFromOldLocToNewLoc);
 	}
 	
-	void setItems(ItemVector&& newItems) {
+	void set_items(ItemVector&& newItems) {
 		items_.swap(newItems);
 	}
 
