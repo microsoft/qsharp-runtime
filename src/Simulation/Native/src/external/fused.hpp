@@ -104,7 +104,7 @@ class Fused
     }
 
     template <class T, class A, class M>
-    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q)
+    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q) const
     {
       std::vector<unsigned> cs;
       apply_controlled(wfn, mat, cs, q);
