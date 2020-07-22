@@ -164,8 +164,8 @@ class Wavefunction
 
     void flush() const
     {
-        if (dbgFusedSpan < 0) dbgFusedSpan = 4;
-        auto clusters = makeClusters(dbgFusedSpan, gatelist_);
+        unsigned fusedSpan = 4;
+        auto clusters = makeClusters(fusedSpan, gatelist_);
         gatelist_.clear();
         if (clusters.size() == 0) {
             fused_.flush(wfn_);
