@@ -66,19 +66,19 @@ namespace SIMULATOR
         void setQids(std::vector<unsigned> qids) {
             qids_ = qids;
         }
-        void appendGates(std::vector<GateWrapper> gates) {
+        void append_gates(std::vector<GateWrapper> gates) {
             gates_.insert(gates_.end(), gates.begin(), gates.end());
         }
-        std::pair<Cluster, std::vector<unsigned>> nextCluster(std::vector<Cluster>& prevClusters, unsigned maxWidth, unsigned maxDepth) {
+        std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& prevClusters, unsigned maxWidth, unsigned maxDepth) {
             std::set<unsigned> tempCurQids(qids_.begin(), qids_.end());
             for (int i = 0; i < prevClusters.size(); i++) {
                 if (i > maxDepth) {
                     break;
                 }
                 auto prevQids = prevClusters[i].get_qids();
-                std::set<unsigned> tempPrevQids(prevQids.begin(), prevQids.end());
+                std::sort(prevQids.begin(), prevQids.end());
                 std::set<unsigned> tempTotQids(qids_.begin(), qids_.end());
-                tempTotQids.insert(tempPrevQids.begin(), tempPrevQids.end());
+                tempTotQids.insert(prevQids.begin(), prevQids.end());
                 std::vector<unsigned> totQids(tempTotQids.begin(), tempTotQids.end());
                 if (totQids.size() <= maxWidth) {
                     auto cl = prevClusters[i];
@@ -88,7 +88,7 @@ namespace SIMULATOR
 
                 std::vector<int> qidsIntersection;
                 if (i == prevClusters.size() - 1) {
-                    std::set_intersection(tempPrevQids.begin(), tempPrevQids.end(),
+                    std::set_intersection(prevQids.begin(), prevQids.end(),
                         tempCurQids.begin(), tempCurQids.end(),
                         std::back_inserter(qidsIntersection));
                 }
@@ -96,7 +96,7 @@ namespace SIMULATOR
                     std::vector<unsigned> lookAhead = prevClusters[i + 1].get_qids();
                     std::set<int> lookAheadQids(lookAhead.begin(), lookAhead.end());
                     if (i == 0) {
-                        std::set_intersection(tempPrevQids.begin(), tempPrevQids.end(),
+                        std::set_intersection(prevQids.begin(), prevQids.end(),
                             tempCurQids.begin(), tempCurQids.end(),
                             std::back_inserter(qidsIntersection));
                     }
@@ -165,7 +165,7 @@ class Wavefunction
     void flush() const
     {
         unsigned fusedSpan = 4;
-        auto clusters = makeClusters(fusedSpan, gatelist_);
+        auto clusters = make_clusters(fusedSpan, gatelist_);
         gatelist_.clear();
         if (clusters.size() == 0) {
             fused_.flush(wfn_);
@@ -378,7 +378,7 @@ class Wavefunction
         rng_.seed(s);
     }
 
-    std::vector<Cluster> makeClusters(unsigned fuseSpan, std::vector<GateWrapper> gates) const {
+    std::vector<Cluster> make_clusters(unsigned fuseSpan, std::vector<GateWrapper> gates) const {
         std::vector<Cluster> curClusters;
 
         if (gates.size() > 0) {
@@ -399,7 +399,7 @@ class Wavefunction
                 auto prevCluster = prevClusters[0];
                 prevClusters.erase(prevClusters.begin());
                 while (prevClusters.size() > 0) {
-                    auto foundCompat = prevCluster.nextCluster(prevClusters, i, maxDepth);
+                    auto foundCompat = prevCluster.next_cluster(prevClusters, i, maxDepth);
                     Cluster clusterFound = foundCompat.first;
                     std::vector<unsigned> foundTotQids = foundCompat.second;
                     if (clusterFound.get_gates().size() == 0) {
@@ -409,7 +409,7 @@ class Wavefunction
                     }
                     else {
                         prevCluster.setQids(foundTotQids);
-                        prevCluster.appendGates(clusterFound.get_gates());
+                        prevCluster.append_gates(clusterFound.get_gates());
                     }
                 }
                 curClusters.push_back(prevCluster);
