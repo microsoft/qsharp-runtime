@@ -25,7 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(QSimDll)">
+    <None Include="$(QSimDll)" 
+        Condition=" Exists('$(QSimDll)') ">
       <Link>Microsoft.Quantum.Simulator.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
