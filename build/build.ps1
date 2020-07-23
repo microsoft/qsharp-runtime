@@ -6,13 +6,15 @@ $ErrorActionPreference = 'Stop'
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
-Write-Host "##[info]Build Native simulator"
-cmake --build (Join-Path $PSScriptRoot "../src/Simulation/Native/build") --config $Env:BUILD_CONFIGURATION
-if ($LastExitCode -ne 0) {
-    Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
-    $script:all_ok = $False
+$nativeBuild = (Join-Path $PSScriptRoot "../src/Simulation/Native/build") 
+if (Test-Path $nativeBuild) {
+    Write-Host "##[info]Build Native simulator"
+    cmake --build--config $Env:BUILD_CONFIGURATION
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
+        $script:all_ok = $False
+    }
 }
-
 
 function Build-One {
     param(
