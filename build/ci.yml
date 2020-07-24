@@ -9,7 +9,8 @@ variables:
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
 
 jobs:
-- job: CI build
+- job: build
+  displayName: Build
   strategy:
     matrix:
       linux:
