@@ -29,3 +29,7 @@ steps:
   displayName: "Bootstrap repository (Linux/Mac)"
   condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: ./bootstrap.ps1
+  displayName: "Bootstrap packages."
+  workingDirectory: $(System.DefaultWorkingDirectory)
