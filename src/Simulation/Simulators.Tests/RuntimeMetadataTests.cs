@@ -298,6 +298,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void Reset()
+        {
+            var target = new FreeQubit(0);
+            var op = new QuantumSimulator().Get<Intrinsic.Reset>();
+            var args = op.__dataIn(target);
+            var expected = new RuntimeMetadata()
+            {
+                Label = "Reset",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { target },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
         public void ResetAll()
         {
             IQArray<Qubit> targets = new QArray<Qubit>(new[] { new FreeQubit(0) });
@@ -310,7 +332,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
-                IsComposite = false,
+                IsComposite = true,
                 Children = null,
                 Controls = new List<Qubit>() { },
                 Targets = targets,
