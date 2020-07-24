@@ -31,5 +31,5 @@ steps:
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - pwsh: ./bootstrap.ps1
-  displayName: "Bootstrap packages."
+  displayName: "Bootstrap repository (common)"
   workingDirectory: $(System.DefaultWorkingDirectory)
