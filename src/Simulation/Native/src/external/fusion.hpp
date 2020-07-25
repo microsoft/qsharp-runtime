@@ -21,7 +21,7 @@ public:
 	Item(Matrix mat, IndexVector idx) : mat_(std::move(mat)), idx_(idx) {}
 	Matrix& get_matrix() { return mat_; }
 	IndexVector& get_indices() { return idx_; }
-	void set_idx(std::unordered_map<unsigned, unsigned> elemDict) {
+	void remap_idx(std::unordered_map<unsigned, unsigned> elemDict) {
 		for (size_t i = 0; i < idx_.size(); i++) {
 			idx_[i] = elemDict[idx_[i]];
 		}
@@ -65,19 +65,19 @@ public:
 		handle_controls(empty_matrix, empty_vec, {}); // remove all current control qubits (this is a GLOBAL factor)
 	}
 	
-	IndexSet get_target_set() const& {
+	const IndexSet& get_target_set() const {
 		return target_set_;
 	}
 
-	ItemVector get_items() const& {
+	const ItemVector& get_items() const {
 		return items_;
 	}
 
-	IndexSet get_ctrl_set() const& {
+	const IndexSet& get_ctrl_set() const {
 		return ctrl_set_;
 	}
 
-	Complex get_global_factor() const& {
+	const Complex& get_global_factor() const {
 		return global_factor_;
 	}
 
@@ -91,11 +91,11 @@ public:
 		qubits.swap(tempSet);
 	}
 
-	void update_target_set(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+	void remap_target_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
 		remap_qubits(target_set_, mapFromOldLocToNewLoc);
 	}
 
-	void set_ctrl_set(std::unordered_map<unsigned, unsigned> mapFromOldLocToNewLoc) {
+	void remap_ctrl_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
 		remap_qubits(ctrl_set_, mapFromOldLocToNewLoc);
 	}
 	

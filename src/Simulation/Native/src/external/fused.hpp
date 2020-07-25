@@ -41,7 +41,7 @@ class Fused
       fusedgates = Fusion();
     }
 
-    Fusion get_fusedgates() const& {
+    const Fusion& get_fusedgates() const {
         return fusedgates;
     }
     
