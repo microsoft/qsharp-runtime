@@ -12,11 +12,13 @@ Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators")
 Pop-Location
 
 # bootstrap native folder
-if ($Env:ENABLE_BOOTSTRAP_NATIVE -ne "false") {
+if ($Env:ENABLE_NATIVE -ne "false") {
     ## Run the right script based on the OS.
     if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
         .\bootstrap.cmd
     } else {
         .\bootstrap.sh
     }
+} else {
+    Write-Host "Skipping native. ENABLE_NATIVE variable set to: $Env:ENABLE_NATIVE."
 }
