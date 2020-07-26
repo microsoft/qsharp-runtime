@@ -4,15 +4,15 @@
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
-# Write-Host "##[info]Test Native simulator"
-# pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
-# cmake --build . --config $Env:BUILD_CONFIGURATION
-# ctest -C $Env:BUILD_CONFIGURATION
-# if ($LastExitCode -ne 0) {
-#     Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
-#     $script:all_ok = $False
-# }
-# popd
+Write-Host "##[info]Test Native simulator"
+pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
+cmake --build . --config $Env:BUILD_CONFIGURATION
+ctest -C $Env:BUILD_CONFIGURATION
+if ($LastExitCode -ne 0) {
+    Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
+    $script:all_ok = $False
+}
+popd
 
 
 function Test-One {
