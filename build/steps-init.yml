@@ -19,5 +19,5 @@ steps:
 # Bootstrap
 ##
 - pwsh: ./bootstrap.ps1
-  displayName: "Bootstrap repository (common)"
+  displayName: "Bootstrap repository"
   workingDirectory: $(System.DefaultWorkingDirectory)
