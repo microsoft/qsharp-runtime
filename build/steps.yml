@@ -24,7 +24,6 @@ steps:
 
 - powershell: ./pack.ps1
   displayName: "Pack Q# runtime (Windows)"
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 

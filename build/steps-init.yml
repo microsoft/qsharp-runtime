@@ -18,18 +18,6 @@ steps:
 ##
 # Bootstrap
 ##
-- task: BatchScript@1
-  displayName: 'Bootstrap repository (Windows)'
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-  inputs:
-    filename: bootstrap.cmd
-    modifyEnvironment: true
-
-- bash: ./bootstrap.sh
-  displayName: "Bootstrap repository (Linux/Mac)"
-  condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
-  workingDirectory: $(System.DefaultWorkingDirectory)
-
 - pwsh: ./bootstrap.ps1
   displayName: "Bootstrap repository (common)"
   workingDirectory: $(System.DefaultWorkingDirectory)

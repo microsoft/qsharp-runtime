@@ -10,3 +10,13 @@ Pop-Location
 Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators")
     .\FindNuspecReferences.ps1
 Pop-Location
+
+# bootstrap native folder
+if ($Env:ENABLE_BOOTSTRAP_NATIVE -ne "false") {
+    ## Run the right script based on the OS.
+    if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
+        .\bootstrap.cmd
+    } else {
+        .\bootstrap.sh
+    }
+}
