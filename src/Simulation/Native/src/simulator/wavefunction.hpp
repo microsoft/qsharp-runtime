@@ -13,6 +13,7 @@
 #include <random>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 
 #include "types.hpp"
 #include "gates.hpp"
@@ -123,12 +124,12 @@ namespace SIMULATOR
 template <class T = ComplexType>
 class Wavefunction
 {
-  public:
+public:
     using value_type = T;
     using qubit_t = unsigned;
     using RngEngine = std::mt19937;
 
-    constexpr qubit_t invalid_qubit() const { return std::numeric_limits<qubit_t>::max();}
+    constexpr qubit_t invalid_qubit() const { return std::numeric_limits<qubit_t>::max(); }
 
     /// allocate a wave function for zero qubits
     Wavefunction(unsigned /*ignore*/) : num_qubits_(0), wfn_(1, 1.), usage_(0)
@@ -148,7 +149,7 @@ class Wavefunction
 
     ~Wavefunction()
     {
-      flush();
+        flush();
     }
 
     unsigned qubit(unsigned q) const
@@ -206,19 +207,27 @@ class Wavefunction
                         }
                     }
                     //performing reorder
-                    std::vector<qubit_t> indexLocs = qubits(unionOfAllQubitsInUse);
-                    for (unsigned i = 0; i < indexLocs.size(); i++)
+                    std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
+                    std::vector<qubit_t> newLocs;
+                    unsigned pos = 0;
+                    for (unsigned i = 0; i < currLocs.size(); i++)
                     {
-                        auto currLoc = indexLocs[i];
-                        reorder_wavefunction(currLoc, i);
-                        indexLocs = qubits(unionOfAllQubitsInUse);
+                        if (currLocs[i] > currLocs.size() - 1) {
+                            newLocs.push_back(pos);
+                            pos++;
+                        }
+                        else {
+                            newLocs.push_back(currLocs[i]);
+                        }
                     }
+                    reorder_wavefunction(currLocs, newLocs);
+                    currLocs = qubits(unionOfAllQubitsInUse);
                     //keeping old and new location in order to set it appropriately
                     std::unordered_map<unsigned, unsigned> old2newDict;
                     for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                        old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
+                        old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
                     }
-       
+
                     for (int i = 0; i < itemsToFuse.size(); i++) {
                         itemsToFuse[i].remap_idx(old2newDict);
                     }
@@ -226,15 +235,15 @@ class Wavefunction
                     fg.remap_target_set(old2newDict);
                     fg.remap_ctrl_set(old2newDict);
                     fused_.set_fusedgates(fg);
+                }
+
+                fused_.flush(wfn_);
             }
-        
-            fused_.flush(wfn_);
-        }
-                    
+
         }
     }
 
-	/// allocate a qubit and grow the wave function
+    /// allocate a qubit and grow the wave function
     unsigned allocate()
     {
         assert(usage_ != 2);
@@ -254,7 +263,7 @@ class Wavefunction
         }
     }
 
-	/// allocate a qubit and grow the wave function
+    /// allocate a qubit and grow the wave function
     void allocateQubit(unsigned id)
     {
         assert(usage_ != 1);
@@ -337,9 +346,9 @@ class Wavefunction
     }
 
     void apply_controlled_exp(std::vector<Gates::Basis> const& bs,
-                              double phi,
-                              std::vector<unsigned> const& cs,
-                              std::vector<unsigned> const& qs)
+        double phi,
+        std::vector<unsigned> const& cs,
+        std::vector<unsigned> const& qs)
     {
         flush();
         kernels::apply_controlled_exp(wfn_, bs, phi, qubits(cs), qubits(qs));
@@ -419,23 +428,35 @@ class Wavefunction
         return curClusters;
     }
 
-    void reorder_wavefunction(unsigned qubitLoc, unsigned newPos) const
+    void reorder_wavefunction(std::vector<unsigned> currLocs, std::vector<unsigned> newLocs) const
     {
         // swap qubits in wfn between qubitLoc and newPos
-        if (newPos != qubitLoc)
+
+        for (std::size_t i = 0ull; i < wfn_.size(); i++)
         {
-            for (std::size_t i = 0ull; i < wfn_.size(); i++)
+            for (unsigned j = 0; j < currLocs.size(); j++)
             {
-                std::size_t bit1 = (i >> qubitLoc) & 1ull;
-                std::size_t bit2 = (i >> newPos) & 1ull;
-                std::size_t x = (bit1 ^ bit2);
-                x = (x << qubitLoc) | (x << newPos);
-                std::size_t new_i = i ^ x;
-                if (new_i > i)
+                unsigned qubitLoc = currLocs[j];
+                unsigned newPos = newLocs[j];
+                if (newPos != qubitLoc)
                 {
-                    std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
+                    std::size_t bit1 = (i >> qubitLoc) & 1ull;
+                    std::size_t bit2 = (i >> newPos) & 1ull;
+                    std::size_t x = (bit1 ^ bit2);
+                    x = (x << qubitLoc) | (x << newPos);
+                    std::size_t new_i = i ^ x;
+                    if (new_i > i)
+                    {
+                        std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
+                    }
                 }
             }
+        }
+
+        for (unsigned j = 0; j < currLocs.size(); j++)
+        {
+            unsigned qubitLoc = currLocs[j];
+            unsigned newPos = newLocs[j];
             // get id of qubit located at newPos and qubitLoc - getting index from the element
             auto newQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
             assert(newQubitLocItr != qubitmap_.end());
@@ -444,8 +465,7 @@ class Wavefunction
             // swap elements in qubitmap located at iterators
             std::iter_swap(origQubitLocItr, newQubitLocItr);
         }
-    }
-
+}
     /// generic application of a gate
     template <class Gate>
     void apply(Gate const& g)
