@@ -218,7 +218,54 @@ class Wavefunction
                     for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
                         old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
                     }
+        // logic to reorder
+        Fusion fg = fused_.get_fusedgates();
+        auto itemsToFuse = fg.get_items();
+        auto ctrlSet = fg.get_ctrl_set();
+        // getting all qubits to move to lower end of the wfn
+        if (!itemsToFuse.empty()) {
+            std::vector<unsigned> unionOfAllQubitsInUse;
+            std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
+            for (int i = 0; i < itemsToFuse.size(); i++) {
+                auto tempIndices = itemsToFuse[i].get_indices();
+                for (unsigned j = 0; j < tempIndices.size(); j++) {
+                    if (indicesSet.count(tempIndices[j]) == 0) {
+                        unionOfAllQubitsInUse.push_back(tempIndices[j]);
+                        indicesSet.insert(tempIndices[j]);
+                    }
+                }
+            }
+            for (auto it = ctrlSet.begin(); it != ctrlSet.end(); ++it) {
+                if (indicesSet.count(*it) == 0) {
+                    unionOfAllQubitsInUse.push_back(*it);
+                    indicesSet.insert(*it);
+                }
+            }
+            // performing reorder
+            std::vector<qubit_t> indexLocs = qubits(unionOfAllQubitsInUse);
+            for (unsigned i = 0; i < indexLocs.size(); i++)
+            {
+                auto currLoc = indexLocs[i];
+                reorder_wavefunction(currLoc, i);
+                indexLocs = qubits(unionOfAllQubitsInUse);
+            }
+            // keeping old and new location in order to set it appropriately
+            std::unordered_map<unsigned, unsigned> old2newDict;
+            for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
+                old2newDict[unionOfAllQubitsInUse[i]] = indexLocs[i];
+            }
 
+            for (int i = 0; i < itemsToFuse.size(); i++) {
+                itemsToFuse[i].remap_idx(old2newDict);
+            }
+            fg.set_items(std::move(itemsToFuse));
+            fg.remap_target_set(old2newDict);
+            fg.remap_ctrl_set(old2newDict);
+            fused_.set_fusedgates(fg);
+        }
+        
+        fused_.flush(wfn_);
+    }
                     for (int i = 0; i < itemsToFuse.size(); i++) {
                         itemsToFuse[i].set_idx(old2newDict);
                     }
@@ -420,17 +467,9 @@ class Wavefunction
 
     void reorder_wavefunction(unsigned qubitLoc, unsigned newPos) const
     {
-        
         // swap qubits in wfn between qubitLoc and newPos
         if (newPos != qubitLoc)
         {
-            // get id of qubit located at newPos and qubitLoc - getting index from the element
-            auto newQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
-            assert(newQubitLocItr != qubitmap_.end());
-            auto newPosId = std::distance(qubitmap_.begin(), newQubitLocItr);
-            auto origQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
-            assert(origQubitLocItr != qubitmap_.end());
-            auto qid = std::distance(qubitmap_.begin(), origQubitLocItr);
             for (std::size_t i = 0ull; i < wfn_.size(); i++)
             {
                 std::size_t bit1 = (i >> qubitLoc) & 1ull;
@@ -443,10 +482,14 @@ class Wavefunction
                     std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
                 }
             }
-            // swap elements in qubitmap located at qid and newPosId
+            // get id of qubit located at newPos and qubitLoc - getting index from the element
+            auto newQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
+            assert(newQubitLocItr != qubitmap_.end());
+            auto origQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
+            assert(origQubitLocItr != qubitmap_.end());
+            // swap elements in qubitmap located at iterators
             std::iter_swap(origQubitLocItr, newQubitLocItr);
         }
-        
     }
 
     /// generic application of a gate
