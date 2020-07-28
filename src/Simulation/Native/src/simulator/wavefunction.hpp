@@ -184,15 +184,15 @@ public:
                     }
                 }
                 //logic to reorder
-                Fusion fg = fused_.get_fusedgates();
-                auto itemsToFuse = fg.get_items();
-                auto ctrlSet = fg.get_ctrl_set();
+                const Fusion& fg = fused_.get_fusedgates();
+                const auto& itemsToFuse = fg.get_items();
+                const auto& ctrlSet = fg.get_ctrl_set();
                 //getting all qubits to move to lower end of the wfn
                 if (!itemsToFuse.empty()) {
                     std::vector<unsigned> unionOfAllQubitsInUse;
                     std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
                     for (int i = 0; i < itemsToFuse.size(); i++) {
-                        auto tempIndices = itemsToFuse[i].get_indices();
+                        const auto& tempIndices = itemsToFuse[i].get_indices();
                         for (unsigned j = 0; j < tempIndices.size(); j++) {
                             if (indicesSet.count(tempIndices[j]) == 0) {
                                 unionOfAllQubitsInUse.push_back(tempIndices[j]);
@@ -208,13 +208,14 @@ public:
                     }
                     //performing reorder
                     std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
+                    std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
                     std::vector<qubit_t> newLocs;
-                    unsigned pos = 0;
+                    unsigned pos = findNextPos(0, setForSearch);
                     for (unsigned i = 0; i < currLocs.size(); i++)
                     {
                         if (currLocs[i] > currLocs.size() - 1) {
                             newLocs.push_back(pos);
-                            pos++;
+                            pos = findNextPos(pos + 1, setForSearch);
                         }
                         else {
                             newLocs.push_back(currLocs[i]);
@@ -231,10 +232,8 @@ public:
                     for (int i = 0; i < itemsToFuse.size(); i++) {
                         itemsToFuse[i].remap_idx(old2newDict);
                     }
-                    fg.set_items(std::move(itemsToFuse));
                     fg.remap_target_set(old2newDict);
                     fg.remap_ctrl_set(old2newDict);
-                    fused_.set_fusedgates(fg);
                 }
 
                 fused_.flush(wfn_);
@@ -243,6 +242,14 @@ public:
         }
     }
 
+    unsigned findNextPos(unsigned startIdx, std::unordered_set<qubit_t> setForSearch) const
+    {
+        while (setForSearch.find(startIdx) != setForSearch.end())
+        {
+            startIdx++;
+        }
+        return startIdx;
+    }
     /// allocate a qubit and grow the wave function
     unsigned allocate()
     {
@@ -434,6 +441,8 @@ public:
 
         for (std::size_t i = 0ull; i < wfn_.size(); i++)
         {
+            std::size_t orig_i = i;
+            std::size_t new_i = 0;
             for (unsigned j = 0; j < currLocs.size(); j++)
             {
                 unsigned qubitLoc = currLocs[j];
@@ -444,13 +453,16 @@ public:
                     std::size_t bit2 = (i >> newPos) & 1ull;
                     std::size_t x = (bit1 ^ bit2);
                     x = (x << qubitLoc) | (x << newPos);
-                    std::size_t new_i = i ^ x;
-                    if (new_i > i)
-                    {
-                        std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
-                    }
+                    new_i = i ^ x;
+                    i = new_i;
                 }
             }
+            i = orig_i;
+            if (new_i > i)
+            {
+                std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
+            }
+            
         }
 
         for (unsigned j = 0; j < currLocs.size(); j++)
