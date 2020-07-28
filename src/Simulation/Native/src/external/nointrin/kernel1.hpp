@@ -1,4 +1,4 @@
-// (C) 2018 ETH Zurich, ITP, Thomas HΣner and Damian Steiger
+// (C) 2018 ETH Zurich, ITP, Thomas Häner and Damian Steiger
 
 template <class V, class M>
 inline void kernel_core(V& psi, std::size_t I, std::size_t d0, M const& m)
