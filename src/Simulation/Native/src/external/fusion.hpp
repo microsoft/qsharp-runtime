@@ -20,15 +20,15 @@ public:
 	using Matrix = std::vector<std::vector<Complex, Microsoft::Quantum::Simulator::AlignedAlloc<Complex, 64>>>;
 	Item(Matrix mat, IndexVector idx) : mat_(std::move(mat)), idx_(idx) {}
 	Matrix& get_matrix() { return mat_; }
-	IndexVector& get_indices() { return idx_; }
-	void remap_idx(std::unordered_map<unsigned, unsigned> elemDict) {
+	IndexVector& get_indices() const { return idx_; }
+	void remap_idx(std::unordered_map<unsigned, unsigned> elemDict) const {
 		for (size_t i = 0; i < idx_.size(); i++) {
 			idx_[i] = elemDict[idx_[i]];
 		}
 	}
 private:
 	Matrix mat_;
-	IndexVector idx_;
+	mutable IndexVector idx_;
 };
 
 // Class handling the fusion of gates
@@ -91,11 +91,11 @@ public:
 		qubits.swap(tempSet);
 	}
 
-	void remap_target_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
+	void remap_target_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) const {
 		remap_qubits(target_set_, mapFromOldLocToNewLoc);
 	}
 
-	void remap_ctrl_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
+	void remap_ctrl_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) const {
 		remap_qubits(ctrl_set_, mapFromOldLocToNewLoc);
 	}
 	
@@ -234,9 +234,9 @@ private:
 		}
 	}
 	
-	IndexSet target_set_; //set of qubits being acted on
-	ItemVector items_; //queue if gates to be fused
-	IndexSet ctrl_set_; //set of controls
+	mutable IndexSet target_set_; //set of qubits being acted on
+	mutable ItemVector items_; //queue if gates to be fused
+	mutable IndexSet ctrl_set_; //set of controls
 	Complex global_factor_;
 };
 
