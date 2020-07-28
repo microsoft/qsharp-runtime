@@ -108,10 +108,10 @@ class Wavefunction
                     }
                 }
             }
-            for (auto it = ctrlSet.begin(); it != ctrlSet.end(); ++it) {
-                if (indicesSet.count(*it) == 0) {
-                    unionOfAllQubitsInUse.push_back(*it);
-                    indicesSet.insert(*it);
+            for (unsigned index : ctrlSet) {
+                if (indicesSet.count(index) == 0) {
+                    unionOfAllQubitsInUse.push_back(index);
+                    indicesSet.insert(index);
                 }
             }
             // performing reorder

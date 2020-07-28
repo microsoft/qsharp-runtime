@@ -237,7 +237,7 @@ private:
 	mutable IndexSet target_set_; //set of qubits being acted on
 	mutable ItemVector items_; //queue if gates to be fused
 	mutable IndexSet ctrl_set_; //set of controls
-	Complex global_factor_;
+	mutable Complex global_factor_;
 };
 
 #endif
