@@ -49,6 +49,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
              ? randomNumberGeneratorSeed.Value
              : (uint)Guid.NewGuid().GetHashCode();
 
+            Console.WriteLine("@@@DBG: Made it to the simulator"); //@@@DBG
             Id = Init();
             SetSeed(this.Id, this.Seed);
             ((QSimQubitManager)QubitManager).Init(Id);
