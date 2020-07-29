@@ -177,21 +177,22 @@ class Fused
             if (maxFusedDepth < 0) maxFusedDepth = 99;
 
             maxFusedSpan = dbgFusedSpan;
-            dbgNgates++;
-            if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
-                flush(wfn);
-            Fusion newgates = fusedgates;
-            newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-
-            if (newgates.num_qubits() > 4)
-            {
-                flush(wfn);
-                fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
-            }
-            else
-                fusedgates = newgates;
+            
             printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
         }
+        dbgNgates++;
+        if (fusedgates.num_qubits() + fusedgates.num_controls() + cs.size() > 8 || fusedgates.size() > 15)
+            flush(wfn);
+        Fusion newgates = fusedgates;
+        newgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+
+        if (newgates.num_qubits() > 4)
+        {
+            flush(wfn);
+            fusedgates.insert(convertMatrix(mat), std::vector<unsigned>(1, q), cs);
+        }
+        else
+            fusedgates = newgates;
     }
 
     template <class T, class A, class M>
