@@ -539,7 +539,7 @@ int main()
     // test_dump();
     // test_dump_qubits();
 #endif
-#if 1
+#if 0
     int                     nQs, circStart, circStop;
     vector<vector<int32_t>> prb;
 
@@ -622,7 +622,7 @@ int main()
         }
     }
 #endif
-#if 0
+#if 1
     std::vector<std::string> circuits;
     /*circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile0.txt");
     circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile1.txt");
@@ -692,7 +692,8 @@ int main()
                                 else if (gts[k] == "X") X(sim_id, qs[0]);
                                 break;
                             case 2:
-                                CX(sim_id, qs[0], qs[1]);
+                                if (gts[k] == "CX") CX(sim_id, qs[0], qs[1]);
+                                else if (gts[k] == "CZ") CZ(sim_id, qs[0], qs[1]);
                                 break;
                             case 3:
                             {
@@ -703,7 +704,7 @@ int main()
                             case 4:
                             {
                                 uint32_t cs[] = { qs[0], qs[1], qs[2] };
-                                MCX(sim_id, 2, cs, qs[3]);
+                                MCX(sim_id, 3, cs, qs[3]);
                             }
                             break;
                             default:
@@ -720,7 +721,7 @@ int main()
                 }
             }
         }
-    }
+}
 #endif
 
 
