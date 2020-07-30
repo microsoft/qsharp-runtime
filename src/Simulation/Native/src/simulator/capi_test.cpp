@@ -692,8 +692,9 @@ int main()
                                 else if (gts[k] == "X") X(sim_id, qs[0]);
                                 break;
                             case 2:
-                                if(gts[k] == "CX") CX(sim_id, qs[0], qs[1]);
+                                if (gts[k] == "CX") CX(sim_id, qs[0], qs[1]);
                                 else if (gts[k] == "CZ") CZ(sim_id, qs[0], qs[1]);
+                                else CX(sim_id, qs[0], qs[1]);
                                 break;
                             case 3:
                             {
