@@ -526,7 +526,7 @@ int numQs(vector<vector<int32_t>> prb) {
 
 int main()
 {
-#if 1
+#if 0
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -724,7 +724,7 @@ int main()
         }
     }
 #endif
-#if 0
+#if 1
     std::vector<std::string> circuits;
     /*circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile0.txt");
     circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile1.txt");
