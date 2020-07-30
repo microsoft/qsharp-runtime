@@ -134,7 +134,7 @@ class Wavefunction
     /// \pre the qubit has to be in a classical state in the computational basis
     void release(qubit_t q)
     {
-        unsigned p = qubit(q);
+        unsigned p = qubit(q); //returns qubitmap_[q]
         flush();
         kernels::collapse(wfn_, p, getvalue(q), true);
         for (int i = 0; i < qubitmap_.size(); ++i)
@@ -244,7 +244,7 @@ class Wavefunction
     {
         fused_.apply(wfn_, g.matrix(), qubit(g));
     }
-
+    
     /// generic application of a multiply controlled gate
     template <class Gate>
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)

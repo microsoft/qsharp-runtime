@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -144,6 +148,59 @@ namespace Microsoft.Quantum.Simulation.Core
             }
         }
 
+        /// <summary>
+        /// Given an <see cref="object"/>, retrieve its non-qubit fields as a string.
+        /// Returns null if no non-qubit fields found.
+        /// </summary>
+        public static string? GetNonQubitArgumentsAsString(this object o)
+        {
+            var t = o.GetType();
+
+            // If object is a Qubit, QVoid, or array of Qubits, ignore it (i.e. return null)
+            if (o is Qubit || o is QVoid || o is IEnumerable<Qubit>) return null;
+
+            // If object is an ICallable, return its name
+            if (o is ICallable op)
+            {
+                return op.Name;
+            }
+
+            // If object is an IApplyData, recursively extract arguments
+            if (o is IApplyData data)
+            {
+                return data.Value?.GetNonQubitArgumentsAsString();
+            }
+
+            // If object is a string, enclose it in quotations
+            if (o is string s)
+            {
+                return (s != null) ? $"\"{s}\"" : null;
+            }
+
+            // If object is a list, recursively extract its inner arguments and
+            // concatenate them into a list string
+            if (typeof(IEnumerable).IsAssignableFrom(t))
+            {
+                var elements = ((IEnumerable)o).Cast<object>()
+                    .Select(x => x.GetNonQubitArgumentsAsString())
+                    .WhereNotNull();
+                return (elements.Any()) ? $"[{string.Join(", ", elements)}]" : null;
+            }
+
+            // If object is a tuple, recursively extract its inner arguments and
+            // concatenate them into a tuple string
+            if (t.IsTuple())
+            {
+                var items = t.GetFields()
+                    .Select(f => f.GetValue(o).GetNonQubitArgumentsAsString())
+                    .WhereNotNull();
+                return (items.Any()) ? $"({string.Join(", ", items)})" : null;
+            }
+
+            // Otherwise, return argument as a string
+            return (o != null) ? o.ToString() : null;
+        }
+
         private static ConcurrentDictionary<Type, Type> _normalTypesCache = new ConcurrentDictionary<Type, Type>();
 
         /// <summary>
@@ -259,7 +316,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 return OperationVariants(generic.OperationType, op);
             }
 
-             return OperationVariants(t.BaseType, op);
+            return OperationVariants(t.BaseType, op);
         }
 
         public static bool TryQSharpOperationType(Type t, out string typeName)
