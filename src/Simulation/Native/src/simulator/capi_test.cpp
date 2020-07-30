@@ -526,7 +526,7 @@ int numQs(vector<vector<int32_t>> prb) {
 
 int main()
 {
-#if 1
+#if 0
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -724,6 +724,107 @@ int main()
         }
     }
 #endif
+#if 1
+    std::vector<std::string> circuits;
+    /*circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile0.txt");
+    circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile1.txt");
+    circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile2.txt");
+    circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile3.txt");
+    circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\circuitFile4.txt");*/
+    circuits.push_back("C:\\Internship\\GenerateRandomCircuits\\GenerateRandomCircuits\\6BitMultiplication24Qubits.txt");
+
+    for (int i = 0; i < circuits.size(); i++) {
+        int nQs = 24;
+        /*if (i == 5) {
+            nQs = 24;
+        }*/
+        fstream circuit;
+        circuit.open(circuits[i], ios::in);
+
+        std::string line;
+        std::vector<std::string> gts;
+        std::vector<std::vector<unsigned>> qubs;
+        while (std::getline(circuit, line)) {
+            unsigned startPos = line.find("(");
+            unsigned endPos = line.find(")");
+            unsigned diff = endPos - startPos;
+            std::string subLine = line.substr(startPos + 1, diff);
+            std::string gt = line.substr(0, startPos);
+            gts.push_back(gt);
+            std::vector<unsigned> qub;
+            stringstream c_stream(subLine);
+            while (c_stream.good()) {
+                std::string qub_substr;
+                std::getline(c_stream, qub_substr, ','); //get first string delimited by comma
+                qub.push_back(std::stoi(qub_substr));
+            }
+            qubs.push_back(qub);
+
+        }
+
+        printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d\n",// range=%d prb=%d\n",
+            nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());// , doRange, prbIdx);
+        std::cout << circuits[i];
+
+        fflush(stdout);
+
+        for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) {                  // #### 1,8 Span Size
+            for (int numThreads = 1; numThreads < 5; numThreads++) {        // #### 1,5 (or 1,17 for big machine)
+                for (int simTyp = 3; simTyp < 4; simTyp++) {                // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
+                    if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
+                    if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+                    if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+
+                    auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, 0);
+
+                    for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+
+
+                    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+                    for (int j = 0; j < 100000; j++) {
+                        for (int k = 0; k < qubs.size(); k++) {
+                            auto qs = qubs[k];
+                            switch (qs.size()) {
+                            case 0: // Need to force a flush (end of cluster)
+                                break;
+                            case 1:
+                                if (gts[k] == "H") H(sim_id, qs[0]);
+                                else if (gts[k] == "Y") Y(sim_id, qs[0]);
+                                else if (gts[k] == "Z") Z(sim_id, qs[0]);
+                                else if (gts[k] == "X") X(sim_id, qs[0]);
+                                break;
+                            case 2:
+                                CX(sim_id, qs[0], qs[1]);
+                                break;
+                            case 3:
+                            {
+                                uint32_t cs[] = { qs[0], qs[1] };
+                                MCX(sim_id, 2, cs, qs[2]);
+                            }
+                            break;
+                            case 4:
+                            {
+                                uint32_t cs[] = { qs[0], qs[1], qs[2] };
+                                MCX(sim_id, 2, cs, qs[3]);
+                            }
+                            break;
+                            default:
+                                throw(std::invalid_argument("Didn't expect more then 4 wire gates"));
+                            }
+                        }
+
+                        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                        std::chrono::duration<double> elapsed = curr - start;
+                        if (elapsed.count() >= 25.0) break;
+                    }
+
+                    destroy(sim_id);
+                }
+            }
+        }
+    }
+#endif
+
 
     return 0;
 }
