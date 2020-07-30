@@ -127,7 +127,7 @@ class Fused
       double timeInt = log((float)wfn.capacity()) / log(2.0);
       timeInt = (timeInt * timeInt) / 20.0;
 
-      if (dbgElapsed >= timeInt) { 
+      if (dbgElapsed >= 5) { 
             double nFused = (float)dbgNfused;
             printf("@@@DBG sz=%.2f nQs=%.2f nCs=%.2f flsh=%8.2g gts=%8.2g elap=%5.1f gps=%10.4g (fus=%5.1f%%, ker=%5.1f%%)\n",
                 ((float)dbgSize / nFused),
