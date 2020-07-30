@@ -183,59 +183,6 @@ public:
                         fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
                     }
                 }
-                //logic to reorder
-                const Fusion& fg = fused_.get_fusedgates();
-                const auto& itemsToFuse = fg.get_items();
-                const auto& ctrlSet = fg.get_ctrl_set();
-                //getting all qubits to move to lower end of the wfn
-                if (!itemsToFuse.empty()) {
-                    std::vector<unsigned> unionOfAllQubitsInUse;
-                    std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
-                    for (int i = 0; i < itemsToFuse.size(); i++) {
-                        const auto& tempIndices = itemsToFuse[i].get_indices();
-                        for (unsigned j = 0; j < tempIndices.size(); j++) {
-                            if (indicesSet.count(tempIndices[j]) == 0) {
-                                unionOfAllQubitsInUse.push_back(tempIndices[j]);
-                                indicesSet.insert(tempIndices[j]);
-                            }
-                        }
-                    }
-                    for (unsigned index : ctrlSet) {
-                        if (indicesSet.count(index) == 0) {
-                            unionOfAllQubitsInUse.push_back(index);
-                            indicesSet.insert(index);
-                        }
-                    }
-                    //performing reorder
-                    std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
-                    std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
-                    std::vector<qubit_t> newLocs;
-                    unsigned pos = findNextPos(0, setForSearch);
-                    for (unsigned i = 0; i < currLocs.size(); i++)
-                    {
-                        if (currLocs[i] > currLocs.size() - 1) {
-                            newLocs.push_back(pos);
-                            pos = findNextPos(pos + 1, setForSearch);
-                        }
-                        else {
-                            newLocs.push_back(currLocs[i]);
-                        }
-                    }
-                    reorder_wavefunction(currLocs, newLocs);
-                    currLocs = qubits(unionOfAllQubitsInUse);
-                    //keeping old and new location in order to set it appropriately
-                    std::unordered_map<unsigned, unsigned> old2newDict;
-                    for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                        old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
-                    }
-
-                    for (int i = 0; i < itemsToFuse.size(); i++) {
-                        itemsToFuse[i].remap_idx(old2newDict);
-                    }
-                    fg.remap_target_set(old2newDict);
-                    fg.remap_ctrl_set(old2newDict);
-                }
-
                 fused_.flush(wfn_);
             }
 
