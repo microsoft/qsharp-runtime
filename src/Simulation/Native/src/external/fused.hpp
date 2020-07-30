@@ -175,7 +175,7 @@ class Fused
 
         // Have to update capacity as the WFN grows
         if (wfnCapacity != wfn.capacity()) {
-            wfnCapacity     = wfn.capacity();
+            wfnCapacity = wfn.capacity();
             char* envNT = NULL;
             size_t len;
 #ifdef _MSC_VER
@@ -188,17 +188,22 @@ class Fused
                 if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
                 int nProcs = omp_get_num_procs();
                 if (nProcs < 3) nMaxThrds = nProcs;
+                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG allow for debugging from above
                 omp_set_num_threads(nMaxThrds);
             }
 
             // This is now pretty much unlimited, could be set in the future
-            maxFusedDepth = 99;
+            maxFusedDepth = dbgFusedLimit;
+            if (maxFusedDepth < 0) maxFusedDepth = 99;
 
-            // Default for large problems (optimized with benchmarks)
-            maxFusedSpan = 3;
-
-            // Reduce size for small problems (optimized with benchmarks)
-            if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
+            maxFusedSpan = dbgFusedSpan;
+            if (maxFusedSpan < 0) {
+                // Default for large problems (optimized with benchmarks)
+                maxFusedSpan = 3;
+                // Reduce size for small problems (optimized with benchmarks)
+                if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
+            }
+            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
         }
 
         // New rules of when to stop fusing
