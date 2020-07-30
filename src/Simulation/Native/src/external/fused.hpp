@@ -172,7 +172,7 @@ class Fused
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q)
     {
       // Major runtime logic change here
-
+        dbgNgates++;
         // Have to update capacity as the WFN grows
         if (wfnCapacity != wfn.capacity()) {
             wfnCapacity = wfn.capacity();
