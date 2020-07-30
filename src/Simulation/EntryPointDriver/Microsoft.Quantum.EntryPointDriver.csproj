@@ -7,6 +7,18 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Quantum.EntryPointDriver</PackageId>
     <Description>The standard command-line interface for standalone Q# console applications.</Description>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Microsoft</Authors>
+    <Description>Entry point driver for Q# command line applications.</Description>
+    <PackageReleaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
+    <PackageIcon>qdk-nuget-icon.png</PackageIcon>
+    <PackageTags>Quantum Q# Qsharp</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +33,9 @@
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 </Project>

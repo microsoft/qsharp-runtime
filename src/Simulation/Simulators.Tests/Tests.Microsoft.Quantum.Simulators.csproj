@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.11.2006.2309-alpha">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.11.2006.3017-alpha">
 
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
@@ -42,7 +42,7 @@
     <ItemGroup>
       <_ExeFiles Include="$(_ExeDir)*" />
     </ItemGroup>
-    <MakeDir Directories="$(OutputPath)TestExe" />    
+    <MakeDir Directories="$(OutputPath)TestExe" />
     <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
   </Target>
 

@@ -494,7 +494,7 @@ public:
         }
         fused_.apply(wfn_, g.matrix(), g.qubit());*/
     }
-
+    
     /// generic application of a multiply controlled gate
     template <class Gate>
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)

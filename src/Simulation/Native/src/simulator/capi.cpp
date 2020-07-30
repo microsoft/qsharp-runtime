@@ -13,7 +13,13 @@ MICROSOFT_QUANTUM_DECL unsigned init()
 {
   return Microsoft::Quantum::Simulator::create();
 }
-  
+
+//@@@DBG: Debugging version with force
+MICROSOFT_QUANTUM_DECL unsigned initDBG(int force,int fusedSpan,int fusedLimit,int numThreads,int reorder)
+{
+    return Microsoft::Quantum::Simulator::createDBG(0ul,force,fusedSpan,fusedLimit,numThreads,reorder);
+}
+
 MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned id)
   {
     Microsoft::Quantum::Simulator::destroy(id);
@@ -163,6 +169,12 @@ MICROSOFT_QUANTUM_DECL bool DumpQubits(_In_ unsigned id, _In_ unsigned n, _In_re
 MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void(*callback)(unsigned))
 {
     psis[id]->dumpIds(callback);
+}
+
+// Force a flush of any fused gates
+MICROSOFT_QUANTUM_DECL void Flush(_In_ unsigned id)
+{
+    psis[id]->flush();
 }
 
 }

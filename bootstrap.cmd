@@ -12,9 +12,6 @@ git --version  || GOTO missingGit
 :: Initialize C++ runtime project
 CALL :runtimeBootstrap  || EXIT /B 1
 
-:: Initialize the compiler's nuspec file
-CALL :nuspecBootstrap   || EXIT /B 1
-
 :: Next steps are only needed for developers environment, they are skipped for cloud builds.
 IF NOT "%AGENT_ID%" == "" GOTO EOF
 
@@ -32,17 +29,6 @@ CALL bootstrap.cmd
 popd
 EXIT /B
 
-
-:: Bootstrap the compiler nuspec
-:nuspecBootstrap
-pushd src\Simulation\CsharpGeneration
-CALL powershell -NoProfile .\FindNuspecReferences.ps1 || EXIT /B 1
-popd
-
-pushd src\Simulation\Simulators
-CALL powershell -NoProfile .\FindNuspecReferences.ps1 || EXIT /B 1
-popd
-EXIT /B
 
 :missingGit
 echo.
