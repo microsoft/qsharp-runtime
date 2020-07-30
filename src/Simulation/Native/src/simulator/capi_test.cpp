@@ -542,183 +542,82 @@ int main()
 #if 0
     int                     nQs, circStart, circStop;
     vector<vector<int32_t>> prb;
-    /*
-            doRange(0,2) - location in wave function (L,C,H)
-                prbIdx: 0=15q 1=26qs 2,3=shor_8_4
-                    fuseSpan(1,7)
-                        numThreads(1,4) [upto 16 on big machines]
-                            simTyp: 1=Generic 2=AVX 3=AVX2 4=AVX512
-    */
-    const int testCnt = 44;
-    int tests[testCnt][5] = {
-        // rng prb spn thr sim
-        {   1,  2,  4,  4,  4}, // 4 bits Shor
-        {   1,  3,  4,  4,  4}, // 6 bits Shor
-        {   1,  4,  4,  4,  4}, // 8 bits Shor
-        {   1,  5,  4,  4,  4}, // 10 bits Shor
-        {   1,  6,  4,  4,  4}, // 12 bits Shor
-        {   1,  2,  6,  4,  4}, // 4 bits Shor
-        {   1,  3,  6,  4,  4}, // 6 bits Shor
-        {   1,  4,  6,  4,  4}, // 8 bits Shor
-        {   1,  5,  6,  4,  4}, // 10 bits Shor
-        {   1,  6,  6,  4,  4}, // 12 bits Shor
 
-        {   1,  7,  1,  4,  4}, // Suprem_44_4
-        {   1,  7,  4,  4,  4}, // Suprem_44_4
-        {   1,  7,  6,  4,  4}, // Suprem_44_6
-        {   1,  7,  6,  6,  4}, // Suprem_44_6 - big
-        {   1,  7,  6,  8,  4}, // Suprem_44_6 - big
-        {   1,  7,  6, 10,  4}, // Suprem_44_6 - big
-        {   1,  7,  6, 12,  4}, // Suprem_44_6 - big
-        {   1,  7,  6, 14,  4}, // Suprem_44_6 - big
-        {   1,  7,  6, 16,  4}, // Suprem_44_6 - big
+    for (int doRange = 1; doRange < 2; doRange++) {                             // #### 0,3 Location of qubits in WFN
+        for (int prbIdx = 1; prbIdx < 2; prbIdx++) {                            // #### 0=15qs 1=26qs, 2,3=shor_4_4 3=shor_4_4
+            switch (prbIdx) {
+            case 0:
+            case 1:
+                if (prbIdx == 0) nQs = 15;
+                else             nQs = 26;
+                circStart = 0;
+                circStop = nQs;
+                if (doRange == 0) { circStop = 7; }
+                if (doRange == 2) { circStart = nQs - 7; }
+                prb = loadPrb(circStart, circStop);
+                break;
+            case 2:
+                prb = loadTest("..\\..\\..\\shor_4_4.log", false);
+                nQs = numQs(prb);
+                break;
+            case 3:
+                prb = loadTest("..\\..\\..\\shor_4_4.log", true);
+                nQs = numQs(prb);
+                break;
+            }
+            printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d\n",
+                nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx);
+            fflush(stdout);
 
-        {   1,  8,  1,  4,  4}, // Suprem_55_4
-        {   1,  8,  4,  4,  4}, // Suprem_55_4
-        {   1,  8,  6,  4,  4}, // Suprem_55_6
-        {   1,  8,  6,  6,  4}, // Suprem_55_6 - big
-        {   1,  8,  6,  8,  4}, // Suprem_55_6 - big
-        {   1,  8,  6, 10,  4}, // Suprem_55_6 - big
-        {   1,  8,  6, 12,  4}, // Suprem_55_6 - big
-        {   1,  8,  6, 14,  4}, // Suprem_55_6 - big
-        {   1,  8,  6, 16,  4}, // Suprem_55_6 - big
+            for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) {                  // #### 1,8 Span Size
+                for (int numThreads = 1; numThreads < 5; numThreads++) {        // #### 1,5 (or 1,17 for big machine)
+                    for (int simTyp = 3; simTyp < 4; simTyp++) {                // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
+                        if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
+                        if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+                        if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
 
-        {   1,  9,  1,  4,  4}, // Suprem_56_4
-        {   1,  9,  4,  4,  4}, // Suprem_56_4
-        {   1,  9,  6,  4,  4}, // Suprem_56_6
-        {   1,  9,  6,  6,  4}, // Suprem_56_6 - big
-        {   1,  9,  6,  9,  4}, // Suprem_56_6 - big
-        {   1,  9,  6, 10,  4}, // Suprem_56_6 - big
-        {   1,  9,  6, 12,  4}, // Suprem_56_6 - big
-        {   1,  9,  6, 14,  4}, // Suprem_56_6 - big
-        {   1,  9,  6, 16,  4}, // Suprem_56_6 - big
+                        auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, 0);
 
-        {   1, 10,  4,  4,  4}, // qulacs benchmark, nQs=5
-        {   1, 11,  4,  4,  4}, // qulacs benchmark, nQs=10
-        {   1, 12,  4,  4,  4}, // qulacs benchmark, nQs=15
-        {   1, 13,  4,  4,  4}, // qulacs benchmark, nQs=20
-        {   1, 14,  4,  4,  4}, // qulacs benchmark, nQs=25
-    };
+                        for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-    const char* scheds[4]   = { "std", "qio", "sim", "ord" };
-    const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
-
-
-    for (int doReorder = 0; doReorder < 1; doReorder++) {
-        printf(">>>> reorder: %d\n", doReorder);
-        for (int idxSched = 0; idxSched < 4; idxSched++) {
-            const char* sched = scheds[idxSched];
-            printf("==== sched: %s\n", sched);
-
-            for (int tIdx = 0; tIdx < testCnt; tIdx++) {
-                int doRange = tests[tIdx][0];
-                int prbIdx = tests[tIdx][1];
-                int fuseSpan = tests[tIdx][2];
-                int numThreads = tests[tIdx][3];
-                int simTyp = tests[tIdx][4];
-                char fName[30];
-
-                if (prbIdx < 10 || prbIdx > 14) continue;       // Just do qulacs @@@DBG
-                if (idxSched != 3) continue;                    // Just do ord scheduler
-
-                if (numThreads > 4) continue;                   // Not on a big machine
-                if (prbIdx > 8 && prbIdx < 10) continue;        // Not on a big machine
-
-                if (prbIdx >= 0 && prbIdx <= 1) { // Bench
-                    if (prbIdx == 0) nQs = 15;
-                    else             nQs = 26;
-                    circStart = 0;
-                    circStop = nQs;
-                    if (doRange == 0) { circStop = 7; }
-                    if (doRange == 2) { circStart = nQs - 7; }
-                    mySprintf(fName, sizeof(fName), "bench");
-                    prb = loadPrb(circStart, circStop);
-                }
-                else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
-                    int bits = prbIdx * 2;
-                    mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else if (prbIdx >= 7 && prbIdx <= 9) { // Suprem
-                    int sizR = 4;
-                    int sizC = 4;
-                    if (prbIdx == 8) {
-                        sizR = 5;
-                        sizC = 5;
-                    }
-                    else if (prbIdx == 9) {
-                        sizR = 5;
-                        sizC = 6;
-                    }
-                    int spanInp = 4;
-                    if (fuseSpan > 4) spanInp = fuseSpan;
-                    mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else if (prbIdx >= 10 && prbIdx <= 14) { // qulacs
-                    int bits = (prbIdx - 9) * 5;
-                    mySprintf(fName, sizeof(fName), "qulacs_%d_%d.log", bits, fuseSpan);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else throw(std::invalid_argument("Bad problem number"));
-
-                printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
-                    nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
-                fflush(stdout);
-
-                if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
-                if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
-                if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
-
-                auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
-
-                for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
-
-                if (prbIdx < 2) {
-                    for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
-                        unsigned c = k - 1;
-                        MCX(sim_id, 1, &c, k);
-                    }
-                }
-
-                // Amount of time to let things run below (in fused.hpp)
-                double timeInt = (double)nQs;
-                timeInt = 5.0 * (timeInt * timeInt) / 20.0;
-
-                std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-                for (int i = 0; i < 100000; i++) {
-                    for (int i = 0; i < prb.size(); i++) {
-                        auto qs = prb[i];
-                        switch (qs.size()) {
-                        case 0: // Need to force a flush (end of cluster)
-                            Flush(sim_id);
-                            break;
-                        case 1:
-                            H(sim_id, qs[0]);
-                            break;
-                        case 2:
-                            CX(sim_id, qs[0], qs[1]);
-                            break;
-                        case 3:
-                        {
-                            uint32_t cs[] = { (uint32_t)qs[0], (uint32_t)qs[1] };
-                            MCX(sim_id, 2, cs, qs[2]);
-                        }
-                        break;
-                        default:
-                            throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                        for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                            unsigned c = k - 1;
+                            MCX(sim_id, 1, &c, k);
                         }
 
-                        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-                        std::chrono::duration<double> elapsed = curr - start;
-                        if (elapsed.count() >= timeInt) break;
+
+                        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+                        for (int i = 0; i < 100000; i++) {
+                            for (int i = 0; i < prb.size(); i++) {
+                                auto qs = prb[i];
+                                switch (qs.size()) {
+                                case 0: // Need to force a flush (end of cluster)
+                                    break;
+                                case 1:
+                                    H(sim_id, qs[0]);
+                                    break;
+                                case 2:
+                                    CX(sim_id, qs[0], qs[1]);
+                                    break;
+                                case 3:
+                                {
+                                    uint32_t cs[] = { qs[0], qs[1] };
+                                    MCX(sim_id, 2, cs, qs[2]);
+                                }
+                                break;
+                                default:
+                                    throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                                }
+                            }
+
+                            std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                            std::chrono::duration<double> elapsed = curr - start;
+                            if (elapsed.count() >= 25.0) break;
+                        }
+
+                        destroy(sim_id);
                     }
                 }
-
-                destroy(sim_id);
             }
         }
     }
@@ -793,7 +692,8 @@ int main()
                                 else if (gts[k] == "X") X(sim_id, qs[0]);
                                 break;
                             case 2:
-                                CX(sim_id, qs[0], qs[1]);
+                                if(gts[k] == "CX") CX(sim_id, qs[0], qs[1]);
+                                else if (gts[k] == "CZ") CZ(sim_id, qs[0], qs[1]);
                                 break;
                             case 3:
                             {
@@ -804,7 +704,7 @@ int main()
                             case 4:
                             {
                                 uint32_t cs[] = { qs[0], qs[1], qs[2] };
-                                MCX(sim_id, 2, cs, qs[3]);
+                                MCX(sim_id, 3, cs, qs[3]);
                             }
                             break;
                             default:
