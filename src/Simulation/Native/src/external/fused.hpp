@@ -177,7 +177,7 @@ class Fused
             if (maxFusedDepth < 0) maxFusedDepth = 99;
 
             maxFusedSpan = dbgFusedSpan;
-            
+            omp_set_num_threads(dbgNumThreads);
             printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
         }
         dbgNgates++;
