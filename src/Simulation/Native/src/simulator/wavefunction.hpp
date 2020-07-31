@@ -431,7 +431,7 @@ public:
     {
         //check flush condition
         std::vector<qubit_t> cs;
-        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        GateWrapper gateApplied = GateWrapper(cs, qubit(g), g.matrix());
         gatelist_.push_back(gateApplied);
         if (gatelist_.size() > 50) {
             flush();
@@ -447,7 +447,7 @@ public:
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
-        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        GateWrapper gateApplied = GateWrapper(pcs, qubit(g), g.matrix());
         gatelist_.push_back(gateApplied);
         if (gatelist_.size() > 50) {
             flush();
