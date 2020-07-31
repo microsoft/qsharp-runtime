@@ -170,6 +170,15 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q) const
     {
+        if (wfnCapacity != wfn.capacity()) {
+            wfnCapacity = wfn.capacity();
+            maxFusedDepth = dbgFusedLimit;
+            if (maxFusedDepth < 0) maxFusedDepth = 99;
+
+            maxFusedSpan = dbgFusedSpan;
+            omp_set_num_threads(dbgNumThreads);
+            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
+        }
         dbgNgates++;
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
