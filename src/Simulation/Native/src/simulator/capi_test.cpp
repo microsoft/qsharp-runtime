@@ -525,7 +525,7 @@ int numQs(vector<vector<int32_t>> prb) {
 
 int main()
 {
-#if 1
+#if 0
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -539,7 +539,7 @@ int main()
     // test_dump();
     // test_dump_qubits();
 #endif
-#if 0
+#if 1
     int                     nQs, circStart, circStop;
     vector<vector<int32_t>> prb;
 
