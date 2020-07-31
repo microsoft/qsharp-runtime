@@ -46,6 +46,7 @@ namespace SIMULATOR
         }
     }
 
+    // Creating a gate wrapper datatype to represent a gate in a cluster
     class GateWrapper {
     public:
         GateWrapper(std::vector<unsigned> controls, unsigned target, TinyMatrix<ComplexType, 2> mat) : controls_(controls), target_(target), mat_(mat) {}
@@ -58,18 +59,22 @@ namespace SIMULATOR
         TinyMatrix<ComplexType, 2> mat_;
     };
 
-
+    // Creating a cluster datatype for new scheduling logic
     class Cluster {
     public:
         Cluster(std::vector<unsigned> qids, std::vector<GateWrapper> gates) : qids_(qids), gates_(gates) {}
         std::vector<unsigned> get_qids() { return qids_; }
         std::vector<GateWrapper> get_gates() { return gates_; }
+
         void setQids(std::vector<unsigned> qids) {
             qids_ = qids;
         }
+
         void append_gates(std::vector<GateWrapper> gates) {
             gates_.insert(gates_.end(), gates.begin(), gates.end());
         }
+
+        // Greedy method that finds next appropriate cluster
         std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& prevClusters, unsigned maxWidth, unsigned maxDepth) {
             std::set<unsigned> tempCurQids(qids_.begin(), qids_.end());
             for (int i = 0; i < prevClusters.size(); i++) {
@@ -166,12 +171,13 @@ public:
     void flush() const
     {
         unsigned fusedSpan = 4;
-        auto clusters = make_clusters(fusedSpan, gatelist_);
+        auto clusters = make_clusters(fusedSpan, gatelist_); //making clusters with gates in the queue
         gatelist_.clear();
         if (clusters.size() == 0) {
             fused_.flush(wfn_);
         }
         else {
+            // logic to flush gates in each cluster
             for (int i = 0; i < clusters.size(); i++) {
                 Cluster cl = clusters.at(i);
                 for (GateWrapper gate : cl.get_gates()) {
@@ -242,6 +248,7 @@ public:
         }
     }
 
+    // method to find next location qubit should be moved to for reordering routine
     unsigned findNextPos(unsigned startIdx, std::unordered_set<qubit_t> setForSearch) const
     {
         while (setForSearch.find(startIdx) != setForSearch.end())
@@ -250,6 +257,7 @@ public:
         }
         return startIdx;
     }
+
     /// allocate a qubit and grow the wave function
     unsigned allocate()
     {
@@ -395,11 +403,13 @@ public:
         rng_.seed(s);
     }
 
+    //method that makes clusters to be flushed
     std::vector<Cluster> make_clusters(unsigned fuseSpan, std::vector<GateWrapper> gates) const {
         std::vector<Cluster> curClusters;
 
         if (gates.size() > 0) {
             unsigned maxDepth = 999;
+            //creating initial cluster containing one gate each
             for (int i = 0; i < gates.size(); i++) {
                 std::vector<unsigned> qids;
                 std::vector<unsigned> controlQids = gates[i].get_controls();
@@ -410,6 +420,7 @@ public:
                 Cluster newCl = Cluster(qids, { gates[i] });
                 curClusters.push_back(newCl);
             }
+            //creating clusters using greedy algorithm
             for (int i = 1; i < fuseSpan + 1; i++) {
                 auto prevClusters = curClusters;
                 curClusters.clear();
@@ -435,36 +446,36 @@ public:
         return curClusters;
     }
 
+    //function implementing reordering routine
     void reorder_wavefunction(std::vector<unsigned> currLocs, std::vector<unsigned> newLocs) const
     {
-        // swap qubits in wfn between qubitLoc and newPos
-
         for (std::size_t i = 0ull; i < wfn_.size(); i++)
         {
-            std::size_t orig_i = i;
-            std::size_t new_i = 0;
+            std::size_t src = i;
+            std::size_t dst = 0;
+            //swapping bits at all pairs of locations given by currLocs and newLocs
             for (unsigned j = 0; j < currLocs.size(); j++)
             {
                 unsigned qubitLoc = currLocs[j];
                 unsigned newPos = newLocs[j];
+                // swapping bits at qubitLoc and newPos
                 if (newPos != qubitLoc)
                 {
-                    std::size_t bit1 = (i >> qubitLoc) & 1ull;
-                    std::size_t bit2 = (i >> newPos) & 1ull;
+                    std::size_t bit1 = (src >> qubitLoc) & 1ull;
+                    std::size_t bit2 = (src >> newPos) & 1ull;
                     std::size_t x = (bit1 ^ bit2);
                     x = (x << qubitLoc) | (x << newPos);
-                    new_i = i ^ x;
-                    i = new_i;
+                    dst = src ^ x;
+                    src = dst;
                 }
             }
-            i = orig_i;
-            if (new_i > i)
+            if (dst > i)
             {
-                std::iter_swap(wfn_.begin() + i, wfn_.begin() + new_i);
+                std::iter_swap(wfn_.begin() + i, wfn_.begin() + dst);
             }
             
         }
-
+        // swapping locations in qubitmap
         for (unsigned j = 0; j < currLocs.size(); j++)
         {
             unsigned qubitLoc = currLocs[j];
@@ -482,7 +493,6 @@ public:
     template <class Gate>
     void apply(Gate const& g)
     {
-        //check flush condition
         std::vector<qubit_t> cs;
         GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
         gatelist_.push_back(gateApplied);
