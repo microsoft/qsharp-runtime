@@ -165,7 +165,7 @@ public:
 
     void flush() const
     {
-        unsigned fusedSpan = 4;
+        unsigned fusedSpan = dbgFusedSpan;
         auto clusters = make_clusters(fusedSpan, gatelist_);
         gatelist_.clear();
         if (clusters.size() == 0) {

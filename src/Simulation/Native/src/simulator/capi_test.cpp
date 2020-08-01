@@ -663,11 +663,12 @@ int main()
         printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d\n",// range=%d prb=%d\n",
             nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads());// , doRange, prbIdx);
         std::cout << circuits[i];
+        std::cout << "\n";
 
         fflush(stdout);
 
-        for (int fuseSpan = 1; fuseSpan < 5; fuseSpan++) {                  // #### 1,8 Span Size
-            for (int numThreads = 1; numThreads < 5; numThreads++) {        // #### 1,5 (or 1,17 for big machine)
+        for (int fuseSpan = 4; fuseSpan < 5; fuseSpan++) {                  // #### 1,8 Span Size
+            for (int numThreads = 4; numThreads < 5; numThreads++) {        // #### 1,5 (or 1,17 for big machine)
                 for (int simTyp = 3; simTyp < 4; simTyp++) {                // #### 1,5 (1=Generic,2=AVX,3=AVX2,4=AVX512)
                     if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
                     if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
