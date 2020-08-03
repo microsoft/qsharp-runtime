@@ -221,7 +221,7 @@ public:
                             newLocs.push_back(currLocs[i]);
                         }
                     }
-                    if (*setForSearch.begin() > (num_qubits_ / 2)) {
+                    if (*setForSearch.begin() > (num_qubits_ / 2)) { //heuristic for reorder
                         reorder_wavefunction(currLocs, newLocs);
                         currLocs = qubits(unionOfAllQubitsInUse);
                     }
