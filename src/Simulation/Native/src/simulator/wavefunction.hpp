@@ -208,7 +208,7 @@ public:
                     }
                     //performing reorder
                     std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
-                    std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
+                    std::set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
                     std::vector<qubit_t> newLocs;
                     unsigned pos = findNextPos(0, setForSearch);
                     for (unsigned i = 0; i < currLocs.size(); i++)
@@ -221,8 +221,11 @@ public:
                             newLocs.push_back(currLocs[i]);
                         }
                     }
-                    reorder_wavefunction(currLocs, newLocs);
-                    currLocs = qubits(unionOfAllQubitsInUse);
+                    if (*setForSearch.begin() > (num_qubits_ / 2)) {
+                        reorder_wavefunction(currLocs, newLocs);
+                        currLocs = qubits(unionOfAllQubitsInUse);
+                    }
+                    
                     //keeping old and new location in order to set it appropriately
                     std::unordered_map<unsigned, unsigned> old2newDict;
                     for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
@@ -242,7 +245,7 @@ public:
         }
     }
 
-    unsigned findNextPos(unsigned startIdx, std::unordered_set<qubit_t> setForSearch) const
+    unsigned findNextPos(unsigned startIdx, std::set<qubit_t> setForSearch) const
     {
         while (setForSearch.find(startIdx) != setForSearch.end())
         {
