@@ -158,7 +158,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestQubitManagerDiscouragingReuse()
         {
-            {
+            { // BLOCK testing mayExtendCapacity:false
                 QubitManager qm = new QubitManager(10, mayExtendCapacity: false, disableBorrowing: false, encourageReuse: false);
 
                 // Test allocation of single qubit
@@ -197,7 +197,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.True(q5.Id == 8);
             }
 
-            {
+            { // BLOCK testing mayExtendCapacity:true
                 QubitManager qm = new QubitManager(10, mayExtendCapacity: true, disableBorrowing: false, encourageReuse: false);
 
                 // Test allocation of single qubit
