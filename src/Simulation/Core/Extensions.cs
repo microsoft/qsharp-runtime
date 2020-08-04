@@ -17,20 +17,28 @@ namespace Microsoft.Quantum.Simulation.Core
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T: class =>
             source.Where(q => q != null).Select(q => q!);
 
-        public static Result ToResult(this bool b)
+        public static Result ToResult(this bool b, uint[]? sourceIds = null)
         {
             return b
-                ? Result.One
-                : Result.Zero;
+                ? (sourceIds != null)
+                    ? new ResultMeasured(ResultValue.One, sourceIds)
+                    : Result.One
+                : (sourceIds != null)
+                    ? new ResultMeasured(ResultValue.Zero, sourceIds)
+                    : Result.Zero;
         }
 
-        public static Result ToResult(this uint b)
+        public static Result ToResult(this uint b, uint[]? sourceIds = null)
         {
             Debug.Assert(b == 0 || b == 1, $"Unexpected result value: {b}");
 
             return b == 0
-                ? Result.Zero
-                : Result.One;
+                ? (sourceIds != null)
+                    ? new ResultMeasured(ResultValue.Zero, sourceIds)
+                    : Result.Zero
+                : (sourceIds != null)
+                    ? new ResultMeasured(ResultValue.One, sourceIds)
+                    : Result.One;
         }
 
         public static double Pow(this double x, double y)

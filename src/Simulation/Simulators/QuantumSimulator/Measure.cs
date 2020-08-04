@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     //setting qubit as measured to allow for release
                     q.IsMeasured = true;
                 }
-                return Measure(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult();
+                return Measure(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult(qubits.GetIds());
             };
         }
     }

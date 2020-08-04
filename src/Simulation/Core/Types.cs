@@ -49,6 +49,24 @@ namespace Microsoft.Quantum.Simulation.Core
         }
     }
 
+    public class ResultMeasured : Result
+    {
+        private ResultValue Value;
+
+        public uint[] SourceIds { get; }
+
+        public ResultMeasured(ResultValue value, uint[] sourceIds)
+        {
+            Value = value;
+            SourceIds = sourceIds;
+        }
+
+        public override ResultValue GetValue()
+        {
+            return Value;
+        }
+    }
+
     /// <summary>
     /// Represents the Result of a Measurement. Corresponds to Q# type <code>Result</code>.
     /// </summary>

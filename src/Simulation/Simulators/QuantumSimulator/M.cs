@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 Simulator.CheckQubit(q);
                 //setting qubit as measured to allow for release
                 q.IsMeasured = true;
-                return M(Simulator.Id, (uint)q.Id).ToResult();
+                return M(Simulator.Id, (uint)q.Id).ToResult(new[] { (uint)q.Id });
             };
         }
     }
