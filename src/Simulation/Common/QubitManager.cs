@@ -52,7 +52,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Creates and initializes QubitManager that can handle up to numQubits qubits
         /// </summary>
-        public QubitManager(long qubitCapacity, bool mayExtendCapacity = false, bool disableBorrowing = false, bool encourageReuse = true)
+        public QubitManager(
+            long qubitCapacity, 
+            bool mayExtendCapacity = false, 
+            bool disableBorrowing = false, 
+            bool encourageReuse = true)
         {
             MayExtendCapacity = mayExtendCapacity;
             EncourageReuse = encourageReuse;
@@ -312,11 +316,9 @@ namespace Microsoft.Quantum.Simulation.Common
                 } 
                 else
                 {
-                    if (MayExtendCapacity)
-                    {
-
-                    }
-                    else
+                    // If we are allowed to extend capacity we will never reuse this qubit, 
+                    // otherwise we need to add it to the free qubits list.
+                    if (!MayExtendCapacity)
                     {
                         if (qubits[freeTail] != None)
                         {

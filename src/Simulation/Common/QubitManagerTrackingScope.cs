@@ -44,7 +44,11 @@ namespace Microsoft.Quantum.Simulation.Common
         private Stack<StackFrame> operationStack; // Stack of operation calls.
         private StackFrame curFrame; // Current stack frame - all qubits in current scope are listed here.
 
-        public QubitManagerTrackingScope(long qubitCapacity, bool mayExtendCapacity = false, bool disableBorrowing = false, bool encourageReuse = true) 
+        public QubitManagerTrackingScope(
+            long qubitCapacity, 
+            bool mayExtendCapacity = false, 
+            bool disableBorrowing = false, 
+            bool encourageReuse = true) 
             : base(qubitCapacity, mayExtendCapacity, disableBorrowing, encourageReuse)
         {
             if (!DisableBorrowing)
