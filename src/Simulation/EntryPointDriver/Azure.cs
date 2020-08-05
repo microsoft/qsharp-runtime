@@ -121,10 +121,21 @@ namespace Microsoft.Quantum.EntryPointDriver
             switch (format)
             {
                 case OutputFormat.FriendlyUri:
-                    // TODO:
-                    DisplayWithColor(ConsoleColor.Yellow, Console.Error,
-                        "The friendly URI for viewing job results is not available yet. Showing the job ID instead.");
-                    Console.WriteLine(job.Id);
+                    try
+                    {
+                        Console.WriteLine(job.Uri);
+                    }
+                    catch (Exception ex)
+                    {
+                        DisplayWithColor(
+                            ConsoleColor.Yellow,
+                            Console.Error,
+                            $"The friendly URI for viewing job results could not be obtained.{System.Environment.NewLine}" +
+                            $"Error details: {ex.Message}" +
+                            $"Showing the job ID instead.");
+
+                        Console.WriteLine(job.Id);
+                    }
                     break;
                 case OutputFormat.Id:
                     Console.WriteLine(job.Id);
@@ -150,9 +161,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a quantum machine based on the Azure Quantum submission settings.
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/>.Target is null.</exception>
         /// <returns>A quantum machine.</returns>
         private static IQuantumMachine? CreateMachine(AzureSettings settings) => settings.Target switch
         {
+            null => throw new ArgumentNullException(nameof(settings), "Target is null."),
             NothingMachine.TargetId => new NothingMachine(),
             ErrorMachine.TargetId => new ErrorMachine(),
             _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
@@ -191,11 +204,6 @@ namespace Microsoft.Quantum.EntryPointDriver
     internal sealed class AzureSettings
     {
         /// <summary>
-        /// The target device ID.
-        /// </summary>
-        public string? Target { get; set; }
-
-        /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
@@ -209,6 +217,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The workspace name.
         /// </summary>
         public string? Workspace { get; set; }
+
+        /// <summary>
+        /// The target device ID.
+        /// </summary>
+        public string? Target { get; set; }
 
         /// <summary>
         /// The storage account connection string.
@@ -261,10 +274,10 @@ namespace Microsoft.Quantum.EntryPointDriver
 
         public override string ToString() =>
             string.Join(System.Environment.NewLine,
-                $"Target: {Target}",
                 $"Subscription: {Subscription}",
                 $"Resource Group: {ResourceGroup}",
                 $"Workspace: {Workspace}",
+                $"Target: {Target}",
                 $"Storage: {Storage}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",

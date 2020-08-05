@@ -7,6 +7,7 @@ open System
 open System.Collections.Immutable
 open System.IO
 open System.Globalization
+open System.Web
 
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp
@@ -166,6 +167,7 @@ namespace N1
     let genMapper                               = findCallable @"genMapper"
     let genIter                                 = findCallable @"genIter"
     let usesGenerics                            = findCallable @"usesGenerics"
+    let callsGenericWithMultipleTypeParams      = findCallable @"callsGenericWithMultipleTypeParams"
     let duplicatedDefinitionsCaller             = findCallable @"duplicatedDefinitionsCaller"
     let nestedArgTuple1                         = findCallable @"nestedArgTuple1"
     let nestedArgTuple2                         = findCallable @"nestedArgTuple2"
@@ -218,9 +220,13 @@ namespace N1
 
 
     let testOneFile fileName (expected:string) =
-        let expected = expected.Replace("%%%", (Uri(Path.GetFullPath fileName)).AbsolutePath)
-        let expected = expected.Replace("%%", (Path.GetFullPath fileName).Replace("\\", "\\\\"))
-        let tree   = parse [(Path.Combine("Circuits","Intrinsic.qs")); fileName]
+        let fullPath = Path.GetFullPath fileName
+        let escapeCSharpString (s : string) = SymbolDisplay.FormatLiteral (s, false)
+        let expected =
+            expected
+            |> (fun s -> s.Replace("%%%", fullPath |> HttpUtility.JavaScriptStringEncode |> escapeCSharpString))
+            |> (fun s -> s.Replace("%%", fullPath |> escapeCSharpString))
+        let tree = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
         let actual =
             CodegenContext.Create (tree, ImmutableDictionary.Empty)
             |> generate (Path.GetFullPath fileName |> NonNullable<string>.New)
@@ -447,6 +453,11 @@ namespace N1
             ((NS1, "noOpResult"     ), "IUnitary<Result>")
         ]
         |> testOne usesGenerics
+
+        [
+            ((NSG, "genericWithMultipleTypeParams"), "ICallable")
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             ((NS2, "Allocate"       ), "Allocate")
@@ -892,13 +903,18 @@ namespace N1
         |> testOne usesGenerics
 
         [
-            template "Z"                                      "IUnitary<Qubit>"                 "Microsoft.Quantum.Intrinsic.Z"
+            template "genericWithMultipleTypeParams"        "ICallable"                         "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
+
+        [
+            template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
             "this.self = this;"
         ]
         |> testOne selfInvokingOperation
 
         [
-            template "self"                                 "ICallable"                       "genRecursion<>"
+            template "self"                                 "ICallable"                         "genRecursion<>"
         ]
         |> testOne genRecursion
 
@@ -928,6 +944,11 @@ namespace N1
         ]
         |> List.sort
         |> testOne usesGenerics
+
+        [
+            template "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "composeImpl<,>"
@@ -973,6 +994,11 @@ namespace N1
             template "IUnitary<Result>"             "MicrosoftQuantumTestingnoOpResult"
         ]
         |> testOne usesGenerics
+
+        [
+            template "ICallable"                    "genericWithMultipleTypeParams"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "IUnitary<Qubit>"              "Z"
@@ -2307,7 +2333,7 @@ namespace N1
         false |> testOne randomOperation
 
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
-        let expected = expected.Replace("%%%", op.SourceFile.Value)
+        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
         let assemblyConstants =
             new System.Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ExecutionTarget, executionTarget)
             |> Seq.singleton
@@ -2497,7 +2523,7 @@ namespace N1
         |> testOneClass genCtrl3 AssemblyConstants.HoneywellProcessor
 
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1271, 1277)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
         public composeImpl(IOperationFactory m) : base(m)
@@ -2574,7 +2600,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1314, 1316)]
+[SourceLocation("%%%", OperationFunctor.Body, 1319, 1321)]
 internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
 {
     public EmptyInternalFunction(IOperationFactory m) : base(m)
@@ -2608,7 +2634,7 @@ internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
         |> testOneClass emptyInternalFunction null
 
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1316, 1318)]
+[SourceLocation("%%%", OperationFunctor.Body, 1321, 1323)]
 internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallable
 {
     public EmptyInternalOperation(IOperationFactory m) : base(m)
@@ -2725,7 +2751,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () =
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1301,1310)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1306,1315)]
     public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
     {
         public UpdateUdtItems(IOperationFactorym) : base(m)
@@ -3397,7 +3423,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.Inline
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 7, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 7, -1)]
     public partial class HelloWorld : Operation<Int64, Int64>, ICallable
     {
         public HelloWorld(IOperationFactory m) : base(m)
@@ -3454,7 +3480,7 @@ using Microsoft.Quantum.Simulation.Core;
 #line hidden
 namespace Microsoft.Quantum.Tests.LineNumbers
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 9, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 9, -1)]
     public partial class TestLineInBlocks : Operation<Int64, Result>, ICallable
     {
         public TestLineInBlocks(IOperationFactory m) : base(m)
@@ -3628,7 +3654,7 @@ namespace Microsoft.Quantum.Diagnostics
 #line hidden
 namespace Microsoft.Quantum.Tests.UnitTests
 {
-    [SourceLocation("%%%", OperationFunctor.Body, 22, 26)]
+    [SourceLocation("%%", OperationFunctor.Body, 22, 26)]
     public partial class UnitTest1 : Operation<QVoid, QVoid>, ICallable
     {
         public UnitTest1(IOperationFactory m) : base(m)
@@ -3651,7 +3677,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "QuantumSimulator")]
             [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
-#line 22 "%%%"
+#line 22 "%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.QuantumSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
@@ -3683,7 +3709,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "ToffoliSimulator")]
             [Xunit.Trait("Name", "UnitTest1")]
             public void UnitTest1()
-#line 22 "%%%"
+#line 22 "%%"
             {
                 var sim = new Microsoft.Quantum.Simulation.Simulators.ToffoliSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
@@ -3721,7 +3747,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
         }
     }
 
-    [SourceLocation("%%%", OperationFunctor.Body, 26, -1)]
+    [SourceLocation("%%", OperationFunctor.Body, 26, -1)]
     public partial class UnitTest2 : Operation<QVoid, QVoid>, ICallable
     {
         public UnitTest2(IOperationFactory m) : base(m)
@@ -3744,7 +3770,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
             [Xunit.Trait("Target", "CustomSimulator")]
             [Xunit.Trait("Name", "UnitTest2")]
             public void UnitTest2()
-#line 26 "%%%"
+#line 26 "%%"
             {
                 var sim = new SomeNamespace.CustomSimulator();
                 if (sim is Microsoft.Quantum.Simulation.Common.SimulatorBase baseSim && this.Output != null)
