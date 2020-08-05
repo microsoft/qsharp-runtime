@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.NewTracer;
-using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation;
 using Xunit;
 
@@ -18,44 +16,69 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void TracerCoreConstructor()
         {
-            NewTracerConfiguration tracerCoreConfiguration = new NewTracerConfiguration();
+            var tracerCoreConfiguration = new NewTracerConfiguration();
             tracerCoreConfiguration.UsePrimitiveOperationsCounter = true;
-            NewTracerSim tracerCore = new NewTracerSim(tracerCoreConfiguration);
+            var tracer = new TracerSimulator(tracerCoreConfiguration);
         }
 
         [Fact]
-        public void GetPrimitiveOperations()
+        public void GetPrimitiveOperationsNew()
         {
-            NewTracerSim tracerCore = new NewTracerSim();
+            var tracer = new TracerSimulator();
 
-            var measureOp = tracerCore.Get<Intrinsic.Measure, Intrinsic.Measure>();
+            var measureOp = tracer.Get<Intrinsic.Measure, Intrinsic.Measure>();
             Assert.NotNull(measureOp);
 
-            var assertOp = tracerCore.Get<Intrinsic.Assert, Intrinsic.Assert>();
+            var assertOp = tracer.Get<Intrinsic.Assert, Intrinsic.Assert>();
             Assert.NotNull(assertOp);
 
-            var assertProb = tracerCore.Get<Intrinsic.AssertProb, Intrinsic.AssertProb>();
+            var assertProb = tracer.Get<Intrinsic.AssertProb, Intrinsic.AssertProb>();
             Assert.NotNull(assertProb);
 
-            var allocOp = tracerCore.Get<Intrinsic.Allocate, Intrinsic.Allocate>();
+            var allocOp = tracer.Get<Intrinsic.Allocate, Intrinsic.Allocate>();
             Assert.NotNull(allocOp);
 
-            var releaseOp = tracerCore.Get<Intrinsic.Release, Intrinsic.Release>();
+            var releaseOp = tracer.Get<Intrinsic.Release, Intrinsic.Release>();
             Assert.NotNull(releaseOp);
 
-            var borrowOp = tracerCore.Get<Intrinsic.Borrow, Intrinsic.Borrow>();
+            var borrowOp = tracer.Get<Intrinsic.Borrow, Intrinsic.Borrow>();
             Assert.NotNull(borrowOp);
 
-            var returnOp = tracerCore.Get<Intrinsic.Return, Intrinsic.Return>();
+            var returnOp = tracer.Get<Intrinsic.Return, Intrinsic.Return>();
             Assert.NotNull(returnOp);
         }
 
-        //TODO: New tracer does not work through operation overrides but via the QuantumProcessorDispatcher.
-        //Test no longer relevant/necessary?
-        [Fact(Skip = "no longer relevant?")]
+        [Fact]
+        public void GetPrimitiveOperationsOld()
+        {
+            var tracer = new TracerSimulator(new QCTraceSimConfiguration());
+
+            var measureOp = tracer.Get<Intrinsic.Measure, Intrinsic.Measure>();
+            Assert.NotNull(measureOp);
+
+            var assertOp = tracer.Get<Intrinsic.Assert, Intrinsic.Assert>();
+            Assert.NotNull(assertOp);
+
+            var assertProb = tracer.Get<Intrinsic.AssertProb, Intrinsic.AssertProb>();
+            Assert.NotNull(assertProb);
+
+            var allocOp = tracer.Get<Intrinsic.Allocate, Intrinsic.Allocate>();
+            Assert.NotNull(allocOp);
+
+            var releaseOp = tracer.Get<Intrinsic.Release, Intrinsic.Release>();
+            Assert.NotNull(releaseOp);
+
+            var borrowOp = tracer.Get<Intrinsic.Borrow, Intrinsic.Borrow>();
+            Assert.NotNull(borrowOp);
+
+            var returnOp = tracer.Get<Intrinsic.Return, Intrinsic.Return>();
+            Assert.NotNull(returnOp);
+        }
+
+        [Fact]
         public void GetInterfaceOperations()
         {
-            NewTracerSim tracerCore = new NewTracerSim();
+            var tracerCore = new TracerSimulator(new QCTraceSimConfiguration());
 
             var CX = tracerCore.Get<Interface_CX, Interface_CX>();
             Assert.NotNull(CX);
@@ -76,7 +99,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void TracerVerifyPrimitivesCompleteness()
         {
-            NewTracerSim tracerCore = new NewTracerSim();
+            var tracer = new TracerSimulator();
 
             var ops =
                 from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
@@ -90,7 +113,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             {
                 try
                 {
-                    var i = tracerCore.GetInstance(op);
+                    var i = tracer.GetInstance(op);
                     Assert.NotNull(i);
                 }
                 catch (Exception)

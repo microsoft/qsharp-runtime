@@ -1,47 +1,22 @@
-﻿using Microsoft.Quantum.Intrinsic;
-using Microsoft.Quantum.Simulation.Common;
+﻿using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using static Microsoft.Quantum.Simulation.Simulators.NewTracer.TraceableQubitManager;
 
 namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 {
-    /// <summary>
-    /// TraceableQubit holds data associated with a qubit 
-    /// for runtime checks, metrics collection and measurement constraints tracking.
-    /// Used by <see cref="TraceableQubitManager"/>
-    /// </summary>
-    public class TraceableQubit : Qubit
+    public interface IQubitTraceSubscriber : ITracerTarget
     {
-        /// <summary>
-        /// Objects attached to the qubit
-        /// </summary>
-        private readonly object[] TraceData;
-
-        private readonly TraceableQubitManager QubitManagerPtr;
-
-        internal TraceableQubit(TraceableQubitManager managerPtr, int id, object[] traceData) : base(id)
-        {
-            this.QubitManagerPtr = managerPtr;
-            this.TraceData = traceData;
-        }
-
-        public object ExtractData(IQubitTraceSubscriber subscriber)
-        {
-            return TraceData[QubitManagerPtr.GetSubscriberIndex(subscriber)];
-        }
-
-        public void SetData(IQubitTraceSubscriber subscriber, object value)
-        {
-            TraceData[QubitManagerPtr.GetSubscriberIndex(subscriber)] = value;
-        }
+        object? NewTracingData(long id);
     }
 
-    public interface IQubitTraceSubscriber
+    public interface IQubitTraceSubscriber<TData> : IQubitTraceSubscriber
     {
-        object NewTracingData(long id);
+        new TData NewTracingData(long id);
+
+        object? IQubitTraceSubscriber.NewTracingData(long id) => this.NewTracingData(id);
     }
 
     /// <summary>
@@ -54,11 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 
         private readonly IQubitTraceSubscriber[] Subscribers;
 
-        /// <summary>
-        /// The qubit manager makes sure that trace data array for qubits 
-        /// is initialized with objects created by qubitTraceDataInitializers callbacks
-        /// </summary>
-        public TraceableQubitManager(IList<IQubitTraceSubscriber> subscribers)
+        public TraceableQubitManager(IEnumerable<IQubitTraceSubscriber>? subscribers)
             : base(NumQubits, mayExtendCapacity: true, disableBorrowing: false)
         {
             this.Subscribers = subscribers?.ToArray() ?? new IQubitTraceSubscriber[] { };
@@ -66,22 +37,62 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 
         public override Qubit CreateQubitObject(long id)
         {
-            object[] traceData = new object[Subscribers.Length];
-            for (int i = 0; i < traceData.Length; i++)
-            {
-                traceData[i] = Subscribers[i].NewTracingData(id);
-            }
-            return new TraceableQubit(this, (int)id, traceData);
+            return new TraceableQubit(this.Subscribers, (int)id);
         }
 
-        public int GetSubscriberIndex(IQubitTraceSubscriber subscriber)
+        internal class TraceableQubit : Qubit
         {
-            for (int i = 0; i < Subscribers.Length; i++)
+            // Objects attached to the qubit
+            private readonly object?[] TraceData;
+
+            private readonly IQubitTraceSubscriber[] Subscribers;
+
+            internal TraceableQubit(IQubitTraceSubscriber[] subscribers, int id) : base(id)
             {
-                if (Subscribers[i] == subscriber)
-                { return i; }
+                this.Subscribers = subscribers;
+
+                this.TraceData = new object[subscribers.Length];
+                for (int i = 0; i < subscribers.Length; i++)
+                {
+                    TraceData[i] = subscribers[i].NewTracingData(id);
+                }
             }
-            throw new ArgumentException("Provided subscriber not registered.");
+
+            internal TData ExtractData<TData>(IQubitTraceSubscriber<TData> subscriber)
+            {
+                int subIndex = GetSubscriberIndex(subscriber);
+                #pragma warning disable CS8603 // Possible null reference return.
+                return (TData)TraceData[subIndex];
+            }
+
+            internal void SetData<TData>(IQubitTraceSubscriber<TData> subscriber, TData value)
+            {
+                int subIndex = GetSubscriberIndex(subscriber);
+                this.TraceData[subIndex] = value;
+            }
+
+            private int GetSubscriberIndex(IQubitTraceSubscriber subscriber)
+            {
+                for (int i = 0; i < Subscribers.Length; i++)
+                {
+                    if (Object.ReferenceEquals(Subscribers[i], subscriber))
+                    { return i; }
+                }
+                throw new ArgumentException("Provided subscriber not registered.");
+            }
+        }
+    }
+
+    public static class QubitTracingExtensions
+    {
+        public static TData ExtractQubitData<TData>(this IQubitTraceSubscriber<TData> sub, Qubit q)
+        {
+            return ((TraceableQubit)q).ExtractData(sub);
+        }
+
+        public static void SetQubitData<TData>(this IQubitTraceSubscriber<TData> sub, Qubit q, TData value)
+        {
+            ((TraceableQubit)q).SetData(sub, value);
         }
     }
 }

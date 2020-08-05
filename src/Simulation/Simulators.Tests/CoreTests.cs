@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.Simulators.NewTracer;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 using Microsoft.Quantum.Tests.CoreOperations;
 
@@ -199,7 +200,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
-            RunOne(new QCTraceSimulator());
+            RunOne(new TracerSimulator());
             RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
         }
@@ -234,7 +235,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
-            RunOne(new QCTraceSimulator());
+            RunOne(new TracerSimulator());
             RunOne(new ResourcesEstimator());
         }
 

@@ -5,79 +5,214 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
     
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Simulation.TestSuite;
+    open Microsoft.Quantum.Arrays;
     
-    
-    operation SingleQubitOperationsWithControlsTest () : Unit {
-        
-        
-        // TODO: add (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.HY, HY);
-        // below, when HY is added to standard.qb
-        let paramFreeList = [
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.H, H),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.X, X),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Z, Z),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.S, S),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Y, Y),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.T, T)
+
+    function MaxControls() : Int {
+        return 3;
+    }
+
+    function MaxQubitsWidth() : Int {
+        return 3;
+    }
+
+    function NumberOfTestRepetitions() : Int {
+        return 1;
+    }
+
+    function AnglesToTest() : Double[] {
+        let pi = Microsoft.Quantum.Math.PI();
+        return [
+            0.0, 
+            0.1,
+            pi/8.0,
+            pi/4.0,
+            pi/2.0,
+            3.0 * pi/4.0,
+            pi,
+            5.0 * pi/4.0,
+            3.0 * pi/2.0,
+            2.0 * pi,
+            3.0 * pi,
+            4.0 * pi,
+            0.1984 
         ];
-        let rList = [
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliZ, 1,0,_), RFrac(PauliZ,1,0,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliZ, 1,1,_), RFrac(PauliZ,1,1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliZ, 1,2,_), RFrac(PauliZ,1,2,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliZ, 1,3,_), RFrac(PauliZ,1,3,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliZ, 1,4,_), RFrac(PauliZ,1,4,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Rz(0.1,_), Rz(0.1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Ry(0.1,_), Ry(0.1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Rx(0.1,_), Rx(0.1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(1,0,_), R1Frac(1,0,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(1,1,_), R1Frac(1,1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(1,2,_), R1Frac(1,2,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(1,3,_), R1Frac(1,3,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(1,4,_), R1Frac(1,4,_))
+    }
+
+    function FractionsToTest() : (Int,Int)[] {
+        return [
+            (0,-1),
+            (1,1),
+            (-1,1),
+            (1,2),
+            (3,2),
+            (-3,2),
+            (-1,2),
+            (1,3),
+            (-1,3),
+            (3,4),
+            (-1,4),
+            //(1, 9223372036854775807),
+            (1, 13),
+            (1, -13)
         ];
-        let testList = paramFreeList + rList;
-        
-        for (i in 0 .. Length(testList) - 1) {
-            let (actual, expected) = testList[i];
-            ControlledQubitOperationTester(actual, expected, 3);
+    }
+
+    function FractionsToTestLarge() : (Int, Int)[] {
+        mutable fractions =  FractionsToTest(); //new (Int, Int)[0];
+        for (i in 0 .. 4) {
+            for (j in -2 ^ i .. 2 ^ i) {
+                set fractions = fractions + [(j, i)];
+			}
+		}
+        return fractions;
+	}
+
+    function PaulisToTest() : Pauli[] {
+        return [PauliI, PauliX, PauliY, PauliZ];
+    }
+
+    newtype TestEntry = (
+        Actual: (Qubit => Unit is Adj + Ctl),
+        Expected: (Qubit => Unit is Adj + Ctl), 
+        Description: String
+    );
+
+    operation ParamFreeSingleQubitIntrinsics() : TestEntry[] {
+		return [
+            TestEntry(_Decomposer_H, H, "H"),
+            TestEntry(_Decomposer_X, X, "X"),
+            TestEntry(_Decomposer_Z, Z, "Z"),
+            TestEntry(_Decomposer_S, S, "S"),
+            TestEntry(_Decomposer_Y, Y, "Y"),
+            TestEntry(_Decomposer_T, T, "T")
+        ];
+    }
+
+    operation DoubleParamSingleQubitIntrinsics() : TestEntry[] {
+        let ops = [
+            (_Decomposer_Rz, Rz, "Rz"),
+            (_Decomposer_Ry, Ry, "Ry"),
+            (_Decomposer_Rx, Rx, "Rx"),
+            (_Decomposer_R1, R1, "R1")
+        ];
+        mutable tests = new TestEntry[0];
+        for((actual, expected, name) in ops) {
+            for (angle in AnglesToTest()) {
+                let message = $"{name}({angle})";
+                set tests = tests + [TestEntry(actual(angle, _), expected(angle, _), message)];
+		    }
+		}
+        return tests;
+	}
+
+    operation PauliDoubleParamSingleQubitIntrinsics() : TestEntry[] {
+        let ops = [
+            (_Decomposer_R, R, "R"),
+        ];
+        mutable tests = new TestEntry[0];
+        for((actual, expected, name) in ops) {
+            for (angle in AnglesToTest()) {
+                for(pauli in PaulisToTest()) {
+                    let message = $"{name}({pauli}, {angle})";
+                    set tests = tests + [TestEntry(actual(pauli, angle, _), expected(pauli, angle, _), message)];
+				}
+		    }
+		}
+        return tests;
+	}
+
+    operation FracParamSingleQubitIntrinsics() : TestEntry[] {
+        let ops = [
+            (_Decomposer_R1Frac, R1Frac, "R1Frac")
+        ];
+        mutable tests = new TestEntry[0];
+        for((actual, expected, name) in ops) {
+            for ((num, denom) in FractionsToTestLarge()) {
+                let message = $"{name}({num}, {denom})";
+                set tests = tests + [TestEntry(actual(num, denom, _), expected(num, denom, _), message)
+                ];
+		    }
+		}
+        return tests;
+	}
+
+    operation PauliFracParamSingleQubitIntrinsics() : TestEntry[] {
+        let ops = [
+            (_Decomposer_RFrac, RFrac, "RFrac")
+        ];
+        mutable tests = new TestEntry[0];
+        for((actual, expected, name) in ops) {
+            for ((num, denom) in FractionsToTestLarge()) {
+                for(pauli in PaulisToTest()) {
+                    let message = $"{name}({pauli}, {num}, {denom})";
+                    set tests = tests + [TestEntry( actual(pauli, num, denom, _), expected(pauli, num, denom, _), message)
+                    ];
+				}
+		    }
+		}
+        return tests;
+	}
+
+    operation AllSingleQubitIntrinsics() : TestEntry[] {
+        return ParamFreeSingleQubitIntrinsics() + DoubleParamSingleQubitIntrinsics() + PauliDoubleParamSingleQubitIntrinsics()
+            + FracParamSingleQubitIntrinsics() + PauliFracParamSingleQubitIntrinsics();
+	}
+
+     operation SingleQubitOperationsWithControlsTest () : Unit {
+		let testList = AllSingleQubitIntrinsics();
+        for (testEntry in testList) {
+            Message($"TESTING: {testEntry::Description}");
+            ControlledQubitOperationTester(testEntry::Actual, testEntry::Expected, 3);
         }
         
-        for (i in 0 .. Length(paramFreeList) - 1) {
-            let (actual, expected) = paramFreeList[i];
-            ControlledQubitOperationTester(actual, expected, 5);
+        for (testEntry in testList) {
+            Message($"TESTING: {testEntry::Description}");
+            ControlledQubitOperationTester(testEntry::Actual, testEntry::Expected, 5);
         }
     }
-    
     
     operation SingleQubitRotationsWithOneControlTest () : Unit {
         
         mutable testList = [
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1(0.1,_), R1(0.1,_)),  
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Rz(0.1,_), Rz(0.1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Ry(0.1,_), Ry(0.1,_)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Rx(0.1,_), Rx(0.1,_))
+            (_Decomposer_R1(0.1,_), R1(0.1,_)),  
+            (_Decomposer_Rz(0.1,_), Rz(0.1,_)),
+            (_Decomposer_Ry(0.1,_), Ry(0.1,_)),
+            (_Decomposer_Rx(0.1,_), Rx(0.1,_))
         ];
 
-        //TODO: add PauliI here when known issues are fixed
-        let paulies = [PauliX, PauliY, PauliZ];
+        let paulies = [PauliI, PauliX, PauliY, PauliZ];
         
         for (k in 0 .. 2) {
             let pauli = paulies[k];
             let phi = 0.1;
             let opExpected = Exp([paulies[k]], phi, _);
-            let opActual = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Exp([paulies[k]], phi, _);
-            set testList = testList + [(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R(pauli, phi, _), R(pauli, phi, _)), (OnOneQubitAC(opActual, _), OnOneQubitAC(opExpected, _))];
+            let opActual = _Decomposer_Exp([paulies[k]], phi, _);
+            set testList = testList + [
+                (OnOneQubitAC(opActual, _), 
+                OnOneQubitAC(opExpected, _)),
+                (_Decomposer_R(pauli, phi, _), 
+                R(pauli, phi, _))
+            ];
         }
         
         for (i in 0 .. 4) {
             
             for (j in -2 ^ i .. 2 ^ i) {
-                set testList = testList + [(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R1Frac(j, i, _), R1Frac(j, i, _))];
+                set testList = testList + [
+                    (_Decomposer_R1Frac(j, i, _), 
+                    R1Frac(j, i, _))
+                ];
                 
                 for (k in 0 .. 2) {
                     let opExpected = ExpFrac([paulies[k]], j, i, _);
-                    let opActual = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.ExpFrac([paulies[k]], j, i, _);
-                    set testList = testList + [(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(paulies[k], j, i, _), RFrac(paulies[k], j, i, _)), (OnOneQubitAC(opActual, _), OnOneQubitAC(opExpected, _))];
+                    let opActual = _Decomposer_ExpFrac([paulies[k]], j, i, _);
+                    set testList = testList + [
+                        (_Decomposer_RFrac(paulies[k], j, i, _), 
+                        RFrac(paulies[k], j, i, _)),
+                        (OnOneQubitAC(opActual, _), 
+                        OnOneQubitAC(opExpected, _))
+                    ];
                 }
             }
         }
@@ -87,7 +222,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
             ControlledQubitOperationTester(actual, expected, 2);
         }
     }
-    
 }
 
 

@@ -10,18 +10,18 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
 
         let paramFreeList = [
             (
-                OnFirstThreeQubitsAC(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.CCNOT, _),
+                OnFirstThreeQubitsAC(_Decomposer_CCNOT, _),
                 OnFirstThreeQubitsAC(CCNOT, _)
             )
         ];
 
-        for (i in 0 .. Length(paramFreeList) - 1) {
-            let (actual, expected) = paramFreeList[i];
+        for ((actual, expected) in paramFreeList) {
             ControlledOperationTester(actual, expected, 3, 5);
         }
 
-        IterateThroughCartesianPower(3, 2, ExpTester);
-        IterateThroughCartesianPower(4, 2, ExpTester);
+        //TODO: rethinking testing scope to optimize execution time
+        IterateThroughCartesianPower(3, NumberOfPaulies(), ExpTester);
+        IterateThroughCartesianPower(4, NumberOfPaulies() - 1, ExpTester);
     }
 
 }

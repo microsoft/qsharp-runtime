@@ -25,9 +25,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                         $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                 }
 
-                CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-
-                Simulator.QuantumProcessor.ExpFrac(newPaulis, nom, den, newQubits);
+                //We are intentionally not pruning identities here as we expect the implementation to do so
+                Simulator.QuantumProcessor.ExpFrac(paulis, nom, den, qubits);
                 return QVoid.Instance;
             };
 
@@ -48,16 +47,14 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                         throw new InvalidOperationException(
                             $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                     }
-
-                    CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                    
+ 
                     if ((ctrls == null) || (ctrls.Count == 0))
                     {
-                        Simulator.QuantumProcessor.ExpFrac(newPaulis, nom, den, newQubits);
+                        Simulator.QuantumProcessor.ExpFrac(paulis, nom, den, qubits);
                     }
                     else
                     {
-                        Simulator.QuantumProcessor.ControlledExpFrac(ctrls, newPaulis, nom, den, newQubits);
+                        Simulator.QuantumProcessor.ControlledExpFrac(ctrls, paulis, nom, den, qubits);
                     }
 
                     return QVoid.Instance;

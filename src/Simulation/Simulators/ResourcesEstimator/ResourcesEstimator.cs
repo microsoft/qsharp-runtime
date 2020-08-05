@@ -22,10 +22,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
     ///   <li>Gates width (total number of gates used for the computation)</li>
     /// </ol>
     /// </summary>
-    public partial class ResourcesEstimator : NewTracerSim
+    public partial class ResourcesEstimator : TracerSimulator
     {
         /// <summary>
-        /// The ResourceEstimator is based on <see cref="NewTracerSim"/>; this returns
+        /// The ResourceEstimator is based on <see cref="TracerSimulator"/>; this returns
         /// the correct configuration expected by the ResourceEstimator and what get used when
         /// a new instance is created with no parameters. It is
         /// optimized for performance and metrics collection.

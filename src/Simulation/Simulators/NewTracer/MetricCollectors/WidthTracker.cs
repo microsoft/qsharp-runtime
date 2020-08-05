@@ -1,18 +1,14 @@
-﻿using Microsoft.Quantum.Simulation.Common;
-using Microsoft.Quantum.Simulation.Core;
-using System;
+﻿using Microsoft.Quantum.Simulation.Core;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollection;
 
 namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
 {
-    public class WidthTracker : QuantumProcessorBase, IMetricCollector, IQuantumProcessor
+    public class WidthTracker : IQubitTrackingTarget, IMetricCollector
     {
         public class WidthState : IStackRecord
         {
-            // Per-invocation metrics
-
             public double InputWidth { get; set; }
 
             public double AllocatedAtStart { get; set; }
@@ -33,12 +29,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             AllocatedQubits = 0;
         }
 
-        public string CollectorName()
+        string IMetricCollector.CollectorName()
         {
             return "WidthCounter";
         }
 
-        public IList<string> Metrics()
+        IList<string> IMetricCollector.Metrics()
         {
             return new string[]
             {
@@ -49,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             };
         }
 
-        public double[] OutputMetricsOnOperationEnd(IStackRecord savedParentState, IApplyData returned)
+        double[] IMetricCollector.OutputMetricsOnOperationEnd(IStackRecord savedParentState, IApplyData returned)
         {
             WidthState endState = (WidthState)savedParentState;
             // Updating parent state
@@ -67,7 +63,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             return values;
         }
 
-        public IStackRecord SaveRecordOnOperationStart(IApplyData inputArgs)
+        IStackRecord IMetricCollector.SaveRecordOnOperationStart(IApplyData inputArgs)
         {
             WidthState savedState = this.CurrentState;
             this.CurrentState = new WidthState
@@ -81,23 +77,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             return savedState;
         }
 
-        private int CountQubits(IApplyData args)
-        {
-            return args?.Qubits?.Where(qubit => qubit != null).Count() ?? 0;
-        }
-
-        public override void OnAllocateQubits(IQArray<Qubit> qubits)
+        void IQubitTrackingTarget.OnAllocateQubits(IQArray<Qubit> qubits)
         {
             this.AllocatedQubits += qubits.Count;
             CurrentState.MaxAllocated = System.Math.Max(this.AllocatedQubits, CurrentState.MaxAllocated);
         }
 
-        public override void OnReleaseQubits(IQArray<Qubit> qubits)
+        void IQubitTrackingTarget.OnReleaseQubits(IQArray<Qubit> qubits)
         {
             this.AllocatedQubits -= qubits.Count;
         }
 
-        public override void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
+        void IQubitTrackingTarget.OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)
         {
             this.AllocatedQubits += allocatedForBorrowingCount;
             CurrentState.MaxAllocated = System.Math.Max(this.AllocatedQubits, CurrentState.MaxAllocated);
@@ -106,80 +97,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             CurrentState.MaxBorrowed = System.Math.Max(CurrentState.BorrowedQubits, CurrentState.MaxBorrowed);
         }
 
-        public override void OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
+        void IQubitTrackingTarget.OnReturnQubits(IQArray<Qubit> qubits, long releasedOnReturnCount)
         {
             this.AllocatedQubits -= releasedOnReturnCount;
             CurrentState.BorrowedQubits -= (qubits.Length - releasedOnReturnCount);
         }
 
-        #region boilerplate
-
-        public override void Z(Qubit qubit)
+        private int CountQubits(IApplyData args)
         {
-
+            return args?.Qubits?.Where(qubit => qubit != null).Count() ?? 0;
         }
 
-        public override void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
-        {
-            if (controls.Length == 1 || controls.Length == 2)
-            {
-
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-        public override void H(Qubit qubit)
-        {
-        }
-
-        public override void S(Qubit qubit)
-        {
-
-        }
-
-        public override void SAdjoint(Qubit qubit)
-        {
-
-        }
-        public override void T(Qubit qubit)
-        {
-
-        }
-
-        public override void TAdjoint(Qubit qubit)
-        {
-
-        }
-
-        public override void SWAP(Qubit qubit1, Qubit qubit2)
-        {
-
-        }
-
-        public override void R(Pauli axis, double theta, Qubit qubit)
-        {
-            if (axis == Pauli.PauliZ)
-            {
-
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
-        {
-            return null;
-        }
-
-        public override Result M(Qubit qubit)
-        {
-            return null;
-        }
-
-        #endregion
+        bool ITracerTarget.SupportsTarget(ITracerTarget target) => false;
     }
 }

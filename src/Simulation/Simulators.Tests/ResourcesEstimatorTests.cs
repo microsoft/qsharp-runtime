@@ -42,18 +42,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ResourcesEstimator();
 
+            /*
             foreach(IMetricCollector collector in sim.TracerCore.Collectors)
             {
                 // We expect all of them to have the Moment (with Sum)
-                /*var stats = collector.Results.GetStatisticsNamesCopy();
+                var stats = collector.Results.GetStatisticsNamesCopy();
                 var expected = new MomentsStatistic().GetStatisticsNames();
                 foreach (var n in expected)
                 {
                     Assert.Contains(n, stats);
                 }
-                */
                 //TODO: implement custom statistics
-            }
+            }*/
         }
 
 

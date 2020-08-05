@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         {
             var config = new NewTracerConfiguration();
             config.UsePrimitiveOperationsCounter = true;
-            NewTracerSim sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
 
             int numControls = 3;
             QVoid res;
@@ -34,27 +34,33 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             Debug.WriteLine(csvSummary);
             output.WriteLine(csvSummary);
 
-            Assert.Equal(2.0, sim.GetMetric("CCZ"));
-            Assert.Equal(1.0, sim.GetMetric("CZ"));
+
+            Assert.Equal(2.0, sim.GetMetric("CCZ"), 3);
+            //TODO: non-deterministic! either 1 or 0 depending on measurement of aux qubit
+            Assert.Equal(1.0, sim.GetMetric("CZ"), 3);
         }
 
-        //TODO: revisit
-        [Fact(Skip = "different decomposition")]
+        [Fact]
         void CCNOTGateCountExample()
         {
-            var config = new NewTracerConfiguration();
+            var config = new QCTraceSimConfiguration();
             config.UsePrimitiveOperationsCounter = true;
-            NewTracerSim sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
+
             QVoid res;
             res = CCNOTDriver.Run(sim).Result;
             res = CCNOTDriver.Run(sim).Result;
 
+            string csvSummary = sim.ToCSV()[MetricsCountersNames.primitiveOperationsCounter];
+
+            Debug.WriteLine(csvSummary);
+            output.WriteLine(csvSummary);
+
+            
             double tCount = sim.GetAggregateEdgeMetric<Intrinsic.CCNOT, CCNOTDriver>(PrimitiveOperationsGroupsNames.T);
             double tCountAll = sim.GetOperationMetric<CCNOTDriver>(PrimitiveOperationsGroupsNames.T);
 
-            double cxCount = sim.GetAggregateEdgeMetric<Intrinsic.CCNOT, CCNOTDriver>("CZ");
-
-            string csvSummary = sim.ToCSV()[MetricsCountersNames.primitiveOperationsCounter];
+            double cxCount = sim.GetAggregateEdgeMetric<Intrinsic.CCNOT, CCNOTDriver>("CNOT");
 
             // above code is an example used in the documentation
 
@@ -67,6 +73,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             Assert.Equal(10.0, cxCount);
             Debug.WriteLine(csvSummary);
             output.WriteLine(csvSummary);
+            
         }
 
         [Fact]
@@ -75,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             var config = new NewTracerConfiguration();
             config.UsePrimitiveOperationsCounter = true;
             config.CallStackDepthLimit = 2;
-            NewTracerSim sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
             var res = TCountOneGatesTest.Run(sim).Result;
             var res2 = TCountZeroGatesTest.Run(sim).Result;
             var tcount = PrimitiveOperationsGroupsNames.T;
@@ -106,19 +113,19 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             var config = new NewTracerConfiguration();
             config.UseDepthCounter = true;
             config.CallStackDepthLimit = 1;
-            NewTracerSim sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
             var res = TDepthOne.Run(sim).Result;
             string csvSummary = sim.ToCSV()[MetricsCountersNames.depthCounter];
             Assert.Equal(1, sim.GetOperationMetric<TDepthOne>(MetricsNames.DepthCounter.Depth));
         }
 
-        [Fact(Skip = "different decomposition")]
+        [Fact]
         void CCNOTDepthCountExample()
         {
             var config = new NewTracerConfiguration();
             config.UseDepthCounter = true;
             config.CallStackDepthLimit = 2;
-            NewTracerSim sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
             var res = CCNOTDriver.Run(sim).Result;
 
             double tDepth = sim.GetAggregateEdgeMetric<Intrinsic.CCNOT, CCNOTDriver>(MetricsNames.DepthCounter.Depth);
@@ -136,12 +143,12 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         }
 
         [Fact]
-        void MultiControilledXWidthExample()
+        void MultiControlledXWidthExample()
         {
             var config = new NewTracerConfiguration();
             config.UseWidthCounter = true;
             config.CallStackDepthLimit = 2;
-            var sim = new NewTracerSim(config);
+            var sim = new TracerSimulator(config);
             int totalNumberOfQubits = 5;
             var res = MultiControlledXDriver.Run(sim, totalNumberOfQubits).Result;
 

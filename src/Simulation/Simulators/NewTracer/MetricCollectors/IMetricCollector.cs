@@ -1,6 +1,5 @@
 ﻿using Microsoft.Quantum.Simulation.Core;
 using System.Collections.Generic;
-using Microsoft.Quantum.Simulation.Common;
 
 namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollection
 {
@@ -9,7 +8,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollection
     {
     }
 
-    public interface IMetricCollector : IQuantumProcessor
+    public interface IMetricCollector : ITracerTarget
     {
         string CollectorName();
 

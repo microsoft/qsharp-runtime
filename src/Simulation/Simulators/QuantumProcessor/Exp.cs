@@ -28,10 +28,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                         $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                 }
 
-                CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-
-                Simulator.QuantumProcessor.Exp(newPaulis, angle, newQubits);
-
+                //We are intentionally not pruning identities here as we expect the implementation to do so
+                Simulator.QuantumProcessor.Exp(paulis, angle, qubits);
                 return QVoid.Instance;
             };
 
@@ -52,15 +50,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                         $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
                 }
                 
-                CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-                
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    Simulator.QuantumProcessor.Exp(newPaulis, angle, newQubits);
+                    Simulator.QuantumProcessor.Exp(paulis, angle, qubits);
                 }
                 else
                 {
-                    Simulator.QuantumProcessor.ControlledExp(ctrls, newPaulis, angle, newQubits);
+                    Simulator.QuantumProcessor.ControlledExp(ctrls, paulis, angle, qubits);
                 }
 
                 return QVoid.Instance;

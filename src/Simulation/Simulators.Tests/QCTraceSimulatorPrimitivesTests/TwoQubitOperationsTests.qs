@@ -11,23 +11,23 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
     operation TwoQubitOperationsWithControllsTest () : Unit {
         
         let phi = 0.1;
-        let globalPhaseOp1 = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.R(PauliI, phi, _);
+        let globalPhaseOp1 = _Decomposer_R(PauliI, phi, _);
         let rotationOp1 = R1(-phi / 2.0, _);
-        let globalPhaseOp3 = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.RFrac(PauliI, 1, 3, _);
+        let globalPhaseOp3 = _Decomposer_RFrac(PauliI, 1, 3, _);
         let rotationOp3 = R1Frac(1, 3, _);
-        let globalPhaseOp2 = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Exp([PauliI], phi, _);
+        let globalPhaseOp2 = _Decomposer_Exp([PauliI], phi, _);
         let rotationOp2 = R1(phi, _);
-        let globalPhaseOp4 = Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.ExpFrac([PauliI], 1, 3, _);
+        let globalPhaseOp4 = _Decomposer_ExpFrac([PauliI], 1, 3, _);
         let rotationOp4 = R1Frac(1, 3, _);
         let paramFreeList = [
             (MultiControlledQubitTestHelper(globalPhaseOp1, 1, _), OnSecondQubitAC(rotationOp1, _)),
             (MultiControlledQubitTestHelper(globalPhaseOp3, 1, _), OnSecondQubitAC(rotationOp3, _)),
-            (MultiControlledTestHelper(globalPhaseOp2, 1, 1, _), OnSecondQubitAC(rotationOp2, _)),
-            (MultiControlledTestHelper(globalPhaseOp4, 1, 1, _), OnSecondQubitAC(rotationOp4, _)),
-            (OnFirstTwoQubitsAC(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.CNOT, _), OnFirstTwoQubitsAC(CNOT, _)),
-            (OnFirstTwoQubitsAC(Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.SWAP, _), OnFirstTwoQubitsAC(SWAP, _)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Exp([PauliI, PauliI], 0.0, _), Exp([PauliI, PauliI], 0.0, _)),
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.ExpFrac([PauliI, PauliI], 0, 0, _), ExpFrac([PauliI, PauliI], 0, 0, _))
+            (MultiControlledTestHelper(globalPhaseOp2, 1, 1, _), OnSecondQubitAC(rotationOp2, _)), //
+            (MultiControlledTestHelper(globalPhaseOp4, 1, 1, _), OnSecondQubitAC(rotationOp4, _)), //
+            (OnFirstTwoQubitsAC(_Decomposer_CNOT, _), OnFirstTwoQubitsAC(CNOT, _)),
+            (OnFirstTwoQubitsAC(_Decomposer_SWAP, _), OnFirstTwoQubitsAC(SWAP, _)),
+            (_Decomposer_Exp([PauliI, PauliI], 0.0, _), Exp([PauliI, PauliI], 0.0, _)),
+            (_Decomposer_ExpFrac([PauliI, PauliI], 0, 0, _), ExpFrac([PauliI, PauliI], 0, 0, _))
         ];
         
         for (i in 0 .. Length(paramFreeList) - 1) {
@@ -40,21 +40,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
     
     
     operation ExpTester (pauliIds : Int[]) : Unit {
-        
-        mutable allIdentities = true;
-        
-        for (i in 0 .. Length(pauliIds) - 1) {
-            
-            if (pauliIds[i] != 3) {
-                set allIdentities = false;
-            }
-        }
-        
-        if (allIdentities) {
-            return ();
-            //TODO: remove this when known issues are fixed
-        }
-        
+
         let paulies = PauliById(pauliIds);
         let inputQubits = Length(paulies);
         let maxControls = 3;
@@ -62,16 +48,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests {
         let num = 1;
         let denom = 8;
         let testList = [
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.Exp(paulies, phi, _), Exp(paulies, phi, _)), 
-            (Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits.ExpFrac(paulies, num, denom, _), ExpFrac(paulies, num, denom, _))
+            (_Decomposer_Exp(paulies, phi, _), Exp(paulies, phi, _)), 
+            (_Decomposer_ExpFrac(paulies, num, denom, _), ExpFrac(paulies, num, denom, _))
         ];
         
-        for (i in 0 .. Length(testList) - 1) {
-            let (actual, expected) = testList[i];
+        for ((actual, expected) in testList) {
             ControlledOperationTester(actual, expected, inputQubits, maxControls);
         }
     }
-    
+
 }
-
-

@@ -1,7 +1,5 @@
-﻿using Microsoft.Quantum.Simulation.Common;
-using Microsoft.Quantum.Simulation.Core;
+﻿using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.NewTracer.CallGraph;
-using Microsoft.Quantum.Simulation.Simulators.NewTracer.GateDecomposition;
 using Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollection;
 using System;
 using System.Collections.Generic;
@@ -9,7 +7,7 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.Tracing
 {
-    public class TracingCore : DecomposerBase
+    public class TracingCore : IOperationTrackingTarget
     {
         public readonly CallGraphEdge RootCall;
 
@@ -26,8 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.Tracing
         protected readonly Dictionary<CallGraphEdge, VariableDistributionSummary[]> TracerData;
         internal readonly string[] Metrics;
 
-        public TracingCore(IQuantumProcessor targetProcessor, IEnumerable<IMetricCollector> allCollectors)
-            : base(targetProcessor)
+        public TracingCore(IEnumerable<IMetricCollector> allCollectors)
         {
             if (allCollectors == null || allCollectors.Count() == 0)
             {
@@ -46,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.Tracing
             this.NextFreeEdgeId = this.RootCall.Id + 1;
         }
 
-        public override void OnOperationStart(ICallable op, IApplyData arguments)
+        void IOperationTrackingTarget.OnOperationStart(ICallable op, IApplyData arguments)
         {
             this.CurrentCallGraphDepth++;
             OPSpecialization callee = OPSpecialization.FromCallable(op);
@@ -60,12 +57,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.Tracing
                 IStackRecord savedRecord = listener.SaveRecordOnOperationStart(arguments);
                 StackRecords[i].Push(savedRecord);
             }
-            base.OnOperationStart(op, arguments);
         }
 
-        public override void OnOperationEnd(ICallable op, IApplyData arguments)
+        void IOperationTrackingTarget.OnOperationEnd(ICallable op, IApplyData arguments)
         {
-            base.OnOperationEnd(op, arguments);
             if (!this.IsExecuting() || this.CurrentCallGraphDepth <= 0 || this.CurrentCall.ParentEdge == null
                 || this.CurrentCall.Operation.FullName != op.FullName || this.CurrentCall.Operation.Variant != op.Variant)
             {
@@ -100,6 +95,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.Tracing
                 }
             }
             return distributions;
+        }
+
+        bool ITracerTarget.SupportsTarget(ITracerTarget target)
+        {
+            return target is IMetricCollector;
         }
 
         internal bool TryGetRecord(CallGraphEdge edge, out VariableDistributionSummary[] record)
