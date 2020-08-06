@@ -409,7 +409,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
+    }
 
+    public class CustomCircuitTests
+    {
         [Fact]
         public void EmptyOperation()
         {
@@ -471,6 +474,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Children = null,
                 Controls = new List<Qubit>() { },
                 Targets = new List<Qubit>() { },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
+        public void DuplicateQubitArgs()
+        {
+            var q = new FreeQubit(0);
+            var op = new QuantumSimulator().Get<Circuits.TwoQubitOp>();
+            var args = op.__dataIn((q, q));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "TwoQubitOp",
+                FormattedNonQubitArgs = "",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { q },
             };
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);

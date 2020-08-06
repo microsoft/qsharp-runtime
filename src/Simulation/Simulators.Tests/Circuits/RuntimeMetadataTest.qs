@@ -26,5 +26,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             HOp(q);
         }
     }
+
+    operation TwoQubitOp (q1 : Qubit, q2 : Qubit) : Unit {
+        // ...
+    }
     
 }
