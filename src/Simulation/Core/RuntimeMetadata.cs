@@ -87,7 +87,8 @@ namespace Microsoft.Quantum.Simulation.Core
 
             if (this.Label != other.Label || this.FormattedNonQubitArgs != other.FormattedNonQubitArgs ||
                 this.IsAdjoint != other.IsAdjoint || this.IsControlled != other.IsControlled ||
-                this.IsMeasurement != other.IsMeasurement || this.IsComposite != other.IsComposite)
+                this.IsMeasurement != other.IsMeasurement || this.IsComposite != other.IsComposite ||
+                this.IsConditional != other.IsConditional)
                 return false;
 
             if (!ListEquals<Qubit>(this.Controls, other.Controls)) return false;
