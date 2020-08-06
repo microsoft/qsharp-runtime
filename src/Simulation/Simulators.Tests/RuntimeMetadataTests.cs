@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.Common;
+using Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
 using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
@@ -435,52 +435,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
-        public class TracerApplyIfElse : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsic
-        {
-            private SimulatorBase Simulator { get; }
-
-            public TracerApplyIfElse(SimulatorBase m) : base(m)
-            {
-                this.Simulator = m;
-            }
-
-            public override Func<(Result, ICallable, ICallable), QVoid> Body => (q) =>
-            {
-                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                onZero.Apply(QVoid.Instance);
-                onOne.Apply(QVoid.Instance);
-
-                return QVoid.Instance;
-            };
-        }
 
         [Fact]
         public void OperationAsArgument()
         {
-            var qsim = new QuantumSimulator();
-            qsim.Register(typeof(QuantumProcessor.Extensions.ApplyIfElseIntrinsic), typeof(TracerApplyIfElse));
-            var customX = qsim.Get<QuantumProcessor.Extensions.ApplyIfElseIntrinsic>();
-            Assert.Equal(typeof(TracerApplyIfElse), customX.GetType());
+            var q = new FreeQubit(0);
+            var opArg = new QuantumSimulator().Get<Circuits.HOp>();
+            var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
+            var args = op.__dataIn((opArg, q));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "WrapperOp",
+                FormattedNonQubitArgs = "(HOp)",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                Children = null,
+                Controls = new List<Qubit>() { },
+                Targets = new List<Qubit>() { q },
+            };
 
-
-            // var q = new FreeQubit(0);
-            // var opArg = new QuantumSimulator().Get<Circuits.HOp>();
-            // var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
-            // var args = op.__dataIn((opArg, q));
-            // var expected = new RuntimeMetadata()
-            // {
-            //     Label = "WrapperOp",
-            //     FormattedNonQubitArgs = "(HOp)",
-            //     IsAdjoint = false,
-            //     IsControlled = false,
-            //     IsMeasurement = false,
-            //     IsComposite = false,
-            //     Children = null,
-            //     Controls = new List<Qubit>() { },
-            //     Targets = new List<Qubit>() { q },
-            // };
-
-            // Assert.Equal(op.GetRuntimeMetadata(args), expected);
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
 
         [Fact]
@@ -816,6 +792,37 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Children = null,
                 Controls = new List<Qubit>() { },
                 Targets = new List<Qubit>() { },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+    }
+
+    public class ClassicallyControlledTests
+    {
+        [Fact]
+        public void ApplyIfElseR()
+        {
+            var qsim = new QuantumSimulator();
+            var control = new FreeQubit(0);
+            var target = new FreeQubit(1);
+            var res = new ResultMeasured(ResultValue.Zero, control);
+            var zeroOp = qsim.Get<Intrinsic.Z>();
+            var oneOp = qsim.Get<Intrinsic.X>();
+            var op = qsim.Get<ApplyIfElseR<Qubit, Qubit>>();
+            var args = op.__dataIn((res, (zeroOp, target), (oneOp, target)));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "ApplyIfElseR",
+                FormattedNonQubitArgs = "(Zero, (Z), (X))",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                IsConditional = true,
+                Children = null,
+                Controls = new List<Qubit>() { control },
+                Targets = new List<Qubit>() { target },
             };
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);

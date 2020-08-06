@@ -17,28 +17,36 @@ namespace Microsoft.Quantum.Simulation.Core
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T: class =>
             source.Where(q => q != null).Select(q => q!);
 
-        public static Result ToResult(this bool b, uint[]? sourceIds = null)
+        public static Result ToResult(this bool b)
         {
             return b
-                ? (sourceIds != null)
-                    ? new ResultMeasured(ResultValue.One, sourceIds)
-                    : Result.One
-                : (sourceIds != null)
-                    ? new ResultMeasured(ResultValue.Zero, sourceIds)
-                    : Result.Zero;
+                ? Result.One
+                : Result.Zero;
         }
 
-        public static Result ToResult(this uint b, uint[]? sourceIds = null)
+        public static Result ToResult(this bool b, Qubit qubit)
+        {
+            return b
+                ? new ResultMeasured(ResultValue.One, qubit)
+                : new ResultMeasured(ResultValue.Zero, qubit);
+        }
+
+        public static Result ToResult(this uint b)
         {
             Debug.Assert(b == 0 || b == 1, $"Unexpected result value: {b}");
 
             return b == 0
-                ? (sourceIds != null)
-                    ? new ResultMeasured(ResultValue.Zero, sourceIds)
-                    : Result.Zero
-                : (sourceIds != null)
-                    ? new ResultMeasured(ResultValue.One, sourceIds)
-                    : Result.One;
+                ? Result.Zero
+                : Result.One;
+        }
+
+        public static Result ToResult(this uint b, Qubit qubit)
+        {
+            Debug.Assert(b == 0 || b == 1, $"Unexpected result value: {b}");
+
+            return b == 0
+                ? new ResultMeasured(ResultValue.Zero, qubit)
+                : new ResultMeasured(ResultValue.One, qubit);
         }
 
         public static double Pow(this double x, double y)

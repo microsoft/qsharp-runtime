@@ -42,11 +42,15 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// True if operation is composed of multiple operations.
         /// </summary>
-        /// </summary>
         /// <remarks>
         /// This is used in composite operations, such as <c>ApplyToEach</c>.
         /// </remarks>
         public bool IsComposite { get; set; }
+
+        /// <summary>
+        /// True if operation is a classically-controlled conditional operation.
+        /// </summary>
+        public bool IsConditional { get; set; }
 
         /// <summary>
         /// Group of operations for each classical branch (<c>true</c> and <c>false</c>).

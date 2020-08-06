@@ -53,12 +53,12 @@ namespace Microsoft.Quantum.Simulation.Core
     {
         private ResultValue Value;
 
-        public uint[] SourceIds { get; }
+        public Qubit Qubit { get; set; }
 
-        public ResultMeasured(ResultValue value, uint[] sourceIds)
+        public ResultMeasured(ResultValue value, Qubit qubit)
         {
             Value = value;
-            SourceIds = sourceIds;
+            Qubit = qubit;
         }
 
         public override ResultValue GetValue()
