@@ -78,18 +78,13 @@ namespace Microsoft.Quantum.Simulation.Core
         public ControlledOperation<I, O> Controlled => _controlled.Value;
 
         /// <inheritdoc/>
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
-        {
-            var targets = args.GetQubits() ?? new List<Qubit>();
-            // Remove duplicate qubits
-            targets = new HashSet<Qubit>(targets).ToList();
-            return new RuntimeMetadata()
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
+            new RuntimeMetadata()
             {
                 Label = ((ICallable)this).Name,
                 FormattedNonQubitArgs = args.GetNonQubitArgumentsAsString() ?? "",
-                Targets = targets,
+                Targets = args.GetQubits().Distinct() ?? new List<Qubit>(),
             };
-        }
 
         public O Apply(I a)
         {
