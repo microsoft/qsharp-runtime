@@ -227,8 +227,11 @@ public:
                             newLocs.push_back(currLocs[i]);
                         }
                     }
-                    reorder_wavefunction(currLocs, newLocs);
-                    currLocs = qubits(unionOfAllQubitsInUse);
+                    //heuristic to check whether all qubits operated upon are in the upper half of wfn
+                    if (*setForSearch.begin() > (num_qubits_ / 2)) {
+                        reorder_wavefunction(currLocs, newLocs);
+                        currLocs = qubits(unionOfAllQubitsInUse);
+                    }
                     //keeping old and new location in order to set it appropriately
                     std::unordered_map<unsigned, unsigned> old2newDict;
                     for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
