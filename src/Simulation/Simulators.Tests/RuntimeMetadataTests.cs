@@ -859,5 +859,89 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Equal(op.GetRuntimeMetadata(args), expected);
         }
+
+        [Fact]
+        public void ApplyIfElseRA()
+        {
+            var qsim = new QuantumSimulator();
+            var control = new FreeQubit(0);
+            var target = new FreeQubit(1);
+            var res = new ResultMeasured(ResultValue.Zero, control);
+            var zeroOp = qsim.Get<Intrinsic.Z>().Adjoint;
+            var oneOp = qsim.Get<Intrinsic.X>().Adjoint;
+            var op = qsim.Get<ApplyIfElseRA<Qubit, Qubit>>();
+            var args = op.__dataIn((res, (zeroOp, target), (oneOp, target)));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "ApplyIfElseRA",
+                FormattedNonQubitArgs = "(Zero, (Z), (X))",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                IsConditional = true,
+                Children = null,
+                Controls = new List<Qubit>() { control },
+                Targets = new List<Qubit>() { target },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
+        public void ApplyIfElseRC()
+        {
+            var qsim = new QuantumSimulator();
+            var control = new FreeQubit(0);
+            var target = new FreeQubit(1);
+            var res = new ResultMeasured(ResultValue.Zero, control);
+            var zeroOp = qsim.Get<Intrinsic.Z>().Controlled;
+            var oneOp = qsim.Get<Intrinsic.X>().Controlled;
+            var op = qsim.Get<ApplyIfElseRC<Qubit, Qubit>>();
+            var args = op.__dataIn((res, (zeroOp, target), (oneOp, target)));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "ApplyIfElseRC",
+                FormattedNonQubitArgs = "(Zero, (Z), (X))",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                IsConditional = true,
+                Children = null,
+                Controls = new List<Qubit>() { control },
+                Targets = new List<Qubit>() { target },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
+
+        [Fact]
+        public void ApplyIfElseRCA()
+        {
+            var qsim = new QuantumSimulator();
+            var control = new FreeQubit(0);
+            var target = new FreeQubit(1);
+            var res = new ResultMeasured(ResultValue.Zero, control);
+            var zeroOp = qsim.Get<Intrinsic.Z>().Controlled.Adjoint;
+            var oneOp = qsim.Get<Intrinsic.X>().Controlled.Adjoint;
+            var op = qsim.Get<ApplyIfElseRCA<Qubit, Qubit>>();
+            var args = op.__dataIn((res, (zeroOp, target), (oneOp, target)));
+            var expected = new RuntimeMetadata()
+            {
+                Label = "ApplyIfElseRCA",
+                FormattedNonQubitArgs = "(Zero, (Z), (X))",
+                IsAdjoint = false,
+                IsControlled = false,
+                IsMeasurement = false,
+                IsComposite = false,
+                IsConditional = true,
+                Children = null,
+                Controls = new List<Qubit>() { control },
+                Targets = new List<Qubit>() { target },
+            };
+
+            Assert.Equal(op.GetRuntimeMetadata(args), expected);
+        }
     }
 }

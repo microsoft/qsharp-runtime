@@ -45,10 +45,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
     {
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
-            Debug.Assert(args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)>,
+            Debug.Assert(args.Value is ValueTuple<Result, (IAdjointable, __T__), (IAdjointable, __U__)>,
                 $"Failed to retrieve runtime metadata for {this.ToString()}.");
 
-            if (args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)> ifArgs)
+            if (args.Value is ValueTuple<Result, (IAdjointable, __T__), (IAdjointable, __U__)> ifArgs)
             {
                 var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
                 var metadata = base.GetRuntimeMetadata(args);
@@ -76,10 +76,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
     {
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
-            Debug.Assert(args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)>,
+            Debug.Assert(args.Value is ValueTuple<Result, (IControllable, __T__), (IControllable, __U__)>,
                 $"Failed to retrieve runtime metadata for {this.ToString()}.");
 
-            if (args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)> ifArgs)
+            if (args.Value is ValueTuple<Result, (IControllable, __T__), (IControllable, __U__)> ifArgs)
             {
                 var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
                 var metadata = base.GetRuntimeMetadata(args);
@@ -107,10 +107,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
     {
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
         {
-            Debug.Assert(args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)>,
+            Debug.Assert(args.Value is ValueTuple<Result, (IUnitary, __T__), (IUnitary, __U__)>,
                 $"Failed to retrieve runtime metadata for {this.ToString()}.");
 
-            if (args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)> ifArgs)
+            if (args.Value is ValueTuple<Result, (IUnitary, __T__), (IUnitary, __U__)> ifArgs)
             {
                 var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
                 var metadata = base.GetRuntimeMetadata(args);
