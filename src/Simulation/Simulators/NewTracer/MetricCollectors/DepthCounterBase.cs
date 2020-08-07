@@ -50,7 +50,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
 
         public void RecordQubitUse(double duration, params Qubit[] qubits)
         {
-            this.RecordQubitUse(duration, qubits);
+            this.RecordQubitUse(duration, (IEnumerable<Qubit>) qubits);
         }
 
         public void RecordQubitUse(double duration, IEnumerable<Qubit> qubits)

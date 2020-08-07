@@ -64,7 +64,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
             return matchingTargets.First();
         }
 
-
         public TracerSimulator(IEnumerable<ITracerTarget> suppliedTargets, bool useNewDecomposition = true)
         {
             if (suppliedTargets == null) { throw new ArgumentNullException(nameof(suppliedTargets)); }
@@ -97,6 +96,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
             IEnumerable<IOperationTrackingTarget> operationTrackers = Targets.Extract<ITracerTarget, IOperationTrackingTarget>();
             this.RegisterOperationTrackers(operationTrackers);
         }
+
         private void RegisterOperationTrackers(IEnumerable<IOperationTrackingTarget> operationTrackers)
         {
             foreach (IOperationTrackingTarget target in operationTrackers)
@@ -180,7 +180,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 
         protected string GetOperationName<TOperation>()
         {
-            return this.GetInstance(typeof(TOperation)).GetType().FullName;
+            return typeof(TOperation).FullName; //TODO: investigate
+            //return this.GetInstance(typeof(TOperation)).GetType().FullName;
         }
 
         protected double GetAggregateEdgeMetricStatistic(OPSpecialization callee, OPSpecialization caller, string metric, string statistic)

@@ -46,28 +46,30 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
                     Console.WriteLine(s);
                 }
             }
-            var sim = new DecompositionTestingSim(print);
+            var sim = new DecompositionTestingSim();
+            sim.OnLog += print;
             SingleQubitOperationsWithControlsTest.Run(sim).Wait();
         }
 
         [Fact]
         public void SingleQubitRotationsWithControls()
         {
-            var sim = new DecompositionTestingSim((s)=>{ Debug.WriteLine(s); });
+            var sim = new DecompositionTestingSim();
+            sim.OnLog += (s) => Debug.WriteLine(s);
             SingleQubitRotationsWithOneControlTest.Run(sim).Wait();
         }
 
         [Fact]
         public void TwoQubitOperationsWithControls()
         {
-            var sim = new DecompositionTestingSim((_) => { });
+            var sim = new DecompositionTestingSim();
             TwoQubitOperationsWithControllsTest.Run(sim).Wait();
         }
 
         [Fact]
         public void ThreeQubitOperationsWithControls()
         {
-            var sim = new DecompositionTestingSim((_) => { });
+            var sim = new DecompositionTestingSim();
             ThreeQubitPlusOperationsWithControllsTest.Run(sim).Wait();
         }
 
@@ -79,12 +81,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
 
             readonly Dictionary<string, AbstractCallable> dispatcherOpsCache = new Dictionary<string, AbstractCallable>();
             readonly Type[] dispatcherOpsTypes;
-
-            readonly Action<string> Log;
  
-            public DecompositionTestingSim(Action<string> log) : base()
+            public DecompositionTestingSim() : base()
             {
-                this.OnLog += this.Log = log;
                 //we decompose to the tracer's target gate set, and then call the primitive gates on this sim
                 ITracerTarget bridge = new DecomposerToSimBridge(this); 
                 IQuantumProcessor decomposer = new NewDecomposer(this, new[] { bridge }); //the QuantumSimulator will handle qubit allocation within the decomposer

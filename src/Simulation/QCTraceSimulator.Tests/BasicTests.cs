@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.NewTracer;
-using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation;
+using Microsoft.Quantum.Simulation.Simulators.NewTracer.OldDecomposition;
 using Xunit;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
