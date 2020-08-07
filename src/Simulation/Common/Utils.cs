@@ -125,5 +125,12 @@ namespace Microsoft.Quantum.Simulation.Common
                 yield return acc;
             }
         }
+
+        public static IEnumerable<TResult> Extract<TSource, TResult>(this IEnumerable<TSource> source) 
+            where TSource : class
+            where TResult : TSource
+        {
+            return source?.Where(item => item is TResult)?.Cast<TResult>() ?? new TResult[] { };
+        }
     }
 }

@@ -478,15 +478,16 @@ let ``Shadows --shots`` () =
 
 // The expected output from the resources estimator.
 let private resourceSummary =
-    "Metric          Sum Max
-     CNOT            0   0
-     QubitClifford   1   1
-     R               0   0
-     Measure         1   1
-     T               0   0
-     Depth           0   0
-     Width           1   1
-     BorrowedWidth   0   0"
+   "Metric                      Sum Max
+    UnconstrainedMeasurements   1   1
+    CZ                          0   0
+    CCZ                         0   0
+    RZ                          0   0
+    Measure                     1   1
+    T                           0   0
+    Width                       1   1
+    BorrowedWidth               0   0
+    Depth                       0   0"
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =

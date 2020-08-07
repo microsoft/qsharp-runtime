@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 (Pauli basis, double angle, Qubit q1) = _args;
                 if (basis != Pauli.PauliI)
                 {
-                    Simulator.QuantumProcessor.R(basis, angle,q1);
+                    Simulator.QuantumProcessor.R(basis, angle, q1);
                 }
                 return QVoid.Instance;
             };
