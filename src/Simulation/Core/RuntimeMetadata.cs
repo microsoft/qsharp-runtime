@@ -127,7 +127,7 @@ namespace Microsoft.Quantum.Simulation.Core
             
             // Combine all other properties and get the resulting hashcode
             var otherHash = HashCode.Combine(this.Label, this.FormattedNonQubitArgs, this.IsAdjoint, this.IsControlled,
-                this.IsMeasurement, this.IsComposite);
+                this.IsMeasurement, this.IsComposite, this.IsConditional);
             
             // Combine them all together to get the final hashcode
             return HashCode.Combine(controlsHash, targetsHash, childrenHash, otherHash);
