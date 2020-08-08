@@ -93,9 +93,7 @@ module SimulationCode =
     let isGeneric context (n: QsQualifiedName) =
         if context.allCallables.ContainsKey n then
             let signature = context.allCallables.[n].Signature
-            let tIn = signature.ArgumentType
-            let tOut = signature.ReturnType
-            hasTypeParameters [tIn;tOut]
+            not signature.TypeParameters.IsEmpty
         else
             false
 
@@ -898,9 +896,7 @@ module SimulationCode =
             let opName = if sameNamespace then n.Name.Value else n.Namespace.Value + "." + n.Name.Value
             if isGeneric context n then
                 let signature = context.allCallables.[n].Signature
-                let tIn = signature.ArgumentType
-                let tOut = signature.ReturnType
-                let count = (getTypeParameters [tIn;tOut]).Length
+                let count = signature.TypeParameters.Length
                 sprintf "%s<%s>" opName (String.replicate (count - 1) ",")
             else
                 opName

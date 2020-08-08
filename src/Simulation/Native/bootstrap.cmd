@@ -23,6 +23,10 @@ IF EXIST %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll copy %DRO
 IF NOT EXIST %BUILD_FOLDER% mkdir %BUILD_FOLDER%
 pushd %BUILD_FOLDER%
 
+IF NOT EXIST Release mkdir Release
+IF EXIST %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll copy %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll Release\Microsoft.Quantum.Simulator.Runtime.dll
+
+
 cmake -A "x64" ^
     -DBUILD_SHARED_LIBS:BOOL="1" ^
     ..

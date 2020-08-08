@@ -5,7 +5,7 @@
 namespace Microsoft.Quantum.Simulation.Testing.QCI.MeasurementSupportTests {
 
     open Microsoft.Quantum.Intrinsic;
-    
+
     operation MeasureInMiddle() : Unit {
         using (qs = Qubit[2]) {
             H(qs[0]);

@@ -6,13 +6,13 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportTests;
     open Microsoft.Quantum.Simulation.Testing.QCI.MeasurementSupportTests;
-    
+
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     operation MeasureInMiddleTest() : Unit {
         MeasureInMiddle();
     }
-    
+
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     operation QubitAfterMeasurementTest() : Unit {
@@ -169,12 +169,11 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
         LiteralOnTheLeft();
     }
 
-    // ToDo: Uncomment once #17245 is fixed.
-    //@Test("QuantumSimulator")
-    //@Test("ResourcesEstimator")
-    //operation GenericsSupportTest() : Unit {
-    //    GenericsSupport<Int, Int, Int>();
-    //}
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    operation GenericsSupportTest() : Unit {
+        GenericsSupport<Int, Int, Int>();
+    }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")

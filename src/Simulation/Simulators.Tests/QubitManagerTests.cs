@@ -153,6 +153,91 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         /// <summary>
+        /// Test for QubitManager.
+        /// </summary>
+        [Fact]
+        public void TestQubitManagerDiscouragingReuse()
+        {
+            { // BLOCK testing mayExtendCapacity:false
+                QubitManager qm = new QubitManager(10, mayExtendCapacity: false, disableBorrowing: false, encourageReuse: false);
+
+                // Test allocation of single qubit
+                Qubit q1 = qm.Allocate();
+                Assert.True(q1.Id == 0);
+
+                // Test allocation of multiple qubits
+                IQArray<Qubit> qa1 = qm.Allocate(4);
+                Assert.True(qa1.Length == 4);
+                Assert.True(qa1[0].Id == 1);
+                Assert.True(qa1[1].Id == 2);
+                Assert.True(qa1[2].Id == 3);
+                Assert.True(qa1[3].Id == 4);
+
+                // Test reuse of deallocated qubits
+                qm.Release(qa1[1]);
+
+                Qubit q2 = qm.Allocate();
+                Assert.True(q2.Id == 5);
+
+                IQArray<Qubit> qa2 = qm.Allocate(3);
+                Assert.True(qa2.Length == 3);
+                Assert.True(qa2[0].Id == 6);
+                Assert.True(qa2[1].Id == 7);
+                Assert.True(qa2[2].Id == 8);
+
+                qm.Release(qa2);
+
+                Qubit q3 = qm.Allocate();
+                Assert.True(q3.Id == 9);
+
+                Qubit q4 = qm.Allocate();
+                Assert.True(q4.Id == 2);
+
+                Qubit q5 = qm.Allocate();
+                Assert.True(q5.Id == 8);
+            }
+
+            { // BLOCK testing mayExtendCapacity:true
+                QubitManager qm = new QubitManager(10, mayExtendCapacity: true, disableBorrowing: false, encourageReuse: false);
+
+                // Test allocation of single qubit
+                Qubit q1 = qm.Allocate();
+                Assert.True(q1.Id == 0);
+
+                // Test allocation of multiple qubits
+                IQArray<Qubit> qa1 = qm.Allocate(4);
+                Assert.True(qa1.Length == 4);
+                Assert.True(qa1[0].Id == 1);
+                Assert.True(qa1[1].Id == 2);
+                Assert.True(qa1[2].Id == 3);
+                Assert.True(qa1[3].Id == 4);
+
+                // Test reuse of deallocated qubits
+                qm.Release(qa1[1]);
+
+                Qubit q2 = qm.Allocate();
+                Assert.True(q2.Id == 5);
+
+                IQArray<Qubit> qa2 = qm.Allocate(3);
+                Assert.True(qa2.Length == 3);
+                Assert.True(qa2[0].Id == 6);
+                Assert.True(qa2[1].Id == 7);
+                Assert.True(qa2[2].Id == 8);
+
+                qm.Release(qa2);
+
+                Qubit q3 = qm.Allocate();
+                Assert.True(q3.Id == 9);
+
+                Qubit q4 = qm.Allocate();
+                Assert.True(q4.Id == 10);
+
+                Qubit q5 = qm.Allocate();
+                Assert.True(q5.Id == 11);
+            }
+        }
+
+        /// <summary>
         /// Test for QubitManagerTrackingScope.
         /// </summary>
         [Fact]
