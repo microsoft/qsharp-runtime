@@ -255,6 +255,8 @@ module SimulationCode =
         member val StartLine = None with get, set
         member val LineNumber = None with get, set
 
+        member val CurrentTypeParamRes = None with get, set
+
         new (context : CodegenContext) as this =
             new SyntaxBuilder("_private_") then
                 this.Namespaces <- new NamespaceBuilder(this)
@@ -341,9 +343,9 @@ module SimulationCode =
             | BoolLiteral b                 -> upcast (if b then ``true`` else ``false``)
             | ResultLiteral r               -> (``ident`` "Result") <|.|> (``ident`` (match r with | Zero -> "Zero" | One -> "One"))
             | PauliLiteral p                -> (``ident`` "Pauli")  <|.|> (``ident`` (match p with | PauliI -> "PauliI" | PauliX -> "PauliX" | PauliY -> "PauliY" | PauliZ -> "PauliZ"))
-            | Identifier (id,types)         -> buildId id types
-            | StringLiteral (s,e)           -> buildInterpolatedString s.Value e
-            | RangeLiteral (r,e)            -> buildRange r e
+            | Identifier (id, _)            -> buildId id
+            | StringLiteral (s, e)          -> buildInterpolatedString s.Value e
+            | RangeLiteral (r, e)           -> buildRange r e
             | NEG n                         -> ``-`` (buildExpression n)
             | NOT r                         -> ! (buildExpression r)
             | BNOT i                        -> ``~~~`` (buildExpression i)
@@ -385,9 +387,9 @@ module SimulationCode =
 
         and captureExpression (ex : TypedExpression) =
             match ex.Expression with
-            | Identifier (s, types) when ex.InferredInformation.IsMutable ->
+            | Identifier (s, _) when ex.InferredInformation.IsMutable ->
                 match ex.ResolvedType.Resolution with
-                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s types <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
+                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
                 | _ -> buildExpression ex
             | _ -> buildExpression ex
 
@@ -408,7 +410,7 @@ module SimulationCode =
                 ``invoke`` (``ident`` "String.Format" ) ``(`` (literal s :: exprs) ``)``
             else literal s
 
-        and buildId id types : ExpressionSyntax =
+        and buildId id : ExpressionSyntax =
             match id with
             | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
             | GlobalCallable n ->
@@ -420,15 +422,18 @@ module SimulationCode =
                     else
                         n.Name.Value
                 
-                //if isGeneric context n then
-                //    // ToDo: this may not be correct for all situations
-                //    let typeNames =
-                //        match types with
-                //        | Null -> ""
-                //        | Value ary -> Seq.map (roslynTypeName context) ary |> String.concat ","
-                //    ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
-                //else
-                identifier |> ``ident`` :> ExpressionSyntax
+                if isGeneric context n then
+                    let typeNames =
+                        match parent.CurrentTypeParamRes with
+                        | None -> ""
+                        | Some (resolutions: ImmutableDictionary<QsQualifiedName*NonNullable<string>,ResolvedType>) ->
+                            context.allCallables.[n].Signature.TypeParameters
+                            |> Seq.choose (function | ValidName temp -> Some temp | InvalidName -> None)
+                            |> Seq.map (fun x -> roslynTypeName context resolutions.[n,x])
+                            |> String.concat ","
+                    ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
+                else
+                    identifier |> ``ident`` :> ExpressionSyntax
 // TODO: Diagnostics
             | InvalidIdentifier ->
                 failwith "Received InvalidIdentifier"
@@ -538,38 +543,25 @@ module SimulationCode =
                         false
                 | _ ->
                     false
+            let opRef =
+                if isNonGenericCallable then
+                    buildExpression op
+                else
+                    // ImmutableDictionary<QsQualifiedName*NonNullable<string>,ResolvedType> option
+                    let parentCurrentTypeParamRes = parent.CurrentTypeParamRes
+                    let combination = new TypeResolutionCombination(ex)
+                    parent.CurrentTypeParamRes <- Some combination.CombinedResolutionDictionary
+                    let rtrn = buildExpression op
+                    parent.CurrentTypeParamRes <- parentCurrentTypeParamRes
+                    rtrn
             let useReturnType =
                 match returnType.Resolution with
                 | QsTypeKind.UnitType ->
                     false
                 | _ ->
                     not isNonGenericCallable
-            let opRef =
-                if isNonGenericCallable then
-                    buildExpression op
-                else
-                    match op.Expression with
-                    | Identifier (id, _) ->
-                        match id with
-                        | GlobalCallable n ->
-                            let identifier = 
-                                if isCurrentOp context n then
-                                    Directives.Self
-                                elif needsFullPath context n then
-                                    prependNamespaceString n
-                                else
-                                    n.Name.Value
-                            let combination = new TypeResolutionCombination(ex)
-                            //combination.CombinedResolutionDictionary // ToDo: needs to be filtered and ordered
-                            //context.allCallables // can be used to get the correct order of type params
-                            // ToDo: this is not correct
-                            let typeNames = Seq.map (fun resType -> roslynTypeName context resType) combination.CombinedResolutionDictionary.Values |> String.concat ","
-                            ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
-                        | _ -> buildExpression op
-                    | _ -> buildExpression op
-
             let apply = if useReturnType then (``ident`` (sprintf "Apply<%s>" (roslynTypeName context returnType))) else (``ident`` "Apply")
-            //buildExpression op <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
+            
             opRef <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
 
         and buildConditional c t f =
