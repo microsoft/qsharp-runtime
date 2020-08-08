@@ -343,7 +343,7 @@ module SimulationCode =
             | BoolLiteral b                 -> upcast (if b then ``true`` else ``false``)
             | ResultLiteral r               -> (``ident`` "Result") <|.|> (``ident`` (match r with | Zero -> "Zero" | One -> "One"))
             | PauliLiteral p                -> (``ident`` "Pauli")  <|.|> (``ident`` (match p with | PauliI -> "PauliI" | PauliX -> "PauliX" | PauliY -> "PauliY" | PauliZ -> "PauliZ"))
-            | Identifier (id,_)             -> buildId id
+            | Identifier (id,types)         -> buildId id types
             | StringLiteral (s,e)           -> buildInterpolatedString s.Value e
             | RangeLiteral (r,e)            -> buildRange r e
             | NEG n                         -> ``-`` (buildExpression n)
@@ -387,9 +387,9 @@ module SimulationCode =
 
         and captureExpression (ex : TypedExpression) =
             match ex.Expression with
-            | Identifier (s, _) when ex.InferredInformation.IsMutable ->
+            | Identifier (s, types) when ex.InferredInformation.IsMutable ->
                 match ex.ResolvedType.Resolution with
-                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
+                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s types <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
                 | _ -> buildExpression ex
             | _ -> buildExpression ex
 
@@ -410,16 +410,27 @@ module SimulationCode =
                 ``invoke`` (``ident`` "String.Format" ) ``(`` (literal s :: exprs) ``)``
             else literal s
 
-        and buildId id : ExpressionSyntax =
+        and buildId id types : ExpressionSyntax =
             match id with
             | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
             | GlobalCallable n ->
-                if isCurrentOp context n then
-                    Directives.Self |> ``ident`` :> ExpressionSyntax
-                elif needsFullPath context n then
-                    prependNamespaceString n |> ``ident`` :> ExpressionSyntax
+                let identifier = 
+                    if isCurrentOp context n then
+                        Directives.Self
+                    elif needsFullPath context n then
+                        prependNamespaceString n
+                    else
+                        n.Name.Value
+                
+                if isGeneric context n then
+                    // ToDo: this may not be correct for all situations
+                    let typeNames =
+                        match types with
+                        | Null -> ""
+                        | Value ary -> Seq.map (roslynTypeName context) ary |> String.concat ","
+                    ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
                 else
-                    n.Name.Value |> ``ident`` :> ExpressionSyntax
+                    identifier |> ``ident`` :> ExpressionSyntax
 // TODO: Diagnostics
             | InvalidIdentifier ->
                 failwith "Received InvalidIdentifier"
@@ -513,7 +524,7 @@ module SimulationCode =
             // Checks if the expression points to a non-generic user-defined callable.
             // Because these have fully-resolved types in the runtime,
             // they don't need to have the return type explicitly in the apply.
-            let isNonGenericCallable() =
+            let isNonGenericCallable =
                 match op.Expression with
                 | Identifier (_, Value tArgs) when tArgs.Length > 0 -> false
                 | Identifier (id, _) ->
@@ -533,7 +544,15 @@ module SimulationCode =
                 | QsTypeKind.UnitType ->
                     false
                 | _ ->
-                    not (isNonGenericCallable())
+                    not isNonGenericCallable
+            let opRef =
+                if isNonGenericCallable then
+                    buildExpression op
+                else
+                    // ToDo: this is not correct
+                    let typeNames = Seq.map (fun (_, _, resType) -> roslynTypeName context resType) op.TypeArguments |> String.concat ","
+                    ``invoke`` (``ident`` (sprintf "Foo<%s>" typeNames )) ``(`` [] ``)``
+
             let apply = if useReturnType then (``ident`` (sprintf "Apply<%s>" (roslynTypeName context returnType))) else (``ident`` "Apply")
             buildExpression op <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
 
@@ -900,7 +919,7 @@ module SimulationCode =
             ``{`` [] ``}``
         :> MemberDeclarationSyntax
 
-    /// For each Operation used in the given OperationDeclartion, returns
+    /// For each non-generic Operation used in the given OperationDeclartion, returns
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
@@ -923,6 +942,53 @@ module SimulationCode =
             let name = getOpName context qualifiedName
             let modifiers = getPropertyModifiers qualifiedName
             ``prop`` signature name modifiers
+            :> MemberDeclarationSyntax
+
+        operations
+        |> List.map buildOne
+
+    /// For each generic Operation used in the given OperationDeclartion, returns
+    /// a Method that returns a concrete instance of the operation by calling the
+    /// IOperationFactory
+    let buildGenericReferences context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
+        let getCallableAccessModifier qualifiedName =
+            match context.allCallables.TryGetValue qualifiedName with
+            | true, callable -> Some callable.Modifiers.Access
+            | false, _ -> None
+
+        let getMethodModifiers qualifiedName =
+            // Use the right accessibility for the method depending on the accessibility of the callable.
+            // Note: In C#, "private protected" is the intersection of protected and internal.
+            match getCallableAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
+            | DefaultAccess -> [ ``protected`` ]
+            | Internal -> [ ``private``; ``protected`` ]
+
+        let getTypeOfOp context (n: QsQualifiedName) typeParams =
+            let name =
+                let sameNamespace = match context.current with | None -> false | Some o -> o.Namespace = n.Namespace
+                let opName = if sameNamespace then n.Name.Value else n.Namespace.Value + "." + n.Name.Value
+                let stringParams = String.concat "," typeParams
+                sprintf "%s<%s>" opName stringParams
+            ``invoke`` (``ident`` "typeof") ``(`` [``ident`` name] ``)``
+
+        let buildOne qualifiedName =
+            /// eg:
+            /// protected opType opName { get; }
+            let signature = roslynCallableTypeName context qualifiedName
+            let name = getOpName context qualifiedName
+            let modifiers = getMethodModifiers qualifiedName
+            let typeParams =
+                Seq.choose
+                    (function | ValidName s -> Some(s.Value) | InvalidName -> None )
+                    context.allCallables.[qualifiedName].Signature.TypeParameters
+                |> Seq.toList
+            let body =
+                let factoryGet = (``ident`` "this" <|.|> ``ident`` "Factory" <|.|> (generic "Get" ``<<`` [ signature ] ``>>``))
+                (``invoke`` factoryGet ``(`` [ (getTypeOfOp context qualifiedName typeParams) ] ``)``)
+            ``arrow_method`` signature name ``<<`` typeParams ``>>``
+                ``(`` [] ``)``
+                modifiers
+                ( Some ( ``=>`` body) )
             :> MemberDeclarationSyntax
 
         operations
@@ -1351,13 +1417,13 @@ module SimulationCode =
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
-        let opNames = operationDependencies op
+        let genericNames, propNames =
+            List.partition (isGeneric context) (operationDependencies op)
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
-
         let constructors = [ (buildConstructor context name) ]
         let properties =
-            let opProperties = buildOpsProperties context opNames
+            let opProperties = buildOpsProperties context propNames
             buildName name ::
             buildFullName context.current.Value ::
             if globalContext.entryPoints |> Seq.contains op.FullName then
@@ -1406,7 +1472,8 @@ module SimulationCode =
             ]
 
         let innerClasses = ([ inData |> snd;  outData |> snd ] |> List.choose id) @ unitTests
-        let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
+        let genericMethods = buildGenericReferences context genericNames
+        let methods = genericMethods @ [ propNames |> buildInit context; inData |> fst; outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
         let modifiers =
             let access = classAccessModifier op.Modifiers.Access
