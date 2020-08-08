@@ -382,7 +382,7 @@ module SimulationCode =
             | Property (elem, prop)         -> (buildExpression elem) <|.|> (``ident`` prop)
             | PartialApplication (op,args)  -> buildPartial ex.ResolvedType ex.TypeParameterResolutions op args // needs to be before NewUdt!
             | NewUdt (udt,args)             -> buildNewUdt udt args // needs to be before CallLikeExpression!
-            | CallLikeExpression (op,args)  -> buildApply ex.ResolvedType op args
+            | CallLikeExpression (op,args)  -> buildApply ex op args
             | MissingExpr                   -> ``ident`` "_" :> ExpressionSyntax
 
         and captureExpression (ex : TypedExpression) =
@@ -422,15 +422,15 @@ module SimulationCode =
                     else
                         n.Name.Value
                 
-                if isGeneric context n then
-                    // ToDo: this may not be correct for all situations
-                    let typeNames =
-                        match types with
-                        | Null -> ""
-                        | Value ary -> Seq.map (roslynTypeName context) ary |> String.concat ","
-                    ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
-                else
-                    identifier |> ``ident`` :> ExpressionSyntax
+                //if isGeneric context n then
+                //    // ToDo: this may not be correct for all situations
+                //    let typeNames =
+                //        match types with
+                //        | Null -> ""
+                //        | Value ary -> Seq.map (roslynTypeName context) ary |> String.concat ","
+                //    ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
+                //else
+                identifier |> ``ident`` :> ExpressionSyntax
 // TODO: Diagnostics
             | InvalidIdentifier ->
                 failwith "Received InvalidIdentifier"
@@ -520,7 +520,8 @@ module SimulationCode =
         and buildNewUdt n args =
             ``new`` (``type`` [ justTheName context n ]) ``(`` [args |> captureExpression] ``)``
 
-        and buildApply returnType op args =
+        and buildApply ex op args =
+            let returnType = ex.ResolvedType
             // Checks if the expression points to a non-generic user-defined callable.
             // Because these have fully-resolved types in the runtime,
             // they don't need to have the return type explicitly in the apply.
@@ -549,12 +550,29 @@ module SimulationCode =
                 if isNonGenericCallable then
                     buildExpression op
                 else
-                    // ToDo: this is not correct
-                    let typeNames = Seq.map (fun (_, _, resType) -> roslynTypeName context resType) op.TypeArguments |> String.concat ","
-                    ``invoke`` (``ident`` (sprintf "Foo<%s>" typeNames )) ``(`` [] ``)``
+                    match op.Expression with
+                    | Identifier (id, _) ->
+                        match id with
+                        | GlobalCallable n ->
+                            let identifier = 
+                                if isCurrentOp context n then
+                                    Directives.Self
+                                elif needsFullPath context n then
+                                    prependNamespaceString n
+                                else
+                                    n.Name.Value
+                            let combination = new TypeResolutionCombination(ex)
+                            //combination.CombinedResolutionDictionary // ToDo: needs to be filtered and ordered
+                            //context.allCallables // can be used to get the correct order of type params
+                            // ToDo: this is not correct
+                            let typeNames = Seq.map (fun resType -> roslynTypeName context resType) combination.CombinedResolutionDictionary.Values |> String.concat ","
+                            ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
+                        | _ -> buildExpression op
+                    | _ -> buildExpression op
 
             let apply = if useReturnType then (``ident`` (sprintf "Apply<%s>" (roslynTypeName context returnType))) else (``ident`` "Apply")
-            buildExpression op <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
+            //buildExpression op <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
+            opRef <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
 
         and buildConditional c t f =
             let cond  = c |> buildExpression
