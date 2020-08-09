@@ -380,7 +380,7 @@ module SimulationCode =
             | AdjointApplication op         -> (buildExpression op)   <|.|> (``ident`` "Adjoint")
             | ControlledApplication op      -> (buildExpression op)   <|.|> (``ident`` "Controlled")
             | Property (elem, prop)         -> (buildExpression elem) <|.|> (``ident`` prop)
-            | PartialApplication (op,args)  -> buildPartial ex.ResolvedType ex.TypeParameterResolutions op args // needs to be before NewUdt!
+            | PartialApplication (op,args)  -> buildPartial ex op args // needs to be before NewUdt!
             | NewUdt (udt,args)             -> buildNewUdt udt args // needs to be before CallLikeExpression!
             | CallLikeExpression (op,args)  -> buildApply ex op args
             | MissingExpr                   -> ``ident`` "_" :> ExpressionSyntax
@@ -480,9 +480,9 @@ module SimulationCode =
         and buildTuple many : ExpressionSyntax =
             many |> Seq.map captureExpression |> Seq.toList |> ``tuple`` // captured since we rely on the native C# tuples
 
-        and buildPartial (partialType : ResolvedType) typeParamResolutions opEx args =
-            let (pIn, pOut) = inAndOutputType partialType     // The type of the operation constructed by partial application
-            let (oIn, _) = inAndOutputType opEx.ResolvedType  // The type of the operation accepting the partial tuples.
+        and buildPartial ex op args =
+            let (pIn, pOut) = inAndOutputType ex.ResolvedType     // The type of the operation constructed by partial application
+            let (oIn, _) = inAndOutputType op.ResolvedType  // The type of the operation accepting the partial tuples.
 
             let buildPartialMapper () = // may only be executed if there are no more type parameters to be resolved
                 let argName = nextArgName()
@@ -507,18 +507,24 @@ module SimulationCode =
 // TODO: Diagnostics.
                     | _ -> failwith "partial application contains an error expression"
 
-                let resolvedOrigInputT = ResolvedType.ResolveTypeParameters typeParamResolutions oIn
+                let resolvedOrigInputT = ResolvedType.ResolveTypeParameters ex.TypeParameterResolutions oIn
                 let mapper =  [ ``() =>`` [argName] (argMapping {args with ResolvedType = resolvedOrigInputT}) ]
                 ``new`` (generic "Func"  ``<<`` [ (roslynTypeName context pIn); (roslynTypeName context resolvedOrigInputT) ] ``>>``) ``(`` mapper ``)``
 
             // Checks if the expression still has type parameters.
             // If it does, we can't create the PartialMapper at compile time
             // so we just build a partial-tuple and let it be resolved at runtime.
-            let op = buildExpression opEx
+            let opRef =
+                let parentCurrentTypeParamRes = parent.CurrentTypeParamRes
+                let combination = new TypeResolutionCombination(ex)
+                parent.CurrentTypeParamRes <- Some combination.CombinedResolutionDictionary
+                let rtrn = buildExpression op
+                parent.CurrentTypeParamRes <- parentCurrentTypeParamRes
+                rtrn
             let values =
                 if hasTypeParameters [ pIn; pOut ] then args |> captureExpression
                 else buildPartialMapper()
-            op <.> (``ident`` "Partial", [ values ])
+            opRef <.> (``ident`` "Partial", [ values ])
 
         and buildNewUdt n args =
             ``new`` (``type`` [ justTheName context n ]) ``(`` [args |> captureExpression] ``)``
