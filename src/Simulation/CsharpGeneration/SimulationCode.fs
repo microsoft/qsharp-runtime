@@ -528,6 +528,7 @@ module SimulationCode =
             // Checks if the expression points to a non-generic user-defined callable.
             // Because these have fully-resolved types in the runtime,
             // they don't need to have the return type explicitly in the apply.
+            // ToDo: this doesn't seem to handle the case of functor applications
             let isNonGenericCallable =
                 match op.Expression with
                 | Identifier (_, Value tArgs) when tArgs.Length > 0 -> false
@@ -544,16 +545,12 @@ module SimulationCode =
                 | _ ->
                     false
             let opRef =
-                if isNonGenericCallable then
-                    buildExpression op
-                else
-                    // ImmutableDictionary<QsQualifiedName*NonNullable<string>,ResolvedType> option
-                    let parentCurrentTypeParamRes = parent.CurrentTypeParamRes
-                    let combination = new TypeResolutionCombination(ex)
-                    parent.CurrentTypeParamRes <- Some combination.CombinedResolutionDictionary
-                    let rtrn = buildExpression op
-                    parent.CurrentTypeParamRes <- parentCurrentTypeParamRes
-                    rtrn
+                let parentCurrentTypeParamRes = parent.CurrentTypeParamRes
+                let combination = new TypeResolutionCombination(ex)
+                parent.CurrentTypeParamRes <- Some combination.CombinedResolutionDictionary
+                let rtrn = buildExpression op
+                parent.CurrentTypeParamRes <- parentCurrentTypeParamRes
+                rtrn
             let useReturnType =
                 match returnType.Resolution with
                 | QsTypeKind.UnitType ->
