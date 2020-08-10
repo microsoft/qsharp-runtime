@@ -343,7 +343,7 @@ module SimulationCode =
             | BoolLiteral b                 -> upcast (if b then ``true`` else ``false``)
             | ResultLiteral r               -> (``ident`` "Result") <|.|> (``ident`` (match r with | Zero -> "Zero" | One -> "One"))
             | PauliLiteral p                -> (``ident`` "Pauli")  <|.|> (``ident`` (match p with | PauliI -> "PauliI" | PauliX -> "PauliX" | PauliY -> "PauliY" | PauliZ -> "PauliZ"))
-            | Identifier (id, _)            -> buildId id
+            | Identifier (id, _)            -> buildId id ex.TypeParameterResolutions
             | StringLiteral (s, e)          -> buildInterpolatedString s.Value e
             | RangeLiteral (r, e)           -> buildRange r e
             | NEG n                         -> ``-`` (buildExpression n)
@@ -389,7 +389,7 @@ module SimulationCode =
             match ex.Expression with
             | Identifier (s, _) when ex.InferredInformation.IsMutable ->
                 match ex.ResolvedType.Resolution with
-                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
+                | QsTypeKind.ArrayType _ -> ``invoke`` (buildId s ex.TypeParameterResolutions <|?.|> (``ident`` "Copy")) ``(`` [] ``)``
                 | _ -> buildExpression ex
             | _ -> buildExpression ex
 
@@ -410,27 +410,38 @@ module SimulationCode =
                 ``invoke`` (``ident`` "String.Format" ) ``(`` (literal s :: exprs) ``)``
             else literal s
 
-        and buildId id : ExpressionSyntax =
+        and buildId id localTypeParamResolutions: ExpressionSyntax =
             match id with
             | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
             | GlobalCallable n ->
-                let identifier = 
+                let identifier =
                     if isCurrentOp context n then
                         Directives.Self
                     elif needsFullPath context n then
                         prependNamespaceString n
                     else
                         n.Name.Value
-                
+
                 if isGeneric context n then
+                    let typeParams =
+                        context.allCallables.[n].Signature.TypeParameters
+                        |> Seq.choose (function | ValidName id -> Some id | InvalidName -> None)
+
                     let typeNames =
                         match parent.CurrentTypeParamRes with
-                        | None -> ""
+                        | None ->
+                            typeParams
+                            |> Seq.map (fun x -> roslynTypeName context localTypeParamResolutions.[n,x])
                         | Some (resolutions: ImmutableDictionary<QsQualifiedName*NonNullable<string>,ResolvedType>) ->
-                            context.allCallables.[n].Signature.TypeParameters
-                            |> Seq.choose (function | ValidName temp -> Some temp | InvalidName -> None)
-                            |> Seq.map (fun x -> roslynTypeName context resolutions.[n,x])
-                            |> String.concat ","
+                            typeParams
+                            |> Seq.map (fun x ->
+                                let typeName =
+                                    if resolutions.ContainsKey(n,x) then
+                                        resolutions.[n,x]
+                                    else
+                                        localTypeParamResolutions.[n,x]
+                                roslynTypeName context typeName)
+                        |> String.concat ","
                     ``invoke`` (``ident`` (sprintf "%s<%s>" identifier typeNames )) ``(`` [] ``)``
                 else
                     identifier |> ``ident`` :> ExpressionSyntax
@@ -564,8 +575,7 @@ module SimulationCode =
                 | _ ->
                     not isNonGenericCallable
             let apply = if useReturnType then (``ident`` (sprintf "Apply<%s>" (roslynTypeName context returnType))) else (``ident`` "Apply")
-            
-            opRef <.> (apply, [args |> captureExpression]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
+            opRef <.> (apply, [ args |> captureExpression ]) // we need to capture to guarantee that the result accurately reflects any indirect binding of arguments
 
         and buildConditional c t f =
             let cond  = c |> buildExpression
