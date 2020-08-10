@@ -7,180 +7,180 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     open Microsoft.Quantum.Convert;
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Math;
-    
-    
+
+
     newtype Q = Qubit;
-    
+
     newtype Qs = Qubit[];
-    
+
     newtype T1 = (Qubit, Qubit);
-    
+
     newtype T2 = (Qubit, Qubit[]);
-    
+
     newtype T3 = (Qubit[], Qs);
-    
+
     newtype T4 = (Int, (Double, Bool, Result));
-    
+
     newtype T5 = (Pauli, Qubit[], Qs, Q);
-    
+
     newtype Plain1 = ((Qubit, Qubit) => Unit);
-    
-    newtype Adj1 = ((Qubit, Qubit) => Unit : Adjoint);
-    
+
+    newtype Adj1 = ((Qubit, Qubit) => Unit is Adj);
+
     newtype Adj2 = Adj1;
-    
-    newtype Ctrl1 = ((Qubit, Qubit) => Unit : Controlled);
-    
-    newtype U1 = ((Qubit, Qubit, Qubit[]) => Unit : Adjoint, Controlled);
-    
+
+    newtype Ctrl1 = ((Qubit, Qubit) => Unit is Ctl);
+
+    newtype U1 = ((Qubit, Qubit, Qubit[]) => Unit is Adj + Ctl);
+
     newtype U2 = U1;
-    
-    newtype U3 = (Qubit => Unit : Adjoint, Controlled);
-    
-    
+
+    newtype U3 = (Qubit => Unit is Adj + Ctl);
+
+
     operation BPlain1 (available : Int, q1 : Qubit, action : ((Qubit, Qubit) => Unit)) : Unit {
-        
-        
+
+
         borrowing (b = Qubit[2]) {
             Trace(available, b[0]);
             Trace(available, b[1]);
             action(b[0], b[1]);
         }
     }
-    
-    
+
+
     operation BPlain2 (available : Int, (q1 : Qubit, q2 : Qubit), action : Plain1) : Unit {
-        
-        
+
+
         borrowing (b = Qubit[2]) {
             Trace(available, b[0]);
             Trace(available, b[1]);
             action!(b[0], b[1]);
         }
     }
-    
-    
-    operation BAdj1 (available : Int, (q1 : Qubit, q2 : Qubit, qs : Qubit[]), action : ((Qubit, Qubit) => Unit : Adjoint)) : Unit {
-        
+
+
+    operation BAdj1 (available : Int, (q1 : Qubit, q2 : Qubit, qs : Qubit[]), action : ((Qubit, Qubit) => Unit is Adj)) : Unit {
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action(b[0], b[1]);
             }
         }
-        
+
         adjoint invert;
     }
-    
-    
+
+
     operation BAdj2 (available : Int, qs : Qubit[], action : Adj1) : Unit {
-        
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action!(b[0], b[1]);
             }
         }
-        
+
         adjoint invert;
     }
-    
-    
-    operation BCtrl1 (available : Int, qs : Qs, action : ((Qubit, Qubit) => Unit : Controlled)) : Unit {
-        
+
+
+    operation BCtrl1 (available : Int, qs : Qs, action : ((Qubit, Qubit) => Unit is Ctl)) : Unit {
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action(b[0], b[1]);
             }
         }
-        
+
         controlled distribute;
     }
-    
-    
+
+
     operation BCtrl2 (available : Int, (qs1 : Qubit[], qs2 : Qs), action : Ctrl1) : Unit {
-        
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action!(b[0], b[1]);
             }
         }
-        
+
         controlled distribute;
     }
-    
-    
-    operation BU1 (available : Int, qs : Qubit[], action : ((Qubit, Qubit, Qubit[]) => Unit : Adjoint, Controlled)) : Unit {
-        
+
+
+    operation BU1 (available : Int, qs : Qubit[], action : ((Qubit, Qubit, Qubit[]) => Unit is Adj + Ctl)) : Unit {
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action(b[0], b[1], qs);
             }
         }
-        
+
         adjoint invert;
         controlled distribute;
         controlled adjoint distribute;
     }
-    
-    
-    operation BGen<'T> (available : Int, arg : 'T, action : ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled)) : Unit {
-        
+
+
+    operation BGen<'T> (available : Int, arg : 'T, action : ((Qubit, Qubit, 'T) => Unit is Adj + Ctl)) : Unit {
+
         body (...) {
-            
+
             borrowing (b = Qubit[2]) {
                 Trace(available, b[0]);
                 Trace(available, b[1]);
                 action(b[0], b[1], arg);
             }
         }
-        
+
         adjoint invert;
         controlled distribute;
         controlled adjoint distribute;
     }
-    
-    
+
+
     operation Action (q0 : Qubit, q1 : Qubit, array : Qubit[]) : Unit {
-        
+
         body (...) {
             SWAP(q0, q1);
         }
-        
+
         adjoint invert;
         controlled distribute;
         controlled adjoint distribute;
     }
-    
-    
+
+
     operation ActionGen<'T> (q0 : Qubit, q1 : Qubit, array : 'T) : Unit {
-        
+
         body (...) {
             SWAP(q0, q1);
         }
-        
+
         adjoint invert;
         controlled distribute;
         controlled adjoint distribute;
     }
-    
-    
-    operation TestAllVariants<'T> (available : Int, args : 'T, action : ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled), B : ((Int, 'T, ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled)) => Unit : Adjoint, Controlled)) : Unit {
-        
-        
+
+
+    operation TestAllVariants<'T> (available : Int, args : 'T, action : ((Qubit, Qubit, 'T) => Unit is Adj + Ctl), B : ((Int, 'T, ((Qubit, Qubit, 'T) => Unit is Adj + Ctl)) => Unit is Adj + Ctl)) : Unit {
+
+
         using (ctrls = Qubit[2]) {
             B(available, args, action);
             Adjoint B(available, args, action);
@@ -188,11 +188,11 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
             Adjoint Controlled B(ctrls, (available, args, action));
         }
     }
-    
-    
+
+
     operation BorrowingTest () : Unit {
-        
-        
+
+
         using (qubits = Qubit[5]) {
             let q0 = qubits[0];
             let q1 = qubits[1];
@@ -217,30 +217,30 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
             let t3_e_e = T3(e, q_e);
             let t3_n_n = T3(n, q_n);
             let t3_all = T3([q1, q2], q_2_4);
-            
+
             BPlain1(0, n[0], Action(_,_,qubits));                                               // 0, q5 & q6
-                                                                                                    
+
             BPlain1(1, q1, Action(_,_,a_2_4));                                                  // 1, q0 & q6
             BPlain2(1, ((Q(q0))!, (Q(q0))!), Plain1(Action(_,_,a_2_4)));                        // 1, q1 & q6
-                                                                                                    
+
             BPlain1(3, q0, Action(_,_,a_2_2));                                                  // 3, q1 & q3
             BPlain2(3, (q1, q2), Plain1(SWAP));                                                 // 3, q0 & q3
-                                                                                                    
+
             BPlain1(4, q1, (Plain1(SWAP))!);                                                    // 4, q0 & q2
             BPlain2(5, (n[0], n[1]), Plain1(SWAP));                                             // 5, q0 & q1
-                                                                                                    
+
             BAdj1(5, (n[0], n[1], e), (Adj1(SWAP))!);                                           // 5, q0 & q1
             (Adjoint BAdj1)(1, (q1, q2, q_2_4!), SWAP);                                         // 1, q0 & q6
             BAdj2(0, qubits, (Adj2(Adj1(SWAP)))!);                                              // 0, q5 & q6
             (Adjoint BAdj2)(1, (Qs([q0, n[0]]))!, (Adj2(Adj1(Action(_,_,a_2_4))))!);            // 1, q1 & q5
-                
+
             BCtrl1(5, q_n, SWAP);                                                               // 5, q0 & q1
             (Controlled BCtrl1)([q1], (1, q_2_4, SWAP));                                        // 1, q0 & q5
             BCtrl2(0, (a_2_2, Qs(qubits)), Ctrl1(SWAP));                                        // 0, q5 & q6
             let ctrl = (Controlled (Ctrl1(Action(_,_,a_2_2)))!)([q4], (_,_));
             (Controlled BCtrl2)([q0], (1, ([q3], q_n), Ctrl1(ctrl)));                           // 1, q1 & q5
             (Controlled BCtrl2)(q_e!, (5, (n, q_e), Ctrl1(Action(_,_,n))));                     // 5, q0 & q1
-                
+
             TestAllVariants(0, qubits, ActionGen<Qubit[]>, BGen<Qubit[]>);                                      // 0, q5 & q6 (q7 & q8 for controlled)
             TestAllVariants(2, (q0, q1, q4), ActionGen<(Qubit, Qubit, Qubit)>, BGen<(Qubit, Qubit, Qubit)>);    // 2, q2 & q3
             TestAllVariants(4, (Qs(q_1!))!, Action, BGen<Qubit[]>);                                             // 4, q0 & q2
@@ -250,22 +250,22 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
             TestAllVariants(5, n, ActionGen<Qubit[]>(_,_,_), BGen<Qubit[]>);                                    // 5, q0 & q1
             TestAllVariants(5, n, Action(_,_,_), BGen<Qubit[]>);                                                // 5, q0 & q1
             TestAllVariants(4, a_0, Adjoint (ActionGen<Qubit[]>(_,_,_)), BGen<Qubit[]>);                        // 4, q1 & q2
-                
+
             TestAllVariants(1, e, (Controlled Action([q1,q2,q3,q0], (_,_,_))), BGen<Qubit[]>);                  // 1, q4 & q5 (q7 for controlled)
             TestAllVariants(0, e, (Controlled (Adjoint ActionGen<Qubit[]>))(qubits, (_,_,_)), BGen<Qubit[]>);   // 0, q5 & q6 (q7 & q8 for controlled)
         }
     }
-    
-    
+
+
     operation SimpleRangeTest () : Unit {
-        
+
         mutable ints = new Int[12];
         mutable results = new Result[12];
         mutable qubits = new Qubit[12];
         mutable qs = new Qs[12];
         mutable u1s = new U1[12];
         mutable state = new Complex[12];
-        
+
         for (i in 10 .. -2 .. 4) {
             set ints = ints w/ i <- i;
             set results = results w/ i <- One;
@@ -280,21 +280,21 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
             Trace(state[i]);
         }
     }
-    
-    
+
+
     operation SimpleDumpTest () : Unit {
-        
+
         body (...) {
-            
+
             using (qubits = Qubit[3]) {
                 Message($"Starting test");
                 DumpMachine($"dumptest-start.txt");
                 ApplyToEachCA(H, qubits);
                 DumpMachine($"dumptest-h.txt");
                 DumpMachine($"");
-                
+
                 using (q2 = Qubit[2]) {
-                    Assert([PauliZ, PauliZ], q2, Zero, $"Qubit should be in Zero state");
+                    AssertMeasurement([PauliZ, PauliZ], q2, Zero, $"Qubit should be in Zero state");
                     DumpRegister($"dumptest-former.txt", qubits);
                     DumpRegister($"dumptest-later.txt", q2);
                     DumpRegister($"dumptest-one.txt", [qubits[1]]);
@@ -309,15 +309,15 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
                     DumpMachine();
                     ApplyToEachCA(Adjoint Controlled X(qubits, _), q2);
                 }
-                
+
                 Adjoint ApplyToEachCA(H, qubits);
             }
-            
+
             DumpMachine($"dumptest-end.txt");
             DumpMachine();
         }
     }
-    
+
     operation LockedFileDumpTest () : Unit {
         using (qubits = Qubit[3]) {
             DumpMachine($"locked-file.txt");
@@ -351,12 +351,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         let n = 3;
 
         using (q = Qubit()) {
-            Assert([PauliZ], [q], Zero, "Expecting Zero - a");
+            AssertMeasurement([PauliZ], [q], Zero, "Expecting Zero - a");
         }
 
         using (qs = Qubit[n]) {
             AssertEqual(n, Length(qs));
-            Assert([PauliZ, PauliZ, PauliZ], qs, Zero, "Expecting Zero - b");
+            AssertMeasurement([PauliZ, PauliZ, PauliZ], qs, Zero, "Expecting Zero - b");
         }
 
         using ((q1, (q2t, (_, q3s, _, q4s))) = (Qubit(), ((Qubit(), Qubit[2]), (Qubit(), Qubit[n], Qubit[n-1], Qubit[4])))) {
@@ -366,23 +366,23 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             AssertEqual(n, Length(q3s));
             AssertEqual(4, Length(q4s));
 
-            Assert([PauliZ, PauliZ], [q1, a], Zero, "Expecting Zero - c");
-            Assert([PauliZ, PauliZ], b, Zero, "Expecting Zero - d");
-            Assert([PauliZ, PauliZ, PauliZ], q3s, Zero, "Expecting Zero - d");
-            Assert([PauliZ, PauliZ, PauliZ, PauliZ], q4s, Zero, "Expecting Zero - e");
-            
+            AssertMeasurement([PauliZ, PauliZ], [q1, a], Zero, "Expecting Zero - c");
+            AssertMeasurement([PauliZ, PauliZ], b, Zero, "Expecting Zero - d");
+            AssertMeasurement([PauliZ, PauliZ, PauliZ], q3s, Zero, "Expecting Zero - d");
+            AssertMeasurement([PauliZ, PauliZ, PauliZ, PauliZ], q4s, Zero, "Expecting Zero - e");
+
         }
-            
+
         using (qt = (Qubit(), (Qubit[1], Qubit[2]))) {
             let (qt1, (qt2a, qt2b)) = qt;
 
-            Assert([PauliZ], [qt1], Zero, "Expecting Zero - f");
-            Assert([PauliZ], qt2a, Zero, "Expecting Zero - g");
-            Assert([PauliZ, PauliZ], qt2b, Zero, "Expecting Zero - h");
+            AssertMeasurement([PauliZ], [qt1], Zero, "Expecting Zero - f");
+            AssertMeasurement([PauliZ], qt2a, Zero, "Expecting Zero - g");
+            AssertMeasurement([PauliZ, PauliZ], qt2b, Zero, "Expecting Zero - h");
         }
     }
 
-    
+
     operation ExtendedForTest() : Unit
     {
         mutable n = 0;
@@ -390,7 +390,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         using (qs = Qubit[3]) {
 
             for(q in qs) {
-                Assert([PauliZ], [q], Zero, "Expecting Zero - a");
+                AssertMeasurement([PauliZ], [q], Zero, "Expecting Zero - a");
                 set n = n + 1;
             }
 
@@ -448,7 +448,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         AssertEqual(5L, MinL(7L, 5L));
         AssertEqual(1L, ModPowL(3L, 100L, 2L));
     }
-    
+
     operation RangePropsTest() : Unit
     {
         let range = 1..2..10;
@@ -481,19 +481,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     operation ReturnFromWithinUsing() : Int {
         using (q = Qubit()){
-            return 1; 
+            return 1;
         }
     }
 
     operation ReturnFromWithinBorrowing() : Int {
         borrowing (q = Qubit()){
-            return 1; 
+            return 1;
         }
     }
 
     operation ReturnTest() : Unit {
-        let _ = ReturnFromWithinUsing(); 
-        let _ = ReturnFromWithinBorrowing(); 
+        let _ = ReturnFromWithinUsing();
+        let _ = ReturnFromWithinBorrowing();
     }
 
     operation VariablesScopeTest() : Unit
@@ -512,7 +512,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             }
             AssertEqual(9, a);
         }
-        
+
         borrowing (qubits = Qubit[2])
         {
             for(q in qubits) {
@@ -531,7 +531,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     // that returns Unit...
     // Not totally sure if this should be allowed, but it works as of v0.3
     function Bar() : Unit { }
-    
+
     function Foo<'T>(a: 'T) : Unit  {
         return Bar();
     }
@@ -540,7 +540,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         return Foo(3);
     }
 
-    operation UsingQubitCheck () : Unit 
+    operation UsingQubitCheck () : Unit
     {
         using (q = Qubit())
         {
@@ -549,7 +549,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         }
     }
 
-    operation ReleaseMeasuredQubitCheck () : Unit 
+    operation ReleaseMeasuredQubitCheck () : Unit
     {
         using (q = Qubit())
         {
