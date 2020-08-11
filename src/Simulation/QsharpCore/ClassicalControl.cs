@@ -10,17 +10,29 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
 {
-    public partial class ApplyIfElseR<__T__, __U__>
+    /// <summary>
+    /// Provides interface to access base `GetRuntimeMetadata` method.
+    /// </summary>
+    public interface IApplyIfElse : ICallable
     {
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
-        {
-            Debug.Assert(args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)>,
-                $"Failed to retrieve runtime metadata for {this.ToString()}.");
+        RuntimeMetadata? GetBaseRuntimeMetadata(IApplyData args);
+    }
 
-            if (args.Value is ValueTuple<Result, (ICallable, __T__), (ICallable, __U__)> ifArgs)
+    /// <summary>
+    /// Provides static `GetRuntimeMetadata` method for ApplyIfElseR and its variants
+    /// to avoid code duplication.
+    /// </summary>
+    public class ApplyIfElseUtils<__C__, __T__, __U__>
+    {
+        public static RuntimeMetadata? GetRuntimeMetadata(IApplyIfElse op, IApplyData args)
+        {
+            Debug.Assert(args.Value is ValueTuple<Result, (__C__, __T__), (__C__, __U__)>,
+                $"Failed to retrieve runtime metadata for {op.ToString()}.");
+
+            if (args.Value is ValueTuple<Result, (__C__, __T__), (__C__, __U__)> ifArgs)
             {
                 var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
-                var metadata = base.GetRuntimeMetadata(args);
+                var metadata = op.GetBaseRuntimeMetadata(args);
 
                 if (metadata == null) return null;
 
@@ -41,96 +53,43 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
         }
     }
 
-    public partial class ApplyIfElseRA<__T__, __U__>
+    public partial class ApplyIfElseR<__T__, __U__> : IApplyIfElse
     {
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
-        {
-            Debug.Assert(args.Value is ValueTuple<Result, (IAdjointable, __T__), (IAdjointable, __U__)>,
-                $"Failed to retrieve runtime metadata for {this.ToString()}.");
+        public RuntimeMetadata? GetBaseRuntimeMetadata(IApplyData args) =>
+            base.GetRuntimeMetadata(args);
 
-            if (args.Value is ValueTuple<Result, (IAdjointable, __T__), (IAdjointable, __U__)> ifArgs)
-            {
-                var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
-                var metadata = base.GetRuntimeMetadata(args);
-
-                if (metadata == null) return null;
-
-                if (result is ResultMeasured measured)
-                {
-                    metadata.IsConditional = true;
-                    metadata.Controls = new List<Qubit>() { measured.Qubit };
-                }
-                else
-                {
-                    metadata.IsComposite = true;
-                }
-
-                return metadata;
-            }
-
-            return null;
-        }
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
+            ApplyIfElseUtils<ICallable, __T__, __U__>.GetRuntimeMetadata(this, args);
     }
 
-    public partial class ApplyIfElseRC<__T__, __U__>
+    public partial class ApplyIfElseRA<__T__, __U__> : IApplyIfElse
     {
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
-        {
-            Debug.Assert(args.Value is ValueTuple<Result, (IControllable, __T__), (IControllable, __U__)>,
-                $"Failed to retrieve runtime metadata for {this.ToString()}.");
+        public RuntimeMetadata? GetBaseRuntimeMetadata(IApplyData args) =>
+            base.GetRuntimeMetadata(args);
 
-            if (args.Value is ValueTuple<Result, (IControllable, __T__), (IControllable, __U__)> ifArgs)
-            {
-                var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
-                var metadata = base.GetRuntimeMetadata(args);
-
-                if (metadata == null) return null;
-
-                if (result is ResultMeasured measured)
-                {
-                    metadata.IsConditional = true;
-                    metadata.Controls = new List<Qubit>() { measured.Qubit };
-                }
-                else
-                {
-                    metadata.IsComposite = true;
-                }
-
-                return metadata;
-            }
-
-            return null;
-        }
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
+            ApplyIfElseUtils<IAdjointable, __T__, __U__>.GetRuntimeMetadata(this, args);
     }
 
-    public partial class ApplyIfElseRCA<__T__, __U__>
+    public partial class ApplyIfElseRC<__T__, __U__> : IApplyIfElse
     {
-        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
-        {
-            Debug.Assert(args.Value is ValueTuple<Result, (IUnitary, __T__), (IUnitary, __U__)>,
-                $"Failed to retrieve runtime metadata for {this.ToString()}.");
+        public RuntimeMetadata? GetBaseRuntimeMetadata(IApplyData args) =>
+            base.GetRuntimeMetadata(args);
 
-            if (args.Value is ValueTuple<Result, (IUnitary, __T__), (IUnitary, __U__)> ifArgs)
-            {
-                var (result, (onZeroOp, zeroArg), (onOneOp, oneArg)) = ifArgs;
-                var metadata = base.GetRuntimeMetadata(args);
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
+            ApplyIfElseUtils<IControllable, __T__, __U__>.GetRuntimeMetadata(this, args);
+    }
 
-                if (metadata == null) return null;
+    public partial class ApplyIfElseRCA<__T__, __U__> : IApplyIfElse
+    {
+        public RuntimeMetadata? GetBaseRuntimeMetadata(IApplyData args) =>
+            base.GetRuntimeMetadata(args);
 
-                if (result is ResultMeasured measured)
-                {
-                    metadata.IsConditional = true;
-                    metadata.Controls = new List<Qubit>() { measured.Qubit };
-                }
-                else
-                {
-                    metadata.IsComposite = true;
-                }
-
-                return metadata;
-            }
-
-            return null;
-        }
+        /// <inheritdoc/>
+        public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args) =>
+            ApplyIfElseUtils<IUnitary, __T__, __U__>.GetRuntimeMetadata(this, args);
     }
 }
