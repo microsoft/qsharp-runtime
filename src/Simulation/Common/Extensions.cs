@@ -49,5 +49,32 @@ namespace Microsoft.Quantum.Simulation
                 factory.Register(op.BaseType, op);
             }
         }
+
+        internal static long NextLongBelow(this System.Random random, long upperExclusive)
+        {
+            long SampleNBits(int nBits)
+            {
+                var nBytes = (nBits + 7) / 8;
+                var nExcessBits = nBytes * 8 - nBits;
+                var bytes = new byte[nBytes];
+                random.NextBytes(bytes);
+                return System.BitConverter.ToInt64(bytes) >> nExcessBits;
+            };
+            
+            var nBits = (int) (System.Math.Log(upperExclusive, 2) + 1);
+            var sample = SampleNBits(nBits);
+            while (sample >= upperExclusive)
+            {
+                sample = SampleNBits(nBits);
+            }
+            return sample;
+        }
+
+        internal static long NextLong(this System.Random random, long lower, long upper)
+        {
+            var delta = upper - lower;
+            return lower + random.NextLongBelow(delta + 1);
+        }
+
     }
 }
