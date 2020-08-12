@@ -15,6 +15,12 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.Contradiction
+    ///
+    /// # Example
+    /// The following Q# snippet will fail:
+    /// ```Q#
+    /// Fact(false, "Expected true.");
+    /// ```
     function Fact(actual : Bool, message : String) : Unit {
         if (not actual) { fail message; }
     }
