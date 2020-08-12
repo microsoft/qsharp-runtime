@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Implementation of the Random operation for the Toffoli simulator.
         /// </summary>
-        public class ToffSimRandom : Quantum.Intrinsic.Random
+        public class ToffSimRandom : Microsoft.Quantum.Intrinsic.Random
         {
             private ToffoliSimulator Simulator;
 
