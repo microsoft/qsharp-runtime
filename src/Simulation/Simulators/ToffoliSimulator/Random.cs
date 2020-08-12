@@ -31,7 +31,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// </summary>
             public override Func<IQArray<double>, Int64> Body => (probs) =>
                 CommonUtils.SampleDistribution(probs, Simulator.RandomGenerator.NextDouble());
-            };
         }
     }
 }
