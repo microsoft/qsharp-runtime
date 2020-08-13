@@ -109,9 +109,9 @@ namespace Microsoft.Quantum.Simulation.Core
 
         IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)this.BaseOp).Qubits;
 
-        public override IApplyData __dataIn((IQArray<Qubit>, I) data) => new In((data.Item1, this.BaseOp.__dataIn(data.Item2)));
+        public override IApplyData __DataIn__((IQArray<Qubit>, I) data) => new In((data.Item1, this.BaseOp.__DataIn__(data.Item2)));
 
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
 
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
@@ -121,7 +121,7 @@ namespace Microsoft.Quantum.Simulation.Core
             if (args.Value is ValueTuple<IQArray<Qubit>, I> ctrlArgs)
             {
                 var (controls, baseArgs) = ctrlArgs;
-                var baseMetadata = this.BaseOp.GetRuntimeMetadata(this.BaseOp.__dataIn(baseArgs));
+                var baseMetadata = this.BaseOp.GetRuntimeMetadata(this.BaseOp.__DataIn__(baseArgs));
                 if (baseMetadata == null) return null;
                 baseMetadata.IsControlled = true;
                 baseMetadata.Controls = controls.Concat(baseMetadata.Controls);

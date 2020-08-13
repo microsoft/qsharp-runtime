@@ -31,9 +31,9 @@ namespace Microsoft.Quantum.Simulation.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public abstract Func<I, O> Body { get; }
 
-        public virtual IApplyData __dataIn(I data) => new QTuple<I>(data);
+        public virtual IApplyData __DataIn__(I data) => new QTuple<I>(data);
 
-        public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
+        public virtual IApplyData __DataOut__(O data) => new QTuple<O>(data);
 
         public O Apply(I a)
         {

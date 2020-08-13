@@ -55,9 +55,9 @@ namespace Microsoft.Quantum.Simulation.Core
         OperationFunctor ICallable.Variant => OperationFunctor.Body;
 
 
-        public virtual IApplyData __dataIn(I data) => new QTuple<I>(data);
+        public virtual IApplyData __DataIn__(I data) => new QTuple<I>(data);
 
-        public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
+        public virtual IApplyData __DataOut__(O data) => new QTuple<O>(data);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public abstract Func<I, O> Body { get; }
@@ -92,7 +92,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             try
             {
-                this.Factory?.StartOperation(this, __dataIn(a));
+                this.Factory?.StartOperation(this, __DataIn__(a));
                 __result__ = this.Body(a);
             }
             catch (Exception e)
@@ -102,7 +102,7 @@ namespace Microsoft.Quantum.Simulation.Core
             }
             finally
             {
-                this.Factory?.EndOperation(this, __dataOut(__result__));
+                this.Factory?.EndOperation(this, __DataOut__(__result__));
             }
 
             return __result__;
