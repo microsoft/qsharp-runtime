@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(Pauli, double, Qubit), QVoid> Body => (_args) =>
+            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => (_args) =>
             {
                 var (basis, angle, q1) = _args;
 
@@ -38,14 +38,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(Pauli, double, Qubit), QVoid> AdjointBody => (_args) =>
+            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => (_args) =>
             {
                 var (basis, angle, q1) = _args;
 
-                return this.Body.Invoke((basis, -angle, q1));
+                return this.__Body__.Invoke((basis, -angle, q1));
             };
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => (_args) =>
             {
                 var (ctrls, (basis, angle, q1)) = _args;
 
@@ -53,18 +53,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 CheckAngle(angle);
 
                 SafeControlled(ctrls,
-                    () => this.Body.Invoke((basis, angle, q1)),
+                    () => this.__Body__.Invoke((basis, angle, q1)),
                     (count, ids) => MCR(Simulator.Id, basis, angle, count, ids, (uint)q1.Id));
 
                 return QVoid.Instance;
             };
 
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 var (ctrls, (basis, angle, q1)) = _args;
 
-                return this.ControlledBody.Invoke((ctrls, (basis, -angle, q1)));
+                return this.__ControlledBody__.Invoke((ctrls, (basis, -angle, q1)));
             };
         }
     }

@@ -979,10 +979,10 @@ module SimulationCode =
         | Generated SelfInverse ->
             let adjointedBodyName =
                 match sp.Kind with
-                | QsAdjoint           -> "Body"
-                | QsControlledAdjoint -> "ControlledBody"
+                | QsAdjoint           -> "__Body__"
+                | QsControlledAdjoint -> "__ControlledBody__"
 //TODO: diagnostics.
-                | _ -> "Body"
+                | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
         | _ ->
             None
@@ -1023,7 +1023,7 @@ module SimulationCode =
         | Some body ->
             let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
             let impl =
-                ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
+                ``property-arrow_get`` propertyType ("__" + bodyName + "__") [``public``; ``override``]
                     ``get``
                     (``=>`` body)
             Some (impl, attributes)

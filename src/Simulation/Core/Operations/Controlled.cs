@@ -77,11 +77,11 @@ namespace Microsoft.Quantum.Simulation.Core
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).ControlledVariant();
 
-        public override Func<(IQArray<Qubit>, I), QVoid> Body => this.BaseOp.ControlledBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> __Body__ => this.BaseOp.__ControlledBody__;
 
-        public override Func<(IQArray<Qubit>, I), QVoid> AdjointBody => this.BaseOp.ControlledAdjointBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> __AdjointBody__ => this.BaseOp.__ControlledAdjointBody__;
 
-        public override Func<(IQArray<Qubit>, (IQArray<Qubit>, I)), QVoid> ControlledBody
+        public override Func<(IQArray<Qubit>, (IQArray<Qubit>, I)), QVoid> __ControlledBody__
         {
             get
             {
@@ -89,12 +89,12 @@ namespace Microsoft.Quantum.Simulation.Core
                 {
                     var (ctrl1, (ctrl2, args)) = __in;
                     var ctrls = QArray<Qubit>.Add(ctrl1, ctrl2);
-                    return this.BaseOp.ControlledBody.Invoke((ctrls, args));
+                    return this.BaseOp.__ControlledBody__.Invoke((ctrls, args));
                 };
             }
         }
 
-        public override Func<(IQArray<Qubit>, (IQArray<Qubit>, I)), QVoid> ControlledAdjointBody
+        public override Func<(IQArray<Qubit>, (IQArray<Qubit>, I)), QVoid> __ControlledAdjointBody__
         {
             get
             {
@@ -102,7 +102,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 {
                     var (ctrl1, (ctrl2, args)) = __in;
                     var ctrls = QArray<Qubit>.Add(ctrl1, ctrl2);
-                    return this.BaseOp.ControlledAdjointBody.Invoke((ctrls, args));
+                    return this.BaseOp.__ControlledAdjointBody__.Invoke((ctrls, args));
                 };
             }
         }

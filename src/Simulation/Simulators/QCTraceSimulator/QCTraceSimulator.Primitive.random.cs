@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 core = m;
             }
 
-            public override Func<IQArray<double>, Int64> Body => (p) =>
+            public override Func<IQArray<double>, Int64> __Body__ => (p) =>
             {
                 return CommonUtils.SampleDistribution(p, core.random.NextDouble());
             };

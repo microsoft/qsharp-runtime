@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).Variant;
 
-        public override Func<P, O> Body => (a) =>
+        public override Func<P, O> __Body__ => (a) =>
         {
             var args = this.Mapper(a);
             return this.BaseOp.Apply(args);

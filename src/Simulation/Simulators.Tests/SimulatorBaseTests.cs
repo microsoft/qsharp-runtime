@@ -328,9 +328,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
             }
 
-            public override Func<Qubit, QVoid> Body => throw new NotImplementedException();
+            public override Func<Qubit, QVoid> __Body__ => throw new NotImplementedException();
 
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledBody => throw new NotImplementedException();
+            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => throw new NotImplementedException();
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
             }
 
-            public override Func<Qubit, Result> Body => throw new NotImplementedException();
+            public override Func<Qubit, Result> __Body__ => throw new NotImplementedException();
 
             public override void __Init__()
             {
@@ -368,7 +368,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 this.X = this.Factory.Get<IUnitary<Qubit>, Intrinsic.X>();
             }
 
-            public override Func<QVoid, QVoid> Body => throw new NotImplementedException();
+            public override Func<QVoid, QVoid> __Body__ => throw new NotImplementedException();
         }
 
         /// <summary>
@@ -386,13 +386,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public override void __Init__() { }
 
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledAdjointBody => throw new NotImplementedException();
+            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => throw new NotImplementedException();
 
-            public override Func<Qubit, QVoid> AdjointBody => throw new NotImplementedException();
+            public override Func<Qubit, QVoid> __AdjointBody__ => throw new NotImplementedException();
 
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledBody => throw new NotImplementedException();
+            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => throw new NotImplementedException();
 
-            public override Func<Qubit, QVoid> Body => throw new NotImplementedException();
+            public override Func<Qubit, QVoid> __Body__ => throw new NotImplementedException();
         }
 
 
@@ -414,7 +414,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             string ICallable.FullName => "A";
 
-            public override Func<QVoid, QVoid> Body => (_) => { return QVoid.Instance; };
+            public override Func<QVoid, QVoid> __Body__ => (_) => { return QVoid.Instance; };
         }
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 this.A = this.Factory.Get<ICallable, A>();
             }
 
-            public override Func<QVoid, QVoid> Body => (_) => { return QVoid.Instance; };
+            public override Func<QVoid, QVoid> __Body__ => (_) => { return QVoid.Instance; };
         }
 
         public class Gen<T> : Operation<T, QVoid>, ICallable
@@ -446,7 +446,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             string ICallable.FullName => "Gen";
 
-            public override Func<T, QVoid> Body => (_) => { return QVoid.Instance; };
+            public override Func<T, QVoid> __Body__ => (_) => { return QVoid.Instance; };
 
             public ICallable A { get; set; }
 
@@ -470,7 +470,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public ICallable Gen { get; set; }
 
-            public override Func<QVoid, QVoid> Body => (_) => { return QVoid.Instance; };
+            public override Func<QVoid, QVoid> __Body__ => (_) => { return QVoid.Instance; };
 
             public override void __Init__()
             {

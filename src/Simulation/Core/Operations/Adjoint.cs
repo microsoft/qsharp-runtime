@@ -60,13 +60,13 @@ namespace Microsoft.Quantum.Simulation.Core
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).AdjointVariant();
         
-        public override Func<I, QVoid> Body => this.BaseOp.AdjointBody;
+        public override Func<I, QVoid> __Body__ => this.BaseOp.__AdjointBody__;
 
-        public override Func<I, QVoid> AdjointBody => this.BaseOp.Body;
+        public override Func<I, QVoid> __AdjointBody__ => this.BaseOp.__Body__;
 
-        public override Func<(IQArray<Qubit>, I), QVoid> ControlledBody => this.BaseOp.ControlledAdjointBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> __ControlledBody__ => this.BaseOp.__ControlledAdjointBody__;
                                                  
-        public override Func<(IQArray<Qubit>, I), QVoid> ControlledAdjointBody => this.BaseOp.ControlledBody;
+        public override Func<(IQArray<Qubit>, I), QVoid> __ControlledAdjointBody__ => this.BaseOp.__ControlledBody__;
 
         IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)this.BaseOp).Qubits;
 

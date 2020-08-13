@@ -20,7 +20,7 @@ namespace NativeOperations
         {
             public Native(IOperationFactory m) : base(m) { }
 
-            public override Func<QVoid, String> Body => (arg) =>
+            public override Func<QVoid, String> __Body__ => (arg) =>
             {
                 return RESULT;
             };
@@ -34,7 +34,7 @@ namespace NativeOperations
         {
             public Native(IOperationFactory m) : base(m) { }
 
-            public override Func<QVoid, String> Body => (arg) =>
+            public override Func<QVoid, String> __Body__ => (arg) =>
             {
                 if (this.Factory is QuantumSimulator)
                 {
@@ -45,7 +45,7 @@ namespace NativeOperations
                     return "Toffoli";
                 }
 
-                return base.Body(arg);
+                return base.__Body__(arg);
             };
         }
     }
@@ -58,7 +58,7 @@ namespace NativeOperations
         {
             public Other1(IOperationFactory m) : base(m) { }
 
-            public override Func<__T__, string> Body => throw new NotImplementedException();
+            public override Func<__T__, string> __Body__ => throw new NotImplementedException();
         }
 
         // This one should not be used, it has the same number of Type parameters,
@@ -70,7 +70,7 @@ namespace NativeOperations
         {
             public Emulation(IOperationFactory m) : base(m) { }
 
-            public override Func<__T__, string> Body => (arg) =>
+            public override Func<__T__, string> __Body__ => (arg) =>
             {
                 if (arg is string s)
                 {
@@ -92,7 +92,7 @@ namespace NativeOperations
         {
             public Emulation(IOperationFactory m) : base(m) { }
 
-            public override Func<__T__, __T__> Body => (arg) =>
+            public override Func<__T__, __T__> __Body__ => (arg) =>
             {
                 if (arg is string s)
                 {
@@ -100,7 +100,7 @@ namespace NativeOperations
                 }
                 else
                 {
-                    return base.Body(arg);
+                    return base.__Body__(arg);
                 }
             };
         }

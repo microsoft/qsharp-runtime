@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The implementation of the operation.
             /// </summary>
-            public override Func<IQArray<double>, Int64> Body => (probs) =>
+            public override Func<IQArray<double>, Int64> __Body__ => (probs) =>
             {
                 if (probs.Any(d => d < 0.0))
                 {

@@ -74,35 +74,35 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public override IApplyData __DataOut__(O data) => this.BaseOp.__DataOut__(data);
 
-        public override Func<P, O> Body => (a) =>
+        public override Func<P, O> __Body__ => (a) =>
         {
             var args = this.Mapper(a);
-            return this.BaseOp.Body.Invoke(args);
+            return this.BaseOp.__Body__.Invoke(args);
         };
 
-        public override Func<P, QVoid> AdjointBody => (a) =>
+        public override Func<P, QVoid> __AdjointBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
 
             var args = this.Mapper(a);
-            return op.AdjointBody.Invoke(args);
+            return op.__AdjointBody__.Invoke(args);
         };
 
-        public override Func<(IQArray<Qubit>, P), QVoid> ControlledBody => (a) =>
+        public override Func<(IQArray<Qubit>, P), QVoid> __ControlledBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
             var (ctrl, ps) = a;
-            return op.ControlledBody.Invoke((ctrl, this.Mapper(ps)));
+            return op.__ControlledBody__.Invoke((ctrl, this.Mapper(ps)));
         };
 
-        public override Func<(IQArray<Qubit>, P), QVoid> ControlledAdjointBody => (a) =>
+        public override Func<(IQArray<Qubit>, P), QVoid> __ControlledAdjointBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
             var (ctrl, ps) = a;
-            return op.ControlledAdjointBody.Invoke((ctrl, this.Mapper(ps)));
+            return op.__ControlledAdjointBody__.Invoke((ctrl, this.Mapper(ps)));
         };
 
         IEnumerable<Qubit> IApplyData.Qubits => __qubits.Value;
