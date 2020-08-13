@@ -75,6 +75,9 @@ namespace Microsoft.Quantum.Random {
         return DiscreteDistribution(Delay(DrawCategorial, probs, _));
     }
 
+    /// # Summary
+    /// Internal-only operation for sampling from transformed distributions.
+    /// Should only be used via partial application.
     internal operation SampleTransformedContinuousDistribution(
         transform : (Double -> Double),
         distribution : ContinuousDistribution

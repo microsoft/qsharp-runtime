@@ -7,8 +7,10 @@ namespace Microsoft.Quantum.Random {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// The random operation takes an array of doubles as input, and returns
-    /// a randomly-selected index into the array as an `Int`.
+    /// Draws a random sample from a categorical distribution specified by a
+    /// list of probablities.
+    ///
+    /// # Description
     /// The probability of selecting a specific index is proportional to the value
     /// of the array element at that index.
     /// Array elements that are equal to zero are ignored and their indices are never
@@ -23,6 +25,9 @@ namespace Microsoft.Quantum.Random {
     /// # Output
     /// An integer $i$ with probability $\Pr(i) = p_i / \sum_i p_i$, where $p_i$
     /// is the $i$th element of `probs`.
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Random.CategoricalDistribution
     operation DrawCategorial(probs : Double[]) : Int {
         // There are nicer ways of doing this, but they require the full
         // standard library to be available.
@@ -44,10 +49,40 @@ namespace Microsoft.Quantum.Random {
         return Length(probs) - 1;
     }
 
+    /// # Summary
+    /// Draws a random Pauli value.
+    ///
+    /// # Output
+    /// Either `PauliI`, `PauliX`, `PauliY`, or `PauliZ` with equal
+    /// probability.
     operation DrawRandomPauli() : Pauli {
         return [PauliI, PauliX, PauliY, PauliZ][DrawRandomInt(0, 3)];
     }
 
+    /// # Summary
+    /// Given an array of data and an a distribution over its indices,
+    /// attempts to choose an element at random.
+    ///
+    /// # Input
+    /// ## data
+    /// The array from which an element should be chosen.
+    /// ## indexDistribution
+    /// A distribution over the indices of `data`.
+    ///
+    /// # Ouput
+    /// A tuple `(succeeded, element)` where `succeeded` is `true` if and only
+    /// if the sample chosen from `indexDistribution` was a valid index into
+    /// `data`, and where `element` is an element of `data` chosen at random.
+    ///
+    /// # Example
+    /// The following Q# snippet chooses an element at random from an array:
+    /// ```Q#
+    /// let (succeeded, element) = MaybeChooseElement(
+    ///     data,
+    ///     DiscreteUniformDistribution(0, Length(data) - 1)
+    /// );
+    /// Fact(succeeded, "Index chosen by MaybeChooseElement was not valid.");
+    /// ```
     operation MaybeChooseElement<'T>(data : 'T[], indexDistribution : DiscreteDistribution) : (Bool, 'T) {
         let index = indexDistribution::Sample();
         if (index >= 0 and index < Length(data)) {
@@ -57,6 +92,7 @@ namespace Microsoft.Quantum.Random {
         }
     }
 
+    // TODO: rename from binomial, since it's a single trial.
     operation DrawBinomialSample(successProbability : Double) : Bool {
         return DrawRandomDouble(0.0, 1.0) <= successProbability;
     }
