@@ -48,9 +48,9 @@
       <_TargetedExeFiles Include="$(_TargetedExeDir)*" />
     </ItemGroup>
     <MakeDir Directories="$(OutputPath)TestExe" />
-    <MakeDir Directories="$(OutputPath)TargetedExe" />
+    <MakeDir Directories="$(OutputPath)TestTargetedExe" />
     <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
-    <Copy SourceFiles="@(_TargetedExeFiles)" DestinationFolder="$(OutputPath)TargetedExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(_TargetedExeFiles)" DestinationFolder="$(OutputPath)TestTargetedExe" ContinueOnError="false" />
   </Target>
 
 </Project>
