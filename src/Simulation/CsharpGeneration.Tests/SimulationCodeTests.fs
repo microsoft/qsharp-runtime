@@ -1189,22 +1189,22 @@ namespace N1
     let ``usesGenerics body`` () =
         [
             "var a = (IQArray<Result>)new QArray<Result>(Result.One, Result.Zero, Result.Zero);"
-            "var s = (IQArray<String>)new QArray<String>(ResultToString.Apply(a[0L]), ResultToString.Apply(a[1L]));"
-            "MicrosoftQuantumTestingnoOpResult.Apply(a[0L]);"
+            "var s = (IQArray<String>)new QArray<String>(__ResultToString__.Apply(a[0L]), __ResultToString__.Apply(a[1L]));"
+            "__MicrosoftQuantumTestingnoOpResult__.Apply(a[0L]);"
 
             """
             {
-                var qubits = Allocate.Apply(3L);
+                var qubits = __Allocate__.Apply(3L);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    var op = MicrosoftQuantumTestingHold.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (CNOT, (qubits[0L], qubits[1L]), __arg2__)));
+                    var op = __MicrosoftQuantumTestingHold__.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (__CNOT__, (qubits[0L], qubits[1L]), __arg2__)));
                     op.Apply(QVoid.Instance);
 
-                    MicrosoftQuantumTestingnoOpGeneric.Apply(qubits[0L]);
-                    MicrosoftQuantumTestingnoOpGeneric.Apply(a[0L]);
-                    genIter.Apply((X, qubits));
+                    __MicrosoftQuantumTestingnoOpGeneric__.Apply(qubits[0L]);
+                    __MicrosoftQuantumTestingnoOpGeneric__.Apply(a[0L]);
+                    __genIter__.Apply((__X__, qubits));
                 }
 #line hidden
                 catch
@@ -1217,17 +1217,17 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        Release.Apply(qubits);
+                        __Release__.Apply(qubits);
                     }
                 }
             }
             """
-            "genIter.Apply((MicrosoftQuantumTestingnoOpResult, a));"
+            "__genIter__.Apply((__MicrosoftQuantumTestingnoOpResult__, a));"
             """
-            genIter.Apply((genU1, genMapper.Apply<IQArray<String>>((ResultToString, a))));
+            __genIter__.Apply((__genU1__, __genMapper__.Apply<IQArray<String>>((__ResultToString__, a))));
             """
-            "genIter.Apply((genU1, s));"
-            "genIter.Apply((genU1, a));"
+            "__genIter__.Apply((__genU1__, s));"
+            "__genIter__.Apply((__genU1__, a));"
         ]
         |> testOneBody (applyVisitor usesGenerics)
 
