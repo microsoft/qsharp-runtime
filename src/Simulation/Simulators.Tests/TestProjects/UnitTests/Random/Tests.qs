@@ -2,6 +2,7 @@ namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Random;
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Checks that DrawRandomDouble obeys ranges.
