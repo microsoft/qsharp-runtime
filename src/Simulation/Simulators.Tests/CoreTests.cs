@@ -44,6 +44,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void BasicExecutionTargetedExe()
+        {
+            var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var exe = Path.Combine(asmPath, "TargetedExe", "TargetedExe.dll");
+
+            ProcessRunner.Run("dotnet", exe, out StringBuilder output, out StringBuilder error, out int exitCode, out Exception ex);
+
+            Assert.Null(ex);
+            Assert.Equal(0, exitCode);
+            Assert.Empty(error.ToString().Trim());
+            Assert.Equal("TargetedExe", output.ToString().Trim());
+        }
+
+        [Fact]
         public void Borrowing()
         {
             OperationsTestHelper.RunWithMultipleSimulators((s) =>
