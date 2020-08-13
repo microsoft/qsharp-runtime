@@ -202,6 +202,13 @@ module SimulationCode =
         count <- count + 1
         sprintf "__arg%d__" count
 
+    let getOpName context name =
+        let name' =
+            if needsFullPath context name then prependNamespaceString name
+            else if isCurrentOp context name then Directives.Self
+            else name.Name.Value
+        "__" + name' + "__"
+
     type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) =
         inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
 
@@ -412,12 +419,9 @@ module SimulationCode =
             match id with
             | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
             | GlobalCallable n ->
-                if isCurrentOp context n then
-                    Directives.Self |> ``ident`` :> ExpressionSyntax
-                elif needsFullPath context n then
-                    prependNamespaceString n |> ``ident`` :> ExpressionSyntax
-                else
-                    n.Name.Value |> ``ident`` :> ExpressionSyntax
+                if isCurrentOp context n
+                then upcast ("__" + Directives.Self + "__" |> ``ident``)
+                else upcast (getOpName context n |> ``ident``)
 // TODO: Diagnostics
             | InvalidIdentifier ->
                 failwith "Received InvalidIdentifier"
@@ -761,8 +765,8 @@ module SimulationCode =
         override this.OnQubitScope (using:QsQubitScope) =
             let (alloc, release) =
                 match using.Kind with
-                | Allocate -> ("Allocate", "Release")
-                | Borrow   -> ("Borrow", "Return")
+                | Allocate -> ("__Allocate__", "__Release__")
+                | Borrow   -> ("__Borrow__", "__Return__")
             let rec removeDiscarded sym =
                 match sym with
                 | VariableName _         -> sym
@@ -847,11 +851,6 @@ module SimulationCode =
         let seeker = new OperationsSeeker()
         seeker.Namespaces.OnCallableDeclaration od |> ignore
         seeker.SharedState |> Seq.toList
-
-    let getOpName context n =
-        if needsFullPath context n then prependNamespaceString n
-        else if isCurrentOp context n then Directives.Self
-        else n.Name.Value
 
     let getTypeOfOp context (n: QsQualifiedName) =
         let name =
