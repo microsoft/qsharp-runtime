@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// This method is called once, to let the Operation initialize and verify its dependencies.
         /// </summary>
-        public abstract void Init();
+        public abstract void __Init__();
 
         /// <summary>
         /// Retrieves the runtime metadata of the Operation. If the Operation has no associated

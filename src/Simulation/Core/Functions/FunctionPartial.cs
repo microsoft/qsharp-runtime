@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.Mapper = PartialMapper.Create<P, I>(partialTuple);
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public ICallable<I, O> BaseOp { get; }
 

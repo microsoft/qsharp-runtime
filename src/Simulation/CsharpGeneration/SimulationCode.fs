@@ -882,7 +882,7 @@ module SimulationCode =
                 statement (lhs <-- rhs)
             operations
             |> List.map buildOne
-        ``method`` "void"  "Init" ``<<`` [] ``>>``
+        ``method`` "void"  "__Init__" ``<<`` [] ``>>``
             ``(`` parameters ``)``
             [  ``public``; ``override``  ]
             ``{`` body ``}``

@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public override Func<TestTuple, QVoid> Body => (a) => QVoid.Instance;
 
-            public override void Init() { }
+            public override void __Init__() { }
         }
 
         private void TestOneTupleNoSubstitution<I>(I original, params object[] expected)

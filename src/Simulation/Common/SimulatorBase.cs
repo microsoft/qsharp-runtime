@@ -94,7 +94,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual void Init(AbstractCallable op)
         {
-            op.Init();
+            op.__Init__();
         }
 
         public override AbstractCallable CreateInstance(Type t)

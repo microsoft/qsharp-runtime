@@ -58,7 +58,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(this.Mapper(default(P)))?.Qubits?.ToArray());
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public Operation<I, O> BaseOp { get; }
         ICallable IOperationWrapper.BaseOperation => BaseOp;

@@ -345,7 +345,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public override Func<Qubit, Result> Body => throw new NotImplementedException();
 
-            public override void Init()
+            public override void __Init__()
             {
             }
         }
@@ -363,7 +363,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public IUnitary<Qubit> X { get; set; }
 
-            public override void Init()
+            public override void __Init__()
             {
                 this.X = this.Factory.Get<IUnitary<Qubit>, Intrinsic.X>();
             }
@@ -384,7 +384,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             string ICallable.FullName => "LikeX";
 
-            public override void Init() { }
+            public override void __Init__() { }
 
             public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledAdjointBody => throw new NotImplementedException();
 
@@ -407,7 +407,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public ICallable B { get; set; }
 
-            public override void Init()
+            public override void __Init__()
             {
                 this.B = this.Factory.Get<ICallable, B>();
             }
@@ -430,7 +430,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public ICallable A { get; set; }
 
-            public override void Init()
+            public override void __Init__()
             {
                 this.A = this.Factory.Get<ICallable, A>();
             }
@@ -452,7 +452,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public IUnitary<Qubit> X { get; set; }
 
-            public override void Init()
+            public override void __Init__()
             {
                 this.A = this.Factory.Get<ICallable, A>();
                 this.X = this.Factory.Get<IUnitary<Qubit>, Intrinsic.X>();
@@ -472,7 +472,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public override Func<QVoid, QVoid> Body => (_) => { return QVoid.Instance; };
 
-            public override void Init()
+            public override void __Init__()
             {
                 this.Gen = this.Factory.Get<ICallable>(typeof(Gen<>));
             }

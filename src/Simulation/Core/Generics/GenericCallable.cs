@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Core
             _controlled = new Lazy<GenericControlled>(() => new GenericControlled(this));
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public Type OperationType { get; }
 
