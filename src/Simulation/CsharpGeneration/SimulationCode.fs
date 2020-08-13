@@ -926,7 +926,7 @@ module SimulationCode =
     /// Returns a static property of type OperationInfo using the operation's input and output types.
     let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
         let propertyType =
-            match globalContext.ExecutionTarget with
+            match globalContext.ProcessorArchitecture with
             | target when target = AssemblyConstants.HoneywellProcessor -> sprintf "HoneywellEntryPointInfo<%s, %s>" operationInput operationOutput
             | target when target = AssemblyConstants.IonQProcessor      -> sprintf "IonQEntryPointInfo<%s, %s>"      operationInput operationOutput
             | target when target = AssemblyConstants.QCIProcessor       -> sprintf "QCIEntryPointInfo<%s, %s>"       operationInput operationOutput
