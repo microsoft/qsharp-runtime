@@ -104,7 +104,6 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 if (oldQubitsArray[i] == oldNone) {
                     // Point to the first new (free) element
-                    Debug.Assert(!EncourageReuse,"Why do we extend an array, when we still have available slots?");
                     this.qubits[i] = oldNumQubits; 
                 } else if (oldQubitsArray[i] == oldAllocated) {
                     // Allocated qubits are marked differently now.
@@ -131,9 +130,6 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 free = oldNumQubits;
                 freeTail = NumQubits - 1;
-            } else
-            {
-                Debug.Assert(!EncourageReuse, "Why do we extend an array, when we still have available slots?");
             }
         }
 
