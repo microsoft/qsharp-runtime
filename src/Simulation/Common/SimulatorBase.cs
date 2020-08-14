@@ -464,7 +464,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<(double, double), double> Body => (arg) =>
+            public override Func<(double, double), double> Body => arg =>
             {
                 var (min, max) = arg;
                 var delta = max - min;
