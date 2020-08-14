@@ -86,7 +86,7 @@ namespace Microsoft
         _psis[id].reset();
       }
 
-      MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface> get(unsigned id)
+      MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface>& get(unsigned id)
       {
         std::shared_lock<std::shared_mutex> shared_lock(_mutex);
 

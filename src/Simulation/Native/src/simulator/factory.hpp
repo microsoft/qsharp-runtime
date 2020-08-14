@@ -12,7 +12,7 @@ namespace Microsoft
     {
       MICROSOFT_QUANTUM_DECL unsigned create(unsigned =0u);
       MICROSOFT_QUANTUM_DECL void destroy(unsigned);
-      MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface> get(unsigned);
+      MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface>& get(unsigned);
     }
   }
 }
