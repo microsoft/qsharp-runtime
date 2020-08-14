@@ -203,11 +203,9 @@ module SimulationCode =
         sprintf "__arg%d__" count
 
     let getOpName context name =
-        let name' =
-            if needsFullPath context name then prependNamespaceString name
-            else if isCurrentOp context name then Directives.Self
-            else name.Name.Value
-        "__" + name' + "__"
+        if needsFullPath context name then "__" + prependNamespaceString name + "__"
+        else if isCurrentOp context name then Directives.Self
+        else "__" + name.Name.Value + "__"
 
     type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) =
         inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
@@ -420,7 +418,7 @@ module SimulationCode =
             | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
             | GlobalCallable n ->
                 if isCurrentOp context n
-                then upcast ("__" + Directives.Self + "__" |> ``ident``)
+                then upcast ``ident`` Directives.Self
                 else upcast (getOpName context n |> ``ident``)
 // TODO: Diagnostics
             | InvalidIdentifier ->

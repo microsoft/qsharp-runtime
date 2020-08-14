@@ -865,6 +865,7 @@ namespace N1
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
 
         let template = sprintf "this.__%s__ = this.Factory.Get<%s>(typeof(%s));"
+
         [
         ]
         |> testOne emptyOperation
@@ -909,12 +910,12 @@ namespace N1
 
         [
             template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
-            "this.__self__ = this;"
+            "this.self = this;"
         ]
         |> testOne selfInvokingOperation
 
         [
-            template "self"                                 "ICallable"                         "genRecursion<>"
+            "this.self = this.Factory.Get<ICallable>(typeof(genRecursion<>));"
         ]
         |> testOne genRecursion
 
@@ -1002,12 +1003,12 @@ namespace N1
 
         [
             template "IUnitary<Qubit>"              "Z"
-            template "IAdjointable<Qubit>"          "self"
+            "protected IAdjointable<Qubit> self { get; set; }"
         ]
         |> testOne selfInvokingOperation
 
         [
-            template "ICallable"                    "self"
+            "protected ICallable self { get; set; }"
         ]
         |> testOne genRecursion
 
@@ -1125,7 +1126,7 @@ namespace N1
 
         [
             "__Z__.Adjoint.Apply(q1);"
-            "__self__.Apply(q1);"
+            "self.Apply(q1);"
         ]
         |> testOne (adjointVisitor selfInvokingOperation)
 
@@ -1141,7 +1142,7 @@ namespace N1
             }
             else
             {
-                return __self__.Apply<__T__>((x, (cnt - 1L)));
+                return self.Apply<__T__>((x, (cnt - 1L)));
             }
             """
         ]
@@ -1155,7 +1156,7 @@ namespace N1
             }
             else
             {
-                return (x * __self__.Apply<Int64>((x - 1L)));
+                return (x * self.Apply<Int64>((x - 1L)));
             }
             """
         ]
