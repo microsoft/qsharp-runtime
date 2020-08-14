@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Random {
     function ContinuousUniformDistribution(
         min : Double, max : Double
     ) : ContinuousDistribution {
-        Fac(max > min, $"Max must be larger than min, but {max} <= {min}.");
+        Fact(max > min, $"Max must be larger than min, but {max} <= {min}.");
         return ContinuousDistribution(Delay(DrawRandomDouble, (min, max), _));
     }
 
@@ -63,7 +63,7 @@ namespace Microsoft.Quantum.Random {
     /// # See Also
     /// - Microsoft.Quantum.DrawRandomDouble
     function DiscreteUniformDistribution(min : Int, max : Int) : DiscreteDistribution {
-        Fac(max > min, $"Max must be larger than min, but {max} <= {min}.");
+        Fact(max > min, $"Max must be larger than min, but {max} <= {min}.");
         return DiscreteDistribution(Delay(DrawRandomInt, (min, max), _));
     }
 
