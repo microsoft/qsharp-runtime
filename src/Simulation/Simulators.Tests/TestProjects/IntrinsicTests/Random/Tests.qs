@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Tests {
             let sample = samples[idx];
             let oldMeanAcc = meanAcc;
             let delta = (sample - meanAcc);
-            set meanAcc += delta / IntAsDouble(idx);
+            set meanAcc += delta / IntAsDouble(idx + 1);
             set varAcc += delta * (sample - oldMeanAcc);
         }
 
