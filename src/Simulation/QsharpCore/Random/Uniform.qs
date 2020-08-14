@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Random {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Returns a uniform distribution over a given inclusive interval.
