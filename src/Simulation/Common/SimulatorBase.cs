@@ -444,7 +444,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<(long, long), long> Body => (arg) =>
+            public override Func<(long, long), long> Body => arg =>
             {
                 var (min, max) = arg;
                 return sim.RandomGenerator.NextLong(min, max);
