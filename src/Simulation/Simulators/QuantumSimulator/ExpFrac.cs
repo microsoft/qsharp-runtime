@@ -23,28 +23,28 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 var (paulis, numerator, power, qubits) = args;
                 var angle = Angle(numerator, power);
-                return __Exp__.Apply((paulis, angle, qubits));
+                return __Call_Exp__.Apply((paulis, angle, qubits));
             };
 
             public override Func<(IQArray<Pauli>, long, long, IQArray<Qubit>), QVoid> __AdjointBody__ => (args) =>
             {
                 var (paulis, numerator, power, qubits) = args;
                 var angle = Angle(numerator, power);
-                return __Exp__.Adjoint.Apply((paulis, angle, qubits));
+                return __Call_Exp__.Adjoint.Apply((paulis, angle, qubits));
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (paulis, numerator, power, qubits)) = args;
                 var angle = Angle(numerator, power);
-                return __Exp__.Controlled.Apply((ctrls, (paulis, angle, qubits)));
+                return __Call_Exp__.Controlled.Apply((ctrls, (paulis, angle, qubits)));
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => (args) =>
             {
                 var (ctrls, (paulis, numerator, power, qubits)) = args;
                 var angle = Angle(numerator, power);
-                return __Exp__.Adjoint.Controlled.Apply((ctrls, (paulis, angle, qubits)));
+                return __Call_Exp__.Adjoint.Controlled.Apply((ctrls, (paulis, angle, qubits)));
             };
         }
     }
