@@ -24,6 +24,7 @@ namespace Microsoft
 {
 namespace Quantum
 {
+    extern int dbgReorder;      //@@@DBG+
 namespace SIMULATOR
 {
     namespace detail

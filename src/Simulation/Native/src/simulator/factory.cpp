@@ -13,19 +13,19 @@ namespace Microsoft
   {
     namespace SimulatorGeneric
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX2
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX512
     {
-        MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
   }
 }
@@ -34,6 +34,12 @@ namespace Microsoft
 {
   namespace Quantum
   {
+      //@@@DBG+
+      int dbgFusedSpan  = -1;
+      int dbgFusedLimit = 99;
+      int dbgNumThreads = 0;
+      int dbgReorder    = 0;
+
     namespace Simulator
     {
       std::shared_mutex _mutex;
@@ -41,9 +47,38 @@ namespace Microsoft
 
       SimulatorInterface* createSimulator(unsigned maxlocal)
       {
-        if (haveFMA() && haveAVX2())
+          //@@@DBG+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+          dbgFusedSpan = fusedSpan;
+          dbgFusedLimit = fusedLimit;
+          dbgNumThreads = numThreads;
+          dbgReorder = reorder;
+
+        if (force > 0) {
+            switch (force) {
+            case 1:
+                printf("@@@DBG: Generic\n");
+                return SimulatorGeneric::createSimulator(maxlocal);
+            case 2: 
+                printf("@@@DBG: AVX\n");
+                return SimulatorAVX::createSimulator(maxlocal);
+            case 3: 
+                printf("@@@DBG: AVX2\n");
+                return SimulatorAVX2::createSimulator(maxlocal);
+            case 4:
+                printf("@@@DBG: AVX512\n");
+                return SimulatorAVX512::createSimulator(maxlocal);
+            }
+          //@@@DBG+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+
+       if (haveAVX512())
         {
-          return SimulatorAVX2::createSimulator(maxlocal);
+            return SimulatorAVX512::createSimulator(maxlocal);
+        }
+        else if (haveFMA() && haveAVX2())
+        {
+           return SimulatorAVX2::createSimulator(maxlocal);
         }
         else if(haveAVX())
         {
