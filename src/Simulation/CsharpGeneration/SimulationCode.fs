@@ -1014,9 +1014,9 @@ module SimulationCode =
 
         match body with
         | Some body ->
-            let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
+            let bodyName = if bodyName = "Body" then "__Body__" else "__" + bodyName + "Body__"
             let impl =
-                ``property-arrow_get`` propertyType ("__" + bodyName + "__") [``public``; ``override``]
+                ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
                     (``=>`` body)
             Some (impl, attributes)
