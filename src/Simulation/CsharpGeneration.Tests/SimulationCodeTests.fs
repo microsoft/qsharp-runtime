@@ -2335,7 +2335,7 @@ namespace N1
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
         let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
         let assemblyConstants =
-            new System.Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ExecutionTarget, executionTarget)
+            new Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ProcessorArchitecture, executionTarget)
             |> Seq.singleton
             |> ImmutableDictionary.CreateRange
         let compilation = {Namespaces = syntaxTree; EntryPoints = ImmutableArray.Create op.FullName}
