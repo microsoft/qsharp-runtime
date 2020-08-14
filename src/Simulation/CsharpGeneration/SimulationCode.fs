@@ -559,7 +559,7 @@ module SimulationCode =
 
         and buildArrayItem a i =
             match i.ResolvedType.Resolution with
-            | Range -> ``invoke`` ((buildExpression a) <|?.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
+            | Range -> ``invoke`` ((buildExpression a) <|.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
             | _ -> ``item`` (buildExpression a) [ (buildExpression i) ]
 
         let buildBlock (block : QsScope) =
