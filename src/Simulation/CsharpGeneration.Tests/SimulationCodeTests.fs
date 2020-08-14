@@ -1243,7 +1243,7 @@ namespace N1
 
             "__Microsoft_Quantum_Intrinsic_X__.Apply(qubits.Data[0L]);"
             "__Microsoft_Quantum_Intrinsic_X__.Adjoint.Apply(qubits.Data[0L]);"
-            "__Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
+            "__Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((qubits.Data.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
             "__Microsoft_Quantum_Testing_call__target1__.Apply((1L, __Microsoft_Quantum_Intrinsic_X__,     __Microsoft_Quantum_Intrinsic_X__,   __Microsoft_Quantum_Intrinsic_X__,   __Microsoft_Quantum_Intrinsic_X__));"
             "__Microsoft_Quantum_Testing_call__target1__.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
@@ -1821,7 +1821,7 @@ namespace N1
             "var r5 = (IQArray<Result>)QArray<Result>.Create((4L + 2L));"
             "var r6 = QArray<Pauli>.Create(r5.Length);"
             "var r7 = (IQArray<Int64>)QArray<Int64>.Add(r2, r4);"
-            "var r8 = (IQArray<Int64>)r7?.Slice(new QRange(1L, 5L, 10L));"
+            "var r8 = (IQArray<Int64>)r7.Slice(new QRange(1L, 5L, 10L));"
 
             "var r9 = new Microsoft.Quantum.Testing.arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
             "var r10 = (IQArray<Microsoft.Quantum.Testing.arrays_T1>)QArray<Microsoft.Quantum.Testing.arrays_T1>.Create(4L);"
@@ -1829,8 +1829,8 @@ namespace N1
             "var r12 = (IQArray<Microsoft.Quantum.Testing.arrays_T2>)QArray<Microsoft.Quantum.Testing.arrays_T2>.Create(r10.Length);"
             "var r13 = new Microsoft.Quantum.Testing.arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
             "var r14 = (IQArray<Qubit>)QArray<Qubit>.Add(qubits, register.Data);"
-            "var r15 = (IQArray<Qubit>)register.Data?.Slice(new QRange(0L, 2L));"
-            "var r16 = (IQArray<Qubit>)qubits?.Slice(new QRange(1L, -(1L)));"
+            "var r15 = (IQArray<Qubit>)register.Data.Slice(new QRange(0L, 2L));"
+            "var r16 = (IQArray<Qubit>)qubits.Slice(new QRange(1L, -(1L)));"
             "var r18 = (IQArray<Microsoft.Quantum.Intrinsic.Qubits>)QArray<Microsoft.Quantum.Intrinsic.Qubits>.Create(2L);"
             "var r19 = (IQArray<Microsoft.Quantum.Overrides.udt0>)QArray<Microsoft.Quantum.Overrides.udt0>.Create(7L);"
             "var i0 = r13.Data[0L][1L];"
@@ -1861,12 +1861,12 @@ namespace N1
             "var r2 = new QRange(10L,-(2L),0L);"
             "var ranges = (IQArray<QRange>)QArray<QRange>.Create(1L);"
 
-            "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
-            "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
-            "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
-            "var s4 = (IQArray<Qubit>)qubits?.Slice(__Microsoft_Quantum_Testing_GetMeARange__.Apply(QVoid.Instance));"
+            "var s1 = (IQArray<Qubit>)qubits.Slice(new QRange(0L,10L));"
+            "var s2 = (IQArray<Qubit>)qubits.Slice(r2);"
+            "var s3 = (IQArray<Qubit>)qubits.Slice(ranges[3L]);"
+            "var s4 = (IQArray<Qubit>)qubits.Slice(__Microsoft_Quantum_Testing_GetMeARange__.Apply(QVoid.Instance));"
 
-            "return qubits?.Slice(new QRange(10L,-(3L),0L));"
+            "return qubits.Slice(new QRange(10L,-(3L),0L));"
         ]
         |> testOneBody (applyVisitor sliceOperations)
 
@@ -3530,7 +3530,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     else
                     {
 #line 20 "%%"
-                        foreach (var c in ctrls?.Slice(new QRange(0L, 2L, r)))
+                        foreach (var c in ctrls.Slice(new QRange(0L, 2L, r)))
 #line hidden
                         {
 #line 21 "%%"
