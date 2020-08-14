@@ -112,9 +112,10 @@ void test_gates()
     assert(M(sim_id, 1)==false);
 
     X(sim_id, 0);
+     CRx(sim_id, 1.0, 0, 1);
+
     H(sim_id, 1);
-    CRx(sim_id, 1.0, 0, 1);
-    CRx(sim_id, -1.0, 0, 1);
+    CRz(sim_id, -1.0, 0, 1);
     H(sim_id, 1);
 
     assert(M(sim_id, 1)==false);
