@@ -3,6 +3,7 @@ namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Random;
     open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Convert;
 
     // Uses Welford's method to compute the mean and variance of an array
     // of samples.
@@ -93,7 +94,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.standardnormaldistribution" has the
     /// expected moments.
     @Test("QuantumSimulator")
-    operation CheckContinuousUniformDistributionHasRightMoments() : Unit {
+    operation CheckStandardNormalDistributionHasRightMoments() : Unit {
         CheckMeanAndVariance(
             "standard normal",
             StandardNormalDistribution(),
