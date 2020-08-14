@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -60,6 +62,18 @@ namespace Microsoft.Quantum.Simulation.Core
             var tupleType = Operation<P, U>.FindPartialType(typeof(P), partialTuple);
             var partialType = typeof(UDTPartial<,,>).MakeGenericType(tupleType, typeof(B), typeof(U));
             return (ICallable)Activator.CreateInstance(partialType, new object[] { this, partialTuple });
+        }
+
+        /// <inheritdoc/>
+        public RuntimeMetadata? GetRuntimeMetadata(IApplyData args)
+        {
+            Debug.Assert(args.Value is P, $"Failed to retrieve runtime metadata for {typeof(U).Name}.");
+            var baseArgs = this.Apply((P) args.Value);
+            return new RuntimeMetadata()
+            {
+                Label = typeof(U).Name,
+                FormattedNonQubitArgs = baseArgs?.GetNonQubitArgumentsAsString() ?? "",
+            };
         }
 
         internal class DebuggerProxy

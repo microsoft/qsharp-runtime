@@ -5,6 +5,7 @@
 #include "config.hpp"
 #include "util/cpuid.hpp"
 #include <iostream>
+#include <shared_mutex>
 
 namespace Microsoft
 {
@@ -35,7 +36,8 @@ namespace Microsoft
   {
     namespace Simulator
     {
-      mutex_type _mutex;
+      std::shared_mutex _mutex;
+      std::vector<std::shared_ptr<SimulatorInterface>> _psis;
 
       SimulatorInterface* createSimulator(unsigned maxlocal)
       {
@@ -56,26 +58,26 @@ namespace Microsoft
 
       MICROSOFT_QUANTUM_DECL unsigned create(unsigned maxlocal)
       {
-        std::lock_guard<mutex_type> lock(_mutex);
+        std::lock_guard<std::shared_mutex> lock(_mutex);
 
         size_t emptySlot = -1;
-        for (auto const& s : psis) 
+        for (auto const& s : _psis) 
         {
             if (s == NULL) 
             {
-                emptySlot = &s - &psis[0];
+                emptySlot = &s - &_psis[0];
                 break;
             }
         }
 
         if (emptySlot == -1) 
         {
-            psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal)));
-            emptySlot = psis.size() - 1;
+            _psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal)));
+            emptySlot = _psis.size() - 1;
         }
         else 
         {
-            psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal));
+            _psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal));
         }
 
         return static_cast<unsigned>(emptySlot);
@@ -83,12 +85,17 @@ namespace Microsoft
 
       MICROSOFT_QUANTUM_DECL void destroy(unsigned id)
       {
-        std::lock_guard<mutex_type> lock(_mutex);
+        std::lock_guard<std::shared_mutex> lock(_mutex);
 
-        psis[id].reset();
+        _psis[id].reset();
       }
 
-      MICROSOFT_QUANTUM_DECL std::vector<std::shared_ptr<SimulatorInterface>> psis;
+      MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface>& get(unsigned id)
+      {
+        std::shared_lock<std::shared_mutex> shared_lock(_mutex);
+
+        return _psis[id];
+      }
 
     }
   }

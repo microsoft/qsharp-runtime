@@ -196,7 +196,10 @@ namespace Microsoft.Quantum.Simulation.Common
         ///     no guarantee is made as to any particular action taken as a result
         ///     of calling this method.
         /// </summary>
-        protected void MaybeDisplayDiagnostic(object data)
+        /// <param name="data">
+        ///     The diagnostic object to be displayed.
+        /// </param>
+        public void MaybeDisplayDiagnostic(object data)
         {
             OnDisplayableDiagnostic?.Invoke(data);
         }

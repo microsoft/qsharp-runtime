@@ -93,9 +93,7 @@ module SimulationCode =
     let isGeneric context (n: QsQualifiedName) =
         if context.allCallables.ContainsKey n then
             let signature = context.allCallables.[n].Signature
-            let tIn = signature.ArgumentType
-            let tOut = signature.ReturnType
-            hasTypeParameters [tIn;tOut]
+            not signature.TypeParameters.IsEmpty
         else
             false
 
@@ -861,9 +859,7 @@ module SimulationCode =
             let opName = if sameNamespace then n.Name.Value else n.Namespace.Value + "." + n.Name.Value
             if isGeneric context n then
                 let signature = context.allCallables.[n].Signature
-                let tIn = signature.ArgumentType
-                let tOut = signature.ReturnType
-                let count = (getTypeParameters [tIn;tOut]).Length
+                let count = signature.TypeParameters.Length
                 sprintf "%s<%s>" opName (String.replicate (count - 1) ",")
             else
                 opName
@@ -931,7 +927,7 @@ module SimulationCode =
     /// Returns a static property of type OperationInfo using the operation's input and output types.
     let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
         let propertyType =
-            match globalContext.ExecutionTarget with
+            match globalContext.ProcessorArchitecture with
             | target when target = AssemblyConstants.HoneywellProcessor -> sprintf "HoneywellEntryPointInfo<%s, %s>" operationInput operationOutput
             | target when target = AssemblyConstants.IonQProcessor      -> sprintf "IonQEntryPointInfo<%s, %s>"      operationInput operationOutput
             | target when target = AssemblyConstants.QCIProcessor       -> sprintf "QCIEntryPointInfo<%s, %s>"       operationInput operationOutput
