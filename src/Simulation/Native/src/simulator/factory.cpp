@@ -45,7 +45,10 @@ namespace Microsoft
       std::shared_mutex _mutex;
       std::vector<std::shared_ptr<SimulatorInterface>> _psis;
 
-      SimulatorInterface* createSimulator(unsigned maxlocal)
+      //@@@DBG- SimulatorInterface* createSimulator(unsigned maxlocal)
+      //@@@DBG+
+            SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=-1, int fusedLimit=99, int numThreads=0,int reorder=0)
+
       {
           //@@@DBG+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
           dbgFusedSpan = fusedSpan;
