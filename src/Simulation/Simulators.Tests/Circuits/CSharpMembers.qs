@@ -24,5 +24,15 @@
         Init();
         __dataIn();
         __dataOut();
+        FooBar.Baz();
+        Foo.Bar.Baz();
     }
+}
+
+namespace FooBar {
+    function Baz() : Unit { }
+}
+
+namespace Foo.Bar {
+    function Baz() : Unit { }
 }
