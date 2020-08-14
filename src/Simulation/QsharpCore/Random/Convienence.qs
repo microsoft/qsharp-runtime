@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # See Also
     /// - Microsoft.Quantum.Random.CategoricalDistribution
-    operation DrawCategorial(probs : Double[]) : Int {
+    operation DrawCategorical(probs : Double[]) : Int {
         // There are nicer ways of doing this, but they require the full
         // standard library to be available.
         mutable sum = 0.0;
