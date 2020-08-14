@@ -262,7 +262,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "Ry",
-                FormattedNonQubitArgs = "(2.1)",
+                FormattedNonQubitArgs = "(" + 2.1 + ")",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -513,7 +513,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDTOp",
-                FormattedNonQubitArgs = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -760,7 +760,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "Ry",
-                FormattedNonQubitArgs = "(2.1)",
+                FormattedNonQubitArgs = "(" + 2.1 + ")",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
@@ -783,7 +783,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var expected = new RuntimeMetadata()
             {
                 Label = "FooUDT",
-                FormattedNonQubitArgs = "(\"bar\", (2.1))",
+                FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
                 IsAdjoint = false,
                 IsControlled = false,
                 IsMeasurement = false,
