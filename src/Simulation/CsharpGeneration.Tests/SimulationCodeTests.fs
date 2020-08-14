@@ -864,7 +864,7 @@ namespace N1
             let expected = sprintf "public override void __Init__() { %s }" (String.concat "" body)
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
 
-        let template = sprintf "this.__%s__ = this.Factory.Get<%s>(typeof(%s));"
+        let template = sprintf "this.__Call_%s__ = this.Factory.Get<%s>(typeof(%s));"
 
         [
         ]
@@ -979,7 +979,7 @@ namespace N1
                 |> List.map formatSyntaxTree
             List.zip (expected |> List.map clearFormatting) (actual  |> List.map clearFormatting) |> List.iter Assert.Equal
 
-        let template = sprintf @"protected %s __%s__ { get; set; }"
+        let template = sprintf @"protected %s __Call_%s__ { get; set; }"
 
         [
             template "Allocate"                     "Allocate"
@@ -1095,37 +1095,37 @@ namespace N1
         |> testOne (applyVisitor zeroQubitOperation)
 
         [
-            "__X__.Apply(q1);"
+            "__Call_X__.Apply(q1);"
         ]
         |> testOne (applyVisitor oneQubitOperation)
 
         [
-            "__X__.Adjoint.Apply(q1);"
+            "__Call_X__.Adjoint.Apply(q1);"
         ]
         |> testOne (adjointVisitor oneQubitOperation)
 
         [
             "var (q2, r) = t1;        "
-            "__CNOT__.Apply((q1,q2));       "
-            "__R__.Apply((r,q1));           "
+            "__Call_CNOT__.Apply((q1,q2));       "
+            "__Call_R__.Apply((r,q1));           "
         ]
         |> testOne (applyVisitor twoQubitOperation)
         [
             "var (q2, r) = t1;        "
-            "__R__.Adjoint.Apply((r,q1));"
-            "__CNOT__.Adjoint.Apply((q1,q2));"
+            "__Call_R__.Adjoint.Apply((r,q1));"
+            "__Call_CNOT__.Adjoint.Apply((q1,q2));"
         ]
         |> testOne (adjointVisitor twoQubitOperation)
 
         [
-            "__three_op1__.Apply((q1,q2));"
-            "__three_op1__.Apply((q2,q1));"
-            "__three_op1__.Apply((q1,q2));"
+            "__Call_three_op1__.Apply((q1,q2));"
+            "__Call_three_op1__.Apply((q2,q1));"
+            "__Call_three_op1__.Apply((q1,q2));"
         ]
         |> testOne (applyVisitor threeQubitOperation)
 
         [
-            "__Z__.Adjoint.Apply(q1);"
+            "__Call_Z__.Adjoint.Apply(q1);"
             "self.Apply(q1);"
         ]
         |> testOne (adjointVisitor selfInvokingOperation)
@@ -1167,7 +1167,7 @@ namespace N1
         let testOne = testOneBody
 
         [
-            "__X__.Apply(q1);"
+            "__Call_X__.Apply(q1);"
         ]
         |> testOne (applyVisitor oneQubitOperation)
 
@@ -1181,7 +1181,7 @@ namespace N1
         |> testOne (applyVisitor composeImpl)
 
         [
-            "return __composeImpl__.Partial((second, first, _));"
+            "return __Call_composeImpl__.Partial((second, first, _));"
         ]
         |> testOne (applyVisitor compose)
 
@@ -1190,22 +1190,22 @@ namespace N1
     let ``usesGenerics body`` () =
         [
             "var a = (IQArray<Result>)new QArray<Result>(Result.One, Result.Zero, Result.Zero);"
-            "var s = (IQArray<String>)new QArray<String>(__ResultToString__.Apply(a[0L]), __ResultToString__.Apply(a[1L]));"
-            "__MicrosoftQuantumTestingnoOpResult__.Apply(a[0L]);"
+            "var s = (IQArray<String>)new QArray<String>(__Call_ResultToString__.Apply(a[0L]), __Call_ResultToString__.Apply(a[1L]));"
+            "__Call_MicrosoftQuantumTestingnoOpResult__.Apply(a[0L]);"
 
             """
             {
-                var qubits = __Allocate__.Apply(3L);
+                var qubits = __Call_Allocate__.Apply(3L);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    var op = __MicrosoftQuantumTestingHold__.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (__CNOT__, (qubits[0L], qubits[1L]), __arg2__)));
+                    var op = __Call_MicrosoftQuantumTestingHold__.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (__Call_CNOT__, (qubits[0L], qubits[1L]), __arg2__)));
                     op.Apply(QVoid.Instance);
 
-                    __MicrosoftQuantumTestingnoOpGeneric__.Apply(qubits[0L]);
-                    __MicrosoftQuantumTestingnoOpGeneric__.Apply(a[0L]);
-                    __genIter__.Apply((__X__, qubits));
+                    __Call_MicrosoftQuantumTestingnoOpGeneric__.Apply(qubits[0L]);
+                    __Call_MicrosoftQuantumTestingnoOpGeneric__.Apply(a[0L]);
+                    __Call_genIter__.Apply((__Call_X__, qubits));
                 }
 #line hidden
                 catch
@@ -1218,17 +1218,17 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Release__.Apply(qubits);
+                        __Call_Release__.Apply(qubits);
                     }
                 }
             }
             """
-            "__genIter__.Apply((__MicrosoftQuantumTestingnoOpResult__, a));"
+            "__Call_genIter__.Apply((__Call_MicrosoftQuantumTestingnoOpResult__, a));"
             """
-            __genIter__.Apply((__genU1__, __genMapper__.Apply<IQArray<String>>((__ResultToString__, a))));
+            __Call_genIter__.Apply((__Call_genU1__, __Call_genMapper__.Apply<IQArray<String>>((__Call_ResultToString__, a))));
             """
-            "__genIter__.Apply((__genU1__, s));"
-            "__genIter__.Apply((__genU1__, a));"
+            "__Call_genIter__.Apply((__Call_genU1__, s));"
+            "__Call_genIter__.Apply((__Call_genU1__, a));"
         ]
         |> testOneBody (applyVisitor usesGenerics)
 
@@ -1236,20 +1236,20 @@ namespace N1
     [<Fact>]
     let ``callTests body`` () =
         [
-            "var plain = new call_plain(__X__);"
-            "var adj   = new call_adj(__X__);"
-            "var ctr   = new call_ctr(__X__);"
-            "var uni   = new call_uni(__X__);"
+            "var plain = new call_plain(__Call_X__);"
+            "var adj   = new call_adj(__Call_X__);"
+            "var ctr   = new call_ctr(__Call_X__);"
+            "var uni   = new call_uni(__Call_X__);"
 
-            "__X__.Apply(qubits.Data[0L]);"
-            "__X__.Adjoint.Apply(qubits.Data[0L]);"
-            "__X__.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
+            "__Call_X__.Apply(qubits.Data[0L]);"
+            "__Call_X__.Adjoint.Apply(qubits.Data[0L]);"
+            "__Call_X__.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
-            "__call_target1__.Apply((1L, __X__,     __X__,   __X__,   __X__));"
-            "__call_target1__.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
+            "__Call_call_target1__.Apply((1L, __Call_X__,     __Call_X__,   __Call_X__,   __Call_X__));"
+            "__Call_call_target1__.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
 
-            "__call_target2__.Apply((1L, (Result.Zero, __X__),    (Result.Zero, __X__),  (Result.Zero, __X__),  (Result.Zero, __X__)));"
-            "__call_target2__.Apply((2L, (Result.One, plain.Data), (Result.One, adj.Data), (Result.One, ctr.Data), (Result.One, uni.Data)));"
+            "__Call_call_target2__.Apply((1L, (Result.Zero, __Call_X__),    (Result.Zero, __Call_X__),  (Result.Zero, __Call_X__),  (Result.Zero, __Call_X__)));"
+            "__Call_call_target2__.Apply((2L, (Result.One, plain.Data), (Result.One, adj.Data), (Result.One, ctr.Data), (Result.One, uni.Data)));"
         ]
         |> testOneBody (applyVisitor callTests)
 
@@ -1259,7 +1259,7 @@ namespace N1
         [
             "var q2 = q1;"
 
-            "var r = __M__.Apply(q1);"
+            "var r = __Call_M__.Apply(q1);"
 
             "var i = 1.1D;"
             "var iZero = 0L;"
@@ -1292,7 +1292,7 @@ namespace N1
             "var __arg1__ = t;"
             "var __arg2__ = t;"
 
-            "return __let_f0__.Apply(n);"
+            "return __Call_let_f0__.Apply(n);"
         ]
         |> testOneBody (applyVisitor letsOperations)
 
@@ -1335,7 +1335,7 @@ namespace N1
             """
             if ((r == Result.One))
             {
-                n = (__if_f0__.Apply(QVoid.Instance) * i);
+                n = (__Call_if_f0__.Apply(QVoid.Instance) * i);
             }
             """
             """
@@ -1359,7 +1359,7 @@ namespace N1
             }
             else
             {
-                return ((p==Pauli.PauliI)?3L:__if_f0__.Apply(QVoid.Instance));
+                return ((p==Pauli.PauliI)?3L:__Call_if_f0__.Apply(QVoid.Instance));
             }
             """
         ]
@@ -1383,7 +1383,7 @@ namespace N1
             @"foreach (var n in range)
             #line hidden
             {
-                result = ((range.End + result) + (n * -(__foreach_f2__.Apply((n, 4L)))));
+                result = ((range.End + result) + (n * -(__Call_foreach_f2__.Apply((n, 4L)))));
             }"
             """
             if ((result > 10L))
@@ -1421,7 +1421,7 @@ namespace N1
     [<Fact>]
     let ``test Length dependency`` () =
         [
-            "__iter__.Apply((__Length__, new QArray<IQArray<Result>>(new QArray<Result>(Result.One), new QArray<Result>(Result.Zero, Result.One))));"
+            "__Call_iter__.Apply((__Call_Length__, new QArray<IQArray<Result>>(new QArray<Result>(Result.One), new QArray<Result>(Result.Zero, Result.One))));"
         ]
         |> testOneBody (applyVisitor testLengthDependency)
 
@@ -1482,22 +1482,22 @@ namespace N1
         [
             """
             {
-                var qubits = __Allocate__.Apply(i);
+                var qubits = __Call_Allocate__.Apply(i);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
                     while (true)
                     {
-                        var res =  __repeat_op0__.Apply(new repeat_udt0((0L, qubits)));
+                        var res =  __Call_repeat_op0__.Apply(new repeat_udt0((0L, qubits)));
 
-                        if ((__repeat_op1__.Apply((0L, qubits)) == Result.One))
+                        if ((__Call_repeat_op1__.Apply((0L, qubits)) == Result.One))
                         {
                             break;
                         }
                         else
                         {
-                            res = __repeat_op2__.Apply((3D, new repeat_udt0(((i-1L), qubits))));
+                            res = __Call_repeat_op2__.Apply((3D, new repeat_udt0(((i-1L), qubits))));
                         }
                     }
                 }
@@ -1512,7 +1512,7 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Release__.Apply(qubits);
+                        __Call_Release__.Apply(qubits);
                     }
                 }
             }
@@ -1525,14 +1525,14 @@ namespace N1
         [
             """
             {
-                var q = __Allocate__.Apply();
+                var q = __Call_Allocate__.Apply();
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
                     var flag = true;
-                    (flag ? __X__ : __Z__).Apply(q);
-                    __alloc_op0__.Apply(q);
+                    (flag ? __Call_X__ : __Call_Z__).Apply(q);
+                    __Call_alloc_op0__.Apply(q);
                 }
 #line hidden
                 catch
@@ -1545,18 +1545,18 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Release__.Apply(q);
+                        __Call_Release__.Apply(q);
                     }
                 }
             }"""
             """
             {
-                var qs = __Allocate__.Apply(n);
+                var qs = __Call_Allocate__.Apply(n);
 #line hidden
                 bool __arg2__ = true;
                 try
                 {
-                    __alloc_op0__.Apply(qs[(n-1L)]);
+                    __Call_alloc_op0__.Apply(qs[(n-1L)]);
                 }
 #line hidden
                 catch
@@ -1569,19 +1569,19 @@ namespace N1
                 {
                     if (__arg2__)
                     {
-                        __Release__.Apply(qs);
+                        __Call_Release__.Apply(qs);
                     }
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg3__, q3, __arg4__, q4))) = (__Allocate__.Apply(), ((__Allocate__.Apply(), __Allocate__.Apply(2L)), (__Allocate__.Apply(), __Allocate__.Apply(n), __Allocate__.Apply((n-1L)), __Allocate__.Apply(4L))));
+                var (q1, (q2, (__arg3__, q3, __arg4__, q4))) = (__Call_Allocate__.Apply(), ((__Call_Allocate__.Apply(), __Call_Allocate__.Apply(2L)), (__Call_Allocate__.Apply(), __Call_Allocate__.Apply(n), __Call_Allocate__.Apply((n-1L)), __Call_Allocate__.Apply(4L))));
 #line hidden
                 bool __arg5__ = true;
                 try
                 {
-                    __alloc_op0__.Apply(q1);
-                    __alloc_op0__.Apply(q3[1L]);
+                    __Call_alloc_op0__.Apply(q1);
+                    __Call_alloc_op0__.Apply(q3[1L]);
                 }
 #line hidden
                 catch
@@ -1594,13 +1594,13 @@ namespace N1
                 {
                     if (__arg5__)
                     {
-                        __Release__.Apply(q1);
-                        __Release__.Apply(q2.Item1);
-                        __Release__.Apply(q2.Item2);
-                        __Release__.Apply(__arg3__);
-                        __Release__.Apply(q3);
-                        __Release__.Apply(__arg4__);
-                        __Release__.Apply(q4);
+                        __Call_Release__.Apply(q1);
+                        __Call_Release__.Apply(q2.Item1);
+                        __Call_Release__.Apply(q2.Item2);
+                        __Call_Release__.Apply(__arg3__);
+                        __Call_Release__.Apply(q3);
+                        __Call_Release__.Apply(__arg4__);
+                        __Call_Release__.Apply(q4);
                     }
                 }
             }"""
@@ -1610,12 +1610,12 @@ namespace N1
         [
             """
             {
-                var b = __Borrow__.Apply(n);
+                var b = __Call_Borrow__.Apply(n);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    __alloc_op0__.Apply(b[(n-1L)]);
+                    __Call_alloc_op0__.Apply(b[(n-1L)]);
                 }
 #line hidden
                 catch
@@ -1628,25 +1628,25 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Return__.Apply(b);
+                        __Call_Return__.Apply(b);
                     }
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg2__, q3))) = (__Borrow__.Apply(), (__Borrow__.Apply(2L), (__Borrow__.Apply(), (__Borrow__.Apply(n), __Borrow__.Apply(4L)))));
+                var (q1, (q2, (__arg2__, q3))) = (__Call_Borrow__.Apply(), (__Call_Borrow__.Apply(2L), (__Call_Borrow__.Apply(), (__Call_Borrow__.Apply(n), __Call_Borrow__.Apply(4L)))));
 #line hidden
                 bool __arg3__ = true;
                 try
                 {
                     {
-                        var qt = (__Allocate__.Apply(), (__Allocate__.Apply(1L), __Allocate__.Apply(2L)));
+                        var qt = (__Call_Allocate__.Apply(), (__Call_Allocate__.Apply(1L), __Call_Allocate__.Apply(2L)));
 #line hidden
                         bool __arg4__ = true;
                         try
                         {
                             var (qt1, qt2) = ((Qubit, (IQArray<Qubit>, IQArray<Qubit>)))qt;
-                            __alloc_op0__.Apply(qt1);
+                            __Call_alloc_op0__.Apply(qt1);
                         }
 #line hidden
                         catch
@@ -1659,15 +1659,15 @@ namespace N1
                         {
                             if (__arg4__)
                             {
-                                __Release__.Apply(qt.Item1);
-                                __Release__.Apply(qt.Item2.Item1);
-                                __Release__.Apply(qt.Item2.Item2);
+                                __Call_Release__.Apply(qt.Item1);
+                                __Call_Release__.Apply(qt.Item2.Item1);
+                                __Call_Release__.Apply(qt.Item2.Item2);
                             }
                         }
                     }
 
-                    __alloc_op0__.Apply(q1);
-                    __alloc_op0__.Apply(q2[1L]);
+                    __Call_alloc_op0__.Apply(q1);
+                    __Call_alloc_op0__.Apply(q2[1L]);
                 }
 #line hidden
                 catch
@@ -1680,11 +1680,11 @@ namespace N1
                 {
                     if (__arg3__)
                     {
-                        __Return__.Apply(q1);
-                        __Return__.Apply(q2);
-                        __Return__.Apply(__arg2__);
-                        __Return__.Apply(q3.Item1);
-                        __Return__.Apply(q3.Item2);
+                        __Call_Return__.Apply(q1);
+                        __Call_Return__.Apply(q2);
+                        __Call_Return__.Apply(__arg2__);
+                        __Call_Return__.Apply(q3.Item1);
+                        __Call_Return__.Apply(q3.Item2);
                     }
                 }
             }"""
@@ -1745,7 +1745,7 @@ namespace N1
         {
             var q1 = __in__;
 
-            __X__.Apply(q1);
+            __Call_X__.Apply(q1);
             #line hidden
             return  QVoid.Instance;
         };
@@ -1759,8 +1759,8 @@ namespace N1
 
             var (q2,r) = t1;
 
-            __CNOT__.Apply((q1, q2));
-            __R__.Apply((r, q1));
+            __Call_CNOT__.Apply((q1, q2));
+            __Call_R__.Apply((r, q1));
 
             #line hidden
             return  QVoid.Instance;
@@ -1774,10 +1774,10 @@ namespace N1
         {
             var (q1,q2,arr1) = __in__;
 
-            __da_op0__.Apply(QVoid.Instance);
-            __da_op1__.Adjoint.Apply(q1);
-            __da_op2__.Controlled.Apply((new QArray<Qubit>(q1), (1L, q2)));
-            __da_op3__.Controlled.Adjoint.Apply((new QArray<Qubit>(q1, q2), (1.1D, Result.One, arr1.Length)));
+            __Call_da_op0__.Apply(QVoid.Instance);
+            __Call_da_op1__.Adjoint.Apply(q1);
+            __Call_da_op2__.Controlled.Apply((new QArray<Qubit>(q1), (1L, q2)));
+            __Call_da_op3__.Controlled.Adjoint.Apply((new QArray<Qubit>(q1, q2), (1.1D, Result.One, arr1.Length)));
 
             #line hidden
             return QVoid.Instance;
@@ -1800,7 +1800,7 @@ namespace N1
         public override Func<(Qubit, %s, %s, %s, (%s, %s), %s), %s> __Body__  => (__in__) =>
                 {
                     var (q1, op0, op1, op2, t1, f1) = __in__;
-                    op1.Apply(__OP_1__);
+                    op1.Apply(__Call_OP_1__);
                     var v0 = op0;
                     var r0 = v0.Apply<Result>(q1);
                     var (op3, op4) = t1;
@@ -1864,7 +1864,7 @@ namespace N1
             "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
             "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
             "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
-            "var s4 = (IQArray<Qubit>)qubits?.Slice(__GetMeARange__.Apply(QVoid.Instance));"
+            "var s4 = (IQArray<Qubit>)qubits?.Slice(__Call_GetMeARange__.Apply(QVoid.Instance));"
 
             "return qubits?.Slice(new QRange(10L,-(3L),0L));"
         ]
@@ -1947,7 +1947,7 @@ namespace N1
         public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
-            __X__.Adjoint.Apply(q1);
+            __Call_X__.Adjoint.Apply(q1);
 
             #line hidden
             return QVoid.Instance;
@@ -1961,8 +1961,8 @@ namespace N1
 
             var (q2,r) = t1;
 
-            __R__.Adjoint.Apply((r, q1));
-            __CNOT__.Adjoint.Apply((q1, q2));
+            __Call_R__.Adjoint.Apply((r, q1));
+            __Call_CNOT__.Adjoint.Apply((q1, q2));
 
             #line hidden
             return QVoid.Instance;
@@ -1973,9 +1973,9 @@ namespace N1
         public override Func<(Qubit,Qubit,Qubits), QVoid> __AdjointBody__ => (__in__) =>
         {
             var (q1,q2,arr1) = __in__;
-            __three_op1__.Adjoint.Apply((q1, q2));
-            __three_op1__.Adjoint.Apply((q2, q1));
-            __three_op1__.Adjoint.Apply((q1, q2));
+            __Call_three_op1__.Adjoint.Apply((q1, q2));
+            __Call_three_op1__.Adjoint.Apply((q2, q1));
+            __Call_three_op1__.Adjoint.Apply((q1, q2));
             #line hidden
             return QVoid.Instance;
         };"""
@@ -2013,7 +2013,7 @@ namespace N1
         {
             var (c, q1) = __in__;
 
-            __X__.Controlled.Apply((c, q1));
+            __Call_X__.Controlled.Apply((c, q1));
 
             #line hidden
             return QVoid.Instance;
@@ -2025,9 +2025,9 @@ namespace N1
         {
             var (c, (q1, q2, arr1)) = __in__;
 
-            __three_op1__.Controlled.Apply((c, (q1, q2)));
-            __three_op1__.Controlled.Apply((c, (q2, q1)));
-            __three_op1__.Controlled.Apply((c, (q1, q2)));
+            __Call_three_op1__.Controlled.Apply((c, (q1, q2)));
+            __Call_three_op1__.Controlled.Apply((c, (q2, q1)));
+            __Call_three_op1__.Controlled.Apply((c, (q1, q2)));
 
             #line hidden
             return QVoid.Instance;
@@ -2061,7 +2061,7 @@ namespace N1
         public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __X__.Controlled.Adjoint.Apply((c, q1));
+            __Call_X__.Controlled.Adjoint.Apply((c, q1));
             #line hidden
             return QVoid.Instance;
         };"""
@@ -2073,9 +2073,9 @@ namespace N1
         {
             var (c,(q1,q2,arr1)) = __in__;
 
-            __three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
-            __three_op1__.Controlled.Adjoint.Apply((c, (q2, q1)));
-            __three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
+            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
+            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q2, q1)));
+            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
 
             #line hidden
             return QVoid.Instance;
@@ -2086,40 +2086,40 @@ namespace N1
     let ``partial application`` () =
         [
             //todo: "partial1Args.Partial<Int64>(_).Apply(1L);"
-            "__partial3Args__
+            "__Call_partial3Args__
                 .Partial(new Func<(Int64,Double,Result), (Int64,Double,Result)>((__arg1__) => (__arg1__.Item1, __arg1__.Item2, __arg1__.Item3)))
                 .Apply((1L, 3.5D, Result.One));"
-            "__partial3Args__
+            "__Call_partial3Args__
                 .Partial(new Func<Double, (Int64,Double,Result)>((__arg2__) => (1L, __arg2__, Result.Zero)))
                 .Apply(3.5D);"
-            "__partial3Args__
+            "__Call_partial3Args__
                 .Partial(new Func<(Int64,Result), (Int64,Double,Result)>((__arg3__) => (__arg3__.Item1, 3.5D, __arg3__.Item2)))
                 .Apply((1L, Result.Zero));"
-            "__partial3Args__
+            "__Call_partial3Args__
                 .Partial(new Func<Result, (Int64,Double,Result)>((__arg4__) => (1L, 3.5D, __arg4__)))
                 .Apply(Result.Zero);"
-            "__partial3Args__
+            "__Call_partial3Args__
                 .Partial(new Func<(Double,Result), (Int64,Double,Result)>((__arg5__) => (1L, __arg5__.Item1, __arg5__.Item2)))
                 .Apply((3.5D, Result.Zero));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<(Int64,(Double,Result)), (Int64,(Double,Result))>((__arg6__) => (__arg6__.Item1, (__arg6__.Item2.Item1, __arg6__.Item2.Item2))))
                 .Apply((1L, (3.5D, Result.One)));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<(Int64,(Double,Result)), (Int64,(Double,Result))>((__arg7__) => (__arg7__.Item1, (__arg7__.Item2.Item1, __arg7__.Item2.Item2))))
                 .Apply((1L, (3.5D, Result.Zero)));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<(Double,Result), (Int64,(Double,Result))>((__arg8__) => (1L, (__arg8__.Item1, __arg8__.Item2))))
                 .Apply((3.5D, Result.Zero));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<(Int64,Result), (Int64,(Double,Result))>((__arg9__) => (__arg9__.Item1, (3.5D, __arg9__.Item2))))
                 .Apply((1L, Result.Zero));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<(Int64,Double), (Int64,(Double,Result))>((__arg10__) => (__arg10__.Item1, (__arg10__.Item2, Result.One))))
                 .Apply((1L, 3.5D));"
-            "__partialInnerTuple__
+            "__Call_partialInnerTuple__
                 .Partial(new Func<Result, (Int64,(Double,Result))>((__arg11__) => (1L, (3.5D, __arg11__))))
                 .Apply(Result.One);"
-            "__partialNestedArgsOp__
+            "__Call_partialNestedArgsOp__
                 .Partial(new Func<((Int64,Int64,Int64),((Double,Double),(Result,Result,Result))), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg12__) =>
                     (
                         (__arg12__.Item1.Item1, __arg12__.Item1.Item2, __arg12__.Item1.Item3),
@@ -2139,7 +2139,7 @@ namespace N1
                     )
                 ))
                 .Apply((1L, ((3.3D, 2D), Result.Zero)));"
-            "__partialNestedArgsOp__
+            "__Call_partialNestedArgsOp__
                 .Partial(new Func<(Int64,((Double,Double),Result)), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg14__) =>
                     (
                         (1L, i, __arg14__.Item1),
@@ -2159,7 +2159,7 @@ namespace N1
                     )
                 ))
                 .Apply((3.3D, Result.Zero));"
-            "__partialNestedArgsOp__
+            "__Call_partialNestedArgsOp__
                 .Partial(new Func<(Int64,(Double,Result)), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg16__) =>
                     (
                         (i, __arg16__.Item1, 1L),
@@ -2175,20 +2175,20 @@ namespace N1
                     )
                 ))
                 .Apply(3.3D);"
-            "__partialGeneric1__
+            "__Call_partialGeneric1__
                 .Partial(new Func<Int64, (Int64, Result, (Int64, Result))>((__arg18__) =>
                     (0L, Result.Zero, (__arg18__, Result.One))
                 ))
                 .Apply(1L);"
-            "__partialGeneric1__
+            "__Call_partialGeneric1__
                 .Partial(new Func<(Int64, Result), (Int64, Result, (Int64, Result))>((__arg19__) =>
                     (__arg19__.Item1, __arg19__.Item2, (1L, Result.One))
                 ))
                 .Apply((0L, Result.Zero));"
-            "__partialGeneric1__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
-            "__partialGeneric2__.Partial((0L, Result.Zero, (_, Result.One))).Apply(1L);"
-            "__partialGeneric2__.Partial((_, _, (1L, Result.One))).Apply((0L, Result.Zero));"
-            "__partialGeneric2__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
+            "__Call_partialGeneric1__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
+            "__Call_partialGeneric2__.Partial((0L, Result.Zero, (_, Result.One))).Apply(1L);"
+            "__Call_partialGeneric2__.Partial((_, _, (1L, Result.One))).Apply((0L, Result.Zero));"
+            "__Call_partialGeneric2__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
             "partialInput
                 .Partial(new Func<(Double,(Result,Result)), (Int64,(Double,Double),(Result,Result,Result))>((__arg20__) =>
                     (
@@ -2203,7 +2203,7 @@ namespace N1
                 .Partial(new Func<IQArray<Qubit>, (Double,ICallable,IQArray<Qubit>)>((__arg21__) =>
                 (
                     1.1D,
-                    __partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg22__) =>
+                    __Call_partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg22__) =>
                         (
                             __arg22__.Item1,
                             __arg22__.Item2,
@@ -2217,10 +2217,10 @@ namespace N1
         |> testOneBody (applyVisitor partialApplicationTest)
 
         [
-            "var r1 = __partialFunction__
+            "var r1 = __Call_partialFunction__
                 .Partial(new Func<(Int64,Double,Pauli), (Int64,Double,Pauli)>((__arg1__) => (__arg1__.Item1, __arg1__.Item2, __arg1__.Item3)))
                 .Apply<Result>((2L, 2.2D, Pauli.PauliY));"
-            "var r2 = __partialFunction__
+            "var r2 = __Call_partialFunction__
                 .Partial(new Func<(Double,Pauli), (Int64,Double,Pauli)>((__arg2__) => (1L, __arg2__.Item1, __arg2__.Item2)))
                 .Partial(new Func<Pauli, (Double,Pauli)>((__arg3__) => (3.3D, __arg3__)))
                 .Apply<Result>(Pauli.PauliZ);"
@@ -2425,12 +2425,12 @@ namespace N1
 
         public static QCIEntryPointInfo<Qubit, QVoid> Info => new QCIEntryPointInfo<Qubit, QVoid>(typeof(oneQubitOperation));
 
-        protected IUnitary<Qubit> __X__ { get; set; }
+        protected IUnitary<Qubit> __Call_X__ { get; set; }
 
         public override Func<Qubit, QVoid> __Body__ => (__in__) =>
         {
             var q1 = __in__;
-            __X__.Apply(q1);
+            __Call_X__.Apply(q1);
 #line hidden
             return QVoid.Instance;
         }
@@ -2439,7 +2439,7 @@ namespace N1
         public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
-            __X__.Adjoint.Apply(q1);
+            __Call_X__.Adjoint.Apply(q1);
 #line hidden
             return QVoid.Instance;
         }
@@ -2448,7 +2448,7 @@ namespace N1
         public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __X__.Controlled.Apply((c, q1));
+            __Call_X__.Controlled.Apply((c, q1));
 #line hidden
             return QVoid.Instance;
         }
@@ -2457,7 +2457,7 @@ namespace N1
         public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __X__.Controlled.Adjoint.Apply((c, q1));
+            __Call_X__.Controlled.Adjoint.Apply((c, q1));
 #line hidden
             return QVoid.Instance;
         }
@@ -2466,7 +2466,7 @@ namespace N1
 
         public override void __Init__()
         {
-            this.__X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.__Call_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __DataIn__(Qubit data) => data;
@@ -2672,17 +2672,17 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     [<Fact>]
     let ``duplicatedDefinitionsCaller body`` () =
         [
-            "__emptyFunction__.Apply(QVoid.Instance);"
-            "__MicrosoftQuantumOverridesemptyFunction__.Apply(QVoid.Instance);"
+            "__Call_emptyFunction__.Apply(QVoid.Instance);"
+            "__Call_MicrosoftQuantumOverridesemptyFunction__.Apply(QVoid.Instance);"
             """
             {
-                var qubits = __Allocate__.Apply(1L);
+                var qubits = __Call_Allocate__.Apply(1L);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    __H__.Apply(qubits[0L]);
-                    __MicrosoftQuantumIntrinsicH__.Apply(qubits[0L]);
+                    __Call_H__.Apply(qubits[0L]);
+                    __Call_MicrosoftQuantumIntrinsicH__.Apply(qubits[0L]);
                 }
 #line hidden
                 catch
@@ -2695,7 +2695,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
                 {
                     if (__arg1__)
                     {
-                        __Release__.Apply(qubits);
+                        __Call_Release__.Apply(qubits);
                     }
                 }
             }"""
@@ -2705,7 +2705,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
     [<Fact>]
     let ``buildOpsProperties with duplicatedDefinitionsCaller`` () =
-        let t = sprintf @"protected %s __%s__ { get; set; }"
+        let t = sprintf @"protected %s __Call_%s__ { get; set; }"
         let template (sign: string) (name: string) = t sign name
 
         let expected =
@@ -2731,7 +2731,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
     [<Fact>]
     let ``buildOpsProperties - internal callables`` () =
-        let property = sprintf "private protected %s __%s__ { get; set; }"
+        let property = sprintf "private protected %s __Call_%s__ { get; set; }"
         let expected =
             [
                 property "ICallable<QVoid, QVoid>" "EmptyInternalFunction"
@@ -3490,19 +3490,19 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 
         String ICallable.Name => "TestLineInBlocks";
         String ICallable.FullName => "Microsoft.Quantum.Tests.LineNumbers.TestLineInBlocks";
-        protected Allocate __Allocate__
+        protected Allocate __Call_Allocate__
         {
             get;
             set;
         }
 
-        protected Release __Release__
+        protected Release __Call_Release__
         {
             get;
             set;
         }
 
-        protected IUnitary<Qubit> __X__
+        protected IUnitary<Qubit> __Call_X__
         {
             get;
             set;
@@ -3516,7 +3516,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 #line hidden
             {
 #line 13 "%%"
-                var (ctrls,q) = (__Allocate__.Apply(r), __Allocate__.Apply());
+                var (ctrls,q) = (__Call_Allocate__.Apply(r), __Call_Allocate__.Apply());
 #line hidden
                 bool __arg1__ = true;
                 try
@@ -3525,7 +3525,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     if ((n == 0L))
                     {
 #line 16 "%%"
-                        __X__.Apply(q);
+                        __Call_X__.Apply(q);
                     }
                     else
                     {
@@ -3534,7 +3534,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 #line hidden
                         {
 #line 21 "%%"
-                            __X__.Controlled.Apply((new QArray<Qubit>(c), q));
+                            __Call_X__.Controlled.Apply((new QArray<Qubit>(c), q));
                         }
                     }
                 }
@@ -3550,9 +3550,9 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     if (__arg1__)
                     {
 #line hidden
-                        __Release__.Apply(ctrls);
+                        __Call_Release__.Apply(ctrls);
 #line hidden
-                        __Release__.Apply(q);
+                        __Call_Release__.Apply(q);
                     }
                 }
             }
@@ -3564,9 +3564,9 @@ namespace Microsoft.Quantum.Tests.LineNumbers
         ;
         public override void __Init__()
         {
-            this.__Allocate__ = this.Factory.Get<Allocate>(typeof(Microsoft.Quantum.Intrinsic.Allocate));
-            this.__Release__ = this.Factory.Get<Release>(typeof(Microsoft.Quantum.Intrinsic.Release));
-            this.__X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.__Call_Allocate__ = this.Factory.Get<Allocate>(typeof(Microsoft.Quantum.Intrinsic.Allocate));
+            this.__Call_Release__ = this.Factory.Get<Release>(typeof(Microsoft.Quantum.Intrinsic.Release));
+            this.__Call_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __DataIn__(Int64 data) => new QTuple<Int64>(data);

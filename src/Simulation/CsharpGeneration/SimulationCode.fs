@@ -203,9 +203,10 @@ module SimulationCode =
         sprintf "__arg%d__" count
 
     let getOpName context name =
-        if needsFullPath context name then "__" + prependNamespaceString name + "__"
+        // Callable names need their own prefix to avoid name collisions with other members of the generated class.
+        if needsFullPath context name then "__Call_" + prependNamespaceString name + "__"
         else if isCurrentOp context name then Directives.Self
-        else "__" + name.Name.Value + "__"
+        else "__Call_" + name.Name.Value + "__"
 
     type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) =
         inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
@@ -763,8 +764,8 @@ module SimulationCode =
         override this.OnQubitScope (using:QsQubitScope) =
             let (alloc, release) =
                 match using.Kind with
-                | Allocate -> ("__Allocate__", "__Release__")
-                | Borrow   -> ("__Borrow__", "__Return__")
+                | Allocate -> ("__Call_Allocate__", "__Call_Release__")
+                | Borrow   -> ("__Call_Borrow__", "__Call_Return__")
             let rec removeDiscarded sym =
                 match sym with
                 | VariableName _         -> sym
