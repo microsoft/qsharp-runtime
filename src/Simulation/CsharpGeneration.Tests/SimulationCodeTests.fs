@@ -265,7 +265,7 @@ namespace N1
         "QTuple<ICallable>"
         |> testOne udt_A
 
-        "QTuple<A>"
+        "QTuple<Microsoft.Quantum.Testing.A>"
         |> testOne udt_AA
 
         "QTuple<IUnitary>"
@@ -277,7 +277,7 @@ namespace N1
         "QTuple<Double>"
         |> testOne udt_Real
 
-        "QTuple<(udt_Real,udt_Real)>"
+        "QTuple<(Microsoft.Quantum.Testing.udt_Real,Microsoft.Quantum.Testing.udt_Real)>"
         |> testOne udt_Complex
 
         "QTuple<IQArray<IQArray<Result>>>"
@@ -373,10 +373,10 @@ namespace N1
         [
             ((NS2, "Allocate"),    "Allocate")
             ((NS2, "Release"),     "Release")
-            ((NS1, "repeat_op0"),  "ICallable<repeat_udt0, Result>")
+            ((NS1, "repeat_op0"),  "ICallable<Microsoft.Quantum.Testing.repeat_udt0, Result>")
             ((NS1, "repeat_op1"),  "ICallable<(Int64,IQArray<Qubit>), Result>")
-            ((NS1, "repeat_op2"),  "ICallable<(Double,repeat_udt0), Result>")
-            ((NS1, "repeat_udt0"), "ICallable<(Int64,IQArray<Qubit>), repeat_udt0>")
+            ((NS1, "repeat_op2"),  "ICallable<(Double,Microsoft.Quantum.Testing.repeat_udt0), Result>")
+            ((NS1, "repeat_udt0"), "ICallable<(Int64,IQArray<Qubit>), Microsoft.Quantum.Testing.repeat_udt0>")
         ]
         |> testOne repeatOperation
 
@@ -504,13 +504,13 @@ namespace N1
         [
             "q1",   "Qubit"
             "q2",   "Qubit"
-            "arr1", "Qubits"
+            "arr1", "Microsoft.Quantum.Intrinsic.Qubits"
         ]
         |> testOne threeQubitOperation
 
         [
             "q1", "Qubit"
-            "b",  "Basis"
+            "b",  "Microsoft.Quantum.Testing.Basis"
             "t",  "(Pauli,IQArray<IQArray<Double>>,Boolean)"
             "i",  "Int64"
         ]
@@ -864,7 +864,7 @@ namespace N1
             let expected = sprintf "public override void __Init__() { %s }" (String.concat "" body)
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
 
-        let template = sprintf "this.__Call_%s__ = this.Factory.Get<%s>(typeof(%s));"
+        let template = sprintf "this.__%s__ = this.Factory.Get<%s>(typeof(%s));"
 
         [
         ]
@@ -879,37 +879,37 @@ namespace N1
         |> testOne genU2
 
         [
-            template "Allocate"                               "Allocate"                        "Microsoft.Quantum.Intrinsic.Allocate"
-            template "MicrosoftQuantumIntrinsicH"             "IUnitary<Qubit>"                 "Microsoft.Quantum.Intrinsic.H"
-            template "H"                                      "ICallable<Qubit, QVoid>"         "H"
-            template "Release"                                "Release"                         "Microsoft.Quantum.Intrinsic.Release"
-            template "MicrosoftQuantumOverridesemptyFunction" "ICallable<QVoid, QVoid>"         "Microsoft.Quantum.Overrides.emptyFunction"
-            template "emptyFunction"                          "ICallable<QVoid, QVoid>"         "emptyFunction"
+            template "Microsoft_Quantum_Intrinsic_Allocate" "Allocate" "Microsoft.Quantum.Intrinsic.Allocate"
+            template "Microsoft_Quantum_Intrinsic_H" "IUnitary<Qubit>" "Microsoft.Quantum.Intrinsic.H"
+            template "Microsoft_Quantum_Testing_H" "ICallable<Qubit, QVoid>" "H"
+            template "Microsoft_Quantum_Intrinsic_Release" "Release" "Microsoft.Quantum.Intrinsic.Release"
+            template "Microsoft_Quantum_Overrides_emptyFunction" "ICallable<QVoid, QVoid>" "Microsoft.Quantum.Overrides.emptyFunction"
+            template "Microsoft_Quantum_Testing_emptyFunction" "ICallable<QVoid, QVoid>" "emptyFunction"
         ]
         |> testOne duplicatedDefinitionsCaller
 
         [
-            template "Allocate"                             "Allocate"                          "Microsoft.Quantum.Intrinsic.Allocate"
-            template "CNOT"                                 "IAdjointable<(Qubit, Qubit)>"      "Microsoft.Quantum.Intrinsic.CNOT"
-            template "MicrosoftQuantumTestingHold"          "ICallable"                         "Microsoft.Quantum.Testing.Hold<>"
-            template "Release"                              "Release"                           "Microsoft.Quantum.Intrinsic.Release"
-            template "ResultToString"                       "ICallable<Result,String>"          "ResultToString"
-            template "X"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.X"
-            template "genIter"                              "IUnitary"                          "genIter<>"
-            template "genMapper"                            "ICallable"                         "genMapper<,>"
-            template "genU1"                                "IUnitary"                          "genU1<>"
-            template "MicrosoftQuantumTestingnoOpGeneric"   "IUnitary"                          "Microsoft.Quantum.Testing.noOpGeneric<>"
-            template "MicrosoftQuantumTestingnoOpResult"    "IUnitary<Result>"                  "Microsoft.Quantum.Testing.noOpResult"
+            template "Microsoft_Quantum_Intrinsic_Allocate" "Allocate" "Microsoft.Quantum.Intrinsic.Allocate"
+            template "Microsoft_Quantum_Intrinsic_CNOT" "IAdjointable<(Qubit, Qubit)>" "Microsoft.Quantum.Intrinsic.CNOT"
+            template "Microsoft_Quantum_Testing_Hold" "ICallable" "Microsoft.Quantum.Testing.Hold<>"
+            template "Microsoft_Quantum_Intrinsic_Release" "Release" "Microsoft.Quantum.Intrinsic.Release"
+            template "Microsoft_Quantum_Compiler_Generics_ResultToString" "ICallable<Result,String>" "ResultToString"
+            template "Microsoft_Quantum_Intrinsic_X" "IUnitary<Qubit>" "Microsoft.Quantum.Intrinsic.X"
+            template "Microsoft_Quantum_Compiler_Generics_genIter" "IUnitary" "genIter<>"
+            template "Microsoft_Quantum_Compiler_Generics_genMapper" "ICallable" "genMapper<,>"
+            template "Microsoft_Quantum_Compiler_Generics_genU1" "IUnitary" "genU1<>"
+            template "Microsoft_Quantum_Testing_noOpGeneric" "IUnitary" "Microsoft.Quantum.Testing.noOpGeneric<>"
+            template "Microsoft_Quantum_Testing_noOpResult" "IUnitary<Result>" "Microsoft.Quantum.Testing.noOpResult"
         ]
         |> testOne usesGenerics
 
         [
-            template "genericWithMultipleTypeParams"        "ICallable"                         "genericWithMultipleTypeParams<,,>"
+            template "Microsoft_Quantum_Compiler_Generics_genericWithMultipleTypeParams" "ICallable" "genericWithMultipleTypeParams<,,>"
         ]
         |> testOne callsGenericWithMultipleTypeParams
 
         [
-            template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
+            template "Microsoft_Quantum_Intrinsic_Z" "IUnitary<Qubit>" "Microsoft.Quantum.Intrinsic.Z"
             "this.self = this;"
         ]
         |> testOne selfInvokingOperation
@@ -979,30 +979,30 @@ namespace N1
                 |> List.map formatSyntaxTree
             List.zip (expected |> List.map clearFormatting) (actual  |> List.map clearFormatting) |> List.iter Assert.Equal
 
-        let template = sprintf @"protected %s __Call_%s__ { get; set; }"
+        let template = sprintf @"protected %s __%s__ { get; set; }"
 
         [
-            template "Allocate"                     "Allocate"
-            template "IAdjointable<(Qubit,Qubit)>"  "CNOT"
-            template "ICallable"                    "MicrosoftQuantumTestingHold"
-            template "Release"                      "Release"
-            template "ICallable<Result, String>"    "ResultToString"
-            template "IUnitary<Qubit>"              "X"
-            template "IUnitary"                     "genIter"
-            template "ICallable"                    "genMapper"
-            template "IUnitary"                     "genU1"
-            template "IUnitary"                     "MicrosoftQuantumTestingnoOpGeneric"
-            template "IUnitary<Result>"             "MicrosoftQuantumTestingnoOpResult"
+            template "Allocate" "Microsoft_Quantum_Intrinsic_Allocate"
+            template "IAdjointable<(Qubit,Qubit)>" "Microsoft_Quantum_Intrinsic_CNOT"
+            template "ICallable" "Microsoft_Quantum_Testing_Hold"
+            template "Release" "Microsoft_Quantum_Intrinsic_Release"
+            template "ICallable<Result, String>" "Microsoft_Quantum_Compiler_Generics_ResultToString"
+            template "IUnitary<Qubit>" "Microsoft_Quantum_Intrinsic_X"
+            template "IUnitary" "Microsoft_Quantum_Compiler_Generics_genIter"
+            template "ICallable" "Microsoft_Quantum_Compiler_Generics_genMapper"
+            template "IUnitary" "Microsoft_Quantum_Compiler_Generics_genU1"
+            template "IUnitary" "Microsoft_Quantum_Testing_noOpGeneric"
+            template "IUnitary<Result>" "Microsoft_Quantum_Testing_noOpResult"
         ]
         |> testOne usesGenerics
 
         [
-            template "ICallable"                    "genericWithMultipleTypeParams"
+            template "ICallable" "Microsoft_Quantum_Compiler_Generics_genericWithMultipleTypeParams"
         ]
         |> testOne callsGenericWithMultipleTypeParams
 
         [
-            template "IUnitary<Qubit>"              "Z"
+            template "IUnitary<Qubit>" "Microsoft_Quantum_Intrinsic_Z"
             "protected IAdjointable<Qubit> self { get; set; }"
         ]
         |> testOne selfInvokingOperation
@@ -1039,7 +1039,7 @@ namespace N1
         template "(Qubit,(Qubit,Double))" "QVoid" "twoQubitOperation"
         |> testOne twoQubitOperation
 
-        template "(Qubit,Qubit,Qubits)" "QVoid" "threeQubitOperation"
+        template "(Qubit,Qubit,Microsoft.Quantum.Intrinsic.Qubits)" "QVoid" "threeQubitOperation"
         |> testOne threeQubitOperation
 
         template "(Qubit,Qubit,IQArray<Qubit>)" "QVoid" "differentArgsOperation"
@@ -1095,37 +1095,37 @@ namespace N1
         |> testOne (applyVisitor zeroQubitOperation)
 
         [
-            "__Call_X__.Apply(q1);"
+            "__Microsoft_Quantum_Intrinsic_X__.Apply(q1);"
         ]
         |> testOne (applyVisitor oneQubitOperation)
 
         [
-            "__Call_X__.Adjoint.Apply(q1);"
+            "__Microsoft_Quantum_Intrinsic_X__.Adjoint.Apply(q1);"
         ]
         |> testOne (adjointVisitor oneQubitOperation)
 
         [
             "var (q2, r) = t1;        "
-            "__Call_CNOT__.Apply((q1,q2));       "
-            "__Call_R__.Apply((r,q1));           "
+            "__Microsoft_Quantum_Intrinsic_CNOT__.Apply((q1,q2));       "
+            "__Microsoft_Quantum_Intrinsic_R__.Apply((r,q1));           "
         ]
         |> testOne (applyVisitor twoQubitOperation)
         [
             "var (q2, r) = t1;        "
-            "__Call_R__.Adjoint.Apply((r,q1));"
-            "__Call_CNOT__.Adjoint.Apply((q1,q2));"
+            "__Microsoft_Quantum_Intrinsic_R__.Adjoint.Apply((r,q1));"
+            "__Microsoft_Quantum_Intrinsic_CNOT__.Adjoint.Apply((q1,q2));"
         ]
         |> testOne (adjointVisitor twoQubitOperation)
 
         [
-            "__Call_three_op1__.Apply((q1,q2));"
-            "__Call_three_op1__.Apply((q2,q1));"
-            "__Call_three_op1__.Apply((q1,q2));"
+            "__Microsoft_Quantum_Testing_three__op1__.Apply((q1,q2));"
+            "__Microsoft_Quantum_Testing_three__op1__.Apply((q2,q1));"
+            "__Microsoft_Quantum_Testing_three__op1__.Apply((q1,q2));"
         ]
         |> testOne (applyVisitor threeQubitOperation)
 
         [
-            "__Call_Z__.Adjoint.Apply(q1);"
+            "__Microsoft_Quantum_Intrinsic_Z__.Adjoint.Apply(q1);"
             "self.Apply(q1);"
         ]
         |> testOne (adjointVisitor selfInvokingOperation)
@@ -1167,7 +1167,7 @@ namespace N1
         let testOne = testOneBody
 
         [
-            "__Call_X__.Apply(q1);"
+            "__Microsoft_Quantum_Intrinsic_X__.Apply(q1);"
         ]
         |> testOne (applyVisitor oneQubitOperation)
 
@@ -1181,7 +1181,7 @@ namespace N1
         |> testOne (applyVisitor composeImpl)
 
         [
-            "return __Call_composeImpl__.Partial((second, first, _));"
+            "return __Microsoft_Quantum_Compiler_Generics_composeImpl__.Partial((second, first, _));"
         ]
         |> testOne (applyVisitor compose)
 
@@ -1190,22 +1190,22 @@ namespace N1
     let ``usesGenerics body`` () =
         [
             "var a = (IQArray<Result>)new QArray<Result>(Result.One, Result.Zero, Result.Zero);"
-            "var s = (IQArray<String>)new QArray<String>(__Call_ResultToString__.Apply(a[0L]), __Call_ResultToString__.Apply(a[1L]));"
-            "__Call_MicrosoftQuantumTestingnoOpResult__.Apply(a[0L]);"
+            "var s = (IQArray<String>)new QArray<String>(__Microsoft_Quantum_Compiler_Generics_ResultToString__.Apply(a[0L]), __Microsoft_Quantum_Compiler_Generics_ResultToString__.Apply(a[1L]));"
+            "__Microsoft_Quantum_Testing_noOpResult__.Apply(a[0L]);"
 
             """
             {
-                var qubits = __Call_Allocate__.Apply(3L);
+                var qubits = __Microsoft_Quantum_Intrinsic_Allocate__.Apply(3L);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    var op = __Call_MicrosoftQuantumTestingHold__.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (__Call_CNOT__, (qubits[0L], qubits[1L]), __arg2__)));
+                    var op = __Microsoft_Quantum_Testing_Hold__.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (__Microsoft_Quantum_Intrinsic_CNOT__, (qubits[0L], qubits[1L]), __arg2__)));
                     op.Apply(QVoid.Instance);
 
-                    __Call_MicrosoftQuantumTestingnoOpGeneric__.Apply(qubits[0L]);
-                    __Call_MicrosoftQuantumTestingnoOpGeneric__.Apply(a[0L]);
-                    __Call_genIter__.Apply((__Call_X__, qubits));
+                    __Microsoft_Quantum_Testing_noOpGeneric__.Apply(qubits[0L]);
+                    __Microsoft_Quantum_Testing_noOpGeneric__.Apply(a[0L]);
+                    __Microsoft_Quantum_Compiler_Generics_genIter__.Apply((__Microsoft_Quantum_Intrinsic_X__, qubits));
                 }
 #line hidden
                 catch
@@ -1218,17 +1218,17 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Call_Release__.Apply(qubits);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(qubits);
                     }
                 }
             }
             """
-            "__Call_genIter__.Apply((__Call_MicrosoftQuantumTestingnoOpResult__, a));"
+            "__Microsoft_Quantum_Compiler_Generics_genIter__.Apply((__Microsoft_Quantum_Testing_noOpResult__, a));"
             """
-            __Call_genIter__.Apply((__Call_genU1__, __Call_genMapper__.Apply<IQArray<String>>((__Call_ResultToString__, a))));
+            __Microsoft_Quantum_Compiler_Generics_genIter__.Apply((__Microsoft_Quantum_Compiler_Generics_genU1__, __Microsoft_Quantum_Compiler_Generics_genMapper__.Apply<IQArray<String>>((__Microsoft_Quantum_Compiler_Generics_ResultToString__, a))));
             """
-            "__Call_genIter__.Apply((__Call_genU1__, s));"
-            "__Call_genIter__.Apply((__Call_genU1__, a));"
+            "__Microsoft_Quantum_Compiler_Generics_genIter__.Apply((__Microsoft_Quantum_Compiler_Generics_genU1__, s));"
+            "__Microsoft_Quantum_Compiler_Generics_genIter__.Apply((__Microsoft_Quantum_Compiler_Generics_genU1__, a));"
         ]
         |> testOneBody (applyVisitor usesGenerics)
 
@@ -1236,20 +1236,20 @@ namespace N1
     [<Fact>]
     let ``callTests body`` () =
         [
-            "var plain = new call_plain(__Call_X__);"
-            "var adj   = new call_adj(__Call_X__);"
-            "var ctr   = new call_ctr(__Call_X__);"
-            "var uni   = new call_uni(__Call_X__);"
+            "var plain = new Microsoft.Quantum.Testing.call_plain(__Microsoft_Quantum_Intrinsic_X__);"
+            "var adj   = new Microsoft.Quantum.Testing.call_adj(__Microsoft_Quantum_Intrinsic_X__);"
+            "var ctr   = new Microsoft.Quantum.Testing.call_ctr(__Microsoft_Quantum_Intrinsic_X__);"
+            "var uni   = new Microsoft.Quantum.Testing.call_uni(__Microsoft_Quantum_Intrinsic_X__);"
 
-            "__Call_X__.Apply(qubits.Data[0L]);"
-            "__Call_X__.Adjoint.Apply(qubits.Data[0L]);"
-            "__Call_X__.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
+            "__Microsoft_Quantum_Intrinsic_X__.Apply(qubits.Data[0L]);"
+            "__Microsoft_Quantum_Intrinsic_X__.Adjoint.Apply(qubits.Data[0L]);"
+            "__Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
-            "__Call_call_target1__.Apply((1L, __Call_X__,     __Call_X__,   __Call_X__,   __Call_X__));"
-            "__Call_call_target1__.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
+            "__Microsoft_Quantum_Testing_call__target1__.Apply((1L, __Microsoft_Quantum_Intrinsic_X__,     __Microsoft_Quantum_Intrinsic_X__,   __Microsoft_Quantum_Intrinsic_X__,   __Microsoft_Quantum_Intrinsic_X__));"
+            "__Microsoft_Quantum_Testing_call__target1__.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
 
-            "__Call_call_target2__.Apply((1L, (Result.Zero, __Call_X__),    (Result.Zero, __Call_X__),  (Result.Zero, __Call_X__),  (Result.Zero, __Call_X__)));"
-            "__Call_call_target2__.Apply((2L, (Result.One, plain.Data), (Result.One, adj.Data), (Result.One, ctr.Data), (Result.One, uni.Data)));"
+            "__Microsoft_Quantum_Testing_call__target2__.Apply((1L, (Result.Zero, __Microsoft_Quantum_Intrinsic_X__),    (Result.Zero, __Microsoft_Quantum_Intrinsic_X__),  (Result.Zero, __Microsoft_Quantum_Intrinsic_X__),  (Result.Zero, __Microsoft_Quantum_Intrinsic_X__)));"
+            "__Microsoft_Quantum_Testing_call__target2__.Apply((2L, (Result.One, plain.Data), (Result.One, adj.Data), (Result.One, ctr.Data), (Result.One, uni.Data)));"
         ]
         |> testOneBody (applyVisitor callTests)
 
@@ -1259,7 +1259,7 @@ namespace N1
         [
             "var q2 = q1;"
 
-            "var r = __Call_M__.Apply(q1);"
+            "var r = __Microsoft_Quantum_Intrinsic_M__.Apply(q1);"
 
             "var i = 1.1D;"
             "var iZero = 0L;"
@@ -1274,15 +1274,15 @@ namespace N1
             "var (l,(m,o)) = t;             "
             "var (p,q) = t;                 "
             "var (u0,u1,u2,u3,call1) = udts;"
-            "var u = u3.Data.Apply<let_udt_2>(u1);"
+            "var u = u3.Data.Apply<Microsoft.Quantum.Testing.let_udt_2>(u1);"
             """
             if (true)
             {
                 var (l2,(m2,o2)) = t;
-                return u3.Data.Apply<let_udt_2>(u1).Data.Apply<QRange>(u1);
+                return u3.Data.Apply<Microsoft.Quantum.Testing.let_udt_2>(u1).Data.Apply<QRange>(u1);
             }
             """
-            "var s = String.Format(\"n is {0} and u is {1}, {2}, {3}, {4}\",n,u3.Data.Apply<let_udt_2>(u1),r,n,j);"
+            "var s = String.Format(\"n is {0} and u is {1}, {2}, {3}, {4}\",n,u3.Data.Apply<Microsoft.Quantum.Testing.let_udt_2>(u1),r,n,j);"
             "var str = String.Format(\"Hello{0} world!\", (true ? \" quantum\" : \"\"));"
 
             "var (l3,_) = t;"
@@ -1292,7 +1292,7 @@ namespace N1
             "var __arg1__ = t;"
             "var __arg2__ = t;"
 
-            "return __Call_let_f0__.Apply(n);"
+            "return __Microsoft_Quantum_Testing_let__f0__.Apply(n);"
         ]
         |> testOneBody (applyVisitor letsOperations)
 
@@ -1335,7 +1335,7 @@ namespace N1
             """
             if ((r == Result.One))
             {
-                n = (__Call_if_f0__.Apply(QVoid.Instance) * i);
+                n = (__Microsoft_Quantum_Testing_if__f0__.Apply(QVoid.Instance) * i);
             }
             """
             """
@@ -1359,7 +1359,7 @@ namespace N1
             }
             else
             {
-                return ((p==Pauli.PauliI)?3L:__Call_if_f0__.Apply(QVoid.Instance));
+                return ((p==Pauli.PauliI)?3L:__Microsoft_Quantum_Testing_if__f0__.Apply(QVoid.Instance));
             }
             """
         ]
@@ -1383,7 +1383,7 @@ namespace N1
             @"foreach (var n in range)
             #line hidden
             {
-                result = ((range.End + result) + (n * -(__Call_foreach_f2__.Apply((n, 4L)))));
+                result = ((range.End + result) + (n * -(__Microsoft_Quantum_Testing_foreach__f2__.Apply((n, 4L)))));
             }"
             """
             if ((result > 10L))
@@ -1400,28 +1400,28 @@ namespace N1
     [<Fact>]
     let ``udt operations`` () =
         [
-            "var args0 = new udt_args0(qubits);"
-            "var args1 = new udt_args1((1L, args0.Data));"
-            "var args1a = op2.Apply<udt_args1>(args0);"
-            "var args2 = new udt_args2(op2);"
-            "var args3 = new udt_args3(op2);"
-            "var args4 = new udt_args4(op2);"
+            "var args0 = new Microsoft.Quantum.Testing.udt_args0(qubits);"
+            "var args1 = new Microsoft.Quantum.Testing.udt_args1((1L, args0.Data));"
+            "var args1a = op2.Apply<Microsoft.Quantum.Testing.udt_args1>(args0);"
+            "var args2 = new Microsoft.Quantum.Testing.udt_args2(op2);"
+            "var args3 = new Microsoft.Quantum.Testing.udt_args3(op2);"
+            "var args4 = new Microsoft.Quantum.Testing.udt_args4(op2);"
             "var ext0  = new Microsoft.Quantum.Overrides.udt0((Result.Zero, Result.One));"
             "op0.Apply(args0);"
-            "op0.Apply(new udt_args0(qubits));"
+            "op0.Apply(new Microsoft.Quantum.Testing.udt_args0(qubits));"
             "op1.Apply(args1);"
-            "op1.Apply(new udt_args1((2L, qubits)));"
-            "op1.Apply(new udt_args1((3L, args0.Data)));"
-            "op1.Apply(new udt_args1((4L, new udt_args0(qubits).Data)));"
+            "op1.Apply(new Microsoft.Quantum.Testing.udt_args1((2L, qubits)));"
+            "op1.Apply(new Microsoft.Quantum.Testing.udt_args1((3L, args0.Data)));"
+            "op1.Apply(new Microsoft.Quantum.Testing.udt_args1((4L, new Microsoft.Quantum.Testing.udt_args0(qubits).Data)));"
 
-            "return new udt_args1((22L, qubits));"
+            "return new Microsoft.Quantum.Testing.udt_args1((22L, qubits));"
         ]
         |> testOneBody (applyVisitor udtsTest)
 
     [<Fact>]
     let ``test Length dependency`` () =
         [
-            "__Call_iter__.Apply((__Call_Length__, new QArray<IQArray<Result>>(new QArray<Result>(Result.One), new QArray<Result>(Result.Zero, Result.One))));"
+            "__Microsoft_Quantum_Testing_iter__.Apply((__Microsoft_Quantum_Core_Length__, new QArray<IQArray<Result>>(new QArray<Result>(Result.One), new QArray<Result>(Result.Zero, Result.One))));"
         ]
         |> testOneBody (applyVisitor testLengthDependency)
 
@@ -1443,7 +1443,7 @@ namespace N1
         |> testOneBody (applyVisitor returnTest3)
 
         [
-            "return new returnUdt0((7L, 8L));"
+            "return new Microsoft.Quantum.Testing.returnUdt0((7L, 8L));"
         ]
         |> testOneBody (applyVisitor returnTest4)
 
@@ -1453,22 +1453,22 @@ namespace N1
         |> testOneBody (applyVisitor returnTest5)
 
         [
-            "return new returnUdt1( new QArray<(Int64,Int64)>((1L, 2L), (3L, 4L)));"
+            "return new Microsoft.Quantum.Testing.returnUdt1( new QArray<(Int64,Int64)>((1L, 2L), (3L, 4L)));"
         ]
         |> testOneBody (applyVisitor returnTest6)
 
         [
-            "return new QArray<returnUdt0>( new returnUdt0((1L, 2L)), new returnUdt0((3L, 4L)));"
+            "return new QArray<Microsoft.Quantum.Testing.returnUdt0>( new Microsoft.Quantum.Testing.returnUdt0((1L, 2L)), new Microsoft.Quantum.Testing.returnUdt0((3L, 4L)));"
         ]
         |> testOneBody (applyVisitor returnTest7)
 
         [
-            "return new returnUdt3(new QArray<returnUdt0>(new returnUdt0((1L, 2L)), new returnUdt0((3L, 4L))));"
+            "return new Microsoft.Quantum.Testing.returnUdt3(new QArray<Microsoft.Quantum.Testing.returnUdt0>(new Microsoft.Quantum.Testing.returnUdt0((1L, 2L)), new Microsoft.Quantum.Testing.returnUdt0((3L, 4L))));"
         ]
         |> testOneBody (applyVisitor returnTest8)
 
         [
-            "return (new returnUdt0((7L, 8L)), new returnUdt1(new QArray<(Int64,Int64)>((1L, 2L), (3L, 4L))));"
+            "return (new Microsoft.Quantum.Testing.returnUdt0((7L, 8L)), new Microsoft.Quantum.Testing.returnUdt1(new QArray<(Int64,Int64)>((1L, 2L), (3L, 4L))));"
         ]
         |> testOneBody (applyVisitor returnTest9)
 
@@ -1482,22 +1482,22 @@ namespace N1
         [
             """
             {
-                var qubits = __Call_Allocate__.Apply(i);
+                var qubits = __Microsoft_Quantum_Intrinsic_Allocate__.Apply(i);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
                     while (true)
                     {
-                        var res =  __Call_repeat_op0__.Apply(new repeat_udt0((0L, qubits)));
+                        var res =  __Microsoft_Quantum_Testing_repeat__op0__.Apply(new Microsoft.Quantum.Testing.repeat_udt0((0L, qubits)));
 
-                        if ((__Call_repeat_op1__.Apply((0L, qubits)) == Result.One))
+                        if ((__Microsoft_Quantum_Testing_repeat__op1__.Apply((0L, qubits)) == Result.One))
                         {
                             break;
                         }
                         else
                         {
-                            res = __Call_repeat_op2__.Apply((3D, new repeat_udt0(((i-1L), qubits))));
+                            res = __Microsoft_Quantum_Testing_repeat__op2__.Apply((3D, new Microsoft.Quantum.Testing.repeat_udt0(((i-1L), qubits))));
                         }
                     }
                 }
@@ -1512,7 +1512,7 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Call_Release__.Apply(qubits);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(qubits);
                     }
                 }
             }
@@ -1525,14 +1525,14 @@ namespace N1
         [
             """
             {
-                var q = __Call_Allocate__.Apply();
+                var q = __Microsoft_Quantum_Intrinsic_Allocate__.Apply();
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
                     var flag = true;
-                    (flag ? __Call_X__ : __Call_Z__).Apply(q);
-                    __Call_alloc_op0__.Apply(q);
+                    (flag ? __Microsoft_Quantum_Intrinsic_X__ : __Microsoft_Quantum_Intrinsic_Z__).Apply(q);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(q);
                 }
 #line hidden
                 catch
@@ -1545,18 +1545,18 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Call_Release__.Apply(q);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q);
                     }
                 }
             }"""
             """
             {
-                var qs = __Call_Allocate__.Apply(n);
+                var qs = __Microsoft_Quantum_Intrinsic_Allocate__.Apply(n);
 #line hidden
                 bool __arg2__ = true;
                 try
                 {
-                    __Call_alloc_op0__.Apply(qs[(n-1L)]);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(qs[(n-1L)]);
                 }
 #line hidden
                 catch
@@ -1569,19 +1569,19 @@ namespace N1
                 {
                     if (__arg2__)
                     {
-                        __Call_Release__.Apply(qs);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(qs);
                     }
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg3__, q3, __arg4__, q4))) = (__Call_Allocate__.Apply(), ((__Call_Allocate__.Apply(), __Call_Allocate__.Apply(2L)), (__Call_Allocate__.Apply(), __Call_Allocate__.Apply(n), __Call_Allocate__.Apply((n-1L)), __Call_Allocate__.Apply(4L))));
+                var (q1, (q2, (__arg3__, q3, __arg4__, q4))) = (__Microsoft_Quantum_Intrinsic_Allocate__.Apply(), ((__Microsoft_Quantum_Intrinsic_Allocate__.Apply(), __Microsoft_Quantum_Intrinsic_Allocate__.Apply(2L)), (__Microsoft_Quantum_Intrinsic_Allocate__.Apply(), __Microsoft_Quantum_Intrinsic_Allocate__.Apply(n), __Microsoft_Quantum_Intrinsic_Allocate__.Apply((n-1L)), __Microsoft_Quantum_Intrinsic_Allocate__.Apply(4L))));
 #line hidden
                 bool __arg5__ = true;
                 try
                 {
-                    __Call_alloc_op0__.Apply(q1);
-                    __Call_alloc_op0__.Apply(q3[1L]);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(q1);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(q3[1L]);
                 }
 #line hidden
                 catch
@@ -1594,13 +1594,13 @@ namespace N1
                 {
                     if (__arg5__)
                     {
-                        __Call_Release__.Apply(q1);
-                        __Call_Release__.Apply(q2.Item1);
-                        __Call_Release__.Apply(q2.Item2);
-                        __Call_Release__.Apply(__arg3__);
-                        __Call_Release__.Apply(q3);
-                        __Call_Release__.Apply(__arg4__);
-                        __Call_Release__.Apply(q4);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q1);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q2.Item1);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q2.Item2);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(__arg3__);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q3);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(__arg4__);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q4);
                     }
                 }
             }"""
@@ -1610,12 +1610,12 @@ namespace N1
         [
             """
             {
-                var b = __Call_Borrow__.Apply(n);
+                var b = __Microsoft_Quantum_Intrinsic_Borrow__.Apply(n);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    __Call_alloc_op0__.Apply(b[(n-1L)]);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(b[(n-1L)]);
                 }
 #line hidden
                 catch
@@ -1628,25 +1628,25 @@ namespace N1
                 {
                     if (__arg1__)
                     {
-                        __Call_Return__.Apply(b);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(b);
                     }
                 }
             }"""
             """
             {
-                var (q1, (q2, (__arg2__, q3))) = (__Call_Borrow__.Apply(), (__Call_Borrow__.Apply(2L), (__Call_Borrow__.Apply(), (__Call_Borrow__.Apply(n), __Call_Borrow__.Apply(4L)))));
+                var (q1, (q2, (__arg2__, q3))) = (__Microsoft_Quantum_Intrinsic_Borrow__.Apply(), (__Microsoft_Quantum_Intrinsic_Borrow__.Apply(2L), (__Microsoft_Quantum_Intrinsic_Borrow__.Apply(), (__Microsoft_Quantum_Intrinsic_Borrow__.Apply(n), __Microsoft_Quantum_Intrinsic_Borrow__.Apply(4L)))));
 #line hidden
                 bool __arg3__ = true;
                 try
                 {
                     {
-                        var qt = (__Call_Allocate__.Apply(), (__Call_Allocate__.Apply(1L), __Call_Allocate__.Apply(2L)));
+                        var qt = (__Microsoft_Quantum_Intrinsic_Allocate__.Apply(), (__Microsoft_Quantum_Intrinsic_Allocate__.Apply(1L), __Microsoft_Quantum_Intrinsic_Allocate__.Apply(2L)));
 #line hidden
                         bool __arg4__ = true;
                         try
                         {
                             var (qt1, qt2) = ((Qubit, (IQArray<Qubit>, IQArray<Qubit>)))qt;
-                            __Call_alloc_op0__.Apply(qt1);
+                            __Microsoft_Quantum_Testing_alloc__op0__.Apply(qt1);
                         }
 #line hidden
                         catch
@@ -1659,15 +1659,15 @@ namespace N1
                         {
                             if (__arg4__)
                             {
-                                __Call_Release__.Apply(qt.Item1);
-                                __Call_Release__.Apply(qt.Item2.Item1);
-                                __Call_Release__.Apply(qt.Item2.Item2);
+                                __Microsoft_Quantum_Intrinsic_Release__.Apply(qt.Item1);
+                                __Microsoft_Quantum_Intrinsic_Release__.Apply(qt.Item2.Item1);
+                                __Microsoft_Quantum_Intrinsic_Release__.Apply(qt.Item2.Item2);
                             }
                         }
                     }
 
-                    __Call_alloc_op0__.Apply(q1);
-                    __Call_alloc_op0__.Apply(q2[1L]);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(q1);
+                    __Microsoft_Quantum_Testing_alloc__op0__.Apply(q2[1L]);
                 }
 #line hidden
                 catch
@@ -1680,11 +1680,11 @@ namespace N1
                 {
                     if (__arg3__)
                     {
-                        __Call_Return__.Apply(q1);
-                        __Call_Return__.Apply(q2);
-                        __Call_Return__.Apply(__arg2__);
-                        __Call_Return__.Apply(q3.Item1);
-                        __Call_Return__.Apply(q3.Item2);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(q1);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(q2);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(__arg2__);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(q3.Item1);
+                        __Microsoft_Quantum_Intrinsic_Return__.Apply(q3.Item2);
                     }
                 }
             }"""
@@ -1745,7 +1745,7 @@ namespace N1
         {
             var q1 = __in__;
 
-            __Call_X__.Apply(q1);
+            __Microsoft_Quantum_Intrinsic_X__.Apply(q1);
             #line hidden
             return  QVoid.Instance;
         };
@@ -1759,8 +1759,8 @@ namespace N1
 
             var (q2,r) = t1;
 
-            __Call_CNOT__.Apply((q1, q2));
-            __Call_R__.Apply((r, q1));
+            __Microsoft_Quantum_Intrinsic_CNOT__.Apply((q1, q2));
+            __Microsoft_Quantum_Intrinsic_R__.Apply((r, q1));
 
             #line hidden
             return  QVoid.Instance;
@@ -1774,10 +1774,10 @@ namespace N1
         {
             var (q1,q2,arr1) = __in__;
 
-            __Call_da_op0__.Apply(QVoid.Instance);
-            __Call_da_op1__.Adjoint.Apply(q1);
-            __Call_da_op2__.Controlled.Apply((new QArray<Qubit>(q1), (1L, q2)));
-            __Call_da_op3__.Controlled.Adjoint.Apply((new QArray<Qubit>(q1, q2), (1.1D, Result.One, arr1.Length)));
+            __Microsoft_Quantum_Testing_da__op0__.Apply(QVoid.Instance);
+            __Microsoft_Quantum_Testing_da__op1__.Adjoint.Apply(q1);
+            __Microsoft_Quantum_Testing_da__op2__.Controlled.Apply((new QArray<Qubit>(q1), (1L, q2)));
+            __Microsoft_Quantum_Testing_da__op3__.Controlled.Adjoint.Apply((new QArray<Qubit>(q1, q2), (1.1D, Result.One, arr1.Length)));
 
             #line hidden
             return QVoid.Instance;
@@ -1800,7 +1800,7 @@ namespace N1
         public override Func<(Qubit, %s, %s, %s, (%s, %s), %s), %s> __Body__  => (__in__) =>
                 {
                     var (q1, op0, op1, op2, t1, f1) = __in__;
-                    op1.Apply(__Call_OP_1__);
+                    op1.Apply(__Microsoft_Quantum_Testing_OP__1__);
                     var v0 = op0;
                     var r0 = v0.Apply<Result>(q1);
                     var (op3, op4) = t1;
@@ -1823,15 +1823,15 @@ namespace N1
             "var r7 = (IQArray<Int64>)QArray<Int64>.Add(r2, r4);"
             "var r8 = (IQArray<Int64>)r7?.Slice(new QRange(1L, 5L, 10L));"
 
-            "var r9 = new arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
-            "var r10 = (IQArray<arrays_T1>)QArray<arrays_T1>.Create(4L);"
-            "var r11 = new arrays_T2((new QArray<Pauli>(Pauli.PauliZ), new QArray<Int64>(4L)));"
-            "var r12 = (IQArray<arrays_T2>)QArray<arrays_T2>.Create(r10.Length);"
-            "var r13 = new arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
+            "var r9 = new Microsoft.Quantum.Testing.arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
+            "var r10 = (IQArray<Microsoft.Quantum.Testing.arrays_T1>)QArray<Microsoft.Quantum.Testing.arrays_T1>.Create(4L);"
+            "var r11 = new Microsoft.Quantum.Testing.arrays_T2((new QArray<Pauli>(Pauli.PauliZ), new QArray<Int64>(4L)));"
+            "var r12 = (IQArray<Microsoft.Quantum.Testing.arrays_T2>)QArray<Microsoft.Quantum.Testing.arrays_T2>.Create(r10.Length);"
+            "var r13 = new Microsoft.Quantum.Testing.arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
             "var r14 = (IQArray<Qubit>)QArray<Qubit>.Add(qubits, register.Data);"
             "var r15 = (IQArray<Qubit>)register.Data?.Slice(new QRange(0L, 2L));"
             "var r16 = (IQArray<Qubit>)qubits?.Slice(new QRange(1L, -(1L)));"
-            "var r18 = (IQArray<Qubits>)QArray<Qubits>.Create(2L);"
+            "var r18 = (IQArray<Microsoft.Quantum.Intrinsic.Qubits>)QArray<Microsoft.Quantum.Intrinsic.Qubits>.Create(2L);"
             "var r19 = (IQArray<Microsoft.Quantum.Overrides.udt0>)QArray<Microsoft.Quantum.Overrides.udt0>.Create(7L);"
             "var i0 = r13.Data[0L][1L];"
             "var i1 = r2[(0L + r1.Length)];"
@@ -1864,7 +1864,7 @@ namespace N1
             "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
             "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
             "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
-            "var s4 = (IQArray<Qubit>)qubits?.Slice(__Call_GetMeARange__.Apply(QVoid.Instance));"
+            "var s4 = (IQArray<Qubit>)qubits?.Slice(__Microsoft_Quantum_Testing_GetMeARange__.Apply(QVoid.Instance));"
 
             "return qubits?.Slice(new QRange(10L,-(3L),0L));"
         ]
@@ -1947,7 +1947,7 @@ namespace N1
         public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
-            __Call_X__.Adjoint.Apply(q1);
+            __Microsoft_Quantum_Intrinsic_X__.Adjoint.Apply(q1);
 
             #line hidden
             return QVoid.Instance;
@@ -1961,8 +1961,8 @@ namespace N1
 
             var (q2,r) = t1;
 
-            __Call_R__.Adjoint.Apply((r, q1));
-            __Call_CNOT__.Adjoint.Apply((q1, q2));
+            __Microsoft_Quantum_Intrinsic_R__.Adjoint.Apply((r, q1));
+            __Microsoft_Quantum_Intrinsic_CNOT__.Adjoint.Apply((q1, q2));
 
             #line hidden
             return QVoid.Instance;
@@ -1970,12 +1970,12 @@ namespace N1
         |> testOne twoQubitOperation
 
         Some """
-        public override Func<(Qubit,Qubit,Qubits), QVoid> __AdjointBody__ => (__in__) =>
+        public override Func<(Qubit,Qubit,Microsoft.Quantum.Intrinsic.Qubits), QVoid> __AdjointBody__ => (__in__) =>
         {
             var (q1,q2,arr1) = __in__;
-            __Call_three_op1__.Adjoint.Apply((q1, q2));
-            __Call_three_op1__.Adjoint.Apply((q2, q1));
-            __Call_three_op1__.Adjoint.Apply((q1, q2));
+            __Microsoft_Quantum_Testing_three__op1__.Adjoint.Apply((q1, q2));
+            __Microsoft_Quantum_Testing_three__op1__.Adjoint.Apply((q2, q1));
+            __Microsoft_Quantum_Testing_three__op1__.Adjoint.Apply((q1, q2));
             #line hidden
             return QVoid.Instance;
         };"""
@@ -2013,7 +2013,7 @@ namespace N1
         {
             var (c, q1) = __in__;
 
-            __Call_X__.Controlled.Apply((c, q1));
+            __Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((c, q1));
 
             #line hidden
             return QVoid.Instance;
@@ -2021,13 +2021,13 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> __ControlledBody__ => (__in__) =>
+        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Microsoft.Quantum.Intrinsic.Qubits)), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c, (q1, q2, arr1)) = __in__;
 
-            __Call_three_op1__.Controlled.Apply((c, (q1, q2)));
-            __Call_three_op1__.Controlled.Apply((c, (q2, q1)));
-            __Call_three_op1__.Controlled.Apply((c, (q1, q2)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Apply((c, (q1, q2)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Apply((c, (q2, q1)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Apply((c, (q1, q2)));
 
             #line hidden
             return QVoid.Instance;
@@ -2061,7 +2061,7 @@ namespace N1
         public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __Call_X__.Controlled.Adjoint.Apply((c, q1));
+            __Microsoft_Quantum_Intrinsic_X__.Controlled.Adjoint.Apply((c, q1));
             #line hidden
             return QVoid.Instance;
         };"""
@@ -2069,13 +2069,13 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> __ControlledAdjointBody__ => (__in__) =>
+        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Microsoft.Quantum.Intrinsic.Qubits)), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,(q1,q2,arr1)) = __in__;
 
-            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
-            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q2, q1)));
-            __Call_three_op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Adjoint.Apply((c, (q2, q1)));
+            __Microsoft_Quantum_Testing_three__op1__.Controlled.Adjoint.Apply((c, (q1, q2)));
 
             #line hidden
             return QVoid.Instance;
@@ -2086,40 +2086,40 @@ namespace N1
     let ``partial application`` () =
         [
             //todo: "partial1Args.Partial<Int64>(_).Apply(1L);"
-            "__Call_partial3Args__
+            "__Microsoft_Quantum_Testing_partial3Args__
                 .Partial(new Func<(Int64,Double,Result), (Int64,Double,Result)>((__arg1__) => (__arg1__.Item1, __arg1__.Item2, __arg1__.Item3)))
                 .Apply((1L, 3.5D, Result.One));"
-            "__Call_partial3Args__
+            "__Microsoft_Quantum_Testing_partial3Args__
                 .Partial(new Func<Double, (Int64,Double,Result)>((__arg2__) => (1L, __arg2__, Result.Zero)))
                 .Apply(3.5D);"
-            "__Call_partial3Args__
+            "__Microsoft_Quantum_Testing_partial3Args__
                 .Partial(new Func<(Int64,Result), (Int64,Double,Result)>((__arg3__) => (__arg3__.Item1, 3.5D, __arg3__.Item2)))
                 .Apply((1L, Result.Zero));"
-            "__Call_partial3Args__
+            "__Microsoft_Quantum_Testing_partial3Args__
                 .Partial(new Func<Result, (Int64,Double,Result)>((__arg4__) => (1L, 3.5D, __arg4__)))
                 .Apply(Result.Zero);"
-            "__Call_partial3Args__
+            "__Microsoft_Quantum_Testing_partial3Args__
                 .Partial(new Func<(Double,Result), (Int64,Double,Result)>((__arg5__) => (1L, __arg5__.Item1, __arg5__.Item2)))
                 .Apply((3.5D, Result.Zero));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<(Int64,(Double,Result)), (Int64,(Double,Result))>((__arg6__) => (__arg6__.Item1, (__arg6__.Item2.Item1, __arg6__.Item2.Item2))))
                 .Apply((1L, (3.5D, Result.One)));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<(Int64,(Double,Result)), (Int64,(Double,Result))>((__arg7__) => (__arg7__.Item1, (__arg7__.Item2.Item1, __arg7__.Item2.Item2))))
                 .Apply((1L, (3.5D, Result.Zero)));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<(Double,Result), (Int64,(Double,Result))>((__arg8__) => (1L, (__arg8__.Item1, __arg8__.Item2))))
                 .Apply((3.5D, Result.Zero));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<(Int64,Result), (Int64,(Double,Result))>((__arg9__) => (__arg9__.Item1, (3.5D, __arg9__.Item2))))
                 .Apply((1L, Result.Zero));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<(Int64,Double), (Int64,(Double,Result))>((__arg10__) => (__arg10__.Item1, (__arg10__.Item2, Result.One))))
                 .Apply((1L, 3.5D));"
-            "__Call_partialInnerTuple__
+            "__Microsoft_Quantum_Testing_partialInnerTuple__
                 .Partial(new Func<Result, (Int64,(Double,Result))>((__arg11__) => (1L, (3.5D, __arg11__))))
                 .Apply(Result.One);"
-            "__Call_partialNestedArgsOp__
+            "__Microsoft_Quantum_Testing_partialNestedArgsOp__
                 .Partial(new Func<((Int64,Int64,Int64),((Double,Double),(Result,Result,Result))), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg12__) =>
                     (
                         (__arg12__.Item1.Item1, __arg12__.Item1.Item2, __arg12__.Item1.Item3),
@@ -2139,7 +2139,7 @@ namespace N1
                     )
                 ))
                 .Apply((1L, ((3.3D, 2D), Result.Zero)));"
-            "__Call_partialNestedArgsOp__
+            "__Microsoft_Quantum_Testing_partialNestedArgsOp__
                 .Partial(new Func<(Int64,((Double,Double),Result)), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg14__) =>
                     (
                         (1L, i, __arg14__.Item1),
@@ -2159,7 +2159,7 @@ namespace N1
                     )
                 ))
                 .Apply((3.3D, Result.Zero));"
-            "__Call_partialNestedArgsOp__
+            "__Microsoft_Quantum_Testing_partialNestedArgsOp__
                 .Partial(new Func<(Int64,(Double,Result)), ((Int64,Int64,Int64),((Double,Double),(Result,Result,Result)))>((__arg16__) =>
                     (
                         (i, __arg16__.Item1, 1L),
@@ -2175,20 +2175,20 @@ namespace N1
                     )
                 ))
                 .Apply(3.3D);"
-            "__Call_partialGeneric1__
+            "__Microsoft_Quantum_Testing_partialGeneric1__
                 .Partial(new Func<Int64, (Int64, Result, (Int64, Result))>((__arg18__) =>
                     (0L, Result.Zero, (__arg18__, Result.One))
                 ))
                 .Apply(1L);"
-            "__Call_partialGeneric1__
+            "__Microsoft_Quantum_Testing_partialGeneric1__
                 .Partial(new Func<(Int64, Result), (Int64, Result, (Int64, Result))>((__arg19__) =>
                     (__arg19__.Item1, __arg19__.Item2, (1L, Result.One))
                 ))
                 .Apply((0L, Result.Zero));"
-            "__Call_partialGeneric1__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
-            "__Call_partialGeneric2__.Partial((0L, Result.Zero, (_, Result.One))).Apply(1L);"
-            "__Call_partialGeneric2__.Partial((_, _, (1L, Result.One))).Apply((0L, Result.Zero));"
-            "__Call_partialGeneric2__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
+            "__Microsoft_Quantum_Testing_partialGeneric1__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
+            "__Microsoft_Quantum_Testing_partialGeneric2__.Partial((0L, Result.Zero, (_, Result.One))).Apply(1L);"
+            "__Microsoft_Quantum_Testing_partialGeneric2__.Partial((_, _, (1L, Result.One))).Apply((0L, Result.Zero));"
+            "__Microsoft_Quantum_Testing_partialGeneric2__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
             "partialInput
                 .Partial(new Func<(Double,(Result,Result)), (Int64,(Double,Double),(Result,Result,Result))>((__arg20__) =>
                     (
@@ -2203,7 +2203,7 @@ namespace N1
                 .Partial(new Func<IQArray<Qubit>, (Double,ICallable,IQArray<Qubit>)>((__arg21__) =>
                 (
                     1.1D,
-                    __Call_partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg22__) =>
+                    __Microsoft_Quantum_Testing_partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg22__) =>
                         (
                             __arg22__.Item1,
                             __arg22__.Item2,
@@ -2217,17 +2217,17 @@ namespace N1
         |> testOneBody (applyVisitor partialApplicationTest)
 
         [
-            "var r1 = __Call_partialFunction__
+            "var r1 = __Microsoft_Quantum_Testing_partialFunction__
                 .Partial(new Func<(Int64,Double,Pauli), (Int64,Double,Pauli)>((__arg1__) => (__arg1__.Item1, __arg1__.Item2, __arg1__.Item3)))
                 .Apply<Result>((2L, 2.2D, Pauli.PauliY));"
-            "var r2 = __Call_partialFunction__
+            "var r2 = __Microsoft_Quantum_Testing_partialFunction__
                 .Partial(new Func<(Double,Pauli), (Int64,Double,Pauli)>((__arg2__) => (1L, __arg2__.Item1, __arg2__.Item2)))
                 .Partial(new Func<Pauli, (Double,Pauli)>((__arg3__) => (3.3D, __arg3__)))
                 .Apply<Result>(Pauli.PauliZ);"
             "var (a,d) = t1;"
             "var (b,e) = t2;"
-            "var f = new F((d, e));"
-            "return op.Data.Partial(new Func<IQArray<Qubit>, (Double,F,IQArray<Qubit>)>((__arg4__) => (start, f, __arg4__)));"
+            "var f = new Microsoft.Quantum.Testing.F((d, e));"
+            "return op.Data.Partial(new Func<IQArray<Qubit>, (Double,Microsoft.Quantum.Testing.F,IQArray<Qubit>)>((__arg4__) => (start, f, __arg4__)));"
         ]
         |> testOneBody (applyVisitor partialFunctionTest)
 
@@ -2258,16 +2258,16 @@ namespace N1
         |> testOne oneQubitSelfAdjointAbstractOperation
 
 
-        "public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1, Basis b, (Pauli, IQArray<IQArray<Double>>, Boolean) t, Int64 i)
+        "public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1, Microsoft.Quantum.Testing.Basis b, (Pauli, IQArray<IQArray<Double>>, Boolean) t, Int64 i)
         {
-            return __m__.Run<randomAbstractOperation, (Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>((q1,b,t,i));
+            return __m__.Run<randomAbstractOperation, (Qubit, Microsoft.Quantum.Testing.Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>((q1,b,t,i));
         }"
         |> testOne randomAbstractOperation
 
 
-        "public static System.Threading.Tasks.Task<IQArray<IQArray<Result>>> Run(IOperationFactory __m__, IQArray<Qubit> qubits, Qubits register, IQArray<IQArray<QRange>> indices, arrays_T3 t)
+        "public static System.Threading.Tasks.Task<IQArray<IQArray<Result>>> Run(IOperationFactory __m__, IQArray<Qubit> qubits, Microsoft.Quantum.Intrinsic.Qubits register, IQArray<IQArray<QRange>> indices, Microsoft.Quantum.Testing.arrays_T3 t)
         {
-            return __m__.Run<arraysOperations, (IQArray<Qubit>, Qubits, IQArray<IQArray<QRange>>, arrays_T3), IQArray<IQArray<Result>>>((qubits, register, indices, t));
+            return __m__.Run<arraysOperations, (IQArray<Qubit>, Microsoft.Quantum.Intrinsic.Qubits, IQArray<IQArray<QRange>>, Microsoft.Quantum.Testing.arrays_T3), IQArray<IQArray<Result>>>((qubits, register, indices, t));
         }"
         |> testOne arraysOperations
 
@@ -2371,15 +2371,15 @@ namespace N1
         |> testOneClass emptyOperation AssemblyConstants.HoneywellProcessor
 
         """
-    public abstract partial class randomAbstractOperation : Unitary<(Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, ICallable
+    public abstract partial class randomAbstractOperation : Unitary<(Qubit,Microsoft.Quantum.Testing.Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, ICallable
     {
         public randomAbstractOperation(IOperationFactory m) : base(m)
         {
         }
 
-        public class In : QTuple<(Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, IApplyData
+        public class In : QTuple<(Qubit,Microsoft.Quantum.Testing.Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64)>, IApplyData
         {
-            public In((Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) : base(data)
+            public In((Qubit,Microsoft.Quantum.Testing.Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) : base(data)
             {
             }
 
@@ -2395,15 +2395,15 @@ namespace N1
         String ICallable.Name => "randomAbstractOperation";
         String ICallable.FullName => "Microsoft.Quantum.Testing.randomAbstractOperation";
 
-        public static IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
+        public static IonQEntryPointInfo<(Qubit, Microsoft.Quantum.Testing.Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new IonQEntryPointInfo<(Qubit, Microsoft.Quantum.Testing.Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
 
         public override void __Init__() { }
 
-        public override IApplyData __DataIn__((Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) => new In(data);
+        public override IApplyData __DataIn__((Qubit,Microsoft.Quantum.Testing.Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) => new In(data);
         public override IApplyData __DataOut__(QVoid data) => data;
-        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1, Basis b, (Pauli,IQArray<IQArray<Double>>,Boolean) t, Int64 i)
+        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1, Microsoft.Quantum.Testing.Basis b, (Pauli,IQArray<IQArray<Double>>,Boolean) t, Int64 i)
         {
-            return __m__.Run<randomAbstractOperation, (Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64), QVoid>((q1, b, t, i));
+            return __m__.Run<randomAbstractOperation, (Qubit,Microsoft.Quantum.Testing.Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64), QVoid>((q1, b, t, i));
         }
     }
 """
@@ -2425,12 +2425,12 @@ namespace N1
 
         public static QCIEntryPointInfo<Qubit, QVoid> Info => new QCIEntryPointInfo<Qubit, QVoid>(typeof(oneQubitOperation));
 
-        protected IUnitary<Qubit> __Call_X__ { get; set; }
+        protected IUnitary<Qubit> __Microsoft_Quantum_Intrinsic_X__ { get; set; }
 
         public override Func<Qubit, QVoid> __Body__ => (__in__) =>
         {
             var q1 = __in__;
-            __Call_X__.Apply(q1);
+            __Microsoft_Quantum_Intrinsic_X__.Apply(q1);
 #line hidden
             return QVoid.Instance;
         }
@@ -2439,7 +2439,7 @@ namespace N1
         public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
-            __Call_X__.Adjoint.Apply(q1);
+            __Microsoft_Quantum_Intrinsic_X__.Adjoint.Apply(q1);
 #line hidden
             return QVoid.Instance;
         }
@@ -2448,7 +2448,7 @@ namespace N1
         public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __Call_X__.Controlled.Apply((c, q1));
+            __Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((c, q1));
 #line hidden
             return QVoid.Instance;
         }
@@ -2457,7 +2457,7 @@ namespace N1
         public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
-            __Call_X__.Controlled.Adjoint.Apply((c, q1));
+            __Microsoft_Quantum_Intrinsic_X__.Controlled.Adjoint.Apply((c, q1));
 #line hidden
             return QVoid.Instance;
         }
@@ -2466,7 +2466,7 @@ namespace N1
 
         public override void __Init__()
         {
-            this.__Call_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.__Microsoft_Quantum_Intrinsic_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __DataIn__(Qubit data) => data;
@@ -2672,17 +2672,17 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     [<Fact>]
     let ``duplicatedDefinitionsCaller body`` () =
         [
-            "__Call_emptyFunction__.Apply(QVoid.Instance);"
-            "__Call_MicrosoftQuantumOverridesemptyFunction__.Apply(QVoid.Instance);"
+            "__Microsoft_Quantum_Testing_emptyFunction__.Apply(QVoid.Instance);"
+            "__Microsoft_Quantum_Overrides_emptyFunction__.Apply(QVoid.Instance);"
             """
             {
-                var qubits = __Call_Allocate__.Apply(1L);
+                var qubits = __Microsoft_Quantum_Intrinsic_Allocate__.Apply(1L);
 #line hidden
                 bool __arg1__ = true;
                 try
                 {
-                    __Call_H__.Apply(qubits[0L]);
-                    __Call_MicrosoftQuantumIntrinsicH__.Apply(qubits[0L]);
+                    __Microsoft_Quantum_Testing_H__.Apply(qubits[0L]);
+                    __Microsoft_Quantum_Intrinsic_H__.Apply(qubits[0L]);
                 }
 #line hidden
                 catch
@@ -2695,7 +2695,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
                 {
                     if (__arg1__)
                     {
-                        __Call_Release__.Apply(qubits);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(qubits);
                     }
                 }
             }"""
@@ -2705,17 +2705,17 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
     [<Fact>]
     let ``buildOpsProperties with duplicatedDefinitionsCaller`` () =
-        let t = sprintf @"protected %s __Call_%s__ { get; set; }"
+        let t = sprintf @"protected %s __%s__ { get; set; }"
         let template (sign: string) (name: string) = t sign name
 
         let expected =
             [
-                template "Allocate"                "Allocate"
-                template "IUnitary<Qubit>"         "MicrosoftQuantumIntrinsicH"
-                template "ICallable<Qubit, QVoid>" "H"
-                template "Release"                 "Release"
-                template "ICallable<QVoid, QVoid>" "MicrosoftQuantumOverridesemptyFunction"
-                template "ICallable<QVoid, QVoid>" "emptyFunction"
+                template "Allocate" "Microsoft_Quantum_Intrinsic_Allocate"
+                template "IUnitary<Qubit>" "Microsoft_Quantum_Intrinsic_H"
+                template "ICallable<Qubit, QVoid>" "Microsoft_Quantum_Testing_H"
+                template "Release" "Microsoft_Quantum_Intrinsic_Release"
+                template "ICallable<QVoid, QVoid>" "Microsoft_Quantum_Overrides_emptyFunction"
+                template "ICallable<QVoid, QVoid>" "Microsoft_Quantum_Testing_emptyFunction"
             ]
 
         let (_,op) = duplicatedDefinitionsCaller
@@ -2731,13 +2731,13 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
     [<Fact>]
     let ``buildOpsProperties - internal callables`` () =
-        let property = sprintf "private protected %s __Call_%s__ { get; set; }"
+        let property = sprintf "private protected %s __%s__ { get; set; }"
         let expected =
             [
-                property "ICallable<QVoid, QVoid>" "EmptyInternalFunction"
-                property "ICallable<QVoid, QVoid>" "EmptyInternalOperation"
-                property "ICallable<QVoid, InternalType>" "InternalType"
-                property "ICallable<QVoid, InternalType>" "MakeInternalType"
+                property "ICallable<QVoid, QVoid>" "Microsoft_Quantum_Compiler_Generics_EmptyInternalFunction"
+                property "ICallable<QVoid, QVoid>" "Microsoft_Quantum_Compiler_Generics_EmptyInternalOperation"
+                property "ICallable<QVoid, Microsoft.Quantum.Compiler.Generics.InternalType>" "Microsoft_Quantum_Compiler_Generics_InternalType"
+                property "ICallable<QVoid, Microsoft.Quantum.Compiler.Generics.InternalType>" "Microsoft_Quantum_Compiler_Generics_MakeInternalType"
             ]
         let op = snd useInternalCallables
         let actual =
@@ -2753,7 +2753,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     let ``buildOperationClass - concrete functions`` () =
         """
     [SourceLocation("%%%", OperationFunctor.Body, 1306,1315)]
-    public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
+    public partial class UpdateUdtItems : Function<Microsoft.Quantum.Compiler.Generics.MyType2, Microsoft.Quantum.Compiler.Generics.MyType2>, ICallable
     {
         public UpdateUdtItems(IOperationFactorym) : base(m)
         {
@@ -2761,22 +2761,22 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
         String ICallable.Name => "UpdateUdtItems";
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.UpdateUdtItems";
-        public static EntryPointInfo<MyType2, MyType2> Info => new EntryPointInfo<MyType2, MyType2>(typeof(UpdateUdtItems));
+        public static EntryPointInfo<Microsoft.Quantum.Compiler.Generics.MyType2, Microsoft.Quantum.Compiler.Generics.MyType2> Info => new EntryPointInfo<Microsoft.Quantum.Compiler.Generics.MyType2, Microsoft.Quantum.Compiler.Generics.MyType2>(typeof(UpdateUdtItems));
 
-        public override Func<MyType2, MyType2> __Body__ => (__in__) =>
+        public override Func<Microsoft.Quantum.Compiler.Generics.MyType2, Microsoft.Quantum.Compiler.Generics.MyType2> __Body__ => (__in__) =>
         {
             var udt = __in__;
             vararr=QArray<Int64>.Create(10L);
-            return new MyType2((1L,udt.Data.Item2,(arr?.Copy(),udt.Data.Item3.Item2)));
+            return new Microsoft.Quantum.Compiler.Generics.MyType2((1L,udt.Data.Item2,(arr?.Copy(),udt.Data.Item3.Item2)));
         };
 
         public override void __Init__() { }
 
-        public override IApplyData __DataIn__(MyType2data) => data;
-        public override IApplyData __DataOut__(MyType2data) => data;
-        public static System.Threading.Tasks.Task<MyType2> Run(IOperationFactory __m__, MyType2 udt)
+        public override IApplyData __DataIn__(Microsoft.Quantum.Compiler.Generics.MyType2data) => data;
+        public override IApplyData __DataOut__(Microsoft.Quantum.Compiler.Generics.MyType2data) => data;
+        public static System.Threading.Tasks.Task<Microsoft.Quantum.Compiler.Generics.MyType2> Run(IOperationFactory __m__, Microsoft.Quantum.Compiler.Generics.MyType2 udt)
         {
-            return __m__.Run<UpdateUdtItems,MyType2,MyType2>(udt);
+            return __m__.Run<UpdateUdtItems,Microsoft.Quantum.Compiler.Generics.MyType2,Microsoft.Quantum.Compiler.Generics.MyType2>(udt);
         }
     }
         """
@@ -2949,13 +2949,13 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         |> testOneUdt udt_U
 
         """
-    public class AA : UDTBase<A>, IApplyData
+    public class AA : UDTBase<Microsoft.Quantum.Testing.A>, IApplyData
     {
-        public AA() : base(default(A))
+        public AA() : base(default(Microsoft.Quantum.Testing.A))
         {
         }
 
-        public AA(A data) : base(data)
+        public AA(Microsoft.Quantum.Testing.A data) : base(data)
         {
         }
 
@@ -3001,13 +3001,13 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         |> testOneUdt udt_Q
 
         """
-    public class QQ : UDTBase<Q>, IApplyData
+    public class QQ : UDTBase<Microsoft.Quantum.Testing.Q>, IApplyData
     {
-        public QQ() : base(default(Q))
+        public QQ() : base(default(Microsoft.Quantum.Testing.Q))
         {
         }
 
-        public QQ(Q data) : base(data)
+        public QQ(Microsoft.Quantum.Testing.Q data) : base(data)
         {
         }
 
@@ -3103,20 +3103,20 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         |> testOneUdt udt_Real
 
         """
-    public class udt_Complex : UDTBase<(udt_Real,udt_Real)>, IApplyData
+    public class udt_Complex : UDTBase<(Microsoft.Quantum.Testing.udt_Real,Microsoft.Quantum.Testing.udt_Real)>, IApplyData
     {
-        public udt_Complex() : base(default((udt_Real,udt_Real)))
+        public udt_Complex() : base(default((Microsoft.Quantum.Testing.udt_Real,Microsoft.Quantum.Testing.udt_Real)))
         {
         }
 
-        public udt_Complex((udt_Real,udt_Real) data) : base(data)
+        public udt_Complex((Microsoft.Quantum.Testing.udt_Real,Microsoft.Quantum.Testing.udt_Real) data) : base(data)
         {
         }
 
-        public udt_Real Item1 => Data.Item1;
-        public udt_Real Item2 => Data.Item2;
+        public Microsoft.Quantum.Testing.udt_Real Item1 => Data.Item1;
+        public Microsoft.Quantum.Testing.udt_Real Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out udt_Real item1, out udt_Real item2)
+        public void Deconstruct(out Microsoft.Quantum.Testing.udt_Real item1, out Microsoft.Quantum.Testing.udt_Real item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3270,7 +3270,7 @@ namespace Microsoft.Quantum
         }
     }
 
-    public abstract partial class emptyFunction : Function<Pair, QVoid>, ICallable
+    public abstract partial class emptyFunction : Function<Microsoft.Quantum.Pair, QVoid>, ICallable
     {
         public emptyFunction(IOperationFactory m) : base(m)
         {
@@ -3279,11 +3279,11 @@ namespace Microsoft.Quantum
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.emptyFunction";
         public override void __Init__() { }
-        public override IApplyData __DataIn__(Pair data) => data;
+        public override IApplyData __DataIn__(Microsoft.Quantum.Pair data) => data;
         public override IApplyData __DataOut__(QVoid data) => data;
-        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Pair p)
+        public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Microsoft.Quantum.Pair p)
         {
-            return __m__.Run<emptyFunction, Pair, QVoid>(p);
+            return __m__.Run<emptyFunction, Microsoft.Quantum.Pair, QVoid>(p);
         }
     }
 
@@ -3490,19 +3490,19 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 
         String ICallable.Name => "TestLineInBlocks";
         String ICallable.FullName => "Microsoft.Quantum.Tests.LineNumbers.TestLineInBlocks";
-        protected Allocate __Call_Allocate__
+        protected Allocate __Microsoft_Quantum_Intrinsic_Allocate__
         {
             get;
             set;
         }
 
-        protected Release __Call_Release__
+        protected Release __Microsoft_Quantum_Intrinsic_Release__
         {
             get;
             set;
         }
 
-        protected IUnitary<Qubit> __Call_X__
+        protected IUnitary<Qubit> __Microsoft_Quantum_Intrinsic_X__
         {
             get;
             set;
@@ -3516,7 +3516,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 #line hidden
             {
 #line 13 "%%"
-                var (ctrls,q) = (__Call_Allocate__.Apply(r), __Call_Allocate__.Apply());
+                var (ctrls,q) = (__Microsoft_Quantum_Intrinsic_Allocate__.Apply(r), __Microsoft_Quantum_Intrinsic_Allocate__.Apply());
 #line hidden
                 bool __arg1__ = true;
                 try
@@ -3525,7 +3525,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     if ((n == 0L))
                     {
 #line 16 "%%"
-                        __Call_X__.Apply(q);
+                        __Microsoft_Quantum_Intrinsic_X__.Apply(q);
                     }
                     else
                     {
@@ -3534,7 +3534,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
 #line hidden
                         {
 #line 21 "%%"
-                            __Call_X__.Controlled.Apply((new QArray<Qubit>(c), q));
+                            __Microsoft_Quantum_Intrinsic_X__.Controlled.Apply((new QArray<Qubit>(c), q));
                         }
                     }
                 }
@@ -3550,9 +3550,9 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     if (__arg1__)
                     {
 #line hidden
-                        __Call_Release__.Apply(ctrls);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(ctrls);
 #line hidden
-                        __Call_Release__.Apply(q);
+                        __Microsoft_Quantum_Intrinsic_Release__.Apply(q);
                     }
                 }
             }
@@ -3564,9 +3564,9 @@ namespace Microsoft.Quantum.Tests.LineNumbers
         ;
         public override void __Init__()
         {
-            this.__Call_Allocate__ = this.Factory.Get<Allocate>(typeof(Microsoft.Quantum.Intrinsic.Allocate));
-            this.__Call_Release__ = this.Factory.Get<Release>(typeof(Microsoft.Quantum.Intrinsic.Release));
-            this.__Call_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.__Microsoft_Quantum_Intrinsic_Allocate__ = this.Factory.Get<Allocate>(typeof(Microsoft.Quantum.Intrinsic.Allocate));
+            this.__Microsoft_Quantum_Intrinsic_Release__ = this.Factory.Get<Release>(typeof(Microsoft.Quantum.Intrinsic.Release));
+            this.__Microsoft_Quantum_Intrinsic_X__ = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __DataIn__(Int64 data) => new QTuple<Int64>(data);

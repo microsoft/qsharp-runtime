@@ -51,22 +51,23 @@ module SimulationCode =
         ("Step",   { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "RangeStep" |> NonNullable<String>.New } )
     ]
 
+    let private allocate =
+        { Name = "Allocate" |> NonNullable<_>.New
+          Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<_>.New }
+
+    let private release =
+        { Name = "Release" |> NonNullable<_>.New
+          Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<_>.New }
+
+    let private borrow =
+        { Name = "Borrow" |> NonNullable<_>.New
+          Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<_>.New }
+
+    let private return' =
+        { Name = "Return" |> NonNullable<_>.New
+          Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<_>.New }
+
     let isCurrentOp context n = match context.current with | None -> false | Some name ->  name = n
-
-    let prependNamespaceString (name : QsQualifiedName) =
-        let pieces = name.Namespace.Value.Split([|'.'|]) |> String.Concat
-        pieces + name.Name.Value
-
-    let needsFullPath context (op:QsQualifiedName) =
-        let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
-        let sameNamespace = match context.current with | None -> false | Some n -> n.Namespace = op.Namespace
-
-        if sameNamespace then
-            false
-        elif hasMultipleDefinitions() then
-            true
-        else
-            not (autoNamespaces |> List.contains op.Namespace.Value)
 
     let getTypeParameters types =
         let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function
@@ -87,8 +88,7 @@ module SimulationCode =
 
     let hasTypeParameters types = not (getTypeParameters types).IsEmpty
 
-    let justTheName context (n: QsQualifiedName) =
-        if needsFullPath context n then n.Namespace.Value + "." + n.Name.Value else n.Name.Value
+    let justTheName (n : QsQualifiedName) = n.Namespace.Value + "." + n.Name.Value
 
     let isGeneric context (n: QsQualifiedName) =
         if context.allCallables.ContainsKey n then
@@ -133,7 +133,7 @@ module SimulationCode =
         | QsTypeKind.Range         -> "QRange"
         | QsTypeKind.ArrayType arrayType    -> sprintf "IQArray<%s>" (arrayType |> roslynTypeName context)
         | QsTypeKind.TupleType tupleType    -> tupleType |> roslynTupleTypeName context
-        | QsTypeKind.UserDefinedType name   -> justTheName context (QsQualifiedName.New (name.Namespace, name.Name))
+        | QsTypeKind.UserDefinedType name   -> justTheName (QsQualifiedName.New (name.Namespace, name.Name))
         | QsTypeKind.Operation (_,functors) -> roslynCallableInterfaceName functors.Characteristics
         | QsTypeKind.Function _             -> roslynCallableInterfaceName ResolvedCharacteristics.Empty
         | QsTypeKind.TypeParameter t        -> t |> roslynTypeParameterName
@@ -203,10 +203,10 @@ module SimulationCode =
         sprintf "__arg%d__" count
 
     let getOpName context name =
-        // Callable names need their own prefix to avoid name collisions with other members of the generated class.
-        if needsFullPath context name then "__Call_" + prependNamespaceString name + "__"
-        else if isCurrentOp context name then Directives.Self
-        else "__Call_" + name.Name.Value + "__"
+        if isCurrentOp context name then Directives.Self
+        else
+            let fullName = (justTheName name).Replace("_", "__").Replace(".", "_")
+            "__" + fullName + "__"
 
     type ExpressionSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) =
         inherit ExpressionTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
@@ -224,19 +224,14 @@ module SimulationCode =
     type StatementKindSeeker(parent : SyntaxTreeTransformation<HashSet<QsQualifiedName>>) =
         inherit StatementKindTransformation<HashSet<QsQualifiedName>>(parent, TransformationOptions.NoRebuild)
 
-        let ALLOCATE = { Name = "Allocate" |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
-        let RELEASE  = { Name = "Release"  |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
-        let BORROW   = { Name = "Borrow"   |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
-        let RETURN   = { Name = "Return"   |> NonNullable<string>.New; Namespace = "Microsoft.Quantum.Intrinsic" |> NonNullable<string>.New }
-
         override this.OnAllocateQubits node =
-            this.SharedState.Add ALLOCATE |> ignore
-            this.SharedState.Add RELEASE |> ignore
+            this.SharedState.Add allocate |> ignore
+            this.SharedState.Add release |> ignore
             base.OnAllocateQubits node
 
         override this.OnBorrowQubits node =
-            this.SharedState.Add BORROW |> ignore
-            this.SharedState.Add RETURN |> ignore
+            this.SharedState.Add borrow |> ignore
+            this.SharedState.Add return' |> ignore
             base.OnBorrowQubits node
 
     /// Used to discover which operations are used by a certain code block.
@@ -461,7 +456,7 @@ module SimulationCode =
                                 rhs
                             | _ -> items.Dequeue()
                         | QsTupleItem _ -> items.Dequeue()
-                    ``new`` (``type`` [ justTheName context name ]) ``(`` [buildArg decl.TypeItems] ``)``
+                    ``new`` (``type`` [ justTheName name ]) ``(`` [buildArg decl.TypeItems] ``)``
                 | _ -> failwith "copy-and-update expressions are currently only supported for arrays and user defined types"
 
         and buildTuple many : ExpressionSyntax =
@@ -508,7 +503,7 @@ module SimulationCode =
             op <.> (``ident`` "Partial", [ values ])
 
         and buildNewUdt n args =
-            ``new`` (``type`` [ justTheName context n ]) ``(`` [args |> captureExpression] ``)``
+            ``new`` (``type`` [ justTheName n ]) ``(`` [args |> captureExpression] ``)``
 
         and buildApply returnType op args =
             // Checks if the expression points to a non-generic user-defined callable.
@@ -764,8 +759,8 @@ module SimulationCode =
         override this.OnQubitScope (using:QsQubitScope) =
             let (alloc, release) =
                 match using.Kind with
-                | Allocate -> ("__Call_Allocate__", "__Call_Release__")
-                | Borrow   -> ("__Call_Borrow__", "__Call_Return__")
+                | Allocate -> getOpName context allocate, getOpName context release
+                | Borrow   -> getOpName context borrow, getOpName context return'
             let rec removeDiscarded sym =
                 match sym with
                 | VariableName _         -> sym
