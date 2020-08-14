@@ -447,6 +447,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public override Func<(long, long), long> Body => arg =>
             {
                 var (min, max) = arg;
+                if (max <= min)
+                {
+                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                }
                 return sim.RandomGenerator.NextLong(min, max);
             };
         }
@@ -467,6 +471,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public override Func<(double, double), double> Body => arg =>
             {
                 var (min, max) = arg;
+                if (max <= min)
+                {
+                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                }
                 var delta = max - min;
                 return min + delta * sim.RandomGenerator.NextDouble();
             };

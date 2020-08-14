@@ -16,6 +16,9 @@ namespace Microsoft.Quantum.Random {
     /// An integer in the inclusive range from `min` to `max` with uniform
     /// probability.
     ///
+    /// # Remarks
+    /// Fails if `max <= min`.
+    ///
     /// # Example
     /// The following Q# snippet randomly rolls a six-sided die:
     /// ```Q#
@@ -40,6 +43,9 @@ namespace Microsoft.Quantum.Random {
     /// # Output
     /// A random real number in the inclusive interval from `min` to `max` with
     /// uniform probability.
+    ///
+    /// # Remarks
+    /// Fails if `max <= min`.
     ///
     /// # Example
     /// The following Q# snippet randomly draws an angle between $0$ and $2 \pi$:
