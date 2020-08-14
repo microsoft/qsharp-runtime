@@ -72,7 +72,7 @@ namespace Microsoft.Quantum.Random {
     /// Message($"Got sample: {dist::Sample()}");
     /// ```
     function CategoricalDistribution(probs : Double[]) : DiscreteDistribution {
-        return DiscreteDistribution(Delay(DrawCategorial, probs, _));
+        return DiscreteDistribution(Delay(DrawCategorical, probs, _));
     }
 
     /// # Summary
