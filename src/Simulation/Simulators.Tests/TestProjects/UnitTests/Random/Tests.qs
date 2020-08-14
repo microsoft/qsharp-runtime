@@ -29,6 +29,29 @@ namespace Microsoft.Quantum.Tests {
         return SampleMeanAndVariance(samples);
     }
 
+    internal operation CheckMeanAndVariance(
+        name : String,
+        distribution : ContinuousDistribution,
+        nSamples : Int,
+        (expectedMean : Double, expectedVariance : Double),
+        tolerance : Double
+    ) : Unit {
+        let (mean, variance) = EstimateMeanAndVariance(
+            distribution,
+            nSamples
+        );
+        Fact(
+            expectedMean - tolerance <= mean and
+            mean <= expectedMean + tolerance,
+            $"Mean of {name} distribution should be {expectedMean}, was {mean}."
+        );
+        Fact(
+            expectedVariance - tolerance <= variance and
+            variance <= expectedVariance + tolerance,
+            $"Variance of {name} distribution should be {expectedVariance}, was {variance}."
+        );
+    }
+
     /// # Summary
     /// Checks that @"microsoft.quantum.random.drawrandomdouble" obeys ranges.
     @Test("QuantumSimulator")
@@ -52,29 +75,6 @@ namespace Microsoft.Quantum.Tests {
             fail $"DrawRandomInt(0, 45) returned {randomInt}, outside the allowed range.";
         }
     }
-
-    internal operation CheckMeanAndVariance(
-        name : String,
-        distribution : ContinuousDistribution,
-        nSamples : Int,
-        (expectedMean : Double, expectedVariance : Double),
-        tolerance : Double
-    ) : Unit {
-        let (mean, variance) = EstimateMeanAndVariance(
-            distribution,
-            nSamples
-        );
-        Fact(
-            expectedMean - tolerance <= mean and
-            mean <= expectedMean + tolerance,
-            $"Mean of {name} distribution should be {expectedMean}, was {mean}."
-        );
-        Fact(
-            expectedVariance - tolerance <= variance and
-            variance <= expectedVariance + tolerance,
-            $"Variance of {name} distribution should be {expectedVariance}, was {variance}."
-        );
-    }
     
     /// # Summary
     /// Checks that @"microsoft.quantum.random.continuousuniformdistribution" has the
@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Tests {
     operation CheckContinuousUniformDistributionHasRightMoments() : Unit {
         CheckMeanAndVariance(
             "uniform",
-            DiscreteUniformDistribution(0.0, 1.0),
+            ContinuousUniformDistribution(0.0, 1.0),
             1000000,
             (0.5, 1.0 / 12.0),
             0.02
