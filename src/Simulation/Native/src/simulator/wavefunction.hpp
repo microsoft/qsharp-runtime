@@ -25,6 +25,7 @@ namespace Microsoft
 namespace Quantum
 {
     extern int dbgReorder;      //@@@DBG+ Bit0=Reorder bit1=Schedule
+    extern int dbgFusedSpan;    //@@@DBG+
 
 namespace SIMULATOR
 {
@@ -74,6 +75,10 @@ namespace SIMULATOR
 
         void append_gates(std::vector<GateWrapper> gates) {
             gates_.insert(gates_.end(), gates.begin(), gates.end());
+        }
+
+        size_t size() {
+            return gates_.size();
         }
 
         // Greedy method that finds next appropriate cluster
@@ -188,8 +193,16 @@ public:
             // logic to flush gates in each cluster
             for (int i = 0; i < clusters.size(); i++) {
                 Cluster cl = clusters.at(i);
+
+                //@@@DBG+
+                //auto qids = cl.get_qids();
+                //printf("@@@DBG Cluster: %d (nqs=%d): ", i, (int)qids.size());
+                //for (int ii = 0; ii < qids.size(); ii++) printf(" %d",qids[ii]);
+                //printf("\n");
+
                 for (GateWrapper gate : cl.get_gates()) {
                     std::vector<unsigned> cs = gate.get_controls();
+                    //printf("@@@DBG     %d on %d\n", (int)cs.size(), (int)gate.get_target()); //@@@DBG+
                     if (cs.size() == 0) {
                         fused_.apply(wfn_, gate.get_mat(), gate.get_target());
                     }
@@ -458,6 +471,7 @@ public:
                 curClusters.push_back(prevCluster);
             }
         }
+        
         return curClusters;
     }
 
@@ -511,7 +525,7 @@ public:
         std::vector<qubit_t> cs;
         GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
         gatelist_.push_back(gateApplied);
-        if (gatelist_.size() > 50) {
+        if (gatelist_.size() > 999) {
             flush();
         }
 
@@ -530,7 +544,7 @@ public:
         std::vector<qubit_t> pcs = qubits(cs);
         GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
         gatelist_.push_back(gateApplied);
-        if (gatelist_.size() > 50) {
+        if (gatelist_.size() > 999) {
             flush();
         }
         

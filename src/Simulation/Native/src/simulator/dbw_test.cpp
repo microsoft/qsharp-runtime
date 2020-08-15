@@ -246,7 +246,7 @@ int main()
             char fName[30];
 
             //@@@DBG: Skip over tests we don't want to do right now
-            //if (idxSched > 0 && idxSched < 4) continue;         // Just try Aniket Dalvi (intern) scheduler
+            if (idxSched != 4) continue;         // Just try Aniket Dalvi (intern) scheduler
             if (numThreads > 4) continue;                       // Not on a big machine
             if (prbIdx > 8 && prbIdx < 10) continue;            // Not on a big machine
             if (prbIdx != 7 || fuseSpan != 4) continue;         // Just do a single test
@@ -323,8 +323,8 @@ int main()
 
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {
-                for (int i = 0; i < prb.size(); i++) {
-                    auto qs = prb[i];
+                for (int j = 0; j < prb.size(); j++) {
+                    auto qs = prb[j];
                     switch (qs.size()) {
                     case 0: // Need to force a flush (end of cluster)
                         Flush(sim_id);
