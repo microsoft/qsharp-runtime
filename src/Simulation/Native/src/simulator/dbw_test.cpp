@@ -18,6 +18,7 @@
 
 #include "util/cpuid.hpp" //@@@DBG
 #include "capi.hpp"
+#include <cstdarg>
 
 using namespace std;
 
@@ -60,54 +61,6 @@ void dump(unsigned sim_id, const char* label)
     DumpIds(sim_id, sim_ids_callback);
     std::cout << "]\n";
     Dump(sim_id, dump_callback);
-}
-
-void test_teleport()
-{
-    auto sim_id = init();
-
-    unsigned qs[] = { 0, 1, 2 };
-
-    dump(sim_id, "teleport-pre.txt");
-
-    allocateQubit(sim_id, 0);
-    allocateQubit(sim_id, 1);
-
-    dump(sim_id, "teleport-start.txt");
-
-    // create a Bell pair
-    H(sim_id, 0);
-    MCX(sim_id, 1, qs, 1);
-
-    allocateQubit(sim_id, 2);
-    // create quantum state
-    H(sim_id, 2);
-    R(sim_id, 3, 1.1, 2);
-
-    // teleport
-    MCX(sim_id, 1, &qs[2], 1);
-    H(sim_id, 2);
-    M(sim_id, 2);
-    M(sim_id, 1);
-    MCX(sim_id, 1, &qs[1], 0);
-    MCZ(sim_id, 1, &qs[2], 0);
-
-    dump(sim_id, "teleport-middle.txt");
-
-    // check teleportation success
-    R(sim_id, 3, (-1.1), 0);
-    H(sim_id, 0);
-    assert(M(sim_id, 0)==false);
-
-    dump(sim_id, "teleport-end.txt");
-
-    release(sim_id, 0);
-    release(sim_id, 1);
-    release(sim_id, 2);
-
-    dump(sim_id, "teleport-post.txt");
-
-    destroy(sim_id);
 }
 
 std::vector<std::vector<std::int32_t>> loadPrb(int circStart, int circStop) {
@@ -194,14 +147,14 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
 
 void mySprintf(char* buf, int bufSiz, const char* fmt, ...) {
     va_list args;
-    va_start(args, fmt);
+    __crt_va_start(args, fmt);
 #ifdef _MSC_VER
     vsprintf_s(buf, bufSiz, fmt, args);
 #else
     vsprintf(buf, fmt, args);
 #endif
     //perror(buf);
-    va_end(args);
+    __crt_va_end(args);
 }
 
 int numQs(vector<vector<int32_t>> prb) {
@@ -226,6 +179,8 @@ int main()
     const int testCnt = 44;
     int tests[testCnt][5] = {
         // rng prb spn thr sim
+        {   1,  0,  4,  4,  4}, // Original benchmark
+
         {   1,  2,  4,  4,  4}, // 4 bits Shor
         {   1,  3,  4,  4,  4}, // 6 bits Shor
         {   1,  4,  4,  4,  4}, // 8 bits Shor
@@ -274,126 +229,129 @@ int main()
         {   1, 14,  4,  4,  4}, // qulacs benchmark, nQs=25
     };
 
-    const char* scheds[4]   = { "std", "qio", "sim", "ord" };
-    const char* xtras[4]    = { "",    "",    "S0",  "S1"  };
+    const char* scheds[6]   = { "std", "qio", "sim", "ord", "Sc", "ScRo" };
+    const char* xtras[6]    = { "",    "",    "S0",  "S1",  "",   "", };
 
 
-    for (int doReorder = 0; doReorder < 1; doReorder++) {
-        printf(">>>> reorder: %d\n", doReorder);
-        for (int idxSched = 0; idxSched < 4; idxSched++) {
-            const char* sched = scheds[idxSched];
-            printf("==== sched: %s\n", sched);
+    for (int idxSched = 0; idxSched < 6; idxSched++) {
+        const char* sched = scheds[idxSched];
+        printf("==== sched: %s\n", sched);
 
-            for (int tIdx = 0; tIdx < testCnt; tIdx++) {
-                int doRange = tests[tIdx][0];
-                int prbIdx = tests[tIdx][1];
-                int fuseSpan = tests[tIdx][2];
-                int numThreads = tests[tIdx][3];
-                int simTyp = tests[tIdx][4];
-                char fName[30];
+        for (int tIdx = 0; tIdx < testCnt; tIdx++) {
+            int doRange = tests[tIdx][0];
+            int prbIdx = tests[tIdx][1];
+            int fuseSpan = tests[tIdx][2];
+            int numThreads = tests[tIdx][3];
+            int simTyp = tests[tIdx][4];
+            char fName[30];
 
-                if (prbIdx < 10 || prbIdx > 14) continue;       // Just do qulacs @@@DBG
-                if (idxSched != 3) continue;                    // Just do ord scheduler
+            //@@@DBG: Skip over tests we don't want to do right now
+            //if (idxSched > 0 && idxSched < 4) continue;         // Just try Aniket Dalvi (intern) scheduler
+            if (numThreads > 4) continue;                       // Not on a big machine
+            if (prbIdx > 8 && prbIdx < 10) continue;            // Not on a big machine
+            if (prbIdx != 7 || fuseSpan != 4) continue;         // Just do a single test
 
-                if (numThreads > 4) continue;                   // Not on a big machine
-                if (prbIdx > 8 && prbIdx < 10) continue;        // Not on a big machine
+            bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
-                if (prbIdx >= 0 && prbIdx <= 1) { // Bench
-                    if (prbIdx == 0) nQs = 15;
-                    else             nQs = 26;
-                    circStart = 0;
-                    circStop = nQs;
-                    if (doRange == 0) { circStop = 7; }
-                    if (doRange == 2) { circStart = nQs - 7; }
-                    mySprintf(fName, sizeof(fName), "bench");
-                    prb = loadPrb(circStart, circStop);
-                }
-                else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
-                    int bits = prbIdx * 2;
-                    mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else if (prbIdx >= 7 && prbIdx <= 9) { // Suprem
-                    int sizR = 4;
-                    int sizC = 4;
-                    if (prbIdx == 8) {
-                        sizR = 5;
-                        sizC = 5;
-                    }
-                    else if (prbIdx == 9) {
-                        sizR = 5;
-                        sizC = 6;
-                    }
-                    int spanInp = 4;
-                    if (fuseSpan > 4) spanInp = fuseSpan;
-                    mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else if (prbIdx >= 10 && prbIdx <= 14) { // qulacs
-                    int bits = (prbIdx - 9) * 5;
-                    mySprintf(fName, sizeof(fName), "qulacs_%d_%d.log", bits, fuseSpan);
-                    prb = loadTest(fName, idxSched > 0);
-                    nQs = numQs(prb);
-                }
-                else throw(std::invalid_argument("Bad problem number"));
+            int doReorder = 0;                  // Default to no scheduling or re-ordering
+            if (idxSched == 5)                  doReorder += 1;
+            if (idxSched == 4 || idxSched == 5) doReorder += 2;
 
-                printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
-                    nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
-                fflush(stdout);
-
-                if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
-                if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
-                if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
-
-                auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
-
-                for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
-
-                if (prbIdx < 2) {
-                    for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
-                        unsigned c = k - 1;
-                        MCX(sim_id, 1, &c, k);
-                    }
-                }
-
-                // Amount of time to let things run below (in fused.hpp)
-                double timeInt = (double)nQs;
-                timeInt = 5.0 * (timeInt * timeInt) / 20.0;
-
-                std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-                for (int i = 0; i < 100000; i++) {
-                    for (int i = 0; i < prb.size(); i++) {
-                        auto qs = prb[i];
-                        switch (qs.size()) {
-                        case 0: // Need to force a flush (end of cluster)
-                            Flush(sim_id);
-                            break;
-                        case 1:
-                            H(sim_id, qs[0]);
-                            break;
-                        case 2:
-                            CX(sim_id, qs[0], qs[1]);
-                            break;
-                        case 3:
-                        {
-                            uint32_t cs[] = { (uint32_t)qs[0], (uint32_t)qs[1] };
-                            MCX(sim_id, 2, cs, qs[2]);
-                        }
-                        break;
-                        default:
-                            throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
-                        }
-
-                        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-                        std::chrono::duration<double> elapsed = curr - start;
-                        if (elapsed.count() >= timeInt) break;
-                    }
-                }
-
-                destroy(sim_id);
+            if (prbIdx >= 0 && prbIdx <= 1) { // Bench
+                if (prbIdx == 0) nQs = 15;
+                else             nQs = 26;
+                circStart = 0;
+                circStop = nQs;
+                if (doRange == 0) { circStop = 7; }
+                if (doRange == 2) { circStart = nQs - 7; }
+                mySprintf(fName, sizeof(fName), "bench");
+                prb = loadPrb(circStart, circStop);
             }
+            else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
+                int bits = prbIdx * 2;
+                mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
+                prb = loadTest(fName, doClusters);
+                nQs = numQs(prb);
+            }
+            else if (prbIdx >= 7 && prbIdx <= 9) { // Suprem
+                int sizR = 4;
+                int sizC = 4;
+                if (prbIdx == 8) {
+                    sizR = 5;
+                    sizC = 5;
+                }
+                else if (prbIdx == 9) {
+                    sizR = 5;
+                    sizC = 6;
+                }
+                int spanInp = 4;
+                if (fuseSpan > 4) spanInp = fuseSpan;
+                mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
+                prb = loadTest(fName, doClusters);
+                nQs = numQs(prb);
+            }
+            else if (prbIdx >= 10 && prbIdx <= 14) { // qulacs
+                int bits = (prbIdx - 9) * 5;
+                mySprintf(fName, sizeof(fName), "qulacs_%d_%d.log", bits, fuseSpan);
+                prb = loadTest(fName, doClusters);
+                nQs = numQs(prb);
+            }
+            else throw(std::invalid_argument("Bad problem number"));
+
+            printf("@@@DBG nQs=%d max=%d procs=%d thrds=%d range=%d prb=%d tst=%d fName=%s\n",
+                nQs, omp_get_max_threads(), omp_get_num_procs(), omp_get_num_threads(), doRange, prbIdx, tIdx, fName);
+            fflush(stdout);
+
+            if (simTyp == 4 && (!Microsoft::Quantum::haveAVX512())) continue;
+            if (simTyp == 3 && (!Microsoft::Quantum::haveFMA() || !Microsoft::Quantum::haveAVX2())) continue;
+            if (simTyp == 2 && !Microsoft::Quantum::haveAVX()) continue;
+
+            auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
+
+            for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+
+            if (prbIdx < 2) {
+                for (int k = 1; k < nQs; k++) {                     // Get everyone entangled
+                    unsigned c = k - 1;
+                    MCX(sim_id, 1, &c, k);
+                }
+            }
+
+            // Amount of time to let things run below (in fused.hpp)
+            double timeInt = (double)nQs;
+            timeInt = 5.0 * (timeInt * timeInt) / 20.0;
+
+            std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+            for (int i = 0; i < 100000; i++) {
+                for (int i = 0; i < prb.size(); i++) {
+                    auto qs = prb[i];
+                    switch (qs.size()) {
+                    case 0: // Need to force a flush (end of cluster)
+                        Flush(sim_id);
+                        break;
+                    case 1:
+                        H(sim_id, qs[0]);
+                        break;
+                    case 2:
+                        CX(sim_id, qs[0], qs[1]);
+                        break;
+                    case 3:
+                    {
+                        uint32_t cs[] = { (uint32_t)qs[0], (uint32_t)qs[1] };
+                        MCX(sim_id, 2, cs, qs[2]);
+                    }
+                    break;
+                    default:
+                        throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                    }
+
+                    std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+                    std::chrono::duration<double> elapsed = curr - start;
+                    if (elapsed.count() >= timeInt) break;
+                }
+            }
+
+            destroy(sim_id);
         }
     }
 }

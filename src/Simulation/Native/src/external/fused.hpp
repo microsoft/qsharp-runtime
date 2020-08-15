@@ -58,7 +58,7 @@ class Fused
 
 
         wfnCapacity     = 0u; // used to optimize runtime parameters
-        maxFusedSpan    =-1;  // determine span to use at runtime
+        maxFusedSpan    = 6;  // determine span to use at runtime
         maxFusedDepth   = 99; // determine max depth to use at runtime
     }
 
@@ -223,14 +223,19 @@ class Fused
 
             // Reduce size for small problems (optimized with benchmarks)
             if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
-        }
+
+            maxFusedDepth = dbgFusedLimit; //@@@DBG+
+            maxFusedSpan = dbgFusedSpan; //@@@DBG+
+
             printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity); //@@@DBG+
+        }
 
         // New rules of when to stop fusing
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
 
         return (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= (unsigned)maxFusedDepth);
     }
+
   private:
     mutable Fusion fusedgates;
 

@@ -38,7 +38,7 @@ namespace Microsoft
       int dbgFusedSpan  = -1;
       int dbgFusedLimit = 99;
       int dbgNumThreads = 0;
-      int dbgReorder    = 0;
+      int dbgReorder    = 2; // bit0: doReorder bit1: Schedule
 
     namespace Simulator
     {
@@ -120,6 +120,35 @@ namespace Microsoft
 
         return static_cast<unsigned>(emptySlot);
       }
+
+     //@@@DBG+: for benchmarks vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force,int fusedSpan,int fusedLimit,int numThreads,int reorder)
+      {
+          std::lock_guard<std::shared_mutex> lock(_mutex);
+
+          size_t emptySlot = -1;
+          for (auto const& s : _psis)
+          {
+              if (s == NULL)
+              {
+                  emptySlot = &s - &_psis[0];
+                  break;
+              }
+          }
+
+          if (emptySlot == -1)
+          {
+              _psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads,reorder)));
+              emptySlot = _psis.size() - 1;
+          }
+          else
+          {
+              _psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal,force,fusedSpan,fusedLimit,numThreads,reorder));
+          }
+
+          return static_cast<unsigned>(emptySlot);
+      }
+      //@@@DBG+: for benchmarks ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       MICROSOFT_QUANTUM_DECL void destroy(unsigned id)
       {

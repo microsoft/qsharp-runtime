@@ -24,7 +24,8 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    extern int dbgReorder;      //@@@DBG+
+    extern int dbgReorder;      //@@@DBG+ Bit0=Reorder bit1=Schedule
+
 namespace SIMULATOR
 {
     namespace detail
@@ -171,9 +172,15 @@ public:
 
     void flush() const
     {
+        //@@@DBG+
+        if (dbgReorder == 0) {
+            fused_.flush(wfn_);
+            gatelist_.clear();
+            return;
+        }
+
         unsigned fusedSpan = 4;
         auto clusters = make_clusters(fusedSpan, gatelist_); //making clusters with gates in the queue
-        gatelist_.clear();
         if (clusters.size() == 0) {
             fused_.flush(wfn_);
         }
@@ -190,66 +197,70 @@ public:
                         fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
                     }
                 }
-                //logic to reorder
-                const Fusion& fg = fused_.get_fusedgates();
-                const auto& itemsToFuse = fg.get_items();
-                const auto& ctrlSet = fg.get_ctrl_set();
-                //getting all qubits to move to lower end of the wfn
-                if (!itemsToFuse.empty()) {
-                    std::vector<unsigned> unionOfAllQubitsInUse;
-                    std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
-                    for (int i = 0; i < itemsToFuse.size(); i++) {
-                        const auto& tempIndices = itemsToFuse[i].get_indices();
-                        for (unsigned j = 0; j < tempIndices.size(); j++) {
-                            if (indicesSet.count(tempIndices[j]) == 0) {
-                                unionOfAllQubitsInUse.push_back(tempIndices[j]);
-                                indicesSet.insert(tempIndices[j]);
+
+                if ((dbgReorder & 1) == 1) { //@@@DBG+: Turn on re-ordering?
+                    //logic to reorder
+                    const Fusion& fg = fused_.get_fusedgates();
+                    const auto& itemsToFuse = fg.get_items();
+                    const auto& ctrlSet = fg.get_ctrl_set();
+
+                    //getting all qubits to move to lower end of the wfn
+                    if (!itemsToFuse.empty()) {
+                        std::vector<unsigned> unionOfAllQubitsInUse;
+                        std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
+                        for (int i = 0; i < itemsToFuse.size(); i++) {
+                            const auto& tempIndices = itemsToFuse[i].get_indices();
+                            for (unsigned j = 0; j < tempIndices.size(); j++) {
+                                if (indicesSet.count(tempIndices[j]) == 0) {
+                                    unionOfAllQubitsInUse.push_back(tempIndices[j]);
+                                    indicesSet.insert(tempIndices[j]);
+                                }
                             }
                         }
-                    }
-                    for (unsigned index : ctrlSet) {
-                        if (indicesSet.count(index) == 0) {
-                            unionOfAllQubitsInUse.push_back(index);
-                            indicesSet.insert(index);
+                        for (unsigned index : ctrlSet) {
+                            if (indicesSet.count(index) == 0) {
+                                unionOfAllQubitsInUse.push_back(index);
+                                indicesSet.insert(index);
+                            }
                         }
-                    }
-                    //performing reorder
-                    std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
-                    std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
-                    std::vector<qubit_t> newLocs;
-                    unsigned pos = findNextPos(0, setForSearch);
-                    for (unsigned i = 0; i < currLocs.size(); i++)
-                    {
-                        if (currLocs[i] > currLocs.size() - 1) {
-                            newLocs.push_back(pos);
-                            pos = findNextPos(pos + 1, setForSearch);
+                        //performing reorder
+                        std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
+                        std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
+                        std::vector<qubit_t> newLocs;
+                        unsigned pos = findNextPos(0, setForSearch);
+                        for (unsigned i = 0; i < currLocs.size(); i++)
+                        {
+                            if (currLocs[i] > currLocs.size() - 1) {
+                                newLocs.push_back(pos);
+                                pos = findNextPos(pos + 1, setForSearch);
+                            }
+                            else {
+                                newLocs.push_back(currLocs[i]);
+                            }
                         }
-                        else {
-                            newLocs.push_back(currLocs[i]);
+                        //heuristic to check whether all qubits operated upon are in the upper half of wfn
+                        if (*setForSearch.begin() > (num_qubits_ / 2)) {
+                            reorder_wavefunction(currLocs, newLocs);
+                            currLocs = qubits(unionOfAllQubitsInUse);
                         }
-                    }
-                    //heuristic to check whether all qubits operated upon are in the upper half of wfn
-                    if (*setForSearch.begin() > (num_qubits_ / 2)) {
-                        reorder_wavefunction(currLocs, newLocs);
-                        currLocs = qubits(unionOfAllQubitsInUse);
-                    }
-                    //keeping old and new location in order to set it appropriately
-                    std::unordered_map<unsigned, unsigned> old2newDict;
-                    for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                        old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
-                    }
+                        //keeping old and new location in order to set it appropriately
+                        std::unordered_map<unsigned, unsigned> old2newDict;
+                        for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
+                            old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
+                        }
 
-                    for (int i = 0; i < itemsToFuse.size(); i++) {
-                        itemsToFuse[i].remap_idx(old2newDict);
+                        for (int i = 0; i < itemsToFuse.size(); i++) {
+                            itemsToFuse[i].remap_idx(old2newDict);
+                        }
+                        fg.remap_target_set(old2newDict);
+                        fg.remap_ctrl_set(old2newDict);
                     }
-                    fg.remap_target_set(old2newDict);
-                    fg.remap_ctrl_set(old2newDict);
                 }
 
                 fused_.flush(wfn_);
             }
-
         }
+        gatelist_.clear();
     }
 
     // method to find next location qubit should be moved to for reordering routine
@@ -503,10 +514,13 @@ public:
         if (gatelist_.size() > 50) {
             flush();
         }
-        /*if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
-            flush();
+
+        //@@@DBG+ Turn on the old code if we're not scheduling
+        int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
+        if ((dbgReorder & 2) == 0) {
+            if (doFlush) flush();
+            fused_.apply(wfn_, g.matrix(), g.qubit());
         }
-        fused_.apply(wfn_, g.matrix(), g.qubit());*/
     }
 
     /// generic application of a multiply controlled gate
@@ -519,11 +533,13 @@ public:
         if (gatelist_.size() > 50) {
             flush();
         }
-        //check flush condition
-        /*if (fused_.shouldFlush(wfn_, g.matrix(), cs, g.qubit())) {
-            flush();
+        
+        //@@@DBG+ Turn on the old code is we're not scheduling
+        int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
+        if ((dbgReorder & 2) == 0) {
+            if (doFlush) flush();
+            fused_.apply(wfn_, g.matrix(), g.qubit());
         }
-        fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());*/
     }
 
     /// generic application of a controlled gate

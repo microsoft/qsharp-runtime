@@ -15,7 +15,7 @@ namespace Microsoft {
         int dbgFusedSpan = 4; //@@@DBG
         int dbgFusedLimit = 99;
         int dbgNumThreads = 0;
-        int dbgReorder = 0;
+        int dbgReorder = 2;
     }
 }
 

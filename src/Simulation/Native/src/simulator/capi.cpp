@@ -171,5 +171,9 @@ MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void(*callback)(unsig
 {
     Microsoft::Quantum::Simulator::get(id)->dumpIds(callback);
 }
-
+//@@@DBG+  Force a flush of any fused gates
+MICROSOFT_QUANTUM_DECL void Flush(_In_ unsigned id)
+{
+    Microsoft::Quantum::Simulator::get(id)->flush();
+}
 }
