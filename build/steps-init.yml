@@ -18,8 +18,6 @@ steps:
 ##
 # Bootstrap
 ##
-- task: BatchScript@1
-  displayName: 'Prepare build'
-  inputs:
-    filename: bootstrap.cmd
-    modifyEnvironment: true
+- pwsh: ./bootstrap.ps1
+  displayName: "Bootstrap repository"
+  workingDirectory: $(System.DefaultWorkingDirectory)

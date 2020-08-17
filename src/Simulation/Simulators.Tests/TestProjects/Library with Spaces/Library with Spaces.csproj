@@ -12,9 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj"
-                      PrivateAssets="All"
-                      IsQscReference="true" />
+    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
 
   <Target Name="BeforeCsharpCompile">

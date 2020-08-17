@@ -561,7 +561,7 @@ module SimulationCode =
 
         and buildArrayItem a i =
             match i.ResolvedType.Resolution with
-            | Range -> ``invoke`` ((buildExpression a) <|?.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
+            | Range -> ``invoke`` ((buildExpression a) <|.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
             | _ -> ``item`` (buildExpression a) [ (buildExpression i) ]
 
         let buildBlock (block : QsScope) =
@@ -927,7 +927,7 @@ module SimulationCode =
     /// Returns a static property of type OperationInfo using the operation's input and output types.
     let buildOperationInfoProperty (globalContext:CodegenContext) operationInput operationOutput operationName =
         let propertyType =
-            match globalContext.ExecutionTarget with
+            match globalContext.ProcessorArchitecture with
             | target when target = AssemblyConstants.HoneywellProcessor -> sprintf "HoneywellEntryPointInfo<%s, %s>" operationInput operationOutput
             | target when target = AssemblyConstants.IonQProcessor      -> sprintf "IonQEntryPointInfo<%s, %s>"      operationInput operationOutput
             | target when target = AssemblyConstants.QCIProcessor       -> sprintf "QCIEntryPointInfo<%s, %s>"       operationInput operationOutput

@@ -12,7 +12,8 @@ steps:
     testRunTitle: 'Q# runtime tests'
 
 - task: PublishSymbols@1
-  displayName: 'Publish symbols'
+  displayName: 'Publish symbols (Windows only)'
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   continueOnError: true
   inputs:
     SearchPattern: '$(System.DefaultWorkingDirectory)/src/**/*.pdb'
