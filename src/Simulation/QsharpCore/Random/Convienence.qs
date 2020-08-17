@@ -92,8 +92,24 @@ namespace Microsoft.Quantum.Random {
         }
     }
 
-    // TODO: rename from binomial, since it's a single trial.
-    operation DrawBinomialSample(successProbability : Double) : Bool {
+    /// # Summary
+    /// Given a success probability, returns a single Bernoulli trial that 
+    /// is true with the given probability.
+    ///
+    /// # Input
+    /// ## successProbability
+    /// The probability with which `true` should be returned.
+    ///
+    /// # Output
+    /// `true` with probability `successProbability` and `false` with
+    /// probability `1.0 - successProbability`.
+    ///
+    /// # Example
+    /// The following Q# snippet samples flips from a biased coin:
+    /// ```Q#
+    /// let flips = DrawMany(DrawRandomBool, 10, 0.6);
+    /// ```
+    operation DrawRandomBool(successProbability : Double) : Bool {
         return DrawRandomDouble(0.0, 1.0) <= successProbability;
     }
 }

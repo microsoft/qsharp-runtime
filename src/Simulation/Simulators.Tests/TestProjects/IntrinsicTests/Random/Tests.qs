@@ -4,6 +4,7 @@ namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Random;
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Convert;
+    open Microsoft.Quantum.Math;
 
     // Uses Welford's method to compute the mean and variance of an array
     // of samples.
@@ -101,6 +102,50 @@ namespace Microsoft.Quantum.Tests {
             1000000,
             (0.0, 1.0),
             0.02
+        );
+    }
+
+    /// # Summary
+    /// Checks that @"microsoft.quantum.random.normaldistribution" has the
+    /// expected moments.
+    @Test("QuantumSimulator")
+    operation CheckNormalDistributionHasRightMoments() : Unit {
+        CheckMeanAndVariance(
+            "normal(-2.0, 5.0)",
+            NormalDistribution(-2.0, 5.0),
+            1000000,
+            (-2.0, 5.0),
+            0.02
+        );
+    }
+
+    /// # Summary
+    /// Checks that @"microsoft.quantum.random.drawrandombool" has the right
+    /// first moment. Note that since DrawRandomBool represents a Bernoulli
+    /// trial, it is entirely characterized by its first moment; we don't need
+    /// to check variance here.
+    @Test("QuantumSimulator")
+    operation CheckDrawRandomBoolHasRightExpectation() : Unit {
+        // NB: DrawMany isn't available yet, since it's in the
+        // Microsoft.Quantum.Standard package, not QSharpCore.
+        let prHeads = 0.65;
+        let nFlips = 1000000;
+        let stdDev = Sqrt(IntAsDouble(nFlips) * prHeads * (1.0 - prHeads));
+        let expected = IntAsDouble(nFlips) * prHeads;
+        let nAllowedStdDev = 4.0;
+        mutable nHeads = 0;
+        for (idx in 0..nFlips - 1) {
+            if (DrawRandomBool(prHeads)) {
+                set nHeads += 1;
+            }
+        }
+
+        let delta = IntAsDouble(nHeads) - expected;
+
+        Fact(
+            -nAllowedStdDev * stdDev <= delta and
+            delta <= nAllowedStdDev * stdDev,
+            "First moment of Bernoulli distribution was incorrect."
         );
     }
     
