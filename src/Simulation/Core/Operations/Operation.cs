@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Core
     {
         O Apply(I args);
 
-        ICallable<P,O> Partial<P>(Func<P, I> mapper);
+        ICallable<P, O> Partial<P>(Func<P, I> mapper);
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.Core
     /// </summary>
     /// <typeparam name="I">Type of input parameters.</typeparam>
     /// <typeparam name="O">Type of return values.</typeparam>
-    [DebuggerTypeProxy(typeof(Operation<,>.DebuggerProxy))]  
+    [DebuggerTypeProxy(typeof(Operation<,>.DebuggerProxy))]
     public abstract class Operation<I, O> : AbstractCallable, ICallable<I, O>
     {
         private Lazy<AdjointedOperation<I, O>> _adjoint;
@@ -56,7 +56,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
 
         public virtual IApplyData __dataIn(I data) => new QTuple<I>(data);
-                                               
+
         public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Simulation.Core
             {
                 Label = ((ICallable)this).Name,
                 FormattedNonQubitArgs = args.GetNonQubitArgumentsAsString() ?? "",
-                Targets = args.GetQubits() ?? new List<Qubit>(),
+                Targets = args.GetQubits()?.Distinct() ?? new List<Qubit>(),
             };
 
         public O Apply(I a)
@@ -95,7 +95,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 this.Factory?.StartOperation(this, __dataIn(a));
                 __result__ = this.Body(a);
             }
-            catch( Exception e)
+            catch (Exception e)
             {
                 this.Factory?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
                 throw;
@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 this.Factory?.EndOperation(this, __dataOut(__result__));
             }
 
-            return __result__; 
+            return __result__;
         }
 
         public T Partial<T>(object partialInfo)
@@ -212,7 +212,7 @@ namespace Microsoft.Quantum.Simulation.Core
         {
             private Operation<I, O> op;
 
-            public DebuggerProxy(Operation<I,O> op)
+            public DebuggerProxy(Operation<I, O> op)
             {
                 this.op = op;
             }

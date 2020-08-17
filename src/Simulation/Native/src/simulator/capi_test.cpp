@@ -23,12 +23,12 @@ void CZ(unsigned sim_id, unsigned c, unsigned q)
 
 void Ry(unsigned sim_id, double phi, unsigned q)
 {
-    R(sim_id,2,phi,q);
+    R(sim_id,3,phi,q);
 }
 
 void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
 {
-    MCR(sim_id,3,phi,1,&c,q);
+    MCR(sim_id,2,phi,1,&c,q);
 }
 
 void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
@@ -115,7 +115,7 @@ void test_gates()
      CRx(sim_id, 1.0, 0, 1);
 
     H(sim_id, 1);
-    CRx(sim_id, -1.0, 0, 1);
+    CRz(sim_id, -1.0, 0, 1);
     H(sim_id, 1);
 
     assert(M(sim_id, 1)==false);

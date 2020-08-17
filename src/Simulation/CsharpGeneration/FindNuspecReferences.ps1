@@ -21,13 +21,13 @@
 
 using namespace System.IO
 
-$target = 'Microsoft.Quantum.CsharpGeneration.nuspec'
+$target = Join-Path $PSScriptRoot 'Microsoft.Quantum.CsharpGeneration.nuspec'
 if (Test-Path $target) {
     Write-Host "$target exists. Skipping generating new one."
     exit
 }
 
-$nuspec = [Xml](Get-Content 'Microsoft.Quantum.CsharpGeneration.nuspec.template')
+$nuspec = [Xml](Get-Content (Join-Path $PSScriptRoot 'Microsoft.Quantum.CsharpGeneration.nuspec.template'))
 $dependencies = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
 # Adds a dependency to the dependencies element if it does not already exist.

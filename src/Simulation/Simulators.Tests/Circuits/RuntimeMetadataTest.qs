@@ -11,6 +11,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     operation Empty () : Unit is Ctl + Adj { }
 
+    operation WrapperOp (op: (Qubit => Unit), q : Qubit) : Unit {
+        op(q);
+        Reset(q);
+    }
+
     operation HOp (q : Qubit) : Unit {
         H(q);
         Reset(q);
@@ -20,6 +25,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         using (q = Qubit()) {
             HOp(q);
         }
+    }
+
+    operation TwoQubitOp (q1 : Qubit, q2 : Qubit) : Unit {
+        // ...
     }
     
 }
