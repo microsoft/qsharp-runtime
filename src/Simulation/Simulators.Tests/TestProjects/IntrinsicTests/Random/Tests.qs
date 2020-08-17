@@ -148,5 +148,68 @@ namespace Microsoft.Quantum.Tests {
             "First moment of Bernoulli distribution was incorrect."
         );
     }
+
+    /// # Summary
+    /// Checks that DrawCategorical never draws elements with probability zero.
+    @Test("QuantumSimulator")
+    operation CheckImpossibleEventsAreNotDrawn() : Unit {
+        let distribution = CategoricalDistribution([0.5, 0.0, 0.5]);
+        let nTrials = 100000;
+        for (idxTrial in 0..nTrials - 1) {
+            let variate = distribution::Sample();
+            Fact(
+                variate != 1,
+                "A variate of 1 was drawn from a categorical distribution, depsite having a probability of 0."
+            );
+        }
+    }
     
+    // We define a couple callables to help us run continuous tests on discrete
+    // distributions as well.
+
+    internal operation DrawDiscreteAsContinuous(discrete : DiscreteDistribution) : Double {
+        return IntAsDouble(discrete::Sample());
+    }
+
+    internal function DiscreteAsContinuous(discrete : DiscreteDistribution) : ContinuousDistribution {
+        return ContinuousDistribution(Delay(DrawDiscreteAsContinuous, discrete, _));
+    }
+
+    @Test("QuantumSimulator")
+    operation CheckCategoricalMomentsAreCorrect() : Unit {
+        let categorical = DiscreteAsContinuous(
+            CategoricalDistribution([0.2, 0.7, 0.3])
+        );
+        let expected = 0.0 * 0.2 + 1.0 * 0.7 + 2.0 * 0.3;
+        let variance = PowD(0.0 - expected, 2.0) * 0.2 +
+                       PowD(1.0 - expected, 2.0) * 0.7 +
+                       PowD(2.0 - expected, 2.0) * 0.3;
+        
+        CheckMeanAndVariance(
+            "categorical([0.2, 0.7, 0.3])",
+            categorical,
+            1000000,
+            (expected, variance),
+            0.04
+        );
+    }
+
+    @Test("QuantumSimulator")
+    operation CheckDiscreteUniformMomentsAreCorrect() : Unit {
+        let (min, max) = (-3, 7);
+        let expected = 0.5  * (IntAsDouble(min + max));
+        let variance = (1.0 / 12.0) * (
+            PowD(IntAsDouble(max - min + 1), 2.0) - 1.0
+        );
+        CheckMeanAndVariance(
+            $"discrete uniform ({min}, {max})",
+            DiscreteAsContinuous(
+                DiscreteUniformDistribution(min, max)
+            ),
+            1000000,
+            (expected, variance),
+            0.1
+        );
+    }
+
 }
