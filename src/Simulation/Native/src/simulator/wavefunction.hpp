@@ -22,114 +22,131 @@
 
 namespace Microsoft
 {
-namespace Quantum
-{
-    extern int dbgReorder;      //@@@DBG+ Bit0=Reorder bit1=Schedule
-    extern int dbgFusedSpan;    //@@@DBG+
-
-namespace SIMULATOR
-{
-    namespace detail
+    namespace Quantum
     {
-        inline std::size_t get_register(const std::vector<unsigned>& qs, std::size_t basis_state)
+        extern int dbgReorder;      //@@@DBG+ Bit0=Reorder bit1=Schedule
+        extern int dbgFusedSpan;    //@@@DBG+
+
+        namespace SIMULATOR
         {
-            std::size_t result = 0;
-            for (unsigned i = 0; i < qs.size(); ++i)
-                result |= ((basis_state >> qs[i]) & 1) << i;
-            return result;
+            namespace detail
+            {
+                inline std::size_t get_register(const std::vector<unsigned>& qs, std::size_t basis_state)
+                {
+                    std::size_t result = 0;
+                    for (unsigned i = 0; i < qs.size(); ++i)
+                        result |= ((basis_state >> qs[i]) & 1) << i;
+                    return result;
 
-        }
-
-        inline std::size_t set_register(const std::vector<unsigned>& qs, std::size_t qmask, std::size_t basis_state, std::size_t original = 0ull)
-        {
-            std::size_t result = original & ~qmask;
-            for (unsigned i = 0; i < qs.size(); ++i)
-                result |= ((basis_state >> i) & 1) << qs[i];
-            return result;
-        }
-    }
-
-    // Creating a gate wrapper datatype to represent a gate in a cluster
-    class GateWrapper {
-    public:
-        GateWrapper(std::vector<unsigned> controls, unsigned target, TinyMatrix<ComplexType, 2> mat) : controls_(controls), target_(target), mat_(mat) {}
-        std::vector<unsigned> get_controls() { return controls_; }
-        unsigned get_target() { return target_; }
-        TinyMatrix<ComplexType, 2> get_mat() { return mat_; }
-    private:
-        std::vector<unsigned> controls_;
-        unsigned target_;
-        TinyMatrix<ComplexType, 2> mat_;
-    };
-
-    // Creating a cluster datatype for new scheduling logic
-    class Cluster {
-    public:
-        Cluster(std::vector<unsigned> qids, std::vector<GateWrapper> gates) : qids_(qids), gates_(gates) {}
-        std::vector<unsigned> get_qids() { return qids_; }
-        std::vector<GateWrapper> get_gates() { return gates_; }
-
-        void setQids(std::vector<unsigned> qids) {
-            qids_ = qids;
-        }
-
-        void append_gates(std::vector<GateWrapper> gates) {
-            gates_.insert(gates_.end(), gates.begin(), gates.end());
-        }
-
-        size_t size() {
-            return gates_.size();
-        }
-
-        // Greedy method that finds next appropriate cluster
-        std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& prevClusters, unsigned maxWidth, unsigned maxDepth) {
-            std::set<unsigned> tempCurQids(qids_.begin(), qids_.end());
-            for (int i = 0; i < prevClusters.size(); i++) {
-                if (i > maxDepth) {
-                    break;
-                }
-                auto prevQids = prevClusters[i].get_qids();
-                std::sort(prevQids.begin(), prevQids.end());
-                std::set<unsigned> tempTotQids(qids_.begin(), qids_.end());
-                tempTotQids.insert(prevQids.begin(), prevQids.end());
-                std::vector<unsigned> totQids(tempTotQids.begin(), tempTotQids.end());
-                if (totQids.size() <= maxWidth) {
-                    auto cl = prevClusters[i];
-                    prevClusters.erase(prevClusters.begin() + i);
-                    return std::make_pair(cl, totQids);
                 }
 
-                std::vector<int> qidsIntersection;
-                if (i == prevClusters.size() - 1) {
-                    std::set_intersection(prevQids.begin(), prevQids.end(),
-                        tempCurQids.begin(), tempCurQids.end(),
-                        std::back_inserter(qidsIntersection));
-                }
-                else {
-                    std::vector<unsigned> lookAhead = prevClusters[i + 1].get_qids();
-                    std::set<int> lookAheadQids(lookAhead.begin(), lookAhead.end());
-                    if (i == 0) {
-                        std::set_intersection(prevQids.begin(), prevQids.end(),
-                            tempCurQids.begin(), tempCurQids.end(),
-                            std::back_inserter(qidsIntersection));
-                    }
-                    std::set_intersection(lookAheadQids.begin(), lookAheadQids.end(),
-                        tempCurQids.begin(), tempCurQids.end(),
-                        std::back_inserter(qidsIntersection));
-                }
-                tempCurQids.insert(prevQids.begin(), prevQids.end());
-                if (qidsIntersection.size() > 0) {
-                    break;
+                inline std::size_t set_register(const std::vector<unsigned>& qs, std::size_t qmask, std::size_t basis_state, std::size_t original = 0ull)
+                {
+                    std::size_t result = original & ~qmask;
+                    for (unsigned i = 0; i < qs.size(); ++i)
+                        result |= ((basis_state >> i) & 1) << qs[i];
+                    return result;
                 }
             }
-            Cluster defCl = Cluster({}, {});
-            std::vector<unsigned> defVec = {};
-            return std::make_pair(defCl, defVec);
-        }
-    private:
-        std::vector<unsigned> qids_;
-        std::vector<GateWrapper> gates_;
-    };
+
+            // Creating a gate wrapper datatype to represent a gate in a cluster
+            class GateWrapper {
+            public:
+                GateWrapper(std::vector<unsigned> controls, unsigned target, TinyMatrix<ComplexType, 2> mat) : controls_(controls), target_(target), mat_(mat) {}
+                std::vector<unsigned> get_controls() { return controls_; }
+                unsigned get_target() { return target_; }
+                TinyMatrix<ComplexType, 2> get_mat() { return mat_; }
+            private:
+                std::vector<unsigned> controls_;
+                unsigned target_;
+                TinyMatrix<ComplexType, 2> mat_;
+            };
+
+            // Creating a cluster datatype for new scheduling logic
+            class Cluster {
+            public:
+                Cluster(std::vector<unsigned> qids, std::vector<GateWrapper> gates) : qids_(qids), gates_(gates) {}
+                std::vector<unsigned> get_qids() { return qids_; }
+                std::vector<GateWrapper> get_gates() { return gates_; }
+
+                void setQids(std::vector<unsigned> qids) {
+                    qids_ = qids;
+                }
+
+                void append_gates(std::vector<GateWrapper> gates) {
+                    gates_.insert(gates_.end(), gates.begin(), gates.end());
+                }
+
+                size_t size() {
+                    return gates_.size();
+                }
+
+                //@@@DBG+
+                //void dbg1(char* name,std::set<unsigned> st) {
+                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    for (const auto& v : st) printf(" %d", v);
+                //    printf("\n");
+                //}
+                //void dbg2(char* name, std::vector<unsigned> st) {
+                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    for (const auto& v : st) printf(" %d", v);
+                //    printf("\n");
+                //}
+
+                // Greedy method that finds next appropriate cluster
+                std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth, unsigned maxDepth) {
+                    std::vector<unsigned>   myUnion;                                // My qubits touched + Next qubits touched
+                    std::vector<unsigned>   myDiff;                                 // New qubits touched by Next
+                    std::vector<unsigned>   myInter;                                // Old qubits touched by Next
+                    std::vector<unsigned>   allInter;                               // My qubits + All touched qubits
+                    std::set<unsigned>      myTouched(qids_.begin(), qids_.end());  // My qubits touched
+                    std::set<unsigned>      allTouched(qids_.begin(), qids_.end()); // All the qubits touched so far
+                    //printf("@@@DBG: maxWidth: %d ===============================================\n", maxWidth);
+                    //dbg1("myTouched", myTouched); //@@@DBG+
+                    for (int i = 0; i < (int)nextClusters.size() && i < (int)maxDepth; i++) { // Look at the clusters that follow us
+                        auto                    nextQs = nextClusters[i].get_qids();// Pull off one future cluster
+                        myUnion.clear();
+                        std::set_union(nextQs.begin(), nextQs.end(),                // See what qubits we and the future cluster touch
+                            myTouched.begin(), myTouched.end(),
+                            std::back_inserter(myUnion));
+                            //dbg2("next >>>>", nextQs);
+                            //dbg1("allTouched", allTouched); //@@@DBG+
+                            //dbg2("   myUnion", myUnion); //@@@DBG+
+                        if (myUnion.size() <= maxWidth) {                           // It's a candiate if it's not beyond our allowed width
+                            myDiff.clear();
+                            std::set_difference(nextQs.begin(), nextQs.end(),       // Figure out if any of the future qubits aren't already seen by us
+                                myTouched.begin(), myTouched.end(),
+                                std::back_inserter(myDiff));
+                            allInter.clear();
+                            std::set_intersection(myDiff.begin(), myDiff.end(),     // These are any new qubits that might have already been touched
+                                allTouched.begin(), allTouched.end(),
+                                std::back_inserter(allInter));
+                            //dbg2("  allInter", allInter); //@@@DBG+
+                            //dbg2("    myDiff", myDiff); //@@@DBG+
+                            if (allInter.size() == 0) {                             // If the new qubits are untouched... then this is allowed
+                                auto cl = nextClusters[i];
+                                nextClusters.erase(nextClusters.begin() + i);       // Remove the future cluster
+                                // printf("@@@DBG:                          GOOD!!!!\n");
+                                return std::make_pair(cl, myUnion);                 // ... and add it to our cluster (done above)
+                            }
+                        }
+                        myInter.clear();
+                        std::set_intersection(nextQs.begin(), nextQs.end(),         // If a future cluster touches any of our qubits... we've hit a hard wall
+                            myTouched.begin(), myTouched.end(),
+                            std::back_inserter(myInter));
+                        if (myInter.size() != 0) break;
+
+                        allTouched.insert(nextQs.begin(), nextQs.end());            // Add in all qubits touched, and try the next cluster
+                    }
+                    // printf("@@@DBG:                          bad!!!!\n");
+                    Cluster defCl = Cluster({}, {});                                // Couldn't find any more clusters to add
+                    std::vector<unsigned> defVec = {};
+                    return std::make_pair(defCl, defVec);
+                }
+        private:
+            std::vector<unsigned> qids_;
+            std::vector<GateWrapper> gates_;
+            };
 
 /// A wave function class to store and manipulate the state of qubits
 
@@ -194,11 +211,16 @@ public:
             for (int i = 0; i < clusters.size(); i++) {
                 Cluster cl = clusters.at(i);
 
-                //@@@DBG+
-                //auto qids = cl.get_qids();
-                //printf("@@@DBG Cluster: %d (nqs=%d): ", i, (int)qids.size());
-                //for (int ii = 0; ii < qids.size(); ii++) printf(" %d",qids[ii]);
-                //printf("\n");
+                /* @@@DBG+
+                auto qids = cl.get_qids();
+                auto gs = cl.get_gates();
+                printf("@@@DBG Cluster: %d (nqs=%d, nGates=%d): ", i, (int)qids.size(), (int)gs.size());
+                for (const auto& qid : qids) printf(" %d",qid);
+                printf("\n");
+                for (GateWrapper& g : gs) {
+                    printf("@@@DBG     qs=%d\n", 1+g.get_controls().size());
+                }
+                */
 
                 for (GateWrapper gate : cl.get_gates()) {
                     std::vector<unsigned> cs = gate.get_controls();
@@ -449,27 +471,27 @@ public:
                 curClusters.push_back(newCl);
             }
             //creating clusters using greedy algorithm
-            for (int i = 1; i < fuseSpan + 1; i++) {
-                auto prevClusters = curClusters;
+            for (int i = 1; i < (int)fuseSpan + 1; i++) {                                   // Build clusters of width 1,2,...
+                auto prevClusters = curClusters;                                            // Save away the last set of clusters built
                 curClusters.clear();
-                auto prevCluster = prevClusters[0];
+                auto prevCluster = prevClusters[0];                                         // Pop the first cluster
                 prevClusters.erase(prevClusters.begin());
-                while (prevClusters.size() > 0) {
-                    auto foundCompat = prevCluster.next_cluster(prevClusters, i, maxDepth);
+                while (prevClusters.size() > 0) {                                           // While there are more clusters...
+                    auto foundCompat = prevCluster.next_cluster(prevClusters, i, maxDepth); // See if we can accumlate anyone who follows
                     Cluster clusterFound = foundCompat.first;
                     std::vector<unsigned> foundTotQids = foundCompat.second;
-                    if (clusterFound.get_gates().size() == 0) {
-                        curClusters.push_back(prevCluster);
+                    if (clusterFound.get_gates().size() == 0) {                             // Can't append any more clusters to this one
+                        curClusters.push_back(prevCluster);                                 // Save this cluster
                         prevCluster = prevClusters[0];
-                        prevClusters.erase(prevClusters.begin());
+                        prevClusters.erase(prevClusters.begin());                           // Remove it from our list
                     }
                     else {
-                        prevCluster.setQids(foundTotQids);
+                        prevCluster.setQids(foundTotQids);                                  // New version of our cluster (appended)
                         prevCluster.append_gates(clusterFound.get_gates());
                     }
-                }
-                curClusters.push_back(prevCluster);
-            }
+                }                                                                           // Keep looking for clusters to add
+                curClusters.push_back(prevCluster);                                         // Save the final cluster
+            }                                                                               // Start all over with the next larger span
         }
         
         return curClusters;

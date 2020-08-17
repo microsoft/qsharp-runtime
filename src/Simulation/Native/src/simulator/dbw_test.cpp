@@ -132,7 +132,10 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
                 rslt.push_back(qs);
                 break;
             }
-            else phase = 3;
+            else {
+                phase = 3;
+                [[fallthrough]];
+            }
         case 3:
             if (regex_match(line, sm, reCluster)) {
                 rslt.push_back(empty);
@@ -246,8 +249,8 @@ int main()
             char fName[30];
 
             //@@@DBG: Skip over tests we don't want to do right now
-            if (idxSched != 4) continue;         // Just try Aniket Dalvi (intern) scheduler
-            if (numThreads > 4) continue;                       // Not on a big machine
+            if (/*idxSched != 1 && idxSched != 3 &&*/ idxSched != 4) continue; // Try specific schedulers
+            if (numThreads > 4) continue;                       //Not on a big machine
             if (prbIdx > 8 && prbIdx < 10) continue;            // Not on a big machine
             if (prbIdx != 7 || fuseSpan != 4) continue;         // Just do a single test
 
