@@ -856,7 +856,7 @@ module SimulationCode =
     let getTypeOfOp context (n: QsQualifiedName) =
         let name =
             let sameNamespace = match context.current with | None -> false | Some o -> o.Namespace = n.Namespace
-            let opName = if sameNamespace then n.Name.Value else n.Namespace.Value + "." + n.Name.Value
+            let opName = if sameNamespace then n.Name.Value else "global::" + n.Namespace.Value + "." + n.Name.Value
             if isGeneric context n then
                 let signature = context.allCallables.[n].Signature
                 let count = signature.TypeParameters.Length
