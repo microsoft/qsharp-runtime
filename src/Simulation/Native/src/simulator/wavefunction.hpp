@@ -126,7 +126,7 @@ namespace Microsoft
                             if (allInter.size() == 0) {                             // If the new qubits are untouched... then this is allowed
                                 auto cl = nextClusters[i];
                                 nextClusters.erase(nextClusters.begin() + i);       // Remove the future cluster
-                                // printf("@@@DBG:                          GOOD!!!!\n");
+                                //printf("@@@DBG:                          GOOD!!!! (%d)\n",i);
                                 return std::make_pair(cl, myUnion);                 // ... and add it to our cluster (done above)
                             }
                         }
@@ -218,7 +218,9 @@ public:
                 for (const auto& qid : qids) printf(" %d",qid);
                 printf("\n");
                 for (GateWrapper& g : gs) {
-                    printf("@@@DBG     qs=%d\n", 1+g.get_controls().size());
+                    printf("@@@DBG   ");
+                    for (auto& c : g.get_controls()) printf(" %d", c);
+                    printf(" %d\n",g.get_target());
                 }
                 */
 
@@ -458,7 +460,7 @@ public:
         std::vector<Cluster> curClusters;
 
         if (gates.size() > 0) {
-            unsigned maxDepth = 999;
+            unsigned maxDepth = 300;
             //creating initial cluster containing one gate each
             for (int i = 0; i < gates.size(); i++) {
                 std::vector<unsigned> qids;
