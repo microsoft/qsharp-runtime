@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override Func<IQArray<double>, Int64> Body => (p) =>
             {
-                return CommonUtils.SampleDistribution(p, Simulator.random.NextDouble());
+                return CommonUtils.SampleDistribution(p, Simulator.RandomGenerator.NextDouble());
             };            
         }
     }
