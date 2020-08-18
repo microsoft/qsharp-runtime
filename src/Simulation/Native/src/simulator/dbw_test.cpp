@@ -150,14 +150,16 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
 
 void mySprintf(char* buf, int bufSiz, const char* fmt, ...) {
     va_list args;
-    __crt_va_start(args, fmt);
 #ifdef _MSC_VER
+    __crt_va_start(args, fmt);
     vsprintf_s(buf, bufSiz, fmt, args);
+    __crt_va_end(args);
 #else
+    va_start(args,fmt);
     vsprintf(buf, fmt, args);
+    va_end(args);
 #endif
     //perror(buf);
-    __crt_va_end(args);
 }
 
 int numQs(vector<vector<int32_t>> prb) {
