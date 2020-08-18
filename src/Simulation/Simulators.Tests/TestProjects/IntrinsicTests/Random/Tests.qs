@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.drawrandomdint" obeys ranges.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
-    operation CheckDrawRandomIntObeysRanges () : Unit {
+    operation CheckDrawRandomIntObeysRanges() : Unit {
         let randomInt = DrawRandomInt(0, 45);
         if (randomInt > 45 or randomInt < 0) {
             fail $"DrawRandomInt(0, 45) returned {randomInt}, outside the allowed range.";
