@@ -188,14 +188,14 @@ int main()
         {   1,  1,  4,  4,  4}, // Original benchmark
 
         {   1,  2,  4,  4,  4}, // 4 bits Shor
-        {   1,  3,  4,  4,  4}, // 6 bits Shor
-        {   1,  4,  4,  4,  4}, // 8 bits Shor
-        {   1,  5,  4,  4,  4}, // 10 bits Shor
-        {   1,  6,  4,  4,  4}, // 12 bits Shor
         {   1,  2,  6,  4,  4}, // 4 bits Shor
+        {   1,  3,  4,  4,  4}, // 6 bits Shor
         {   1,  3,  6,  4,  4}, // 6 bits Shor
         {   1,  4,  6,  4,  4}, // 8 bits Shor
+        {   1,  4,  4,  4,  4}, // 8 bits Shor
+        {   1,  5,  4,  4,  4}, // 10 bits Shor
         {   1,  5,  6,  4,  4}, // 10 bits Shor
+        {   1,  6,  4,  4,  4}, // 12 bits Shor
         {   1,  6,  6,  4,  4}, // 12 bits Shor
 
         {   1,  7,  1,  4,  4}, // Suprem_44_4
@@ -239,24 +239,23 @@ int main()
     const char* xtras[6]    = { "",    "",    "S0",  "S1",  "",   "", };
 
 
-    for (int idxSched = 0; idxSched < 6; idxSched++) {
-        const char* sched = scheds[idxSched];
-        printf("==== sched: %s\n", sched);
+    for (int tIdx = 0; tIdx < testCnt; tIdx++) {
+        int doRange = tests[tIdx][0];
+        int prbIdx = tests[tIdx][1];
+        int fuseSpan = tests[tIdx][2];
+        int numThreads = tests[tIdx][3];
+        int simTyp = tests[tIdx][4];
+        char fName[30];
 
-        for (int tIdx = 0; tIdx < testCnt; tIdx++) {
-            int doRange = tests[tIdx][0];
-            int prbIdx = tests[tIdx][1];
-            int fuseSpan = tests[tIdx][2];
-            int numThreads = tests[tIdx][3];
-            int simTyp = tests[tIdx][4];
-            char fName[30];
+        for (int idxSched = 0; idxSched < 6; idxSched++) {
+            const char* sched = scheds[idxSched];
+            printf("==== sched: %s\n", sched);
 
             //@@@DBG: Skip over tests we don't want to do right now
             //if (numThreads > 4) continue;                         // Not on a big machine
             //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
-
-            if (idxSched == 2 || idxSched == 5) continue;           // Try specific schedulers
             //if (prbIdx != 4 || fuseSpan != 4) continue;           // Just do a single test
+            if (idxSched == 2 || idxSched == 5) continue;           // Try specific schedulers
 
             bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
