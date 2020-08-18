@@ -19,8 +19,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
         private readonly double[] gateTimes;
-
-        private readonly Random random = new Random(DateTime.Now.Millisecond);
         protected readonly QCTraceSimulatorCoreConfiguration tCoreConfig;
 
         private Dictionary<int, string> primitiveOperationsIdToNames =
