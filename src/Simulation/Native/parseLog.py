@@ -1,5 +1,6 @@
 import re   
 import sys
+import numpy as np
 
 logName = sys.argv[1]
 reSched = re.compile(r"^==== sched:\s+(\S+)")
@@ -32,27 +33,35 @@ prbs = [
     "shor_12"  ,
     "suprem_44",
     "suprem_55",
-    "suprem_56"
+    "suprem_56",
+    "qulacs_5",
+    "qulacs_10",
+    "qulacs_15",
+    "qulacs_20",
+    "qulacs_25"
 ]
 def dumpGpss():
     global gpss,env,sim,totalQs,threads,span,sz,rng,prb,sched
     if len(gpss) > 0:
-        gpsAvg  = sum(gpss) / len(gpss)
+        gpsMed  = np.median(gpss)
         cnt     = 0.0
         tot     = 0.0
         for gps in gpss:
-            if gps > gpsAvg/2.0 and gps < gpsAvg*1.5:
+            #print(f" {gps:.1f}",end='') # @@@DBG
+            if gps > gpsMed/2.0 and gps < gpsMed*1.5:
                 cnt += 1.0
                 tot += gps
+            #else: print("*",end='') # @@@DBG
+        if cnt > 0: gps = tot/cnt
+        else:       gps = gpsAvg
+
+        #print(f" = {gps:.1f}")  # @@@DBG
 
         nam     = prbs[prb]
        
         if rng == 0:    nam  = f'{env},{nam}L'
         elif rng == 2:  nam  = f'{env},{nam}H'
         else:           nam  = f'{env},{nam}'
-
-        if cnt > 0: gps = tot/cnt
-        else:       gps = gpsAvg
 
         print(f"{nam},{sched},{sim},{totalQs},{threads},{span},{sz},{gps:.1f}")
         

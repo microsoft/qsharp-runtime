@@ -94,17 +94,18 @@ namespace Microsoft
                 //}
 
                 // Greedy method that finds next appropriate cluster
-                std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth, unsigned maxDepth) {
+                std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
                     std::vector<unsigned>   myUnion;                                // My qubits touched + Next qubits touched
                     std::vector<unsigned>   myDiff;                                 // New qubits touched by Next
                     std::vector<unsigned>   myInter;                                // Old qubits touched by Next
                     std::vector<unsigned>   allInter;                               // My qubits + All touched qubits
                     std::set<unsigned>      myTouched(qids_.begin(), qids_.end());  // My qubits touched
-                    std::set<unsigned>      allTouched(qids_.begin(), qids_.end()); // All the qubits touched so far
+                    std::set<unsigned>      allTouched = myTouched;                 // All the qubits touched so far
                     //printf("@@@DBG: maxWidth: %d ===============================================\n", maxWidth);
                     //dbg1("myTouched", myTouched); //@@@DBG+
-                    for (int i = 0; i < (int)nextClusters.size() && i < (int)maxDepth; i++) { // Look at the clusters that follow us
-                        auto                    nextQs = nextClusters[i].get_qids();// Pull off one future cluster
+                    int lastNexts = (int)nextClusters.size() - 1;                   // nexts are in reverse order (from above)
+                    for (int i = 0; i <= lastNexts; i++) {                          // Look at the clusters that follow us
+                        auto   nextQs = nextClusters[lastNexts-i].get_qids();       // Pull off one future cluster
                         myUnion.clear();
                         std::set_union(nextQs.begin(), nextQs.end(),                // See what qubits we and the future cluster touch
                             myTouched.begin(), myTouched.end(),
@@ -124,8 +125,8 @@ namespace Microsoft
                             //dbg2("  allInter", allInter); //@@@DBG+
                             //dbg2("    myDiff", myDiff); //@@@DBG+
                             if (allInter.size() == 0) {                             // If the new qubits are untouched... then this is allowed
-                                auto cl = nextClusters[i];
-                                nextClusters.erase(nextClusters.begin() + i);       // Remove the future cluster
+                                auto cl = nextClusters[lastNexts-i];
+                                nextClusters.erase(nextClusters.begin() + (lastNexts-i));       // Remove the future cluster
                                 //printf("@@@DBG:                          GOOD!!!! (%d)\n",i);
                                 return std::make_pair(cl, myUnion);                 // ... and add it to our cluster (done above)
                             }
@@ -460,7 +461,6 @@ public:
         std::vector<Cluster> curClusters;
 
         if (gates.size() > 0) {
-            unsigned maxDepth = 300;
             //creating initial cluster containing one gate each
             for (int i = 0; i < gates.size(); i++) {
                 std::vector<unsigned> qids;
@@ -473,19 +473,20 @@ public:
                 curClusters.push_back(newCl);
             }
             //creating clusters using greedy algorithm
+            std::reverse(curClusters.begin(),curClusters.end());                            // Keep everything in reverse order
             for (int i = 1; i < (int)fuseSpan + 1; i++) {                                   // Build clusters of width 1,2,...
                 auto prevClusters = curClusters;                                            // Save away the last set of clusters built
                 curClusters.clear();
-                auto prevCluster = prevClusters[0];                                         // Pop the first cluster
-                prevClusters.erase(prevClusters.begin());
+                auto prevCluster = prevClusters.back();                                     // Pop the first cluster
+                prevClusters.pop_back();
                 while (prevClusters.size() > 0) {                                           // While there are more clusters...
-                    auto foundCompat = prevCluster.next_cluster(prevClusters, i, maxDepth); // See if we can accumlate anyone who follows
+                    auto foundCompat = prevCluster.next_cluster(prevClusters, i);           // See if we can accumlate anyone who follows
                     Cluster clusterFound = foundCompat.first;
                     std::vector<unsigned> foundTotQids = foundCompat.second;
                     if (clusterFound.get_gates().size() == 0) {                             // Can't append any more clusters to this one
                         curClusters.push_back(prevCluster);                                 // Save this cluster
-                        prevCluster = prevClusters[0];
-                        prevClusters.erase(prevClusters.begin());                           // Remove it from our list
+                        prevCluster = prevClusters.back();
+                        prevClusters.pop_back();
                     }
                     else {
                         prevCluster.setQids(foundTotQids);                                  // New version of our cluster (appended)
@@ -494,6 +495,7 @@ public:
                 }                                                                           // Keep looking for clusters to add
                 curClusters.push_back(prevCluster);                                         // Save the final cluster
             }                                                                               // Start all over with the next larger span
+            std::reverse(curClusters.begin(),curClusters.end());
         }
         
         return curClusters;
@@ -572,7 +574,7 @@ public:
             flush();
         }
         
-        //@@@DBG+ Turn on the old code is we're not scheduling
+        //@@@DBG+ Turn on the old code if we're not scheduling
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
         if ((dbgReorder & 2) == 0) {
             if (doFlush) flush();

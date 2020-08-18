@@ -185,6 +185,7 @@ int main()
     int tests[testCnt][5] = {
         // rng prb spn thr sim
         {   1,  0,  4,  4,  4}, // Original benchmark
+        {   1,  1,  4,  4,  4}, // Original benchmark
 
         {   1,  2,  4,  4,  4}, // 4 bits Shor
         {   1,  3,  4,  4,  4}, // 6 bits Shor
@@ -251,10 +252,11 @@ int main()
             char fName[30];
 
             //@@@DBG: Skip over tests we don't want to do right now
-            if (idxSched == 2 || idxSched == 5) continue;           // Try specific schedulers
             //if (numThreads > 4) continue;                         // Not on a big machine
             //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
-            //if (prbIdx != 7 || fuseSpan != 4) continue;           // Just do a single test
+
+            if (/*idxSched != 0 &&*/ idxSched != 4) continue;       // Try specific schedulers
+            //if (prbIdx != 4 || fuseSpan != 4) continue;           // Just do a single test
 
             bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
@@ -274,7 +276,9 @@ int main()
             }
             else if (prbIdx >= 2 && prbIdx <= 6) { // Shor
                 int bits = prbIdx * 2;
-                mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, fuseSpan);
+                int useSpan = fuseSpan;
+                if (fuseSpan != 4 && fuseSpan != 6) useSpan = 4;
+                mySprintf(fName, sizeof(fName), "shor%s_%d_%d.log", xtras[idxSched], bits, useSpan);
                 prb = loadTest(fName, doClusters);
                 nQs = numQs(prb);
             }
@@ -289,9 +293,9 @@ int main()
                     sizR = 5;
                     sizC = 6;
                 }
-                int spanInp = 4;
-                if (fuseSpan > 4) spanInp = fuseSpan;
-                mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, spanInp);
+                int useSpan = fuseSpan;
+                if (fuseSpan != 4 && fuseSpan != 6) useSpan = 4;
+                mySprintf(fName, sizeof(fName), "suprem%s_%d%d_%d.log", xtras[idxSched], sizR, sizC, useSpan);
                 prb = loadTest(fName, doClusters);
                 nQs = numQs(prb);
             }
