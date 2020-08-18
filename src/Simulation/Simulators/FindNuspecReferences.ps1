@@ -19,7 +19,7 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
-$target = "Microsoft.Quantum.Simulators.nuspec"
+$target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec"
 
 if (Test-Path $target) { 
     Write-Host "$target exists. Skipping generating new one."
@@ -28,7 +28,7 @@ if (Test-Path $target) {
 
 
 # Start with the nuspec template
-$nuspec = [xml](Get-Content "Microsoft.Quantum.Simulators.nuspec.template")
+$nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec.template"))
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
 function Add-PackageReferenceIfNew($ref)

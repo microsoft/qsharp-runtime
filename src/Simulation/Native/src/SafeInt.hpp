@@ -47,8 +47,10 @@ Please read the leading comments before using the class.
 #define CPLUSPLUS_STD CPLUSPLUS_98
 #elif __cplusplus < 201402L
 #define CPLUSPLUS_STD CPLUSPLUS_11
-#else 
+#elif __cplusplus < 201703L
 #define CPLUSPLUS_STD CPLUSPLUS_14
+#else
+#define CPLUSPLUS_STD CPLUSPLUS_17
 #endif
 
 #elif SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
@@ -60,10 +62,13 @@ Please read the leading comments before using the class.
 #elif _MSC_VER < 1910 // VS 2015
 #define CPLUSPLUS_STD CPLUSPLUS_11
 
-#else // VS 2017 or later
+#elif _MSC_VER < 1926 // VS 2017
+#define CPLUSPLUS_STD CPLUSPLUS_14
+
+#else // VS 2019 or later
 // Note - there is a __cpp_constexpr test now, but everything prior to VS 2017 reports incorrect values
 // and this version always supports at least the CPLUSPLUS_14 approach
-#define CPLUSPLUS_STD CPLUSPLUS_14
+#define CPLUSPLUS_STD CPLUSPLUS_17
 
 #endif 
 
@@ -72,8 +77,8 @@ Please read the leading comments before using the class.
 #define CPLUSPLUS_STD CPLUSPLUS_98
 #endif // Determine C++ support level
 
-#if (SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER) && CPLUSPLUS_STD < CPLUSPLUS_11
-#error Must compile with --std=c++11, preferably --std=c++14 to use constexpr improvements
+#if (SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER) && CPLUSPLUS_STD < CPLUSPLUS_17
+#error Must compile with --std=c++17
 #endif
 
 #define CONSTEXPR_NONE 0

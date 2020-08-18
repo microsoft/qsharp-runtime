@@ -167,6 +167,7 @@ namespace N1
     let genMapper                               = findCallable @"genMapper"
     let genIter                                 = findCallable @"genIter"
     let usesGenerics                            = findCallable @"usesGenerics"
+    let callsGenericWithMultipleTypeParams      = findCallable @"callsGenericWithMultipleTypeParams"
     let duplicatedDefinitionsCaller             = findCallable @"duplicatedDefinitionsCaller"
     let nestedArgTuple1                         = findCallable @"nestedArgTuple1"
     let nestedArgTuple2                         = findCallable @"nestedArgTuple2"
@@ -452,6 +453,11 @@ namespace N1
             ((NS1, "noOpResult"     ), "IUnitary<Result>")
         ]
         |> testOne usesGenerics
+
+        [
+            ((NSG, "genericWithMultipleTypeParams"), "ICallable")
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             ((NS2, "Allocate"       ), "Allocate")
@@ -897,13 +903,18 @@ namespace N1
         |> testOne usesGenerics
 
         [
-            template "Z"                                      "IUnitary<Qubit>"                 "Microsoft.Quantum.Intrinsic.Z"
+            template "genericWithMultipleTypeParams"        "ICallable"                         "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
+
+        [
+            template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
             "this.self = this;"
         ]
         |> testOne selfInvokingOperation
 
         [
-            template "self"                                 "ICallable"                       "genRecursion<>"
+            template "self"                                 "ICallable"                         "genRecursion<>"
         ]
         |> testOne genRecursion
 
@@ -933,6 +944,11 @@ namespace N1
         ]
         |> List.sort
         |> testOne usesGenerics
+
+        [
+            template "genericWithMultipleTypeParams<,,>"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "composeImpl<,>"
@@ -978,6 +994,11 @@ namespace N1
             template "IUnitary<Result>"             "MicrosoftQuantumTestingnoOpResult"
         ]
         |> testOne usesGenerics
+
+        [
+            template "ICallable"                    "genericWithMultipleTypeParams"
+        ]
+        |> testOne callsGenericWithMultipleTypeParams
 
         [
             template "IUnitary<Qubit>"              "Z"
@@ -1221,7 +1242,7 @@ namespace N1
 
             "X.Apply(qubits.Data[0L]);"
             "X.Adjoint.Apply(qubits.Data[0L]);"
-            "X.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
+            "X.Controlled.Apply((qubits.Data.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
             "call_target1.Apply((1L, X,     X,   X,   X));"
             "call_target1.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
@@ -1799,7 +1820,7 @@ namespace N1
             "var r5 = (IQArray<Result>)QArray<Result>.Create((4L + 2L));"
             "var r6 = QArray<Pauli>.Create(r5.Length);"
             "var r7 = (IQArray<Int64>)QArray<Int64>.Add(r2, r4);"
-            "var r8 = (IQArray<Int64>)r7?.Slice(new QRange(1L, 5L, 10L));"
+            "var r8 = (IQArray<Int64>)r7.Slice(new QRange(1L, 5L, 10L));"
 
             "var r9 = new arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
             "var r10 = (IQArray<arrays_T1>)QArray<arrays_T1>.Create(4L);"
@@ -1807,8 +1828,8 @@ namespace N1
             "var r12 = (IQArray<arrays_T2>)QArray<arrays_T2>.Create(r10.Length);"
             "var r13 = new arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
             "var r14 = (IQArray<Qubit>)QArray<Qubit>.Add(qubits, register.Data);"
-            "var r15 = (IQArray<Qubit>)register.Data?.Slice(new QRange(0L, 2L));"
-            "var r16 = (IQArray<Qubit>)qubits?.Slice(new QRange(1L, -(1L)));"
+            "var r15 = (IQArray<Qubit>)register.Data.Slice(new QRange(0L, 2L));"
+            "var r16 = (IQArray<Qubit>)qubits.Slice(new QRange(1L, -(1L)));"
             "var r18 = (IQArray<Qubits>)QArray<Qubits>.Create(2L);"
             "var r19 = (IQArray<Microsoft.Quantum.Overrides.udt0>)QArray<Microsoft.Quantum.Overrides.udt0>.Create(7L);"
             "var i0 = r13.Data[0L][1L];"
@@ -1839,12 +1860,12 @@ namespace N1
             "var r2 = new QRange(10L,-(2L),0L);"
             "var ranges = (IQArray<QRange>)QArray<QRange>.Create(1L);"
 
-            "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
-            "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
-            "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
-            "var s4 = (IQArray<Qubit>)qubits?.Slice(GetMeARange.Apply(QVoid.Instance));"
+            "var s1 = (IQArray<Qubit>)qubits.Slice(new QRange(0L,10L));"
+            "var s2 = (IQArray<Qubit>)qubits.Slice(r2);"
+            "var s3 = (IQArray<Qubit>)qubits.Slice(ranges[3L]);"
+            "var s4 = (IQArray<Qubit>)qubits.Slice(GetMeARange.Apply(QVoid.Instance));"
 
-            "return qubits?.Slice(new QRange(10L,-(3L),0L));"
+            "return qubits.Slice(new QRange(10L,-(3L),0L));"
         ]
         |> testOneBody (applyVisitor sliceOperations)
 
@@ -2314,7 +2335,7 @@ namespace N1
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
         let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
         let assemblyConstants =
-            new System.Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ExecutionTarget, executionTarget)
+            new Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ProcessorArchitecture, executionTarget)
             |> Seq.singleton
             |> ImmutableDictionary.CreateRange
         let compilation = {Namespaces = syntaxTree; EntryPoints = ImmutableArray.Create op.FullName}
@@ -2502,7 +2523,7 @@ namespace N1
         |> testOneClass genCtrl3 AssemblyConstants.HoneywellProcessor
 
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1266, 1272)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1271, 1277)]
     public partial class composeImpl<__A__, __B__> : Operation<(ICallable,ICallable,__B__), QVoid>, ICallable
     {
         public composeImpl(IOperationFactory m) : base(m)
@@ -2579,7 +2600,7 @@ namespace N1
     [<Fact>]
     let ``buildOperationClass - access modifiers`` () =
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1314, 1316)]
+[SourceLocation("%%%", OperationFunctor.Body, 1319, 1321)]
 internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
 {
     public EmptyInternalFunction(IOperationFactory m) : base(m)
@@ -2613,7 +2634,7 @@ internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
         |> testOneClass emptyInternalFunction null
 
         """
-[SourceLocation("%%%", OperationFunctor.Body, 1316, 1318)]
+[SourceLocation("%%%", OperationFunctor.Body, 1321, 1323)]
 internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallable
 {
     public EmptyInternalOperation(IOperationFactory m) : base(m)
@@ -2730,7 +2751,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     [<Fact>]
     let ``buildOperationClass - concrete functions`` () =
         """
-    [SourceLocation("%%%", OperationFunctor.Body, 1301,1310)]
+    [SourceLocation("%%%", OperationFunctor.Body, 1306,1315)]
     public partial class UpdateUdtItems : Function<MyType2, MyType2>, ICallable
     {
         public UpdateUdtItems(IOperationFactorym) : base(m)
@@ -3508,7 +3529,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     else
                     {
 #line 20 "%%"
-                        foreach (var c in ctrls?.Slice(new QRange(0L, 2L, r)))
+                        foreach (var c in ctrls.Slice(new QRange(0L, 2L, r)))
 #line hidden
                         {
 #line 21 "%%"
