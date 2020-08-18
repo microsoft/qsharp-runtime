@@ -82,16 +82,16 @@ namespace Microsoft
                 }
 
                 //@@@DBG+
-                void dbg1(char* name,std::set<unsigned> st) {
-                    printf("@@@DBG: %s(%d):  ", name, st.size());
-                    for (const auto& v : st) printf(" %d", v);
-                    printf("\n");
-                }
-                void dbg2(char* name, std::vector<unsigned> st) {
-                    printf("@@@DBG: %s(%d):  ", name, st.size());
-                    for (const auto& v : st) printf(" %d", v);
-                    printf("\n");
-                }
+                //void dbg1(char* name,std::set<unsigned> st) {
+                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    for (const auto& v : st) printf(" %d", v);
+                //    printf("\n");
+                //}
+                //void dbg2(char* name, std::vector<unsigned> st) {
+                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    for (const auto& v : st) printf(" %d", v);
+                //    printf("\n");
+                //}
 
                 // Greedy method that finds next appropriate cluster
                 std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
