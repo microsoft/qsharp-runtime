@@ -22,6 +22,7 @@ open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
+open Microsoft.Quantum.QsCompiler.TargetGeneration.GenerateTarget
 
 
 module SimulationCode =
@@ -3813,5 +3814,51 @@ namespace Microsoft.Quantum.Tests.UnitTests
         |>
         testOneFile (Path.Combine("Circuits","UnitTests.qs"))
 
+    let testOneTarget target baseClass qbm dmp expectedFile =
+        let syntaxTree = parse [ (Path.Combine("Circuits", target + ".qs")) ]
+        let text = GenerateTarget syntaxTree target "Test" baseClass qbm dmp
+        let expected = (Path.Combine("Circuits", expectedFile + ".txt")) |> File.ReadAllText
+        Assert.Equal(expected, text)
+        ()
+
+    [<Fact>]
+    let ``target test: manual`` () =
+        let syntaxTree = parse [ (Path.Combine("Circuits", "DupNameTarget.qs")) ]
+        let text = GenerateTarget syntaxTree "DupNameTarget" "Test" 
+                        None
+                        false false
+        File.WriteAllText("Target.cs" , text)
+        ()
 
 
+    [<Fact>]
+    let ``target test: simple`` () =
+        testOneTarget "SimpleTarget" None false false "SimpleTarget"
+
+    [<Fact>]
+    let ``target test: simple with qubit mgmt`` () =
+        testOneTarget "SimpleTarget" None true false "SimpleTarget_q"
+
+    [<Fact>]
+    let ``target test: simple with dump`` () =
+        testOneTarget "SimpleTarget" None false true "SimpleTarget_d"
+
+    [<Fact>]
+    let ``target test: simple with dump and qubit mgmt`` () =
+        testOneTarget "SimpleTarget" None true true "SimpleTarget_qd"
+
+    [<Fact>]
+    let ``target test: unit arg`` () =
+        testOneTarget "UnitArgTarget" None false false "UnitArgTarget"
+
+    [<Fact>]
+    let ``target test: emulator`` () =
+        testOneTarget "EmulatorTarget" 
+            (Some "QuantumSimulator") 
+            false false "EmulatorTarget"
+
+    [<Fact>]
+    let ``target test: duplicate names`` () =
+        testOneTarget "DupNameTarget" 
+            (Some "Microsoft.Quantum.Simulation.Simulators.QuantumSimulator") 
+            false false "DupNameTarget"

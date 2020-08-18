@@ -118,28 +118,37 @@ module SimulationCode =
 // TODO: Diagnostics
         | Null -> (true, true)
 
+    let roslynSimpleTypeName (qsharpType:ResolvedType) =
+        match qsharpType.Resolution with
+        | QsTypeKind.UnitType      -> Some "QVoid"
+        | QsTypeKind.Int           -> Some "Int64"
+        | QsTypeKind.BigInt        -> Some "System.Numerics.BigInteger"
+        | QsTypeKind.Double        -> Some "Double"
+        | QsTypeKind.Bool          -> Some "Boolean"
+        | QsTypeKind.String        -> Some "String"
+        | QsTypeKind.Qubit         -> Some "Qubit"
+        | QsTypeKind.Result        -> Some "Result"
+        | QsTypeKind.Pauli         -> Some "Pauli"
+        | QsTypeKind.Range         -> Some "QRange"
+        | _                        -> None
+
    // Maps Q# types to their corresponding Roslyn type
     let rec roslynTypeName context (qsharpType:ResolvedType) : string =
-        match qsharpType.Resolution with
-        | QsTypeKind.UnitType      -> "QVoid"
-        | QsTypeKind.Int           -> "Int64"
-        | QsTypeKind.BigInt        -> "System.Numerics.BigInteger"
-        | QsTypeKind.Double        -> "Double"
-        | QsTypeKind.Bool          -> "Boolean"
-        | QsTypeKind.String        -> "String"
-        | QsTypeKind.Qubit         -> "Qubit"
-        | QsTypeKind.Result        -> "Result"
-        | QsTypeKind.Pauli         -> "Pauli"
-        | QsTypeKind.Range         -> "QRange"
-        | QsTypeKind.ArrayType arrayType    -> sprintf "IQArray<%s>" (arrayType |> roslynTypeName context)
-        | QsTypeKind.TupleType tupleType    -> tupleType |> roslynTupleTypeName context
-        | QsTypeKind.UserDefinedType name   -> justTheName context (QsQualifiedName.New (name.Namespace, name.Name))
-        | QsTypeKind.Operation (_,functors) -> roslynCallableInterfaceName functors.Characteristics
-        | QsTypeKind.Function _             -> roslynCallableInterfaceName ResolvedCharacteristics.Empty
-        | QsTypeKind.TypeParameter t        -> t |> roslynTypeParameterName
-        | QsTypeKind.MissingType            -> "object"
-// TODO: diagnostics
-        | QsTypeKind.InvalidType            -> ""
+        qsharpType 
+        |> roslynSimpleTypeName           
+        |> Option.defaultWith 
+            (fun () ->
+                match qsharpType.Resolution with
+                | QsTypeKind.ArrayType arrayType    -> sprintf "IQArray<%s>" (arrayType |> roslynTypeName context)
+                | QsTypeKind.TupleType tupleType    -> tupleType |> roslynTupleTypeName context
+                | QsTypeKind.UserDefinedType name   -> justTheName context (QsQualifiedName.New (name.Namespace, name.Name))
+                | QsTypeKind.Operation (_,functors) -> roslynCallableInterfaceName functors.Characteristics
+                | QsTypeKind.Function _             -> roslynCallableInterfaceName ResolvedCharacteristics.Empty
+                | QsTypeKind.TypeParameter t        -> t |> roslynTypeParameterName
+                | QsTypeKind.MissingType            -> "object"
+        // TODO: diagnostics
+                | _            -> ""
+            )
 
     and roslynTupleTypeName context tupleTypes =
         tupleTypes
@@ -940,6 +949,13 @@ module SimulationCode =
             (``=>`` newInstance)
         :> MemberDeclarationSyntax
 
+    let getAdjointBodyName (sp:QsSpecialization) =
+        match sp.Kind with
+        | QsAdjoint           -> "Body"
+        | QsControlledAdjoint -> "ControlledBody"
+//TODO: diagnostics.
+        | _ -> "Body"
+
     let buildSpecializationBody context (sp:QsSpecialization) =
         match sp.Implementation with
         | Provided (args, _) ->
@@ -977,32 +993,34 @@ module SimulationCode =
 
             Some (``() => {}`` [ argName ] (argsInit @ statements @ ret) :> ExpressionSyntax)
         | Generated SelfInverse ->
-            let adjointedBodyName =
-                match sp.Kind with
-                | QsAdjoint           -> "Body"
-                | QsControlledAdjoint -> "ControlledBody"
-//TODO: diagnostics.
-                | _ -> "Body"
+            let adjointedBodyName = getAdjointBodyName sp
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
         | _ ->
             None
+
+    let getSpecPropertyName (sp:QsSpecialization) =
+        match sp.Kind with
+        | QsBody              -> "Body"
+        | QsAdjoint           -> "AdjointBody"
+        | QsControlled        -> "ControlledBody"
+        | QsControlledAdjoint -> "ControlledAdjointBody"
 
     let buildSpecialization context (sp:QsSpecialization) : (PropertyDeclarationSyntax * _) option =
         let inType  = roslynTypeName context sp.Signature.ArgumentType
         let outType = roslynTypeName context sp.Signature.ReturnType
         let propertyType = "Func<" + inType + ", " + outType + ">"
-        let bodyName =
-            match sp.Kind with
-            | QsBody              -> "Body"
-            | QsAdjoint           -> "Adjoint"
-            | QsControlled        -> "Controlled"
-            | QsControlledAdjoint -> "ControlledAdjoint"
         let body = buildSpecializationBody context sp
         let attributes =
             match sp.Location with
             | Null -> []
             | Value location -> [
                 // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
+                let bodyName =
+                    match sp.Kind with
+                    | QsBody              -> "Body"
+                    | QsAdjoint           -> "Adjoint"
+                    | QsControlled        -> "Controlled"
+                    | QsControlledAdjoint -> "ControlledAdjoint"
                 let startLine = fst location.Offset + 1
                 let endLine =
                     match context.declarationPositions.TryGetValue sp.SourceFile with
@@ -1017,13 +1035,13 @@ module SimulationCode =
                     ``literal`` startLine
                     ``literal`` endLine
                 ]
-        ]
+            ]
 
         match body with
         | Some body ->
-            let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
+            let propertyName = getSpecPropertyName sp
             let impl =
-                ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
+                ``property-arrow_get`` propertyType propertyName [``public``; ``override``]
                     ``get``
                     (``=>`` body)
             Some (impl, attributes)
@@ -1343,13 +1361,34 @@ module SimulationCode =
         | DefaultAccess -> ``public``
         | Internal -> ``internal``
 
+    let getBaseClass context op =
+        let inType   = op.Signature.ArgumentType |> roslynTypeName context
+        let outType  = op.Signature.ReturnType   |> roslynTypeName context
+        let baseOp =
+            if isFunction op then
+                "Function"
+            else
+                let (adj, ctrl) = op.Signature.Information.Characteristics.SupportedFunctors |> hasAdjointControlled
+                match (adj, ctrl) with
+                | (false , false) -> "Operation"
+                | (true  , false) -> "Adjointable"
+                | (false , true ) -> "Controllable"
+                | (true  , true ) -> "Unitary"
+        let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
+        let baseClass = genericBase baseOp ``<<`` typeArgsInterface ``>>``
+        baseClass, inType, outType
+
+    let buildInOutData context op =
+        let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType)
+        let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
+        inData, outData
+
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
         let (name, nonGenericName) = findClassName context op
         let opNames = operationDependencies op
-        let inType   = op.Signature.ArgumentType |> roslynTypeName context
-        let outType  = op.Signature.ReturnType   |> roslynTypeName context
+        let baseClass, inType, outType = getBaseClass context op
 
         let constructors = [ (buildConstructor context name) ]
         let properties =
@@ -1361,25 +1400,10 @@ module SimulationCode =
                 opProperties
             else opProperties
 
-        let baseOp =
-            if isFunction op then
-                "Function"
-            else
-                let (adj, ctrl) = op.Signature.Information.Characteristics.SupportedFunctors |> hasAdjointControlled
-                match (adj, ctrl) with
-                | (false , false) -> "Operation"
-                | (true  , false) -> "Adjointable"
-                | (false , true ) -> "Controllable"
-                | (true  , true ) -> "Unitary"
-
-        let typeArgsInterface = if (baseOp = "Operation" || baseOp = "Function") then [inType; outType] else [inType]
-        let typeParameters = typeParametersNames op.Signature
-        let baseClass = genericBase baseOp ``<<`` typeArgsInterface ``>>``
         let bodies, attr =
             op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList
             |> List.map (fun (x, y) -> (x :> MemberDeclarationSyntax, y)) |> List.unzip
-        let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType)
-        let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
+        let inData, outData = buildInOutData context op
 
         let defaultTargetNs = NonNullable<_>.New("Microsoft.Quantum.Simulation.Simulators")
         let testTargets =
@@ -1411,6 +1435,7 @@ module SimulationCode =
             else
                 [ access; ``partial`` ]
 
+        let typeParameters = typeParametersNames op.Signature
         ``attributes`` (attr |> List.concat) (
             ``class`` name ``<<`` typeParameters ``>>``
                 ``:`` (Some baseClass) ``,`` [ ``simpleBase`` "ICallable" ] modifiers
@@ -1578,7 +1603,7 @@ module SimulationCode =
         |> Seq.toList
 
     /// The comment that is displayed at the top of generated files.
-    let internal autogenComment = [
+    let autogenComment = [
         "//------------------------------------------------------------------------------"
         "// <auto-generated>                                                             "
         "//     This code was generated by a tool.                                       "
@@ -1587,6 +1612,12 @@ module SimulationCode =
         "// </auto-generated>                                                            "
         "//------------------------------------------------------------------------------"
     ]
+
+    let buildPragmas comp = 
+        comp
+        |> ``pragmaDisableWarning`` 1591
+        |> ``pragmaDisableWarning`` 0162 // unreachable code
+        |> ``pragmaDisableWarning`` 0436 // shadowing existing classes from references
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
     let buildSyntaxTree localElements (context : CodegenContext) =
@@ -1599,9 +1630,7 @@ module SimulationCode =
             usings
             namespaces
         // We add a "pragma warning disable 1591" since we don't generate doc comments in our C# code.
-        |> ``pragmaDisableWarning`` 1591
-        |> ``pragmaDisableWarning`` 0162 // unreachable code
-        |> ``pragmaDisableWarning`` 0436 // shadowing existing classes from references
+        |> buildPragmas
         |> ``with leading comments`` autogenComment
 
     // Helper method that takes a SyntaxTree, adds trivia (formatting)
