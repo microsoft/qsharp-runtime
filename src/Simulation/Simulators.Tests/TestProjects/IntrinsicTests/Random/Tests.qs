@@ -167,12 +167,12 @@ namespace Microsoft.Quantum.Tests {
     // We define a couple callables to help us run continuous tests on discrete
     // distributions as well.
 
-    internal operation DrawDiscreteAsContinuous(discrete : DiscreteDistribution) : Double {
+    internal operation DrawDiscreteAsContinuous(discrete : DiscreteDistribution, delay : Unit) : Double {
         return IntAsDouble(discrete::Sample());
     }
 
     internal function DiscreteAsContinuous(discrete : DiscreteDistribution) : ContinuousDistribution {
-        return ContinuousDistribution(Delay(DrawDiscreteAsContinuous, discrete, _));
+        return ContinuousDistribution(DrawDiscreteAsContinuous(discrete, _));
     }
 
     @Test("QuantumSimulator")
