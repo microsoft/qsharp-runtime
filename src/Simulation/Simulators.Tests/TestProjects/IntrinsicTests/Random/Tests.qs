@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Tests {
             let variate = distribution::Sample();
             Fact(
                 variate != 1,
-                "A variate of 1 was drawn from a categorical distribution, depsite having a probability of 0."
+                "A variate of 1 was drawn from a categorical distribution, despite having a probability of 0."
             );
         }
     }
