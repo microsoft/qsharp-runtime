@@ -178,15 +178,34 @@ namespace Microsoft.Quantum.Tests {
     @Test("QuantumSimulator")
     operation CheckCategoricalMomentsAreCorrect() : Unit {
         let categorical = DiscreteAsContinuous(
-            CategoricalDistribution([0.2, 0.7, 0.3])
+            CategoricalDistribution([0.2, 0.5, 0.3])
         );
-        let expected = 0.0 * 0.2 + 1.0 * 0.7 + 2.0 * 0.3;
+        let expected = 0.0 * 0.2 + 1.0 * 0.5 + 2.0 * 0.3;
         let variance = PowD(0.0 - expected, 2.0) * 0.2 +
-                       PowD(1.0 - expected, 2.0) * 0.7 +
+                       PowD(1.0 - expected, 2.0) * 0.5 +
                        PowD(2.0 - expected, 2.0) * 0.3;
         
         CheckMeanAndVariance(
-            "categorical([0.2, 0.7, 0.3])",
+            "categorical([0.2, 0.5, 0.3])",
+            categorical,
+            1000000,
+            (expected, variance),
+            0.04
+        );
+    }
+
+    @Test("QuantumSimulator")
+    operation CheckRescaledCategoricalMomentsAreCorrect() : Unit {
+        let categorical = DiscreteAsContinuous(
+            CategoricalDistribution([2.0, 5.0, 3.0])
+        );
+        let expected = 0.0 * 0.2 + 1.0 * 0.5 + 2.0 * 0.3;
+        let variance = PowD(0.0 - expected, 2.0) * 0.2 +
+                       PowD(1.0 - expected, 2.0) * 0.5 +
+                       PowD(2.0 - expected, 2.0) * 0.3;
+        
+        CheckMeanAndVariance(
+            "categorical([0.2, 0.5, 0.3])",
             categorical,
             1000000,
             (expected, variance),
@@ -195,8 +214,8 @@ namespace Microsoft.Quantum.Tests {
     }
     
     @Test("QuantumSimulator")
-    operation CheckCategoricalHistographIsCorrect() : Unit {
-        let categorical = CategoricalDistribution([0.2, 0.7, 0.3]);
+    operation CheckCategoricalHistogramIsCorrect() : Unit {
+        let categorical = CategoricalDistribution([0.2, 0.5, 0.3]);
         mutable counts = new Int[3];
         let nSamples = 1000000;
 
@@ -206,7 +225,7 @@ namespace Microsoft.Quantum.Tests {
         }
 
         Fact(190000 <= counts[0] and counts[0] <= 210000, $"counts[0] was {counts[0]}, expected about 200000.");
-        Fact(690000 <= counts[1] and counts[1] <= 710000, $"counts[1] was {counts[1]}, expected about 700000.");
+        Fact(490000 <= counts[1] and counts[1] <= 510000, $"counts[1] was {counts[1]}, expected about 500000.");
         Fact(290000 <= counts[2] and counts[2] <= 310000, $"counts[2] was {counts[2]}, expected about 300000.");
     }
 
