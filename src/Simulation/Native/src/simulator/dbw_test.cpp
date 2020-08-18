@@ -251,10 +251,10 @@ int main()
             char fName[30];
 
             //@@@DBG: Skip over tests we don't want to do right now
-            //if (/*idxSched != 1 && idxSched != 3 &&*/ idxSched != 4) continue; // Try specific schedulers
-            //if (numThreads > 4) continue;                       // Not on a big machine
-            //if (prbIdx > 8 && prbIdx < 10) continue;            // Not on a big machine
-            //if (prbIdx != 7 || fuseSpan != 4) continue;         // Just do a single test
+            if (idxSched == 2 || idxSched == 5) continue;           // Try specific schedulers
+            //if (numThreads > 4) continue;                         // Not on a big machine
+            //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
+            //if (prbIdx != 7 || fuseSpan != 4) continue;           // Just do a single test
 
             bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
