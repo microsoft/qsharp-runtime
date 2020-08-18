@@ -83,12 +83,12 @@ namespace Microsoft
 
                 //@@@DBG+
                 //void dbg1(char* name,std::set<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
                 //    for (const auto& v : st) printf(" %d", v);
                 //    printf("\n");
                 //}
                 //void dbg2(char* name, std::vector<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, st.size());
+                //    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
                 //    for (const auto& v : st) printf(" %d", v);
                 //    printf("\n");
                 //}
