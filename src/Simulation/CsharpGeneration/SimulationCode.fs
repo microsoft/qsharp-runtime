@@ -66,8 +66,7 @@ module SimulationCode =
     let isCurrentOp context n = match context.current with | None -> false | Some name ->  name = n
 
     let prependNamespaceString (name : QsQualifiedName) =
-        let pieces = name.Namespace.Value.Split([|'.'|]) |> String.Concat
-        pieces + name.Name.Value
+        name.Namespace.Value.Replace (".", "__") + "__" + name.Name.Value
 
     let needsFullPath context (op:QsQualifiedName) =
         let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
