@@ -1015,7 +1015,7 @@ namespace N1
     let ``buildOperationInfoProperty test`` () =
         let testOne (_, op) expectedCodeString =
             let context = {createTestContext op with entryPoints = ImmutableArray.Create op.FullName}
-            let (_, operationName) = findClassName context op
+            let (_, operationName) = findClassName op
             let inType   = op.Signature.ArgumentType |> roslynTypeName context
             let outType  = op.Signature.ReturnType   |> roslynTypeName context
             let codeString =
@@ -2234,7 +2234,7 @@ namespace N1
     let ``buildRun test`` () =
         let testOne (_,op) expected =
             let context = createTestContext op
-            let (name, nonGenericName) = findClassName context op
+            let _, nonGenericName = findClassName op
             let actual = buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType |> formatSyntaxTree
             Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
