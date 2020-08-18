@@ -11,6 +11,16 @@
 
 // some convenience functions
 
+//@@@DBG+
+unsigned init() {
+    int simTyp = 0;
+    int fuseSpan = 4;
+    int numThreads = 4;
+    int doReorder = 2;      // 1 = reorder 2 = schedule
+    auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
+    return sim_id;
+}
+
 void CX(unsigned sim_id, unsigned c, unsigned q)
 {
     MCX(sim_id,1,&c,q);
@@ -87,6 +97,7 @@ void test_teleport()
     // check teleportation success
     R(sim_id, 3, (-1.1), 0);
     H(sim_id, 0);
+    dump(sim_id, "@@@DBG teleport");
     assert(M(sim_id, 0)==false);
 
     dump(sim_id, "teleport-end.txt");
@@ -107,8 +118,10 @@ void test_gates()
     allocateQubit(sim_id, 0);
     allocateQubit(sim_id, 1);
 
+    dump(sim_id, "test_gatesA");
     CRx(sim_id, 1.0, 0, 1);
 
+    dump(sim_id, "test_gatesB");
     assert(M(sim_id, 1) == false);
 
     X(sim_id, 0);
@@ -345,14 +358,13 @@ void test_permute_basis()
     Ry(sim_id, -1.1, 3);
     CX(sim_id, 1, 2);
     H(sim_id, 1);
-
     // Dump(sim_id, "permute-end.txt");
     assert(M(sim_id, 0) == false);
     assert(M(sim_id, 1) == false);
     assert(M(sim_id, 2) == false);
     assert(M(sim_id, 3) == false);
     assert(M(sim_id, 4) == false);
-
+ 
     for (unsigned i = 0; i < nqubits + 1; ++i)
         release(sim_id, i);
     destroy(sim_id);

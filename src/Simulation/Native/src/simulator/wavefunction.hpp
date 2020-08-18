@@ -82,16 +82,16 @@ namespace Microsoft
                 }
 
                 //@@@DBG+
-                //void dbg1(char* name,std::set<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, st.size());
-                //    for (const auto& v : st) printf(" %d", v);
-                //    printf("\n");
-                //}
-                //void dbg2(char* name, std::vector<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, st.size());
-                //    for (const auto& v : st) printf(" %d", v);
-                //    printf("\n");
-                //}
+                void dbg1(char* name,std::set<unsigned> st) {
+                    printf("@@@DBG: %s(%d):  ", name, st.size());
+                    for (const auto& v : st) printf(" %d", v);
+                    printf("\n");
+                }
+                void dbg2(char* name, std::vector<unsigned> st) {
+                    printf("@@@DBG: %s(%d):  ", name, st.size());
+                    for (const auto& v : st) printf(" %d", v);
+                    printf("\n");
+                }
 
                 // Greedy method that finds next appropriate cluster
                 std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
@@ -106,6 +106,7 @@ namespace Microsoft
                     int lastNexts = (int)nextClusters.size() - 1;                   // nexts are in reverse order (from above)
                     for (int i = 0; i <= lastNexts; i++) {                          // Look at the clusters that follow us
                         auto   nextQs = nextClusters[lastNexts-i].get_qids();       // Pull off one future cluster
+                        std::sort(nextQs.begin(), nextQs.end());                    // Has to be sorted for set operations
                         myUnion.clear();
                         std::set_union(nextQs.begin(), nextQs.end(),                // See what qubits we and the future cluster touch
                             myTouched.begin(), myTouched.end(),
@@ -222,6 +223,15 @@ public:
                     printf("@@@DBG   ");
                     for (auto& c : g.get_controls()) printf(" %d", c);
                     printf(" %d\n",g.get_target());
+                    auto mat = g.get_mat();
+                    for (unsigned i = 0; i < mat.rows(); ++i) {
+                        printf("@@@DBG        ");
+                        for (unsigned j = 0; j < mat.cols(); ++j) {
+                            printf("%4.1f,%4.1f ",mat(i,j).real(),mat(i,j).imag());
+                        }
+                        printf("\n");
+                    }
+
                 }
                 */
 
@@ -473,8 +483,8 @@ public:
                 curClusters.push_back(newCl);
             }
             //creating clusters using greedy algorithm
-            std::reverse(curClusters.begin(),curClusters.end());                            // Keep everything in reverse order
             for (int i = 1; i < (int)fuseSpan + 1; i++) {                                   // Build clusters of width 1,2,...
+                std::reverse(curClusters.begin(), curClusters.end());                       // Keep everything in reverse order
                 auto prevClusters = curClusters;                                            // Save away the last set of clusters built
                 curClusters.clear();
                 auto prevCluster = prevClusters.back();                                     // Pop the first cluster
@@ -495,7 +505,7 @@ public:
                 }                                                                           // Keep looking for clusters to add
                 curClusters.push_back(prevCluster);                                         // Save the final cluster
             }                                                                               // Start all over with the next larger span
-            std::reverse(curClusters.begin(),curClusters.end());
+            std::reverse(curClusters.begin(),curClusters.end());                            // Put it back in the right order
         }
         
         return curClusters;
@@ -578,7 +588,7 @@ public:
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
         if ((dbgReorder & 2) == 0) {
             if (doFlush) flush();
-            fused_.apply(wfn_, g.matrix(), g.qubit());
+            fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());
         }
     }
 
