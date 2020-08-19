@@ -59,7 +59,7 @@ module SimulationCode =
             | "Info"
             | "Run" -> true
             | _ ->
-                Regex.IsMatch (name, "^Item\d+") ||
+                Regex.IsMatch (name, @"^Item\d+$") ||
                 parent |> Option.exists (fun current' -> name = current'.Name.Value)
         if isReserved then name + "__" else name
 
