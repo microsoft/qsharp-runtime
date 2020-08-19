@@ -79,6 +79,11 @@ module SimulationCode =
         else
             not (autoNamespaces |> List.contains op.Namespace.Value)
 
+    let getOpName context n =
+        if isCurrentOp context n then Directives.Self
+        elif needsFullPath context n then prependNamespaceString n + "__"
+        else n.Name.Value + "__"
+
     let getTypeParameters types =
         let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function
             | QsTypeKind.TypeParameter tp -> seq{ yield tp }
@@ -429,14 +434,8 @@ module SimulationCode =
 
         and buildId id : ExpressionSyntax =
             match id with
-            | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
-            | GlobalCallable n ->
-                if isCurrentOp context n then
-                    Directives.Self |> ``ident`` :> ExpressionSyntax
-                elif needsFullPath context n then
-                    prependNamespaceString n |> userDefinedName context.current |> ``ident`` :> ExpressionSyntax
-                else
-                    n.Name.Value |> userDefinedName context.current |> ``ident`` :> ExpressionSyntax
+            | LocalVariable n -> n.Value |> ident :> ExpressionSyntax
+            | GlobalCallable n -> getOpName context n |> ident :> ExpressionSyntax
             | InvalidIdentifier ->
                 // TODO: Diagnostics
                 failwith "Received InvalidIdentifier"
@@ -780,8 +779,8 @@ module SimulationCode =
         override this.OnQubitScope (using:QsQubitScope) =
             let (alloc, release) =
                 match using.Kind with
-                | Allocate -> ("Allocate", "Release")
-                | Borrow   -> ("Borrow", "Return")
+                | Allocate -> "Allocate__", "Release__"
+                | Borrow   -> "Borrow__", "Return__"
             let rec removeDiscarded sym =
                 match sym with
                 | VariableName _         -> sym
@@ -867,11 +866,6 @@ module SimulationCode =
         seeker.Namespaces.OnCallableDeclaration od |> ignore
         seeker.SharedState |> Seq.toList
 
-    let getOpName context n =
-        if needsFullPath context n then prependNamespaceString n
-        else if isCurrentOp context n then Directives.Self
-        else n.Name.Value
-
     let getTypeOfOp context (n: QsQualifiedName) =
         let name =
             let sameNamespace = match context.current with | None -> false | Some o -> o.Namespace = n.Namespace
@@ -892,7 +886,7 @@ module SimulationCode =
         let parameters = []
         let body =
             let buildOne n  =
-                let name = getOpName context n |> userDefinedName context.current
+                let name = getOpName context n
                 let lhs = ``ident`` "this" <|.|> ``ident`` name
                 let rhs =
                     if (isCurrentOp context n) && not (isGeneric context n) then
@@ -938,7 +932,7 @@ module SimulationCode =
             /// eg:
             /// protected opType opName { get; }
             let signature = roslynCallableTypeName context qualifiedName
-            let name = getOpName context qualifiedName |> userDefinedName context.current
+            let name = getOpName context qualifiedName
             let modifiers = getPropertyModifiers qualifiedName
             ``prop`` signature name modifiers
             :> MemberDeclarationSyntax

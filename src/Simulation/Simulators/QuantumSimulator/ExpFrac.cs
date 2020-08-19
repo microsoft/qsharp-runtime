@@ -23,28 +23,28 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 var (paulis, numerator, power, qubits) = args;
                 var angle = Angle(numerator, power);
-                return Exp.Apply((paulis, angle, qubits));
+                return Exp__.Apply((paulis, angle, qubits));
             };
 
             public override Func<(IQArray<Pauli>, long, long, IQArray<Qubit>), QVoid> __AdjointBody__ => (args) =>
             {
                 var (paulis, numerator, power, qubits) = args;
                 var angle = Angle(numerator, power);
-                return Exp.Adjoint.Apply((paulis, angle, qubits));
+                return Exp__.Adjoint.Apply((paulis, angle, qubits));
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (paulis, numerator, power, qubits)) = args;
                 var angle = Angle(numerator, power);
-                return Exp.Controlled.Apply((ctrls, (paulis, angle, qubits)));
+                return Exp__.Controlled.Apply((ctrls, (paulis, angle, qubits)));
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => (args) =>
             {
                 var (ctrls, (paulis, numerator, power, qubits)) = args;
                 var angle = Angle(numerator, power);
-                return Exp.Adjoint.Controlled.Apply((ctrls, (paulis, angle, qubits)));
+                return Exp__.Adjoint.Controlled.Apply((ctrls, (paulis, angle, qubits)));
             };
         }
     }
