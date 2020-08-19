@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 var filename = (location is QVoid) ? "" : location.ToString();
                 var msg = "QCTraceSimulator doesn't support state dump.";
 
-                var logMessage = this.Factory.Get<ICallable<string, QVoid>, Intrinsic.Message>();
+                var logMessage = this.__Factory__.Get<ICallable<string, QVoid>, Intrinsic.Message>();
 
                 if (string.IsNullOrEmpty(filename))
                 {
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 var filename = (location is QVoid) ? "" : location.ToString();
                 var msg = "QCTraceSimulator doesn't support state dump.";
 
-                var logMessage = this.Factory.Get<ICallable<string, QVoid>, Intrinsic.Message>();
+                var logMessage = this.__Factory__.Get<ICallable<string, QVoid>, Intrinsic.Message>();
 
                 if (string.IsNullOrEmpty(filename))
                 {

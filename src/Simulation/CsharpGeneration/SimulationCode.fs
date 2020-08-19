@@ -899,12 +899,12 @@ module SimulationCode =
                         "this" |> ``ident`` :> ExpressionSyntax
                     else
                         let signature = roslynCallableTypeName context n
-                        let factoryGet = (``ident`` "this" <|.|> ``ident`` "Factory" <|.|> (generic "Get" ``<<`` [ signature ] ``>>``))
+                        let factoryGet = (``ident`` "this" <|.|> ``ident`` "__Factory__" <|.|> (generic "Get" ``<<`` [ signature ] ``>>``))
                         (``invoke`` factoryGet ``(`` [ (getTypeOfOp context n) ] ``)``)
                 statement (lhs <-- rhs)
             operations
             |> List.map buildOne
-        ``method`` "void"  "Init" ``<<`` [] ``>>``
+        ``method`` "void"  "__Init__" ``<<`` [] ``>>``
             ``(`` parameters ``)``
             [  ``public``; ``override``  ]
             ``{`` body ``}``

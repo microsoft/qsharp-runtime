@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     {
         public UnitaryNoOp() : base(null) { }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public override Func<(IQArray<Qubit>, TInput), QVoid> ControlledAdjointBody => (arg) =>
         {

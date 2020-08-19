@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Simulation.Core
             IEnumerable<Qubit> IApplyData.Qubits => Qubit.Concat(Ctrls, BaseData?.Qubits);
         }
 
-        public ControlledOperation(Operation<I, O> op) : base(op.Factory)
+        public ControlledOperation(Operation<I, O> op) : base(op.__Factory__)
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             Debug.Assert(op is Operation<I, QVoid>);
@@ -71,7 +71,7 @@ namespace Microsoft.Quantum.Simulation.Core
         public Operation<I, QVoid> BaseOp { get; }
         ICallable IOperationWrapper.BaseOperation => BaseOp;
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         string ICallable.Name => ((ICallable)this.BaseOp).Name;
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;

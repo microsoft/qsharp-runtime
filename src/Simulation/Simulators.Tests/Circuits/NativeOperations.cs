@@ -36,11 +36,11 @@ namespace NativeOperations
 
             public override Func<QVoid, String> Body => (arg) =>
             {
-                if (this.Factory is QuantumSimulator)
+                if (this.__Factory__ is QuantumSimulator)
                 {
                     return "Simulator";
                 }
-                else if (this.Factory is ToffoliSimulator)
+                else if (this.__Factory__ is ToffoliSimulator)
                 {
                     return "Toffoli";
                 }

@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Core
     [DebuggerTypeProxy(typeof(AdjointedOperation<,>.DebuggerProxy))]
     public class AdjointedOperation<I, O> : Unitary<I>, IApplyData, ICallable, IOperationWrapper
     {
-        public AdjointedOperation(Operation<I, O> op) : base(op.Factory)
+        public AdjointedOperation(Operation<I, O> op) : base(op.__Factory__)
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             Debug.Assert(op is Operation<I, QVoid>);
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Core
         public Operation<I, QVoid> BaseOp { get; }
         ICallable IOperationWrapper.BaseOperation => BaseOp;
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         string ICallable.Name => ((ICallable)this.BaseOp).Name;
         string ICallable.FullName => ((ICallable)this.BaseOp).FullName;

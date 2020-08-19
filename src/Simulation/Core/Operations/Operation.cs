@@ -92,17 +92,17 @@ namespace Microsoft.Quantum.Simulation.Core
 
             try
             {
-                this.Factory?.StartOperation(this, __dataIn(a));
+                this.__Factory__?.StartOperation(this, __dataIn(a));
                 __result__ = this.Body(a);
             }
             catch (Exception e)
             {
-                this.Factory?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
+                this.__Factory__?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
                 throw;
             }
             finally
             {
-                this.Factory?.EndOperation(this, __dataOut(__result__));
+                this.__Factory__?.EndOperation(this, __dataOut(__result__));
             }
 
             return __result__;

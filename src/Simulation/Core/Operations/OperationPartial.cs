@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
 
-        public OperationPartial(Operation<I, O> op, Func<P, I> mapper) : base(op.Factory)
+        public OperationPartial(Operation<I, O> op, Func<P, I> mapper) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(mapper != null);
@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(mapper(default(P)))?.Qubits?.ToArray());
         }
 
-        public OperationPartial(Operation<I, O> op, object partialTuple) : base(op.Factory)
+        public OperationPartial(Operation<I, O> op, object partialTuple) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(partialTuple != null);
@@ -58,7 +58,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(this.Mapper(default(P)))?.Qubits?.ToArray());
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public Operation<I, O> BaseOp { get; }
         ICallable IOperationWrapper.BaseOperation => BaseOp;
