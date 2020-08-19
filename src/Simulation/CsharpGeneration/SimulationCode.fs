@@ -81,7 +81,7 @@ module SimulationCode =
 
     let getOpName context n =
         if isCurrentOp context n then Directives.Self
-        elif needsFullPath context n then prependNamespaceString n + "__"
+        elif needsFullPath context n then prependNamespaceString n
         else n.Name.Value + "__"
 
     let getTypeParameters types =
