@@ -1295,7 +1295,7 @@ module SimulationCode =
         let buildMethod t body =
             let baseType = (roslynTypeName context t)
             let args     = [ (``param`` "data" ``of`` (``type`` (roslynTypeName context t)) ) ]
-            ``arrow_method`` "IApplyData" (sprintf "__data%s" name) ``<<`` [] ``>>``
+            ``arrow_method`` "IApplyData" (sprintf "__Data%s__" name) ``<<`` [] ``>>``
                 ``(`` args ``)``
                 [``public``; ``override``]
                 ( Some ( ``=>`` body) )

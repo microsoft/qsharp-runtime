@@ -70,9 +70,9 @@ namespace Microsoft.Quantum.Simulation.Core
 
         IEnumerable<Qubit> IApplyData.Qubits => ((IApplyData)this.BaseOp).Qubits;
 
-        public override IApplyData __dataIn(I data) => this.BaseOp.__dataIn(data);
+        public override IApplyData __DataIn__(I data) => this.BaseOp.__DataIn__(data);
 
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
 
         /// <inheritdoc/>
         public override RuntimeMetadata? GetRuntimeMetadata(IApplyData args)

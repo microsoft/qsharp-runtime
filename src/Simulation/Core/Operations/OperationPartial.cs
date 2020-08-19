@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             public In(Operation<I, O> op, Func<P, I> mapper, P data)
             {
-                this.__data = new Lazy<IApplyData>(() => op?.__dataIn(mapper(data)));
+                this.__data = new Lazy<IApplyData>(() => op?.__DataIn__(mapper(data)));
             }
 
             public object Value => __data.Value.Value;
@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             this.BaseOp = op;
             this.Mapper = mapper;
-            this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(mapper(default(P)))?.Qubits?.ToArray());
+            this.__qubits = new Lazy<Qubit[]>(() => op?.__DataIn__(mapper(default(P)))?.Qubits?.ToArray());
         }
 
         public OperationPartial(Operation<I, O> op, object partialTuple) : base(op.__Factory__)
@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             this.BaseOp = op;
             this.Mapper = PartialMapper.Create<P, I>(partialTuple);
-            this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(this.Mapper(default(P)))?.Qubits?.ToArray());
+            this.__qubits = new Lazy<Qubit[]>(() => op?.__DataIn__(this.Mapper(default(P)))?.Qubits?.ToArray());
         }
 
         public override void __Init__() { }
@@ -70,9 +70,9 @@ namespace Microsoft.Quantum.Simulation.Core
 
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).Variant;
 
-        public override IApplyData __dataIn(P data) => new In(this.BaseOp, this.Mapper, data);
+        public override IApplyData __DataIn__(P data) => new In(this.BaseOp, this.Mapper, data);
 
-        public override IApplyData __dataOut(O data) => this.BaseOp.__dataOut(data);
+        public override IApplyData __DataOut__(O data) => this.BaseOp.__DataOut__(data);
 
         public override Func<P, O> __Body__ => (a) =>
         {
