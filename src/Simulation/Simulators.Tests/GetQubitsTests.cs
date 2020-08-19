@@ -24,25 +24,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         public override void __Init__() { }
 
-        public override Func<(IQArray<Qubit>, TInput), QVoid> ControlledAdjointBody => (arg) =>
+        public override Func<(IQArray<Qubit>, TInput), QVoid> __ControlledAdjointBody__ => (arg) =>
         {
             Debug.Write("NoOp:ControlledAdjointBody:" + typeof(TInput).FullName);
             return QVoid.Instance;
         };
 
-        public override Func<TInput, QVoid> AdjointBody => (arg) =>
+        public override Func<TInput, QVoid> __AdjointBody__ => (arg) =>
         {
             Debug.Write("NoOp:AdjointBody:" + typeof(TInput).FullName);
             return QVoid.Instance;
         };
 
-        public override Func<(IQArray<Qubit>, TInput), QVoid> ControlledBody => (arg) =>
+        public override Func<(IQArray<Qubit>, TInput), QVoid> __ControlledBody__ => (arg) =>
         {
             Debug.Write("NoOp:ControlledBody:" + typeof(TInput).FullName);
             return QVoid.Instance;
         };
 
-        public override Func<TInput, QVoid> Body => (TInput arg) =>
+        public override Func<TInput, QVoid> __Body__ => (TInput arg) =>
         {
             Debug.Write("NoOp:Body:" + typeof(TInput).FullName);
             return QVoid.Instance;

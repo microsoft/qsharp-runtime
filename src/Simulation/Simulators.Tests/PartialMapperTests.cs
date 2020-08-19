@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             string ICallable.FullName => "NoOp";
 
-            public override Func<TestTuple, QVoid> Body => (a) => QVoid.Instance;
+            public override Func<TestTuple, QVoid> __Body__ => (a) => QVoid.Instance;
 
             public override void __Init__() { }
         }

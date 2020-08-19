@@ -60,16 +60,16 @@ namespace Microsoft.Quantum.Simulation.Core
         public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public abstract Func<I, O> Body { get; }
+        public abstract Func<I, O> __Body__ { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<I, QVoid> AdjointBody => throw new NotImplementedException();
+        public virtual Func<I, QVoid> __AdjointBody__ => throw new NotImplementedException();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<(IQArray<Qubit>, I), QVoid> ControlledBody => throw new NotImplementedException();
+        public virtual Func<(IQArray<Qubit>, I), QVoid> __ControlledBody__ => throw new NotImplementedException();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<(IQArray<Qubit>, I), QVoid> ControlledAdjointBody => throw new NotImplementedException();
+        public virtual Func<(IQArray<Qubit>, I), QVoid> __ControlledAdjointBody__ => throw new NotImplementedException();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public AdjointedOperation<I, O> Adjoint => _adjoint.Value;
@@ -93,7 +93,7 @@ namespace Microsoft.Quantum.Simulation.Core
             try
             {
                 this.__Factory__?.StartOperation(this, __dataIn(a));
-                __result__ = this.Body(a);
+                __result__ = this.__Body__(a);
             }
             catch (Exception e)
             {

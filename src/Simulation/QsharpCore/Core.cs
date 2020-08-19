@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Core
         public class Native : Length<__T__>
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<IQArray<__T__>, long> Body => (arg) => (arg.Length);
+            public override Func<IQArray<__T__>, long> __Body__ => (arg) => (arg.Length);
         }
     }
 
@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeStart
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<QRange, long> Body => (arg) => (arg.Start);
+            public override Func<QRange, long> __Body__ => (arg) => (arg.Start);
         }
     }
 
@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeEnd
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<QRange, long> Body => (arg) => (arg.End);
+            public override Func<QRange, long> __Body__ => (arg) => (arg.End);
         }
     }
 
@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeStep
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<QRange, long> Body => (arg) => (arg.Step);
+            public override Func<QRange, long> __Body__ => (arg) => (arg.Step);
         }
     }
 
@@ -47,7 +47,7 @@ namespace Microsoft.Quantum.Core
         public class Native : RangeReverse
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<QRange, QRange> Body => (arg) => (arg.Reverse());
+            public override Func<QRange, QRange> __Body__ => (arg) => (arg.Reverse());
         }
     }
 }
