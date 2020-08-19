@@ -82,16 +82,16 @@ namespace Microsoft
                 }
 
                 //@@@DBG+
-                //void dbg1(char* name,std::set<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
-                //    for (const auto& v : st) printf(" %d", v);
-                //    printf("\n");
-                //}
-                //void dbg2(char* name, std::vector<unsigned> st) {
-                //    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
-                //    for (const auto& v : st) printf(" %d", v);
-                //    printf("\n");
-                //}
+                void dbg1(char* name,std::set<unsigned> st) {
+                    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
+                    for (const auto& v : st) printf(" %d", v);
+                    printf("\n");
+                }
+                void dbg2(char* name, std::vector<unsigned> st) {
+                    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
+                    for (const auto& v : st) printf(" %d", v);
+                    printf("\n");
+                }
 
                 // Greedy method that finds next appropriate cluster
                 std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
@@ -196,6 +196,25 @@ public:
 
     void flush() const
     {
+        /* @@@DBG+ */
+        if (gatelist_.size() > 0) {
+            printf("@@@DBG Input Gates:\n");
+            for (GateWrapper& g : gatelist_) {
+                printf("@@@DBG   ");
+                for (auto& c : g.get_controls()) printf(" %d", c);
+                printf(" %d\n", g.get_target());
+                auto mat = g.get_mat();
+                for (unsigned i = 0; i < mat.rows(); ++i) {
+                    printf("@@@DBG        ");
+                    for (unsigned j = 0; j < mat.cols(); ++j) {
+                        printf("%4.1f,%4.1f ", mat(i, j).real(), mat(i, j).imag());
+                    }
+                    printf("\n");
+                }
+            }
+        }
+        /**/
+
         //@@@DBG+
         if (dbgReorder == 0) {
             fused_.flush(wfn_);
@@ -205,6 +224,7 @@ public:
 
         unsigned fusedSpan = 4;
         auto clusters = make_clusters(fusedSpan, gatelist_); //making clusters with gates in the queue
+
         if (clusters.size() == 0) {
             fused_.flush(wfn_);
         }
@@ -213,7 +233,7 @@ public:
             for (int i = 0; i < clusters.size(); i++) {
                 Cluster cl = clusters.at(i);
 
-                /* @@@DBG+
+                /* @@@DBG+ */
                 auto qids = cl.get_qids();
                 auto gs = cl.get_gates();
                 printf("@@@DBG Cluster: %d (nqs=%d, nGates=%d): ", i, (int)qids.size(), (int)gs.size());
@@ -233,7 +253,7 @@ public:
                     }
 
                 }
-                */
+                /**/
 
                 for (GateWrapper gate : cl.get_gates()) {
                     std::vector<unsigned> cs = gate.get_controls();
@@ -505,7 +525,6 @@ public:
                 }                                                                           // Keep looking for clusters to add
                 curClusters.push_back(prevCluster);                                         // Save the final cluster
             }                                                                               // Start all over with the next larger span
-            std::reverse(curClusters.begin(),curClusters.end());                            // Put it back in the right order
         }
         
         return curClusters;

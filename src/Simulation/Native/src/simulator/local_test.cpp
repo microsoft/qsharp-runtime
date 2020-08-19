@@ -14,7 +14,7 @@ namespace Microsoft {
     namespace Quantum {
         int dbgFusedSpan = 4; //@@@DBG
         int dbgFusedLimit = 99;
-        int dbgNumThreads = 0;
+        int dbgNumThreads = 4;
         int dbgReorder = 2;
     }
 }
@@ -326,6 +326,7 @@ void test_extract_qubits_cat_state(unsigned qubits_number,
 
 void test_extract_qubits_state()
 {
+    /*@@@DBG-
     test_extract_qubits_state_simple(5);
     test_extract_qubits_cat_state(4, {0, 1}, {0, 2});
     test_extract_qubits_cat_state(4, {0, 2}, {0, 3});
@@ -333,7 +334,7 @@ void test_extract_qubits_state()
     test_extract_qubits_cat_state(4, {1, 2}, {1, 3});
     test_extract_qubits_cat_state(4, {1, 3}, {0, 1});
     test_extract_qubits_cat_state(4, {2, 3}, {1, 2});
-
+    */
     test_extract_qubits_cat_state(12, {2, 4, 5, 6, 7}, {0, 1, 2});
     test_extract_qubits_cat_state(6, {0, 1, 3}, {0, 1});
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
@@ -341,6 +342,7 @@ void test_extract_qubits_state()
 
 int main()
 {
+    /*@@@DBG-
     std::cerr << "Testing allocate\n";
     test_allocate();
     std::cerr << "Testing gates\n";
@@ -351,6 +353,7 @@ int main()
     test_multicontrol();
     std::cerr << "Testing teleport\n";
     test_teleport();
+    */
     std::cerr << "Testing state extraction\n";
     test_extract_qubits_state();
     return 0;
