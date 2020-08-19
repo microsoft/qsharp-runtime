@@ -861,10 +861,10 @@ namespace N1
             let context  = createTestContext op
             let deps     = op   |> operationDependencies |> depsByName
             let actual   = deps |> buildInit context |> formatSyntaxTree
-            let expected = sprintf "public override void Init() { %s }" (String.concat "" body)
+            let expected = sprintf "public override void __Init__() { %s }" (String.concat "" body)
             Assert.Equal (expected |> clearFormatting, actual |> clearFormatting)
 
-        let template = sprintf "this.%s = this.Factory.Get<%s>(typeof(%s));"
+        let template = sprintf "this.%s = this.__Factory__.Get<%s>(typeof(%s));"
         [
         ]
         |> testOne emptyOperation
@@ -878,27 +878,27 @@ namespace N1
         |> testOne genU2
 
         [
-            template "Allocate"                               "Allocate"                        "global::Microsoft.Quantum.Intrinsic.Allocate"
-            template "MicrosoftQuantumIntrinsicH"             "IUnitary<Qubit>"                 "global::Microsoft.Quantum.Intrinsic.H"
-            template "H"                                      "ICallable<Qubit, QVoid>"         "H"
-            template "Release"                                "Release"                         "global::Microsoft.Quantum.Intrinsic.Release"
-            template "MicrosoftQuantumOverridesemptyFunction" "ICallable<QVoid, QVoid>"         "global::Microsoft.Quantum.Overrides.emptyFunction"
-            template "emptyFunction"                          "ICallable<QVoid, QVoid>"         "emptyFunction"
+            template "Allocate" "Allocate" "global::Microsoft.Quantum.Intrinsic.Allocate"
+            template "Microsoft__Quantum__Intrinsic__H" "IUnitary<Qubit>" "global::Microsoft.Quantum.Intrinsic.H"
+            template "H" "ICallable<Qubit, QVoid>" "H"
+            template "Release" "Release" "global::Microsoft.Quantum.Intrinsic.Release"
+            template "Microsoft__Quantum__Overrides__emptyFunction" "ICallable<QVoid, QVoid>" "global::Microsoft.Quantum.Overrides.emptyFunction"
+            template "emptyFunction" "ICallable<QVoid, QVoid>" "emptyFunction"
         ]
         |> testOne duplicatedDefinitionsCaller
 
         [
-            template "Allocate"                             "Allocate"                          "global::Microsoft.Quantum.Intrinsic.Allocate"
-            template "CNOT"                                 "IAdjointable<(Qubit, Qubit)>"      "global::Microsoft.Quantum.Intrinsic.CNOT"
-            template "MicrosoftQuantumTestingHold"          "ICallable"                         "global::Microsoft.Quantum.Testing.Hold<>"
-            template "Release"                              "Release"                           "global::Microsoft.Quantum.Intrinsic.Release"
-            template "ResultToString"                       "ICallable<Result,String>"          "ResultToString"
-            template "X"                                    "IUnitary<Qubit>"                   "global::Microsoft.Quantum.Intrinsic.X"
-            template "genIter"                              "IUnitary"                          "genIter<>"
-            template "genMapper"                            "ICallable"                         "genMapper<,>"
-            template "genU1"                                "IUnitary"                          "genU1<>"
-            template "MicrosoftQuantumTestingnoOpGeneric"   "IUnitary"                          "global::Microsoft.Quantum.Testing.noOpGeneric<>"
-            template "MicrosoftQuantumTestingnoOpResult"    "IUnitary<Result>"                  "global::Microsoft.Quantum.Testing.noOpResult"
+            template "Allocate" "Allocate" "global::Microsoft.Quantum.Intrinsic.Allocate"
+            template "CNOT" "IAdjointable<(Qubit, Qubit)>" "global::Microsoft.Quantum.Intrinsic.CNOT"
+            template "Microsoft__Quantum__Testing__Hold" "ICallable" "global::Microsoft.Quantum.Testing.Hold<>"
+            template "Release" "Release" "global::Microsoft.Quantum.Intrinsic.Release"
+            template "ResultToString" "ICallable<Result,String>" "ResultToString"
+            template "X" "IUnitary<Qubit>" "global::Microsoft.Quantum.Intrinsic.X"
+            template "genIter" "IUnitary" "genIter<>"
+            template "genMapper" "ICallable" "genMapper<,>"
+            template "genU1" "IUnitary" "genU1<>"
+            template "Microsoft__Quantum__Testing__noOpGeneric" "IUnitary" "global::Microsoft.Quantum.Testing.noOpGeneric<>"
+            template "Microsoft__Quantum__Testing__noOpResult" "IUnitary<Result>" "global::Microsoft.Quantum.Testing.noOpResult"
         ]
         |> testOne usesGenerics
 
@@ -983,15 +983,15 @@ namespace N1
         [
             template "Allocate"                     "Allocate"
             template "IAdjointable<(Qubit,Qubit)>"  "CNOT"
-            template "ICallable"                    "MicrosoftQuantumTestingHold"
+            template "ICallable"                    "Microsoft__Quantum__Testing__Hold"
             template "Release"                      "Release"
             template "ICallable<Result, String>"    "ResultToString"
             template "IUnitary<Qubit>"              "X"
             template "IUnitary"                     "genIter"
             template "ICallable"                    "genMapper"
             template "IUnitary"                     "genU1"
-            template "IUnitary"                     "MicrosoftQuantumTestingnoOpGeneric"
-            template "IUnitary<Result>"             "MicrosoftQuantumTestingnoOpResult"
+            template "IUnitary"                     "Microsoft__Quantum__Testing__noOpGeneric"
+            template "IUnitary<Result>"             "Microsoft__Quantum__Testing__noOpResult"
         ]
         |> testOne usesGenerics
 
@@ -1190,7 +1190,7 @@ namespace N1
         [
             "var a = (IQArray<Result>)new QArray<Result>(Result.One, Result.Zero, Result.Zero);"
             "var s = (IQArray<String>)new QArray<String>(ResultToString.Apply(a[0L]), ResultToString.Apply(a[1L]));"
-            "MicrosoftQuantumTestingnoOpResult.Apply(a[0L]);"
+            "Microsoft__Quantum__Testing__noOpResult.Apply(a[0L]);"
 
             """
             {
@@ -1199,11 +1199,11 @@ namespace N1
                 bool __arg1__ = true;
                 try
                 {
-                    var op = MicrosoftQuantumTestingHold.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (CNOT, (qubits[0L], qubits[1L]), __arg2__)));
+                    var op = Microsoft__Quantum__Testing__Hold.Partial(new Func<QVoid,(ICallable,(Qubit,Qubit),QVoid)>((__arg2__) => (CNOT, (qubits[0L], qubits[1L]), __arg2__)));
                     op.Apply(QVoid.Instance);
 
-                    MicrosoftQuantumTestingnoOpGeneric.Apply(qubits[0L]);
-                    MicrosoftQuantumTestingnoOpGeneric.Apply(a[0L]);
+                    Microsoft__Quantum__Testing__noOpGeneric.Apply(qubits[0L]);
+                    Microsoft__Quantum__Testing__noOpGeneric.Apply(a[0L]);
                     genIter.Apply((X, qubits));
                 }
 #line hidden
@@ -1222,7 +1222,7 @@ namespace N1
                 }
             }
             """
-            "genIter.Apply((MicrosoftQuantumTestingnoOpResult, a));"
+            "genIter.Apply((Microsoft__Quantum__Testing__noOpResult, a));"
             """
             genIter.Apply((genU1, genMapper.Apply<IQArray<String>>((ResultToString, a))));
             """
@@ -1732,7 +1732,7 @@ namespace N1
         |> testOne randomAbstractOperation
 
         Some """
-        public override Func<QVoid,QVoid> Body => (__in__) =>
+        public override Func<QVoid,QVoid> __Body__ => (__in__) =>
         {
             #line hidden
             return QVoid.Instance;
@@ -1740,7 +1740,7 @@ namespace N1
         |> testOne zeroQubitOperation
 
         Some """
-        public override Func<Qubit,QVoid> Body => (__in__) =>
+        public override Func<Qubit,QVoid> __Body__ => (__in__) =>
         {
             var q1 = __in__;
 
@@ -1752,7 +1752,7 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(Qubit,(Qubit,Double)), QVoid> Body => (__in__) =>
+        public override Func<(Qubit,(Qubit,Double)), QVoid> __Body__ => (__in__) =>
         {
             var (q1,t1) = __in__;
 
@@ -1769,7 +1769,7 @@ namespace N1
 
 
         Some """
-        public override Func<(Qubit,Qubit,IQArray<Qubit>), QVoid> Body => (__in__) =>
+        public override Func<(Qubit,Qubit,IQArray<Qubit>), QVoid> __Body__ => (__in__) =>
         {
             var (q1,q2,arr1) = __in__;
 
@@ -1796,7 +1796,7 @@ namespace N1
         let op4 = "IUnitary";
         let f1  = "ICallable"
         Some (sprintf """
-        public override Func<(Qubit, %s, %s, %s, (%s, %s), %s), %s> Body  => (__in__) =>
+        public override Func<(Qubit, %s, %s, %s, (%s, %s), %s), %s> __Body__  => (__in__) =>
                 {
                     var (q1, op0, op1, op2, t1, f1) = __in__;
                     op1.Apply(OP_1);
@@ -1925,17 +1925,17 @@ namespace N1
         None
         |> testOne oneQubitAbstractOperation
 
-        Some "public override Func<Qubit, QVoid> AdjointBody  => Body;"
+        Some "public override Func<Qubit, QVoid> __AdjointBody__ => __Body__;"
         |> testOne oneQubitSelfAdjointAbstractOperation
 
         None
         |> testOne randomAbstractOperation
 
-        Some "public override Func<Qubit, QVoid> AdjointBody => Body;"
+        Some "public override Func<Qubit, QVoid> __AdjointBody__ => __Body__;"
         |> testOne oneQubitSelfAdjointOperation
 
         Some """
-        public override Func<QVoid, QVoid> AdjointBody => (__in__) =>
+        public override Func<QVoid, QVoid> __AdjointBody__ => (__in__) =>
         {
             #line hidden
             return QVoid.Instance;
@@ -1943,7 +1943,7 @@ namespace N1
         |> testOne zeroQubitOperation
 
         Some """
-        public override Func<Qubit, QVoid> AdjointBody => (__in__) =>
+        public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
             X.Adjoint.Apply(q1);
@@ -1954,7 +1954,7 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(Qubit,(Qubit,Double)), QVoid> AdjointBody => (__in__) =>
+        public override Func<(Qubit,(Qubit,Double)), QVoid> __AdjointBody__ => (__in__) =>
         {
             var (q1,t1) = __in__;
 
@@ -1969,7 +1969,7 @@ namespace N1
         |> testOne twoQubitOperation
 
         Some """
-        public override Func<(Qubit,Qubit,Qubits), QVoid> AdjointBody => (__in__) =>
+        public override Func<(Qubit,Qubit,Qubits), QVoid> __AdjointBody__ => (__in__) =>
         {
             var (q1,q2,arr1) = __in__;
             three_op1.Adjoint.Apply((q1, q2));
@@ -1981,7 +1981,7 @@ namespace N1
         |> testOne threeQubitOperation
 
 
-        Some "public override Func<__T__, QVoid> AdjointBody => Body;"
+        Some "public override Func<__T__, QVoid> __AdjointBody__ => __Body__;"
         |> testOne genAdj1
 
     [<Fact>]
@@ -1998,7 +1998,7 @@ namespace N1
         |> testOne randomAbstractOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,QVoid), QVoid> ControlledBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,QVoid), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (__controlQubits__, __unitArg__) = __in__;
 
@@ -2008,7 +2008,7 @@ namespace N1
         |> testOne zeroQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,Qubit), QVoid> ControlledBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c, q1) = __in__;
 
@@ -2020,7 +2020,7 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> ControlledBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c, (q1, q2, arr1)) = __in__;
 
@@ -2040,14 +2040,14 @@ namespace N1
         None
         |> testOne oneQubitAbstractOperation
 
-        Some "public override Func<(IQArray<Qubit>,Qubit), QVoid> ControlledAdjointBody  => ControlledBody;"
+        Some "public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledAdjointBody__ => __ControlledBody__;"
         |> testOne oneQubitSelfAdjointAbstractOperation
 
         None
         |> testOne randomAbstractOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,QVoid), QVoid> ControlledAdjointBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,QVoid), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (__controlQubits__, __unitArg__) = __in__;
 
@@ -2057,7 +2057,7 @@ namespace N1
         |> testOne zeroQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledAdjointBody => (__in__) =>
+        public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
             X.Controlled.Adjoint.Apply((c, q1));
@@ -2068,7 +2068,7 @@ namespace N1
         |> testOne oneQubitOperation
 
         Some """
-        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> ControlledAdjointBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,(Qubit,Qubit,Qubits)), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,(q1,q2,arr1)) = __in__;
 
@@ -2357,10 +2357,10 @@ namespace N1
 
         public static HoneywellEntryPointInfo<QVoid, QVoid> Info => new HoneywellEntryPointInfo<QVoid, QVoid>(typeof(emptyOperation));
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
         {
             return __m__.Run<emptyOperation, QVoid, QVoid>(QVoid.Instance);
@@ -2396,10 +2396,10 @@ namespace N1
 
         public static IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid> Info => new IonQEntryPointInfo<(Qubit, Basis, (Pauli, IQArray<IQArray<Double>>, Boolean), Int64), QVoid>(typeof(randomAbstractOperation));
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn((Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) => new In(data);
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__((Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64) data) => new In(data);
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1, Basis b, (Pauli,IQArray<IQArray<Double>>,Boolean) t, Int64 i)
         {
             return __m__.Run<randomAbstractOperation, (Qubit,Basis,(Pauli,IQArray<IQArray<Double>>,Boolean),Int64), QVoid>((q1, b, t, i));
@@ -2426,7 +2426,7 @@ namespace N1
 
         protected IUnitary<Qubit> X { get; set; }
 
-        public override Func<Qubit, QVoid> Body => (__in__) =>
+        public override Func<Qubit, QVoid> __Body__ => (__in__) =>
         {
             var q1 = __in__;
             X.Apply(q1);
@@ -2435,7 +2435,7 @@ namespace N1
         }
 
         ;
-        public override Func<Qubit, QVoid> AdjointBody => (__in__) =>
+        public override Func<Qubit, QVoid> __AdjointBody__ => (__in__) =>
         {
             var q1 = __in__;
             X.Adjoint.Apply(q1);
@@ -2444,7 +2444,7 @@ namespace N1
         }
 
         ;
-        public override Func<(IQArray<Qubit>,Qubit), QVoid> ControlledBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
             X.Controlled.Apply((c, q1));
@@ -2453,7 +2453,7 @@ namespace N1
         }
 
         ;
-        public override Func<(IQArray<Qubit>,Qubit), QVoid> ControlledAdjointBody => (__in__) =>
+        public override Func<(IQArray<Qubit>,Qubit), QVoid> __ControlledAdjointBody__ => (__in__) =>
         {
             var (c,q1) = __in__;
             X.Controlled.Adjoint.Apply((c, q1));
@@ -2463,13 +2463,13 @@ namespace N1
 
         ;
 
-        public override void Init()
+        public override void __Init__()
         {
-            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
+            this.X = this.__Factory__.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
         }
 
-        public override IApplyData __dataIn(Qubit data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(Qubit data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Qubit q1)
         {
             return __m__.Run<oneQubitOperation, Qubit, QVoid>(q1);
@@ -2510,10 +2510,10 @@ namespace N1
 
         public static HoneywellEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid> Info => new HoneywellEntryPointInfo<(__X__, (Int64, (__Y__, __Z__), Result)), QVoid>(typeof(genCtrl3<__X__,__Y__,__Z__>));
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn((__X__,(Int64,(__Y__,__Z__),Result)) data) => new In(data);
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__((__X__,(Int64,(__Y__,__Z__),Result)) data) => new In(data);
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, __X__ arg1, (Int64,(__Y__,__Z__),Result) arg2)
         {
             return __m__.Run<genCtrl3<__X__,__Y__,__Z__>, (__X__,(Int64,(__Y__,__Z__),Result)), QVoid>((arg1, arg2));
@@ -2551,7 +2551,7 @@ namespace N1
 
         public static IonQEntryPointInfo<(ICallable, ICallable, __B__), QVoid> Info => new IonQEntryPointInfo<(ICallable, ICallable, __B__), QVoid>(typeof(composeImpl<__A__,__B__>));
 
-        public override Func<(ICallable,ICallable,__B__), QVoid> Body => (__in__) =>
+        public override Func<(ICallable,ICallable,__B__), QVoid> __Body__ => (__in__) =>
         {
             var (second,first,arg) = __in__;
             second.Apply(first.Apply<__A__>(arg));
@@ -2559,10 +2559,10 @@ namespace N1
             return QVoid.Instance;
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn((ICallable,ICallable,__B__) data) => new In(data);
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__((ICallable,ICallable,__B__) data) => new In(data);
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, ICallable second, ICallable first, __B__ arg)
         {
             return __m__.Run<composeImpl<__A__,__B__>, (ICallable,ICallable,__B__), QVoid>((second, first, arg));
@@ -2585,10 +2585,10 @@ namespace N1
 
         public static QCIEntryPointInfo<__A__, QVoid> Info => new QCIEntryPointInfo<__A__, QVoid>(typeof(genF1<__A__>));
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(__A__ data) => new QTuple<__A__>(data);
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(__A__ data) => new QTuple<__A__>(data);
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, __A__ arg)
         {
             return __m__.Run<genF1<__A__>, __A__, QVoid>(arg);
@@ -2611,19 +2611,19 @@ internal partial class EmptyInternalFunction : Function<QVoid, QVoid>, ICallable
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.EmptyInternalFunction";
         public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(EmptyInternalFunction));
 
-        public override Func<QVoid, QVoid> Body => (__in__) =>
+        public override Func<QVoid, QVoid> __Body__ => (__in__) =>
         {
 #line hidden
             return QVoid.Instance;
         };
 
-        public override void Init()
+        public override void __Init__()
         {
         }
 
-        public override IApplyData __dataIn(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
 
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
 
     public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
     {
@@ -2645,19 +2645,19 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.EmptyInternalOperation";
         public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(EmptyInternalOperation));
 
-        public override Func<QVoid, QVoid> Body => (__in__) =>
+        public override Func<QVoid, QVoid> __Body__ => (__in__) =>
         {
     #line hidden
             return QVoid.Instance;
         };
 
-        public override void Init()
+        public override void __Init__()
         {
         }
 
-        public override IApplyData __dataIn(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
 
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
 
     public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
     {
@@ -2672,7 +2672,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
     let ``duplicatedDefinitionsCaller body`` () =
         [
             "emptyFunction.Apply(QVoid.Instance);"
-            "MicrosoftQuantumOverridesemptyFunction.Apply(QVoid.Instance);"
+            "Microsoft__Quantum__Overrides__emptyFunction.Apply(QVoid.Instance);"
             """
             {
                 var qubits = Allocate.Apply(1L);
@@ -2681,7 +2681,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
                 try
                 {
                     H.Apply(qubits[0L]);
-                    MicrosoftQuantumIntrinsicH.Apply(qubits[0L]);
+                    Microsoft__Quantum__Intrinsic__H.Apply(qubits[0L]);
                 }
 #line hidden
                 catch
@@ -2710,10 +2710,10 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         let expected =
             [
                 template "Allocate"                "Allocate"
-                template "IUnitary<Qubit>"         "MicrosoftQuantumIntrinsicH"
+                template "IUnitary<Qubit>"         "Microsoft__Quantum__Intrinsic__H"
                 template "ICallable<Qubit, QVoid>" "H"
                 template "Release"                 "Release"
-                template "ICallable<QVoid, QVoid>" "MicrosoftQuantumOverridesemptyFunction"
+                template "ICallable<QVoid, QVoid>" "Microsoft__Quantum__Overrides__emptyFunction"
                 template "ICallable<QVoid, QVoid>" "emptyFunction"
             ]
 
@@ -2762,17 +2762,17 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Compiler.Generics.UpdateUdtItems";
         public static EntryPointInfo<MyType2, MyType2> Info => new EntryPointInfo<MyType2, MyType2>(typeof(UpdateUdtItems));
 
-        public override Func<MyType2, MyType2> Body => (__in__) =>
+        public override Func<MyType2, MyType2> __Body__ => (__in__) =>
         {
             var udt = __in__;
             vararr=QArray<Int64>.Create(10L);
             return new MyType2((1L,udt.Data.Item2,(arr?.Copy(),udt.Data.Item3.Item2)));
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(MyType2data) => data;
-        public override IApplyData __dataOut(MyType2data) => data;
+        public override IApplyData __DataIn__(MyType2data) => data;
+        public override IApplyData __DataOut__(MyType2data) => data;
         public static System.Threading.Tasks.Task<MyType2> Run(IOperationFactory __m__, MyType2 udt)
         {
             return __m__.Run<UpdateUdtItems,MyType2,MyType2>(udt);
@@ -2793,10 +2793,10 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Overrides.emptyFunction";
         public static EntryPointInfo<QVoid, QVoid> Info => new EntryPointInfo<QVoid, QVoid>(typeof(emptyFunction));
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
         {
             return __m__.Run<emptyFunction, QVoid, QVoid>(QVoid.Instance);
@@ -2817,15 +2817,15 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Testing.intFunction";
         public static EntryPointInfo<QVoid, Int64> Info => new EntryPointInfo<QVoid, Int64>(typeof(intFunction));
 
-        public override Func<QVoid, Int64> Body => (__in__) =>
+        public override Func<QVoid, Int64> __Body__ => (__in__) =>
         {
             return 1L;
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(Int64 data) => new QTuple<Int64>(data);
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(Int64 data) => new QTuple<Int64>(data);
         public static System.Threading.Tasks.Task<Int64> Run(IOperationFactory __m__)
         {
             return __m__.Run<intFunction, QVoid, Int64>(QVoid.Instance);
@@ -2855,16 +2855,16 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Testing.powFunction";
         public static EntryPointInfo<(Int64, Int64), Int64> Info => new EntryPointInfo<(Int64, Int64), Int64>(typeof(powFunction));
 
-        public override Func<(Int64,Int64), Int64> Body => (__in__) =>
+        public override Func<(Int64,Int64), Int64> __Body__ => (__in__) =>
         {
             var (x,y) = __in__;
             return x.Pow(y);
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn((Int64,Int64) data) => new In(data);
-        public override IApplyData __dataOut(Int64 data) => new QTuple<Int64>(data);
+        public override IApplyData __DataIn__((Int64,Int64) data) => new In(data);
+        public override IApplyData __DataOut__(Int64 data) => new QTuple<Int64>(data);
         public static System.Threading.Tasks.Task<Int64> Run(IOperationFactory __m__, Int64 x, Int64 y)
         {
             return __m__.Run<powFunction, (Int64,Int64), Int64>((x, y));
@@ -2894,16 +2894,16 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         String ICallable.FullName => "Microsoft.Quantum.Testing.bigPowFunction";
         public static EntryPointInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger> Info => new EntryPointInfo<(System.Numerics.BigInteger, Int64), System.Numerics.BigInteger>(typeof(bigPowFunction));
 
-        public override Func<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger> Body => (__in__) =>
+        public override Func<(System.Numerics.BigInteger,Int64), System.Numerics.BigInteger> __Body__ => (__in__) =>
         {
             var (x,y) = __in__;
             return x.Pow(y);
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn((System.Numerics.BigInteger,Int64) data) => new In(data);
-        public override IApplyData __dataOut(System.Numerics.BigInteger data) => new QTuple<System.Numerics.BigInteger>(data);
+        public override IApplyData __DataIn__((System.Numerics.BigInteger,Int64) data) => new In(data);
+        public override IApplyData __DataOut__(System.Numerics.BigInteger data) => new QTuple<System.Numerics.BigInteger>(data);
         public static System.Threading.Tasks.Task<System.Numerics.BigInteger> Run(IOperationFactory __m__, System.Numerics.BigInteger x, Int64 y)
         {
             return __m__.Run<bigPowFunction, (System.Numerics.BigInteger,Int64), System.Numerics.BigInteger>((x, y));
@@ -2940,7 +2940,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -2966,7 +2966,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -2992,7 +2992,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3018,7 +3018,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3044,7 +3044,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3072,7 +3072,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void Deconstruct(out Int64 item1, out IQArray<Qubit> item2)
+        public void __Deconstruct__(out Int64 item1, out IQArray<Qubit> item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3094,7 +3094,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3115,7 +3115,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         public udt_Real Item1 => Data.Item1;
         public udt_Real Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out udt_Real item1, out udt_Real item2)
+        public void __Deconstruct__(out udt_Real item1, out udt_Real item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3137,7 +3137,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3159,7 +3159,7 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
 
     System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-    public void Deconstruct()
+    public void __Deconstruct__()
     {
     }
 }
@@ -3184,7 +3184,7 @@ public class NamedTuple : UDTBase<((Int64,Double),Int64)>, IApplyData
     public (Int64,Double) Item1 => Data.Item1;
     public Int64 Item2 => Data.Item2;
     System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-    public void Deconstruct(out (Int64,Double) item1, out Int64 item2)
+    public void __Deconstruct__(out (Int64,Double) item1, out Int64 item2)
     {
         item1 = Data.Item1;
         item2 = Data.Item2;
@@ -3242,7 +3242,7 @@ namespace Microsoft.Quantum
         public Int64 Item1 => Data.Item1;
         public Int64 Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out Int64 item1, out Int64 item2)
+        public void __Deconstruct__(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3262,7 +3262,7 @@ namespace Microsoft.Quantum
         public Int64 Item1 => Data.Item1;
         public Int64 Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out Int64 item1, out Int64 item2)
+        public void __Deconstruct__(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3277,9 +3277,9 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyFunction";
         String ICallable.FullName => "Microsoft.Quantum.emptyFunction";
-        public override void Init() { }
-        public override IApplyData __dataIn(Pair data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override void __Init__() { }
+        public override IApplyData __DataIn__(Pair data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__, Pair p)
         {
             return __m__.Run<emptyFunction, Pair, QVoid>(p);
@@ -3294,9 +3294,9 @@ namespace Microsoft.Quantum
 
         String ICallable.Name => "emptyOperation";
         String ICallable.FullName => "Microsoft.Quantum.emptyOperation";
-        public override void Init() { }
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override void __Init__() { }
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
         {
             return __m__.Run<emptyOperation, QVoid, QVoid>(QVoid.Instance);
@@ -3352,7 +3352,7 @@ namespace Microsoft.Quantum
         public Int64 Item2 => Data.Item2;
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out Int64 item1, out Int64 item2)
+        public void __Deconstruct__(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3376,7 +3376,7 @@ namespace Microsoft.Quantum
         public ((Boolean, String), Int64) Item2 => Data.Item2;
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct(out Double item1, out ((Boolean, String), Int64) item2)
+        public void __Deconstruct__(out Double item1, out ((Boolean, String), Int64) item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3432,7 +3432,7 @@ namespace Microsoft.Quantum.Tests.Inline
 
         String ICallable.Name => "HelloWorld";
         String ICallable.FullName => "Microsoft.Quantum.Tests.Inline.HelloWorld";
-        public override Func<Int64, Int64> Body => (__in__) =>
+        public override Func<Int64, Int64> __Body__ => (__in__) =>
         {
             var n = __in__;
 #line 9 "%%"
@@ -3441,10 +3441,10 @@ namespace Microsoft.Quantum.Tests.Inline
             return r;
         };
 
-        public override void Init() { }
+        public override void __Init__() { }
 
-        public override IApplyData __dataIn(Int64 data) => new QTuple<Int64>(data);
-        public override IApplyData __dataOut(Int64 data) => new QTuple<Int64>(data);
+        public override IApplyData __DataIn__(Int64 data) => new QTuple<Int64>(data);
+        public override IApplyData __DataOut__(Int64 data) => new QTuple<Int64>(data);
         public static System.Threading.Tasks.Task<Int64> Run(IOperationFactory __m__, Int64 n)
         {
             return __m__.Run<HelloWorld, Int64, Int64>(n);
@@ -3507,7 +3507,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
             set;
         }
 
-        public override Func<Int64, Result> Body => (__in__) =>
+        public override Func<Int64, Result> __Body__ => (__in__) =>
         {
             var n = __in__;
 #line 11 "%%"
@@ -3561,15 +3561,15 @@ namespace Microsoft.Quantum.Tests.LineNumbers
         }
 
         ;
-        public override void Init()
+        public override void __Init__()
         {
-            this.Allocate = this.Factory.Get<Allocate>(typeof(global::Microsoft.Quantum.Intrinsic.Allocate));
-            this.Release = this.Factory.Get<Release>(typeof(global::Microsoft.Quantum.Intrinsic.Release));
-            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
+            this.Allocate = this.__Factory__.Get<Allocate>(typeof(global::Microsoft.Quantum.Intrinsic.Allocate));
+            this.Release = this.__Factory__.Get<Release>(typeof(global::Microsoft.Quantum.Intrinsic.Release));
+            this.X = this.__Factory__.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
         }
 
-        public override IApplyData __dataIn(Int64 data) => new QTuple<Int64>(data);
-        public override IApplyData __dataOut(Result data) => new QTuple<Result>(data);
+        public override IApplyData __DataIn__(Int64 data) => new QTuple<Int64>(data);
+        public override IApplyData __DataOut__(Result data) => new QTuple<Result>(data);
         public static System.Threading.Tasks.Task<Result> Run(IOperationFactory __m__, Int64 n)
         {
             return __m__.Run<TestLineInBlocks, Int64, Result>(n);
@@ -3625,7 +3625,7 @@ namespace Microsoft.Quantum.Core
         }
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3645,7 +3645,7 @@ namespace Microsoft.Quantum.Diagnostics
         }
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void Deconstruct()
+        public void __Deconstruct__()
         {
         }
     }
@@ -3728,19 +3728,19 @@ namespace Microsoft.Quantum.Tests.UnitTests
         String ICallable.Name => "UnitTest1";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest1";
 
-        public override Func<QVoid, QVoid> Body => (__in__) =>
+        public override Func<QVoid, QVoid> __Body__ => (__in__) =>
         {
         #line hidden
             return QVoid.Instance;
         }
 
         ;
-        public override void Init()
+        public override void __Init__()
         {
         }
 
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
         {
             return __m__.Run<UnitTest1, QVoid, QVoid>(QVoid.Instance);
@@ -3789,19 +3789,19 @@ namespace Microsoft.Quantum.Tests.UnitTests
         String ICallable.Name => "UnitTest2";
         String ICallable.FullName => "Microsoft.Quantum.Tests.UnitTests.UnitTest2";
 
-        public override Func<QVoid, QVoid> Body => (__in__) =>
+        public override Func<QVoid, QVoid> __Body__ => (__in__) =>
         {
         #line hidden
             return QVoid.Instance;
         }
 
         ;
-        public override void Init()
+        public override void __Init__()
         {
         }
 
-        public override IApplyData __dataIn(QVoid data) => data;
-        public override IApplyData __dataOut(QVoid data) => data;
+        public override IApplyData __DataIn__(QVoid data) => data;
+        public override IApplyData __DataOut__(QVoid data) => data;
         public static System.Threading.Tasks.Task<QVoid> Run(IOperationFactory __m__)
         {
             return __m__.Run<UnitTest2, QVoid, QVoid>(QVoid.Instance);
