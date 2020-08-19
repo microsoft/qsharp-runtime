@@ -16,7 +16,7 @@
 #include <vector>
 #include <stdarg.h>
 
-#include "util/cpuid.hpp" //@@@DBG
+#include "util/cpuid.hpp"
 #include "capi.hpp"
 #include <cstdarg>
 
@@ -170,6 +170,7 @@ int numQs(vector<vector<int32_t>> prb) {
     return (mx + 1);
 }
 
+#ifdef DBWDBG // Top level testing app for DBWDBG
 int main()
 {
     int                     nQs, circStart, circStop;
@@ -386,3 +387,10 @@ int main()
     }
 }
 #endif
+
+#else // DBWDBG Turned off
+int main()
+{
+    return 0;
+}
+#endif // DBWDBG

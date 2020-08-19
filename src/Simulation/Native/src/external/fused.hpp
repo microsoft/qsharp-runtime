@@ -20,22 +20,28 @@
 #endif
 #endif
 
-#include <chrono> //@@@DBG+
+#ifdef DBWDBG // Used for reporting timings
+#include <chrono>
+#endif
+
 namespace Microsoft
 {
 namespace Quantum
 {
-    extern int dbgFusedSpan; //@@@DBG+
+#ifdef DBWDBG // Debugging switches used by top level apps
+    extern int dbgFusedSpan;
     extern int dbgFusedLimit;
     extern int dbgNumThreads;
     extern int dbgReorder;
+#endif
 
 namespace SIMULATOR
 {
 
 class Fused
   {
-    mutable int dbgNfused; //@@@DBG+
+#ifdef DBWDBG // Debugging statistics reported out
+    mutable int dbgNfused;
     mutable int dbgSize;
     mutable int dbgNqs;
     mutable int dbgNcs;
@@ -44,10 +50,12 @@ class Fused
     mutable double dbgET1;
     mutable double dbgET2;
     mutable std::chrono::system_clock::time_point prev  = std::chrono::system_clock::now();
+#endif
 
   public:
       Fused() {
-        dbgNfused   = 0; //@@@DBG+
+#ifdef DBWDBG // Init stats
+        dbgNfused   = 0;
         dbgSize     = 0;
         dbgNqs      = 0;
         dbgNcs      = 0;
@@ -55,7 +63,7 @@ class Fused
         dbgElapsed  = 0.0;
         dbgET1      = 0.0;
         dbgET2      = 0.0;
-
+#endif
 
         wfnCapacity     = 0u; // used to optimize runtime parameters
         maxFusedSpan    = 6;  // determine span to use at runtime
@@ -84,27 +92,30 @@ class Fused
       Fusion::Matrix m;
       Fusion::IndexVector qs, cs;
 
-      //@@@DBG+      
+#ifdef DBWDBG // Timing
       std::chrono::system_clock::time_point dbgT1 = std::chrono::system_clock::now();
-      
+#endif
+
       fusedgates.perform_fusion(m, qs, cs);
 
-      //@@@DBG+
+#ifdef DBWDBG // Timing
       std::chrono::system_clock::time_point dbgT2 = std::chrono::system_clock::now();
       std::chrono::duration<double> dbgE = dbgT2 - dbgT1;
       dbgET1 += dbgE.count();
+#endif
 
       std::size_t cmask = 0;
       for (auto c : cs)
         cmask |= (1ull << c);
       
-      //@@@DBG+
+#ifdef DBWDBG // Gather stats
       dbgNfused++;
       dbgSize += fusedgates.size();
       dbgNqs += fusedgates.num_qubits();
       dbgNcs += fusedgates.num_controls();
       dbgT1 = std::chrono::system_clock::now();
-      
+#endif
+
       switch (qs.size())
       {
         case 1:
@@ -130,14 +141,15 @@ class Fused
             break;
       }
 
-      //@@@DBG+
+#ifdef DBWDBG // More timing stats
       dbgT2 = std::chrono::system_clock::now();
       dbgE = dbgT2 - dbgT1;
       dbgET2 += dbgE.count();
+#endif
 
       fusedgates = Fusion();
 
-      //@@@DBG+
+#ifdef DBWDBG // Report out periodically
       std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
       std::chrono::duration<double> elapsed = curr - prev;
       dbgElapsed = elapsed.count();
@@ -162,7 +174,7 @@ class Fused
           prev      = curr;
           dbgNgates = 0;
       }
-
+#endif
 
     }
     
@@ -179,7 +191,9 @@ class Fused
     template <class T, class A, class M>
     void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q) const
     {
-        dbgNgates++; //@@@DBG+
+#ifdef DBWDBG // Gather gate count stats
+        dbgNgates++;
+#endif
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
     }
@@ -211,7 +225,9 @@ class Fused
                 if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
                 int nProcs = omp_get_num_procs();
                 if (nProcs < 3) nMaxThrds = nProcs;
-                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG+ allow for debugging from above
+#ifdef DBWDBG // Force number of threads
+                if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //allow for debugging from above
+#endif
                 omp_set_num_threads(nMaxThrds);
             }
 
@@ -224,10 +240,11 @@ class Fused
             // Reduce size for small problems (optimized with benchmarks)
             if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
 
-            maxFusedDepth = dbgFusedLimit; //@@@DBG+
-            maxFusedSpan = dbgFusedSpan; //@@@DBG+
-
-            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity); //@@@DBG+
+#ifdef DBWDBG // Set fusion depth and span limits
+            maxFusedDepth = dbgFusedLimit;
+            maxFusedSpan = dbgFusedSpan;
+            printf("@@@DBG: OMP_NUM_THREADS=%d fusedSpan=%d fusedDepth=%d wfnCapacity=%u\n", omp_get_max_threads(), maxFusedSpan, maxFusedDepth, (unsigned)wfnCapacity);
+#endif
         }
 
         // New rules of when to stop fusing

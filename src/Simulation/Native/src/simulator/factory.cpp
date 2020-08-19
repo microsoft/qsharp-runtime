@@ -34,23 +34,24 @@ namespace Microsoft
 {
   namespace Quantum
   {
-      //@@@DBG+
+#ifdef DBWDBG // Defaults for the library
       int dbgFusedSpan  = -1;
       int dbgFusedLimit = 99;
       int dbgNumThreads = 0;
       int dbgReorder    = 2; // bit0: doReorder bit1: Schedule
+#endif
 
     namespace Simulator
     {
       std::shared_mutex _mutex;
       std::vector<std::shared_ptr<SimulatorInterface>> _psis;
 
-      //@@@DBG- SimulatorInterface* createSimulator(unsigned maxlocal)
-      //@@@DBG+
-            SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=-1, int fusedLimit=99, int numThreads=0,int reorder=0)
-
+#ifndef DBWDBG
+     SimulatorInterface* createSimulator(unsigned maxlocal)
+     {
+#else // DBWDBG Override createSimulator with debug parameters
+      SimulatorInterface* createSimulator(unsigned maxlocal,int force=0,int fusedSpan=-1, int fusedLimit=99, int numThreads=0,int reorder=0)
       {
-          //@@@DBG+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
           dbgFusedSpan = fusedSpan;
           dbgFusedLimit = fusedLimit;
           dbgNumThreads = numThreads;
@@ -71,9 +72,8 @@ namespace Microsoft
                 printf("@@@DBG: AVX512\n");
                 return SimulatorAVX512::createSimulator(maxlocal);
             }
-          //@@@DBG+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         }
-
+#endif // DBWDBG
 
        if (haveAVX512())
         {
@@ -121,7 +121,7 @@ namespace Microsoft
         return static_cast<unsigned>(emptySlot);
       }
 
-     //@@@DBG+: for benchmarks vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+#ifdef DBWDBG // Create a debug version of the simulator
       MICROSOFT_QUANTUM_DECL unsigned createDBG(unsigned maxlocal,int force,int fusedSpan,int fusedLimit,int numThreads,int reorder)
       {
           std::lock_guard<std::shared_mutex> lock(_mutex);
@@ -148,7 +148,7 @@ namespace Microsoft
 
           return static_cast<unsigned>(emptySlot);
       }
-      //@@@DBG+: for benchmarks ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#endif
 
       MICROSOFT_QUANTUM_DECL void destroy(unsigned id)
       {

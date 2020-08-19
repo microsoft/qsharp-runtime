@@ -169,6 +169,7 @@ namespace SIMULATOR
     }
     
     // Exponential of Pauli operators
+    // Exponential of Pauli operators
     void CExp(std::vector<Gates::Basis> bs, double phi, std::vector<unsigned> const& cs, std::vector<unsigned> qs)
     {
       if (bs.size()==0)

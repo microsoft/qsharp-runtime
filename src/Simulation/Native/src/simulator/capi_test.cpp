@@ -11,7 +11,7 @@
 
 // some convenience functions
 
-//@@@DBG+
+#ifdef DBWDBG // Defaults for this app
 unsigned init() {
     int simTyp = 0;
     int fuseSpan = 4;
@@ -20,6 +20,7 @@ unsigned init() {
     auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
     return sim_id;
 }
+#endif
 
 void CX(unsigned sim_id, unsigned c, unsigned q)
 {
@@ -97,7 +98,6 @@ void test_teleport()
     // check teleportation success
     R(sim_id, 3, (-1.1), 0);
     H(sim_id, 0);
-    dump(sim_id, "@@@DBG teleport");
     assert(M(sim_id, 0)==false);
 
     dump(sim_id, "teleport-end.txt");
