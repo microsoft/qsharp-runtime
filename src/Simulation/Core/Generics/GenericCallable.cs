@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             // Get the list of Parameters of the Invoke method of the Body of the operation:
             var expectedParameters = this.OperationType
-                .GetProperty("Body").PropertyType
+                .GetProperty("__Body__").PropertyType
                 .GetMethod("Invoke").GetParameters();
 
             // Tuple in...
@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             // Tuple out...
             var expectedReturn = this.OperationType
-                .GetProperty("Body").PropertyType
+                .GetProperty("__Body__").PropertyType
                 .GetMethod("Invoke").ReturnType;
             Resolve(expectedReturn, O, typeArgs);
 
