@@ -1517,7 +1517,7 @@ module SimulationCode =
                 match qsharpType.Resolution with
                 | QsTypeKind.TupleType many  -> many |> Seq.mapi buildOneParameter  |> List.ofSeq
                 | _                 -> []
-            ``method`` "void"  "Deconstruct" ``<<`` [] ``>>``
+            ``method`` "void"  "__Deconstruct__" ``<<`` [] ``>>``
                 ``(`` parameters ``)``
                 [  ``public``  ]
                 ``{`` body ``}``
