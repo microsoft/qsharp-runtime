@@ -8,6 +8,41 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Simulation.TestSuite.Math;
     
     
+    internal operation flipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
+        if (Length(qubits) != Length(basis))
+        {
+            fail $"qubits and stateIds must have the same length";
+        }
+            
+        for (i in 0 .. Length(qubits) - 1)
+        {
+            let id = basis[i];
+            let qubit = qubits[i];
+                
+            if (id < 0 or id > 3) {
+                fail $"Invalid basis. Must be between 0 and 3, it was {basis}";
+            }
+                
+            if (id == 0)
+            {
+                I(qubit);
+            }
+            elif (id == 1)
+            {
+                X(qubit);
+            }
+            elif (id == 2)
+            {
+                H(qubit);
+            }
+            else
+            {
+                H(qubit);
+                S(qubit);
+            }
+        }
+    }
+
     operation AssertProbMultiQubitTest () : Unit {
         
         
@@ -51,12 +86,12 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
         }
         
         using (qubits = Qubit[l]) {
-            _flipToBasis(stateId, qubits);
+            flipToBasis(stateId, qubits);
             let expectedZeroProbability = 0.5 + 0.5 * ExpectedValueForMultiPauliByStateId(observable, stateId);
             let expectedOneProbability = 1.0 - expectedZeroProbability;
-            AssertProb(observable, qubits, Zero, expectedZeroProbability, $"", Accuracy());
-            AssertProb(observable, qubits, One, expectedOneProbability, $"", Accuracy());
-            Adjoint _flipToBasis(stateId, qubits);
+            AssertMeasurementProbability(observable, qubits, Zero, expectedZeroProbability, $"", Accuracy());
+            AssertMeasurementProbability(observable, qubits, One, expectedOneProbability, $"", Accuracy());
+            Adjoint flipToBasis(stateId, qubits);
         }
     }
     
