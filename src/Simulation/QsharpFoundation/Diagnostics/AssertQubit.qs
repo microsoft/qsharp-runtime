@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
     operation AssertQubit (expected : Result, q : Qubit) : Unit {
-        Assert([PauliZ], [q], expected, $"Qubit in invalid state. Expecting: {expected}");
+        AssertMeasurement([PauliZ], [q], expected, $"Qubit in invalid state. Expecting: {expected}");
     }
 
     /// # Summary
@@ -47,7 +47,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
     operation AssertQubitWithinTolerance(expected : Result, q : Qubit, tolerance : Double) : Unit {
-        AssertProb([PauliZ], [q], expected, 1.0, $"Qubit in invalid state. Expecting: {expected} with tolerance {tolerance}", tolerance);
+        AssertMeasurementProbability([PauliZ], [q], expected, 1.0, $"Qubit in invalid state. Expecting: {expected} with tolerance {tolerance}", tolerance);
     }
 
     /// # Summary
@@ -126,10 +126,10 @@ namespace Microsoft.Quantum.Diagnostics {
         // Probability of getting outcome One in measuring PauliZ is Tr(M(I-Z)/2) = (mi-mz)/2.0
         // similarly, we find the probabilities for measuring PauliX,PauliY
         let tol = tolerance / 2.0;
-        AssertProb([PauliX], [register], Zero, (mi + mx) / 2.0, $"Qubit Zero probability on X basis failed", tol);
-        AssertProb([PauliY], [register], Zero, (mi + my) / 2.0, $"Qubit Zero probability on Y basis failed", tol);
-        AssertProb([PauliZ], [register], Zero, (mi + mz) / 2.0, $"Qubit Zero probability on Z basis failed", tol);
-        AssertProb([PauliZ], [register], One, (mi - mz) / 2.0, $"Qubit One probability on Z basis failed", tol);
+        AssertMeasurementProbability([PauliX], [register], Zero, (mi + mx) / 2.0, $"Qubit Zero probability on X basis failed", tol);
+        AssertMeasurementProbability([PauliY], [register], Zero, (mi + my) / 2.0, $"Qubit Zero probability on Y basis failed", tol);
+        AssertMeasurementProbability([PauliZ], [register], Zero, (mi + mz) / 2.0, $"Qubit Zero probability on Z basis failed", tol);
+        AssertMeasurementProbability([PauliZ], [register], One, (mi - mz) / 2.0, $"Qubit One probability on Z basis failed", tol);
     }
     
 }
