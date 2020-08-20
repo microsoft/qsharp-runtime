@@ -3,12 +3,200 @@
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
 
-    operation HelloQ() : Result {
-        using (q = Qubit()) {
-            Message("Hello from quantum");
-            H(q);
-            return M(q);
+    operation CZ (a : Qubit, b : Qubit) : Unit
+    {
+        body (...)
+        {
+            H(b);
+            CNOT(a, b);
+            H(b);
         }
+        
+        adjoint self;
+    }
+
+    operation HelloQ() : Int {
+        let gateCnt = 171 * 100;
+        using (q = Qubit[16]) {
+            for (loop in 0..99) {
+                if (loop % 10 == 9) {
+                    Message("Loop...");
+                }
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[2],q[3]);
+                CZ(q[10],q[11]);
+                CZ(q[4],q[5]);
+                CZ(q[12],q[13]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[0],q[1]);
+                CZ(q[8],q[9]);
+                CZ(q[6],q[7]);
+                CZ(q[14],q[15]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[5],q[9]);
+                CZ(q[7],q[11]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[4],q[8]);
+                CZ(q[6],q[10]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[3],q[4]);
+                CZ(q[11],q[12]);
+                CZ(q[5],q[6]);
+                CZ(q[13],q[14]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[1],q[2]);
+                CZ(q[9],q[10]);
+                CZ(q[7],q[8]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[0],q[4]);
+                CZ(q[2],q[6]);
+                CZ(q[9],q[13]);
+                CZ(q[11],q[15]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+                CZ(q[8],q[12]);
+                CZ(q[10],q[14]);
+                CZ(q[1],q[5]);
+                CZ(q[3],q[7]);
+                H(q[0]);
+                H(q[1]);
+                H(q[2]);
+                H(q[3]);
+                H(q[4]);
+                H(q[5]);
+                H(q[6]);
+                H(q[7]);
+                H(q[8]);
+                H(q[9]);
+                H(q[10]);
+                H(q[11]);
+                H(q[12]);
+                H(q[13]);
+                H(q[14]);
+                H(q[15]);
+            }
+        ResetAll(q);
+        }
+    return(gateCnt);
     }
 }
 
