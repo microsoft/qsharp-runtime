@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
 
         for (stateId in 0 .. maxId) {
             let expectedState = ApplyMatrix(unitaryMatrix, StateIdToVector(stateId));
-            _flipToBasis([stateId], [qubit]);
+            flipToBasis([stateId], [qubit]);
             unitaryOp(qubit);
             let alpha = Microsoft.Quantum.Math.Complex((expectedState![0])!);
             let beta = Microsoft.Quantum.Math.Complex((expectedState![1])!);

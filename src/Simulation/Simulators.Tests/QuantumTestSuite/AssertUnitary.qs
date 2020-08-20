@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     operation AssertUnitaryHelper (stateIds : Int[], unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit[] => Unit), qubits : Qubit[]) : Unit {
         
         let expectedState = ApplyMatrix(unitaryMatrix, StateById(stateIds));
-        _flipToBasis(stateIds, qubits);
+        flipToBasis(stateIds, qubits);
         unitaryOp(qubits);
         AssertState(expectedState, qubits);
         ResetAll(qubits);
