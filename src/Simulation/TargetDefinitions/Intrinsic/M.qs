@@ -31,6 +31,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.M")
     operation M (qubit : Qubit) : Result {
-        return Measure([PauliZ], [qubit]);
+        body intrinsic;
     }
 }

@@ -41,6 +41,24 @@ namespace Microsoft.Quantum.Intrinsic {
     /// operation will fail.
     @EnableTestingViaName("Test.TargetDefinitions.Measure")
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
-        body intrinsic;
+        if (Length(bases) == 1) {
+            MapPauli(qubits[0], PauliZ, bases[0]);
+            return M(qubits[0]);
+        }
+        else {
+            using (q = Qubit()) {
+                within {
+                    H(q);
+                }
+                apply {
+                    for (k in 0 .. Length(bases) - 1) {
+                        if (bases[k] == PauliX) { Controlled X([qubits[k]], q); }
+                        if (bases[k] == PauliZ) { Controlled Z([qubits[k]], q); }
+                        if (bases[k] == PauliY) { Controlled Y([qubits[k]], q); }
+                    }
+                }
+                return M(q);
+            }
+        }
     }
 }

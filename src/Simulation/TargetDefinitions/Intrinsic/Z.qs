@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Applies the Pauli $Z$ gate.
     ///
@@ -17,6 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.TargetDefinitions.Z")
     operation Z (qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
         adjoint self;

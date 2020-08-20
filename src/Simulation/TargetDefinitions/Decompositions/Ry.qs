@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Applies a rotation about the $y$-axis by a given angle.
     ///
@@ -26,6 +28,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliY, theta, qubit);
     /// ```
+    @EnableTestingViaName("Test.TargetDefinitions.Ry")
     operation Ry (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         body (...) {
             R(PauliY, theta, qubit);

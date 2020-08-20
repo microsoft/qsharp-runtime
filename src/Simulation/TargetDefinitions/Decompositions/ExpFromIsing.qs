@@ -25,6 +25,20 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Register to apply the given rotation to.
     @EnableTestingViaName("Test.TargetDefinitions.Exp")
     operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
-        body intrinsic;
+        body(...) {
+            if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'qubits' must have the same length"; }
+            let (newPaulis, newQubits) = RemovePauliI(paulis, qubits);
+
+            if (Length(newPaulis) != 0) {
+                if (Length(newPaulis) == 2 and newPaulis[0] != newPaulis[1]) { fail $"Target Package supports only rotation around XX, YY, ZZ, given {paulis}"; }
+                ExpNoIdUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
+            }
+            else {
+                ApplyGlobalPhase(theta);
+            }
+        }
+        adjoint(...) {
+            Exp(paulis, -theta, qubits);
+        }
     }
 }

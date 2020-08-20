@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Applies the π/4 phase gate to a single qubit.
     ///
@@ -17,6 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @EnableTestingViaName("Test.TargetDefinitions.S")
     operation S (qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }

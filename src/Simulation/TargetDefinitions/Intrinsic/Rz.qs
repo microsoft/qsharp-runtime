@@ -5,12 +5,16 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// Applies a rotation about the $\ket{1}$ state by a given angle.
+    /// Applies a rotation about the $z$-axis by a given angle.
     ///
     /// # Description
     /// \begin{align}
-    ///     R_1(\theta) \mathrel{:=}
-    ///     \operatorname{diag}(1, e^{i\theta}).
+    ///     R_z(\theta) \mathrel{:=}
+    ///     e^{-i \theta \sigma_z / 2} = 
+    ///     \begin{bmatrix}
+    ///         e^{-i \theta / 2} & 0 \\\\
+    ///         0 & e^{i \theta / 2}
+    ///     \end{bmatrix}.
     /// \end{align}
     ///
     /// # Input
@@ -23,11 +27,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Equivalent to:
     /// ```qsharp
     /// R(PauliZ, theta, qubit);
-    /// R(PauliI, -theta, qubit);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.R1")
-    operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
-        R(PauliZ, theta, qubit);
-        R(PauliI, -theta, qubit);
+    @EnableTestingViaName("Test.TargetDefinitions.Rz")
+    operation Rz (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        body intrinsic;
     }
 }

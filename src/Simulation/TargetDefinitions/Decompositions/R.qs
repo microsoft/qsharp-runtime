@@ -28,6 +28,19 @@ namespace Microsoft.Quantum.Intrinsic {
     /// when used with the `Controlled` functor.
     @EnableTestingViaName("Test.TargetDefinitions.R")
     operation R (pauli : Pauli, theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
-        body intrinsic;
+        if( pauli != PauliI ) {
+            if( pauli == PauliX ) {
+                Rx(theta, qubit);
+            }
+            elif( pauli == PauliY ) {
+                Ry(theta, qubit);
+            }
+            else { // PauliZ
+                Rz(theta, qubit);
+            }
+        }
+        else {
+            ApplyGlobalPhase( - theta / 2.0 );
+        }
     }
 }

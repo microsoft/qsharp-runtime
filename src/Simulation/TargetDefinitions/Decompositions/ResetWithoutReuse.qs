@@ -13,8 +13,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The qubit whose state is to be reset to $\ket{0}$.
     @EnableTestingViaName("Test.TargetDefinitions.Reset")
     operation Reset (target : Qubit) : Unit {
-        if (M(target) == One) {
-            X(target);
-        }
+        let r = M(target);
     }
 }

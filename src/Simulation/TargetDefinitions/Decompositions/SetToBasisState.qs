@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Sets a qubit to a given computational basis state by measuring the
@@ -17,6 +18,7 @@ namespace Microsoft.Quantum.Measurement {
     /// # Remarks
     /// As an invariant of this operation, calling `M(q)` immediately
     /// after `SetToBasisState(result, q)` will return `result`.
+    @EnableTestingViaName("Test.TargetDefinitions.SetToBasisState")
     operation SetToBasisState(desired : Result, target : Qubit) : Unit {
         if (desired != M(target)) {
             X(target);
