@@ -221,10 +221,18 @@ class Fused
             envNT = getenv("OMP_NUM_THREADS");
 #endif
             if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
-                int nMaxThrds = 4;
-                if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
+                int nMaxThrds   = 6;    // Default for big problems
+                maxFusedSpan    = 6;    // Default for big problems
                 int nProcs = omp_get_num_procs();
-                if (nProcs < 3) nMaxThrds = nProcs;
+                if (nProcs < nMaxThrds) nMaxThrds = nProcs;
+                
+                /* This doesn't seem to really help much...
+                if (wfnCapacity < 1ul << 20) {
+                    if (nMaxThrds > 4) nMaxThrds = 4;   // Lower for small problems
+                    maxFusedSpan = 4;                   // Lower for small problems
+                }
+                */
+
 #ifdef DBWDBG // Force number of threads
                 if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //allow for debugging from above
 #endif
@@ -234,12 +242,6 @@ class Fused
             // This is now pretty much unlimited, could be set in the future
             maxFusedDepth = 99;
 
-            // Default for large problems (optimized with benchmarks)
-            maxFusedSpan = 3;
-
-            // Reduce size for small problems (optimized with benchmarks)
-            if (wfnCapacity < 1ul << 20) maxFusedSpan = 2;
-
 #ifdef DBWDBG // Set fusion depth and span limits
             maxFusedDepth = dbgFusedLimit;
             maxFusedSpan = dbgFusedSpan;
@@ -247,10 +249,12 @@ class Fused
 #endif
         }
 
-        // New rules of when to stop fusing
+#ifdef DBWDBG // Only really predict if we're in debugging mode
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
-
         return (fusedgates.predict(qs, cs) > maxFusedSpan || fusedgates.size() >= (unsigned)maxFusedDepth);
+#else
+        return false;
+#endif
     }
 
   private:

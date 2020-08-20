@@ -597,8 +597,8 @@ public:
             flush();
         }
 
-#ifdef DBWDBG        //Turn on the old code if we're not scheduling
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
+#ifdef DBWDBG        //Turn on the old code if we're not scheduling
         if ((dbgReorder & 2) == 0) {
             if (doFlush) flush();
             fused_.apply(wfn_, g.matrix(), g.qubit());
@@ -617,8 +617,8 @@ public:
             flush();
         }
         
-#ifdef DBWDBG // Turn on the old code if we're not scheduling
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
+#ifdef DBWDBG // Turn on the old code if we're not scheduling
         if ((dbgReorder & 2) == 0) {
             if (doFlush) flush();
             fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());
@@ -734,5 +734,5 @@ std::ostream& operator<<(std::ostream& out, Wavefunction<T> const& wfn)
     return out;
 }
 }
-};
+}
 }

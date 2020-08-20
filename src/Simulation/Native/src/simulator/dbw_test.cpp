@@ -255,8 +255,8 @@ int main()
             //@@@DBG: Skip over tests we don't want to do right now
             //if (numThreads > 4) continue;                         // Not on a big machine
             //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
-            if (idxSched == 2 || idxSched == 5) continue;           // Limit # of schedulers
-            if (prbIdx < 10) continue;                              // Limit # of tests
+            if (idxSched != 0 && idxSched != 4) continue;           // Limit # of schedulers
+            if (prbIdx != 8 || numThreads != 4 || fuseSpan != 4) continue;  // Limit # of tests
 
             bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
