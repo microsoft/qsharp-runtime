@@ -35,11 +35,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.SWAP")
     operation SWAP (qubit1 : Qubit, qubit2 : Qubit) : Unit is Adj + Ctl {
-        body (...) {
-            CNOT(qubit1, qubit2);
-            CNOT(qubit2, qubit1);
-            CNOT(qubit1, qubit2);
-        }
+        body intrinsic;
         adjoint self;
     }
 }

@@ -31,7 +31,27 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Register to apply the given rotation to.
     @EnableTestingViaName("Test.TargetDefinitions.ExpFrac")
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {
-        let angle = (PI() * IntAsDouble(numerator)) / IntAsDouble(2 ^ power);
-        Exp(paulis, angle, qubits);
+        body(...) {
+            if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'target' must have the same length"; }
+
+            if (Length(paulis) != 0) {
+                let indices = IndicesOfNonIdentity(paulis);
+                let newPaulis = ArrayFromIndiciesP(paulis, indices);
+                let newQubits = ArrayFromIndiciesQ(qubits, indices);
+
+                if (Length(indices) != 0) {
+                    let (kModPositive, n) = ReducedDyadicFractionPeriodic(numerator, power); // k is odd, in the range [1,2*2^n-1] or (k,n) are both 0
+                    let numeratorD = PI() * IntAsDouble(kModPositive);
+                    let theta = numeratorD * PowD(2.0, IntAsDouble(-n));
+                    ExpNoIdUtil(newPaulis, theta, newQubits, RFrac(_, numerator, power, _));
+                }
+                else {
+                    ApplyGlobalPhaseFracWithR1Frac(numerator, power);
+                }
+            }
+        }
+        adjoint(...) {
+            ExpFrac(paulis, -numerator, power, qubits);
+        }
     }
 }

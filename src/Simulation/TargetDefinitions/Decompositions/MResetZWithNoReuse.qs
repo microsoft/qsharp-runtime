@@ -23,15 +23,6 @@ namespace Microsoft.Quantum.Measurement {
     /// The result of measuring `target` in the Pauli $Z$ basis.
     @EnableTestingViaName("Test.TargetDefinitions.MResetZ")
     operation MResetZ (target : Qubit) : Result {
-        let result = M(target);
-
-        if (result == One) {
-            // Recall that the +1 eigenspace of a measurement operator corresponds to
-            // the Result case Zero. Thus, if we see a One case, we must reset the state
-            // have +1 eigenvalue.
-            X(target);
-        }
-
-        return result;
+        return M(target);
     }
 }
