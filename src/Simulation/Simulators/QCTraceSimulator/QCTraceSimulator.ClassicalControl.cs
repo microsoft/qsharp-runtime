@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         #region ApplyIfElse
 
-        public class TracerApplyIfElse : Interface_ApplyIfElse
+        public class TracerApplyIfElse : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsic
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -130,7 +130,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        public class TracerApplyIfElseA : Interface_ApplyIfElseA
+        public class TracerApplyIfElseA : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -142,11 +142,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             public override Func<(Result, IAdjointable, IAdjointable), QVoid> Body => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                return ExecuteConditionalStatement(measurementResult, onZero, onOne, OperationFunctor.Body, null);
+            };
+
+            public override Func<(Result, IAdjointable, IAdjointable), QVoid> AdjointBody => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
                 return ExecuteConditionalStatement(measurementResult, onZero, onOne, OperationFunctor.Adjoint, null);
             };
         }
 
-        public class TracerApplyIfElseC : Interface_ApplyIfElseC
+        public class TracerApplyIfElseC : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicC
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -155,15 +161,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 this.tracerCore = m;
             }
 
-            public override Func<(IQArray<Qubit>, Result, IControllable, IControllable), QVoid> Body => (q) =>
+            public override Func<(Result, IControllable, IControllable), QVoid> Body => (q) =>
             {
-                (IQArray<Qubit> ctrls, Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                return ExecuteConditionalStatement(measurementResult, onZero, onOne, OperationFunctor.Body, null);
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> ControlledBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
                 OperationFunctor type = AdjustForNoControls(OperationFunctor.Controlled, ctrls);
                 return ExecuteConditionalStatement(measurementResult, onZero, onOne, type, ctrls);
             };
         }
 
-        public class TracerApplyIfElseCA : Interface_ApplyIfElseCA
+        public class TracerApplyIfElseCA : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyIfElseIntrinsicCA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -172,9 +184,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 this.tracerCore = m;
             }
 
-            public override Func<(IQArray<Qubit>, Result, IUnitary, IUnitary), QVoid> Body => (q) =>
+            public override Func<(Result, IUnitary, IUnitary), QVoid> Body => (q) =>
             {
-                (IQArray<Qubit> ctrls, Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                return ExecuteConditionalStatement(measurementResult, onZero, onOne, OperationFunctor.Body, null);
+            };
+
+            public override Func<(Result, IUnitary, IUnitary), QVoid> AdjointBody => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                return ExecuteConditionalStatement(measurementResult, onZero, onOne, OperationFunctor.Adjoint, null);
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> ControlledBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+                OperationFunctor type = AdjustForNoControls(OperationFunctor.Controlled, ctrls);
+                return ExecuteConditionalStatement(measurementResult, onZero, onOne, type, ctrls);
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> ControlledAdjointBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
                 OperationFunctor type = AdjustForNoControls(OperationFunctor.ControlledAdjoint, ctrls);
                 return ExecuteConditionalStatement(measurementResult, onZero, onOne, type, ctrls);
             };
@@ -184,7 +215,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         #region ApplyConditionally
 
-        public class TracerApplyConditionally : Interface_ApplyConditionally
+        public class TracerApplyConditionally : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsic
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -200,7 +231,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        public class TracerApplyConditionallyA : Interface_ApplyConditionallyA
+        public class TracerApplyConditionallyA : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -212,11 +243,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> Body => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> AdjointBody => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
                 return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
             };
         }
 
-        public class TracerApplyConditionallyC : Interface_ApplyConditionallyC
+        public class TracerApplyConditionallyC : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicC
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -225,15 +262,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 this.tracerCore = m;
             }
 
-            public override Func<(IQArray<Qubit>, IQArray<Result>, IQArray<Result>, IControllable, IControllable), QVoid> Body => (q) =>
+            public override Func<(IQArray<Result>, IQArray<Result>, IControllable, IControllable), QVoid> Body => (q) =>
             {
-                (IQArray<Qubit> ctrls, IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> ControlledBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
                 OperationFunctor type = AdjustForNoControls(OperationFunctor.Controlled, ctrls);
                 return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, type, ctrls);
             };
         }
 
-        public class TracerApplyConditionallyCA : Interface_ApplyConditionallyCA
+        public class TracerApplyConditionallyCA : Microsoft.Quantum.Simulation.QuantumProcessor.Extensions.ApplyConditionallyIntrinsicCA
         {
             private QCTraceSimulatorImpl tracerCore { get; }
 
@@ -242,10 +285,29 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 this.tracerCore = m;
             }
 
-            public override Func<(IQArray<Qubit>, IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> Body => (q) =>
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> Body => (q) =>
             {
-                (IQArray<Qubit> ctrls, IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> AdjointBody => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> ControlledBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
                 OperationFunctor type = AdjustForNoControls(OperationFunctor.Controlled, ctrls);
+                return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, type, ctrls);
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> ControlledAdjointBody => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> comparisonResults, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+                OperationFunctor type = AdjustForNoControls(OperationFunctor.ControlledAdjoint, ctrls);
                 return ExecuteConditionalStatement(measurementResults, comparisonResults, onEqualOp, onNonEqualOp, type, ctrls);
             };
         }

@@ -12,13 +12,20 @@ SET DROP_FOLDER=%SYSTEM_DEFAULTWORKINGDIRECTORY%\xplat\src\Simulation\Native\bui
 DIR %DROP_FOLDER%
 
 IF NOT EXIST linux mkdir linux
-IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so    copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so     linux\Microsoft.Quantum.Simulator.Runtime.dll
+IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so       copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.so       linux\Microsoft.Quantum.Simulator.Runtime.dll
 
 IF NOT EXIST osx mkdir osx
-IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib  osx\Microsoft.Quantum.Simulator.Runtime.dll
+IF EXIST %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib    copy %DROP_FOLDER%\libMicrosoft.Quantum.Simulator.Runtime.dylib    osx\Microsoft.Quantum.Simulator.Runtime.dll
+
+IF NOT EXIST win10 mkdir win10
+IF EXIST %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll copy %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll win10\Microsoft.Quantum.Simulator.Runtime.dll
 
 IF NOT EXIST %BUILD_FOLDER% mkdir %BUILD_FOLDER%
 pushd %BUILD_FOLDER%
+
+IF NOT EXIST Release mkdir Release
+IF EXIST %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll copy %DROP_FOLDER%\Release\Microsoft.Quantum.Simulator.Runtime.dll Release\Microsoft.Quantum.Simulator.Runtime.dll
+
 
 cmake -A "x64" ^
     -DBUILD_SHARED_LIBS:BOOL="1" ^
