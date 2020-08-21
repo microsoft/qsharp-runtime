@@ -103,16 +103,13 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     int phase = 0;
     if (doClusters) phase = 2;
 
-    regex reOrig("^=== Original:.*");
-    regex reGate("^\\s*(\\d+):\\s+(.+)\\[(.*)\\]");
-    regex reClusters("^=== Clusters.*");
-    regex reCluster("^==== cluster\\[\\s*(\\d+)\\]:.*");
+    regex reOrig("^=== Original:.*[\r]?");
+    regex reGate("^\\s*(\\d+):\\s+(.+)\\[(.*)\\].*[\r]?");
+    regex reClusters("^=== Clusters.*[\r]?");
+    regex reCluster("^==== cluster\\[\\s*(\\d+)\\]:.*[\r]?");
     smatch sm;
 
     while (getline(file, line)) {
-#ifndef _MSC_VER
-        line.pop_back();
-#endif
         if (phase == 99) break;
         switch (phase) {
         case 0:
@@ -379,18 +376,18 @@ int main()
         int sizR = 4;
         int sizC = 4;
         int loops = 5000;
-        int gateCnt = 171;
         if (prbIdx == 8) {
             sizR = 5;
             sizC = 5;
             loops = 10;
-            gateCnt = 269;
         }
         mySprintf(fName, sizeof(fName), "suprem_%d%d_4.log", sizR, sizC);
-        printf("==== Starting %s\n",fName);
 
-        prb = loadTest(fName, false);
-        nQs = numQs(prb);
+        prb         = loadTest(fName, false);
+        nQs         = numQs(prb);
+        int gateCnt = (int)prb.size();
+
+        printf("==== Starting %s (%d gates)\n", fName, gateCnt);
 
         auto sim_id = init();
         for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
