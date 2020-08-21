@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var _ = AbstractCallable._;
 
-            var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Extensions.Diagnostics.DumpMachine<>));
+            var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Diagnostics.DumpMachine<>));
             var trace = qsim.Get<IUnitary>(typeof(Circuits.Generics.Trace<>));
             var x = qsim.Get<Intrinsic.X>();
             var q2 = new FreeQubit(2) as Qubit;
@@ -223,7 +223,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             Helper.RunWithMultipleSimulators((qsim) =>
             {
-                var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Extensions.Diagnostics.DumpMachine<>)) as GenericCallable;
+                var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Diagnostics.DumpMachine<>)) as GenericCallable;
                 var trace = qsim.Get<IUnitary>(typeof(Circuits.Generics.Trace<>)) as GenericCallable;
                 var gen3 = qsim.Get<IControllable>(typeof(Circuits.Generics.Gen3<,,>)) as GenericCallable;
 
@@ -231,7 +231,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 TestOneProxy("Trace", "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics.Trace", OperationFunctor.Adjoint, "T => () : Adjoint, Controlled", trace.Adjoint);
                 TestOneProxy("Trace", "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics.Trace", OperationFunctor.Controlled, "(Qubit[],T) => () : Adjoint, Controlled", trace.Controlled);
                 TestOneProxy("Trace", "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics.Trace", OperationFunctor.ControlledAdjoint, "(Qubit[],T) => () : Adjoint, Controlled", trace.Adjoint.Controlled);
-                TestOneProxy("DumpMachine", "Microsoft.Quantum.Extensions.Diagnostics.DumpMachine", OperationFunctor.Body, "T => ()", dump);
+                TestOneProxy("DumpMachine", "Microsoft.Quantum.Diagnostics.DumpMachine", OperationFunctor.Body, "T => ()", dump);
                 TestOneProxy("Gen3", "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics.Gen3", OperationFunctor.Body, "(__T1,(__T2,__T3),Result) => () : Controlled", gen3);
                 TestOneProxy("Gen3", "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics.Gen3", OperationFunctor.Controlled, "(Qubit[],(__T1,(__T2,__T3),Result)) => () : Controlled", gen3.Controlled);
             });
@@ -252,7 +252,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 var _ = AbstractCallable._;
 
-                var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Extensions.Diagnostics.DumpMachine<>)) as GenericCallable;
+                var dump = qsim.Get<ICallable>(typeof(Microsoft.Quantum.Diagnostics.DumpMachine<>)) as GenericCallable;
                 var trace = qsim.Get<IUnitary>(typeof(Circuits.Generics.Trace<>)) as GenericCallable;
                 var gen3 = qsim.Get<IControllable>(typeof(Circuits.Generics.Gen3<,,>)) as GenericCallable;
 
