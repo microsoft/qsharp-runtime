@@ -364,7 +364,7 @@ int main()
         }
     }
 }
-#else // !DBWDBG
+#else // !DBWDBG (version that can be run without any other debugging hooks).
 int main()
 {
     int                     nQs;
