@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             return x;
         }
         else {
-            let fct = GenRecursionPartial(_, cnt - 1);
+            let fct = GenRecursionPartial<'T>(_, cnt - 1);
             return fct(x);
         }
     }

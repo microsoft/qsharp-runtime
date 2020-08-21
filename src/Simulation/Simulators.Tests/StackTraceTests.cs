@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
+#nullable enable
 
 using Xunit;
 
@@ -29,32 +31,33 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AllocateQubit2Test()
         {
-            using (var sim = new QuantumSimulator())
+            using var sim = new QuantumSimulator();
+            try
             {
-                try
-                {
-                    IgnorableAssert.Disable();
-                    QVoid res = sim.Execute<AllocateQubit2, QVoid, QVoid>(QVoid.Instance);
-                }
-                catch (ExecutionFailException)
-                {
-                    StackFrame[] stackFrames = sim.CallStack;
+                IgnorableAssert.Disable();
+                QVoid res = sim.Execute<AllocateQubit2, QVoid, QVoid>(QVoid.Instance);
+            }
+            catch (ExecutionFailException)
+            {
+                var stackFrames = sim.CallStack;
 
-                    // The following assumes that Assert is on Q# stack.
-                    Assert.Equal(2, stackFrames.Length);
+                // Make sure that the call stack isn't null before proceeding.
+                Assert.NotNull(stackFrames);
 
-                    Assert.Equal("Microsoft.Quantum.Intrinsic.Assert", stackFrames[0].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "AllocateQubit2", stackFrames[1].Callable.FullName);
+                // The following assumes that Assert is on Q# stack.
+                Assert.Equal(2, stackFrames!.Length);
 
-                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+                Assert.Equal("Microsoft.Quantum.Diagnostics.AssertMeasurement", stackFrames[0].Callable.FullName);
+                Assert.Equal(namespacePrefix + "AllocateQubit2", stackFrames[1].Callable.FullName);
 
-                    Assert.Equal(94, stackFrames[1].FailedLineNumber);
-                }
-                finally
-                {
-                    IgnorableAssert.Enable();
-                }
+                Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
+                Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+
+                Assert.Equal(94, stackFrames[1].FailedLineNumber);
+            }
+            finally
+            {
+                IgnorableAssert.Enable();
             }
         }
 

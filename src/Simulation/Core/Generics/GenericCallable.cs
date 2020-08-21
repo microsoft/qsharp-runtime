@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -24,6 +26,8 @@ namespace Microsoft.Quantum.Simulation.Core
         O Apply<O>(object args);
 
         ICallable Partial(object partialTuple);
+
+        RuntimeMetadata? GetRuntimeMetadata(IApplyData args);
     }
 
     /// <summary>

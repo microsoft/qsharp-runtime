@@ -24,7 +24,25 @@ type private Parameter =
 let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private driverNamespace = "Microsoft.Quantum.CsharpGeneration.EntryPointDriver"
+let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
+
+/// The driver settings object.
+let private driverSettings =
+    let newDriverSettings = driverNamespace + ".DriverSettings" |> ``type`` |> SyntaxFactory.ObjectCreationExpression
+    let namedArg (name : string) expr = SyntaxFactory.NameColon name |> (SyntaxFactory.Argument expr).WithNameColon
+    let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
+    let simulatorOptionAliases =
+        [ literal <| "--" + fst CommandLineArguments.SimulatorOption 
+          literal <| "-" + snd CommandLineArguments.SimulatorOption ]
+        |> immutableList
+    [ namedArg "simulatorOptionAliases" simulatorOptionAliases
+      namedArg "quantumSimulatorName" <| literal AssemblyConstants.QuantumSimulator
+      namedArg "toffoliSimulatorName" <| literal AssemblyConstants.ToffoliSimulator
+      namedArg "resourcesEstimatorName" <| literal AssemblyConstants.ResourcesEstimator ]
+    |> SyntaxFactory.SeparatedList
+    |> SyntaxFactory.ArgumentList
+    |> newDriverSettings.WithArgumentList
+    :> ExpressionSyntax
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
@@ -94,7 +112,7 @@ let private createArgument context entryPoint =
 
 /// A tuple of the callable's name, argument type name, and return type name.
 let private callableTypeNames context (callable : QsCallable) =
-    let callableName = sprintf "%s.%s" callable.FullName.Namespace.Value callable.FullName.Name.Value
+    let callableName = sprintf "global::%s.%s" callable.FullName.Namespace.Value callable.FullName.Name.Value
     let argTypeName = SimulationCode.roslynTypeName context callable.Signature.ArgumentType
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
@@ -104,7 +122,7 @@ let private mainMethod context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
     let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-    let driver = ``new`` driverType ``(`` [entryPointInstance] ``)``
+    let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
     let commandLineArgsName = "args"
     arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
         ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
@@ -115,21 +133,28 @@ let private mainMethod context entryPoint =
 let private entryPointClass context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
-    let summaryProperty = property "Summary" "string" (literal ((PrintSummary entryPoint.Documentation false).Trim ()))
+    let summaryProperty =
+        (PrintSummary entryPoint.Documentation false).Trim ()
+        |> literal
+        |> property "Summary" "string"
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
     let defaultSimulator =
         context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
-        |> snd
-        |> (fun value -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value)
-    let defaultSimulatorProperty = property "DefaultSimulator" "string" (literal defaultSimulator)
+        |> fun (_, value) -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value
+    let defaultSimulatorNameProperty = literal defaultSimulator |> property "DefaultSimulatorName" "string"
+    let defaultExecutionTargetProperty =
+        context.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget
+        |> (fun (_, value) -> if value = null then "" else value)
+        |> literal
+        |> property "DefaultExecutionTarget" "string"
     let infoProperty =
-        property "Info"
-            (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
-            (ident callableName <|.|> ident "Info")
+        property "Info" (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
+                        (ident callableName <|.|> ident "Info")
     let members : MemberDeclarationSyntax list = [
         summaryProperty
         parameterOptionsProperty parameters
-        defaultSimulatorProperty
+        defaultSimulatorNameProperty
+        defaultExecutionTargetProperty
         infoProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint

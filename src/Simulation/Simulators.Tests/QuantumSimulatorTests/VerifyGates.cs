@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     public partial class QuantumSimulatorTests
     {
         public const int seed = 19740212;
-        public static Random r = new Random(seed);
+        public static System.Random r = new System.Random(seed);
 
         public static double sqrt1_2 = Sqrt(1.0 / 2.0);
 

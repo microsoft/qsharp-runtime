@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Quantum.Intrinsic;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 
@@ -25,11 +26,13 @@ namespace Microsoft.Quantum.Simulation.Common
         long AllocatedForBorrowing; // All qubits allocated only for borrowing, will be marked with this number or higher.
         long[] qubits; // Tracks the allocation state of all qubits.
         long free; // Points to the first free (unallocated) qubit.
+        long freeTail; // Points to the last free (unallocated) qubit. Only valid iff (!EncourageReuse).
         long numAllocatedQubits; // Tracking this for optimization.
         long numDisabledQubits; // Number of disabled qubits.
 
         // Options
         bool MayExtendCapacity;
+        bool EncourageReuse;
         public bool DisableBorrowing { get; }
 
         const long MaxQubitCapacity = long.MaxValue - 3;
@@ -49,9 +52,14 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Creates and initializes QubitManager that can handle up to numQubits qubits
         /// </summary>
-        public QubitManager(long qubitCapacity, bool mayExtendCapacity = false, bool disableBorrowing = false)
+        public QubitManager(
+            long qubitCapacity, 
+            bool mayExtendCapacity = false, 
+            bool disableBorrowing = false, 
+            bool encourageReuse = true)
         {
             MayExtendCapacity = mayExtendCapacity;
+            EncourageReuse = encourageReuse;
             DisableBorrowing = disableBorrowing;
 
             if (qubitCapacity <= 0) { qubitCapacity = MinQubitCapacity; }
@@ -65,6 +73,7 @@ namespace Microsoft.Quantum.Simulation.Common
             Debug.Assert(this.qubits[NumQubits - 1] == None);
 
             free = 0;
+            freeTail = NumQubits - 1;
             numAllocatedQubits = 0;
             numDisabledQubits = 0;
         }
@@ -95,7 +104,6 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 if (oldQubitsArray[i] == oldNone) {
                     // Point to the first new (free) element
-                    Debug.Assert(false,"Why do we extend an array, when we still have available slots?");
                     this.qubits[i] = oldNumQubits; 
                 } else if (oldQubitsArray[i] == oldAllocated) {
                     // Allocated qubits are marked differently now.
@@ -121,9 +129,7 @@ namespace Microsoft.Quantum.Simulation.Common
             if (free == oldNone)
             {
                 free = oldNumQubits;
-            } else
-            {
-                Debug.Assert(false, "Why do we extend an array, when we still have available slots?");
+                freeTail = NumQubits - 1;
             }
         }
 
@@ -259,7 +265,6 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Allocate(long numToAllocate)
         {
-            IgnorableAssert.Assert(numToAllocate >= 0, "Attempt to allocate negative number of qubits.");
             if (numToAllocate < 0)
             {
                 throw new ArgumentException("Attempt to allocate negative number of qubits.");
@@ -297,13 +302,33 @@ namespace Microsoft.Quantum.Simulation.Common
             else
             {
                 long Occupied = (usedOnlyForBorrowing ? AllocatedForBorrowing : Allocated);
-                IgnorableAssert.Assert(qubits[qubit.Id] == Occupied, "Attempt to free qubit that has not been allocated.");
                 if (qubits[qubit.Id] != Occupied)
                 {
                     throw new ArgumentException("Attempt to free qubit that has not been allocated.");
                 }
-                qubits[qubit.Id] = free;
-                free = qubit.Id;
+                if (EncourageReuse) { 
+                    qubits[qubit.Id] = free;
+                    free = qubit.Id;
+                } 
+                else
+                {
+                    // If we are allowed to extend capacity we will never reuse this qubit, 
+                    // otherwise we need to add it to the free qubits list.
+                    if (!MayExtendCapacity)
+                    {
+                        if (qubits[freeTail] != None)
+                        {
+                            // There were no free qubits at all
+                            free = qubit.Id;
+                        }
+                        else
+                        {
+                            qubits[freeTail] = qubit.Id;
+                        }
+                    }
+                    qubits[qubit.Id] = None;
+                    freeTail = qubit.Id;
+                }
 
                 numAllocatedQubits--;
                 Debug.Assert(numAllocatedQubits >= 0);
@@ -337,7 +362,7 @@ namespace Microsoft.Quantum.Simulation.Common
         protected virtual void DisableOneQubit(Qubit qubit)
         {
             // Note: Borrowed qubits cannot be disabled.
-            IgnorableAssert.Assert(qubits[qubit.Id] == Allocated, "Attempt to disable qubit that has not been allocated.");
+            Debug.Assert(qubits[qubit.Id] == Allocated);
             qubits[qubit.Id] = Disabled;
             numDisabledQubits++;
 
@@ -416,7 +441,6 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public virtual IQArray<Qubit> Borrow(long numToBorrow, IEnumerable<Qubit> excludedQubitsSortedById) // Note, excluded could be an array of Ids for efficiency, if it is convenient for compiler.
         {
-            IgnorableAssert.Assert(numToBorrow >= 0, "Attempt to borrow negative number of qubits.");
             if (numToBorrow < 0)
             {
                 throw new ArgumentException("Attempt to borrow negative number of qubits.");

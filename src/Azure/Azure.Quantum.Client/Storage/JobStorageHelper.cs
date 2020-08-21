@@ -1,18 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.Quantum.Utility;
-using Microsoft.WindowsAzure.Storage.Blob;
-
 namespace Microsoft.Azure.Quantum.Storage
 {
-    public class JobStorageHelper : IJobStorageHelper
+    using System;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Bond;
+    using global::Azure.Storage.Blobs;
+    using Microsoft.Azure.Quantum.Exceptions;
+    using Microsoft.Azure.Quantum.Utility;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
+
+    public class JobStorageHelper : JobStorageHelperBase
     {
-        private readonly TimeSpan expiryInterval;
+        private readonly string connectionString;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JobStorageHelper"/> class.
@@ -20,14 +24,19 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="connectionString">The connection string.</param>
         public JobStorageHelper(string connectionString)
         {
-            this.StorageHelper = new StorageHelper(connectionString);
-            this.expiryInterval = TimeSpan.FromDays(Constants.Storage.ExpiryIntervalInDays);
-        }
+            this.connectionString = connectionString;
 
-        /// <summary>
-        /// Gets the underlying storage helper.
-        /// </summary>
-        public IStorageHelper StorageHelper { get; }
+            try
+            {
+                _ = CloudStorageAccount.Parse(connectionString);
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException(
+                    "An error related to the cloud storage account occurred",
+                    ex);
+            }
+        }
 
         /// <summary>
         /// Uploads the job input.
@@ -39,27 +48,32 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <returns>
         /// Container uri + Input uri.
         /// </returns>
-        public async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
+        public override async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
             Stream input,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
+
+            BlobContainerClient containerClient = await this.GetContainerClient(containerName);
+
             await this.StorageHelper.UploadBlobAsync(
-                containerName,
+                containerClient,
                 Constants.Storage.InputBlobName,
                 input,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
+                this.connectionString,
                 containerName,
-                this.expiryInterval,
+                this.ExpiryInterval,
                 SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.Read);
 
             string inputUri = this.StorageHelper.GetBlobSasUri(
+                this.connectionString,
                 containerName,
                 Constants.Storage.InputBlobName,
-                this.expiryInterval,
+                this.ExpiryInterval,
                 SharedAccessBlobPermissions.Read);
 
             return (containerUri, inputUri);
@@ -73,55 +87,40 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="protocol">Serialization protocol of the mapping to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Container uri + Mapping uri.</returns>
-        public async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
+        public override async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
             string jobId,
             Stream mapping,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
+            BlobContainerClient containerClient = await this.GetContainerClient(containerName);
+
             await this.StorageHelper.UploadBlobAsync(
-                containerName,
+                containerClient,
                 Constants.Storage.MappingBlobName,
                 mapping,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
+                this.connectionString,
                 containerName,
-                this.expiryInterval,
+                this.ExpiryInterval,
                 SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.Read);
 
             string mappingUri = this.StorageHelper.GetBlobSasUri(
+                this.connectionString,
                 containerName,
                 Constants.Storage.MappingBlobName,
-                this.expiryInterval,
+                this.ExpiryInterval,
                 SharedAccessBlobPermissions.Read);
 
             return (containerUri, mappingUri);
         }
 
-        /// <summary>
-        /// Downloads the job's execution output.
-        /// </summary>
-        /// <param name="jobId">The job id.</param>
-        /// <param name="destination">The destination stream.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Serialization protocol of the downloaded execution output.</returns>
-        public Task DownloadJobOutputAsync(
-            string jobId,
-            Stream destination,
-            CancellationToken cancellationToken = default)
+        protected override Task<BlobContainerClient> GetContainerClient(string containerName, CancellationToken cancellationToken = default)
         {
-            string containerName = GetContainerName(jobId);
-            return this.StorageHelper.DownloadBlobAsync(
-                containerName,
-                "rawOutputData", // TODO: 14643
-                destination,
-                cancellationToken);
-        }
-
-        private static string GetContainerName(string jobId)
-        {
-            return Constants.Storage.ContainerNamePrefix + jobId.ToLowerInvariant();
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            return Task.FromResult(blobServiceClient.GetBlobContainerClient(containerName));
         }
     }
 }

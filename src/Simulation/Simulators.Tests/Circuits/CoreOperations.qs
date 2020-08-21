@@ -540,7 +540,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         return Foo(3);
     }
 
-    operation ToffoliUsingQubitCheck () : Unit 
+    operation UsingQubitCheck () : Unit 
     {
         using (q = Qubit())
         {
@@ -549,15 +549,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         }
     }
 
-    operation ToffoliBorrowingQubitCheck () : Unit
+    operation ReleaseMeasuredQubitCheck () : Unit 
     {
         using (q = Qubit())
         {
-            ToffoliBorrower();
+            X(q);
+            let r = M(q);
+            // Should not raise an exception
         }
     }
 
-    operation ToffoliBorrower() : Unit
+    operation BorrowingQubitCheck () : Unit
+    {
+        using (q = Qubit())
+        {
+            QubitBorrower();
+        }
+    }
+
+    operation QubitBorrower() : Unit
     {
         borrowing (q = Qubit())
         {

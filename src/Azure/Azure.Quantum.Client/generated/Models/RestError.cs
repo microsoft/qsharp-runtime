@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
     /// <summary>
     /// An Error response.
     /// </summary>
-    [JsonTransformation]
+    [Rest.Serialization.JsonTransformation]
     public partial class RestError
     {
         /// <summary>

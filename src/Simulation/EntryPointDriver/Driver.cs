@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -11,11 +12,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.Simulation.Core;
-using static Microsoft.Quantum.CsharpGeneration.EntryPointDriver.Driver;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
@@ -25,6 +25,11 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
     /// <typeparam name="TOut">The entry point's return type.</typeparam>
     public sealed class Driver<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
     {
+        /// <summary>
+        /// The driver settings.
+        /// </summary>
+        private readonly DriverSettings settings;
+
         /// <summary>
         /// The entry point.
         /// </summary>
@@ -36,27 +41,37 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         private OptionInfo<string> SimulatorOption { get; }
 
         /// <summary>
+        /// The target option.
+        /// </summary>
+        private OptionInfo<string?> TargetOption { get; }
+
+        /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
+        /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoint">The entry point.</param>
-        public Driver(IEntryPoint<TIn, TOut> entryPoint)
+        public Driver(DriverSettings settings, IEntryPoint<TIn, TOut> entryPoint)
         {
+            this.settings = settings;
             this.entryPoint = entryPoint;
+
             SimulatorOption = new OptionInfo<string>(
-                new[]
-                {
-                    "--" + CommandLineArguments.SimulatorOption.Item1,
-                    "-" + CommandLineArguments.SimulatorOption.Item2
-                },
-                entryPoint.DefaultSimulator,
+                settings.SimulatorOptionAliases,
+                entryPoint.DefaultSimulatorName,
                 "The name of the simulator to use.",
                 suggestions: new[]
                 {
-                    AssemblyConstants.QuantumSimulator,
-                    AssemblyConstants.ToffoliSimulator,
-                    AssemblyConstants.ResourcesEstimator,
-                    entryPoint.DefaultSimulator
+                    settings.QuantumSimulatorName,
+                    settings.ToffoliSimulatorName,
+                    settings.ResourcesEstimatorName,
+                    entryPoint.DefaultSimulatorName
                 });
+
+            var targetAliases = ImmutableList.Create("--target");
+            const string targetDescription = "The target device ID.";
+            TargetOption = string.IsNullOrWhiteSpace(entryPoint.DefaultExecutionTarget)
+                ? new OptionInfo<string?>(targetAliases, targetDescription)
+                : new OptionInfo<string?>(targetAliases, entryPoint.DefaultExecutionTarget, targetDescription);
         }
 
         /// <summary>
@@ -77,15 +92,16 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
                 IsHidden = true,
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            AddOptionIfAvailable(submit, TargetOption);
-            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, SubscriptionOption);
             AddOptionIfAvailable(submit, ResourceGroupOption);
             AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, TargetOption);
+            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
-            AddOptionIfAvailable(submit, OutputOption);
+            AddOptionIfAvailable(submit, JobNameOption);
             AddOptionIfAvailable(submit, ShotsOption);
+            AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
 
@@ -118,27 +134,28 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// <returns>The exit code.</returns>
         private async Task<int> Simulate(ParseResult parseResult, string simulator) =>
             await Simulation<TCallable, TIn, TOut>.Simulate(
-                entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
+                settings, entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="settings">The submission settings.</param>
-        private async Task<int> Submit(ParseResult parseResult, AzureSettings settings) =>
+        /// <param name="azureSettings">The Azure submission settings.</param>
+        private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
-                Target = settings.Target,
-                Storage = settings.Storage,
-                Subscription = settings.Subscription,
-                ResourceGroup = settings.ResourceGroup,
-                Workspace = settings.Workspace,
-                AadToken = DefaultIfShadowed(AadTokenOption, settings.AadToken),
-                BaseUri = DefaultIfShadowed(BaseUriOption, settings.BaseUri),
-                Shots = DefaultIfShadowed(ShotsOption, settings.Shots),
-                Output = DefaultIfShadowed(OutputOption, settings.Output),
-                DryRun = DefaultIfShadowed(DryRunOption, settings.DryRun),
-                Verbose = DefaultIfShadowed(VerboseOption, settings.Verbose)
+                Subscription = azureSettings.Subscription,
+                ResourceGroup = azureSettings.ResourceGroup,
+                Workspace = azureSettings.Workspace,
+                Target = DefaultIfShadowed(TargetOption, azureSettings.Target),
+                Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
+                AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
+                BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
+                JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
+                Shots = DefaultIfShadowed(ShotsOption, azureSettings.Shots),
+                Output = DefaultIfShadowed(OutputOption, azureSettings.Output),
+                DryRun = DefaultIfShadowed(DryRunOption, azureSettings.DryRun),
+                Verbose = DefaultIfShadowed(VerboseOption, azureSettings.Verbose)
             });
 
         /// <summary>
@@ -201,52 +218,52 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         // TODO: Define the aliases as constants.
 
         /// <summary>
-        /// The target option.
-        /// </summary>
-        internal static readonly OptionInfo<string> TargetOption = new OptionInfo<string>(
-            new[] { "--target" }, "The target device ID.");
-
-        /// <summary>
-        /// The storage option.
-        /// </summary>
-        internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
-            new[] { "--storage" }, "The storage account connection string.");
-        
-        /// <summary>
         /// The subscription option.
         /// </summary>
         internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
-            new[] { "--subscription" }, "The subscription ID.");
+            ImmutableList.Create("--subscription"), "The subscription ID.");
 
         /// <summary>
         /// The resource group option.
         /// </summary>
         internal static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
-            new[] { "--resource-group" }, "The resource group name.");
+            ImmutableList.Create("--resource-group"), "The resource group name.");
 
         /// <summary>
         /// The workspace option.
         /// </summary>
         internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
-            new[] { "--workspace" }, "The workspace name.");
+            ImmutableList.Create("--workspace"), "The workspace name.");
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
+            ImmutableList.Create("--storage"), default, "The storage account connection string.");
 
         /// <summary>
         /// The AAD token option.
         /// </summary>
         internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
-            new[] { "--aad-token" }, default, "The Azure Active Directory authentication token.");
-        
+            ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
+
         /// <summary>
         /// The base URI option.
         /// </summary>
         internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
-            new[] { "--base-uri" }, default, "The base URI of the Azure Quantum endpoint.");
+            ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
+
+        /// <summary>
+        /// The job name option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
+            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.
         /// </summary>
         internal static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
-            new[] { "--shots" },
+            ImmutableList.Create("--shots"),
             500,
             "The number of times the program is executed on the target machine.",
             validator: result =>
@@ -258,7 +275,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The output option.
         /// </summary>
         internal static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
-            new[] { "--output" },
+            ImmutableList.Create("--output"),
             OutputFormat.FriendlyUri,
             "The information to show in the output after the job is submitted.");
 
@@ -266,7 +283,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The dry run option.
         /// </summary>
         internal static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
-            new[] { "--dry-run" },
+            ImmutableList.Create("--dry-run"),
             false,
             "Validate the program and options, but do not submit to Azure Quantum.");
 
@@ -274,7 +291,7 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// The verbose option.
         /// </summary>
         internal static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
-            new[] { "--verbose" }, false, "Show additional information about the submission.");
+            ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
 
         /// <summary>
         /// Displays a message to the console using the given color and text writer.
@@ -300,7 +317,9 @@ namespace Microsoft.Quantum.CsharpGeneration.EntryPointDriver
         /// Creates a new help builder using the given console.
         /// </summary>
         /// <param name="console">The console to use.</param>
-        internal QsHelpBuilder(IConsole console) : base(console) { }
+        internal QsHelpBuilder(IConsole console) : base(console)
+        {
+        }
 
         protected override string ArgumentDescriptor(IArgument argument)
         {

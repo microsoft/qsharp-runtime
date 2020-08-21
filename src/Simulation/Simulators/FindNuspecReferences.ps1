@@ -19,7 +19,7 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
-$target = "Microsoft.Quantum.Simulators.nuspec"
+$target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec"
 
 if (Test-Path $target) { 
     Write-Host "$target exists. Skipping generating new one."
@@ -28,7 +28,7 @@ if (Test-Path $target) {
 
 
 # Start with the nuspec template
-$nuspec = [xml](Get-Content "Microsoft.Quantum.Simulators.nuspec.template")
+$nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec.template"))
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
 function Add-PackageReferenceIfNew($ref)
@@ -97,7 +97,7 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 
 # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
 Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
-Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulation.Simulators.csproj"
+Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulators.csproj"
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)

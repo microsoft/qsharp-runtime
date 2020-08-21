@@ -66,7 +66,7 @@ type CodegenContext = {
     signature               : ResolvedSignature option
     fileName                : string option
     entryPoints             : IEnumerable<QsQualifiedName>
-} 
+}
     with
     static member public Create (syntaxTree, assemblyConstants) = 
         let udts = GlobalTypeResolutions syntaxTree
@@ -104,6 +104,11 @@ type CodegenContext = {
     static member public Create (syntaxTree : ImmutableArray<QsNamespace>) = 
         CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
 
+    member public this.ProcessorArchitecture = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ProcessorArchitecture with 
+        | true, name -> name
+        | false, _ -> null
+
     member public this.ExecutionTarget = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with 
         | true, name -> name
@@ -113,3 +118,11 @@ type CodegenContext = {
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
         | true, name -> name
         | false, _ -> null
+
+    member internal this.GenerateCodeForSource (fileName : NonNullable<string>) = 
+        let targetsQuantumProcessor = 
+            match this.assemblyConstants.TryGetValue AssemblyConstants.ProcessorArchitecture with
+            | true, target -> target = AssemblyConstants.HoneywellProcessor || target = AssemblyConstants.IonQProcessor || target = AssemblyConstants.QCIProcessor
+            | _ -> false
+        not (fileName.Value.EndsWith ".dll") || targetsQuantumProcessor
+
