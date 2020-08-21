@@ -7,7 +7,6 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Bond;
     using global::Azure.Storage.Blobs;
     using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
@@ -43,7 +42,6 @@ namespace Microsoft.Azure.Quantum.Storage
         /// </summary>
         /// <param name="jobId">The job id.</param>
         /// <param name="input">The input.</param>
-        /// <param name="protocol">Serialization protocol of the input to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// Container uri + Input uri.
@@ -84,7 +82,6 @@ namespace Microsoft.Azure.Quantum.Storage
         /// </summary>
         /// <param name="jobId">The job id.</param>
         /// <param name="mapping">The job program output mapping.</param>
-        /// <param name="protocol">Serialization protocol of the mapping to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Container uri + Mapping uri.</returns>
         public override async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(

@@ -7,7 +7,6 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Bond;
     using global::Azure.Storage.Blobs;
     using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -20,7 +19,7 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="destination">The destination.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Serialization protocol of the downloaded BLOB.</returns>
+        /// <returns>Async task.</returns>
         Task DownloadBlobAsync(
             BlobContainerClient containerClient,
             string blobName,
