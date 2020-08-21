@@ -10,12 +10,17 @@ namespace Sample
         {
             using (var sim = new QuantumSimulator()) 
             {
+                long        gates;
+                TimeSpan    ts;
+                double      tSecs;
+                double      gps;
                 Stopwatch stopWatch = new Stopwatch();
+
                 stopWatch.Start();
-                long gates      = Dummy.Run(sim).Result;
-                TimeSpan ts     = stopWatch.Elapsed;
-                double tSecs    = ts.TotalSeconds;
-                double gps      = gates / tSecs;
+                gates       = Dummy.Run(sim).Result;
+                ts          = stopWatch.Elapsed;
+                tSecs       = ts.TotalSeconds;
+                gps         = gates / tSecs;
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
 
                 stopWatch.Restart();
@@ -30,6 +35,13 @@ namespace Sample
                 ts          = stopWatch.Elapsed;
                 tSecs       = ts.TotalSeconds;
                 gps         = gates / tSecs;
+                Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
+
+                stopWatch.Restart();
+                gates = Suprem56.Run(sim).Result;
+                ts = stopWatch.Elapsed;
+                tSecs = ts.TotalSeconds;
+                gps = gates / tSecs;
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
             }
         }
