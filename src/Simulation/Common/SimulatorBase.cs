@@ -181,6 +181,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public void EnableLogToConsole()
         {
             OnLog += Console.WriteLine;
+            OnDisplayableDiagnostic += Console.WriteLine;
         }
 
 
@@ -190,6 +191,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public void DisableLogToConsole()
         {
             OnLog -= Console.WriteLine;
+            OnDisplayableDiagnostic -= Console.WriteLine;
         }
 
         /// <summary>
