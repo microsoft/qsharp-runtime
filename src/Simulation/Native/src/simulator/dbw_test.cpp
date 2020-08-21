@@ -110,6 +110,9 @@ std::vector<std::vector<std::int32_t>> loadTest(char* fName,bool doClusters) {
     smatch sm;
 
     while (getline(file, line)) {
+#ifndef _MSC_VER
+        line.pop_back();
+#endif
         if (phase == 99) break;
         switch (phase) {
         case 0:
