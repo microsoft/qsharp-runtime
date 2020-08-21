@@ -1,8 +1,8 @@
 ﻿namespace Sample {
-
+    open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
-
+    
     operation CZ (a : Qubit, b : Qubit) : Unit
     {
         body (...)
@@ -15,8 +15,16 @@
         adjoint self;
     }
 
+    operation Dummy(): Int {
+        using (q = Qubit[2]) {
+            CZ(q[0],q[1]);
+            ResetAll(q);
+        }
+        return(1);
+    }
+
     operation Suprem44() : Int {
-        let loops = 10000;
+        let loops = 5000;
         let gateCnt = 171 * loops;
         using (q = Qubit[16]) {
             for (loop in 0..(loops-1)) {
@@ -201,7 +209,7 @@
     }
 
     operation Suprem55() : Int {
-        let loops = 50;
+        let loops = 10;
         let gateCnt = 269 * loops;
         using (q = Qubit[25]) {
             for (loop in 0..(loops-1)) {
@@ -483,9 +491,4 @@
     return(gateCnt);
     }
 
-    operation HelloQ() : Int {
-        //return Suprem44();
-        return Suprem55();
-    }
 }
-

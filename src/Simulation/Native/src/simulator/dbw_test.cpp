@@ -364,6 +364,72 @@ int main()
         }
     }
 }
+#else // !DBWDBG
+int main()
+{
+    int                     nQs;
+    vector<vector<int32_t>> prb;
+    char                    fName[30];
+
+
+    for (int prbIdx = 7; prbIdx <= 8; prbIdx++) {
+        int sizR = 4;
+        int sizC = 4;
+        int loops = 5000;
+        int gateCnt = 171;
+        if (prbIdx == 8) {
+            sizR = 5;
+            sizC = 5;
+            loops = 10;
+            gateCnt = 269;
+        }
+        mySprintf(fName, sizeof(fName), "suprem_%d%d_4.log", sizR, sizC);
+        printf("==== Starting %s\n",fName);
+
+        prb = loadTest(fName, false);
+        nQs = numQs(prb);
+
+        auto sim_id = init();
+        for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
+
+        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+        int itvl = loops / 10;
+        for (int i = 0; i < loops; i++) {
+            for (int j = 0; j < prb.size(); j++) {
+                auto qs = prb[j];
+                uint32_t cs[2];
+                switch (qs.size()) {
+                case 0: // Need to force a flush (end of cluster)
+                    //Flush(sim_id);
+                    break;
+                case 1:
+                    H(sim_id, qs[0]);
+                    break;
+                case 2:
+                    CX(sim_id, qs[0], qs[1]);
+                    break;
+                case 3:
+                    cs[0] = (uint32_t)qs[0];
+                    cs[1] = (uint32_t)qs[1];
+                    MCX(sim_id, 2, cs, qs[2]);
+                    break;
+                default:
+                    throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
+                }
+
+            }
+            std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed = curr - start;
+            if (i % itvl == (itvl - 1)) {
+                double gps = (double)gateCnt * (double)i / elapsed.count();
+                printf("Loops[%4d]: GPS = %.2e\n", i, gps);
+                fflush(stdout);
+            }
+        }
+        destroy(sim_id);
+    }
+}
+#endif
 
 #if 0 // OpenMP test
     double thrd1elapsed = 1.0;
@@ -387,10 +453,3 @@ int main()
     }
 }
 #endif
-
-#else // DBWDBG Turned off
-int main()
-{
-    return 0;
-}
-#endif // DBWDBG
