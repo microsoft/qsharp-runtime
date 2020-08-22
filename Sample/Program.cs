@@ -38,10 +38,10 @@ namespace Sample
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
 
                 stopWatch.Restart();
-                gates = Suprem56.Run(sim).Result;
-                ts = stopWatch.Elapsed;
-                tSecs = ts.TotalSeconds;
-                gps = gates / tSecs;
+                gates 	    = Suprem56.Run(sim).Result;
+                ts 	    = stopWatch.Elapsed;
+                tSecs 	    = ts.TotalSeconds;
+                gps 	    = gates / tSecs;
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
             }
         }
