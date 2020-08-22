@@ -372,14 +372,20 @@ int main()
     char                    fName[30];
 
 
-    for (int prbIdx = 7; prbIdx <= 8; prbIdx++) {
+    // 7,8,9 are the supremacy tests
+    for (int prbIdx = 7; prbIdx <= 9; prbIdx++) {
         int sizR = 4;
         int sizC = 4;
         int loops = 5000;
         if (prbIdx == 8) {
             sizR = 5;
             sizC = 5;
-            loops = 10;
+            loops = 30;
+        }
+        if (prbIdx == 9) {
+            sizR = 5;
+            sizC = 6;
+            loops = 2;
         }
         mySprintf(fName, sizeof(fName), "suprem_%d%d_4.log", sizR, sizC);
 
@@ -418,6 +424,8 @@ int main()
                 }
 
             }
+            for (int q = 0; q < nQs; q++) M(sim_id, q);
+
             std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed = curr - start;
             if (i % itvl == (itvl - 1)) {

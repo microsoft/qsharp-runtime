@@ -2,6 +2,7 @@
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Measurement;
     
     operation CZ (a : Qubit, b : Qubit) : Unit
     {
@@ -202,6 +203,7 @@
                 H(q[13]);
                 H(q[14]);
                 H(q[15]);
+                for (q1 in q) { let _ = M(q1); }
             }
         ResetAll(q);
         }
@@ -485,6 +487,7 @@
                 H(q[22]);
                 H(q[23]);
                 H(q[24]);
+                for (q1 in q) { let _ = M(q1); }
             }
         ResetAll(q);
         }
@@ -492,7 +495,7 @@
     }
 
     operation Suprem56() : Int {
-        let loops = 10;
+        let loops = 1;
         let gateCnt = 323 * loops;
         using (q = Qubit[30]) {
             for (loop in 0..(loops-1)) {
@@ -822,6 +825,7 @@
                 H(q[27]);
                 H(q[28]);
                 H(q[29]);
+                for (q1 in q) { let _ = M(q1); }
             }
         ResetAll(q);
         }
