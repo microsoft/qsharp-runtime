@@ -1,4 +1,4 @@
-﻿namespace quantum
+namespace quantum
 {
     using System;
     using System.Diagnostics;
@@ -26,7 +26,8 @@
                             case 2: gates = Suprem55.Run(sim).Result; break;
                             case 3: gates = Suprem56.Run(sim).Result; break;
                         }
-                        ts 	        = stopWatch.Elapsed;
+			stopWatch.Stop();
+                        ts 	    = stopWatch.Elapsed;
                         tSecs 	    = ts.TotalSeconds;
                         gps 	    = gates / tSecs;
                         Console.WriteLine($"    {loop:D2}: Time: {tSecs:F2} / {gates:E2} = {gps:E2}");

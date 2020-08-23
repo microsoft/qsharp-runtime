@@ -25,7 +25,7 @@
     }
 
     operation Suprem44() : Int {
-        let loops = 500;
+        let loops = 200;
         let gateCnt = (171+27*2) * loops;
         using (q = Qubit[16]) {
             for (loop in 0..(loops-1)) {
