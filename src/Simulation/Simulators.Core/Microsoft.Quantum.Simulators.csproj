@@ -23,14 +23,12 @@
     <Compile Include="..\Simulators\QuantumSimulator\Exp.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\ExpFrac.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\H.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\M.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Measure.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\QuantumSimulator.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Qubit.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\QubitManager.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\R.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\random.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\RFrac.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\S.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\StateDumper.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\T.cs" />
