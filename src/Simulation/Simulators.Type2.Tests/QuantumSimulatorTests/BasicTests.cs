@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
-using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
@@ -60,7 +59,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 var x = sim.Get<Intrinsic.X>();
                 var measure = sim.Get<Intrinsic.M>();
-                var set = sim.Get<SetQubit>();
+                var set = sim.Get<Measurement.SetToBasisState>();
 
                 var ctrlX = x.ControlledBody.AsAction();
                 OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>

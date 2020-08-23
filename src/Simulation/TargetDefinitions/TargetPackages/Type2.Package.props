@@ -36,6 +36,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ResetWithoutReuse.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SetToBasisState.qs" />
 
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\Utils.qs" />
   </ItemGroup>
