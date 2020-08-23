@@ -25,13 +25,10 @@
     }
 
     operation Suprem44() : Int {
-        let loops = 5000;
+        let loops = 500;
         let gateCnt = (171+27*2) * loops;
         using (q = Qubit[16]) {
             for (loop in 0..(loops-1)) {
-                if (loop % (loops/10) == (loops/10)-1) {
-                    Message("Loop...");
-                }
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
@@ -211,13 +208,10 @@
     }
 
     operation Suprem55() : Int {
-        let loops = 10;
+        let loops = 1;
         let gateCnt = (269+44*2) * loops;
         using (q = Qubit[25]) {
             for (loop in 0..(loops-1)) {
-                if (loop % (loops/10) == (loops/10)-1) {
-                    Message("Loop...");
-                }
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
@@ -499,7 +493,6 @@
         let gateCnt = (323+53*2) * loops;
         using (q = Qubit[30]) {
             for (loop in 0..(loops-1)) {
-		        Message("Loop...");
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
