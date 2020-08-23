@@ -2,7 +2,9 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
 
+    @EnableTestingViaName("Test.TargetDefinitions.ExpNoIdUtil")
     internal operation ExpNoIdUtil(paulis : Pauli[], theta : Double, qubits : Qubit[], rotation : ((Pauli, Qubit) => Unit is Adj + Ctl)) : Unit is Ctl {
         if (Length(paulis) != Length(qubits)) { fail "Arrays 'paulis' and 'qubits' must have the same length"; }
         if (Length(paulis) == 1) {
@@ -20,7 +22,7 @@ namespace Microsoft.Quantum.Intrinsic {
                 } elif (paulis[0] == PauliZ) {
                     IsingZZ(theta / 2.0, qubits[0], qubits[1]);
                 } else {
-                    fail "Type2 decompositions do not support PauliI";
+                    fail "Type2 decompositions do not support PauliI as an input to Exp";
                 }
             }
         }
@@ -41,6 +43,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.SpreadZ")
     internal operation SpreadZ(from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
             CNOT(to[0], from);
@@ -52,6 +55,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhase")
     internal operation ApplyGlobalPhase(theta : Double) : Unit is Ctl + Adj {
         body(...) {}
         controlled(controls, (...)) {
@@ -65,6 +69,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhaseFracWithR1Frac")
     internal operation ApplyGlobalPhaseFracWithR1Frac(numerator : Int, power : Int) : Unit is Adj + Ctl {
         body(...) {}
         controlled(ctrls, ... ) {
@@ -77,6 +82,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.MapPauli")
     internal operation MapPauli(qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
         if (from == to) {
         }
@@ -104,6 +110,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ReducedDyadicFraction")
     internal function ReducedDyadicFraction(numerator : Int, denominatorPowerOfTwo : Int) : (Int,Int) {
         if (numerator == 0) { return (0,0); }
         mutable num = numerator;
@@ -115,6 +122,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return (num,denPow);
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ReducedDyadicFractionPeriodic")
     internal function ReducedDyadicFractionPeriodic(numerator : Int, denominatorPowerOfTwo : Int) : (Int,Int) {
         let (k,n) = ReducedDyadicFraction(numerator,denominatorPowerOfTwo); // k is odd, or (k,n) are both 0
         let period = 2*2^n; // \pi k / 2^n is 2\pi periodic, therefore k is 2 * 2^n periodic
@@ -123,6 +131,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return (kModPositive, n);
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ArrayFromIndicesP")
     internal function ArrayFromIndiciesP(values : Pauli[], indicies : Int[]) : Pauli[] {
         mutable arr = new Pauli[Length(indicies)];
         for (i in 0 .. Length(indicies) - 1) {
@@ -131,6 +140,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return arr;
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.ArrayFromIndicesQ")
     internal function ArrayFromIndiciesQ(values : Qubit[], indicies : Int[]) : Qubit[] {
         mutable arr = new Qubit[Length(indicies)];
         for (i in 0 .. Length(indicies) - 1) {
@@ -139,6 +149,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return arr;
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.IndicesOfNonIdentity")
     internal function IndicesOfNonIdentity(paulies : Pauli[]) : Int[] {
         mutable nonIdPauliCount = 0;
 
@@ -159,6 +170,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return indices;
     }
 
+    @EnableTestingViaName("Test.TargetDefinitions.RemovePauliI")
     internal function RemovePauliI(paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
         let indices = IndicesOfNonIdentity(paulis);
         let newPaulis = ArrayFromIndiciesP(paulis, indices);
