@@ -23,7 +23,6 @@ namespace quantum
                 gps         = gates / tSecs;
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
 
-#if FALSE
                 stopWatch.Restart();
                 gates       = Suprem44.Run(sim).Result;
                 ts          = stopWatch.Elapsed;
@@ -37,7 +36,7 @@ namespace quantum
                 tSecs       = ts.TotalSeconds;
                 gps         = gates / tSecs;
                 Console.WriteLine($"Time: {tSecs:F2} / {gates:F0} = {gps:E2}");
-#endif
+
 		for (int i=0; i<3; i++) {
                     stopWatch.Restart();
                     gates 	    = Suprem56.Run(sim).Result;
