@@ -21,7 +21,6 @@
     <Compile Include="..\Simulators\QuantumSimulator\ClassicalControl.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Dump.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Exp.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\ExpFrac.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\H.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Measure.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\QuantumSimulator.cs" />
@@ -38,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Simulators\Properties\AssemblyInfo.cs" />
     <Compile Include="..\Simulators\QCTraceSimulator\*.cs" />
     <QSharpcompile Include="..\Simulators\QCTraceSimulator\Circuits\*.qs" />
     <Compile Include="..\Simulators\QuantumProcessor\*.cs" />
