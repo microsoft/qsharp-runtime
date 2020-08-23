@@ -9,3 +9,4 @@ foo*
 *.vcxproj
 CMakeFiles/
 CMakeCache.txt
+*.so

@@ -1,4 +1,4 @@
-﻿namespace Sample {
+﻿namespace quantum {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
@@ -26,7 +26,7 @@
 
     operation Suprem44() : Int {
         let loops = 5000;
-        let gateCnt = 171 * loops;
+        let gateCnt = (171+27*2) * loops;
         using (q = Qubit[16]) {
             for (loop in 0..(loops-1)) {
                 if (loop % (loops/10) == (loops/10)-1) {
@@ -212,7 +212,7 @@
 
     operation Suprem55() : Int {
         let loops = 10;
-        let gateCnt = 269 * loops;
+        let gateCnt = (269+44*2) * loops;
         using (q = Qubit[25]) {
             for (loop in 0..(loops-1)) {
                 if (loop % (loops/10) == (loops/10)-1) {
@@ -495,11 +495,15 @@
     }
 
     operation Suprem56() : Int {
-        let loops = 1;
-        let gateCnt = 323 * loops;
+        let loops = 3;
+        let gateCnt = (323+53*2) * loops;
         using (q = Qubit[30]) {
             for (loop in 0..(loops-1)) {
+<<<<<<< HEAD:Sample/Quantum.qs
 		Message("Loop...");
+=======
+	            Message("Loop...");
+>>>>>>> bdf388213825b6313e40514ac6a918a71cd76640:SupremacyBenchmark/privateBuild/Quantum.qs
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
