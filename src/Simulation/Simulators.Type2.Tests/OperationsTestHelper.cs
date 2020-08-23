@@ -14,6 +14,18 @@ using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
+    public static class Extensions
+    {
+        /// <summary>
+        ///     This method is a wrapper to let the tests keep using a one Type parameter
+        ///     method to fetch for Gates.
+        /// </summary>
+        public static T Get<T>(this SimulatorBase sim) where T : AbstractCallable
+        {
+            return sim.Get<T, T>();
+        }
+    }
+
     public class Log<T>
     {
         public Dictionary<string, int> _log = new Dictionary<string, int>();
@@ -90,48 +102,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
     static class OperationsTestHelper
     {
-        public static TraceImpl<T> GetTracer<T>(this SimulatorBase s)
-        {
-            return s.Get<GenericCallable>(typeof(Tests.Circuits.Generics.Trace<>)).FindCallable(typeof(T), typeof(QVoid)) as TraceImpl<T>;
-        }
-
-
-        public class TracerImpl : Tests.Circuits.ClosedType.Trace
-        {
-            public TracerImpl(IOperationFactory m) : base(m)
-            {
-                this.Log = new Log<string>();
-            }
-
-            public override Func<string, QVoid> Body => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<string, QVoid> AdjointBody => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, string), QVoid> ControlledBody => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, string), QVoid> ControlledAdjointBody => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
-
-            public Log<string> Log { get; }
-        }
-
-        public class TraceImpl<T> : Tests.Circuits.Generics.Trace<T>
-        {
-            public TraceImpl(IOperationFactory m) : base(m)
-            {
-                this.Log = new Log<T>();
-            }
-
-            public override Func<T, QVoid> Body => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<T, QVoid> AdjointBody => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, T), QVoid> ControlledBody => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, T), QVoid> ControlledAdjointBody => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
-
-            public int GetNumberOfCalls(OperationFunctor functor, T tag) => this.Log.GetNumberOfCalls(functor, tag);
-
-            public Log<T> Log { get; }
-        }
-
         private static void InitSimulator(SimulatorBase sim)
         {
             sim.InitBuiltinOperations(typeof(OperationsTestHelper));
-            sim.Register(typeof(Tests.Circuits.Generics.Trace<>), typeof(TraceImpl<>), typeof(IUnitary));
         }
 
         public static void RunWithMultipleSimulators(Action<SimulatorBase> test)
@@ -189,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
-            var set = sim.Get<SetQubit>();
+            var set = sim.Get<Measurement.SetToBasisState>();
 
             // Number of control bits to use
             for (int n = 0; n < 4; n++)
