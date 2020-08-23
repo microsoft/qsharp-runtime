@@ -156,7 +156,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         /// <summary>
         /// A shell for simple Controlled tests. It calls the controlled operation with 0..4 control qubits
-        /// set to all possible combination of 1 & 0.
+        /// set to all possible combination of 1 and 0.
         /// </summary>
         internal static void ctrlTestShell(SimulatorBase sim, Action<(IQArray<Qubit>, Qubit)> operationControlled, Action<bool, IQArray<Qubit>, Qubit> test)
         {
