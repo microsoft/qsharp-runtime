@@ -499,7 +499,7 @@
         let gateCnt = (323+53*2) * loops;
         using (q = Qubit[30]) {
             for (loop in 0..(loops-1)) {
-		Message("Loop...");
+		        Message("Loop...");
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
