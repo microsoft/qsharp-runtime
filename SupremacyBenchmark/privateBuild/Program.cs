@@ -1,4 +1,4 @@
-namespace Sample
+namespace quantum
 {
     using System;
     using System.Diagnostics;
