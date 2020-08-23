@@ -7,3 +7,4 @@ using System.Runtime.InteropServices;
 
 // Allow the test assembly to use our internal methods
 [assembly: InternalsVisibleTo("Tests.Microsoft.Quantum.Simulators" + SigningConstants.PUBLIC_KEY)]
+[assembly: InternalsVisibleTo("Tests.Microsoft.Quantum.Simulators.Type2" + SigningConstants.PUBLIC_KEY)]
