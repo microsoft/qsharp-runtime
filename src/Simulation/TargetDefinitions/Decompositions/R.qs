@@ -40,6 +40,7 @@ namespace Microsoft.Quantum.Intrinsic {
             }
         }
         else {
+            RotationAngleValidation(theta);
             ApplyGlobalPhase( - theta / 2.0 );
         }
     }

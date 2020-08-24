@@ -32,6 +32,7 @@ namespace Microsoft.Quantum.Intrinsic {
     @EnableTestingViaName("Test.TargetDefinitions.ExpFrac")
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {
         body(...) {
+            CheckQubitUniqueness(qubits);
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'target' must have the same length"; }
 
             if (Length(paulis) != 0) {
