@@ -40,6 +40,8 @@
     <Compile Include="..\Simulators\QuantumSimulator\X.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Y.cs" />
     <Compile Include="..\Simulators\QuantumSimulator\Z.cs" />
+
+    <Compile Include="..\Simulators\QuantumSimulator\Checks.cs" />
   </ItemGroup>
 
   <ItemGroup>

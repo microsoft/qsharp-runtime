@@ -46,6 +46,7 @@ namespace Microsoft.Quantum.Intrinsic {
             return M(qubits[0]);
         }
         else {
+            CheckQubitUniqueness(qubits);
             using (q = Qubit()) {
                 within {
                     H(q);
