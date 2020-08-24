@@ -2940,7 +2940,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -2966,7 +2966,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -2992,7 +2992,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3018,7 +3018,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3044,7 +3044,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3072,7 +3072,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
             }
         }
 
-        public void __Deconstruct__(out Int64 item1, out IQArray<Qubit> item2)
+        public void Deconstruct(out Int64 item1, out IQArray<Qubit> item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3094,7 +3094,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3115,7 +3115,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         public udt_Real Item1 => Data.Item1;
         public udt_Real Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__(out udt_Real item1, out udt_Real item2)
+        public void Deconstruct(out udt_Real item1, out udt_Real item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3137,7 +3137,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3159,7 +3159,7 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
 
     System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
 
-    public void __Deconstruct__()
+    public void Deconstruct()
     {
     }
 }
@@ -3184,7 +3184,7 @@ public class NamedTuple : UDTBase<((Int64,Double),Int64)>, IApplyData
     public (Int64,Double) Item1 => Data.Item1;
     public Int64 Item2 => Data.Item2;
     System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-    public void __Deconstruct__(out (Int64,Double) item1, out Int64 item2)
+    public void Deconstruct(out (Int64,Double) item1, out Int64 item2)
     {
         item1 = Data.Item1;
         item2 = Data.Item2;
@@ -3242,7 +3242,7 @@ namespace Microsoft.Quantum
         public Int64 Item1 => Data.Item1;
         public Int64 Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__(out Int64 item1, out Int64 item2)
+        public void Deconstruct(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3262,7 +3262,7 @@ namespace Microsoft.Quantum
         public Int64 Item1 => Data.Item1;
         public Int64 Item2 => Data.Item2;
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__(out Int64 item1, out Int64 item2)
+        public void Deconstruct(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3352,7 +3352,7 @@ namespace Microsoft.Quantum
         public Int64 Item2 => Data.Item2;
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__(out Int64 item1, out Int64 item2)
+        public void Deconstruct(out Int64 item1, out Int64 item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3376,7 +3376,7 @@ namespace Microsoft.Quantum
         public ((Boolean, String), Int64) Item2 => Data.Item2;
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__(out Double item1, out ((Boolean, String), Int64) item2)
+        public void Deconstruct(out Double item1, out ((Boolean, String), Int64) item2)
         {
             item1 = Data.Item1;
             item2 = Data.Item2;
@@ -3625,7 +3625,7 @@ namespace Microsoft.Quantum.Core
         }
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
@@ -3645,7 +3645,7 @@ namespace Microsoft.Quantum.Diagnostics
         }
 
         System.Collections.Generic.IEnumerable<Qubit> IApplyData.Qubits => null;
-        public void __Deconstruct__()
+        public void Deconstruct()
         {
         }
     }
