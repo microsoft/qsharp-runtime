@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Include="..\..\privateBuild\program.cs" Link="program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\quantum\quantum.csproj" />
   </ItemGroup>
 
