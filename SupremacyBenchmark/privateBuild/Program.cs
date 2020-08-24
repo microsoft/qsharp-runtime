@@ -16,6 +16,14 @@ namespace quantum
             if (envFus == null || envFus.Length == 0) envFus = "6";
             if (envDep == null || envDep.Length == 0) envDep = "99";
 
+            int tstMin  = 0;
+            int tstMax  = 3;
+            int loopCnt = 10;
+
+            if (args.Length > 0) tstMin  = Convert.ToInt32(args[0]);
+            if (args.Length > 1) tstMax  = Convert.ToInt32(args[1]);
+            if (args.Length > 2) loopCnt = Convert.ToInt32(args[2]);
+
             using (var sim = new QuantumSimulator()) 
             {
                 long        gates = 1;
@@ -25,9 +33,9 @@ namespace quantum
                 string      tstName = "";
                 Stopwatch stopWatch = new Stopwatch();
 
-                for (int tst = 1; tst < 4; tst++)
+                for (int tst = tstMin; tst <= tstMax; tst++)
                 {
-                    for (int loop = 0; loop < 10; loop++)
+                    for (int loop = 0; loop < loopCnt; loop++)
                     {
                         stopWatch.Restart();
                         switch (tst) 
