@@ -232,9 +232,20 @@ public:
             return;
         }
 #endif
+        char* envFS = NULL;
+        size_t len;
 
-        unsigned fusedSpan = 4;
-        auto clusters = make_clusters(fusedSpan, gatelist_); //making clusters with gates in the queue
+#ifdef _MSC_VER
+        errno_t err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
+#else
+        envFS = getenv("QDK_SIM_FUSESPAN");
+#endif
+        int fuseSpan = 6;
+        if (envFS != NULL && len > 0) {
+            fuseSpan = atoi(envFS);
+        }
+
+        auto clusters = make_clusters(fuseSpan, gatelist_); //making clusters with gates in the queue
 
         if (clusters.size() == 0) {
             fused_.flush(wfn_);

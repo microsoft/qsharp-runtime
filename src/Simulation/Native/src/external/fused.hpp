@@ -222,25 +222,38 @@ class Fused
 #endif
             if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
                 int nMaxThrds   = 6;    // Default for big problems
-                maxFusedSpan    = 6;    // Default for big problems
                 int nProcs = omp_get_num_procs();
                 if (nProcs < nMaxThrds) nMaxThrds = nProcs;
                 
-                /* This doesn't seem to really help much...
-                if (wfnCapacity < 1ul << 20) {
-                    if (nMaxThrds > 4) nMaxThrds = 4;   // Lower for small problems
-                    maxFusedSpan = 4;                   // Lower for small problems
-                }
-                */
-
 #ifdef DBWDBG // Force number of threads
                 if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //allow for debugging from above
 #endif
                 omp_set_num_threads(nMaxThrds);
             }
 
-            // This is now pretty much unlimited, could be set in the future
+            // Set the max fused depth
+            char* envFD = NULL;
+#ifdef _MSC_VER
+            err = _dupenv_s(&envFD, &len, "QDK_SIM_FUSEDEPTH");
+#else
+            envFD = getenv("QDK_SIM_FUSEDEPTH");
+#endif
             maxFusedDepth = 99;
+            if (envFD != NULL && len > 0) {
+                maxFusedDepth = atoi(envFD);
+            }
+
+            // Set the fused span limit
+            char* envFS = NULL;
+#ifdef _MSC_VER
+            err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
+#else
+            envFS = getenv("QDK_SIM_FUSESPAN");
+#endif
+            maxFusedSpan = 4;
+            if (envFS != NULL && len > 0) {
+                maxFusedSpan = atoi(envFS);
+            }
 
 #ifdef DBWDBG // Set fusion depth and span limits
             maxFusedDepth = dbgFusedLimit;
