@@ -1624,8 +1624,8 @@ module SimulationCode =
             if globalContext.ExposeReferencesViaTestNames then
                 let asOption = function | Value _ -> Some nsElement | _ -> None
                 match nsElement with
-                | QsCallable c as e -> SymbolResolution.TryGetTestName c.Attributes
-                | QsCustomType t as e -> SymbolResolution.TryGetTestName t.Attributes
+                | QsCallable c -> SymbolResolution.TryGetTestName c.Attributes
+                | QsCustomType t -> SymbolResolution.TryGetTestName t.Attributes
                 |> asOption
             else None
         let context = {globalContext with fileName = Some dllName.Value}
