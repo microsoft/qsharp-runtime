@@ -56,6 +56,7 @@ module SimulationCode =
         let isReserved =
             match name with
             | "Data"
+            | "Deconstruct"
             | "Info"
             | "Run" -> true
             | _ ->
@@ -1511,7 +1512,7 @@ module SimulationCode =
                 match qsharpType.Resolution with
                 | QsTypeKind.TupleType many  -> many |> Seq.mapi buildOneParameter  |> List.ofSeq
                 | _                 -> []
-            ``method`` "void"  "__Deconstruct__" ``<<`` [] ``>>``
+            ``method`` "void"  "Deconstruct" ``<<`` [] ``>>``
                 ``(`` parameters ``)``
                 [  ``public``  ]
                 ``{`` body ``}``
