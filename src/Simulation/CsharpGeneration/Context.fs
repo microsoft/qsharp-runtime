@@ -119,6 +119,11 @@ type CodegenContext = {
         | true, name -> name
         | false, _ -> null
 
+    member public this.ExposeReferencesViaTestNames = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ExposeReferencesViaTestNames with 
+        | true, propVal -> propVal = "true"
+        | false, _ -> false
+
     member internal this.GenerateCodeForSource (fileName : NonNullable<string>) = 
         let targetsQuantumProcessor = 
             match this.assemblyConstants.TryGetValue AssemblyConstants.ProcessorArchitecture with
