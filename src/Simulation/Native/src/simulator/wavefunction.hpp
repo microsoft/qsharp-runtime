@@ -14,6 +14,7 @@
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include <string.h>
 
 #include "types.hpp"
 #include "gates.hpp"
@@ -234,17 +235,19 @@ public:
 #endif
         char* envFS = NULL;
         size_t len;
+        int fuseSpan = 6;
 
 #ifdef _MSC_VER
         errno_t err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
-#else
-        envFS = getenv("QDK_SIM_FUSESPAN");
-#endif
-        int fuseSpan = 6;
         if (envFS != NULL && len > 0) {
             fuseSpan = atoi(envFS);
+    }
+#else
+        envFS = getenv("QDK_SIM_FUSESPAN");
+        if (envFS != NULL && strlen(envFS) > 0) {
+            fuseSpan = atoi(envFS);
         }
-
+#endif
         auto clusters = make_clusters(fuseSpan, gatelist_); //making clusters with gates in the queue
 
         if (clusters.size() == 0) {

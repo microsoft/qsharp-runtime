@@ -5,6 +5,7 @@
 #include "config.hpp"
 #include "external/fusion.hpp"
 #include "simulator/kernels.hpp"
+#include <string.h>
 
 #ifndef HAVE_INTRINSICS
 #include "external/nointrin/kernels.hpp"
@@ -233,27 +234,32 @@ class Fused
 
             // Set the max fused depth
             char* envFD = NULL;
+            maxFusedDepth = 99;
 #ifdef _MSC_VER
             err = _dupenv_s(&envFD, &len, "QDK_SIM_FUSEDEPTH");
-#else
-            envFD = getenv("QDK_SIM_FUSEDEPTH");
-#endif
-            maxFusedDepth = 99;
             if (envFD != NULL && len > 0) {
                 maxFusedDepth = atoi(envFD);
+        }
+#else
+            envFD = getenv("QDK_SIM_FUSEDEPTH");
+            if (envFD != NULL && strlen(envFD) > 0) {
+                maxFusedDepth = atoi(envFD);
             }
-
+#endif
             // Set the fused span limit
             char* envFS = NULL;
+            maxFusedSpan = 4;
 #ifdef _MSC_VER
             err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
-#else
-            envFS = getenv("QDK_SIM_FUSESPAN");
-#endif
-            maxFusedSpan = 4;
             if (envFS != NULL && len > 0) {
                 maxFusedSpan = atoi(envFS);
+        }
+#else
+            envFS = getenv("QDK_SIM_FUSESPAN");
+            if (envFS != NULL && strlen(envFS) > 0) {
+                maxFusedSpan = atoi(envFS);
             }
+#endif
 
 #ifdef DBWDBG // Set fusion depth and span limits
             maxFusedDepth = dbgFusedLimit;
