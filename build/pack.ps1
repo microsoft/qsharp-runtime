@@ -67,6 +67,7 @@ Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
 Pack-Dotnet '../src/Simulation/QSharpFoundation/Microsoft.Quantum.QSharp.Foundation.csproj'
 Pack-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
 Pack-One '../src/Simulation/Simulators.Core/Microsoft.Quantum.Simulators.nuspec'
+Pack-One '../src/Simulation/Simulators.Type2/Microsoft.Quantum.Simulators.Type2.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
