@@ -1619,13 +1619,15 @@ module SimulationCode =
     /// Builds the SyntaxTree for callables and types loaded via test names,
     /// formats it and returns it as a string.
     /// Returns null if no elements have been loaded via test name.
-    let loadedViaTestNames (dllName : NonNullable<string>) globalContext =
+    let loadedViaTestNames (dllName : NonNullable<string>) (globalContext : CodegenContext) =
         let isLoadedViaTestName nsElement =
-            let asOption = function | Value _ -> Some nsElement | _ -> None
-            match nsElement with
-            | QsCallable c as e -> SymbolResolution.TryGetTestName c.Attributes
-            | QsCustomType t as e -> SymbolResolution.TryGetTestName t.Attributes
-            |> asOption
+            if globalContext.ExposeReferencesViaTestNames then
+                let asOption = function | Value _ -> Some nsElement | _ -> None
+                match nsElement with
+                | QsCallable c -> SymbolResolution.TryGetTestName c.Attributes
+                | QsCustomType t -> SymbolResolution.TryGetTestName t.Attributes
+                |> asOption
+            else None
         let context = {globalContext with fileName = Some dllName.Value}
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
 
