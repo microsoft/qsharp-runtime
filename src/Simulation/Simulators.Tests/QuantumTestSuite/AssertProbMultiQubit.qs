@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     internal operation FlipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
         if (Length(qubits) != Length(basis))
         {
-            fail $"qubits and stateIds must have the same length";
+            fail "qubits and stateIds must have the same length";
         }
             
         for (i in 0 .. Length(qubits) - 1)
@@ -96,5 +96,4 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
 }
-
 
