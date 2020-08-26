@@ -8,7 +8,6 @@
     <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>honeywell.qpu</ExecutionTarget>
-    <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
 
   <ItemGroup>

@@ -259,7 +259,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         /// </summary>
         internal static void ctrlOnReleasedCtrlQubitTest(SimulatorBase sim, Action<(IQArray<Qubit>, Qubit)> operationControlled)
         {
-            var random = new Random();
+            var random = new System.Random();
 
             ctrlTestShell(sim, operationControlled, (enabled, ctrlQs, q) =>
             {

@@ -49,5 +49,57 @@ namespace Microsoft.Quantum.Simulation
                 factory.Register(op.BaseType, op);
             }
         }
+
+        internal static long NextLongBelow(this System.Random random, long upperExclusive)
+        {
+            // Don't allow sampling non-positive numbers, so that we don't break
+            // Math.Log2.
+            if (upperExclusive <= 0)
+            {
+                throw new ArgumentException(
+                    $"Must be positive, got {upperExclusive}.",
+                    nameof(upperExclusive)
+                );
+            }
+            long SampleNBits(int nBits)
+            {
+                // Note that we can assume that nBytes is never more than 8,
+                // since we got there by looking at the bit length of
+                // upperExclusive, which is itself a 64-bit integer.
+                var nBytes = (nBits + 7) / 8;
+                var nExcessBits = nBytes * 8 - nBits;
+                var bytes = new byte[nBytes];
+                random.NextBytes(bytes);
+                
+                // ToInt64 requires an array of exactly eight bytes.
+                // We can use IsLittleEndian to check which side we
+                // need to pad on to get there.
+                var padded = new byte[8];
+                bytes.CopyTo(padded,
+                    // ToInt64 requires an array of exactly eight bytes.
+                    // We can use IsLittleEndian to check which side we
+                    // need to pad on to get there.
+                    System.BitConverter.IsLittleEndian
+                    ? 0
+                    : 8 - nBytes
+                );
+                return System.BitConverter.ToInt64(padded) >> nExcessBits;
+            };
+            
+            var nBits = (int) (System.Math.Log(upperExclusive, 2) + 1);
+            var sample = SampleNBits(nBits);
+            while (sample >= upperExclusive)
+            {
+                sample = SampleNBits(nBits);
+            }
+            return sample;
+        }
+
+        internal static long NextLong(this System.Random random, long lower, long upper)
+        {
+            var delta = upper - lower;
+            return lower + random.NextLongBelow(delta + 1);
+        }
+
     }
 }
