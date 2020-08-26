@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Simulation.TestSuite.Math;
     
     
-    internal operation flipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
+    internal operation FlipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
         if (Length(qubits) != Length(basis))
         {
             fail $"qubits and stateIds must have the same length";
@@ -86,12 +86,12 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
         }
         
         using (qubits = Qubit[l]) {
-            flipToBasis(stateId, qubits);
+            FlipToBasis(stateId, qubits);
             let expectedZeroProbability = 0.5 + 0.5 * ExpectedValueForMultiPauliByStateId(observable, stateId);
             let expectedOneProbability = 1.0 - expectedZeroProbability;
             AssertMeasurementProbability(observable, qubits, Zero, expectedZeroProbability, $"", Accuracy());
             AssertMeasurementProbability(observable, qubits, One, expectedOneProbability, $"", Accuracy());
-            Adjoint flipToBasis(stateId, qubits);
+            Adjoint FlipToBasis(stateId, qubits);
         }
     }
     

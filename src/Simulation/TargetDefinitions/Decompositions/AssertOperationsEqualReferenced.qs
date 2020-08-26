@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// A qubit array in the $\ket{0\cdots 0}$ state
     /// ## right
     /// A qubit array in the $\ket{0\cdots 0}$ state
-    internal operation prepareEntangledState (left : Qubit[], right : Qubit[]) : Unit
+    internal operation PrepareEntangledState (left : Qubit[], right : Qubit[]) : Unit
     is Adj + Ctl {
 
         for (idxQubit in 0 .. Length(left) - 1)
@@ -56,10 +56,10 @@ namespace Microsoft.Quantum.Diagnostics {
     operation AssertOperationsEqualReferenced (nQubits : Int, actual : (Qubit[] => Unit), expected : (Qubit[] => Unit is Adj)) : Unit {
         // Prepare a reference register entangled with the target register.
         using ((reference, target) = (Qubit[nQubits], Qubit[nQubits])) {
-            prepareEntangledState(reference, target);
+            PrepareEntangledState(reference, target);
             actual(target);
             Adjoint expected(target);
-            Adjoint prepareEntangledState(reference, target);
+            Adjoint PrepareEntangledState(reference, target);
             AssertAllZero(reference + target);
             ResetAll(target);
             ResetAll(reference);

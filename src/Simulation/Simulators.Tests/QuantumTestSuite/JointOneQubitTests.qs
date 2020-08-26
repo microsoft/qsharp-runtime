@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
         }
         
         mutable states = new Vector[numQubits];
-        flipToBasis(inputStateId, qubits);
+        FlipToBasis(inputStateId, qubits);
         
         for (i in 0 .. numQubits - 1) {
             let (op, matrix) = operationsToTest[i]!;
