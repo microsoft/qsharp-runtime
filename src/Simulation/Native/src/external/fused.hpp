@@ -5,7 +5,8 @@
 #include "config.hpp"
 #include "external/fusion.hpp"
 #include "simulator/kernels.hpp"
-#include <string.h>
+#include <string>
+#include <thread>
 
 #ifndef HAVE_INTRINSICS
 #include "external/nointrin/kernels.hpp"
@@ -67,7 +68,7 @@ class Fused
 #endif
 
         wfnCapacity     = 0u; // used to optimize runtime parameters
-        maxFusedSpan    = 6;  // determine span to use at runtime
+        maxFusedSpan    = 4;  // determine span to use at runtime
         maxFusedDepth   = 99; // determine max depth to use at runtime
     }
 
@@ -82,6 +83,10 @@ class Fused
     
     void set_fusedgates(Fusion newFusedGates) const {
         fusedgates = newFusedGates;
+    }
+
+    const int maxSpan() const {
+        return maxFusedSpan;
     }
 
     template <class T, class A>
@@ -222,10 +227,12 @@ class Fused
             envNT = getenv("OMP_NUM_THREADS");
 #endif
             if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
-                int nMaxThrds   = 6;    // Default for big problems
-                int nProcs = omp_get_num_procs();
-                if (nProcs < nMaxThrds) nMaxThrds = nProcs;
-                
+                int nMaxThrds = std::thread::hardware_concurrency();        // Logical HW threads
+                if (nMaxThrds > 4) nMaxThrds/= 2;                           // Assume we have hyperthreading (no consistent/concise way to do this)
+                if (wfnCapacity < 1u << 20) {
+                    if (nMaxThrds > 8) nMaxThrds = 8;                       // Small problem, never use too many
+                    else if (nMaxThrds > 3) nMaxThrds = 3;                  // Small problem on a small machine
+                }
 #ifdef DBWDBG // Force number of threads
                 if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //allow for debugging from above
 #endif
@@ -248,7 +255,8 @@ class Fused
 #endif
             // Set the fused span limit
             char* envFS = NULL;
-            maxFusedSpan = 4;
+            maxFusedSpan = 4;                               // General sweet spot
+            if (wfnCapacity < 1u << 20) maxFusedSpan = 2;   // Don't pre-fuse small problems
 #ifdef _MSC_VER
             err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
             if (envFS != NULL && len > 0) {
