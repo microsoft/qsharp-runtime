@@ -94,6 +94,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 (new FreeQubit(1), "bar"),
             };
             Assert.Equal("[(\"foo\"), (\"bar\")]", qTupleArr.GetNonQubitArgumentsAsString());
+
+            var qArrayBool = new QArray<Boolean>(new[] { false, true });
+            Assert.Equal("[False, True]", qArrayBool.GetNonQubitArgumentsAsString());
         }
 
         [Fact]

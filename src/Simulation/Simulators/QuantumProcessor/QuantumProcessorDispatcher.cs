@@ -12,10 +12,6 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
     public partial class QuantumProcessorDispatcher : SimulatorBase
     {
         private const int PreallocatedQubitCount = 256;
-        /// <summary>
-        /// Random number generator used for <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.random">Microsoft.Quantum.Intrinsic.Random</a> 
-        /// </summary>
-        public readonly System.Random random;
 
         public override string Name => "QuantumProcessorDispatcher";
 
@@ -35,9 +31,14 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
         /// <param name="qubitManager">An instance of a class implementing <see cref="IQubitManager"/> interface. If the parameter is null <see cref="QubitManagerTrackingScope"/> is used.</param>
         /// <param name="randomSeed">A seed to be used by Q# <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.random">Microsoft.Quantum.Intrinsic.Random</a> operation.</param>
         public QuantumProcessorDispatcher(IQuantumProcessor? quantumProcessor = null, IQubitManager? qubitManager = null, int? randomSeed = null)
-            : base(qubitManager ?? new QubitManagerTrackingScope(PreallocatedQubitCount, mayExtendCapacity:true, disableBorrowing:false))
+        : base(
+            qubitManager ?? new QubitManagerTrackingScope(
+                PreallocatedQubitCount,
+                mayExtendCapacity: true, disableBorrowing: false
+            ),
+            randomSeed
+        )
         {
-            random = new System.Random(randomSeed == null ? DateTime.Now.Millisecond : randomSeed.Value);
             QuantumProcessor = quantumProcessor ?? new QuantumProcessorBase();
             OnOperationStart += QuantumProcessor.OnOperationStart;
             OnOperationEnd += QuantumProcessor.OnOperationEnd;
