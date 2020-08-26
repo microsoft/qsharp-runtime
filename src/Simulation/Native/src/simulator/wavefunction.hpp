@@ -233,9 +233,6 @@ public:
             return;
         }
 #endif
-        char* envFS = NULL;
-        size_t len;
-
         int maxSpan = fused_.maxSpan();
         auto clusters = make_clusters(maxSpan, gatelist_); //making clusters with gates in the queue
 
