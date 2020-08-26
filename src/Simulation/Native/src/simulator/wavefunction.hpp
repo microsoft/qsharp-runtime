@@ -525,11 +525,12 @@ public:
                 curClusters.clear();
                 auto prevCluster = prevClusters.back();                                     // Pop the first cluster
                 prevClusters.pop_back();
-                while (prevClusters.size() > 0) {                                           // While there are more clusters...
+                while (prevClusters.size() > 0)  {                                          // While there are more clusters...
                     auto foundCompat = prevCluster.next_cluster(prevClusters, i);           // See if we can accumlate anyone who follows
                     Cluster clusterFound = foundCompat.first;
                     std::vector<unsigned> foundTotQids = foundCompat.second;
-                    if (clusterFound.get_gates().size() == 0) {                             // Can't append any more clusters to this one
+                    if (clusterFound.get_gates().size() == 0 ||                             // Can't append any more clusters to this one
+                        (int)prevCluster.size() >= fused_.maxDepth()) {                     // ... or we're beyond max depth
                         curClusters.push_back(prevCluster);                                 // Save this cluster
                         prevCluster = prevClusters.back();
                         prevClusters.pop_back();

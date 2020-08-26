@@ -67,9 +67,9 @@ class Fused
         dbgET2      = 0.0;
 #endif
 
-        wfnCapacity     = 0u; // used to optimize runtime parameters
-        maxFusedSpan    = 4;  // determine span to use at runtime
-        maxFusedDepth   = 99; // determine max depth to use at runtime
+        wfnCapacity     = 0u;   // used to optimize runtime parameters
+        maxFusedSpan    = 4;    // determine span to use at runtime
+        maxFusedDepth   = 999;  // determine max depth to use at runtime
     }
 
     inline void reset()
@@ -87,6 +87,10 @@ class Fused
 
     const int maxSpan() const {
         return maxFusedSpan;
+    }
+
+    const int maxDepth() const {
+        return maxFusedDepth;
     }
 
     template <class T, class A>
@@ -241,7 +245,7 @@ class Fused
 
             // Set the max fused depth
             char* envFD = NULL;
-            maxFusedDepth = 99;
+            maxFusedDepth = 999;
 #ifdef _MSC_VER
             err = _dupenv_s(&envFD, &len, "QDK_SIM_FUSEDEPTH");
             if (envFD != NULL && len > 0) {
