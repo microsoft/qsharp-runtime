@@ -19,12 +19,13 @@ def dumpGpss():
         gpsMed  = np.median(gpss)
         cnt     = 0.0
         tot     = 0.0
-        for gps in gpss:
-            if gps > gpsMed/2.0 and gps < gpsMed*1.5:
-                cnt += 1.0
-                tot += gps
-        if cnt > 0: gps = tot/cnt
-        else:       gps = np.average(gpss)
+        #for gps in gpss:
+        #    if gps > gpsMed/2.0 and gps < gpsMed*1.5:
+        #        cnt += 1.0
+        #        tot += gps
+        #if cnt > 0: gps = tot/cnt
+        #else:       gps = np.average(gpss)
+        gps     = np.max(gpss)
 
         idx     = int(len(infos)/2)
         itm     = infos[idx]
