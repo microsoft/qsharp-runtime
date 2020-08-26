@@ -265,6 +265,7 @@ class Fused
             err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
             if (envFS != NULL && len > 0) {
                 maxFusedSpan = atoi(envFS);
+                if (maxFusedSpan > 7) maxFusedSpan = 7;     // Highest we can handle
         }
 #else
             envFS = getenv("QDK_SIM_FUSESPAN");
