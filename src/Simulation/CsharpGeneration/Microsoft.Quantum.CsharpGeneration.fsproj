@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.12.20081703-beta" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.12.2008.2604-alpha" />
   </ItemGroup>
 
   <ItemGroup>
