@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     public partial class QuantumProcessorDispatcher
     {
-        public class QuantumProcessorDispatcherAssertProb : Quantum.Intrinsic.AssertProb
+        public class QuantumProcessorDispatcherAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private QuantumProcessorDispatcher Simulator { get; }
 

@@ -8,7 +8,7 @@ using namespace Microsoft::Quantum::Simulator;
 
 int main(int argc, char** argv)
 {
-  auto& sim = psis[create()];
+  auto sim = get(create());
 
   unsigned q=0; // qubit number
   sim->allocateQubit(q);

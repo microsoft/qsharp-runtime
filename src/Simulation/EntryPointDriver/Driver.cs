@@ -41,6 +41,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         private OptionInfo<string> SimulatorOption { get; }
 
         /// <summary>
+        /// The target option.
+        /// </summary>
+        private OptionInfo<string?> TargetOption { get; }
+
+        /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
         /// <param name="settings">The driver settings.</param>
@@ -49,6 +54,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             this.settings = settings;
             this.entryPoint = entryPoint;
+
             SimulatorOption = new OptionInfo<string>(
                 settings.SimulatorOptionAliases,
                 entryPoint.DefaultSimulatorName,
@@ -60,6 +66,12 @@ namespace Microsoft.Quantum.EntryPointDriver
                     settings.ResourcesEstimatorName,
                     entryPoint.DefaultSimulatorName
                 });
+
+            var targetAliases = ImmutableList.Create("--target");
+            const string targetDescription = "The target device ID.";
+            TargetOption = string.IsNullOrWhiteSpace(entryPoint.DefaultExecutionTarget)
+                ? new OptionInfo<string?>(targetAliases, targetDescription)
+                : new OptionInfo<string?>(targetAliases, entryPoint.DefaultExecutionTarget, targetDescription);
         }
 
         /// <summary>
@@ -80,11 +92,11 @@ namespace Microsoft.Quantum.EntryPointDriver
                 IsHidden = true,
                 Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
             };
-            AddOptionIfAvailable(submit, TargetOption);
-            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, SubscriptionOption);
             AddOptionIfAvailable(submit, ResourceGroupOption);
             AddOptionIfAvailable(submit, WorkspaceOption);
+            AddOptionIfAvailable(submit, TargetOption);
+            AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
             AddOptionIfAvailable(submit, JobNameOption);
@@ -132,11 +144,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
             await Azure.Submit(entryPoint, parseResult, new AzureSettings
             {
-                Target = azureSettings.Target,
-                Storage = azureSettings.Storage,
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
+                Target = DefaultIfShadowed(TargetOption, azureSettings.Target),
+                Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
                 JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
@@ -206,18 +218,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         // TODO: Define the aliases as constants.
 
         /// <summary>
-        /// The target option.
-        /// </summary>
-        internal static readonly OptionInfo<string> TargetOption = new OptionInfo<string>(
-            ImmutableList.Create("--target"), "The target device ID.");
-
-        /// <summary>
-        /// The storage option.
-        /// </summary>
-        internal static readonly OptionInfo<string> StorageOption = new OptionInfo<string>(
-            ImmutableList.Create("--storage"), "The storage account connection string.");
-
-        /// <summary>
         /// The subscription option.
         /// </summary>
         internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
@@ -234,6 +234,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
             ImmutableList.Create("--workspace"), "The workspace name.");
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
+            ImmutableList.Create("--storage"), default, "The storage account connection string.");
 
         /// <summary>
         /// The AAD token option.

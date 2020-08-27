@@ -169,7 +169,7 @@ namespace Microsoft.Azure.Quantum.Client
                 try
                 {
                     _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    RestError _errorBody =  Microsoft.Rest.Serialization.SafeJsonConvert.DeserializeObject<RestError>(_responseContent, Client.DeserializationSettings);
+                    RestError _errorBody =  Rest.Serialization.SafeJsonConvert.DeserializeObject<RestError>(_responseContent, Client.DeserializationSettings);
                     if (_errorBody != null)
                     {
                         ex.Body = _errorBody;
@@ -206,7 +206,7 @@ namespace Microsoft.Azure.Quantum.Client
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = Microsoft.Rest.Serialization.SafeJsonConvert.DeserializeObject<Page<ProviderStatus>>(_responseContent, Client.DeserializationSettings);
+                    _result.Body = Rest.Serialization.SafeJsonConvert.DeserializeObject<Page<ProviderStatus>>(_responseContent, Client.DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {
@@ -337,7 +337,7 @@ namespace Microsoft.Azure.Quantum.Client
                 try
                 {
                     _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    RestError _errorBody =  Microsoft.Rest.Serialization.SafeJsonConvert.DeserializeObject<RestError>(_responseContent, Client.DeserializationSettings);
+                    RestError _errorBody =  Rest.Serialization.SafeJsonConvert.DeserializeObject<RestError>(_responseContent, Client.DeserializationSettings);
                     if (_errorBody != null)
                     {
                         ex.Body = _errorBody;
@@ -374,7 +374,7 @@ namespace Microsoft.Azure.Quantum.Client
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = Microsoft.Rest.Serialization.SafeJsonConvert.DeserializeObject<Page<ProviderStatus>>(_responseContent, Client.DeserializationSettings);
+                    _result.Body = Rest.Serialization.SafeJsonConvert.DeserializeObject<Page<ProviderStatus>>(_responseContent, Client.DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {

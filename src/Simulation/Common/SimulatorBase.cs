@@ -31,6 +31,21 @@ namespace Microsoft.Quantum.Simulation.Common
         public event Action<string>? OnLog = null;
         public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
 
+
+        protected readonly int randomSeed;
+        protected readonly Lazy<System.Random> randomGenerator;
+        public int Seed => randomSeed;
+        protected System.Random RandomGenerator => randomGenerator.Value;
+
+
+        
+        /// <summary>
+        ///     An event fired whenever a simulator has additional diagnostic data
+        ///     available for display (e.g. state information, assertion details,
+        ///     execution traces).
+        /// </summary>
+        public event Action<object>? OnDisplayableDiagnostic = null;
+
         public IQubitManager? QubitManager { get; }
 
         public abstract string Name { get; }
@@ -47,8 +62,12 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </remarks>
         public StackFrame[]? CallStack { get; private set; }
 
-        public SimulatorBase(IQubitManager? qubitManager = null)
+        public SimulatorBase(IQubitManager? qubitManager = null, int? seed = null)
         {
+            this.randomSeed = seed ?? Guid.NewGuid().GetHashCode();
+            this.randomGenerator = new Lazy<System.Random>(
+                () => new System.Random(Seed)
+            );
             this.QubitManager = qubitManager;
 
             this.InitBuiltinOperations(this.GetType());
@@ -162,6 +181,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public void EnableLogToConsole()
         {
             OnLog += Console.WriteLine;
+            OnDisplayableDiagnostic += Console.WriteLine;
         }
 
 
@@ -171,6 +191,7 @@ namespace Microsoft.Quantum.Simulation.Common
         public void DisableLogToConsole()
         {
             OnLog -= Console.WriteLine;
+            OnDisplayableDiagnostic -= Console.WriteLine;
         }
 
         /// <summary>
@@ -180,6 +201,20 @@ namespace Microsoft.Quantum.Simulation.Common
         public void EnableExceptionPrinting()
         {
             OnException += WriteStackTraceToLog;
+        }
+
+        /// <summary>
+        ///     Sends diagnostic data to any listening display handlers.
+        ///     Display handlers may discard any unrecognized data, such that
+        ///     no guarantee is made as to any particular action taken as a result
+        ///     of calling this method.
+        /// </summary>
+        /// <param name="data">
+        ///     The diagnostic object to be displayed.
+        /// </param>
+        public void MaybeDisplayDiagnostic(object data)
+        {
+            OnDisplayableDiagnostic?.Invoke(data);
         }
 
 
@@ -396,6 +431,55 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override Func<QVoid, long> Body => (arg) => sim.QubitManager.GetParentQubitsAvailableToBorrowCount() +
                                                                sim.QubitManager.GetFreeQubitsCount();
+        }
+
+        /// <summary>
+        ///     Implements the DrawRandomInt operation from the
+        ///     Microsoft.Quantum.Random namespace.
+        /// </summary>
+        public class DrawRandomInt : Random.DrawRandomInt
+        {
+            private SimulatorBase sim;
+
+            public DrawRandomInt(SimulatorBase m) : base(m)
+            {
+                sim = m;
+            }
+
+            public override Func<(long, long), long> Body => arg =>
+            {
+                var (min, max) = arg;
+                if (max <= min)
+                {
+                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                }
+                return sim.RandomGenerator.NextLong(min, max);
+            };
+        }
+
+        /// <summary>
+        ///     Implements the DrawRandomInt operation from the
+        ///     Microsoft.Quantum.Random namespace.
+        /// </summary>
+        public class DrawRandomDouble : Random.DrawRandomDouble
+        {
+            private SimulatorBase sim;
+
+            public DrawRandomDouble(SimulatorBase m) : base(m)
+            {
+                sim = m;
+            }
+
+            public override Func<(double, double), double> Body => arg =>
+            {
+                var (min, max) = arg;
+                if (max <= min)
+                {
+                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                }
+                var delta = max - min;
+                return min + delta * sim.RandomGenerator.NextDouble();
+            };
         }
 
         public virtual void StartOperation(ICallable operation, IApplyData inputValue)

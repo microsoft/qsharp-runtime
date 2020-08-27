@@ -9,36 +9,26 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Quantum.Utility
 {
-    internal sealed class LazyAsync<T>
+    internal sealed class LazyAsync<T> : Lazy<Task<T>>
     {
-        private readonly Lazy<Task<T>> instance;
-        private readonly Lazy<T> valueL;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LazyAsync{T}"/> class.
+        /// Constructor for use with asynchronous factories.
+        /// </summary>
+        /// <param name="taskFactory">Async value factory.</param>
+        public LazyAsync(Func<Task<T>> taskFactory)
+            : base(() => Task.Run(taskFactory))
+        { }
 
         /// <summary>
-        /// Constructor for use with synchronous factories
+        /// Initializes a new instance of the <see cref="LazyAsync{T}"/> class.
+        /// Constructor for use with synchronous factories.
         /// </summary>
-        public LazyAsync(Func<T> synchronousFactory)
-            : this(new Lazy<Task<T>>(() => Task.Run(synchronousFactory)))
-        {
-        }
+        /// <param name="valueFactory">Sync value factory.</param>
+        public LazyAsync(Func<T> valueFactory)
+            : base(() => Task.Run(valueFactory))
+        { }
 
-        /// <summary>
-        /// Constructor for use with asynchronous factories
-        /// </summary>
-        public LazyAsync(Func<Task<T>> asynchronousFactory)
-            : this(new Lazy<Task<T>>(() => asynchronousFactory()))
-        {
-        }
-
-        // private constructor which sets both fields
-        private LazyAsync(Lazy<Task<T>> instance)
-        {
-            this.instance = instance;
-            this.valueL = new Lazy<T>(() => this.instance.Value.GetAwaiter().GetResult());
-        }
-
-        public T Value => valueL.Value;
-
-        public TaskAwaiter<T> GetAwaiter() => instance.Value.GetAwaiter();
+        public TaskAwaiter<T> GetAwaiter() => Value.GetAwaiter();
     }
 }

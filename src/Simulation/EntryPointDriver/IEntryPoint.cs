@@ -36,6 +36,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         string DefaultSimulatorName { get; }
 
         /// <summary>
+        /// The default execution target when to use when submitting the entry point to Azure Quantum.
+        /// </summary>
+        string DefaultExecutionTarget { get; }
+
+        /// <summary>
         /// Additional information about the entry point.
         /// </summary>
         EntryPointInfo<TIn, TOut> Info { get; }

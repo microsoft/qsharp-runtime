@@ -1,105 +1,87 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Bond;
-using Microsoft.Azure.Quantum.Exceptions;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-
 namespace Microsoft.Azure.Quantum.Storage
 {
+    using System;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using global::Azure.Storage.Blobs;
+    using global::Azure.Storage.Blobs.Models;
+    using Microsoft.Azure.Quantum.Exceptions;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
+
     internal class StorageHelper : IStorageHelper
     {
-        private readonly string connectionString;
-        private readonly CloudStorageAccount storageAccount;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StorageHelper"/> class.
-        /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        public StorageHelper(string connectionString)
-        {
-            this.connectionString = connectionString;
-
-            try
-            {
-                this.storageAccount = CloudStorageAccount.Parse(connectionString);
-            }
-            catch (Exception ex)
-            {
-                throw CreateException(ex, "An error related to the cloud storage account occurred");
-            }
-        }
-
         /// <summary>
         /// Downloads the BLOB.
         /// </summary>
-        /// <param name="containerName">Name of the container.</param>
+        /// <param name="containerClient">Container client.</param>
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="destination">The destination.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Serialization protocol of the downloaded BLOB.</returns>
-        public async Task<ProtocolType> DownloadBlobAsync(
-            string containerName,
+        /// <returns>Async task.</returns>
+        public async Task DownloadBlobAsync(
+            BlobContainerClient containerClient,
             string blobName,
             Stream destination,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                BlobClient blob = await this.GetBlobClient(containerName, blobName, false, cancellationToken);
+                BlobClient blob = containerClient.GetBlobClient(blobName);
                 await blob.DownloadToAsync(destination, cancellationToken);
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "Could not download BLOB", containerName, blobName);
+                throw CreateException(ex, "Could not download BLOB", containerClient.Name, blobName);
             }
 
-            return ProtocolType.COMPACT_PROTOCOL;
+            return;
         }
 
         /// <summary>
         /// Uploads the BLOB.
         /// </summary>
-        /// <param name="containerName">Name of the container.</param>
+        /// <param name="containerClient">Container client.</param>
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="input">The input.</param>
-        /// <param name="protocol">Serialization protocol of the BLOB to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Async task.</returns>
         public async Task UploadBlobAsync(
-            string containerName,
+            BlobContainerClient containerClient,
             string blobName,
             Stream input,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                BlobClient blob = await this.GetBlobClient(containerName, blobName, true, cancellationToken);
+                // Ensure container is created
+                await containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: cancellationToken);
+
+                // Upload blob
+                BlobClient blob = containerClient.GetBlobClient(blobName);
                 await blob.UploadAsync(input, overwrite: true, cancellationToken);
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "Could not upload BLOB", containerName, blobName);
+                throw CreateException(ex, "Could not upload BLOB", containerClient.Name, blobName);
             }
         }
 
         /// <summary>
         /// Gets the BLOB sas URI.
         /// </summary>
+        /// <param name="connectionString">Storage account connection string.</param>
         /// <param name="containerName">Name of the container.</param>
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="expiryInterval">The expiry interval.</param>
         /// <param name="permissions">The permissions.</param>
         /// <returns>Blob uri.</returns>
         public string GetBlobSasUri(
+            string connectionString,
             string containerName,
             string blobName,
             TimeSpan expiryInterval,
@@ -109,7 +91,8 @@ namespace Microsoft.Azure.Quantum.Storage
             {
                 SharedAccessBlobPolicy adHocSAS = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
 
-                CloudBlob blob = this.storageAccount
+                CloudBlob blob = CloudStorageAccount
+                    .Parse(connectionString)
                     .CreateCloudBlobClient()
                     .GetContainerReference(containerName)
                     .GetBlobReference(blobName);
@@ -125,11 +108,13 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <summary>
         /// Gets the BLOB container sas URI.
         /// </summary>
+        /// <param name="connectionString">Storage account connection string.</param>
         /// <param name="containerName">Name of the container.</param>
         /// <param name="expiryInterval">The expiry interval.</param>
         /// <param name="permissions">The permissions.</param>
         /// <returns>Container uri.</returns>
         public string GetBlobContainerSasUri(
+            string connectionString,
             string containerName,
             TimeSpan expiryInterval,
             SharedAccessBlobPermissions permissions)
@@ -139,7 +124,10 @@ namespace Microsoft.Azure.Quantum.Storage
                 SharedAccessBlobPolicy adHocPolicy = CreateSharedAccessBlobPolicy(expiryInterval, permissions);
 
                 // Generate the shared access signature on the container, setting the constraints directly on the signature.
-                CloudBlobContainer container = this.storageAccount.CreateCloudBlobClient().GetContainerReference(containerName);
+                CloudBlobContainer container = CloudStorageAccount
+                    .Parse(connectionString)
+                    .CreateCloudBlobClient().GetContainerReference(containerName);
+
                 return container.Uri + container.GetSharedAccessSignature(adHocPolicy, null);
             }
             catch (Exception ex)
@@ -156,27 +144,9 @@ namespace Microsoft.Azure.Quantum.Storage
         {
             return new StorageClientException(
                 message,
-                connectionString,
                 containerName,
                 blobName,
                 inner);
-        }
-
-        private async Task<BlobClient> GetBlobClient(
-            string containerName,
-            string blobName,
-            bool createContainer,
-            CancellationToken cancellationToken)
-        {
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-            BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-
-            if (createContainer)
-            {
-                await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
-            }
-
-            return blobContainerClient.GetBlobClient(blobName);
         }
 
         private static SharedAccessBlobPolicy CreateSharedAccessBlobPolicy(

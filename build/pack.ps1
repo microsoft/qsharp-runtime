@@ -46,7 +46,8 @@ function Pack-Dotnet() {
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
         @args `
-        /property:Version=$Env:NUGET_VERSION `
+        /property:Version=$Env:ASSEMBLY_VERSION `
+        /property:PackageVersion=$Env:NUGET_VERSION `
         $option1 `
         $option2 `
         $option3
