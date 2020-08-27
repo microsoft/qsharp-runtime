@@ -99,6 +99,7 @@ namespace SIMULATOR
     bool release(unsigned q)
     {
       recursive_lock_type l(mutex());
+      flush();
       bool allok = isclassical(q);
       if (allok)
       allok = (psi.getvalue(q)==false);
@@ -168,7 +169,6 @@ namespace SIMULATOR
       psi.apply_controlled(c, Gates::R(b, phi, q));
     }
     
-    // Exponential of Pauli operators
     // Exponential of Pauli operators
     void CExp(std::vector<Gates::Basis> bs, double phi, std::vector<unsigned> const& cs, std::vector<unsigned> qs)
     {

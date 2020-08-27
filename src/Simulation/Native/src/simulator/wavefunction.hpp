@@ -270,10 +270,10 @@ public:
                 for (GateWrapper gate : cl.get_gates()) {
                     std::vector<unsigned> cs = gate.get_controls();
                     if (cs.size() == 0) {
-                        fused_.apply(wfn_, gate.get_mat(), gate.get_target());
+                        fused_.apply(wfn_, gate.get_mat(), qubit(gate.get_target()));
                     }
                     else {
-                        fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
+                        fused_.apply_controlled(wfn_, gate.get_mat(), qubits(cs), qubit(gate.get_target()));
                     }
                 }
 
@@ -586,7 +586,8 @@ public:
             // swap elements in qubitmap located at iterators
             std::iter_swap(origQubitLocItr, newQubitLocItr);
         }
-}
+    }
+
     /// generic application of a gate
     template <class Gate>
     void apply(Gate const& g)
