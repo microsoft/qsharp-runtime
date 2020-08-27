@@ -15,7 +15,7 @@
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(QsimDllMac)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindowsRelease)</QSimDll>
-    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows')) And Exists('$(QsimDllWindowsRelease)')">$(QsimDllWindowsRelease)</QSimDll>
+    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows')) And Exists('$(QsimDllWindowsDebug)')">$(QsimDllWindowsDebug)</QSimDll>
   </PropertyGroup>
 
   <ItemGroup>
