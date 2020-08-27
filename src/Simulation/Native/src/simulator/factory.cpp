@@ -43,18 +43,22 @@ namespace Microsoft
      {
        if (haveAVX512())
         {
+           printf("@@@DBG: Doing AVX512\n");
             return SimulatorAVX512::createSimulator(maxlocal);
         }
         else if (haveFMA() && haveAVX2())
         {
+           printf("@@@DBG: Doing AVX2\n");
            return SimulatorAVX2::createSimulator(maxlocal);
         }
         else if(haveAVX())
         {
+           printf("@@@DBG: Doing AVX\n");
            return SimulatorAVX::createSimulator(maxlocal);
         }
         else
         {
+           printf("@@@DBG: Doing Generic\n");
            return SimulatorGeneric::createSimulator(maxlocal);
         }
 
