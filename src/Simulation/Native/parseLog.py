@@ -47,18 +47,14 @@ def dumpGpss():
         cnt     = 0.0
         tot     = 0.0
         for gps in gpss:
-            #print(f" {gps:.1f}",end='') # @@@DBG
             if gps > gpsMed/2.0 and gps < gpsMed*1.5:
                 cnt += 1.0
                 tot += gps
-            #else: print("*",end='') # @@@DBG
         if cnt > 0: gps = tot/cnt
         else:       gps = gpsAvg
 
-        #print(f" = {gps:.1f}")  # @@@DBG
-
         nam     = prbs[prb]
-       
+
         if rng == 0:    nam  = f'{env},{nam}L'
         elif rng == 2:  nam  = f'{env},{nam}H'
         else:           nam  = f'{env},{nam}'

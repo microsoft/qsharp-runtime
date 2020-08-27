@@ -119,7 +119,6 @@ namespace Microsoft
 
                         allTouched.insert(nextQs.begin(), nextQs.end());            // Add in all qubits touched, and try the next cluster
                     }
-                    // printf("@@@DBG:                          bad!!!!\n");
                     Cluster defCl = Cluster({}, {});                                // Couldn't find any more clusters to add
                     std::vector<unsigned> defVec = {};
                     return std::make_pair(defCl, defVec);
