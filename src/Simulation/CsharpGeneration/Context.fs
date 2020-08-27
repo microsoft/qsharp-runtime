@@ -19,7 +19,7 @@ module internal DeclarationLocations =
     type TransformationState() = 
 
         member val internal CurrentSource = null with get, set
-        member val internal DeclarationLocations = new List<NonNullable<string> * (int * int)>()
+        member val internal DeclarationLocations = new List<NonNullable<string> * Position>()
 
     type NamespaceTransformation(parent : SyntaxTreeTransformation<TransformationState>) = 
         inherit NamespaceTransformation<TransformationState>(parent)
@@ -60,7 +60,7 @@ type CodegenContext = {
     allQsElements           : IEnumerable<QsNamespace>
     allUdts                 : ImmutableDictionary<QsQualifiedName,QsCustomType>
     allCallables            : ImmutableDictionary<QsQualifiedName,QsCallable>
-    declarationPositions    : ImmutableDictionary<NonNullable<string>, ImmutableSortedSet<int * int>>
+    declarationPositions    : ImmutableDictionary<NonNullable<string>, ImmutableSortedSet<Position>>
     byName                  : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
@@ -118,6 +118,11 @@ type CodegenContext = {
         match this.assemblyConstants.TryGetValue AssemblyConstants.AssemblyName with
         | true, name -> name
         | false, _ -> null
+
+    member public this.ExposeReferencesViaTestNames = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ExposeReferencesViaTestNames with 
+        | true, propVal -> propVal = "true"
+        | false, _ -> false
 
     member internal this.GenerateCodeForSource (fileName : NonNullable<string>) = 
         let targetsQuantumProcessor = 

@@ -274,7 +274,7 @@ module SimulationCode =
         override this.OnStatement (node:QsStatement) =
             match node.Location with
             | Value loc ->
-                let (current, _) = loc.Offset
+                let current = loc.Offset.Line
                 parent.LineNumber <- parent.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
             | Null ->
                 parent.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
@@ -561,7 +561,7 @@ module SimulationCode =
 
         and buildArrayItem a i =
             match i.ResolvedType.Resolution with
-            | Range -> ``invoke`` ((buildExpression a) <|?.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
+            | Range -> ``invoke`` ((buildExpression a) <|.|> (``ident`` "Slice")) ``(`` [ (buildExpression i) ] ``)``
             | _ -> ``item`` (buildExpression a) [ (buildExpression i) ]
 
         let buildBlock (block : QsScope) =
@@ -839,7 +839,7 @@ module SimulationCode =
         override this.OnSpecializationDeclaration (sp : QsSpecialization) =
             count <- 0
             match sp.Location with
-            | Value location -> parent.StartLine <- Some (location.Offset |> fst)
+            | Value location -> parent.StartLine <- Some location.Offset.Line
             | Null -> parent.StartLine <- None // TODO: we may need to have the means to know which original declaration the code came from
             base.OnSpecializationDeclaration sp
 
@@ -856,7 +856,7 @@ module SimulationCode =
     let getTypeOfOp context (n: QsQualifiedName) =
         let name =
             let sameNamespace = match context.current with | None -> false | Some o -> o.Namespace = n.Namespace
-            let opName = if sameNamespace then n.Name.Value else n.Namespace.Value + "." + n.Name.Value
+            let opName = if sameNamespace then n.Name.Value else "global::" + n.Namespace.Value + "." + n.Name.Value
             if isGeneric context n then
                 let signature = context.allCallables.[n].Signature
                 let count = signature.TypeParameters.Length
@@ -1003,12 +1003,12 @@ module SimulationCode =
             | Null -> []
             | Value location -> [
                 // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
-                let startLine = fst location.Offset + 1
+                let startLine = location.Offset.Line + 1
                 let endLine =
                     match context.declarationPositions.TryGetValue sp.SourceFile with
                     | true, startPositions ->
                         let index = startPositions.IndexOf location.Offset
-                        if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
+                        if index + 1 >= startPositions.Count then -1 else startPositions.[index + 1].Line + 1
 //TODO: diagnostics.
                     | false, _ -> startLine
                 ``attribute`` None (``ident`` "SourceLocation") [
@@ -1328,7 +1328,7 @@ module SimulationCode =
         let properties = buildOutput ()
         let methods =
             match op.Location with
-            | Value location -> [ buildUnitTest targetName opName (fst location.Offset) op.SourceFile.Value ]
+            | Value location -> [ buildUnitTest targetName opName location.Offset.Line op.SourceFile.Value ]
 // TODO: diagnostics
             | Null -> failwith "missing location for unit test"
 
@@ -1619,13 +1619,15 @@ module SimulationCode =
     /// Builds the SyntaxTree for callables and types loaded via test names,
     /// formats it and returns it as a string.
     /// Returns null if no elements have been loaded via test name.
-    let loadedViaTestNames (dllName : NonNullable<string>) globalContext =
+    let loadedViaTestNames (dllName : NonNullable<string>) (globalContext : CodegenContext) =
         let isLoadedViaTestName nsElement =
-            let asOption = function | Value _ -> Some nsElement | _ -> None
-            match nsElement with
-            | QsCallable c as e -> SymbolResolution.TryGetTestName c.Attributes
-            | QsCustomType t as e -> SymbolResolution.TryGetTestName t.Attributes
-            |> asOption
+            if globalContext.ExposeReferencesViaTestNames then
+                let asOption = function | Value _ -> Some nsElement | _ -> None
+                match nsElement with
+                | QsCallable c -> SymbolResolution.TryGetTestName c.Attributes
+                | QsCustomType t -> SymbolResolution.TryGetTestName t.Attributes
+                |> asOption
+            else None
         let context = {globalContext with fileName = Some dllName.Value}
         let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
 

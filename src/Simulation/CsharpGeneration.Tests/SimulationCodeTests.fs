@@ -878,27 +878,27 @@ namespace N1
         |> testOne genU2
 
         [
-            template "Allocate"                               "Allocate"                        "Microsoft.Quantum.Intrinsic.Allocate"
-            template "MicrosoftQuantumIntrinsicH"             "IUnitary<Qubit>"                 "Microsoft.Quantum.Intrinsic.H"
+            template "Allocate"                               "Allocate"                        "global::Microsoft.Quantum.Intrinsic.Allocate"
+            template "MicrosoftQuantumIntrinsicH"             "IUnitary<Qubit>"                 "global::Microsoft.Quantum.Intrinsic.H"
             template "H"                                      "ICallable<Qubit, QVoid>"         "H"
-            template "Release"                                "Release"                         "Microsoft.Quantum.Intrinsic.Release"
-            template "MicrosoftQuantumOverridesemptyFunction" "ICallable<QVoid, QVoid>"         "Microsoft.Quantum.Overrides.emptyFunction"
+            template "Release"                                "Release"                         "global::Microsoft.Quantum.Intrinsic.Release"
+            template "MicrosoftQuantumOverridesemptyFunction" "ICallable<QVoid, QVoid>"         "global::Microsoft.Quantum.Overrides.emptyFunction"
             template "emptyFunction"                          "ICallable<QVoid, QVoid>"         "emptyFunction"
         ]
         |> testOne duplicatedDefinitionsCaller
 
         [
-            template "Allocate"                             "Allocate"                          "Microsoft.Quantum.Intrinsic.Allocate"
-            template "CNOT"                                 "IAdjointable<(Qubit, Qubit)>"      "Microsoft.Quantum.Intrinsic.CNOT"
-            template "MicrosoftQuantumTestingHold"          "ICallable"                         "Microsoft.Quantum.Testing.Hold<>"
-            template "Release"                              "Release"                           "Microsoft.Quantum.Intrinsic.Release"
+            template "Allocate"                             "Allocate"                          "global::Microsoft.Quantum.Intrinsic.Allocate"
+            template "CNOT"                                 "IAdjointable<(Qubit, Qubit)>"      "global::Microsoft.Quantum.Intrinsic.CNOT"
+            template "MicrosoftQuantumTestingHold"          "ICallable"                         "global::Microsoft.Quantum.Testing.Hold<>"
+            template "Release"                              "Release"                           "global::Microsoft.Quantum.Intrinsic.Release"
             template "ResultToString"                       "ICallable<Result,String>"          "ResultToString"
-            template "X"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.X"
+            template "X"                                    "IUnitary<Qubit>"                   "global::Microsoft.Quantum.Intrinsic.X"
             template "genIter"                              "IUnitary"                          "genIter<>"
             template "genMapper"                            "ICallable"                         "genMapper<,>"
             template "genU1"                                "IUnitary"                          "genU1<>"
-            template "MicrosoftQuantumTestingnoOpGeneric"   "IUnitary"                          "Microsoft.Quantum.Testing.noOpGeneric<>"
-            template "MicrosoftQuantumTestingnoOpResult"    "IUnitary<Result>"                  "Microsoft.Quantum.Testing.noOpResult"
+            template "MicrosoftQuantumTestingnoOpGeneric"   "IUnitary"                          "global::Microsoft.Quantum.Testing.noOpGeneric<>"
+            template "MicrosoftQuantumTestingnoOpResult"    "IUnitary<Result>"                  "global::Microsoft.Quantum.Testing.noOpResult"
         ]
         |> testOne usesGenerics
 
@@ -908,7 +908,7 @@ namespace N1
         |> testOne callsGenericWithMultipleTypeParams
 
         [
-            template "Z"                                    "IUnitary<Qubit>"                   "Microsoft.Quantum.Intrinsic.Z"
+            template "Z"                                    "IUnitary<Qubit>"                   "global::Microsoft.Quantum.Intrinsic.Z"
             "this.self = this;"
         ]
         |> testOne selfInvokingOperation
@@ -930,17 +930,17 @@ namespace N1
 
         let template = sprintf "typeof(%s)"
         [
-            template "Microsoft.Quantum.Intrinsic.Allocate"
-            template "Microsoft.Quantum.Intrinsic.CNOT"
-            template "Microsoft.Quantum.Testing.Hold<>"
-            template "Microsoft.Quantum.Intrinsic.Release"
+            template "global::Microsoft.Quantum.Intrinsic.Allocate"
+            template "global::Microsoft.Quantum.Intrinsic.CNOT"
+            template "global::Microsoft.Quantum.Testing.Hold<>"
+            template "global::Microsoft.Quantum.Intrinsic.Release"
             template "ResultToString"
-            template "Microsoft.Quantum.Intrinsic.X"
+            template "global::Microsoft.Quantum.Intrinsic.X"
             template "genIter<>"
             template "genMapper<,>"
             template "genU1<>"
-            template "Microsoft.Quantum.Testing.noOpGeneric<>"
-            template "Microsoft.Quantum.Testing.noOpResult"
+            template "global::Microsoft.Quantum.Testing.noOpGeneric<>"
+            template "global::Microsoft.Quantum.Testing.noOpResult"
         ]
         |> List.sort
         |> testOne usesGenerics
@@ -961,7 +961,7 @@ namespace N1
         |> testOne genRecursion
 
         [
-            template "Microsoft.Quantum.Intrinsic.Z"
+            template "global::Microsoft.Quantum.Intrinsic.Z"
             template "selfInvokingOperation"
         ]
         |> testOne selfInvokingOperation
@@ -1242,7 +1242,7 @@ namespace N1
 
             "X.Apply(qubits.Data[0L]);"
             "X.Adjoint.Apply(qubits.Data[0L]);"
-            "X.Controlled.Apply((qubits.Data?.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
+            "X.Controlled.Apply((qubits.Data.Slice(new QRange(1L,5L)), qubits.Data[0L]));"
 
             "call_target1.Apply((1L, X,     X,   X,   X));"
             "call_target1.Apply((1L, plain.Data, adj.Data, ctr.Data, uni.Data));"
@@ -1820,7 +1820,7 @@ namespace N1
             "var r5 = (IQArray<Result>)QArray<Result>.Create((4L + 2L));"
             "var r6 = QArray<Pauli>.Create(r5.Length);"
             "var r7 = (IQArray<Int64>)QArray<Int64>.Add(r2, r4);"
-            "var r8 = (IQArray<Int64>)r7?.Slice(new QRange(1L, 5L, 10L));"
+            "var r8 = (IQArray<Int64>)r7.Slice(new QRange(1L, 5L, 10L));"
 
             "var r9 = new arrays_T1(new QArray<Pauli>(Pauli.PauliX, Pauli.PauliY));"
             "var r10 = (IQArray<arrays_T1>)QArray<arrays_T1>.Create(4L);"
@@ -1828,8 +1828,8 @@ namespace N1
             "var r12 = (IQArray<arrays_T2>)QArray<arrays_T2>.Create(r10.Length);"
             "var r13 = new arrays_T3(new QArray<IQArray<Result>>(new QArray<Result>(Result.Zero, Result.One), new QArray<Result>(Result.One, Result.Zero)));"
             "var r14 = (IQArray<Qubit>)QArray<Qubit>.Add(qubits, register.Data);"
-            "var r15 = (IQArray<Qubit>)register.Data?.Slice(new QRange(0L, 2L));"
-            "var r16 = (IQArray<Qubit>)qubits?.Slice(new QRange(1L, -(1L)));"
+            "var r15 = (IQArray<Qubit>)register.Data.Slice(new QRange(0L, 2L));"
+            "var r16 = (IQArray<Qubit>)qubits.Slice(new QRange(1L, -(1L)));"
             "var r18 = (IQArray<Qubits>)QArray<Qubits>.Create(2L);"
             "var r19 = (IQArray<Microsoft.Quantum.Overrides.udt0>)QArray<Microsoft.Quantum.Overrides.udt0>.Create(7L);"
             "var i0 = r13.Data[0L][1L];"
@@ -1860,12 +1860,12 @@ namespace N1
             "var r2 = new QRange(10L,-(2L),0L);"
             "var ranges = (IQArray<QRange>)QArray<QRange>.Create(1L);"
 
-            "var s1 = (IQArray<Qubit>)qubits?.Slice(new QRange(0L,10L));"
-            "var s2 = (IQArray<Qubit>)qubits?.Slice(r2);"
-            "var s3 = (IQArray<Qubit>)qubits?.Slice(ranges[3L]);"
-            "var s4 = (IQArray<Qubit>)qubits?.Slice(GetMeARange.Apply(QVoid.Instance));"
+            "var s1 = (IQArray<Qubit>)qubits.Slice(new QRange(0L,10L));"
+            "var s2 = (IQArray<Qubit>)qubits.Slice(r2);"
+            "var s3 = (IQArray<Qubit>)qubits.Slice(ranges[3L]);"
+            "var s4 = (IQArray<Qubit>)qubits.Slice(GetMeARange.Apply(QVoid.Instance));"
 
-            "return qubits?.Slice(new QRange(10L,-(3L),0L));"
+            "return qubits.Slice(new QRange(10L,-(3L),0L));"
         ]
         |> testOneBody (applyVisitor sliceOperations)
 
@@ -2465,7 +2465,7 @@ namespace N1
 
         public override void Init()
         {
-            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __dataIn(Qubit data) => data;
@@ -3529,7 +3529,7 @@ namespace Microsoft.Quantum.Tests.LineNumbers
                     else
                     {
 #line 20 "%%"
-                        foreach (var c in ctrls?.Slice(new QRange(0L, 2L, r)))
+                        foreach (var c in ctrls.Slice(new QRange(0L, 2L, r)))
 #line hidden
                         {
 #line 21 "%%"
@@ -3563,9 +3563,9 @@ namespace Microsoft.Quantum.Tests.LineNumbers
         ;
         public override void Init()
         {
-            this.Allocate = this.Factory.Get<Allocate>(typeof(Microsoft.Quantum.Intrinsic.Allocate));
-            this.Release = this.Factory.Get<Release>(typeof(Microsoft.Quantum.Intrinsic.Release));
-            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(Microsoft.Quantum.Intrinsic.X));
+            this.Allocate = this.Factory.Get<Allocate>(typeof(global::Microsoft.Quantum.Intrinsic.Allocate));
+            this.Release = this.Factory.Get<Release>(typeof(global::Microsoft.Quantum.Intrinsic.Release));
+            this.X = this.Factory.Get<IUnitary<Qubit>>(typeof(global::Microsoft.Quantum.Intrinsic.X));
         }
 
         public override IApplyData __dataIn(Int64 data) => new QTuple<Int64>(data);
