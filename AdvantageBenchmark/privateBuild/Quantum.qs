@@ -24,7 +24,7 @@
         return(1);
     }
 
-    operation Suprem44() : Int {
+    operation Advantage44() : Int {
         let loops = 200;
         let gateCnt = (171+27*2) * loops;
         using (q = Qubit[16]) {
@@ -207,7 +207,7 @@
     return(gateCnt);
     }
 
-    operation Suprem55() : Int {
+    operation Advantage55() : Int {
         let loops = 1;
         let gateCnt = (269+44*2) * loops;
         using (q = Qubit[25]) {
@@ -488,7 +488,7 @@
     return(gateCnt);
     }
 
-    operation Suprem56() : Int {
+    operation Advantage56() : Int {
         let loops = 1;
         let gateCnt = (323+53*2) * loops;
         using (q = Qubit[30]) {

@@ -9,17 +9,6 @@
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
-#ifdef DBWDBG // Defaults for this app
-namespace Microsoft {
-    namespace Quantum {
-        int dbgFusedSpan = 4;
-        int dbgFusedLimit = 99;
-        int dbgNumThreads = 4;
-        int dbgReorder = 2;
-    }
-}
-#endif
-
 void test_exp()
 {
     SimulatorType sim;

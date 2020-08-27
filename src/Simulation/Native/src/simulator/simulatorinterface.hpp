@@ -85,9 +85,6 @@ namespace Simulator
     virtual void dump(bool (*callback)(size_t, double, double)) { assert(false); }
     virtual bool dumpQubits(std::vector<unsigned> const& qs, bool (*callback)(size_t, double, double)) { assert(false); return false; }
     virtual void dumpIds(void (*callback)(unsigned)) { assert(false); }
-#ifdef DBWDBG // Need to get to flush() during debugging
-    virtual void flush() { assert(false); }
-#endif
 
     // apply permutation of basis states to the wave function
     virtual void permuteBasis(std::vector<unsigned> const& qs, std::size_t table_size,

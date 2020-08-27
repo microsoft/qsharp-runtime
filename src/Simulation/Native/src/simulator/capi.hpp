@@ -15,11 +15,6 @@
 extern "C" {
 // non-quantum
 
-#ifdef DBWDBG // init and flush for specific debug cases
-MICROSOFT_QUANTUM_DECL unsigned initDBG(int force,int fusedSpan,int fusedLimit,int numThreads,int reorder);
-MICROSOFT_QUANTUM_DECL void Flush(_In_ unsigned sid);
-#endif
-
 MICROSOFT_QUANTUM_DECL unsigned init();
 MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid);
 MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s);

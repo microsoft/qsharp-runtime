@@ -11,17 +11,6 @@
 
 // some convenience functions
 
-#ifdef DBWDBG // Defaults for this app
-unsigned init() {
-    int simTyp = 0;
-    int fuseSpan = 4;
-    int numThreads = 4;
-    int doReorder = 2;      // 1 = reorder 2 = schedule
-    auto sim_id = initDBG(simTyp, fuseSpan, 999, numThreads, doReorder);
-    return sim_id;
-}
-#endif
-
 void CX(unsigned sim_id, unsigned c, unsigned q)
 {
     MCX(sim_id,1,&c,q);

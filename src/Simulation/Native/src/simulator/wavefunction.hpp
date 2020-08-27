@@ -25,11 +25,6 @@ namespace Microsoft
 {
     namespace Quantum
     {
-#ifdef DBWDBG // Flags for turning scheduler and reording on and off
-        extern int dbgReorder;      //Bit0=Reorder bit1=Schedule
-        extern int dbgFusedSpan;
-#endif
-
         namespace SIMULATOR
         {
             namespace detail
@@ -84,18 +79,6 @@ namespace Microsoft
                     return gates_.size();
                 }
 
-#ifdef DBWDBG // Debug output routine support
-                void dbg1(char* name,std::set<unsigned> st) {
-                    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
-                    for (const auto& v : st) printf(" %d", v);
-                    printf("\n");
-                }
-                void dbg2(char* name, std::vector<unsigned> st) {
-                    printf("@@@DBG: %s(%d):  ", name, (int)st.size());
-                    for (const auto& v : st) printf(" %d", v);
-                    printf("\n");
-                }
-#endif
                 // Greedy method that finds next appropriate cluster
                 std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
                     std::vector<unsigned>   myUnion;                                // My qubits touched + Next qubits touched
@@ -104,10 +87,7 @@ namespace Microsoft
                     std::vector<unsigned>   allInter;                               // My qubits + All touched qubits
                     std::set<unsigned>      myTouched(qids_.begin(), qids_.end());  // My qubits touched
                     std::set<unsigned>      allTouched = myTouched;                 // All the qubits touched so far
-#ifdef DBWDBG // report on scheduling decisions
-                    //printf("@@@DBG: maxWidth: %d ===============================================\n", maxWidth);
-                    //dbg1("myTouched", myTouched);
-#endif
+
                     int lastNexts = (int)nextClusters.size() - 1;                   // nexts are in reverse order (from above)
                     for (int i = 0; i <= lastNexts; i++) {                          // Look at the clusters that follow us
                         auto   nextQs = nextClusters[lastNexts-i].get_qids();       // Pull off one future cluster
@@ -116,11 +96,6 @@ namespace Microsoft
                         std::set_union(nextQs.begin(), nextQs.end(),                // See what qubits we and the future cluster touch
                             myTouched.begin(), myTouched.end(),
                             std::back_inserter(myUnion));
-#ifdef DBWDBG  // report on scheduling decisions
-                            //dbg2("next >>>>", nextQs);
-                            //dbg1("allTouched", allTouched);
-                            //dbg2("   myUnion", myUnion);
-#endif
                         if (myUnion.size() <= maxWidth) {                           // It's a candiate if it's not beyond our allowed width
                             myDiff.clear();
                             std::set_difference(nextQs.begin(), nextQs.end(),       // Figure out if any of the future qubits aren't already seen by us
@@ -130,16 +105,9 @@ namespace Microsoft
                             std::set_intersection(myDiff.begin(), myDiff.end(),     // These are any new qubits that might have already been touched
                                 allTouched.begin(), allTouched.end(),
                                 std::back_inserter(allInter));
-#ifdef DBWDBG  // report on scheduling decisions
-                            //dbg2("  allInter", allInter);
-                            //dbg2("    myDiff", myDiff);
-#endif
                             if (allInter.size() == 0) {                             // If the new qubits are untouched... then this is allowed
                                 auto cl = nextClusters[lastNexts-i];
                                 nextClusters.erase(nextClusters.begin() + (lastNexts-i));       // Remove the future cluster
-#ifdef DBWDBG  // report on scheduling decisions
-                                //printf("@@@DBG:                          GOOD!!!! (%d)\n",i);
-#endif
                                 return std::make_pair(cl, myUnion);                 // ... and add it to our cluster (done above)
                             }
                         }
@@ -151,7 +119,6 @@ namespace Microsoft
 
                         allTouched.insert(nextQs.begin(), nextQs.end());            // Add in all qubits touched, and try the next cluster
                     }
-                    // printf("@@@DBG:                          bad!!!!\n");
                     Cluster defCl = Cluster({}, {});                                // Couldn't find any more clusters to add
                     std::vector<unsigned> defVec = {};
                     return std::make_pair(defCl, defVec);
@@ -207,32 +174,6 @@ public:
 
     void flush() const
     {
-#ifdef DBWDBG // Full dump of raw input gate list
-        /*
-        if (gatelist_.size() > 0) {
-            printf("@@@DBG Input Gates:\n");
-            for (GateWrapper& g : gatelist_) {
-                printf("@@@DBG   ");
-                for (auto& c : g.get_controls()) printf(" %d", c);
-                printf(" %d\n", g.get_target());
-                auto mat = g.get_mat();
-                for (unsigned i = 0; i < mat.rows(); ++i) {
-                    printf("@@@DBG        ");
-                    for (unsigned j = 0; j < mat.cols(); ++j) {
-                        printf("%4.1f,%4.1f ", mat(i, j).real(), mat(i, j).imag());
-                    }
-                    printf("\n");
-                }
-            }
-        }
-        */
-
-        if (dbgReorder == 0) {
-            fused_.flush(wfn_);
-            gatelist_.clear();
-            return;
-        }
-#endif
         int maxSpan = fused_.maxSpan();
         auto clusters = make_clusters(maxSpan, gatelist_); //making clusters with gates in the queue
 
@@ -244,29 +185,6 @@ public:
             for (int i = 0; i < clusters.size(); i++) {
                 Cluster cl = clusters.at(i);
 
-#ifdef DBWDBG // Full dump of built clusters
-                /*
-                auto qids = cl.get_qids();
-                auto gs = cl.get_gates();
-                printf("@@@DBG Cluster: %d (nqs=%d, nGates=%d): ", i, (int)qids.size(), (int)gs.size());
-                for (const auto& qid : qids) printf(" %d",qid);
-                printf("\n");
-                for (GateWrapper& g : gs) {
-                    printf("@@@DBG   ");
-                    for (auto& c : g.get_controls()) printf(" %d", c);
-                    printf(" %d\n",g.get_target());
-                    auto mat = g.get_mat();
-                    for (unsigned i = 0; i < mat.rows(); ++i) {
-                        printf("@@@DBG        ");
-                        for (unsigned j = 0; j < mat.cols(); ++j) {
-                            printf("%4.1f,%4.1f ",mat(i,j).real(),mat(i,j).imag());
-                        }
-                        printf("\n");
-                    }
-
-                }
-                */
-#endif
                 for (GateWrapper gate : cl.get_gates()) {
                     std::vector<unsigned> cs = gate.get_controls();
                     if (cs.size() == 0) {
@@ -276,67 +194,6 @@ public:
                         fused_.apply_controlled(wfn_, gate.get_mat(), qubits(cs), qubit(gate.get_target()));
                     }
                 }
-
-#ifdef DBWDBG // Do reordering? Code is not ready for release
-                if ((dbgReorder & 1) == 1) { //Turn on re-ordering?
-                    //logic to reorder
-                    const Fusion& fg = fused_.get_fusedgates();
-                    const auto& itemsToFuse = fg.get_items();
-                    const auto& ctrlSet = fg.get_ctrl_set();
-
-                    //getting all qubits to move to lower end of the wfn
-                    if (!itemsToFuse.empty()) {
-                        std::vector<unsigned> unionOfAllQubitsInUse;
-                        std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
-                        for (int i = 0; i < itemsToFuse.size(); i++) {
-                            const auto& tempIndices = itemsToFuse[i].get_indices();
-                            for (unsigned j = 0; j < tempIndices.size(); j++) {
-                                if (indicesSet.count(tempIndices[j]) == 0) {
-                                    unionOfAllQubitsInUse.push_back(tempIndices[j]);
-                                    indicesSet.insert(tempIndices[j]);
-                                }
-                            }
-                        }
-                        for (unsigned index : ctrlSet) {
-                            if (indicesSet.count(index) == 0) {
-                                unionOfAllQubitsInUse.push_back(index);
-                                indicesSet.insert(index);
-                            }
-                        }
-                        //performing reorder
-                        std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
-                        std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
-                        std::vector<qubit_t> newLocs;
-                        unsigned pos = findNextPos(0, setForSearch);
-                        for (unsigned i = 0; i < currLocs.size(); i++)
-                        {
-                            if (currLocs[i] > currLocs.size() - 1) {
-                                newLocs.push_back(pos);
-                                pos = findNextPos(pos + 1, setForSearch);
-                            }
-                            else {
-                                newLocs.push_back(currLocs[i]);
-                            }
-                        }
-                        //heuristic to check whether all qubits operated upon are in the upper half of wfn
-                        if (*setForSearch.begin() > (num_qubits_ / 2)) {
-                            reorder_wavefunction(currLocs, newLocs);
-                            currLocs = qubits(unionOfAllQubitsInUse);
-                        }
-                        //keeping old and new location in order to set it appropriately
-                        std::unordered_map<unsigned, unsigned> old2newDict;
-                        for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                            old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
-                        }
-
-                        for (int i = 0; i < itemsToFuse.size(); i++) {
-                            itemsToFuse[i].remap_idx(old2newDict);
-                        }
-                        fg.remap_target_set(old2newDict);
-                        fg.remap_ctrl_set(old2newDict);
-                    }
-                }
-#endif // DBWDBG
 
                 fused_.flush(wfn_);
             }
@@ -600,12 +457,6 @@ public:
         }
 
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
-#ifdef DBWDBG        //Turn on the old code if we're not scheduling
-        if ((dbgReorder & 2) == 0) {
-            if (doFlush) flush();
-            fused_.apply(wfn_, g.matrix(), g.qubit());
-        }
-#endif
     }
 
     /// generic application of a multiply controlled gate
@@ -620,12 +471,6 @@ public:
         }
         
         int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
-#ifdef DBWDBG // Turn on the old code if we're not scheduling
-        if ((dbgReorder & 2) == 0) {
-            if (doFlush) flush();
-            fused_.apply_controlled(wfn_, g.matrix(), cs, g.qubit());
-        }
-#endif
     }
 
     /// generic application of a controlled gate

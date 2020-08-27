@@ -45,15 +45,15 @@ namespace quantum
                                 tstName = "Dummy";
                                 break;
                             case 1: 
-                                gates = Suprem44.Run(sim).Result; 
+                                gates = Advantage44.Run(sim).Result; 
                                 tstName = "4x4";
                                 break;
                             case 2: 
-                                gates = Suprem55.Run(sim).Result; 
+                                gates = Advantage55.Run(sim).Result; 
                                 tstName = "5x5";
                                 break;
                             case 3: 
-                                gates = Suprem56.Run(sim).Result; 
+                                gates = Advantage56.Run(sim).Result; 
                                 tstName = "5x6";
                                 break;
                         }
