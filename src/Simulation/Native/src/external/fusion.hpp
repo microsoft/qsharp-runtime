@@ -154,7 +154,7 @@ public:
 				idx2mat[i] = static_cast<unsigned>(((std::equal_range(index_list.begin(), index_list.end(), idx[i])).first - index_list.begin()));
 			
 			#pragma omp parallel for schedule(static)
-			for (int k = 0; k < (1ULL<<N); ++k){ // loop over big matrix columns //@@@DBG std::size_t
+			for (int k = 0; k < (1ULL<<N); ++k){ // loop over big matrix columns
 				// check if column index satisfies control-mask
 				// if not: leave it unchanged
 				std::vector<Complex> oldcol(1ULL<<N);

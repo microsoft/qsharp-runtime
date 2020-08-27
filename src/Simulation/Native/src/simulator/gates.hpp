@@ -401,7 +401,7 @@ namespace Microsoft
                 class R1Frac : public R1
                 {
                 public:
-                    R1Frac(int k, int n, unsigned q) : R1(M_PI* static_cast<RealType>(k) / static_cast<RealType>(1 << n), q)
+                    R1Frac(int k, int n, unsigned q) : R1(M_PI* static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
                     {
                     }
 
@@ -454,7 +454,7 @@ namespace Microsoft
                 class RFrac : public R
                 {
                 public:
-                    RFrac(Basis b, int k, int n, unsigned q) : R(b, -2. * M_PI * static_cast<RealType>(k) / static_cast<RealType>(1 << n), q)
+                    RFrac(Basis b, int k, int n, unsigned q) : R(b, -2. * M_PI * static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
                     {
                     }
                     std::string name() const
