@@ -2,9 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Arrays {
-    open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Canon;
-
     /// # Summary
     /// Given an array, returns a range over the indices of that array, suitable
     /// for use in a for loop.
@@ -29,5 +26,4 @@ namespace Microsoft.Quantum.Arrays {
     function IndexRange<'TElement>(array : 'TElement[]) : Range {
        return 0..(Length(array) - 1);
     }
-
 }

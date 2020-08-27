@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Iterates a variable through a Cartesian product
     /// [ 0, bounds[0]-1 ] × [ 0, bounds[1]-1 ] × [ 0, bounds[Length(bounds)-1]-1 ]
     /// and calls op(arr) for every element of the Cartesian product
-    operation _iterateThroughCartesianPower (length : Int, value : Int, op : (Int[] => Unit)) : Unit {
+    internal operation IterateThroughCartesianPower (length : Int, value : Int, op : (Int[] => Unit)) : Unit {
         mutable bounds = new Int[length];
 
         for (i in 0 .. length - 1)
@@ -67,12 +67,10 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ## basis
     /// Array of single-qubit basis state IDs (0 <= id <= 3), one for each element of
     /// qubits.
-    operation _flipToBasis (basis : Int[], qubits : Qubit[]) : Unit
-    is Adj + Ctl {
-
+    internal operation FlipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
         if (Length(qubits) != Length(basis))
         {
-            fail $"qubits and stateIds must have the same length";
+            fail "qubits and stateIds must have the same length";
         }
             
         for (i in 0 .. Length(qubits) - 1)
@@ -108,7 +106,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # Summary
     /// Checks if the result of applying two operations `givenU` and `expectedU` to
     /// a basis state is the same. The basis state is described by `basis` parameter.
-    /// See <xref:microsoft.quantum.extensions.fliptobasis> function for more details on this
+    /// See <xref:microsoft.quantum.extensions.FlipToBasis> function for more details on this
     /// description.
     ///
     /// # Input
@@ -119,15 +117,15 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Operation on $n$ qubits to be checked.
     /// ## expectedU
     /// Reference operation on $n$ qubits that givenU is to be compared against.
-    operation _assertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
+    internal operation AssertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
         let tolerance = 1e-5;
 
         using (qubits = Qubit[Length(basis)]) {
             AssertAllZeroWithinTolerance(qubits, tolerance);
-            _flipToBasis(basis, qubits);
+            FlipToBasis(basis, qubits);
             givenU(qubits);
             Adjoint expectedU(qubits);
-            Adjoint _flipToBasis(basis, qubits);
+            Adjoint FlipToBasis(basis, qubits);
             AssertAllZeroWithinTolerance(qubits, tolerance);
         }
     }
@@ -157,8 +155,8 @@ namespace Microsoft.Quantum.Diagnostics {
     /// described in [ *I. L. Chuang, M. A. Nielsen* ](https://arxiv.org/abs/quant-ph/9610001).
     operation AssertOperationsEqualInPlace(nQubits : Int, givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit
     {
-        let checkOperation = _assertEqualOnBasisVector(_, givenU, expectedU);
-        _iterateThroughCartesianPower(nQubits, 4, checkOperation);
+        let checkOperation = AssertEqualOnBasisVector(_, givenU, expectedU);
+        IterateThroughCartesianPower(nQubits, 4, checkOperation);
     }
 
     /// # Summary
@@ -177,8 +175,8 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Reference operation on $n$ qubits that `givenU` is to be compared against.
     operation AssertOperationsEqualInPlaceCompBasis (nQubits : Int, givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit
     {
-        let checkOperation = _assertEqualOnBasisVector(_, givenU, expectedU);
-        _iterateThroughCartesianPower(nQubits, 2, checkOperation);
+        let checkOperation = AssertEqualOnBasisVector(_, givenU, expectedU);
+        IterateThroughCartesianPower(nQubits, 2, checkOperation);
     }
     
 }
