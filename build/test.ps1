@@ -8,6 +8,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     Write-Host "##[info]Test Native simulator"
     pushd (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
     cmake --build . --config $Env:BUILD_CONFIGURATION
+    cp ..\suprem_44_4.log .
     ctest -C $Env:BUILD_CONFIGURATION
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"

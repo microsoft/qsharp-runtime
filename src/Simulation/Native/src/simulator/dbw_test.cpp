@@ -371,71 +371,58 @@ int main()
     vector<vector<int32_t>> prb;
     char                    fName[30];
 
+    // Perform a small number of loops on the 4x4 supremacy circuit.
+    int sizR = 4;
+    int sizC = 4;
+    int loops = 10;
+    mySprintf(fName, sizeof(fName), "suprem_%d%d_4.log", sizR, sizC);
 
-    // 7,8,9 are the supremacy tests
-    for (int prbIdx = 7; prbIdx <= 9; prbIdx++) {
-        int sizR = 4;
-        int sizC = 4;
-        int loops = 5000;
-        if (prbIdx == 8) {
-            sizR = 5;
-            sizC = 5;
-            loops = 30;
-        }
-        if (prbIdx == 9) {
-            sizR = 5;
-            sizC = 6;
-            loops = 2;
-        }
-        mySprintf(fName, sizeof(fName), "suprem_%d%d_4.log", sizR, sizC);
+    prb         = loadTest(fName, false);
+    nQs         = numQs(prb);
+    int gateCnt = (int)prb.size();
 
-        prb         = loadTest(fName, false);
-        nQs         = numQs(prb);
-        int gateCnt = (int)prb.size();
+    printf("==== Starting %s (%d gates)\n", fName, gateCnt);
 
-        printf("==== Starting %s (%d gates)\n", fName, gateCnt);
+    auto sim_id = init();
+    for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
 
-        auto sim_id = init();
-        for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
-
-        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-        int itvl = loops / 10;
-        for (int i = 0; i < loops; i++) {
-            for (int j = 0; j < prb.size(); j++) {
-                auto qs = prb[j];
-                uint32_t cs[2];
-                switch (qs.size()) {
-                case 0: // Need to force a flush (end of cluster)
-                    //Flush(sim_id);
-                    break;
-                case 1:
-                    H(sim_id, qs[0]);
-                    break;
-                case 2:
-                    CX(sim_id, qs[0], qs[1]);
-                    break;
-                case 3:
-                    cs[0] = (uint32_t)qs[0];
-                    cs[1] = (uint32_t)qs[1];
-                    MCX(sim_id, 2, cs, qs[2]);
-                    break;
-                default:
-                    throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
-                }
-
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    int itvl = loops / 10;
+    for (int i = 0; i < loops; i++) {
+        for (int j = 0; j < prb.size(); j++) {
+            auto qs = prb[j];
+            uint32_t cs[2];
+            switch (qs.size()) {
+            case 0: // Need to force a flush (end of cluster)
+                //Flush(sim_id);
+                break;
+            case 1:
+                H(sim_id, qs[0]);
+                break;
+            case 2:
+                CX(sim_id, qs[0], qs[1]);
+                break;
+            case 3:
+                cs[0] = (uint32_t)qs[0];
+                cs[1] = (uint32_t)qs[1];
+                MCX(sim_id, 2, cs, qs[2]);
+                break;
+            default:
+                throw(std::invalid_argument("Didn't expect more then 3 wire gates"));
             }
-            for (int q = 0; q < nQs; q++) M(sim_id, q);
 
-            std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed = curr - start;
-            if (i % itvl == (itvl - 1)) {
-                double gps = (double)gateCnt * (double)i / elapsed.count();
-                printf("Loops[%4d]: GPS = %.2e\n", i, gps);
-                fflush(stdout);
-            }
         }
-        destroy(sim_id);
+        for (int q = 0; q < nQs; q++) M(sim_id, q);
+
+        std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed = curr - start;
+        if (i % itvl == (itvl - 1)) {
+            double gps = (double)gateCnt * (double)i / elapsed.count();
+            printf("Loops[%4d]: GPS = %.2e\n", i, gps);
+            fflush(stdout);
+        }
     }
+    destroy(sim_id);
 }
 #endif
 
