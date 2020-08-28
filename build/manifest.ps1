@@ -23,8 +23,8 @@
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
         ".\src\Simulation\QsharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
         ".\src\Simulation\QsharpFoundation\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Foundation.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
+        ".\src\Simulation\Simulators.Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
+        ".\src\Simulation\Simulators.Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
         ".\src\Simulation\Simulators.Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulators.dll",
         ".\src\Simulation\Simulators.Type2\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulators.Type2.dll",
         ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Xunit.dll"
