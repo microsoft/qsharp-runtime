@@ -335,7 +335,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-/src/Simulation/Simulators.Core.Tests/TestProjects/QsharpExe/built
-/src/Simulation/Simulators.Core.Tests/TestProjects/TargetedExe/built
-/src/Simulation/Simulators.Type2.Tests/TestProjects/QsharpExe/built
-/src/Simulation/Simulators.Type2.Tests/TestProjects/TargetedExe/built
+/src/Simulation/Simulators.Tests/TestProjects/QsharpExe/built
+/src/Simulation/Simulators.Tests/TestProjects/TargetedExe/built

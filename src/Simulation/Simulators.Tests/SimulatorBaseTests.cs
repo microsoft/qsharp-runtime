@@ -10,18 +10,6 @@ using Microsoft.Quantum.Simulation.Common;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
-    public static class Extensions
-    {
-        /// <summary>
-        ///     This method is a wrapper to let the tests keep using a one Type parameter
-        ///     method to fetch for Gates.
-        /// </summary>
-        public static T Get<T>(this SimulatorBase sim) where T : AbstractCallable
-        {
-            return sim.Get<T, T>();
-        }
-    }
-
     public class SimulatorBaseTests
     {
         private readonly ITestOutputHelper output;
