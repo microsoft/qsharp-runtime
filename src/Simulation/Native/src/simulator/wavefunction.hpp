@@ -177,6 +177,8 @@ public:
     Wavefunction(unsigned /*ignore*/) : num_qubits_(0), wfn_(1, 1.), usage_(0)
     {
         rng_.seed(std::clock());
+        dbgNumReOrders = 0;
+        dbgNumTotal = 0;
     }
 
     void reset()
@@ -276,8 +278,78 @@ public:
                         fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
                     }
                 }
+/*
+    Design:
+        - Get list of qubits fused (including ctrl set)
+        - Convert to current positions in WFN
+        - Fix positions of qubits that are low enough (< 1/2?)
+        - Any left over? No -> abort reorder
+        - Given k to move, find k holes to move them to at bottom
+        - Perform re-order
 
-#ifdef DBWDBG // Do reordering? Code is not ready for release
+*/
+                if ((dbgReorder & 1) == 1) { //Turn on re-ordering?                       
+                    // Get list of qubits fused (including ctrl set)
+                    const Fusion& fg = fused_.get_fusedgates();
+                    const auto& itemsToFuse = fg.get_items();
+
+                    std::set<unsigned> idxUsed;
+                    for (auto itm: itemsToFuse)
+                        for (auto idx : itm.get_indices())
+                            idxUsed.insert(idx);
+                    for (auto idx :fg.get_ctrl_set())
+                        idxUsed.insert(idx);
+ 
+                    //Convert to current positions in WFN (remember their index as well)
+                    std::set<qubit_t> posUsedLow;
+                    std::set<qubit_t> posUsedHgh;
+                    std::set<qubit_t> posOrig;
+                    std::vector<unsigned> curPos;
+                    std::vector<unsigned> newPos;
+                    unsigned divider    = 16;      // num_qubits_ / 2;     // Decide who's worth moving
+                    unsigned minMv      = 3;
+                    for (unsigned idx : idxUsed) {
+                        qubit_t pos        = qubit(idx);
+                        if (pos < divider)  posUsedLow.insert(pos);
+                        else                posUsedHgh.insert(pos);
+                        posOrig.insert(pos);
+                    }
+
+                    // Move all the high ones we can, as low as they can go
+                    for (qubit_t cur : posUsedHgh) {
+                        qubit_t nxt = findNextAvail(0, posUsedLow);    // Look for an empty position
+                        if (nxt >= divider) break;                      // Can't find an empty position below the divider
+                        curPos.push_back(cur);
+                        newPos.push_back(nxt);
+                        posUsedLow.insert(nxt);
+                    }
+
+                    dbgNumTotal++;
+
+                    // Did we really move enough to be worth it?
+                    if (newPos.size() >= minMv) {
+                        reorder_wavefunction(curPos, newPos);
+                        std::vector<unsigned> idxUsedVec(idxUsed.begin(), idxUsed.end());
+                        std::vector<qubit_t> posReordered    = qubits(idxUsedVec);
+
+                        dbgNumReOrders++;
+                        printf("@@@DBG: %3d of %3d (%2d)\n",dbgNumReOrders,dbgNumTotal,(int)newPos.size());
+                        //keeping old and new location in order to set it appropriately
+                        std::unordered_map<qubit_t, qubit_t> old2newDict;
+                        std::vector<qubit_t> posOrigVec(posOrig.begin(), posOrig.end());
+                        for (unsigned i = 0; i < posOrigVec.size(); i++) {
+                            old2newDict[posOrigVec[i]] = posReordered[i];
+                        }
+
+                        for (int i = 0; i < itemsToFuse.size(); i++) {
+                            itemsToFuse[i].remap_idx(old2newDict);
+                        }
+                        fg.remap_target_set(old2newDict);
+                        fg.remap_ctrl_set(old2newDict);
+                    }
+                }
+
+#ifdef DBWDBG_OLDCODE // Do reordering? Code is not ready for release
                 if ((dbgReorder & 1) == 1) { //Turn on re-ordering?
                     //logic to reorder
                     const Fusion& fg = fused_.get_fusedgates();
@@ -307,12 +379,12 @@ public:
                         std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
                         std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
                         std::vector<qubit_t> newLocs;
-                        unsigned pos = findNextPos(0, setForSearch);
+                        unsigned pos = findNextAvail(0, setForSearch);
                         for (unsigned i = 0; i < currLocs.size(); i++)
                         {
                             if (currLocs[i] > currLocs.size() - 1) {
                                 newLocs.push_back(pos);
-                                pos = findNextPos(pos + 1, setForSearch);
+                                pos = findNextAvail(pos + 1, setForSearch);
                             }
                             else {
                                 newLocs.push_back(currLocs[i]);
@@ -345,7 +417,7 @@ public:
     }
 
     // method to find next location qubit should be moved to for reordering routine
-    unsigned findNextPos(unsigned startIdx, std::unordered_set<qubit_t> setForSearch) const
+    qubit_t findNextAvail(unsigned startIdx, std::set<qubit_t> setForSearch) const
     {
         while (setForSearch.find(startIdx) != setForSearch.end())
         {
@@ -718,6 +790,8 @@ public:
     mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
 	int usage_;
     mutable std::vector<GateWrapper> gatelist_;
+    mutable int dbgNumTotal;
+    mutable int dbgNumReOrders;
 
     // randomness support
     RngEngine rng_;

@@ -254,7 +254,7 @@ int main()
             //@@@DBG: Skip over tests we don't want to do right now
             //if (numThreads > 4) continue;                         // Not on a big machine
             //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
-            if (idxSched != 4 && idxSched != 5) continue;           // Limit # of schedulers
+            if (idxSched != 5 && idxSched != 5) continue;           // Limit # of schedulers
             if (prbIdx != 8 || numThreads != 4 || fuseSpan != 4) continue;  // Limit # of tests
 
             printf("==== sched: %s\n", sched);
