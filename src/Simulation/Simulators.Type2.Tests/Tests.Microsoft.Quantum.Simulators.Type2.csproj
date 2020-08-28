@@ -12,19 +12,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="TestProjects\**" />
-    <EmbeddedResource Remove="TestProjects\**" />
-    <QsharpCompile Remove="TestProjects\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
-  </ItemGroup>  
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Simulators.Tests\OperationsTestHelper.cs" />
+    <Compile Include="..\Simulators.Tests\QuantumSimulatorTests\BasicTests.cs" />
+    <Compile Include="..\Simulators.Tests\QuantumSimulatorTests\VerifyGates.cs" />
+    <Compile Include="..\Simulators.Tests\Circuits\AssertEqual.cs" />
+
+    <QsharpCompile Include="..\Simulators.Tests\Circuits\AssertEqual.qs" />
+    <QsharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
+    <QsharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
