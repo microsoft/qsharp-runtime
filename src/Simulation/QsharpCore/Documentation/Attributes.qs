@@ -61,4 +61,13 @@ namespace Microsoft.Quantum.Documentation {
         Summary: String
     );
 
+    /// # Summary
+    /// Used to denote a single named item in a user defined type.
+    /// May appear once for each named item.
+    @Attribute()
+    newtype NamedItem = (
+        Name: String,
+        Summary: String
+    );
+
 }
