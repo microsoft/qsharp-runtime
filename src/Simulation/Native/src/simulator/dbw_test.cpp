@@ -250,13 +250,14 @@ int main()
 
         for (int idxSched = 0; idxSched < 6; idxSched++) {
             const char* sched = scheds[idxSched];
-            printf("==== sched: %s\n", sched);
 
             //@@@DBG: Skip over tests we don't want to do right now
             //if (numThreads > 4) continue;                         // Not on a big machine
             //if (prbIdx > 8 && prbIdx < 10) continue;              // Not on a big machine
-            if (idxSched != 0 && idxSched != 4) continue;           // Limit # of schedulers
+            if (idxSched != 4 && idxSched != 5) continue;           // Limit # of schedulers
             if (prbIdx != 8 || numThreads != 4 || fuseSpan != 4) continue;  // Limit # of tests
+
+            printf("==== sched: %s\n", sched);
 
             bool doClusters = idxSched > 0 && idxSched < 4;   // Do loaded clusters unless we're not scheduling, or using the new one
 
@@ -328,7 +329,7 @@ int main()
 
             // Amount of time to let things run below (in fused.hpp)
             double timeInt = (double)nQs;
-            timeInt = 5.0 * (timeInt * timeInt) / 20.0;
+            timeInt = 5.0 * (timeInt * timeInt) / 40.0;
 
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
             for (int i = 0; i < 100000; i++) {
