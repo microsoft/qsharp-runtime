@@ -21,15 +21,15 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public AbstractCallable(IOperationFactory m)
         {
-            this.Factory = m;
+            this.__Factory__ = m;
         }
 
-        public IOperationFactory Factory { get; private set; }
+        public IOperationFactory __Factory__ { get; private set; }
 
         /// <summary>
         /// This method is called once, to let the Operation initialize and verify its dependencies.
         /// </summary>
-        public abstract void Init();
+        public abstract void __Init__();
 
         /// <summary>
         /// Retrieves the runtime metadata of the Operation. If the Operation has no associated

@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<T, QVoid> Body => (location) =>
+            public override Func<T, QVoid> __Body__ => (location) =>
             {
                 if (location == null) { throw new ArgumentNullException(nameof(location)); }
 
@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(T, IQArray<Qubit>), QVoid> Body => (__in) =>
+            public override Func<(T, IQArray<Qubit>), QVoid> __Body__ => (__in) =>
             {
                 var (location, qubits) = __in;
 

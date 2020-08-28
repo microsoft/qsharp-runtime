@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Simulation.Core
     [DebuggerTypeProxy(typeof(GenericControlled.DebuggerProxy))]
     public class GenericControlled : GenericCallable, IApplyData, IOperationWrapper
     {
-        public GenericControlled(GenericCallable baseOp) : base(baseOp.Factory, null)
+        public GenericControlled(GenericCallable baseOp) : base(baseOp.__Factory__, null)
         {
             this.BaseOp = baseOp;
         }

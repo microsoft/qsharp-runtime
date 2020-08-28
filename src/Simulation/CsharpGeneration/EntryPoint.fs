@@ -112,7 +112,9 @@ let private createArgument context entryPoint =
 
 /// A tuple of the callable's name, argument type name, and return type name.
 let private callableTypeNames context (callable : QsCallable) =
-    let callableName = sprintf "global::%s.%s" callable.FullName.Namespace.Value callable.FullName.Name.Value
+    let callableName =
+        SimulationCode.userDefinedName None callable.FullName.Name.Value
+        |> sprintf "global::%s.%s" callable.FullName.Namespace.Value
     let argTypeName = SimulationCode.roslynTypeName context callable.Signature.ArgumentType
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
