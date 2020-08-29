@@ -177,8 +177,6 @@ public:
     Wavefunction(unsigned /*ignore*/) : num_qubits_(0), wfn_(1, 1.), usage_(0)
     {
         rng_.seed(std::clock());
-        dbgNumReOrders = 0;
-        dbgNumTotal = 0;
     }
 
     void reset()
@@ -278,16 +276,8 @@ public:
                         fused_.apply_controlled(wfn_, gate.get_mat(), cs, gate.get_target());
                     }
                 }
-/*
-    Design:
-        - Get list of qubits fused (including ctrl set)
-        - Convert to current positions in WFN
-        - Fix positions of qubits that are low enough (< 1/2?)
-        - Any left over? No -> abort reorder
-        - Given k to move, find k holes to move them to at bottom
-        - Perform re-order
 
-*/
+#ifdef DBWDBG
                 if ((dbgReorder & 1) == 1) { //Turn on re-ordering?                       
                     // Get list of qubits fused (including ctrl set)
                     const Fusion& fg = fused_.get_fusedgates();
@@ -324,16 +314,12 @@ public:
                         posUsedLow.insert(nxt);
                     }
 
-                    dbgNumTotal++;
-
                     // Did we really move enough to be worth it?
                     if (newPos.size() >= minMv) {
                         reorder_wavefunction(curPos, newPos);
                         std::vector<unsigned> idxUsedVec(idxUsed.begin(), idxUsed.end());
                         std::vector<qubit_t> posReordered    = qubits(idxUsedVec);
 
-                        dbgNumReOrders++;
-                        printf("@@@DBG: %3d of %3d (%2d)\n",dbgNumReOrders,dbgNumTotal,(int)newPos.size());
                         //keeping old and new location in order to set it appropriately
                         std::unordered_map<qubit_t, qubit_t> old2newDict;
                         std::vector<qubit_t> posOrigVec(posOrig.begin(), posOrig.end());
@@ -348,68 +334,7 @@ public:
                         fg.remap_ctrl_set(old2newDict);
                     }
                 }
-
-#ifdef DBWDBG_OLDCODE // Do reordering? Code is not ready for release
-                if ((dbgReorder & 1) == 1) { //Turn on re-ordering?
-                    //logic to reorder
-                    const Fusion& fg = fused_.get_fusedgates();
-                    const auto& itemsToFuse = fg.get_items();
-                    const auto& ctrlSet = fg.get_ctrl_set();
-
-                    //getting all qubits to move to lower end of the wfn
-                    if (!itemsToFuse.empty()) {
-                        std::vector<unsigned> unionOfAllQubitsInUse;
-                        std::unordered_set<unsigned> indicesSet; //set is introduced to guard against duplicate insertion and maintianing original order
-                        for (int i = 0; i < itemsToFuse.size(); i++) {
-                            const auto& tempIndices = itemsToFuse[i].get_indices();
-                            for (unsigned j = 0; j < tempIndices.size(); j++) {
-                                if (indicesSet.count(tempIndices[j]) == 0) {
-                                    unionOfAllQubitsInUse.push_back(tempIndices[j]);
-                                    indicesSet.insert(tempIndices[j]);
-                                }
-                            }
-                        }
-                        for (unsigned index : ctrlSet) {
-                            if (indicesSet.count(index) == 0) {
-                                unionOfAllQubitsInUse.push_back(index);
-                                indicesSet.insert(index);
-                            }
-                        }
-                        //performing reorder
-                        std::vector<qubit_t> currLocs = qubits(unionOfAllQubitsInUse);
-                        std::unordered_set<qubit_t> setForSearch(currLocs.begin(), currLocs.end());
-                        std::vector<qubit_t> newLocs;
-                        unsigned pos = findNextAvail(0, setForSearch);
-                        for (unsigned i = 0; i < currLocs.size(); i++)
-                        {
-                            if (currLocs[i] > currLocs.size() - 1) {
-                                newLocs.push_back(pos);
-                                pos = findNextAvail(pos + 1, setForSearch);
-                            }
-                            else {
-                                newLocs.push_back(currLocs[i]);
-                            }
-                        }
-                        //heuristic to check whether all qubits operated upon are in the upper half of wfn
-                        if (*setForSearch.begin() > (num_qubits_ / 2)) {
-                            reorder_wavefunction(currLocs, newLocs);
-                            currLocs = qubits(unionOfAllQubitsInUse);
-                        }
-                        //keeping old and new location in order to set it appropriately
-                        std::unordered_map<unsigned, unsigned> old2newDict;
-                        for (unsigned i = 0; i < unionOfAllQubitsInUse.size(); i++) {
-                            old2newDict[unionOfAllQubitsInUse[i]] = currLocs[i];
-                        }
-
-                        for (int i = 0; i < itemsToFuse.size(); i++) {
-                            itemsToFuse[i].remap_idx(old2newDict);
-                        }
-                        fg.remap_target_set(old2newDict);
-                        fg.remap_ctrl_set(old2newDict);
-                    }
-                }
 #endif // DBWDBG
-
                 fused_.flush(wfn_);
             }
         }
@@ -790,8 +715,6 @@ public:
     mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
 	int usage_;
     mutable std::vector<GateWrapper> gatelist_;
-    mutable int dbgNumTotal;
-    mutable int dbgNumReOrders;
 
     // randomness support
     RngEngine rng_;
