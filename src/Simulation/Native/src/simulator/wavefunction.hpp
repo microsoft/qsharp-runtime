@@ -341,6 +341,7 @@ public:
         gatelist_.clear();
     }
 
+#ifdef DBWDBG
     // method to find next location qubit should be moved to for reordering routine
     qubit_t findNextAvail(unsigned startIdx, std::set<qubit_t> setForSearch) const
     {
@@ -350,6 +351,7 @@ public:
         }
         return startIdx;
     }
+#endif
 
     /// allocate a qubit and grow the wave function
     unsigned allocate()
