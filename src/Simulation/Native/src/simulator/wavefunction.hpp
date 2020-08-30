@@ -386,8 +386,11 @@ public:
                     if (clusterFound.get_gates().size() == 0 ||                             // Can't append any more clusters to this one
                         (int)prevCluster.size() >= fused_.maxDepth()) {                     // ... or we're beyond max depth
                         curClusters.push_back(prevCluster);                                 // Save this cluster
-                        prevCluster = prevClusters.back();
-                        prevClusters.pop_back();
+                        if (prevCluster.size() > 0)
+                        {
+                            prevCluster = prevClusters.back();
+                            prevClusters.pop_back();
+                        }
                     }
                     else {
                         prevCluster.setQids(foundTotQids);                                  // New version of our cluster (appended)
