@@ -198,8 +198,7 @@ int main()
             auto qs = prb[j];
             uint32_t cs[2];
             switch (qs.size()) {
-            case 0: // Need to force a flush (end of cluster)
-                //Flush(sim_id);
+            case 0: // No op
                 break;
             case 1:
                 H(sim_id, qs[0]);
