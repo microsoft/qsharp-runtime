@@ -201,16 +201,6 @@ public:
         gatelist_.clear();
     }
 
-    // method to find next location qubit should be moved to for reordering routine
-    unsigned findNextPos(unsigned startIdx, std::unordered_set<qubit_t> setForSearch) const
-    {
-        while (setForSearch.find(startIdx) != setForSearch.end())
-        {
-            startIdx++;
-        }
-        return startIdx;
-    }
-
     /// allocate a qubit and grow the wave function
     unsigned allocate()
     {
@@ -402,50 +392,6 @@ public:
         }
         
         return curClusters;
-    }
-
-    //function implementing reordering routine
-    void reorder_wavefunction(std::vector<unsigned> currLocs, std::vector<unsigned> newLocs) const
-    {
-        for (std::size_t i = 0ull; i < wfn_.size(); i++)
-        {
-            std::size_t src = i;
-            std::size_t dst = 0;
-            //swapping bits at all pairs of locations given by currLocs and newLocs
-            for (unsigned j = 0; j < currLocs.size(); j++)
-            {
-                unsigned qubitLoc = currLocs[j];
-                unsigned newPos = newLocs[j];
-                // swapping bits at qubitLoc and newPos
-                if (newPos != qubitLoc)
-                {
-                    std::size_t bit1 = (src >> qubitLoc) & 1ull;
-                    std::size_t bit2 = (src >> newPos) & 1ull;
-                    std::size_t x = (bit1 ^ bit2);
-                    x = (x << qubitLoc) | (x << newPos);
-                    dst = src ^ x;
-                    src = dst;
-                }
-            }
-            if (dst > i)
-            {
-                std::iter_swap(wfn_.begin() + i, wfn_.begin() + dst);
-            }
-            
-        }
-        // swapping locations in qubitmap
-        for (unsigned j = 0; j < currLocs.size(); j++)
-        {
-            unsigned qubitLoc = currLocs[j];
-            unsigned newPos = newLocs[j];
-            // get id of qubit located at newPos and qubitLoc - getting index from the element
-            auto newQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), newPos);
-            assert(newQubitLocItr != qubitmap_.end());
-            auto origQubitLocItr = std::find(qubitmap_.begin(), qubitmap_.end(), qubitLoc);
-            assert(origQubitLocItr != qubitmap_.end());
-            // swap elements in qubitmap located at iterators
-            std::iter_swap(origQubitLocItr, newQubitLocItr);
-        }
     }
 
     /// generic application of a gate
