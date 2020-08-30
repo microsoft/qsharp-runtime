@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual void Init(AbstractCallable op)
         {
-            op.Init();
+            op.__Init__();
         }
 
         public override AbstractCallable CreateInstance(Type t)
@@ -395,7 +395,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<String, QVoid> Body => (msg) =>
+            public override Func<String, QVoid> __Body__ => (msg) =>
             {
                 sim.OnLog?.Invoke(msg);
                 return QVoid.Instance;
@@ -414,7 +414,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<QVoid, long> Body => (arg) => sim.QubitManager.GetFreeQubitsCount();
+            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetFreeQubitsCount();
         }
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<QVoid, long> Body => (arg) => sim.QubitManager.GetParentQubitsAvailableToBorrowCount() +
+            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetParentQubitsAvailableToBorrowCount() +
                                                                sim.QubitManager.GetFreeQubitsCount();
         }
 
@@ -446,7 +446,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<(long, long), long> Body => arg =>
+            public override Func<(long, long), long> __Body__ => arg =>
             {
                 var (min, max) = arg;
                 if (max <= min)
@@ -470,7 +470,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<(double, double), double> Body => arg =>
+            public override Func<(double, double), double> __Body__ => arg =>
             {
                 var (min, max) = arg;
                 if (max <= min)

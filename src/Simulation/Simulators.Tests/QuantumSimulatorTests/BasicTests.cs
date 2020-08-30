@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 var measure = sim.Get<Intrinsic.M>();
                 var set = sim.Get<SetQubit>();
 
-                var ctrlX = x.ControlledBody.AsAction();
+                var ctrlX = x.__ControlledBody__.AsAction();
                 OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>
                 {
                     set.Apply((Result.Zero, q));
@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     var expected = Result.Zero;
                     Assert.Equal(expected, result);
 
-                    x.ControlledBody((ctrls, q));
+                    x.__ControlledBody__((ctrls, q));
                     result = measure.Apply(q);
                     expected = (enabled) ? Result.One : Result.Zero;
                     Assert.Equal(expected, result);

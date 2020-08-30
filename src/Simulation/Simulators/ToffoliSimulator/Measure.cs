@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// That is, Result.One is returned if an odd number of the measured qubits are
             /// in the One state.
             /// </summary>
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (_args) =>
             {
                 Qubit? f(Pauli p, Qubit q) =>
                     p switch {

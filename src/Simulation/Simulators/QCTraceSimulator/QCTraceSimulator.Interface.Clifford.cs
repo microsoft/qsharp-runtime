@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 tracerCore = m;
             }
 
-            public override Func<(long, Pauli, Qubit), QVoid> Body
+            public override Func<(long, Pauli, Qubit), QVoid> __Body__
                 => (arg) =>
                 {
                     (long id , Pauli pauli, Qubit target) = arg;

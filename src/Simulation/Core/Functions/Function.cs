@@ -29,15 +29,15 @@ namespace Microsoft.Quantum.Simulation.Core
         OperationFunctor ICallable.Variant => OperationFunctor.Body;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public abstract Func<I, O> Body { get; }
+        public abstract Func<I, O> __Body__ { get; }
 
-        public virtual IApplyData __dataIn(I data) => new QTuple<I>(data);
+        public virtual IApplyData __DataIn__(I data) => new QTuple<I>(data);
 
-        public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
+        public virtual IApplyData __DataOut__(O data) => new QTuple<O>(data);
 
         public O Apply(I a)
         {
-            var __result__ = this.Body(a);
+            var __result__ = this.__Body__(a);
             return __result__; 
         }
 

@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.SimulatorId = m.Id;
             }
 
-            public override Func<IQArray<double>, Int64> Body => (p) =>
+            public override Func<IQArray<double>, Int64> __Body__ => (p) =>
             {
                 return random_choice(this.SimulatorId, p.Length, p.ToArray());
             };            

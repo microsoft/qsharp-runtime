@@ -17,13 +17,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 core = m;
             }
 
-            public override Func<T, QVoid> Body => (location) =>
+            public override Func<T, QVoid> __Body__ => (location) =>
             {
                 if (location == null) { throw new ArgumentNullException(nameof(location)); }
                 var filename = (location is QVoid) ? "" : location.ToString();
                 var msg = "QCTraceSimulator doesn't support state dump.";
 
-                var logMessage = this.Factory.Get<ICallable<string, QVoid>, Intrinsic.Message>();
+                var logMessage = this.__Factory__.Get<ICallable<string, QVoid>, Intrinsic.Message>();
 
                 if (string.IsNullOrEmpty(filename))
                 {
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 core = m;
             }
 
-            public override Func<(T, IQArray<Qubit>), QVoid> Body => (__in) =>
+            public override Func<(T, IQArray<Qubit>), QVoid> __Body__ => (__in) =>
             {
                 var (location, qubits) = __in;
 
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 var filename = (location is QVoid) ? "" : location.ToString();
                 var msg = "QCTraceSimulator doesn't support state dump.";
 
-                var logMessage = this.Factory.Get<ICallable<string, QVoid>, Intrinsic.Message>();
+                var logMessage = this.__Factory__.Get<ICallable<string, QVoid>, Intrinsic.Message>();
 
                 if (string.IsNullOrEmpty(filename))
                 {

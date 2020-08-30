@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __Body__ => (_args) =>
             {
                 (IQArray<Pauli> paulis, double angle, IQArray<Qubit> qubits) = _args;
 
@@ -35,14 +35,14 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> AdjointBody => (_args) =>
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __AdjointBody__ => (_args) =>
             {
                 (IQArray<Pauli> paulis, double angle, IQArray<Qubit> qubits) = _args;
                 
-                return this.Body.Invoke((paulis, -angle, qubits));
+                return this.__Body__.Invoke((paulis, -angle, qubits));
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (IQArray<Pauli> paulis, double angle, IQArray<Qubit> qubits)) = _args;
 
@@ -66,11 +66,11 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (IQArray<Pauli> paulis, double angle, IQArray<Qubit> qubits)) = _args;
 
-                return this.ControlledBody.Invoke((ctrls, (paulis, -angle, qubits)));
+                return this.__ControlledBody__.Invoke((ctrls, (paulis, -angle, qubits)));
             };
         }
     }
