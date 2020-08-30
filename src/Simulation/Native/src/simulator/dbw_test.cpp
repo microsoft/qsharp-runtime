@@ -185,8 +185,15 @@ int main()
     prb         = loadTest(fName, false);
     nQs         = numQs(prb);
     int gateCnt = (int)prb.size();
+    double maxGps = 0.0;
 
-    printf("==== Starting %s (%d gates)\n", fName, gateCnt);
+#ifdef NDEBUG
+    double gpsFailureThreshold = 1000.0;
+#else
+    double gpsFailureThreshold = 60.0;
+#endif
+
+    printf("==== Starting %s (%d gates), Failure threshold %.2e gps\n", fName, gateCnt, gpsFailureThreshold);
 
     auto sim_id = init();
     for (int q = 0; q < nQs; q++) allocateQubit(sim_id, q);
@@ -224,7 +231,10 @@ int main()
             double gps = (double)gateCnt * (double)i / elapsed.count();
             printf("Loops[%4d]: GPS = %.2e\n", i, gps);
             fflush(stdout);
+            if (gps > maxGps) maxGps = gps;
         }
     }
     destroy(sim_id);
+
+    if (maxGps < gpsFailureThreshold) return -1;
 }
