@@ -12,8 +12,8 @@ namespace quantum
             var envThr  = System.Environment.GetEnvironmentVariable("OMP_NUM_THREADS");
             var envFus  = System.Environment.GetEnvironmentVariable("QDK_SIM_FUSESPAN");
             var envDep  = System.Environment.GetEnvironmentVariable("QDK_SIM_FUSEDEPTH");
-            if (envThr == null || envThr.Length == 0) envThr = "6";
-            if (envFus == null || envFus.Length == 0) envFus = "6";
+            if (envThr == null || envThr.Length == 0) envThr = "Default";
+            if (envFus == null || envFus.Length == 0) envFus = "Default";
             if (envDep == null || envDep.Length == 0) envDep = "99";
 
             int tstMin  = 0;
