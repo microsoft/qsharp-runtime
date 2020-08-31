@@ -9,7 +9,6 @@
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
-
 void test_exp()
 {
     SimulatorType sim;
@@ -324,7 +323,6 @@ void test_extract_qubits_state()
     test_extract_qubits_cat_state(4, {1, 2}, {1, 3});
     test_extract_qubits_cat_state(4, {1, 3}, {0, 1});
     test_extract_qubits_cat_state(4, {2, 3}, {1, 2});
-
     test_extract_qubits_cat_state(12, {2, 4, 5, 6, 7}, {0, 1, 2});
     test_extract_qubits_cat_state(6, {0, 1, 3}, {0, 1});
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
