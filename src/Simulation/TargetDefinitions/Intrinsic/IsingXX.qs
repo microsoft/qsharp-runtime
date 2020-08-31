@@ -5,9 +5,18 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// Applies the Ising $XX$ gate.
+    /// Applies the two qubit Ising $XX$ rotation gate.
     ///
-    /// TODO - describe XX gate.
+    /// # Description
+    /// \begin{align}
+    ///     XX(\theta) \mathrel{:=}
+    ///     \begin{bmatrix}
+    ///         \cos \theta & 0 & 0 & -i\sin \theta  \\\\
+    ///         0 & \cos \theta & -i\sin \theta & 0  \\\\
+    ///         0 & -i\sin \theta & \cos \theta & 0  \\\\
+    ///         -i\sin \theta & 0 & 0 & \cos \theta
+    ///     \end{bmatrix}.
+    /// \end{align}
     ///
     /// # Input
     /// ## theta

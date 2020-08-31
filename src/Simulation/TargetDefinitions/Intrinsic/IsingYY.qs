@@ -5,9 +5,18 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// Applies the Ising $YY$ gate.
+    /// Applies the two qubit Ising $YY$ rotation gate.
     ///
-    /// TODO - describe YY gate.
+    /// # Description
+    /// \begin{align}
+    ///     YY(\theta) \mathrel{:=}
+    ///     \begin{bmatrix}
+    ///         \cos \theta & 0 & 0 & i\sin \theta  \\\\
+    ///         0 & \cos \theta & -i\sin \theta & 0  \\\\
+    ///         0 & -i\sin \theta & \cos \theta & 0  \\\\
+    ///         i\sin \theta & 0 & 0 & \cos \theta
+    ///     \end{bmatrix}.
+    /// \end{align}
     ///
     /// # Input
     /// ## theta

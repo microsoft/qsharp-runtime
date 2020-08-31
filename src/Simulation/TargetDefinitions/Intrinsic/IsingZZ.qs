@@ -5,9 +5,18 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// Applies the Ising $ZZ$ gate.
+    /// Applies the two qubit Ising $ZZ$ rotation gate.
     ///
-    /// TODO - describe ZZ gate.
+    /// # Description
+    /// \begin{align}
+    ///     ZZ(\theta) \mathrel{:=}
+    ///     \begin{bmatrix}
+    ///         e^{-i \theta / 2} & 0 & 0 & 0 \\\\
+    ///         0 & e^{-i \theta / 2} & 0 & 0 \\\\
+    ///         0 & 0 & e^{-i \theta / 2} & 0 \\\\
+    ///         0 & 0 & 0 & e^{i \theta / 2}
+    ///     \end{bmatrix}.
+    /// \end{align}
     ///
     /// # Input
     /// ## theta
