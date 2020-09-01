@@ -61,6 +61,8 @@ ENABLE_TESTING()
 # include directories
 add_subdirectory("src")
 
+# Copy test file depedencies
+configure_file(advantage_44_4.log advantage_44_4.log COPYONLY)
 
 # RPATH setting
 
