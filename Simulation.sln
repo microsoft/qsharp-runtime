@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulation.Common", "src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj", "{8EC46ADB-7FAA-49EA-BA63-E7B32C4F4445}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulators", "src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj", "{72B7E75C-D305-45BD-929E-C86298AAA8DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulators", "src\Simulation\Simulators.Core\Microsoft.Quantum.Simulators.csproj", "{72B7E75C-D305-45BD-929E-C86298AAA8DE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime", "src\Simulation\QCTraceSimulator.Tests\Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj", "{DD50D2D9-2765-449B-8C4B-835A428E160D}"
 EndProject
@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.QSharp.Fo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.Type2.Core", "src\Simulation\Type2Core\Microsoft.Quantum.Type2.Core.csproj", "{AF6CD304-8E03-433D-AAA2-6E0094B53071}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.Simulators.Type2", "src\Simulation\Simulators.Type2\Microsoft.Quantum.Simulators.Type2.csproj", "{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Microsoft.Quantum.Simulators.Type2", "src\Simulation\Simulators.Type2.Tests\Tests.Microsoft.Quantum.Simulators.Type2.csproj", "{ED3D7040-4B3F-4217-A75E-9DF63DD84707}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulators.Tests", "Simulators.Tests", "{CF48986A-B487-407F-98A7-97AED29C6A43}"
@@ -80,8 +82,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProjects", "{F5F80AEA-34F4-4E1D-8145-0634E9DCF2C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntrinsicTests", "src\Simulation\Simulators.Tests\TestProjects\IntrinsicTests\IntrinsicTests.csproj", "{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.Simulators.Type2", "src\Simulation\Simulators\Microsoft.Quantum.Simulators.Type2.csproj", "{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -527,6 +527,22 @@ Global
 		{AF6CD304-8E03-433D-AAA2-6E0094B53071}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{AF6CD304-8E03-433D-AAA2-6E0094B53071}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{AF6CD304-8E03-433D-AAA2-6E0094B53071}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Debug|x64.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Release|x64.ActiveCfg = Release|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.Release|x64.Build.0 = Release|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 		{ED3D7040-4B3F-4217-A75E-9DF63DD84707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED3D7040-4B3F-4217-A75E-9DF63DD84707}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED3D7040-4B3F-4217-A75E-9DF63DD84707}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -559,22 +575,6 @@ Global
 		{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Debug|x64.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.MinSizeRel|x64.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Release|x64.ActiveCfg = Release|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.Release|x64.Build.0 = Release|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -609,11 +609,11 @@ Global
 		{9008B252-2DF7-404B-B626-D4497BB70A05} = {BC562DAE-FE2B-4A8C-880C-C546F83F99E4}
 		{DB45AD73-4D91-43F3-85CC-C63614A96FB0} = {9008B252-2DF7-404B-B626-D4497BB70A05}
 		{AF6CD304-8E03-433D-AAA2-6E0094B53071} = {9008B252-2DF7-404B-B626-D4497BB70A05}
+		{E7163371-74D5-4DAD-AB04-8DA3FA1AD46F} = {9008B252-2DF7-404B-B626-D4497BB70A05}
 		{ED3D7040-4B3F-4217-A75E-9DF63DD84707} = {9008B252-2DF7-404B-B626-D4497BB70A05}
 		{CF48986A-B487-407F-98A7-97AED29C6A43} = {9008B252-2DF7-404B-B626-D4497BB70A05}
 		{F5F80AEA-34F4-4E1D-8145-0634E9DCF2C3} = {CF48986A-B487-407F-98A7-97AED29C6A43}
 		{4EF958CA-B4A6-4E5F-924A-100B5615BEC3} = {F5F80AEA-34F4-4E1D-8145-0634E9DCF2C3}
-		{7B9A9D18-9530-4772-8186-6FCC2B5E9C72} = {9008B252-2DF7-404B-B626-D4497BB70A05}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}

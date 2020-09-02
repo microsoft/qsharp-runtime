@@ -26,7 +26,6 @@ namespace Microsoft.Quantum.Diagnostics {
     /// one-dimensional array of complex numbers, in which each element represents
     /// the amplitudes of the probability of measuring the corresponding state.
     function DumpMachine<'T> (location : 'T) : Unit {
-        body intrinsic;
     }
 
     /// # Summary
@@ -57,7 +56,6 @@ namespace Microsoft.Quantum.Diagnostics {
     /// If the given qubits are entangled with some other qubit and their
     /// state can't be separated, it just reports that the qubits are entangled.
     function DumpRegister<'T> (location : 'T, qubits : Qubit[]) : Unit {
-        body intrinsic;
     }
 
 }

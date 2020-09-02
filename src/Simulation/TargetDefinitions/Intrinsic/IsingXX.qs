@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit1
     /// The second qubit input to the gate.
     @EnableTestingViaName("Test.TargetDefinitions.IsingXX")
-    operation IsingXX (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+    operation IsingXX (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Ctl {
         body intrinsic;
     }
 }

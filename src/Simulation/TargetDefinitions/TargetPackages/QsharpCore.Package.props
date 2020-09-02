@@ -12,8 +12,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
-
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Checks.qs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,9 +20,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFrac.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingXX.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingYY.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingZZ.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\M.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetY.qs" />

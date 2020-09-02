@@ -52,7 +52,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
-    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
 
 </Project>
