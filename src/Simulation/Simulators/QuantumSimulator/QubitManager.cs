@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        class QSimQubitManager : QubitManagerTrackingScope
+        class QSimQubitManager : QubitManager
         {
             readonly bool throwOnReleasingQubitsNotInZeroState;
 

@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
         /// <param name="randomSeed">A seed to be used by Q# <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.random">Microsoft.Quantum.Intrinsic.Random</a> operation.</param>
         public QuantumProcessorDispatcher(IQuantumProcessor? quantumProcessor = null, IQubitManager? qubitManager = null, int? randomSeed = null)
         : base(
-            qubitManager ?? new QubitManagerTrackingScope(
+            qubitManager ?? new QubitManager(
                 PreallocatedQubitCount,
                 mayExtendCapacity: true, disableBorrowing: false
             ),

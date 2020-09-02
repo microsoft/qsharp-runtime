@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     /// Qubit manager for TraceableQubit type. Ensures that all the traceable 
     /// qubits are configured as requested during qubit manage construction.
     /// </summary>
-    class TraceableQubitManager : QubitManagerTrackingScope
+    class TraceableQubitManager : QubitManager
     {
         const long NumQubits = 1024;
 

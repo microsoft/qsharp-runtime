@@ -243,7 +243,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestQubitManagerTrackingScope()
         {
-            QubitManagerTrackingScope qm = new QubitManagerTrackingScope(20);
+            QubitManager qm = new QubitManager(20);
 
             Qubit q1 = qm.Allocate();
             Assert.True(q1.Id == 0);
@@ -302,7 +302,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestQubitManagerDisabledBorrowing()
         {
-            QubitManagerTrackingScope qm = new QubitManagerTrackingScope(20, mayExtendCapacity: true, disableBorrowing: true);
+            QubitManager qm = new QubitManager(20, mayExtendCapacity: true, disableBorrowing: true);
 
             Qubit q1 = qm.Allocate();
             Assert.True(q1.Id == 0);
@@ -377,7 +377,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestQubitManagerGrowth()
         {
-            QubitManagerTrackingScope qm = new QubitManagerTrackingScope(7, mayExtendCapacity : true, disableBorrowing: false);
+            QubitManager qm = new QubitManager(7, mayExtendCapacity : true, disableBorrowing: false);
 
             Qubit q1 = qm.Allocate();
             Assert.True(q1.Id == 0);
