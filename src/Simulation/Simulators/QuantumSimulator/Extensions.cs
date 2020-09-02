@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation
                 where op.IsSubclassOf(typeof(T))
                 select op;
 
-            foreach (var op in ops)
+            foreach (var op in ops.Where(o => o.BaseType.IsAbstract))
             {
                 factory.Register(op.BaseType, op);
             }

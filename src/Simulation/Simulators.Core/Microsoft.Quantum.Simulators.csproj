@@ -16,31 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Simulators\QuantumSimulator\Assert.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\AssertProb.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\ClassicalControl.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Dump.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Exp.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Extensions.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\H.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Measure.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\QuantumSimulator.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Qubit.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\QubitManager.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\R.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\random.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\S.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\SimulatorBase.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\StackTrace.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\StateDumper.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\T.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\X.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Y.cs" />
-    <Compile Include="..\Simulators\QuantumSimulator\Z.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\Simulators\QCTraceSimulator\*.cs" />
+    <Compile Include="..\Simulators\QuantumSimulator\*.cs" />
     <QSharpcompile Include="..\Simulators\QCTraceSimulator\Circuits\*.qs" />
     <Compile Include="..\Simulators\QuantumProcessor\*.cs" />
     <Compile Include="..\Simulators\ResourcesEstimator\*.cs" />
