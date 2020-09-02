@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Common
     ///     It also provides a mechanism to register overrides when a given
     ///     type should be replaced by a subclass.
     /// </summary>
-    public abstract class AbstractFactory<T>
+    public class Factory<T>
     {
         private Dictionary<Type, Type> opsOverrides = new Dictionary<Type, Type>();
         private Dictionary<Type, T> opsCache = new Dictionary<Type, T>();

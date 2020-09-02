@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Common
     ///     can be tied to this simulator) and
     ///     to manage the allocation of Qubits (via the QubitManager).
     /// </summary>
-    public abstract class SimulatorBase : AbstractFactory<AbstractCallable>, IOperationFactory
+    public abstract class SimulatorBase : Factory<AbstractCallable>, IOperationFactory
     {
         public event Action<ICallable, IApplyData>? OnOperationStart = null;
         public event Action<ICallable, IApplyData>? OnOperationEnd = null;
@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        public virtual I Get<I>(Type T)
+        public I Get<I>(Type T)
         {
             return (I)this.GetInstance(T);
         }
@@ -97,7 +97,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// If the operation has no body in the Q# file, and no override has been defined in the Simulator,
         /// this method will throw an InvalidOperationException.
         /// </summary>
-        public virtual I Get<I, T>() where T : AbstractCallable, I
+        public I Get<I, T>() where T : AbstractCallable, I
         {
             var key = typeof(T);
             return (I)this.GetInstance(key);
