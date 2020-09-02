@@ -34,7 +34,7 @@ namespace Test
         {
         }
 
-        public class Microsoft_Quantum_QftEmulator__QFT : Unitary<IQArray<Qubit>>, ICallable
+        public class Microsoft_Quantum_QftEmulator__QFT : Microsoft.Quantum.QftEmulator.QFT, ICallable
         {
             public Microsoft_Quantum_QftEmulator__QFT(IOperationFactory m) : base(m)
             {

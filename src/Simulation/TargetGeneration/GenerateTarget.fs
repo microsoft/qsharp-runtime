@@ -338,7 +338,8 @@ module GenerateTarget =
         let constructors = [ (SimulationCode.buildConstructor context className) ]
         let nameProperties = [ SimulationCode.buildName className; 
                                SimulationCode.buildFullName op.FullName ]
-        let baseClass, _, _ = SimulationCode.getBaseClass context op
+        //let baseClass, _, _ = SimulationCode.getBaseClass context op
+        let baseClass = op.FullName.Namespace.Value + "." + opName |> ``simpleBase``
         let specProperties = op.Specializations 
                              |> Seq.choose (buildImplProperty targetClass context namingInfo op.ArgumentTuple)
                              |> Seq.toList

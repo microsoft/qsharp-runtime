@@ -26,7 +26,7 @@ namespace Test
         {
         }
 
-        public class Microsoft_Quantum_UnitArgTarget__UnitArg : Controllable<QVoid>, ICallable
+        public class Microsoft_Quantum_UnitArgTarget__UnitArg : Microsoft.Quantum.UnitArgTarget.UnitArg, ICallable
         {
             public Microsoft_Quantum_UnitArgTarget__UnitArg(IOperationFactory m) : base(m)
             {

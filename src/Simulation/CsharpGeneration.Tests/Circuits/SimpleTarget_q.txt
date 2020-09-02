@@ -78,7 +78,7 @@ namespace Test
         {
         }
 
-        public class Microsoft_Quantum_Simple__Measure : Operation<(IQArray<Pauli>,IQArray<Qubit>), Result>, ICallable
+        public class Microsoft_Quantum_Simple__Measure : Microsoft.Quantum.Simple.Measure, ICallable
         {
             public Microsoft_Quantum_Simple__Measure(IOperationFactory m) : base(m)
             {
@@ -105,7 +105,7 @@ namespace Test
             }
         }
 
-        public class Microsoft_Quantum_Simple__S : Unitary<Qubit>, ICallable
+        public class Microsoft_Quantum_Simple__S : Microsoft.Quantum.Simple.S, ICallable
         {
             public Microsoft_Quantum_Simple__S(IOperationFactory m) : base(m)
             {
@@ -155,7 +155,7 @@ namespace Test
             }
         }
 
-        public class Microsoft_Quantum_Simple__X : Unitary<Qubit>, ICallable
+        public class Microsoft_Quantum_Simple__X : Microsoft.Quantum.Simple.X, ICallable
         {
             public Microsoft_Quantum_Simple__X(IOperationFactory m) : base(m)
             {

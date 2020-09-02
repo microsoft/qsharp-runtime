@@ -35,7 +35,7 @@ namespace Test
         {
         }
 
-        public class Microsoft_Quantum_A__X : Unitary<Qubit>, ICallable
+        public class Microsoft_Quantum_A__X : Microsoft.Quantum.A.X, ICallable
         {
             public Microsoft_Quantum_A__X(IOperationFactory m) : base(m)
             {
@@ -72,7 +72,7 @@ namespace Test
             }
         }
 
-        public class Microsoft_Quantum_B__X : Unitary<Qubit>, ICallable
+        public class Microsoft_Quantum_B__X : Microsoft.Quantum.B.X, ICallable
         {
             public Microsoft_Quantum_B__X(IOperationFactory m) : base(m)
             {
