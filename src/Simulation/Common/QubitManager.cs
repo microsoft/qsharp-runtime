@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Quantum.Intrinsic;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 
@@ -31,8 +30,8 @@ namespace Microsoft.Quantum.Simulation.Common
         long numDisabledQubits; // Number of disabled qubits.
 
         // Options
-        bool MayExtendCapacity;
-        bool EncourageReuse;
+        readonly bool MayExtendCapacity;
+        readonly bool EncourageReuse;
         public bool DisableBorrowing { get; }
 
         const long MaxQubitCapacity = long.MaxValue - 3;
@@ -233,18 +232,9 @@ namespace Microsoft.Quantum.Simulation.Common
             return result;
         }
 
-        private class QubitNonAbstract : Qubit
-        {
-            // This class is only needed because Qubit is abstract. 
-            // It is equivalent to Qubit and adds nothing to it except the ability to create it.
-            // It should be used only in CreateQubitObject below, and nowhere else.
-            // When Qubit stops being abstract, this class should be removed.
-            public QubitNonAbstract(int id) : base(id) { }
-        }
-
         public virtual Qubit CreateQubitObject(long id)
         { // User may override it to create his own Qubit object of a derived type.
-            return new QubitNonAbstract((int)id);
+            return new Qubit((int)id);
         }
 
         /// <summary>
@@ -490,12 +480,11 @@ namespace Microsoft.Quantum.Simulation.Common
         private long TryBorrow(long numToBorrow, QArray<Qubit> result, IEnumerable<Qubit> excludedQubitsSortedById)
         {
             long curQubit = 0;
-            long numBorrowed = 0;
             long curBorrowed = 0;
+            long numBorrowed = System.Math.Min(GetQubitsAvailableToBorrowCount(excludedQubitsSortedById), numToBorrow);
+
             IEnumerator<Qubit> enumer = excludedQubitsSortedById.GetEnumerator();
             bool exclusionsPresent = enumer.MoveNext();
-
-            numBorrowed = System.Math.Min(GetQubitsAvailableToBorrowCount(excludedQubitsSortedById), numToBorrow);
 
             while (curBorrowed < numBorrowed)
             {

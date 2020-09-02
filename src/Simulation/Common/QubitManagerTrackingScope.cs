@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        private Stack<StackFrame> operationStack; // Stack of operation calls.
+        private readonly Stack<StackFrame> operationStack; // Stack of operation calls.
         private StackFrame curFrame; // Current stack frame - all qubits in current scope are listed here.
 
         public QubitManagerTrackingScope(

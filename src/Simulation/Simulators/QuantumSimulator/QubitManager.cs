@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     {
         class QSimQubitManager : QubitManagerTrackingScope
         {
-            bool throwOnReleasingQubitsNotInZeroState;
+            readonly bool throwOnReleasingQubitsNotInZeroState;
 
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "allocateQubit")]
             private static extern void AllocateOne(uint id, uint qubit_id);

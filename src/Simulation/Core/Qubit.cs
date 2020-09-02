@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
     /// <summary>
     /// Represents a Quantum Bit.
     /// </summary>
-    public abstract class Qubit : IApplyData, IEquatable<Qubit>, IEqualityComparer<Qubit>
+    public class Qubit : IApplyData, IEquatable<Qubit>, IEqualityComparer<Qubit>
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static readonly Qubit[] NO_QUBITS = new Qubit[0];
