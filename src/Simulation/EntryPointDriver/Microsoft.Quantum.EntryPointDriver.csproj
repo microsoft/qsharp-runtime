@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\..\Azure\Azure.Quantum.Client\Microsoft.Azure.Quantum.Client.csproj" />
   </ItemGroup>
 

@@ -22,7 +22,8 @@
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Type2Core\Microsoft.Quantum.Type2.Core.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators.Type2\Microsoft.Quantum.Simulators.Type2.csproj" Condition=" '$([MSBuild]::NormalizePath($(EnlistmentRoot)src\Simulation\Simulators.Type2))' != '$(MSBuildProjectDirectory)'" IncludeInSimulatorPackage="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Simulators\Microsoft.Quantum.Simulators.Type2.csproj" Condition=" '$([MSBuild]::NormalizePath($(EnlistmentRoot)src\Simulation\Simulators))' != '$(MSBuildProjectDirectory)'" IncludeInSimulatorPackage="true" />
   </ItemGroup>
 
   <ItemGroup>

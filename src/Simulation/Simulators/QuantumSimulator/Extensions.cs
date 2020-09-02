@@ -44,7 +44,8 @@ namespace Microsoft.Quantum.Simulation
                 where op.IsSubclassOf(typeof(T))
                 select op;
 
-            foreach (var op in ops)
+            // Only override abstract operations (declared in Q# as `body intrinsic`).
+            foreach (var op in ops.Where(o => o.BaseType.IsAbstract))
             {
                 factory.Register(op.BaseType, op);
             }

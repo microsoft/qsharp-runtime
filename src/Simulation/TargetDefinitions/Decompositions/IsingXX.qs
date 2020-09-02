@@ -5,16 +5,16 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
-    /// Applies the two qubit Ising $YY$ rotation gate.
+    /// Applies the two qubit Ising $XX$ rotation gate.
     ///
     /// # Description
     /// \begin{align}
-    ///     YY(\theta) \mathrel{:=}
+    ///     XX(\theta) \mathrel{:=}
     ///     \begin{bmatrix}
-    ///         \cos \theta & 0 & 0 & i\sin \theta  \\\\
+    ///         \cos \theta & 0 & 0 & -i\sin \theta  \\\\
     ///         0 & \cos \theta & -i\sin \theta & 0  \\\\
     ///         0 & -i\sin \theta & \cos \theta & 0  \\\\
-    ///         i\sin \theta & 0 & 0 & \cos \theta
+    ///         -i\sin \theta & 0 & 0 & \cos \theta
     ///     \end{bmatrix}.
     /// \end{align}
     ///
@@ -25,8 +25,8 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The first qubit input to the gate.
     /// ## qubit1
     /// The second qubit input to the gate.
-    @EnableTestingViaName("Test.TargetDefinitions.IsingYY")
-    operation IsingYY (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
-        body intrinsic;
+    @EnableTestingViaName("Test.TargetDefinitions.IsingXX")
+    operation IsingXX (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([PauliX, PauliX], 2.0 * theta, [qubit0, qubit1]);
     }
 }
