@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (_args) =>
             {
                 var (paulis, qubits) = _args;
 

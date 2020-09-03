@@ -19,32 +19,32 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public static double Angle(long numerator, long power) =>
                 (-2.0 * System.Math.PI * numerator) / (1 << (int)power);
 
-            public override Func<(Pauli, long, long, Qubit), QVoid> Body => (args) =>
+            public override Func<(Pauli, long, long, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (pauli, numerator, power, qubit) = args;
                 var angle = Angle(numerator, power);
-                return R.Apply((pauli, angle, qubit));
+                return R__.Apply((pauli, angle, qubit));
             };
 
-            public override Func<(Pauli, long, long, Qubit), QVoid> AdjointBody => (args) =>
+            public override Func<(Pauli, long, long, Qubit), QVoid> __AdjointBody__ => (args) =>
             {
                 var (pauli, numerator, power, qubit) = args;
                 var angle = Angle(numerator, power);
-                return R.Adjoint.Apply((pauli, angle, qubit));
+                return R__.Adjoint.Apply((pauli, angle, qubit));
             };
 
-            public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (pauli, numerator, power, qubit)) = args;
                 var angle = Angle(numerator, power);
-                return R.Controlled.Apply((ctrls, (pauli, angle, qubit)));
+                return R__.Controlled.Apply((ctrls, (pauli, angle, qubit)));
             };
 
-            public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> ControlledAdjointBody => (args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, long, long, Qubit)), QVoid> __ControlledAdjointBody__ => (args) =>
             {
                 var (ctrls, (pauli, numerator, power, qubit)) = args;
                 var angle = Angle(numerator, power);
-                return R.Adjoint.Controlled.Apply((ctrls, (pauli, angle, qubit)));
+                return R__.Adjoint.Controlled.Apply((ctrls, (pauli, angle, qubit)));
             };
         }
     }

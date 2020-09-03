@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 tracerCore = m;
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result), QVoid> Body
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result), QVoid> __Body__
                 => (arg) =>
                 {
                     (IQArray<Pauli> observable, IQArray<Qubit> target, Result result) = arg;

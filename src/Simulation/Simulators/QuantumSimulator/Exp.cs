@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __Body__ => (_args) =>
             {
                 var (paulis, theta, qubits) = _args;
 
@@ -43,14 +43,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> AdjointBody => (_args) =>
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __AdjointBody__ => (_args) =>
             {
                 var (paulis, angle, qubits) = _args;
 
-                return this.Body.Invoke((paulis, -angle, qubits));
+                return this.__Body__.Invoke((paulis, -angle, qubits));
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledBody__ => (_args) =>
             {
                 var (ctrls, (paulis, angle, qubits)) = _args;
 
@@ -63,17 +63,17 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 }
 
                 SafeControlled(ctrls,
-                    () => this.Body.Invoke((paulis, angle, qubits)),
+                    () => this.__Body__.Invoke((paulis, angle, qubits)),
                     (count, ids) => MCExp(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), angle, count, ids, qubits.GetIds()));
 
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 var (ctrls, (paulis, angle, qubits)) = _args;
 
-                return this.ControlledBody.Invoke((ctrls, (paulis, -angle, qubits)));
+                return this.__ControlledBody__.Invoke((ctrls, (paulis, -angle, qubits)));
             };
         }
     }
