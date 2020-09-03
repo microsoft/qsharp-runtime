@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Core
     public abstract class Qubit : IApplyData, IEquatable<Qubit>, IEqualityComparer<Qubit>
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static readonly Qubit[] NO_QUBITS = new Qubit[0];
+        public static readonly Qubit[] NO_QUBITS = Array.Empty<Qubit>();
         
         /// <summary>
         /// Used by UDTs that extend Qubit. 

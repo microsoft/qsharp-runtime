@@ -213,21 +213,14 @@ namespace Microsoft.Quantum.Simulation.Common
             return true;
         }
 
-        public bool IsFree(Qubit qubit)
-        {
-            if (!IsValid(qubit)) { return false; }
-            return IsFree(qubit.Id);
-        }
-
         private bool IsFree(long id)
         {
             return qubits[id] < Allocated;
         }
 
-        public bool IsDisabled(Qubit qubit)
+        public bool IsFree(Qubit qubit)
         {
-            if (!IsValid(qubit)) { return false; }
-            return IsDisabled(qubit.Id);
+            return IsValid(qubit) && IsFree(qubit.Id);
         }
 
         private bool IsDisabled(long id)
@@ -235,34 +228,23 @@ namespace Microsoft.Quantum.Simulation.Common
             return (qubits[id] == Disabled);
         }
 
+        public bool IsDisabled(Qubit qubit)
+        {
+            return IsValid(qubit) && IsDisabled(qubit.Id);
+        }
+
         private bool IsAllocatedForBorrowing(long id)
         {
             return qubits[id] >= AllocatedForBorrowing;
         }
 
-        // Returns true if qubit needs to be released: It has been allocated for borrowing and is not borrowed any more.
-        private bool DecreaseBorrowingRefCount(long id)
-        {
-            if (IsAllocatedForBorrowing(id)) {
-                if (qubits[id] == AllocatedForBorrowing)
-                {
-                    return true;
-                }
-                else
-                {
-                    qubits[id]--;
-                    return false;
-                }
-            } else
-            {
-                return false;
-            }
-        }
+        #region Allocate
 
         /// <summary>
         /// Allocates a qubit.
+        /// Returns null if the qubit cannot be allocated.
         /// </summary>
-        protected virtual Qubit AllocateOneQubit(bool usedOnlyForBorrowing)
+        protected virtual Qubit AllocateOneQubit(bool usedOnlyForBorrowing = false)
         {
             if (free == None)
             {
@@ -332,10 +314,11 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Allocates a qubit.
+        /// Throws a NotEnoughQubits exception if the qubit cannot be allocated. 
         /// </summary>
-        public virtual Qubit Allocate()
+        public Qubit Allocate()
         {
-            Qubit qb = AllocateOneQubit(usedOnlyForBorrowing: false);
+            Qubit qb = AllocateOneQubit();
             if (qb == null)
             {
                 throw new NotEnoughQubits(1, GetFreeQubitsCount());
@@ -345,8 +328,9 @@ namespace Microsoft.Quantum.Simulation.Common
 
         /// <summary>
         /// Allocates numToAllocate new qubits.
+        /// Throws a NotEnoughQubits exception without allocating any qubits if the qubits cannot be allocated. 
         /// </summary>
-        public virtual IQArray<Qubit> Allocate(long numToAllocate)
+        public IQArray<Qubit> Allocate(long numToAllocate)
         {
             if (numToAllocate < 0)
             {
@@ -358,10 +342,9 @@ namespace Microsoft.Quantum.Simulation.Common
             }
 
             QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate); 
-
             for (int i = 0; i < numToAllocate; i++)
             {
-                result.Modify(i, AllocateOneQubit(usedOnlyForBorrowing: false));
+                result.Modify(i, AllocateOneQubit());
                 if (result[i] == null)
                 {
                     for (int k = 0; k < i; k++)
@@ -375,7 +358,11 @@ namespace Microsoft.Quantum.Simulation.Common
             return result;
         }
 
-        protected virtual void ReleaseOneQubit(Qubit qubit, bool usedOnlyForBorrowing)
+        #endregion
+
+        #region Release
+
+        protected virtual void ReleaseOneQubit(Qubit qubit, bool usedOnlyForBorrowing = false)
         {
             if (qubits[qubit.Id] == Disabled)
             {
@@ -427,15 +414,15 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Releases a given qubit.
         /// </summary>
-        public virtual void Release(Qubit qubit)
+        public void Release(Qubit qubit)
         {
-            ReleaseOneQubit(qubit, usedOnlyForBorrowing: false);
+            ReleaseOneQubit(qubit);
         }
 
         /// <summary>
         /// Releases a set of given qubits.
         /// </summary>
-        public virtual void Release(IQArray<Qubit> qubitsToRelease)
+        public void Release(IQArray<Qubit> qubitsToRelease)
         {
             if (qubitsToRelease == null || qubitsToRelease.Length == 0)
             {
@@ -444,9 +431,11 @@ namespace Microsoft.Quantum.Simulation.Common
 
             for (long i = qubitsToRelease.Length-1; i>=0; i--)
             { // Going from the end is more efficient in case we are tracking scope.
-                this.ReleaseOneQubit(qubitsToRelease[i], usedOnlyForBorrowing: false);
+                this.ReleaseOneQubit(qubitsToRelease[i]);
             }
         }
+
+        #endregion
 
         protected virtual void DisableOneQubit(Qubit qubit)
         {
@@ -685,11 +674,24 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             if (DisableBorrowing)
             {
-                this.ReleaseOneQubit(qubit, usedOnlyForBorrowing: false);
+                this.ReleaseOneQubit(qubit);
             }
             else
             {
-                if (DecreaseBorrowingRefCount(qubit.Id))
+                var needsToBeReleased = false;
+                if (IsAllocatedForBorrowing(qubit.Id))
+                {
+                    if (qubits[qubit.Id] == AllocatedForBorrowing)
+                    {
+                        needsToBeReleased = true;
+                    }
+                    else
+                    {
+                        qubits[qubit.Id]--;
+                    }
+                }
+
+                if (needsToBeReleased)
                 {
                     this.ReleaseOneQubit(qubit, usedOnlyForBorrowing: true);
                 }
