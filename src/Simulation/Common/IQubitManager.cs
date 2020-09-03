@@ -3,8 +3,8 @@
 
 namespace Microsoft.Quantum.Simulation.Common
 {
-    using Microsoft.Quantum.Simulation.Core;
     using System.Collections.Generic;
+    using Microsoft.Quantum.Simulation.Core;
 
     public interface IQubitManager
     {
@@ -32,7 +32,6 @@ namespace Microsoft.Quantum.Simulation.Common
 
         long GetFreeQubitsCount();
         long GetQubitsAvailableToBorrowCount();
-        long GetParentQubitsAvailableToBorrowCount(); // Required for GetAvailableQubitsToBorrow
         long GetAllocatedQubitsCount();
         IEnumerable<long> GetAllocatedIds();
 
