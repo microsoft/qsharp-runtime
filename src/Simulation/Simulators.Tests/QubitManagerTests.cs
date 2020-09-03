@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestQubitManager()
         {
-            QubitManager qm = new QubitManager(20);
+            QubitManager qm = new QubitManager(30);
 
             // Test allocation of single qubit
             Qubit q1 = qm.Allocate();
@@ -109,16 +109,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(q8.Id == 11);
             qm.Disable(q8);
             IQArray<Qubit> qab2 = qm.Borrow(12);
-            Assert.True(qab2[11].Id == 12);  // make sure 11 is not borrowed.
+            Assert.True(qab2[11].Id == 23);  // make sure 11 is not borrowed.
             qm.Release(q8);
             qm.Return(qab2);
-
+            
             IQArray<Qubit> qa4 = qm.Allocate(2);
             Assert.True(qa4[0].Id == 12); // make sure 11 is not reused.
             Assert.True(qa4[1].Id == 13); // make sure 11 is not reused.
             qm.Release(qa4);
 
-
+            
             { // Test allocating zero qubits
                 IQArray<Qubit> n_q;
                 n_q = qm.Allocate(0);

@@ -129,8 +129,9 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Qubit.NO_QUBITS;
             }
 
-            var qubitsInArgument = frame.QubitsInArgument?.ToArray();
-            long numExcluded = frame.Locals.Count + (qubitsInArgument?.Length ?? 0);
+            var qubitsInArgument = frame.QubitsInArgument?.Where(q => !this.IsDisabled(q)).ToArray();
+            var localQubits = frame.Locals.Where(q => !this.IsDisabled(q));
+            long numExcluded = localQubits.Count() + (qubitsInArgument?.Length ?? 0);
             var excludedQubits = new Qubit[numExcluded];
 
             int k = 0;
@@ -142,7 +143,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     k++;
                 }
             }
-            foreach (Qubit q in frame.Locals)
+            foreach (Qubit q in localQubits)
             {
                 excludedQubits[k] = q;
                 k++;
