@@ -237,9 +237,23 @@ namespace Microsoft.Quantum.Simulation.Common
             return qubits[id] >= AllocatedForBorrowing;
         }
 
-        public virtual long GetQubitsAvailableToBorrowCount()
+        public virtual long GetQubitsAvailableToBorrowCount(int stackFrame)
         {
-            return DisableBorrowing ? 0 : NumAllocatedQubits - QubitsInUseCount(curFrame);
+            StackFrame frame = curFrame;
+            if (stackFrame > 0)
+            {
+                var popped = new Stack<StackFrame>();
+                while (--stackFrame > 0)
+                {
+                    popped.Push(operationStack.Pop());
+                }
+                frame = operationStack.Peek();
+                while (popped.TryPop(out var f))
+                {
+                    operationStack.Push(f);
+                }
+            }
+            return DisableBorrowing ? 0 : NumAllocatedQubits - QubitsInUseCount(frame);
         }
 
         public long GetFreeQubitsCount()
@@ -258,37 +272,6 @@ namespace Microsoft.Quantum.Simulation.Common
             {
                 if (!IsFree(i)) yield return i;
             }
-        }
-
-        /// <summary>
-        /// Returns true if a qubit has been allocated just for borrowing, has been borrowed exactly once,
-        /// and thus will be released after it is returned.
-        /// </summary>
-        public virtual bool ToBeReleasedAfterReturn(Qubit qubit)
-        {
-            return IsAllocatedForBorrowing(qubit.Id) && qubits[qubit.Id] == AllocatedForBorrowing;
-        }
-
-        /// <summary>
-        /// Returns a count of input qubits that have been allocated just for borrowing, borrowed exactly once,
-        /// and thus will be released after they are returned.
-        /// </summary>
-        public virtual long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn)
-        {
-            if (qubitsToReturn == null || qubitsToReturn.Length == 0)
-            {
-                return 0;
-            }
-
-            long count = 0;
-            foreach (Qubit qubit in qubitsToReturn)
-            {
-                if (this.ToBeReleasedAfterReturn(qubit))
-                {
-                    count++;
-                }
-            }
-            return count;
         }
 
         #region Disable

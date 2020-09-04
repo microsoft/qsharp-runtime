@@ -31,14 +31,11 @@ namespace Microsoft.Quantum.Simulation.Common
         public event Action<string>? OnLog = null;
         public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
 
-
         protected readonly int randomSeed;
         protected readonly Lazy<System.Random> randomGenerator;
         public int Seed => randomSeed;
         protected System.Random RandomGenerator => randomGenerator.Value;
 
-
-        
         /// <summary>
         ///     An event fired whenever a simulator has additional diagnostic data
         ///     available for display (e.g. state information, assertion details,
@@ -49,7 +46,6 @@ namespace Microsoft.Quantum.Simulation.Common
         public IQubitManager? QubitManager { get; }
 
         public abstract string Name { get; }
-
 
         /// <summary>
         /// If the execution finishes in failure, this method returns the call-stack of the Q# operations 
@@ -429,7 +425,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetQubitsAvailableToBorrowCount();
+            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetQubitsAvailableToBorrowCount(1);
         }
 
         /// <summary>

@@ -17,10 +17,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Qubit Apply()
             {
                 long allocatedBefore = sim.QubitManager.GetAllocatedQubitsCount();
-                IQArray<Qubit> qubits = sim.QubitManager.Borrow(1);
+                Qubit qubit = sim.QubitManager.Borrow();
                 long allocatedAfter = sim.QubitManager.GetAllocatedQubitsCount();
-                sim.QuantumProcessor.OnBorrowQubits(qubits, allocatedAfter - allocatedBefore);
-                return qubits[0];
+                sim.QuantumProcessor.OnBorrowQubits(new QArray<Qubit>(qubit), allocatedAfter - allocatedBefore);
+                return qubit;
             }
 
             public override IQArray<Qubit> Apply(long count)
