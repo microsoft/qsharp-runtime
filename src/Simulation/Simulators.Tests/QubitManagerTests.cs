@@ -64,14 +64,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             long qubitsAvailable;
 
             qubitsAvailable = qm.GetFreeQubitsCount();
-            QArray<Qubit> qab = QArray<Qubit>.Create(5);
-            long nrBorrowed = qm.TryBorrow(qab, exclusion);
-            Assert.Equal(4, nrBorrowed);
+            IQArray<Qubit> qab = qm.Borrow(5, exclusion);
             Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
             Assert.True(qab[0].Id == 0);
             Assert.True(qab[1].Id == 2);
             Assert.True(qab[2].Id == 4);
-            Assert.True(qab[3].Id == 5);
+            Assert.True(qab[3].Id == 7);
             Assert.True(qab[4].Id == 8);
 
             Qubit q6 = qm.Allocate();
@@ -79,9 +77,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             // Test borrowing of the same qubit again
             qubitsAvailable = qm.GetFreeQubitsCount();
-            QArray<Qubit> qb1 = QArray<Qubit>.Create(1);
-            nrBorrowed = qm.TryBorrow(qb1, exclusion);
-            Assert.Equal(1, nrBorrowed);
+            IQArray<Qubit> qb1 = qm.Borrow(1, exclusion);
             Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 0);
             Assert.True(qb1[0].Id == 0);
             qm.Return(qb1[0]);
@@ -123,8 +119,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 IQArray<Qubit> n_q;
                 n_q = qm.Allocate(0);
                 Assert.True(n_q.Length == 0);
-                nrBorrowed = qm.TryBorrow(new QArray<Qubit>(), exclusion);
-                Assert.Equal(0, nrBorrowed);
+                n_q = qm.Borrow(0, exclusion);
                 Assert.True(n_q.Length == 0);
             }
 

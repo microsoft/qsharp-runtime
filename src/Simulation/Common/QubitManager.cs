@@ -30,8 +30,11 @@ namespace Microsoft.Quantum.Simulation.Common
         /// The number of disabled qubits.
         /// </summary>
         protected long NumDisabledQubits;
+        /// <summary>
+        /// Tracks the allocation state of all qubits.
+        /// </summary>
+        protected long[] qubits; 
 
-        protected long[] qubits; // Tracks the allocation state of all qubits.
         private long None; // Indicates the end of the list of free qubits. If we reach it - we are out of qubits.
         private long Allocated; // All qubits allocated by user will be marked with this number.
         private long Disabled; // All qubits disabled via DisableQubit interface will be marked with this number.
@@ -40,8 +43,8 @@ namespace Microsoft.Quantum.Simulation.Common
         private long freeTail; // Points to the last free (unallocated) qubit. Only valid iff (!EncourageReuse).
 
         // Options
-        readonly bool MayExtendCapacity;
-        readonly bool EncourageReuse;
+        protected readonly bool MayExtendCapacity;
+        protected readonly bool EncourageReuse;
         public bool DisableBorrowing { get; }
 
         const long MaxQubitCapacity = long.MaxValue - 3;
@@ -122,38 +125,23 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        private IEnumerable<Qubit> ConstructExcludedQubitsArray(StackFrame frame)
+        protected IEnumerable<Qubit> QubitsInUse(StackFrame frame)
         {
             if (DisableBorrowing || frame == null)
             {
                 return Qubit.NO_QUBITS;
             }
 
-            var qubitsInArgument = frame.QubitsInArgument?.Where(q => !this.IsDisabled(q)).ToArray();
-            var localQubits = frame.Locals.Where(q => !this.IsDisabled(q));
-            long numExcluded = localQubits.Count() + (qubitsInArgument?.Length ?? 0);
-            var excludedQubits = new Qubit[numExcluded];
+            return frame.Locals.Concat(frame.QubitsInArgument ?? Array.Empty<Qubit>())
+                .Where(q => q != null && !this.IsDisabled(q));
+        }
 
-            int k = 0;
-            if (qubitsInArgument != null)
-            {
-                foreach (Qubit q in qubitsInArgument)
-                {
-                    excludedQubits[k] = q;
-                    k++;
-                }
-            }
-            foreach (Qubit q in localQubits)
-            {
-                excludedQubits[k] = q;
-                k++;
-            }
-            Debug.Assert(k == numExcluded);
-
+        protected int QubitsInUseCount(StackFrame frame)
+        {
             // The following is not really efficient, but let's wait to see if distinct can be part of the contract
             // for the qubitsInArgument parameter of StartOperation call.
             // Well, we are talking about really small arrays here anyway.
-            return excludedQubits.Where(q => q != null).Distinct().OrderBy(Qubit => Qubit.Id);
+            return QubitsInUse(frame).Distinct().Count();
         }
 
         #endregion
@@ -251,7 +239,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual long GetQubitsAvailableToBorrowCount()
         {
-            return DisableBorrowing ? 0 : NumAllocatedQubits - ConstructExcludedQubitsArray(curFrame).Count();
+            return DisableBorrowing ? 0 : NumAllocatedQubits - QubitsInUseCount(curFrame);
         }
 
         public long GetFreeQubitsCount()
@@ -272,24 +260,50 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
+        /// <summary>
+        /// Returns true if a qubit has been allocated just for borrowing, has been borrowed exactly once,
+        /// and thus will be released after it is returned.
+        /// </summary>
+        public virtual bool ToBeReleasedAfterReturn(Qubit qubit)
+        {
+            return IsAllocatedForBorrowing(qubit.Id) && qubits[qubit.Id] == AllocatedForBorrowing;
+        }
+
+        /// <summary>
+        /// Returns a count of input qubits that have been allocated just for borrowing, borrowed exactly once,
+        /// and thus will be released after they are returned.
+        /// </summary>
+        public virtual long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn)
+        {
+            if (qubitsToReturn == null || qubitsToReturn.Length == 0)
+            {
+                return 0;
+            }
+
+            long count = 0;
+            foreach (Qubit qubit in qubitsToReturn)
+            {
+                if (this.ToBeReleasedAfterReturn(qubit))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         #region Disable
 
-        protected virtual void DisableOneQubit(Qubit qubit)
+        /// <summary>
+        /// Disables a given qubit.
+        /// Once a qubit is disabled it can never be reallocated.
+        /// </summary>
+        public virtual void Disable(Qubit qubit)
         {
             qubits[qubit.Id] = Disabled;
             NumDisabledQubits++;
 
             NumAllocatedQubits--;
             Debug.Assert(NumAllocatedQubits >= 0);
-        }
-
-        /// <summary>
-        /// Disables a given qubit.
-        /// Once a qubit is disabled it can never be reallocated.
-        /// </summary>
-        public void Disable(Qubit qubit)
-        {
-            DisableOneQubit(qubit);
         }
 
         /// <summary>
@@ -305,7 +319,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
             foreach (Qubit qubit in qubitsToDisable)
             {
-                this.DisableOneQubit(qubit);
+                this.Disable(qubit);
             }
         }
 
@@ -317,7 +331,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Allocates a qubit.
         /// Returns null if the qubit cannot be allocated.
         /// </summary>
-        protected virtual Qubit AllocateOneQubit(bool usedOnlyForBorrowing = false)
+        protected virtual Qubit Allocate(bool usedOnlyForBorrowing)
         {
             if (free == None)
             {
@@ -391,7 +405,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public Qubit Allocate()
         {
-            Qubit qb = AllocateOneQubit();
+            Qubit qb = Allocate(usedOnlyForBorrowing: false);
             if (qb == null)
             {
                 throw new NotEnoughQubits(1, GetFreeQubitsCount());
@@ -417,12 +431,12 @@ namespace Microsoft.Quantum.Simulation.Common
             QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate); 
             for (int i = 0; i < numToAllocate; i++)
             {
-                result.Modify(i, AllocateOneQubit());
+                result.Modify(i, Allocate(usedOnlyForBorrowing: false));
                 if (result[i] == null)
                 {
                     for (int k = 0; k < i; k++)
                     {
-                        Release(result[k]);
+                        Release(result[k], wasUsedOnlyForBorrowing: false);
                     }
                     throw new NotEnoughQubits(numToAllocate, GetFreeQubitsCount());
                 }
@@ -435,47 +449,45 @@ namespace Microsoft.Quantum.Simulation.Common
 
         #region Release
 
-        protected virtual void ReleaseOneQubit(Qubit qubit, bool usedOnlyForBorrowing = false)
+        protected virtual void Release(Qubit qubit, bool wasUsedOnlyForBorrowing)
         {
             if (qubits[qubit.Id] == Disabled)
             {
                 // Nothing to do. It will stay disabled.
-                // Alternatively, we could mark is as None here.
+                return;
             }
+
+            if (qubits[qubit.Id] != (wasUsedOnlyForBorrowing ? AllocatedForBorrowing : Allocated))
+            {
+                throw new ArgumentException("Attempt to free qubit that has not been allocated.");
+            }
+
+            if (EncourageReuse) { 
+                qubits[qubit.Id] = free;
+                free = qubit.Id;
+            } 
             else
             {
-                long Occupied = (usedOnlyForBorrowing ? AllocatedForBorrowing : Allocated);
-                if (qubits[qubit.Id] != Occupied)
+                // If we are allowed to extend capacity we will never reuse this qubit, 
+                // otherwise we need to add it to the free qubits list.
+                if (!MayExtendCapacity)
                 {
-                    throw new ArgumentException("Attempt to free qubit that has not been allocated.");
-                }
-                if (EncourageReuse) { 
-                    qubits[qubit.Id] = free;
-                    free = qubit.Id;
-                } 
-                else
-                {
-                    // If we are allowed to extend capacity we will never reuse this qubit, 
-                    // otherwise we need to add it to the free qubits list.
-                    if (!MayExtendCapacity)
+                    if (qubits[freeTail] != None)
                     {
-                        if (qubits[freeTail] != None)
-                        {
-                            // There were no free qubits at all
-                            free = qubit.Id;
-                        }
-                        else
-                        {
-                            qubits[freeTail] = qubit.Id;
-                        }
+                        // There were no free qubits at all
+                        free = qubit.Id;
                     }
-                    qubits[qubit.Id] = None;
-                    freeTail = qubit.Id;
+                    else
+                    {
+                        qubits[freeTail] = qubit.Id;
+                    }
                 }
-
-                NumAllocatedQubits--;
-                Debug.Assert(NumAllocatedQubits >= 0);
+                qubits[qubit.Id] = None;
+                freeTail = qubit.Id;
             }
+
+            NumAllocatedQubits--;
+            Debug.Assert(NumAllocatedQubits >= 0);
 
             if (!DisableBorrowing)
             {
@@ -489,7 +501,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public void Release(Qubit qubit)
         {
-            ReleaseOneQubit(qubit);
+            Release(qubit, wasUsedOnlyForBorrowing: false);
         }
 
         /// <summary>
@@ -504,7 +516,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
             for (long i = qubitsToRelease.Length-1; i>=0; i--)
             { // Going from the end is more efficient in case we are tracking scope.
-                this.ReleaseOneQubit(qubitsToRelease[i]);
+                this.Release(qubitsToRelease[i], wasUsedOnlyForBorrowing: false);
             }
         }
 
@@ -512,75 +524,82 @@ namespace Microsoft.Quantum.Simulation.Common
 
         #region Borrow
 
-        protected virtual Qubit BorrowOneQubit(long id)
+        /// <summary>
+        /// Returns a qubit that is free, not disabled, and not listed as in use, whose id is in [minId, maxId).
+        /// </summary>
+        /// <param name="qubitsInUseSortedById">Contains the qubits that cannot be borrowed, where the qubits with the lowest ids are queued first.</param>
+        /// <param name="minId">Only qubits whose id is larger or equal to minId will be considered for borrowing. Set to 0 if unspecified.</param>
+        /// <param name="maxId">Only qubits whose id is smaller than maxId will be considered for borrowing. Set to NumQubits if unspecified.</param>
+        /// <returns></returns>
+        protected virtual Qubit Borrow(Stack<Qubit> qubitsInUseSortedById, long minId = 0, long maxId = -1)
         {
-            if (IsAllocatedForBorrowing(id))
-            {
-                qubits[id]++;
-            }
-
-            Qubit ret = CreateQubitObject(id);
-            if (!DisableBorrowing)
-            {
-                curFrame.Locals.Add(ret);
-            }
-            return ret;
-        }
-
-        internal long TryBorrow(QArray<Qubit> borrowed, IEnumerable<Qubit> excludedQubitsSortedById)
-        {
-            long curQubit = 0;
-            long curBorrowed = 0;
-            long numBorrowed = System.Math.Min(NumAllocatedQubits - excludedQubitsSortedById.Count(), borrowed.Length);
-
-            IEnumerator<Qubit> enumer = excludedQubitsSortedById.GetEnumerator();
-            bool exclusionsPresent = enumer.MoveNext();
-
-            while (curBorrowed < numBorrowed)
+            maxId = maxId < 0 ? NumQubits : maxId;
+            for (long curQubit = System.Math.Max(0, minId); curQubit < maxId; curQubit++)
             {
                 while (IsFree(curQubit) || IsDisabled(curQubit))
                 {
                     curQubit++;
-                    Debug.Assert(curQubit < NumQubits);
                 }
-                Debug.Assert((!exclusionsPresent) || (enumer.Current.Id >= curQubit));
-                if ((!exclusionsPresent) || (enumer.Current.Id != curQubit))
+                bool gotNextInUse = qubitsInUseSortedById.TryPeek(out Qubit nextInUse);
+                if (gotNextInUse && nextInUse.Id == curQubit)
                 {
-                    borrowed.Modify(curBorrowed, BorrowOneQubit(curQubit));
-                    curBorrowed++;
+                    qubitsInUseSortedById.Pop();
+                    continue;
                 }
-                else
+
+                if (IsAllocatedForBorrowing(curQubit))
                 {
-                    exclusionsPresent = enumer.MoveNext();
+                    qubits[curQubit]++;
                 }
-                curQubit++;
-                Debug.Assert(curQubit < NumQubits);
+
+                Qubit ret = CreateQubitObject(curQubit);
+                if (!DisableBorrowing)
+                {
+                    curFrame.Locals.Add(ret);
+                }
+                return ret;
+            }
+            return null;
+        }
+
+        // internal for testing purposes
+        internal IQArray<Qubit> Borrow(long numToBorrow, IEnumerable<Qubit> qubitsInUse)
+        {
+            var inUse = new Stack<Qubit>(qubitsInUse.Distinct().OrderByDescending(q => q.Id));
+            var borrowed = QArray<Qubit>.Create(numToBorrow);
+            long numBorrowed = System.Math.Min(NumAllocatedQubits - inUse.Count, numToBorrow);
+
+            long lastBorrowedId = -1;
+            for (long curBorrowed = 0; curBorrowed < numBorrowed; ++curBorrowed)
+            {
+                borrowed.Modify(curBorrowed, Borrow(inUse, minId: lastBorrowedId + 1));
+                lastBorrowedId = borrowed[curBorrowed].Id;
             }
 
-            if (numBorrowed < borrowed.Length)
+            if (numBorrowed < numToBorrow)
             { // Not enough qubits to borrow. Allocate what was not borrowed.
-                for (long i = numBorrowed; i < borrowed.Length; i++)
+                for (long i = numBorrowed; i < numToBorrow; i++)
                 {
-                    borrowed.Modify(i, AllocateOneQubit(usedOnlyForBorrowing: true));
+                    borrowed.Modify(i, Allocate(usedOnlyForBorrowing: true));
                     if (borrowed[(int)i] == null)
                     {
                         for (long k = numBorrowed; k < i; k++)
                         {
-                            ReleaseOneQubit(borrowed[(int)k], usedOnlyForBorrowing: true);
+                            Release(borrowed[(int)k], wasUsedOnlyForBorrowing: true);
                         }
-                        throw new NotEnoughQubits(borrowed.Length, numBorrowed + GetFreeQubitsCount());
+                        throw new NotEnoughQubits(numToBorrow, numBorrowed + GetFreeQubitsCount());
                     }
                 }
             }
 
-            return numBorrowed;
+            return borrowed;
         }
 
         /// <summary>
         /// Borrows a number of qubits. Chooses them from among already allocated ones.
         /// If there are not enough qubits to borrow, allocates new ones.
         /// </summary>
-        public virtual IQArray<Qubit> Borrow(long numToBorrow) 
+        public IQArray<Qubit> Borrow(long numToBorrow) 
         {
             if (numToBorrow < 0)
             {
@@ -596,57 +615,23 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Allocate(numToBorrow);
             }
 
-            QArray<Qubit> result = QArray<Qubit>.Create(numToBorrow); 
-            _ = TryBorrow(result, ConstructExcludedQubitsArray(curFrame));
-            return result;
+            return Borrow(numToBorrow, QubitsInUse(curFrame));
         }
 
         public Qubit Borrow()
         {
-            return this.Borrow(1)[0];
+            if (DisableBorrowing)
+            {
+                return Allocate();
+            }
+
+            var inUse = new Stack<Qubit>(QubitsInUse(curFrame).Distinct().OrderByDescending(q => q.Id));
+            return NumAllocatedQubits == inUse.Count ? Allocate() : (Borrow(inUse) ?? Allocate());
         }
 
         #endregion
 
-        protected virtual void ReturnOneQubit(Qubit qubit)
-        {
-            if (!DisableBorrowing)
-            {
-                bool success = curFrame.Locals.Remove(qubit); // Could be more efficient here going from the end manually.
-                Debug.Assert(success, "Returning qubit that is not a local variable in scope.");
-            }
-        }
-
-        /// <summary>
-        /// Returns true if a qubit has been allocated just for borrowing, has been borrowed exactly once,
-        /// and thus will be released after it is returned.
-        /// </summary>
-        public virtual bool ToBeReleasedAfterReturn(Qubit qubit)
-        {
-            return IsAllocatedForBorrowing(qubit.Id) && qubits[qubit.Id] == AllocatedForBorrowing;
-        }
-
-        /// <summary>
-        /// Returns a count of input qubits that have been allocated just for borrowing, borrowed exactly once,
-        /// and thus will be released after they are returned.
-        /// </summary>
-        public virtual long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn)
-        {
-            if (qubitsToReturn == null || qubitsToReturn.Length == 0)
-            {
-                return 0;
-            }
-
-            long count = 0;
-            foreach (Qubit qubit in qubitsToReturn)
-            {
-                if (this.ToBeReleasedAfterReturn(qubit)) 
-                { 
-                    count++; 
-                }
-            }
-            return count;
-        }
+        #region Return
 
         /// <summary>
         /// Returns a given borrowed qubit.
@@ -656,7 +641,7 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             if (DisableBorrowing)
             {
-                this.ReleaseOneQubit(qubit);
+                this.Release(qubit, wasUsedOnlyForBorrowing: false);
             }
             else
             {
@@ -675,11 +660,12 @@ namespace Microsoft.Quantum.Simulation.Common
 
                 if (needsToBeReleased)
                 {
-                    this.ReleaseOneQubit(qubit, usedOnlyForBorrowing: true);
+                    this.Release(qubit, wasUsedOnlyForBorrowing: true);
                 }
                 else
                 {
-                    this.ReturnOneQubit(qubit);
+                    bool success = curFrame.Locals.Remove(qubit); // Could be more efficient here going from the end manually.
+                    Debug.Assert(success, "Returning qubit that is not a local variable in scope.");
                 }
             }
         }
@@ -702,4 +688,5 @@ namespace Microsoft.Quantum.Simulation.Common
         }
     }
 
+    #endregion
 }
