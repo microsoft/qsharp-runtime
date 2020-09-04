@@ -17,13 +17,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<IQArray<Qubit>, QVoid> Body => (qubits) =>
+            public override Func<IQArray<Qubit>, QVoid> __Body__ => (qubits) =>
             {
                 Simulator.CheckQubits(qubits);
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, IQArray<Qubit>), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, IQArray<Qubit>), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, qubits) = args;
                 Simulator.CheckQubits(QArray<Qubit>.Add(ctrls, qubits));
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
             }
 
-            public override Func<double, QVoid> Body => (angle) =>
+            public override Func<double, QVoid> __Body__ => (angle) =>
             {
                 CheckAngle(angle);
                 return QVoid.Instance;

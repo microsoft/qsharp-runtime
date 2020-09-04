@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.Quantum.Sdk/0.12.20082705-beta">
+  <!-- Add project references to Simulator and other required packages: -->
+  <Import Project="..\..\src\Simulation\Common\Simulators.Dev.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages> <!-- otherwise the standard library is included by the Sdk -->
+  </PropertyGroup>
+
+</Project>

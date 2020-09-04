@@ -8,6 +8,7 @@ open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
 open System.Reflection
+open System.Text.RegularExpressions
 
 open Microsoft.CodeAnalysis
 open Microsoft.CodeAnalysis.CSharp.Syntax
@@ -51,11 +52,22 @@ module SimulationCode =
         ("Step",   { Namespace = "Microsoft.Quantum.Core" |> NonNullable<String>.New; Name = "RangeStep" |> NonNullable<String>.New } )
     ]
 
+    let internal userDefinedName (parent : QsQualifiedName option) name =
+        let isReserved =
+            match name with
+            | "Data"
+            | "Deconstruct"
+            | "Info"
+            | "Run" -> true
+            | _ ->
+                Regex.IsMatch (name, @"^Item\d+$") ||
+                parent |> Option.exists (fun current' -> name = current'.Name.Value)
+        if isReserved then name + "__" else name
+
     let isCurrentOp context n = match context.current with | None -> false | Some name ->  name = n
 
     let prependNamespaceString (name : QsQualifiedName) =
-        let pieces = name.Namespace.Value.Split([|'.'|]) |> String.Concat
-        pieces + name.Name.Value
+        name.Namespace.Value.Replace (".", "__") + "__" + name.Name.Value
 
     let needsFullPath context (op:QsQualifiedName) =
         let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
@@ -67,6 +79,11 @@ module SimulationCode =
             true
         else
             not (autoNamespaces |> List.contains op.Namespace.Value)
+
+    let getOpName context n =
+        if isCurrentOp context n then Directives.Self
+        elif needsFullPath context n then prependNamespaceString n
+        else n.Name.Value + "__"
 
     let getTypeParameters types =
         let findAll (t: ResolvedType) = t.ExtractAll (fun item -> item.Resolution |> function
@@ -88,7 +105,8 @@ module SimulationCode =
     let hasTypeParameters types = not (getTypeParameters types).IsEmpty
 
     let justTheName context (n: QsQualifiedName) =
-        if needsFullPath context n then n.Namespace.Value + "." + n.Name.Value else n.Name.Value
+        let name = userDefinedName None n.Name.Value
+        if needsFullPath context n then n.Namespace.Value + "." + name else name
 
     let isGeneric context (n: QsQualifiedName) =
         if context.allCallables.ContainsKey n then
@@ -160,7 +178,7 @@ module SimulationCode =
 
     and roslynCallableTypeName context (name:QsQualifiedName) =
         if not (context.allCallables.ContainsKey name) then
-            name.Name.Value
+            userDefinedName None name.Name.Value
         else
             let signature = context.allCallables.[name].Signature
             let tIn = signature.ArgumentType
@@ -274,7 +292,7 @@ module SimulationCode =
         override this.OnStatement (node:QsStatement) =
             match node.Location with
             | Value loc ->
-                let (current, _) = loc.Offset
+                let current = loc.Offset.Line
                 parent.LineNumber <- parent.StartLine |> Option.map (fun start -> start + current + 1) // The Q# compiler reports 0-based line numbers.
             | Null ->
                 parent.LineNumber <- None // auto-generated statement; the line number will be set to the specialization declaration
@@ -393,9 +411,16 @@ module SimulationCode =
 
         and buildNamedItem ex acc =
             match acc with
-            | LocalVariable name -> (buildExpression ex) <|.|> (``ident`` name.Value)
-// TODO: Diagnostics
-            | _ -> failwith "Invalid identifier for named item"
+            | LocalVariable name ->
+                let name' =
+                    match ex.ResolvedType.Resolution with
+                    | UserDefinedType udt ->
+                        name.Value |> userDefinedName (Some { Namespace = udt.Namespace; Name = udt.Name })
+                    | _ -> name.Value
+                buildExpression ex <|.|> ident name'
+            | _ ->
+                // TODO: Diagnostics
+                failwith "Invalid identifier for named item"
 
         and buildAddExpr (exType : ResolvedType) lhs rhs =
             match exType.Resolution |> QArrayType with
@@ -410,16 +435,10 @@ module SimulationCode =
 
         and buildId id : ExpressionSyntax =
             match id with
-            | LocalVariable n-> n.Value |> ``ident`` :> ExpressionSyntax
-            | GlobalCallable n ->
-                if isCurrentOp context n then
-                    Directives.Self |> ``ident`` :> ExpressionSyntax
-                elif needsFullPath context n then
-                    prependNamespaceString n |> ``ident`` :> ExpressionSyntax
-                else
-                    n.Name.Value |> ``ident`` :> ExpressionSyntax
-// TODO: Diagnostics
+            | LocalVariable n -> n.Value |> ident :> ExpressionSyntax
+            | GlobalCallable n -> getOpName context n |> ident :> ExpressionSyntax
             | InvalidIdentifier ->
+                // TODO: Diagnostics
                 failwith "Received InvalidIdentifier"
 
         and buildCopyAndUpdateExpression (lhsEx : TypedExpression, accEx : TypedExpression, rhsEx) =
@@ -761,8 +780,8 @@ module SimulationCode =
         override this.OnQubitScope (using:QsQubitScope) =
             let (alloc, release) =
                 match using.Kind with
-                | Allocate -> ("Allocate", "Release")
-                | Borrow   -> ("Borrow", "Return")
+                | Allocate -> "Allocate__", "Release__"
+                | Borrow   -> "Borrow__", "Return__"
             let rec removeDiscarded sym =
                 match sym with
                 | VariableName _         -> sym
@@ -839,7 +858,7 @@ module SimulationCode =
         override this.OnSpecializationDeclaration (sp : QsSpecialization) =
             count <- 0
             match sp.Location with
-            | Value location -> parent.StartLine <- Some (location.Offset |> fst)
+            | Value location -> parent.StartLine <- Some location.Offset.Line
             | Null -> parent.StartLine <- None // TODO: we may need to have the means to know which original declaration the code came from
             base.OnSpecializationDeclaration sp
 
@@ -848,15 +867,13 @@ module SimulationCode =
         seeker.Namespaces.OnCallableDeclaration od |> ignore
         seeker.SharedState |> Seq.toList
 
-    let getOpName context n =
-        if needsFullPath context n then prependNamespaceString n
-        else if isCurrentOp context n then Directives.Self
-        else n.Name.Value
-
     let getTypeOfOp context (n: QsQualifiedName) =
         let name =
             let sameNamespace = match context.current with | None -> false | Some o -> o.Namespace = n.Namespace
-            let opName = if sameNamespace then n.Name.Value else "global::" + n.Namespace.Value + "." + n.Name.Value
+            let opName =
+                if sameNamespace
+                then userDefinedName None n.Name.Value
+                else "global::" + n.Namespace.Value + "." + userDefinedName None n.Name.Value
             if isGeneric context n then
                 let signature = context.allCallables.[n].Signature
                 let count = signature.TypeParameters.Length
@@ -877,12 +894,12 @@ module SimulationCode =
                         "this" |> ``ident`` :> ExpressionSyntax
                     else
                         let signature = roslynCallableTypeName context n
-                        let factoryGet = (``ident`` "this" <|.|> ``ident`` "Factory" <|.|> (generic "Get" ``<<`` [ signature ] ``>>``))
+                        let factoryGet = (``ident`` "this" <|.|> ``ident`` "__Factory__" <|.|> (generic "Get" ``<<`` [ signature ] ``>>``))
                         (``invoke`` factoryGet ``(`` [ (getTypeOfOp context n) ] ``)``)
                 statement (lhs <-- rhs)
             operations
             |> List.map buildOne
-        ``method`` "void"  "Init" ``<<`` [] ``>>``
+        ``method`` "void"  "__Init__" ``<<`` [] ``>>``
             ``(`` parameters ``)``
             [  ``public``; ``override``  ]
             ``{`` body ``}``
@@ -979,10 +996,10 @@ module SimulationCode =
         | Generated SelfInverse ->
             let adjointedBodyName =
                 match sp.Kind with
-                | QsAdjoint           -> "Body"
-                | QsControlledAdjoint -> "ControlledBody"
+                | QsAdjoint           -> "__Body__"
+                | QsControlledAdjoint -> "__ControlledBody__"
 //TODO: diagnostics.
-                | _ -> "Body"
+                | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
         | _ ->
             None
@@ -1003,12 +1020,12 @@ module SimulationCode =
             | Null -> []
             | Value location -> [
                 // since the line numbers throughout the generated code are 1-based, let's also choose them 1-based here
-                let startLine = fst location.Offset + 1
+                let startLine = location.Offset.Line + 1
                 let endLine =
                     match context.declarationPositions.TryGetValue sp.SourceFile with
                     | true, startPositions ->
                         let index = startPositions.IndexOf location.Offset
-                        if index + 1 >= startPositions.Count then -1 else fst startPositions.[index + 1] + 1
+                        if index + 1 >= startPositions.Count then -1 else startPositions.[index + 1].Line + 1
 //TODO: diagnostics.
                     | false, _ -> startLine
                 ``attribute`` None (``ident`` "SourceLocation") [
@@ -1021,7 +1038,7 @@ module SimulationCode =
 
         match body with
         | Some body ->
-            let bodyName = if bodyName = "Body" then bodyName else bodyName + "Body"
+            let bodyName = if bodyName = "Body" then "__Body__" else "__" + bodyName + "Body__"
             let impl =
                 ``property-arrow_get`` propertyType bodyName [``public``; ``override``]
                     ``get``
@@ -1273,7 +1290,7 @@ module SimulationCode =
         let buildMethod t body =
             let baseType = (roslynTypeName context t)
             let args     = [ (``param`` "data" ``of`` (``type`` (roslynTypeName context t)) ) ]
-            ``arrow_method`` "IApplyData" (sprintf "__data%s" name) ``<<`` [] ``>>``
+            ``arrow_method`` "IApplyData" (sprintf "__Data%s__" name) ``<<`` [] ``>>``
                 ``(`` args ``)``
                 [``public``; ``override``]
                 ( Some ( ``=>`` body) )
@@ -1295,8 +1312,8 @@ module SimulationCode =
         let name = function | ValidName n -> sprintf "__%s__" n.Value | InvalidName -> "__"
         signature.TypeParameters |> Seq.map name  |> Seq.sort |> Seq.toList
 
-    let findClassName context (op: QsCallable)  =
-        let name = op.FullName.Name.Value
+    let findClassName (op: QsCallable)  =
+        let name = userDefinedName None op.FullName.Name.Value
         let typeParameters = typeParametersNames op.Signature
         let nonGeneric = if typeParameters.IsEmpty then name else sprintf "%s<%s>" name (String.Join(",", typeParameters))
         (name, nonGeneric)
@@ -1328,7 +1345,7 @@ module SimulationCode =
         let properties = buildOutput ()
         let methods =
             match op.Location with
-            | Value location -> [ buildUnitTest targetName opName (fst location.Offset) op.SourceFile.Value ]
+            | Value location -> [ buildUnitTest targetName opName location.Offset.Line op.SourceFile.Value ]
 // TODO: diagnostics
             | Null -> failwith "missing location for unit test"
 
@@ -1346,7 +1363,7 @@ module SimulationCode =
     // Builds the .NET class for the given operation.
     let buildOperationClass (globalContext:CodegenContext) (op: QsCallable) =
         let context = globalContext.setCallable op
-        let (name, nonGenericName) = findClassName context op
+        let (name, nonGenericName) = findClassName op
         let opNames = operationDependencies op
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
@@ -1424,7 +1441,7 @@ module SimulationCode =
 
     let buildUdtClass (globalContext:CodegenContext) (udt: QsCustomType) =
         let context = globalContext.setUdt udt
-        let name = udt.FullName.Name.Value
+        let name = userDefinedName None udt.FullName.Name.Value
         let qsharpType = udt.Type
         let buildEmtpyConstructor =
             let baseTupleType =
@@ -1452,8 +1469,11 @@ module SimulationCode =
             :> MemberDeclarationSyntax
         let buildNamedItemFields =
             let produceProperty (decl : LocalVariableDeclaration<NonNullable<_>>) valueExpr =
-                ``property-arrow_get`` (roslynTypeName context decl.Type) decl.VariableName.Value [ ``public`` ]
-                    ``get`` (``=>`` valueExpr) :> MemberDeclarationSyntax
+                ``property-arrow_get``
+                    (roslynTypeName context decl.Type)
+                    (userDefinedName context.current decl.VariableName.Value)
+                    [ ``public`` ] ``get`` (``=>`` valueExpr)
+                :> MemberDeclarationSyntax
             let rec buildProps current = function
                 | QsTuple items -> items |> Seq.mapi (fun i x -> buildProps (current <|.|> ``ident`` ("Item" + (i+1).ToString())) x) |> Seq.collect id
                 | QsTupleItem (Anonymous _) -> Seq.empty

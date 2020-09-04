@@ -13,7 +13,7 @@ MICROSOFT_QUANTUM_DECL unsigned init()
 {
   return Microsoft::Quantum::Simulator::create();
 }
-  
+
 MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned id)
   {
     Microsoft::Quantum::Simulator::destroy(id);

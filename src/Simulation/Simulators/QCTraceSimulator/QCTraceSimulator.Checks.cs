@@ -15,13 +15,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             {
             }
 
-            public override Func<IQArray<Qubit>, QVoid> Body => (qubits) =>
+            public override Func<IQArray<Qubit>, QVoid> __Body__ => (qubits) =>
             {
                 // Noop
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, IQArray<Qubit>), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, IQArray<Qubit>), QVoid> __ControlledBody__ => (args) =>
             {
                 // Noop
                 return QVoid.Instance;
@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             {
             }
 
-            public override Func<double, QVoid> Body => (angle) =>
+            public override Func<double, QVoid> __Body__ => (angle) =>
             {
                 // Noop
                 return QVoid.Instance;

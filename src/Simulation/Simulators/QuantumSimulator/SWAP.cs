@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(Qubit, Qubit), QVoid> Body => (args) =>
+            public override Func<(Qubit, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (qubit1, qubit2) = args;
                 var ctrls = new QArray<Qubit>(qubit1);
@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (qubit1, qubit2)) = args;
 

@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<Qubit, Result> Body => (q) =>
+            public override Func<Qubit, Result> __Body__ => (q) =>
             {
                 return Simulator.QuantumProcessor.M(q);
             };

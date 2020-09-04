@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Bitwise
         public class Native : Xor
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<(long, long), long> Body => (arg) => (arg.Item1 ^ arg.Item2);
+            public override Func<(long, long), long> __Body__ => (arg) => (arg.Item1 ^ arg.Item2);
         }
     }
 
@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Bitwise
         public class Native : And
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<(long, long), long> Body => (arg) => (arg.Item1 & arg.Item2);
+            public override Func<(long, long), long> __Body__ => (arg) => (arg.Item1 & arg.Item2);
         }
     }
 
@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Bitwise
         public class Native : Or
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<(long, long), long> Body => (arg) => (arg.Item1 | arg.Item2);
+            public override Func<(long, long), long> __Body__ => (arg) => (arg.Item1 | arg.Item2);
         }
     }
 
@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Bitwise
         public class Native : Not
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<long, long> Body => (arg) => (~arg);
+            public override Func<long, long> __Body__ => (arg) => (~arg);
         }
     }
 
@@ -57,7 +57,7 @@ namespace Microsoft.Quantum.Bitwise
             }
 
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<long, long> Body => ParityFunc;
+            public override Func<long, long> __Body__ => ParityFunc;
         }
     }
 
@@ -81,7 +81,7 @@ namespace Microsoft.Quantum.Bitwise
             }
 
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<IQArray<Pauli>, long> Body => XBitsFunc;
+            public override Func<IQArray<Pauli>, long> __Body__ => XBitsFunc;
         }
     }
 
@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Bitwise
             }
 
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<IQArray<Pauli>, long> Body => ZBitsFunc;
+            public override Func<IQArray<Pauli>, long> __Body__ => ZBitsFunc;
         }
     }
 }
