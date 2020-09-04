@@ -17,6 +17,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledX.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZ.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledH.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRx.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRz.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledS.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledT.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledY.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledZ.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />

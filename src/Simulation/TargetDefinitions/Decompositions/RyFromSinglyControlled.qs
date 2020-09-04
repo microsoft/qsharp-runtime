@@ -34,6 +34,8 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledRy(theta, qubit);
         }
         controlled (ctls, ...) {
+            CheckQubitUniqueness(ctls + [qubit]);
+            RotationAngleValidation(theta);
             if (Length(ctls) == 0) {
                 ApplyUncontrolledRy(theta, qubit);
             }
@@ -50,7 +52,7 @@ namespace Microsoft.Quantum.Intrinsic {
             }
         }
         adjoint (...) {
-            Rz(-theta, qubit);
+            Ry(-theta, qubit);
         }
     }
 }

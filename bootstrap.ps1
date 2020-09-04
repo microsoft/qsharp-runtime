@@ -11,6 +11,10 @@ Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Core")
     .\FindNuspecReferences.ps1
 Pop-Location
 
+Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type1")
+    .\FindNuspecReferences.ps1
+Pop-Location
+
 Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type2")
     .\FindNuspecReferences.ps1
 Pop-Location

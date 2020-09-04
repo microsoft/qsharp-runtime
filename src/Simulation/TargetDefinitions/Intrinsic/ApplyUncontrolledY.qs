@@ -4,9 +4,23 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
-    /// Helper for native Uncontrolled Y.
+    /// # Summary
+    /// Applies the Pauli $Y$ gate. Note that the Controlled functor is not supported.
+    ///
+    /// # Description
+    /// \begin{align}
+    ///     \sigma_y \mathrel{:=}
+    ///     \begin{bmatrix}
+    ///         0 & -i \\\\
+    ///         i & 0
+    ///     \end{bmatrix}.
+    /// \end{align}
+    ///
+    /// # Input
+    /// ## qubit
+    /// Qubit to which the gate should be applied.
     @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledY")
-    internal operation ApplyUncontrolledY (qubit : Qubit) : Unit is Adj {
+    operation ApplyUncontrolledY (qubit : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
     }

@@ -34,6 +34,8 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledRx(theta, qubit);
         }
         controlled (ctls, ...) {
+            CheckQubitUniqueness(ctls + [qubit]);
+            RotationAngleValidation(theta);
             if (Length(ctls) == 0) {
                 ApplyUncontrolledRx(theta, qubit);
             }

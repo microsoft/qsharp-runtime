@@ -8,11 +8,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Checks that all qubits operated on are unique.
     ///
     /// # Description
-    /// \begin{align}
-    ///     e^{i \theta [P_0 \otimes P_1 \cdots P_{N-1}]},
-    /// \end{align}
-    /// where $P_i$ is the $i$th element of `paulis`, and where
-    /// $N = $`Length(paulis)`.
+    /// Will fail if any qubits are repeated or null.
     ///
     /// # Input
     /// ## qubits
@@ -29,7 +25,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Validates that the given angle is a Double that can be used for rotation.
     ///
     /// # Description
-    /// Validates that the value of theDouble representing a rotation angle is neither infinite nor NaN.
+    /// Validates that the value of the Double representing a rotation angle is neither infinite nor NaN.
     ///
     /// # Input
     /// ## angle
