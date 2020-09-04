@@ -37,8 +37,8 @@ namespace Microsoft.Quantum.Intrinsic {
 
             if (Length(paulis) != 0) {
                 let indices = IndicesOfNonIdentity(paulis);
-                let newPaulis = ArrayFromIndiciesP(paulis, indices);
-                let newQubits = ArrayFromIndiciesQ(qubits, indices);
+                let newPaulis = Subarray(indices, paulis);
+                let newQubits = Subarray(indices, qubits);
 
                 if (Length(indices) != 0) {
                     let (kModPositive, n) = ReducedDyadicFractionPeriodic(numerator, power); // k is odd, in the range [1,2*2^n-1] or (k,n) are both 0

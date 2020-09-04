@@ -41,12 +41,15 @@ namespace Microsoft.Quantum.Intrinsic {
     /// operation will fail.
     @EnableTestingViaName("Test.TargetDefinitions.Measure")
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
+        CheckQubitUniqueness(qubits);
+        if (Length(bases) != Length(qubits)) { fail "Arrays 'bases' and 'qubits' must be of the same length."; }
         if (Length(bases) == 1) {
+            // Because the qubit cannot be reused after measurement, there is no
+            // need to unprepare the Pauli mapping.
             MapPauli(qubits[0], PauliZ, bases[0]);
             return M(qubits[0]);
         }
         else {
-            CheckQubitUniqueness(qubits);
             using (q = Qubit()) {
                 within {
                     H(q);

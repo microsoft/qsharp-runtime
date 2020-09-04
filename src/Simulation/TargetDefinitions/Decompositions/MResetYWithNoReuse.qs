@@ -23,6 +23,8 @@ namespace Microsoft.Quantum.Measurement {
     /// The result of measuring `target` in the Pauli $Y$ basis.
     @EnableTestingViaName("Test.TargetDefinitions.MResetY")
     operation MResetY (target : Qubit) : Result {
+        // Because the qubit cannot be reused after measurement, no actual
+        // reset is required.
         return Measure([PauliY], [target]);
     }
 }

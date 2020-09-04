@@ -23,6 +23,8 @@ namespace Microsoft.Quantum.Measurement {
     /// The result of measuring `target` in the Pauli $Z$ basis.
     @EnableTestingViaName("Test.TargetDefinitions.MResetZ")
     operation MResetZ (target : Qubit) : Result {
+        // Because the qubit cannot be reused after measurement, no actual
+        // reset is required.
         return M(target);
     }
 }

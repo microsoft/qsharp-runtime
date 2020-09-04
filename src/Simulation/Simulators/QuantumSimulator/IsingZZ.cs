@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 CheckAngle(angle);
                 Simulator.CheckQubits(targets);
 
-                Exp(Simulator.Id, (uint)targets.Length, paulis, angle, targets.GetIds());
+                Exp(Simulator.Id, (uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
 
                 return QVoid.Instance;
             };
@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     CheckAngle(angle);
                     Simulator.CheckQubits(QArray<Qubit>.Add(ctrls, targets));
 
-                    MCExp(Simulator.Id, (uint)targets.Length, paulis, angle, (uint)ctrls.Length, ctrls.GetIds(), targets.GetIds());
+                    MCExp(Simulator.Id, (uint)targets.Length, paulis, angle * 2.0, (uint)ctrls.Length, ctrls.GetIds(), targets.GetIds());
                 }
 
                 return QVoid.Instance;
