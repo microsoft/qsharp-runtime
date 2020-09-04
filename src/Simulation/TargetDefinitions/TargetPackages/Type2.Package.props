@@ -26,8 +26,9 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromIsing.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromIsing.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetXWithNoReuse.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetYWithNoReuse.qs" />
