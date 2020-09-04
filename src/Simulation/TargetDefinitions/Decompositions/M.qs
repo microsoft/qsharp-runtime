@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Performs a measurement of a single qubit in the
     /// Pauli $Z$ basis.
@@ -27,6 +29,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Measure([PauliZ], [qubit]);
     /// ```
+    @EnableTestingViaName("Test.TargetDefinitions.M")
     operation M (qubit : Qubit) : Result {
         return Measure([PauliZ], [qubit]);
     }

@@ -3,11 +3,7 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
-
-    internal operation BasisChangeZtoY(target : Qubit) : Unit is Adj + Ctl {
-        H(target);
-        S(target);
-    }
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Measures a single qubit in the Y basis,
@@ -25,11 +21,13 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $Y$ basis.
+    @EnableTestingViaName("Test.TargetDefinitions.MResetY")
     operation MResetY (target : Qubit) : Result {
         let result = Measure([PauliY], [target]);
 
         // We must return the qubit to the Z basis as well.
-        Adjoint BasisChangeZtoY(target);
+        S(target);
+        H(target);
 
         if (result == One) {
             // Recall that the +1 eigenspace of a measurement operator corresponds to

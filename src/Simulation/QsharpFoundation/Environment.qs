@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Environment {
     /// # See Also
     /// - GetQubitsAvailableToBorrow
     operation GetQubitsAvailableToUse () : Int {
-        return -1;
+        body intrinsic;
     }
 
     /// # Summary
@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Environment {
     /// # See Also
     /// - GetQubitsAvailableToUse
     operation GetQubitsAvailableToBorrow () : Int {
-        return -1;
+        body intrinsic;
     }
 }
 

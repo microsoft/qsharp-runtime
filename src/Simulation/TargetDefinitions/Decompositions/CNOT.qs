@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Applies the controlled-NOT (CNOT) gate to a pair of qubits.
     ///
@@ -29,6 +31,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled X([control], target);
     /// ```
+    @EnableTestingViaName("Test.TargetDefinitions.CNOT")
     operation CNOT (control : Qubit, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Controlled X([control], target);

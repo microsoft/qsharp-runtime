@@ -15,6 +15,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Simulators\QCTraceSimulator\*.cs" />
+    <Compile Include="..\Simulators\QuantumSimulator\*.cs" />
+    <QSharpcompile Include="..\Simulators\QCTraceSimulator\Circuits\*.qs" />
+    <Compile Include="..\Simulators\QuantumProcessor\*.cs" />
+    <Compile Include="..\Simulators\ResourcesEstimator\*.cs" />
+    <Compile Include="..\Simulators\ToffoliSimulator\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />

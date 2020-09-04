@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Diagnostics;
+
     /// # Summary
     /// Given an array of qubits, measure them and ensure they are in the |0⟩ state
     /// such that they can be safely released.
@@ -9,6 +11,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubits
     /// An array of qubits whose states are to be reset to $\ket{0}$.
+    @EnableTestingViaName("Test.TargetDefinitions.ResetAll")
     operation ResetAll (qubits : Qubit[]) : Unit {
         for (qubit in qubits) {
             Reset(qubit);

@@ -7,7 +7,7 @@
 # This is problematic because we currently don't want to create a package for every dll.
 #
 # On the other hand, when creating a package using nuget pack, nuget does not
-# identifies PackageReferences defined in the csproj, so all the dependencies
+# identify PackageReferences defined in the csproj, so all the dependencies
 # are not listed and the package doesn't work.
 #
 # We don't want to hardcode the list of dependencies on the .nuspec, as they can
@@ -19,7 +19,7 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
-$target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec"
+$target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.Type2.nuspec"
 
 if (Test-Path $target) { 
     Write-Host "$target exists. Skipping generating new one."
@@ -28,7 +28,7 @@ if (Test-Path $target) {
 
 
 # Start with the nuspec template
-$nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec.template"))
+$nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.Type2.nuspec.template"))
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
 function Add-PackageReferenceIfNew($ref)
@@ -95,9 +95,8 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
     }
 }
 
-# Find all dependencies packaged as part of Microsoft.Quantum.Simulators
-Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
-Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulators.csproj"
+# Find all dependencies packaged as part of Microsoft.Quantum.Simulators.Type2
+Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.Type2.csproj"
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)

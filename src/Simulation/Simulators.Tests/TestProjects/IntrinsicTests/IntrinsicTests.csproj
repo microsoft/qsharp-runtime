@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <ExposeReferencesViaTestNames>true</ExposeReferencesViaTestNames>
     <!-- we will provide our own -->
     <CsharpGeneration>false</CsharpGeneration>
     <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
@@ -11,8 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
     </ItemGroup>
 
   <ItemGroup>

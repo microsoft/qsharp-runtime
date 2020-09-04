@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Measures a single qubit in the X basis,
@@ -20,6 +21,7 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $X$ basis.
+    @EnableTestingViaName("Test.TargetDefinitions.MResetX")
     operation MResetX (target : Qubit) : Result {
         let result = Measure([PauliX], [target]);
 
