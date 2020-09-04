@@ -2,3 +2,11 @@
 build
 /.vs
 /vs2017
+*.csv
+foo*
+*.filters
+*.cmake
+*.vcxproj
+CMakeFiles/
+CMakeCache.txt
+*.so

@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(double, Qubit), QVoid> Body => (args) =>
+            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (angle, target) = args;
                 Simulator.CheckQubit(target, nameof(target));
@@ -34,14 +34,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(double, Qubit), QVoid> AdjointBody => (_args) =>
+            public override Func<(double, Qubit), QVoid> __AdjointBody__ => (_args) =>
             {
                 var (angle, q1) = _args;
 
-                return this.Body.Invoke((-angle, q1));
+                return this.__Body__.Invoke((-angle, q1));
             };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (double, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (angle, target)) = args;
                 Simulator.CheckQubits(ctrls, target);
@@ -50,11 +50,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (double, Qubit)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 var (ctrls, (angle, q1)) = _args;
 
-                return this.ControlledBody.Invoke((ctrls, (-angle, q1)));
+                return this.__ControlledBody__.Invoke((ctrls, (-angle, q1)));
             };
         }
     }

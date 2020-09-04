@@ -55,21 +55,21 @@ namespace Microsoft.Quantum.Simulation.Core
         OperationFunctor ICallable.Variant => OperationFunctor.Body;
 
 
-        public virtual IApplyData __dataIn(I data) => new QTuple<I>(data);
+        public virtual IApplyData __DataIn__(I data) => new QTuple<I>(data);
 
-        public virtual IApplyData __dataOut(O data) => new QTuple<O>(data);
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public abstract Func<I, O> Body { get; }
+        public virtual IApplyData __DataOut__(O data) => new QTuple<O>(data);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<I, QVoid> AdjointBody => throw new NotImplementedException();
+        public abstract Func<I, O> __Body__ { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<(IQArray<Qubit>, I), QVoid> ControlledBody => throw new NotImplementedException();
+        public virtual Func<I, QVoid> __AdjointBody__ => throw new NotImplementedException();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Func<(IQArray<Qubit>, I), QVoid> ControlledAdjointBody => throw new NotImplementedException();
+        public virtual Func<(IQArray<Qubit>, I), QVoid> __ControlledBody__ => throw new NotImplementedException();
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public virtual Func<(IQArray<Qubit>, I), QVoid> __ControlledAdjointBody__ => throw new NotImplementedException();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public AdjointedOperation<I, O> Adjoint => _adjoint.Value;
@@ -92,17 +92,17 @@ namespace Microsoft.Quantum.Simulation.Core
 
             try
             {
-                this.Factory?.StartOperation(this, __dataIn(a));
-                __result__ = this.Body(a);
+                this.__Factory__?.StartOperation(this, __DataIn__(a));
+                __result__ = this.__Body__(a);
             }
             catch (Exception e)
             {
-                this.Factory?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
+                this.__Factory__?.Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e));
                 throw;
             }
             finally
             {
-                this.Factory?.EndOperation(this, __dataOut(__result__));
+                this.__Factory__?.EndOperation(this, __DataOut__(__result__));
             }
 
             return __result__;

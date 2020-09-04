@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.Simulator = m;
             }
 
-            public override Func<(double, Qubit, Qubit), QVoid> Body => (args) =>
+            public override Func<(double, Qubit, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (angle, qubit1, qubit2) = args;
                 var paulis = new Pauli[]{ Pauli.PauliX, Pauli.PauliX };
@@ -38,20 +38,20 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(double, Qubit, Qubit), QVoid> AdjointBody => (args) =>
+            public override Func<(double, Qubit, Qubit), QVoid> __AdjointBody__ => (args) =>
             {
                 var (angle, qubit1, qubit2) = args;
 
-                return this.Body.Invoke((-angle, qubit1, qubit2));
+                return this.__Body__.Invoke((-angle, qubit1, qubit2));
             };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (angle, qubit1, qubit2)) = args;
 
                 if (ctrls == null || ctrls.Length == 0)
                 {
-                    this.Body.Invoke((angle, qubit1, qubit2));
+                    this.__Body__.Invoke((angle, qubit1, qubit2));
                 }
                 else
                 {
@@ -66,11 +66,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> ControlledAdjointBody => (args) =>
+            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledAdjointBody__ => (args) =>
             {
                 var (ctrls, (angle, qubit1, qubit2)) = args;
 
-                return this.ControlledBody.Invoke((ctrls, (-angle, qubit1, qubit2)));
+                return this.__ControlledBody__.Invoke((ctrls, (-angle, qubit1, qubit2)));
             };
         }
     }

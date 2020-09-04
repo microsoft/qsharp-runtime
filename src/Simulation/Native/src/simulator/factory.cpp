@@ -13,15 +13,19 @@ namespace Microsoft
   {
     namespace SimulatorGeneric
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
     namespace SimulatorAVX2
     {
-      MICROSOFT_QUANTUM_DECL_IMPORT Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
+    }
+    namespace SimulatorAVX512
+    {
+      Microsoft::Quantum::Simulator::SimulatorInterface* createSimulator(unsigned);
     }
   }
 }
@@ -35,11 +39,15 @@ namespace Microsoft
       std::shared_mutex _mutex;
       std::vector<std::shared_ptr<SimulatorInterface>> _psis;
 
-      SimulatorInterface* createSimulator(unsigned maxlocal)
-      {
-        if (haveFMA() && haveAVX2())
+     SimulatorInterface* createSimulator(unsigned maxlocal)
+     {
+       if (haveAVX512())
         {
-          return SimulatorAVX2::createSimulator(maxlocal);
+            return SimulatorAVX512::createSimulator(maxlocal);
+        }
+        else if (haveFMA() && haveAVX2())
+        {
+           return SimulatorAVX2::createSimulator(maxlocal);
         }
         else if(haveAVX())
         {
