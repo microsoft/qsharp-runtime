@@ -27,13 +27,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var s in simulators)
             {
-                InitSimulator(s);
+                try
+                { 
+                    InitSimulator(s);
 
-                test(s);
-
-                if (s is IDisposable sim)
+                    test(s);
+                }
+                finally
                 {
-                    sim.Dispose();
+                    if (s is IDisposable sim)
+                    {
+                        sim.Dispose();
+                    }
                 }
             }
         }
