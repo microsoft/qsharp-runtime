@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 ########################################
@@ -45,7 +45,7 @@ function Add-PackageReferenceIfNew($ref)
         $id = [System.IO.Path]::GetFileNameWithoutExtension($id)
     }
 
-    if ($version -eq $null -or $version -eq "") {
+    if ("$version" -eq "") {
         $version = '$version$'
     }
 
