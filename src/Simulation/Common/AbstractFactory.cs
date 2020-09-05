@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -18,8 +15,8 @@ namespace Microsoft.Quantum.Simulation.Common
     /// </summary>
     public abstract class AbstractFactory<T>
     {
-        private Dictionary<Type, Type> opsOverrides = new Dictionary<Type, Type>();
-        private Dictionary<Type, T> opsCache = new Dictionary<Type, T>();
+        protected Dictionary<Type, Type> opsOverrides = new Dictionary<Type, Type>();
+        protected Dictionary<Type, T> opsCache = new Dictionary<Type, T>();
 
         /// <summary>
         /// Register an override for the given operation.
