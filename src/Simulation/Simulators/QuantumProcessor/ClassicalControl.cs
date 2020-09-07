@@ -14,72 +14,41 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             switch (type)
             {
                 case OperationFunctor.Body: op.Apply(QVoid.Instance); break;
-                case OperationFunctor.Adjoint: ((IAdjointable)(op)).Adjoint.Apply(QVoid.Instance); break;
-                case OperationFunctor.Controlled: ((IControllable)(op)).Controlled.Apply((ctrls, QVoid.Instance)); break;
-                case OperationFunctor.ControlledAdjoint: ((IUnitary)(op)).Controlled.Adjoint.Apply((ctrls, QVoid.Instance)); break;
+                case OperationFunctor.Adjoint: ((IAdjointable)op).Adjoint.Apply(QVoid.Instance); break;
+                case OperationFunctor.Controlled: ((IControllable)op).Controlled.Apply((ctrls, QVoid.Instance)); break;
+                case OperationFunctor.ControlledAdjoint: ((IUnitary)op).Controlled.Adjoint.Apply((ctrls, QVoid.Instance)); break;
             }
         }
 
-        private static QVoid ExecuteConditionalStatementInternal(QuantumProcessorDispatcher Simulator,
-                                                    long statement,
-                                                    ICallable onEqualOp,
-                                                    ICallable onNonEqualOp,
-                                                    OperationFunctor type,
-                                                    IQArray<Qubit>? ctrls)
+        private void ExecuteConditionalStatementInternal(long statement, ICallable onEqualOp, ICallable onNonEqualOp, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
-            bool run;
-
-            run = Simulator.QuantumProcessor.RunThenClause(statement);
+            bool run = this.QuantumProcessor.RunThenClause(statement);
             while (run)
             {
                 RunClause(onEqualOp, type, ctrls);
-                run = Simulator.QuantumProcessor.RepeatThenClause(statement);
+                run = this.QuantumProcessor.RepeatThenClause(statement);
             }
 
-            run = Simulator.QuantumProcessor.RunElseClause(statement);
+            run = this.QuantumProcessor.RunElseClause(statement);
             while (run)
             {
                 RunClause(onNonEqualOp, type, ctrls);
-                run = Simulator.QuantumProcessor.RepeatElseClause(statement);
+                run = this.QuantumProcessor.RepeatElseClause(statement);
             }
-
-            Simulator.QuantumProcessor.EndConditionalStatement(statement);
-
-            return QVoid.Instance;
         }
 
-        private static QVoid ExecuteConditionalStatement(QuantumProcessorDispatcher Simulator,
-                                            IQArray<Result> measurementResults,
-                                            IQArray<Result> resultsValues,
-                                            ICallable onEqualOp,
-                                            ICallable onNonEqualOp,
-                                            OperationFunctor type,
-                                            IQArray<Qubit>? ctrls)
+        private void ExecuteConditionalStatement(IQArray<Result> results1, IQArray<Result> results2, ICallable onEqual,  ICallable onNonEqual, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
-            long statement = Simulator.QuantumProcessor.StartConditionalStatement(measurementResults, resultsValues);
-            return ExecuteConditionalStatementInternal(Simulator,
-                                                        statement,
-                                                        onEqualOp,
-                                                        onNonEqualOp,
-                                                        type,
-                                                        ctrls);
+            long statement = this.QuantumProcessor.StartConditionalStatement(results1, results2);
+            ExecuteConditionalStatementInternal(statement, onEqual, onNonEqual, type, ctrls);
+            this.QuantumProcessor.EndConditionalStatement(statement);
         }
 
-        private static QVoid ExecuteConditionalStatement(QuantumProcessorDispatcher Simulator,
-                                            Result measurementResult,
-                                            Result resultValue,
-                                            ICallable onEqualOp,
-                                            ICallable onNonEqualOp,
-                                            OperationFunctor type,
-                                            IQArray<Qubit>? ctrls)
+        private void ExecuteConditionalStatement(Result result1, Result result2, ICallable onEqualOp, ICallable onNonEqualOp, OperationFunctor type, IQArray<Qubit>? ctrls)
         {
-            long statement = Simulator.QuantumProcessor.StartConditionalStatement(measurementResult, resultValue);
-            return ExecuteConditionalStatementInternal(Simulator,
-                                                        statement,
-                                                        onEqualOp,
-                                                        onNonEqualOp,
-                                                        type,
-                                                        ctrls);
+            long statement = this.QuantumProcessor.StartConditionalStatement(result1, result2);
+            ExecuteConditionalStatementInternal(statement, onEqualOp, onNonEqualOp, type, ctrls);
+            this.QuantumProcessor.EndConditionalStatement(statement);
         }
 
 
@@ -92,7 +61,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(Result, ICallable, ICallable), QVoid> __Body__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
         }
 
@@ -105,13 +75,15 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(Result, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(Result, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
             };
         }
 
@@ -124,7 +96,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(Result, IControllable, IControllable), QVoid> __Body__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
@@ -132,12 +105,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
                 }
+                return QVoid.Instance;
             };
         }
 
@@ -150,13 +124,15 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(Result, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(Result, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
             {
                 (Result measurementResult, ICallable onZero, ICallable onOne) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
@@ -165,12 +141,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
                 }
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
@@ -179,12 +156,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResult, Result.Zero, onZero, onOne, OperationFunctor.ControlledAdjoint, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.ControlledAdjoint, ctrls);
                 }
+                return QVoid.Instance;
             };
         }
 
@@ -199,7 +177,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Result>, IQArray<Result>, ICallable, ICallable), QVoid> __Body__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
         }
 
@@ -212,13 +191,15 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
             };
         }
 
@@ -231,7 +212,8 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Result>, IQArray<Result>, IControllable, IControllable), QVoid> __Body__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
@@ -240,12 +222,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
                 }
+                return QVoid.Instance;
             };
         }
 
@@ -258,13 +241,15 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
             {
                 (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
-                return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
@@ -273,12 +258,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
                 }
+                return QVoid.Instance;
             };
 
             public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
@@ -287,12 +273,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
                 if ((ctrls == null) || (ctrls.Count == 0))
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
                 }
                 else
                 {
-                    return ExecuteConditionalStatement(Simulator, measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.ControlledAdjoint, ctrls);
+                    Simulator.ExecuteConditionalStatement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.ControlledAdjoint, ctrls);
                 }
+                return QVoid.Instance;
             };
         }
 

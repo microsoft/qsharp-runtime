@@ -498,7 +498,7 @@ namespace Microsoft.Quantum.Simulation.Common
             OnOperationEnd?.Invoke(operation, resultValue);
         }
 
-        public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo )
+        public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo)
         {
             OnFail?.Invoke(exceptionInfo);
         }
