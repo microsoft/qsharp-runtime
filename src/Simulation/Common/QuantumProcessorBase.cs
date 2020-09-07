@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Common
@@ -10,7 +11,6 @@ namespace Microsoft.Quantum.Simulation.Common
     /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
     /// It throws <see cref="UnsupportedOperationException"/> for most APIs.
     /// </summary>
-    [Obsolete]
     public class QuantumProcessorBase : IQuantumProcessor 
     {
         public virtual void X(Qubit qubit)
@@ -178,25 +178,16 @@ namespace Microsoft.Quantum.Simulation.Common
             throw new UnsupportedOperationException();
         }
 
-        public virtual long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
+        public virtual long StartConditionalStatement(IQArray<Result> results1, IQArray<Result> results2)
         {
-            if (measurementResults == null) { return resultsValues == null ? 1 : 0; };
-            if (measurementResults.Count != resultsValues?.Count) { return 0; };
-
-            for (int i = 0; i < measurementResults.Count; i++)
-            {
-                if (measurementResults[i] != resultsValues[i])
-                {
-                    return 0;
-                }
-            }
-
-            return 1;
+            if (results1 == null) { return results2 == null ? 1 : 0; };
+            if (results1.Count != results2?.Count) { return 0; };
+            return results1.Zip(results2, (r1, r2) => (r1, r2)).Any(pair => pair.r1 != pair.r2) ? 0 : 1;
         }
 
-        public virtual long StartConditionalStatement(Result measurementResult, Result resultValue)
+        public virtual long StartConditionalStatement(Result result1, Result result2)
         {
-            return measurementResult == resultValue ? 1 : 0;
+            return result1 == result2 ? 1 : 0;
         }
 
         public virtual bool RunThenClause(long statement)
