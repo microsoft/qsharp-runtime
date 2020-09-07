@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
@@ -13,20 +12,6 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
-    /// <summary>
-    /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
-    /// </summary>
-    public class UnsupportedOperationException : PlatformNotSupportedException
-    {
-        public UnsupportedOperationException(string text = "",
-                            [CallerFilePath] string file = "",
-                            [CallerMemberName] string member = "",
-                            [CallerLineNumber] int line = 0)
-            : base($"{file}::{line}::[{member}]:{text}")
-        {
-        }
-    }
-
     /// <summary>
     ///     A Base class for Simulators.
     ///     It provides the infrastructure that makes it easy for a Simulator

@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -11,7 +12,6 @@ namespace Microsoft.Quantum.Simulation.Common
     /// A class that implements IQuantumProcessor that does not do any logic, but is convenient to inherit from.
     /// It throws <see cref="UnsupportedOperationException"/> for most APIs.
     /// </summary>
-    [Obsolete]
     public class QuantumProcessorBase : IQuantumProcessor 
     {
         public virtual void X(Qubit qubit)
@@ -285,5 +285,19 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
+    }
+
+    /// <summary>
+    /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
+    /// </summary>
+    public class UnsupportedOperationException : PlatformNotSupportedException
+    {
+        public UnsupportedOperationException(string text = "",
+                            [CallerFilePath] string file = "",
+                            [CallerMemberName] string member = "",
+                            [CallerLineNumber] int line = 0)
+            : base($"{file}::{line}::[{member}]:{text}")
+        {
+        }
     }
 }
