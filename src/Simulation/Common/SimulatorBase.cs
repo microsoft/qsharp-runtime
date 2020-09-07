@@ -8,13 +8,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
 
 #nullable enable
 
 namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
-    /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
+    /// A class that implements exception to be thrown when Operation is not supported.
     /// </summary>
     public class UnsupportedOperationException : PlatformNotSupportedException
     {
@@ -487,6 +488,297 @@ namespace Microsoft.Quantum.Simulation.Common
                 return min + delta * sim.RandomGenerator.NextDouble();
             };
         }
+
+        #region Branching based on measurement
+
+        public class ApplyIfElse : ApplyIfElseIntrinsic
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElse(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, ICallable, ICallable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseA : ApplyIfElseIntrinsicA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(Result, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseC : ApplyIfElseIntrinsicC
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseC(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IControllable, IControllable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
+                }
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseCA : ApplyIfElseIntrinsicCA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseCA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(Result, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Controlled, ctrls);
+                }
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.ControlledAdjoint, ctrls);
+                }
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionally : ApplyConditionallyIntrinsic
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionally(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, ICallable, ICallable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyA : ApplyConditionallyIntrinsicA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyC : ApplyConditionallyIntrinsicC
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyC(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IControllable, IControllable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
+                }
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyCA : ApplyConditionallyIntrinsicCA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyCA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Controlled, ctrls);
+                }
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+
+                if ((ctrls == null) || (ctrls.Count == 0))
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                }
+                else
+                {
+                    this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.ControlledAdjoint, ctrls);
+                }
+                return QVoid.Instance;
+            };
+        }
+
+        private Action BuildClause(ICallable op, OperationFunctor type, IQArray<Qubit>? ctrls) =>
+            type switch
+            {
+                OperationFunctor.Body => () => op.Apply(QVoid.Instance),
+                OperationFunctor.Adjoint => () => ((IAdjointable)op).Adjoint.Apply(QVoid.Instance),
+                OperationFunctor.Controlled => () => ((IControllable)op).Controlled.Apply((ctrls, QVoid.Instance)),
+                OperationFunctor.ControlledAdjoint => () => ((IUnitary)op).Controlled.Adjoint.Apply((ctrls, QVoid.Instance)),
+                _ => throw new NotImplementedException("unknown specialization"),
+            };
+
+        private void BranchingBasedOnMeasurement(IQArray<Result> results1, IQArray<Result> results2, ICallable onEqual, ICallable onNonEqual, OperationFunctor type, IQArray<Qubit>? ctrls)
+        {
+            long statement = this.StartBranchingBasedOnMeasurement(results1, results2);
+            ExecuteBranchingBasedOnMeasurement(statement, BuildClause(onEqual, type, ctrls), BuildClause(onNonEqual, type, ctrls));
+            this.EndBranchingBasedOnMeasurement(statement);
+        }
+
+        private void BranchingBasedOnMeasurement(Result result1, Result result2, ICallable onEqual, ICallable onNonEqual, OperationFunctor type, IQArray<Qubit>? ctrls)
+        {
+            long statement = this.StartBranchingBasedOnMeasurement(result1, result2);
+            ExecuteBranchingBasedOnMeasurement(statement, BuildClause(onEqual, type, ctrls), BuildClause(onNonEqual, type, ctrls));
+            this.EndBranchingBasedOnMeasurement(statement);
+        }
+
+        public virtual void ExecuteBranchingBasedOnMeasurement(long condition, Action onEqual, Action onNonEqual)
+        {
+            switch (condition)
+            {
+                case 1: onEqual?.Invoke(); break;
+                case 0: onNonEqual?.Invoke(); break;
+                default: throw new NotImplementedException("value for condition was expected to be either 0 (when the condition is false) or 1 (when the condition is true)");
+            }
+        }
+
+        /// <summary>
+        /// By default, 1 indicates that all results are equal, i.e. the statement is to enter the then-clause,
+        /// and 0 indicates that they are not, i.e. the statement is to enter then else-clause.
+        /// If both arrays are null, then 1 is returned.
+        /// </summary>
+        public virtual long StartBranchingBasedOnMeasurement(IQArray<Result> results1, IQArray<Result> results2)
+        {
+            if (results1 == null) { return results2 == null ? 1 : 0; };
+            if (results1.Count != results2?.Count) { return 0; };
+            return results1.Zip(results2, (r1, r2) => (r1, r2)).Any(pair => pair.r1 != pair.r2) ? 0 : 1;
+        }
+
+        /// <summary>
+        /// By default, 1 indicates that both results are equal, i.e. the statement is to enter the then-clause.
+        /// and 0 indicates that they are not, i.e. the statement is to enter then else-clause.
+        /// </summary>
+        public virtual long StartBranchingBasedOnMeasurement(Result result1, Result result2)
+        {
+            return result1 == result2 ? 1 : 0;
+        }
+
+        public virtual void EndBranchingBasedOnMeasurement(long statement)
+        { }
+
+        #endregion
 
         public virtual void StartOperation(ICallable operation, IApplyData inputValue)
         {
