@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// CNOT(control, target);
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.ApplyControlledX")
-    operation ApplyControlledX (control : Qubit, target : Qubit) : Unit is Adj {
+    internal operation ApplyControlledX (control : Qubit, target : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
     }

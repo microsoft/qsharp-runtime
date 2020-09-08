@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimCheckQubitUniqueness : Intrinsic.CheckQubitUniqueness
+        internal class QSimCheckQubitUniqueness : Intrinsic.CheckQubitUniqueness
         {
             private QuantumSimulator Simulator { get; }
             public QSimCheckQubitUniqueness(QuantumSimulator m) : base(m)
@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimRotationAngleValidation : Intrinsic.RotationAngleValidation
+        internal class QSimRotationAngleValidation : Intrinsic.RotationAngleValidation
         {
             public QSimRotationAngleValidation(QuantumSimulator m) : base(m)
             {

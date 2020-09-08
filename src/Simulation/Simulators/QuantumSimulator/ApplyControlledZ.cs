@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimApplyControlledZ : Intrinsic.ApplyControlledZ
+        internal class QSimApplyControlledZ : Intrinsic.ApplyControlledZ
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCZ")]
             private static extern void MCZ(uint id, uint count, uint[] ctrls, uint qubit);

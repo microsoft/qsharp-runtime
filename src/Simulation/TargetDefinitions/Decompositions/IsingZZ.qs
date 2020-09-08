@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit1
     /// The second qubit input to the gate.
     @EnableTestingViaName("Test.TargetDefinitions.IsingZZ")
-    operation IsingZZ (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+    internal operation IsingZZ (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
         Exp([PauliZ, PauliZ], theta * 2.0, [qubit0, qubit1]);
     }
 }

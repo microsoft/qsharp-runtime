@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 {
     public partial class QCTraceSimulatorImpl
     {
-        public class QCTracesimulatorImplCheckQubitUniqueness : Intrinsic.CheckQubitUniqueness
+        internal class QCTracesimulatorImplCheckQubitUniqueness : Intrinsic.CheckQubitUniqueness
         {
             public QCTracesimulatorImplCheckQubitUniqueness(QCTraceSimulatorImpl m) : base(m)
             {
@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             };
         }
 
-        public class QCTracesimulatorImplRotationAngleValidation : Intrinsic.RotationAngleValidation
+        internal class QCTracesimulatorImplRotationAngleValidation : Intrinsic.RotationAngleValidation
         {
             public QCTracesimulatorImplRotationAngleValidation(QCTraceSimulatorImpl m) : base(m)
             {

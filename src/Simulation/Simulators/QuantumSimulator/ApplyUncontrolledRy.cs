@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public class QSimApplyUncontrolledRy : Intrinsic.ApplyUncontrolledRy
+        internal class QSimApplyUncontrolledRy : Intrinsic.ApplyUncontrolledRy
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "R")]
             private static extern void R(uint id, Pauli basis, double angle, uint qubit);

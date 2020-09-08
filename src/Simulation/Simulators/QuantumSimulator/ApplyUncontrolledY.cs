@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimApplyUncontrolledY : Intrinsic.ApplyUncontrolledY
+        internal class QSimApplyUncontrolledY : Intrinsic.ApplyUncontrolledY
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Y")]
             private static extern void Y(uint id, uint qubit);

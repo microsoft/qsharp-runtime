@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The array of qubits to verify for uniqueness. In the controlled variant
     /// the full list of qubits among targets and controls are verified to be unique.
     @EnableTestingViaName("Test.TargetDefinitions.CheckQubitUniqueness")
-    operation CheckQubitUniqueness (qubits : Qubit[]) : Unit is Adj + Ctl{
+    internal operation CheckQubitUniqueness (qubits : Qubit[]) : Unit is Adj + Ctl{
         body intrinsic;
         adjoint self;
     }
@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## angle
     /// The Double to validate.
     @EnableTestingViaName("Test.TargetDefinitions.RotationAngleValidation")
-    function RotationAngleValidation (angle : Double) : Unit {
+    internal function RotationAngleValidation (angle : Double) : Unit {
         body intrinsic;
     }
 

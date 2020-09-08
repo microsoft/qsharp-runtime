@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// Qubit to which the gate should be applied.
     @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledH")
-    operation ApplyUncontrolledH (qubit : Qubit) : Unit is Adj {
+    internal operation ApplyUncontrolledH (qubit : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
     }

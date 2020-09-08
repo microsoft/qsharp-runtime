@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimApplyControlledX : Intrinsic.ApplyControlledX
+        internal class QSimApplyControlledX : Intrinsic.ApplyControlledX
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCX")]
             private static extern void MCX(uint id, uint count, uint[] ctrls, uint qubit);

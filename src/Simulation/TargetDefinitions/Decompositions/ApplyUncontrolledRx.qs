@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// R(PauliX, theta, qubit);
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledRx")
-    operation ApplyUncontrolledRx (theta : Double, qubit : Qubit) : Unit is Adj {
+    internal operation ApplyUncontrolledRx (theta : Double, qubit : Qubit) : Unit is Adj {
         Rx(theta, qubit);
     }
 }

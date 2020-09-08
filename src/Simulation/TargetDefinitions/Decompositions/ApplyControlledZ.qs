@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Controlled Z([control], target);
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.ApplyControlledZ")
-    operation ApplyControlledZ (control : Qubit, target : Qubit) : Unit is Adj {
+    internal operation ApplyControlledZ (control : Qubit, target : Qubit) : Unit is Adj {
         Controlled Z([control], target);
     }
 }
