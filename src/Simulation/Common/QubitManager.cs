@@ -83,12 +83,7 @@ namespace Microsoft.Quantum.Simulation.Common
             internal IEnumerable<Qubit>? QubitsInArgument => Data?.Qubits;
             private List<Qubit>? _locals; // Qubits allocated/borrowed in the current operation
 
-            public StackFrame()
-            {
-                Data = null;
-            }
-
-            public StackFrame(IApplyData data)
+            public StackFrame(IApplyData data = null)
             {
                 Data = data;
             }
