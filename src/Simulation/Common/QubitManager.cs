@@ -107,15 +107,13 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        protected readonly Stack<StackFrame> operationStack; // Stack of operation calls.
-        protected StackFrame curFrame; // Current stack frame - all qubits in current scope are listed here.
+        protected readonly Stack<StackFrame> operationStack; // Stack of operation calls, including the current frame for the current scope
 
         public virtual void OnOperationStart(ICallable _, IApplyData values)
         {
             if (!DisableBorrowing)
             {
-                operationStack.Push(curFrame);
-                curFrame = new StackFrame(values);
+                operationStack.Push(new StackFrame(values));
             }
         }
 
@@ -123,7 +121,7 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             if (!DisableBorrowing)
             {
-                curFrame = operationStack.Pop();
+                operationStack.Pop();
             }
         }
 
@@ -179,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Common
             if (!DisableBorrowing)
             {
                 operationStack = new Stack<StackFrame>();
-                curFrame = new StackFrame();
+                operationStack.Push(new StackFrame());
             }
         }
 
@@ -246,19 +244,15 @@ namespace Microsoft.Quantum.Simulation.Common
                 return 0;
             }
 
-            StackFrame frame = curFrame;
-            if (stackFrame > 0)
+            var popped = new Stack<StackFrame>();
+            while (--stackFrame > 0)
             {
-                var popped = new Stack<StackFrame>();
-                while (--stackFrame > 0)
-                {
-                    popped.Push(operationStack.Pop());
-                }
-                frame = operationStack.Peek();
-                while (popped.TryPop(out var f))
-                {
-                    operationStack.Push(f);
-                }
+                popped.Push(operationStack.Pop());
+            }
+            StackFrame frame = operationStack.Peek();
+            while (popped.TryPop(out var f))
+            {
+                operationStack.Push(f);
             }
             return NumAllocatedQubits - QubitsInUseCount(frame);
         }
@@ -384,7 +378,7 @@ namespace Microsoft.Quantum.Simulation.Common
             NumAllocatedQubits++;
             if (!DisableBorrowing)
             {
-                curFrame.Locals.Add(ret);
+                operationStack.Peek().Locals.Add(ret);
             }
             return ret;
         }
@@ -482,7 +476,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
             if (!DisableBorrowing)
             {
-                bool success = curFrame.Locals.Remove(qubit);
+                bool success = operationStack.Peek().Locals.Remove(qubit);
                 Debug.Assert(success, "Releasing qubit that is not a local variable in scope.");
             }
         }
@@ -516,7 +510,7 @@ namespace Microsoft.Quantum.Simulation.Common
         #region Borrow
 
         /// <summary>
-        /// Returns a qubit that is free, not disabled, and not listed as in use, whose id is in [minId, maxId).
+        /// Returns a qubit that is allocated, not disabled, and not listed as in use, whose id is in [minId, maxId).
         /// </summary>
         /// <param name="qubitsInUseSortedById">Contains the qubits that cannot be borrowed, where the qubits with the lowest ids are queued first.</param>
         /// <param name="minId">Only qubits whose id is larger or equal to minId will be considered for borrowing. Set to 0 if unspecified.</param>
@@ -527,10 +521,11 @@ namespace Microsoft.Quantum.Simulation.Common
             maxId = maxId < 0 ? NumQubits : maxId;
             for (long curQubit = System.Math.Max(0, minId); curQubit < maxId; curQubit++)
             {
-                while (IsFree(curQubit) || IsDisabled(curQubit))
+                if (IsFree(curQubit) || IsDisabled(curQubit))
                 {
-                    curQubit++;
+                    continue;
                 }
+
                 bool gotNextInUse = qubitsInUseSortedById.TryPeek(out Qubit nextInUse);
                 if (gotNextInUse && nextInUse.Id == curQubit)
                 {
@@ -546,7 +541,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 Qubit ret = CreateQubitObject(curQubit);
                 if (!DisableBorrowing)
                 {
-                    curFrame.Locals.Add(ret);
+                    operationStack.Peek().Locals.Add(ret);
                 }
                 return ret;
             }
@@ -613,7 +608,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Allocate(numToBorrow);
             }
 
-            return Borrow(numToBorrow, QubitsInUse(curFrame));
+            return Borrow(numToBorrow, QubitsInUse(operationStack.Peek()));
         }
 
         public Qubit Borrow()
@@ -623,7 +618,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Allocate();
             }
 
-            var inUse = new Stack<Qubit>(QubitsInUse(curFrame).Distinct().OrderByDescending(q => q.Id));
+            var inUse = new Stack<Qubit>(QubitsInUse(operationStack.Peek()).Distinct().OrderByDescending(q => q.Id));
             return NumAllocatedQubits == inUse.Count ? Allocate() : (Borrow(inUse) ?? Allocate());
         }
 
@@ -662,7 +657,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
-                    bool success = curFrame.Locals.Remove(qubit); // Could be more efficient here going from the end manually.
+                    bool success = operationStack.Peek().Locals.Remove(qubit); // Could be more efficient here going from the end manually.
                     Debug.Assert(success, "Returning qubit that is not a local variable in scope.");
                 }
             }
