@@ -141,9 +141,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
         public IQArray<Qubit> Borrow(long count)
         {
-            long qubitBeforeBorrow = qubitManager.GetAllocatedQubitsCount();
+            long qubitBeforeBorrow = qubitManager.AllocatedQubitsCount;
             IQArray<Qubit> res = qubitManager.Borrow(count);
-            long newQubitsAllocated = qubitManager.GetAllocatedQubitsCount() - qubitBeforeBorrow;
+            long newQubitsAllocated = qubitManager.AllocatedQubitsCount - qubitBeforeBorrow;
 
             object[][] tracingData = GetTracingData(res);
             for (int i = 0; i < listeners.Length; ++i)
@@ -158,9 +158,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         {
             Debug.Assert(qubit != null);
 
-            long qubitBeforeBorrow = qubitManager.GetAllocatedQubitsCount();
+            long qubitBeforeBorrow = qubitManager.AllocatedQubitsCount;
             qubitManager.Return(qubit);
-            long qubitsReleased = qubitBeforeBorrow - qubitManager.GetAllocatedQubitsCount();
+            long qubitsReleased = qubitBeforeBorrow - qubitManager.AllocatedQubitsCount;
 
             object[][] tracingData = GetTracingData(new QArray<Qubit>(qubit));
             for (int i = 0; i < listeners.Length; ++i)
@@ -173,9 +173,9 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         {
             Debug.Assert(qubits != null);
 
-            long qubitBeforeBorrow = qubitManager.GetAllocatedQubitsCount();
+            long qubitBeforeBorrow = qubitManager.AllocatedQubitsCount;
             qubitManager.Return(qubits);
-            long qubitsReleased = qubitBeforeBorrow - qubitManager.GetAllocatedQubitsCount();
+            long qubitsReleased = qubitBeforeBorrow - qubitManager.AllocatedQubitsCount;
 
             object[][] tracingData = GetTracingData(qubits);
             for (int i = 0; i < listeners.Length; ++i)

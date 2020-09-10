@@ -16,17 +16,17 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 
             public override void Apply(Qubit q)
             {
-                long allocatedBefore = sim.QubitManager.GetAllocatedQubitsCount();
+                long allocatedBefore = sim.QubitManager.AllocatedQubitsCount;
                 sim.QubitManager.Return(q);
-                long allocatedAfter = sim.QubitManager.GetAllocatedQubitsCount();
+                long allocatedAfter = sim.QubitManager.AllocatedQubitsCount;
                 sim.QuantumProcessor.OnReturnQubits(new QArray<Qubit>(q), allocatedBefore - allocatedAfter);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
-                long allocatedBefore = sim.QubitManager.GetAllocatedQubitsCount();
+                long allocatedBefore = sim.QubitManager.AllocatedQubitsCount;
                 sim.QubitManager.Return(qubits);
-                long allocatedAfter = sim.QubitManager.GetAllocatedQubitsCount();
+                long allocatedAfter = sim.QubitManager.AllocatedQubitsCount;
                 sim.QuantumProcessor.OnReturnQubits(qubits, allocatedBefore - allocatedAfter);
             }
         }

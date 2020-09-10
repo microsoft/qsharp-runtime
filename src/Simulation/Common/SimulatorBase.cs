@@ -409,7 +409,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetFreeQubitsCount();
+            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.FreeQubitsCount;
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 sim = m;
             }
 
-            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetQubitsAvailableToBorrowCount(1);
+            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.QubitsAvailableToBorrowCount(1);
         }
 
         /// <summary>

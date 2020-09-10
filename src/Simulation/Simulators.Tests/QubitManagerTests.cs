@@ -63,9 +63,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             long qubitsAvailable;
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qab = qm.Borrow(5, exclusion);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 1);
             Assert.True(qab[0].Id == 0);
             Assert.True(qab[1].Id == 2);
             Assert.True(qab[2].Id == 4);
@@ -76,9 +76,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(q6.Id == 9);
 
             // Test borrowing of the same qubit again
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb1 = qm.Borrow(1, exclusion);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 0);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 0);
             Assert.True(qb1[0].Id == 0);
             qm.Return(qb1[0]);
 
@@ -262,18 +262,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             long qubitsAvailable;
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb1 = qm.Borrow(3);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 1);
             Assert.True(qb1[0].Id == 0);
             Assert.True(qb1[1].Id == 5);
             Assert.True(qb1[2].Id == 6);
             qm.Return(qb1[0]);
             qm.Return(qb1[2]);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb2 = qm.Borrow(3);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 2);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 2);
             Assert.True(qb2[0].Id == 0);
             Assert.True(qb2[1].Id == 6);
             Assert.True(qb2[2].Id == 7);
@@ -281,9 +281,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 qm.OnOperationStart(null, qb2);
 
-                qubitsAvailable = qm.GetFreeQubitsCount();
+                qubitsAvailable = qm.FreeQubitsCount;
                 IQArray<Qubit> qb3 = qm.Borrow(3);
-                Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 0);
+                Assert.True(qubitsAvailable - qm.FreeQubitsCount == 0);
                 Assert.True(qb3[0].Id == 1);
                 Assert.True(qb3[1].Id == 2);
                 Assert.True(qb3[2].Id == 3);
@@ -291,9 +291,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 qm.OnOperationEnd(null, QVoid.Instance); 
             }
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb4 = qm.Borrow(1);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 1);
             Assert.True(qb4[0].Id == 8);
 
             qm.OnOperationEnd(null, QVoid.Instance);
@@ -321,54 +321,54 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             long qubitsAvailable;
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb1 = qm.Borrow(3);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 3);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 3);
             Assert.True(qb1[0].Id == 6);
             Assert.True(qb1[1].Id == 7);
             Assert.True(qb1[2].Id == 8);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 11);
             qm.Return(qb1[0]);
             qm.Return(qb1[2]);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 13);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb2 = qm.Borrow(3);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 3);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 3);
             Assert.True(qb2[0].Id == 8);
             Assert.True(qb2[1].Id == 6);
             Assert.True(qb2[2].Id == 9);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 10);
 
             {
                 qm.OnOperationStart(null, qb2);
 
-                qubitsAvailable = qm.GetFreeQubitsCount();
+                qubitsAvailable = qm.FreeQubitsCount;
                 IQArray<Qubit> qb3 = qm.Borrow(3);
-                Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 3);
+                Assert.True(qubitsAvailable - qm.FreeQubitsCount == 3);
                 Assert.True(qb3[0].Id == 10);
                 Assert.True(qb3[1].Id == 11);
                 Assert.True(qb3[2].Id == 12);
 
-                qubitsAvailable = qm.GetFreeQubitsCount();
+                qubitsAvailable = qm.FreeQubitsCount;
                 Assert.True(qubitsAvailable == 7);
 
                 qm.OnOperationEnd(null, QVoid.Instance);
             }
 
             qm.Release(qb2[1]);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 8);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb4 = qm.Borrow(1);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 1);
             Assert.True(qb4[0].Id == 6);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 7);
 
             qm.OnOperationEnd(null, QVoid.Instance);
@@ -396,19 +396,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             long qubitsAvailable;
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             IQArray<Qubit> qb1 = qm.Borrow(3);
-            Assert.True(qubitsAvailable - qm.GetFreeQubitsCount() == 1);
+            Assert.True(qubitsAvailable - qm.FreeQubitsCount == 1);
             Assert.True(qb1[0].Id == 0);
             Assert.True(qb1[1].Id == 5);
             Assert.True(qb1[2].Id == 6);
             qm.Return(qb1[0]);
             qm.Return(qb1[2]);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 1);
             IQArray<Qubit> qb2 = qm.Borrow(3); // This should grow qubit capacity
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 6);
             Assert.True(qb2[0].Id == 0);
             Assert.True(qb2[1].Id == 6);
@@ -416,10 +416,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             qm.OnOperationEnd(null, null);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 6);
             IQArray<Qubit> qa2 = qm.Allocate(4);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 2);
             Assert.True(qa2.Length == 4);
             Assert.True(qa2[0].Id == 8);
@@ -427,14 +427,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(qa2[2].Id == 10);
             Assert.True(qa2[3].Id == 11);
 
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 2);
             qm.Release(qa2[0]);
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 3);
 
             IQArray<Qubit> qa3 = qm.Allocate(4); // This should grow qubit capacity
-            qubitsAvailable = qm.GetFreeQubitsCount();
+            qubitsAvailable = qm.FreeQubitsCount;
             Assert.True(qubitsAvailable == 13);
             Assert.True(qa3.Length == 4);
             Assert.True(qa3[0].Id == 8);

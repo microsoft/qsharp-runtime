@@ -14,10 +14,10 @@ namespace Microsoft.Quantum.Simulation.Common
         bool IsFree(Qubit qubit);
         bool IsDisabled(Qubit qubit);
 
-        long GetFreeQubitsCount();
-        long GetQubitsAvailableToBorrowCount(int stackFrame = 0);
-        long GetAllocatedQubitsCount();
-        IEnumerable<long> GetAllocatedIds();
+        long FreeQubitsCount { get; }
+        long AllocatedQubitsCount { get; }
+        IEnumerable<long> AllocatedIds();
+        long QubitsAvailableToBorrowCount(int stackFrame = 0);
 
         void Disable(Qubit qubit);
         void Disable(IQArray<Qubit> qubits);

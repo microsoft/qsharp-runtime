@@ -237,7 +237,7 @@ namespace Microsoft.Quantum.Simulation.Common
             return qubits[id] >= AllocatedForBorrowing;
         }
 
-        public virtual long GetQubitsAvailableToBorrowCount(int stackFrame)
+        public virtual long QubitsAvailableToBorrowCount(int stackFrame)
         {
             if (DisableBorrowing)
             {
@@ -257,17 +257,11 @@ namespace Microsoft.Quantum.Simulation.Common
             return NumAllocatedQubits - QubitsInUseCount(frame);
         }
 
-        public long GetFreeQubitsCount()
-        {
-            return NumQubits - NumDisabledQubits - NumAllocatedQubits;
-        }
+        public long FreeQubitsCount => NumQubits - NumDisabledQubits - NumAllocatedQubits;
 
-        public long GetAllocatedQubitsCount()
-        {
-            return NumAllocatedQubits;
-        }
+        public long AllocatedQubitsCount => NumAllocatedQubits;
 
-        public virtual IEnumerable<long> GetAllocatedIds()
+        public virtual IEnumerable<long> AllocatedIds()
         {
             for (long i = 0; i < qubits.LongLength; i++)
             {
@@ -392,7 +386,7 @@ namespace Microsoft.Quantum.Simulation.Common
             Qubit? qb = Allocate(usedOnlyForBorrowing: false);
             if (qb == null)
             {
-                throw new NotEnoughQubits(1, GetFreeQubitsCount());
+                throw new NotEnoughQubits(1, this.FreeQubitsCount);
             }
             return qb;
         }
@@ -422,7 +416,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     {
                         Release(result[k], wasUsedOnlyForBorrowing: false);
                     }
-                    throw new NotEnoughQubits(numToAllocate, GetFreeQubitsCount());
+                    throw new NotEnoughQubits(numToAllocate, this.FreeQubitsCount);
                 }
                 result.Modify(i, allocated);
             }
@@ -579,7 +573,7 @@ namespace Microsoft.Quantum.Simulation.Common
                         {
                             Release(borrowed[(int)k], wasUsedOnlyForBorrowing: true);
                         }
-                        throw new NotEnoughQubits(numToBorrow, numBorrowed + GetFreeQubitsCount());
+                        throw new NotEnoughQubits(numToBorrow, numBorrowed + this.FreeQubitsCount);
                     }
                     borrowed.Modify(i, allocated);
                 }
