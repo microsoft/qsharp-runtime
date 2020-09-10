@@ -8,6 +8,8 @@ using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 
+#nullable enable
+
 namespace Microsoft.Quantum.Simulation.Common
 {
     /// <summary>
@@ -77,9 +79,9 @@ namespace Microsoft.Quantum.Simulation.Common
 
         protected class StackFrame
         {
-            internal IApplyData Data;
-            internal IEnumerable<Qubit> QubitsInArgument => Data?.Qubits;
-            internal List<Qubit> _locals; // Qubits allocated/borrowed in the current operation
+            internal IApplyData? Data;
+            internal IEnumerable<Qubit>? QubitsInArgument => Data?.Qubits;
+            private List<Qubit>? _locals; // Qubits allocated/borrowed in the current operation
 
             public StackFrame()
             {
@@ -239,6 +241,11 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual long GetQubitsAvailableToBorrowCount(int stackFrame)
         {
+            if (DisableBorrowing)
+            {
+                return 0;
+            }
+
             StackFrame frame = curFrame;
             if (stackFrame > 0)
             {
@@ -253,7 +260,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     operationStack.Push(f);
                 }
             }
-            return DisableBorrowing ? 0 : NumAllocatedQubits - QubitsInUseCount(frame);
+            return NumAllocatedQubits - QubitsInUseCount(frame);
         }
 
         public long GetFreeQubitsCount()
@@ -314,7 +321,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Allocates a qubit.
         /// Returns null if the qubit cannot be allocated.
         /// </summary>
-        protected virtual Qubit Allocate(bool usedOnlyForBorrowing)
+        protected virtual Qubit? Allocate(bool usedOnlyForBorrowing)
         {
             if (free == None)
             {
@@ -388,7 +395,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public Qubit Allocate()
         {
-            Qubit qb = Allocate(usedOnlyForBorrowing: false);
+            Qubit? qb = Allocate(usedOnlyForBorrowing: false);
             if (qb == null)
             {
                 throw new NotEnoughQubits(1, GetFreeQubitsCount());
@@ -414,8 +421,8 @@ namespace Microsoft.Quantum.Simulation.Common
             QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate); 
             for (int i = 0; i < numToAllocate; i++)
             {
-                result.Modify(i, Allocate(usedOnlyForBorrowing: false));
-                if (result[i] == null)
+                Qubit? allocated = Allocate(usedOnlyForBorrowing: false);
+                if (allocated == null)
                 {
                     for (int k = 0; k < i; k++)
                     {
@@ -423,6 +430,7 @@ namespace Microsoft.Quantum.Simulation.Common
                     }
                     throw new NotEnoughQubits(numToAllocate, GetFreeQubitsCount());
                 }
+                result.Modify(i, allocated);
             }
 
             return result;
@@ -514,7 +522,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <param name="minId">Only qubits whose id is larger or equal to minId will be considered for borrowing. Set to 0 if unspecified.</param>
         /// <param name="maxId">Only qubits whose id is smaller than maxId will be considered for borrowing. Set to NumQubits if unspecified.</param>
         /// <returns></returns>
-        protected virtual Qubit Borrow(Stack<Qubit> qubitsInUseSortedById, long minId = 0, long maxId = -1)
+        protected virtual Qubit? Borrow(Stack<Qubit> qubitsInUseSortedById, long minId = 0, long maxId = -1)
         {
             maxId = maxId < 0 ? NumQubits : maxId;
             for (long curQubit = System.Math.Max(0, minId); curQubit < maxId; curQubit++)
@@ -555,7 +563,13 @@ namespace Microsoft.Quantum.Simulation.Common
             long lastBorrowedId = -1;
             for (long curBorrowed = 0; curBorrowed < numBorrowed; ++curBorrowed)
             {
-                borrowed.Modify(curBorrowed, Borrow(inUse, minId: lastBorrowedId + 1));
+                Qubit? bq = Borrow(inUse, minId: lastBorrowedId + 1);
+                if (bq == null) // should not happen
+                {
+                    numBorrowed = curBorrowed;
+                    break;
+                }
+                borrowed.Modify(curBorrowed, bq);
                 lastBorrowedId = borrowed[curBorrowed].Id;
             }
 
@@ -563,8 +577,8 @@ namespace Microsoft.Quantum.Simulation.Common
             { // Not enough qubits to borrow. Allocate what was not borrowed.
                 for (long i = numBorrowed; i < numToBorrow; i++)
                 {
-                    borrowed.Modify(i, Allocate(usedOnlyForBorrowing: true));
-                    if (borrowed[(int)i] == null)
+                    Qubit? allocated = Allocate(usedOnlyForBorrowing: true);
+                    if (allocated == null)
                     {
                         for (long k = numBorrowed; k < i; k++)
                         {
@@ -572,6 +586,7 @@ namespace Microsoft.Quantum.Simulation.Common
                         }
                         throw new NotEnoughQubits(numToBorrow, numBorrowed + GetFreeQubitsCount());
                     }
+                    borrowed.Modify(i, allocated);
                 }
             }
 
