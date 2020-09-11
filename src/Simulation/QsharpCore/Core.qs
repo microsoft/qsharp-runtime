@@ -30,6 +30,21 @@ namespace Microsoft.Quantum.Core {
     @Attribute()
     newtype Deprecated = (NewName : String);
 
+    /// # Summary
+    /// Compiler-recognized attribute used to mark a callable with the runtime capabilities it requires.
+    ///
+    /// # Input
+    /// ## Level
+    /// The name of the runtime capability level required by the callable.
+    /// 
+    /// # Remarks
+    /// The valid capability level names, in order of increasing capabilities, are:
+    ///
+    /// 1. QPRGen0
+    /// 2. QPRGen1
+    /// 3. Unknown
+    @Attribute()
+    newtype Capability = (Level : String);
 
     /// # Summary
     /// Returns a default instance of the specified type. 
