@@ -39,13 +39,20 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         public event Action<ICallable, IApplyData>? OnOperationStart = null;
         public event Action<ICallable, IApplyData>? OnOperationEnd = null;
+
+        public event Action<long>? BeforeAllocateQubits = null;
+        public event Action<IQArray<Qubit>>? AfterAllocateQubits = null;
+        public event Action<IQArray<Qubit>>? BeforeReleaseQubits = null;
+        public event Action<long>? AfterReleaseQubits = null;
+
+        public event Action<long>? BeforeBorrowQubits = null;
+        public event Action<IQArray<Qubit>>? AfterBorrowQubits = null;
+        public event Action<IQArray<Qubit>>? BeforeReturnQubits = null;
+        public event Action<long>? AfterReturnQubits = null;
+
         public event Action<System.Runtime.ExceptionServices.ExceptionDispatchInfo>? OnFail = null;
-        public event Action<long>? OnAllocateQubits = null;
-        public event Action<IQArray<Qubit>>? OnReleaseQubits = null;
-        public event Action<long>? OnBorrowQubits = null;
-        public event Action<IQArray<Qubit>>? OnReturnQubits = null;
-        public event Action<string>? OnLog = null;
         public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
+        public event Action<string>? OnLog = null;
 
         protected readonly int randomSeed;
         protected readonly Lazy<System.Random> randomGenerator;
@@ -294,15 +301,17 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override Qubit Apply()
             {
+                sim.BeforeAllocateQubits?.Invoke(1);
                 Qubit qubit = manager.Allocate();
-                sim.OnAllocateQubits?.Invoke(1);
+                sim.AfterAllocateQubits?.Invoke(new QArray<Qubit>(qubit));
                 return qubit;
             }
 
             public override IQArray<Qubit> Apply(long count)
             {
+                sim.BeforeAllocateQubits?.Invoke(count);
                 IQArray<Qubit> qubits = manager.Allocate(count);
-                sim.OnAllocateQubits?.Invoke(count);
+                sim.AfterAllocateQubits?.Invoke(qubits);
                 return qubits;
             }
         }
@@ -324,14 +333,16 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override void Apply(Qubit q)
             {
-                sim.OnReleaseQubits?.Invoke(new QArray<Qubit>(new[] { q }));
+                sim.BeforeReleaseQubits?.Invoke(new QArray<Qubit>(q));
                 manager.Release(q);
+                sim.AfterReleaseQubits?.Invoke(1);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
-                sim.OnReleaseQubits?.Invoke(qubits);
+                sim.BeforeReleaseQubits?.Invoke(qubits);
                 manager.Release(qubits);
+                sim.AfterReleaseQubits?.Invoke(qubits.Length);
             }
         }
 
@@ -352,15 +363,17 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override Qubit Apply()
             {
+                sim.BeforeBorrowQubits?.Invoke(1);
                 Qubit qubit = manager.Borrow();
-                sim.OnBorrowQubits?.Invoke(1);
+                sim.AfterBorrowQubits?.Invoke(new QArray<Qubit>(qubit));
                 return qubit;
             }
 
             public override IQArray<Qubit> Apply(long count)
             {
+                sim.BeforeBorrowQubits?.Invoke(count);
                 IQArray<Qubit> qubits = manager.Borrow(count);
-                sim.OnBorrowQubits?.Invoke(count);
+                sim.AfterBorrowQubits?.Invoke(qubits);
                 return qubits;
             }
         }
@@ -382,14 +395,16 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override void Apply(Qubit q)
             {
-                sim.OnReturnQubits?.Invoke(new QArray<Qubit>(new[] { q }));
+                sim.BeforeReturnQubits?.Invoke(new QArray<Qubit>(q));
                 manager.Return(q);
+                sim.AfterReturnQubits?.Invoke(1);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
-                sim.OnReturnQubits?.Invoke(qubits);
+                sim.BeforeReturnQubits?.Invoke(qubits);
                 manager.Return(qubits);
+                sim.AfterReturnQubits?.Invoke(qubits.Length);
             }
         }
 
