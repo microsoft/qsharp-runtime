@@ -240,7 +240,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
 
             var popped = new Stack<StackFrame>();
-            while (--stackFrame > 0)
+            while (stackFrame-- > 0)
             {
                 popped.Push(operationStack.Pop());
             }
