@@ -29,5 +29,5 @@ resources:
 extends:
   template: build/qdk-module-e2e.yml@qdk
   parameters:
-    module: qsharp-compiler
+    module: qsharp-runtime
     validation_level: ${{ parameters.validation_level }}
