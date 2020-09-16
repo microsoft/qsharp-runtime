@@ -26,7 +26,6 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 [![Build Status](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_apis/build/status/microsoft.qsharp-runtime?branchName=main)](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/latest?definitionId=15&branchName=main)
 
-
 Note that when building from source, this repository is configured so that .NET Core will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
 
