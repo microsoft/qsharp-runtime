@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
+  </PropertyGroup>
+
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\AssemblyCommon.props" />
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\DebugSymbols.props" />
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\Simulators.Dev.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LanguageVersion>8.0</LanguageVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(EnlistmentRoot)src\Simulation\Simulators\QuantumSimulator\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(EnlistmentRoot)src\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(EnlistmentRoot)src\Simulation\Native\win10\**\*">
+      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(EnlistmentRoot)src\Simulation\Native\osx\**\*">
+      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(EnlistmentRoot)src\Simulation\Native\linux\**\*">
+      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
+  </PropertyGroup>
+
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\AssemblyCommon.props" />
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\DebugSymbols.props" />
+  <Import Project="$(EnlistmentRoot)src\Simulation\Common\Simulators.Dev.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(EnlistmentRoot)src\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Xunit\Microsoft.Quantum.Xunit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>  
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
+      <_TargetedExeDir>$(MSBuildThisFileDirectory)TestProjects\TargetedExe\built\</_TargetedExeDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ExeFiles Include="$(_ExeDir)*" />
+      <_TargetedExeFiles Include="$(_TargetedExeDir)*" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutputPath)TestExe" />
+    <MakeDir Directories="$(OutputPath)TestTargetedExe" />
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(_TargetedExeFiles)" DestinationFolder="$(OutputPath)TestTargetedExe" ContinueOnError="false" />
+  </Target>
+
+</Project>
