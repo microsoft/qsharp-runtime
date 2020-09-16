@@ -66,7 +66,8 @@ namespace Microsoft.Azure.Quantum.Exceptions
                   $"ResourceGroupName: {resourceGroupName}{Environment.NewLine}" +
                   $"WorkspaceName: {workspaceName}{Environment.NewLine}" +
                   $"BaseUri: {baseUri}{Environment.NewLine}" +
-                  $"JobId: {jobId}",
+                  $"JobId: {jobId}{Environment.NewLine}" +
+                  (inner != null ? $"Inner Exception: {inner}" : string.Empty),
                   inner)
         {
         }
