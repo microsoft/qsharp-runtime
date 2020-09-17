@@ -18,6 +18,21 @@
     </ProjectReference>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
+      <_TargetedExeDir>$(MSBuildThisFileDirectory)TestProjects\TargetedExe\built\</_TargetedExeDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ExeFiles Include="$(_ExeDir)*" />
+      <_TargetedExeFiles Include="$(_TargetedExeDir)*" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutputPath)TestExe" />
+    <MakeDir Directories="$(OutputPath)TestTargetedExe" />
+    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(_TargetedExeFiles)" DestinationFolder="$(OutputPath)TestTargetedExe" ContinueOnError="false" />
+  </Target>
+
 </Project>
 
 

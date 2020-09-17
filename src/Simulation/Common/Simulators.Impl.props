@@ -5,9 +5,9 @@
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
   </PropertyGroup>
 
-  <Import Project="$(EnlistmentRoot)src\Simulation\Common\AssemblyCommon.props" />
-  <Import Project="$(EnlistmentRoot)src\Simulation\Common\DebugSymbols.props" />
-  <Import Project="$(EnlistmentRoot)src\Simulation\Common\Simulators.Dev.props" />
+  <Import Project="AssemblyCommon.props" />
+  <Import Project="DebugSymbols.props" />
+  <Import Project="Simulators.Dev.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
