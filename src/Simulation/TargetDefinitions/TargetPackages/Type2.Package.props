@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <Import Project="Common.Package.props" />
+
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\I.qs" />
