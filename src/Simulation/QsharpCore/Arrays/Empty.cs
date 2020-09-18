@@ -6,13 +6,13 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Arrays
 {
-    public partial class EmptyArray<TElement>
+    public partial class EmptyArray<__TElement__>
     {
-        public class Native : EmptyArray<TElement>
+        public class Native : EmptyArray<__TElement__>
         {
             public Native(IOperationFactory m) : base(m) { }
-            public override Func<QVoid, IQArray<TElement>> __Body__ => (arg) =>
-                new QArray<TElement>();
+            public override Func<QVoid, IQArray<__TElement__>> __Body__ => (arg) =>
+                new QArray<__TElement__>();
         }
     }
 
