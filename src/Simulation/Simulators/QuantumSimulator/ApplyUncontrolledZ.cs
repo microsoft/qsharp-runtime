@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             public override Func<Qubit, QVoid> __Body__ => (q1) =>
             {
-                Simulator.CheckQubit(q1); ;
+                Simulator.CheckQubit(q1);
 
                 Z(Simulator.Id, (uint)q1.Id);
 
