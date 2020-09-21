@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
+  </PropertyGroup>
+
+  <Import Project="AssemblyCommon.props" />
+  <Import Project="DebugSymbols.props" />
+  <Import Project="Simulators.Dev.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(EnlistmentRoot)src\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Xunit\Microsoft.Quantum.Xunit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>
+
+</Project>

@@ -39,8 +39,12 @@ namespace Microsoft.Quantum.Simulation
 
             InitBuiltinOperations(factory, t.BaseType);
 
+            var overrideTypes = t.GetNestedTypes(
+                System.Reflection.BindingFlags.Public | 
+                System.Reflection.BindingFlags.NonPublic);
+
             var ops =
-                from op in t.GetNestedTypes()
+                from op in overrideTypes
                 where op.IsSubclassOf(typeof(T))
                 select op;
 

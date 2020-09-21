@@ -25,14 +25,14 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Register to apply the given rotation to.
     @EnableTestingViaName("Test.TargetDefinitions.Exp")
     operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
-        body(...) {
+        body (...) {
             CheckQubitUniqueness(qubits);
             RotationAngleValidation(theta);
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'qubits' must have the same length"; }
             let (newPaulis, newQubits) = RemovePauliI(paulis, qubits);
 
             if (Length(newPaulis) != 0) {
-                ExpNoIdUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
+                ExpUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
             }
             else {
                 ApplyGlobalPhase(theta);

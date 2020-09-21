@@ -1,42 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Common\AssemblyCommon.props" />
-  <Import Project="..\Common\DebugSymbols.props" />
-  <Import Project="..\Common\Simulators.Type2.Dev.props" />
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <LanguageVersion>8.0</LanguageVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+  <Import Project="..\Common\Simulators.Impl.props" />
 
   <ItemGroup>
-    <Compile Include="..\Simulators\QuantumSimulator\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Native\win10\**\*">
-      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\Native\osx\**\*">
-      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\Native\linux\**\*">
-      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
+    <ProjectReference Include="..\Type2Core\Microsoft.Quantum.Type2.Core.csproj" />
   </ItemGroup>
 
 </Project>

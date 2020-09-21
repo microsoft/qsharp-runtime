@@ -4,41 +4,6 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Diagnostics;
 
-    @EnableTestingViaName("Test.TargetDefinitions.ExpNoIdUtil")
-    internal operation ExpNoIdUtil (paulis : Pauli[], theta : Double, qubits : Qubit[], rotation : ((Pauli, Qubit) => Unit is Adj + Ctl)) : Unit is Ctl {
-        if (Length(paulis) != Length(qubits)) { fail "Arrays 'paulis' and 'qubits' must have the same length"; }
-        if (Length(paulis) == 1) {
-            rotation(paulis[0], qubits[0]);
-        }
-        elif (Length(paulis) == 2) {
-            within {
-                MapPauli(qubits[1], paulis[0], paulis[1]);
-            }
-            apply {
-                if (paulis[0] == PauliX) {
-                    IsingXX(theta / 2.0, qubits[0], qubits[1]);
-                } elif (paulis[0] == PauliY) {
-                    IsingYY(theta / 2.0, qubits[0], qubits[1]);
-                } elif (paulis[0] == PauliZ) {
-                    IsingZZ(theta / 2.0, qubits[0], qubits[1]);
-                } else {
-                    fail "Type2 decompositions do not support PauliI as an input to Exp";
-                }
-            }
-        }
-        else { // Length(paulis) > 2 
-            within {
-                for (i in 0 .. Length(paulis) - 1) {
-                    MapPauli(qubits[i], PauliZ, paulis[i]);
-                }
-                SpreadZ(qubits[1], qubits[2 .. Length(qubits) - 1]);
-            }
-            apply {
-                IsingZZ(theta / 2.0, qubits[0], qubits[1]);
-            }
-        }
-    }
-
     @EnableTestingViaName("Test.TargetDefinitions.SpreadZ")
     internal operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
@@ -53,8 +18,8 @@ namespace Microsoft.Quantum.Intrinsic {
 
     @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhase")
     internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
-        body(...) {}
-        controlled(controls, (...)) {
+        body (...) {}
+        controlled (controls, (...)) {
             if (Length(controls) > 0) {
                 let qubit = controls[0];
                 let rest = controls[1...];
@@ -67,8 +32,8 @@ namespace Microsoft.Quantum.Intrinsic {
 
     @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhaseFracWithR1Frac")
     internal operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
-        body(...) {}
-        controlled(ctrls, ... ) {
+        body (...) {}
+        controlled (ctrls, ...) {
             let numControls =  Length(ctrls);
             if (numControls > 0 ) {
                 // Invoke Controlled R1Frac, which will recursively call back into ApplyGlobalPhase.
@@ -104,6 +69,41 @@ namespace Microsoft.Quantum.Intrinsic {
         else {
             fail "Unsupported input";
         }
+    }
+
+    /// Given a multiply-controlled operation that requires k controls 
+    /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
+    @EnableTestingViaName("Test.TargetDefinitions.ApplyWithLessControlsA")
+    internal operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {
+        let numControls = Length(controls);
+        let numControlPairs = numControls / 2;
+        using (temps = Qubit[numControlPairs]) {
+            within {
+                for (numPair in 0 .. numControlPairs - 1) { // constant depth
+                    PhaseCCX(controls[2*numPair], controls[2*numPair + 1], temps[numPair]);
+                }
+            }
+            apply {
+                let newControls = numControls % 2 == 0 ? temps | temps + [controls[numControls - 1]];
+                op(newControls, arg);
+            }
+        }
+    }
+
+    @EnableTestingViaName("Test.TargetDefinitions.PhaseCCX")
+    internal operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+        // https://arxiv.org/pdf/1210.0974.pdf#page=2
+        H(target);
+        CNOT(target,control1);
+        CNOT(control1,control2);
+        T(control2);
+        Adjoint T(control1);
+        T(target);
+        CNOT(target,control1);
+        CNOT(control1,control2);
+        Adjoint T(control2);
+        CNOT(target,control2);
+        H(target);
     }
 
     @EnableTestingViaName("Test.TargetDefinitions.ReducedDyadicFraction")
@@ -142,7 +142,7 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @EnableTestingViaName("Test.TargetDefinitions.IndicesOfNonIdentity")
-    internal function IndicesOfNonIdentity(paulies : Pauli[]) : Int[] {
+    internal function IndicesOfNonIdentity (paulies : Pauli[]) : Int[] {
         mutable nonIdPauliCount = 0;
 
         for (i in 0 .. Length(paulies) - 1) {
@@ -163,7 +163,7 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @EnableTestingViaName("Test.TargetDefinitions.RemovePauliI")
-    internal function RemovePauliI(paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
+    internal function RemovePauliI (paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
         let indices = IndicesOfNonIdentity(paulis);
         let newPaulis = Subarray(indices, paulis);
         let newQubits = Subarray(indices, qubits);

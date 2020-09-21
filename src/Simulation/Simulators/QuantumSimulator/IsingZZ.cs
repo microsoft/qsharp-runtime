@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public class QSimIsingZZ : Intrinsic.IsingZZ
+        internal class QSimIsingZZ : Intrinsic.IsingZZ
         {
             [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Exp")]
             private static extern void Exp(uint id, uint n, Pauli[] paulis, double angle, uint[] ids);

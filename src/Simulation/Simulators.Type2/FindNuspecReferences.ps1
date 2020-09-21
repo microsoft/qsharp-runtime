@@ -1,7 +1,8 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 ########################################
+# .Description
 # When creating a package with dotnet pack, nuget changes every ProjectReference to be itself
 # a PackageReference (without checking if that project has a corresponding package).
 # This is problematic because we currently don't want to create a package for every dll.
@@ -31,8 +32,7 @@ if (Test-Path $target) {
 $nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.Type2.nuspec.template"))
 $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
-function Add-PackageReferenceIfNew($ref)
-{
+function Add-PackageReferenceIfNew($ref) {
     # Identify package's id either from "Include" or "Update" attribute:
     $id = $ref.Include
     $version = $ref.Version
@@ -40,8 +40,7 @@ function Add-PackageReferenceIfNew($ref)
     if ($id -eq $null -or $id -eq "") {
         $id = $ref.Update
     }
-    if ($id.EndsWith('.csproj') -or $id.EndsWith('.fsproj')) 
-    {
+    if ($id.EndsWith('.csproj') -or $id.EndsWith('.fsproj')) {
         $id = [System.IO.Path]::GetFileNameWithoutExtension($id)
     }
 
@@ -60,8 +59,7 @@ function Add-PackageReferenceIfNew($ref)
 }
 
 # Recursively find PackageReferences on all ProjectReferences:
-function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
-{
+function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj) {
     Write-Host "`nFinding dependencies for $PathToCsproj"
     $csproj = [xml](Get-Content $PathToCsproj)
 
