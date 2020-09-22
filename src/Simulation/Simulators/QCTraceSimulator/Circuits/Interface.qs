@@ -77,5 +77,4 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     operation ForceMeasure (observable : Pauli[], target : Qubit[], result : Result) : Unit {
         body intrinsic;
     }
-
 }
