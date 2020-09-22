@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
 
 #nullable enable
 
@@ -31,14 +32,11 @@ namespace Microsoft.Quantum.Simulation.Common
         public event Action<string>? OnLog = null;
         public event Action<Exception, IEnumerable<StackFrame>>? OnException = null;
 
-
         protected readonly int randomSeed;
         protected readonly Lazy<System.Random> randomGenerator;
         public int Seed => randomSeed;
         protected System.Random RandomGenerator => randomGenerator.Value;
 
-
-        
         /// <summary>
         ///     An event fired whenever a simulator has additional diagnostic data
         ///     available for display (e.g. state information, assertion details,
@@ -49,7 +47,6 @@ namespace Microsoft.Quantum.Simulation.Common
         public IQubitManager? QubitManager { get; }
 
         public abstract string Name { get; }
-
 
         /// <summary>
         /// If the execution finishes in failure, this method returns the call-stack of the Q# operations 
@@ -82,7 +79,7 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        public virtual I Get<I>(Type T)
+        public I Get<I>(Type T)
         {
             return (I)this.GetInstance(T);
         }
@@ -97,7 +94,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// If the operation has no body in the Q# file, and no override has been defined in the Simulator,
         /// this method will throw an InvalidOperationException.
         /// </summary>
-        public virtual I Get<I, T>() where T : AbstractCallable, I
+        public I Get<I, T>() where T : AbstractCallable, I
         {
             var key = typeof(T);
             return (I)this.GetInstance(key);
@@ -271,8 +268,8 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Allocate : Intrinsic.Allocate
         {
-            private SimulatorBase sim;
-            private IQubitManager? manager;
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
 
             public Allocate(SimulatorBase m) : base(m)
             {
@@ -282,26 +279,16 @@ namespace Microsoft.Quantum.Simulation.Common
 
             public override Qubit Apply()
             {
+                Qubit qubit = manager.Allocate();
                 sim.OnAllocateQubits?.Invoke(1);
-                return manager.Allocate();
+                return qubit;
             }
 
             public override IQArray<Qubit> Apply(long count)
             {
-                if (count < 0)
-                {
-                    throw new InvalidOperationException($"Trying to allocate {count} qubits.");
-                }
-                else if (count == 0)
-                {
-                    sim.OnAllocateQubits?.Invoke(count);
-                    return new QArray<Qubit>();
-                }
-                else
-                {
-                    sim.OnAllocateQubits?.Invoke(count);
-                    return manager.Allocate(count);
-                }
+                IQArray<Qubit> qubits = manager.Allocate(count);
+                sim.OnAllocateQubits?.Invoke(count);
+                return qubits;
             }
         }
 
@@ -311,8 +298,8 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Release : Intrinsic.Release
         {
-            private SimulatorBase sim;
-            private IQubitManager manager;
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
 
             public Release(SimulatorBase m) : base(m)
             {
@@ -339,22 +326,27 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Borrow : Intrinsic.Borrow
         {
-            SimulatorBase sim;
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
 
             public Borrow(SimulatorBase m) : base(m)
             {
-                sim = m;
+                this.sim = m;
+                this.manager = m.QubitManager;
             }
 
             public override Qubit Apply()
             {
-                return sim.QubitManager.Allocate();
+                Qubit qubit = manager.Borrow();
+                sim.OnBorrowQubits?.Invoke(1);
+                return qubit;
             }
 
             public override IQArray<Qubit> Apply(long count)
             {
+                IQArray<Qubit> qubits = manager.Borrow(count);
                 sim.OnBorrowQubits?.Invoke(count);
-                return sim.QubitManager.Borrow(count);
+                return qubits;
             }
         }
 
@@ -364,36 +356,73 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class Return : Intrinsic.Return
         {
-            SimulatorBase sim;
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
 
             public Return(SimulatorBase m) : base(m)
             {
-                sim = m;
+                this.sim = m;
+                this.manager = m.QubitManager;
             }
 
             public override void Apply(Qubit q)
             {
                 sim.OnReturnQubits?.Invoke(new QArray<Qubit>(new[] { q }));
-                sim.QubitManager.Return(q);
+                manager.Return(q);
             }
 
             public override void Apply(IQArray<Qubit> qubits)
             {
                 sim.OnReturnQubits?.Invoke(qubits);
-                sim.QubitManager.Return(qubits);
+                manager.Return(qubits);
             }
         }
+
+        /// <summary>
+        /// Implements the GetQubitsAvailableToUse extension function.
+        /// </summary>
+        public class GetQubitsAvailableToUse : Environment.GetQubitsAvailableToUse
+        {
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
+
+            public GetQubitsAvailableToUse(SimulatorBase m) : base(m)
+            {
+                this.sim = m;
+                this.manager = m.QubitManager;
+            }
+
+            public override Func<QVoid, long> __Body__ => (arg) => 
+                manager.GetFreeQubitsCount();
+        }
+
+        /// <summary>
+        /// Implements the GetQubitsAvailableToBorrow extension function.
+        /// </summary>
+        public class GetQubitsAvailableToBorrow : Environment.GetQubitsAvailableToBorrow
+        {
+            protected readonly SimulatorBase sim;
+            protected readonly IQubitManager manager;
+
+            public GetQubitsAvailableToBorrow(SimulatorBase m) : base(m)
+            {
+                this.sim = m;
+                this.manager = m.QubitManager;
+            }
+
+            public override Func<QVoid, long> __Body__ => (arg) => 
+                manager.GetParentQubitsAvailableToBorrowCount() + manager.GetFreeQubitsCount();
+        }
+
 
         /// <summary>
         ///     Implements the Log statement as an operation. It just calls Console.WriteLine.
         /// </summary>
         public class Message : Intrinsic.Message
         {
-            private SimulatorBase sim;
-            public Message(SimulatorBase m) : base(m)
-            {
+            protected readonly SimulatorBase sim;
+            public Message(SimulatorBase m) : base(m) => 
                 sim = m;
-            }
 
             public override Func<String, QVoid> __Body__ => (msg) =>
             {
@@ -403,48 +432,14 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         /// <summary>
-        /// Implements the GetQubitsAvailableToUse extension function.
-        /// </summary>
-        public class GetQubitsAvailableToUse : Environment.GetQubitsAvailableToUse
-        {
-            private SimulatorBase sim;
-
-            public GetQubitsAvailableToUse(SimulatorBase m) : base(m)
-            {
-                sim = m;
-            }
-
-            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetFreeQubitsCount();
-        }
-
-        /// <summary>
-        /// Implements the GetQubitsAvailableToBorrow extension function.
-        /// </summary>
-        public class GetQubitsAvailableToBorrow : Environment.GetQubitsAvailableToBorrow
-        {
-            private SimulatorBase sim;
-
-            public GetQubitsAvailableToBorrow(SimulatorBase m) : base(m)
-            {
-                sim = m;
-            }
-
-            public override Func<QVoid, long> __Body__ => (arg) => sim.QubitManager.GetParentQubitsAvailableToBorrowCount() +
-                                                               sim.QubitManager.GetFreeQubitsCount();
-        }
-
-        /// <summary>
         ///     Implements the DrawRandomInt operation from the
         ///     Microsoft.Quantum.Random namespace.
         /// </summary>
         public class DrawRandomInt : Random.DrawRandomInt
         {
-            private SimulatorBase sim;
-
-            public DrawRandomInt(SimulatorBase m) : base(m)
-            {
+            protected readonly SimulatorBase sim;
+            public DrawRandomInt(SimulatorBase m) : base(m) =>
                 sim = m;
-            }
 
             public override Func<(long, long), long> __Body__ => arg =>
             {
@@ -463,12 +458,9 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public class DrawRandomDouble : Random.DrawRandomDouble
         {
-            private SimulatorBase sim;
-
-            public DrawRandomDouble(SimulatorBase m) : base(m)
-            {
+            protected readonly SimulatorBase sim;
+            public DrawRandomDouble(SimulatorBase m) : base(m) =>
                 sim = m;
-            }
 
             public override Func<(double, double), double> __Body__ => arg =>
             {
@@ -482,6 +474,256 @@ namespace Microsoft.Quantum.Simulation.Common
             };
         }
 
+        #region Branching based on measurement
+
+        public class ApplyIfElse : ApplyIfElseIntrinsic
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElse(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, ICallable, ICallable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseA : ApplyIfElseIntrinsicA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(Result, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseC : ApplyIfElseIntrinsicC
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseC(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IControllable, IControllable), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Body, null) : (OperationFunctor.Controlled, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, specKind, controls);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyIfElseCA : ApplyIfElseIntrinsicCA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyIfElseCA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(Result, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(Result, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
+            {
+                (Result measurementResult, ICallable onZero, ICallable onOne) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Body, null) : (OperationFunctor.Controlled, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, specKind, controls);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (Result, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (Result measurementResult, ICallable onZero, ICallable onOne)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Adjoint, null) : (OperationFunctor.ControlledAdjoint, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResult, Result.Zero, onZero, onOne, specKind, controls);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionally : ApplyConditionallyIntrinsic
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionally(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, ICallable, ICallable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyA : ApplyConditionallyIntrinsicA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IAdjointable, IAdjointable), QVoid> __AdjointBody__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyC : ApplyConditionallyIntrinsicC
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyC(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IControllable, IControllable), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IControllable, IControllable)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Body, null) : (OperationFunctor.Controlled, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, specKind, controls);
+                return QVoid.Instance;
+            };
+        }
+
+        public class ApplyConditionallyCA : ApplyConditionallyIntrinsicCA
+        {
+            protected readonly SimulatorBase sim;
+            public ApplyConditionallyCA(SimulatorBase m) : base(m) =>
+                sim = m;
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __Body__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Body, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Result>, IQArray<Result>, IUnitary, IUnitary), QVoid> __AdjointBody__ => (q) =>
+            {
+                (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp) = q;
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, OperationFunctor.Adjoint, null);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Body, null) : (OperationFunctor.Controlled, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, specKind, controls);
+                return QVoid.Instance;
+            };
+
+            public override Func<(IQArray<Qubit>, (IQArray<Result>, IQArray<Result>, IUnitary, IUnitary)), QVoid> __ControlledAdjointBody__ => (q) =>
+            {
+                (IQArray<Qubit> ctrls, (IQArray<Result> measurementResults, IQArray<Result> resultsValues, ICallable onEqualOp, ICallable onNonEqualOp)) = q;
+                (var specKind, IQArray<Qubit>? controls) = ctrls?.Count == 0 ? (OperationFunctor.Adjoint, null) : (OperationFunctor.ControlledAdjoint, ctrls);
+                this.sim.BranchingBasedOnMeasurement(measurementResults, resultsValues, onEqualOp, onNonEqualOp, specKind, controls);
+                return QVoid.Instance;
+            };
+        }
+
+        private Action BuildClause(ICallable op, OperationFunctor type, IQArray<Qubit>? ctrls) =>
+            type switch
+            {
+                OperationFunctor.Body => () => op.Apply(QVoid.Instance),
+                OperationFunctor.Adjoint => () => ((IAdjointable)op).Adjoint.Apply(QVoid.Instance),
+                OperationFunctor.Controlled => () => ((IControllable)op).Controlled.Apply((ctrls, QVoid.Instance)),
+                OperationFunctor.ControlledAdjoint => () => ((IUnitary)op).Controlled.Adjoint.Apply((ctrls, QVoid.Instance)),
+                _ => throw new NotImplementedException("unknown specialization"),
+            };
+
+        private void BranchingBasedOnMeasurement(IQArray<Result> results1, IQArray<Result> results2, ICallable onEqual, ICallable onNonEqual, OperationFunctor type, IQArray<Qubit>? ctrls)
+        {
+            long statement = this.StartBranchingBasedOnMeasurement(results1, results2);
+            ExecuteBranchingBasedOnMeasurement(statement, BuildClause(onEqual, type, ctrls), BuildClause(onNonEqual, type, ctrls));
+            this.EndBranchingBasedOnMeasurement(statement);
+        }
+
+        private void BranchingBasedOnMeasurement(Result result1, Result result2, ICallable onEqual, ICallable onNonEqual, OperationFunctor type, IQArray<Qubit>? ctrls)
+        {
+            long statement = this.StartBranchingBasedOnMeasurement(result1, result2);
+            ExecuteBranchingBasedOnMeasurement(statement, BuildClause(onEqual, type, ctrls), BuildClause(onNonEqual, type, ctrls));
+            this.EndBranchingBasedOnMeasurement(statement);
+        }
+
+        public virtual void ExecuteBranchingBasedOnMeasurement(long condition, Action onEqual, Action onNonEqual)
+        {
+            switch (condition)
+            {
+                case 1: onEqual?.Invoke(); break;
+                case 0: onNonEqual?.Invoke(); break;
+                default: throw new NotImplementedException("value for condition was expected to be either 0 (when the condition is false) or 1 (when the condition is true)");
+            }
+        }
+
+        /// <summary>
+        /// By default, 1 indicates that all results are equal, i.e. the statement is to enter the then-clause,
+        /// and 0 indicates that they are not, i.e. the statement is to enter then else-clause.
+        /// If both arrays are null, then 1 is returned.
+        /// </summary>
+        public virtual long StartBranchingBasedOnMeasurement(IQArray<Result> results1, IQArray<Result> results2)
+        {
+            if (results1 == null) { return results2 == null ? 1 : 0; };
+            if (results1.Count != results2?.Count) { return 0; };
+            return results1.Zip(results2, (r1, r2) => (r1, r2)).Any(pair => pair.r1 != pair.r2) ? 0 : 1;
+        }
+
+        /// <summary>
+        /// By default, 1 indicates that both results are equal, i.e. the statement is to enter the then-clause.
+        /// and 0 indicates that they are not, i.e. the statement is to enter then else-clause.
+        /// </summary>
+        public virtual long StartBranchingBasedOnMeasurement(Result result1, Result result2)
+        {
+            return result1 == result2 ? 1 : 0;
+        }
+
+        public virtual void EndBranchingBasedOnMeasurement(long statement)
+        { }
+
+        #endregion
+
         public virtual void StartOperation(ICallable operation, IApplyData inputValue)
         {
             OnOperationStart?.Invoke(operation, inputValue);
@@ -492,7 +734,7 @@ namespace Microsoft.Quantum.Simulation.Common
             OnOperationEnd?.Invoke(operation, resultValue);
         }
 
-        public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo )
+        public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo)
         {
             OnFail?.Invoke(exceptionInfo);
         }
