@@ -89,8 +89,7 @@ namespace Microsoft.Azure.Quantum.Exceptions
                 formattedException += $"Server Error: {ex.Message}{Environment.NewLine}";
 
                 // Handle specific types of exceptions for additional data
-                RestErrorException restErrorException = ex as RestErrorException;
-                if (restErrorException != null)
+                if (ex is RestErrorException restErrorException)
                 {
                     formattedException += $"Error code: {restErrorException?.Body?.Code}{Environment.NewLine}" +
                         $"Server message: {restErrorException?.Body?.Message}{Environment.NewLine}";
