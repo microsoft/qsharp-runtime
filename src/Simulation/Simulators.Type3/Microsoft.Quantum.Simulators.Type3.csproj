@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Common\Simulators.Impl.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Type3Core\Microsoft.Quantum.Type3.Core.csproj" />
+  </ItemGroup>
+
+</Project>

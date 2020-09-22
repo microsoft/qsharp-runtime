@@ -19,6 +19,10 @@ Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type2")
     .\FindNuspecReferences.ps1
 Pop-Location
 
+Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type3")
+    .\FindNuspecReferences.ps1
+Pop-Location
+
 # bootstrap native folder
 if ($Env:ENABLE_NATIVE -ne "false") {
     ## Run the right script based on the OS.
