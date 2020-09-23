@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Azure.Quantum.Client.Models;
 using System;
 
 namespace Microsoft.Azure.Quantum.Exceptions
@@ -67,9 +68,41 @@ namespace Microsoft.Azure.Quantum.Exceptions
                   $"WorkspaceName: {workspaceName}{Environment.NewLine}" +
                   $"BaseUri: {baseUri}{Environment.NewLine}" +
                   $"JobId: {jobId}{Environment.NewLine}" +
-                  (inner != null ? $"Inner Exception: {inner}" : string.Empty),
+                  FormatInnerException(inner),
                   inner)
         {
+        }
+
+        /// <summary>
+        /// Formats the contents of the inner exception in <see cref="WorkspaceClientException"/> so it can be included in the
+        /// exception message and presented in an informative way.
+        /// </summary>
+        /// <param name="ex">Inner exception that we want to include in the outer exception message.</param>
+        /// <return>
+        /// A string representing the contents of the inner exception.
+        /// </return>
+        private static string FormatInnerException(Exception ex)
+        {
+            string formattedException = string.Empty;
+            if (ex != null)
+            {
+                formattedException += $"Server Error: {ex.Message}{Environment.NewLine}";
+
+                // Handle specific types of exceptions for additional data
+                if (ex is RestErrorException restErrorException)
+                {
+                    formattedException += $"Error Code: {restErrorException?.Body?.Code}{Environment.NewLine}" +
+                        $"Server message: {restErrorException?.Body?.Message}{Environment.NewLine}";
+
+                    var headers = restErrorException?.Response?.Headers;
+                    if (headers != null && headers.ContainsKey("x-ms-request-id"))
+                    {
+                        formattedException += $"Server Request Id: {headers["x-ms-request-id"]}{Environment.NewLine}";
+                    }
+                }
+            }
+
+            return formattedException;
         }
     }
 }
