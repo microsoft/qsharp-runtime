@@ -29,8 +29,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 
         private readonly IQubitTraceSubscriber[] Subscribers;
 
-        public TraceableQubitManager(IEnumerable<IQubitTraceSubscriber>? subscribers)
-            : base(NumQubits, mayExtendCapacity: true, disableBorrowing: false)
+        public TraceableQubitManager(IEnumerable<IQubitTraceSubscriber>? subscribers, bool optimizeDepth)
+            : base(NumQubits, mayExtendCapacity: true, disableBorrowing: false, encourageReuse: !optimizeDepth)
         {
             this.Subscribers = subscribers?.ToArray() ?? new IQubitTraceSubscriber[] { };
         }

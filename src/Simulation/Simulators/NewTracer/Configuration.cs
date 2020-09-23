@@ -22,6 +22,8 @@
     {
         public bool UseDepthCounter = false;
 
+        public bool OptimizeDepth = false;
+
         public NewTraceGateTimes TraceGateTimes = NewTraceGateTimes.TGatesOnly;
     }
 

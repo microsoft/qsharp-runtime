@@ -12,6 +12,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         {
             public Qubit[] InputQubits { get; set; }
 
+            public int MaxQubitIdAtStart { get; set; }
+
             public double MinStartTime { get; set; }
 
             public double MaxStartTime { get; set; }
@@ -22,6 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         }
 
         protected DepthState CurrentState;
+        private int MaxQubitId = 0;
 
         public DepthCounterBase()
         {
@@ -38,7 +41,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             return new string[]
             {
                 "Depth",
-                "StartTimeDifference"
+                "StartTimeDifference",
+                "Width"
             };
         }
 
@@ -78,7 +82,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             double[] output = new double[]
             {
                     invocationEndTime - CurrentState.MaxStartTime,
-                    CurrentState.MaxStartTime - CurrentState.MinStartTime
+                    CurrentState.MaxStartTime - CurrentState.MinStartTime,
+                    this.MaxQubitId - endState.MaxQubitIdAtStart
             };
             this.CurrentState = endState;
             return output;
@@ -91,6 +96,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             this.CurrentState = new DepthState
             {
                 InputQubits = inputQubits,
+                MaxQubitIdAtStart = this.MaxQubitId,
                 MinStartTime = this.MinAvailableTime(inputQubits),
                 MaxStartTime = this.MaxAvailableTime(inputQubits),
                 ReleasedQubitsTime = 0,
@@ -115,6 +121,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
 
         void IQubitTrackingTarget.OnAllocateQubits(IQArray<Qubit> qubits)
         {
+            foreach (Qubit qubit in qubits) {
+                this.MaxQubitId = System.Math.Max(this.MaxQubitId, qubit.Id);
+            }
         }
 
         void IQubitTrackingTarget.OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount)

@@ -29,12 +29,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
         }
 
         public TracerSimulator(NewTracerConfiguration? config = null)
-            : this(Utils.BuildTargetsFromConfig(config), useNewDecomposition: true)
+            : this(
+                Utils.BuildTargetsFromConfig(config),
+                useNewDecomposition: true,
+                optimizeDepth: (config != null ? config.OptimizeDepth : false))
         {
         }
 
         public TracerSimulator(QCTraceSimConfiguration config)
-            : this(Utils.BuildTargetsFromConfig(config), useNewDecomposition: false)
+            : this(Utils.BuildTargetsFromConfig(config), useNewDecomposition: false, optimizeDepth: false)
         {
         }
 
@@ -64,7 +67,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
             return matchingTargets.First();
         }
 
-        public TracerSimulator(IEnumerable<ITracerTarget> suppliedTargets, bool useNewDecomposition = true)
+        public TracerSimulator(IEnumerable<ITracerTarget> suppliedTargets, bool useNewDecomposition = true, bool optimizeDepth = false)
         {
             if (suppliedTargets == null) { throw new ArgumentNullException(nameof(suppliedTargets)); }
 
@@ -79,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer
 
             IEnumerable<IQubitTraceSubscriber> qubitTraceTargets = Targets
                 .Extract<ITracerTarget, IQubitTraceSubscriber>();
-            IQubitManager qubitManager = new TraceableQubitManager(qubitTraceTargets);
+            IQubitManager qubitManager = new TraceableQubitManager(qubitTraceTargets, optimizeDepth);
 
             if (useNewDecomposition)
             {
