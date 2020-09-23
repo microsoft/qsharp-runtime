@@ -26,7 +26,17 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         }
     }
     
-    
+    operation TDepthWidth () : Unit {
+        using (q1 = Qubit()) {
+            using (q2 = Qubit()) {
+                CNOT(q1, q2);
+            }
+            using (q3 = Qubit()) {
+                CNOT(q1, q3);
+            }
+        }
+    }
+
     operation BunchOfCNOTs (qs : Qubit[], moreQubits : Qubit[]) : Unit {
         
         body (...) {
@@ -61,7 +71,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
             }
         }
     }
-    
     
     operation TCountZeroGatesTest () : Unit {
         

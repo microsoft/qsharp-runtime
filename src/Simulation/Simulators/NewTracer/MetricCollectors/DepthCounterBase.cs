@@ -24,11 +24,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         }
 
         protected DepthState CurrentState;
-        private int MaxQubitId = 0;
+        private int MaxQubitId = -1;
 
         public DepthCounterBase()
         {
-            this.CurrentState = new DepthState();
+            this.CurrentState = new DepthState() { MaxQubitIdAtStart = MaxQubitId };
         }
 
         string IMetricCollector.CollectorName()
@@ -139,6 +139,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         {
             double finishedAt = startTime + duration;
             this.SetQubitData(qubit, finishedAt);
+            this.MaxQubitId = System.Math.Max(this.MaxQubitId, qubit.Id);
         }
 
         public double GetAvailableTime(Qubit qubit)

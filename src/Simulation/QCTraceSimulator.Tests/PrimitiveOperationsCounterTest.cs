@@ -120,6 +120,26 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             Assert.Equal(1, sim.GetOperationMetric<TDepthOne>(MetricsNames.DepthCounter.Depth));
         }
 
+        [Fact]
+        void TDepthAndWidthTest()
+        {
+            TracerSimulator sim = RunDepthWidth(false);
+            Assert.Equal(2, sim.GetOperationMetric<TDepthWidth>("Width"));
+            sim = RunDepthWidth(true);
+            Assert.Equal(3, sim.GetOperationMetric<TDepthWidth>("Width"));
+        }
+
+        TracerSimulator RunDepthWidth(bool optimizeDepth) {
+            NewTracerConfiguration config = new NewTracerConfiguration();
+            config.UseDepthCounter = true;
+            config.OptimizeDepth = optimizeDepth;
+            TracerSimulator sim = new TracerSimulator(config);
+            QVoid res = TDepthWidth.Run(sim).Result;
+            string csvSummary = sim.ToCSV()[MetricsCountersNames.depthCounter];
+            return sim;
+        }
+
+
         //TODO: re-enable after fixing op lookup bug
         [Fact(Skip = "Old Decomposition")]
         void CCNOTDepthCountExample()
