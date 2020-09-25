@@ -27,12 +27,30 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
     }
     
     operation TDepthWidth () : Unit {
+        // q2 q1 q3 q4
+        // |  |      
+        // O--O      
+        // |  |      
+        //    |  |  |
+        //    |  O--O
+        //    |  |  |
+        //    |  |   
+        //    O--O   
+        //    |  |   
+        //           
+        // Width 4, Depth 2.
+        // Alternatively q2 is reused for q4 (or q3)
+        // Width 3, Depth 3.
+
         using (q1 = Qubit()) {
             using (q2 = Qubit()) {
-                CNOT(q1, q2);
+                Controlled Z([q2], q1);
             }
             using (q3 = Qubit()) {
-                CNOT(q1, q3);
+                using (q4 = Qubit()) {
+                    Controlled Z([q4], q3);
+                }
+                Controlled Z([q3], q1);
             }
         }
     }

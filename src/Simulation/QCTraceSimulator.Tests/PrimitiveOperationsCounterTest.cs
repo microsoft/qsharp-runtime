@@ -123,16 +123,20 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         void TDepthAndWidthTest()
         {
-            TracerSimulator sim = RunDepthWidth(false);
-            Assert.Equal(2, sim.GetOperationMetric<TDepthWidth>("Width"));
-            sim = RunDepthWidth(true);
+            TracerSimulator sim = null;
+            sim = RunDepthWidth(optimizeDepth: true);
+            Assert.Equal(4, sim.GetOperationMetric<TDepthWidth>("Width"));
+            Assert.Equal(2, sim.GetOperationMetric<TDepthWidth>("Depth"));
+            sim = RunDepthWidth(optimizeDepth: false);
             Assert.Equal(3, sim.GetOperationMetric<TDepthWidth>("Width"));
+            Assert.Equal(3, sim.GetOperationMetric<TDepthWidth>("Depth"));
         }
 
         TracerSimulator RunDepthWidth(bool optimizeDepth) {
             NewTracerConfiguration config = new NewTracerConfiguration();
             config.UseDepthCounter = true;
             config.OptimizeDepth = optimizeDepth;
+            config.TraceGateTimes = NewTraceGateTimes.ControlledZOnly;
             TracerSimulator sim = new TracerSimulator(config);
             QVoid res = TDepthWidth.Run(sim).Result;
             string csvSummary = sim.ToCSV()[MetricsCountersNames.depthCounter];

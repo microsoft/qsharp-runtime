@@ -6,7 +6,7 @@ using Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollection;
 
 namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
 {
-    public abstract class DepthCounterBase : IQubitTrackingTarget, IMetricCollector, IQubitTraceSubscriber<double>
+    public abstract class DepthCounterBase : IQubitTrackingTarget, IMetricCollector, IQubitTraceSubscriber
     {
         public class DepthState : IStackRecord
         {
@@ -23,8 +23,36 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             public double ReturnedQubitsTime { get; set; }
         }
 
+        private class AutoArrayOfDouble : List<double> {
+            private double DefaultValue;
+            public AutoArrayOfDouble(double defaultValue, int initialCapacity) : base(initialCapacity) {
+                DefaultValue = defaultValue;
+            }
+
+            public new double this[int index] {
+                get {
+                    if (index < Count) {
+                        return base[index];
+                    }
+                    return DefaultValue;
+                }
+                set {
+                    if (index == Count) {
+                        this.Add(value);
+                        return;
+                    } else if (index > Count) {
+                        this.AddRange(Enumerable.Repeat(DefaultValue, index - Count + 1));
+                    }
+                    base[index] = value;
+                }
+            }
+        }
+
         protected DepthState CurrentState;
         private int MaxQubitId = -1;
+        private AutoArrayOfDouble AvailableTimeById = new AutoArrayOfDouble(
+            defaultValue: 0,
+            initialCapacity: 128);
 
         public DepthCounterBase()
         {
@@ -117,8 +145,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
             this.CurrentState.ReleasedQubitsTime = System.Math.Max(this.CurrentState.ReleasedQubitsTime, releasedTime);
         }
 
-        //TODO: implement time storing as dictionary id->time an clear entries on release
-
         void IQubitTrackingTarget.OnAllocateQubits(IQArray<Qubit> qubits)
         {
             foreach (Qubit qubit in qubits) {
@@ -130,21 +156,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         {
         }
 
-        double IQubitTraceSubscriber<double>.NewTracingData(long id)
-        {
-            return 0.0d;
+        object? IQubitTraceSubscriber.NewTracingData(long id) {
+            // TODO: This function is not needed - this class doesn't need to store any data in qubits.
+            // However, infrastructure requires this function
+            return null;
         }
 
         protected void RecordQubitUse(double startTime, double duration, Qubit qubit)
         {
             double finishedAt = startTime + duration;
-            this.SetQubitData(qubit, finishedAt);
+            AvailableTimeById[qubit.Id] = finishedAt;
             this.MaxQubitId = System.Math.Max(this.MaxQubitId, qubit.Id);
         }
 
         public double GetAvailableTime(Qubit qubit)
         {
-            return this.ExtractQubitData(qubit);
+            return AvailableTimeById[qubit.Id];
         }
 
         public double MinAvailableTime(IEnumerable<Qubit> qubits)
