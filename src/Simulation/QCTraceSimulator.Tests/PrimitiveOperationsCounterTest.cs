@@ -133,13 +133,14 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         }
 
         TracerSimulator RunDepthWidth(bool optimizeDepth) {
-            NewTracerConfiguration config = new NewTracerConfiguration();
-            config.UseDepthCounter = true;
-            config.OptimizeDepth = optimizeDepth;
-            config.TraceGateTimes = NewTraceGateTimes.ControlledZOnly;
+            NewTracerConfiguration config = new NewTracerConfiguration()
+            {
+                UseDepthCounter = true,
+                OptimizeDepth = optimizeDepth,
+                TraceGateTimes = NewTraceGateTimes.ControlledZOnly
+            };
             TracerSimulator sim = new TracerSimulator(config);
-            QVoid res = TDepthWidth.Run(sim).Result;
-            string csvSummary = sim.ToCSV()[MetricsCountersNames.depthCounter];
+            TDepthWidth.Run(sim).Wait();
             return sim;
         }
 

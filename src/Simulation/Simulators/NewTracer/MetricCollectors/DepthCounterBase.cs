@@ -147,7 +147,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
 
         void IQubitTrackingTarget.OnAllocateQubits(IQArray<Qubit> qubits)
         {
-            foreach (Qubit qubit in qubits) {
+            foreach (Qubit qubit in qubits)
+            {
                 this.MaxQubitId = System.Math.Max(this.MaxQubitId, qubit.Id);
             }
         }
@@ -156,7 +157,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.NewTracer.MetricCollectors
         {
         }
 
-        object? IQubitTraceSubscriber.NewTracingData(long id) {
+        object? IQubitTraceSubscriber.NewTracingData(long id)
+        {
             // TODO: This function is not needed - this class doesn't need to store any data in qubits.
             // However, infrastructure requires this function
             return null;

@@ -37,9 +37,10 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests {
         //    |  |   
         //    O--O   
         //    |  |   
-        //           
+        //
+        // Assuming gates are depth one, this circuit is:
         // Width 4, Depth 2.
-        // Alternatively q2 is reused for q4 (or q3)
+        // Alternatively if q2 is reused for q4 (or q3)
         // Width 3, Depth 3.
 
         using (q1 = Qubit()) {
