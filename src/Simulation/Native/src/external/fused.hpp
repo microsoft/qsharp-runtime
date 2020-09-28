@@ -210,7 +210,9 @@ class Fused
 #endif
             if (envNT == NULL) { // If the user didn't force the number of threads, make an intelligent guess
                 int nMaxThrds = 4;
-                if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
+                if (wfnCapacity < 1ul << 14)      nMaxThrds = 1;
+                else if (wfnCapacity < 1ul << 16) nMaxThrds = 2;
+                else if (wfnCapacity < 1ul << 20) nMaxThrds = 3;
                 int nProcs = omp_get_num_procs();
                 if (nProcs < 3) nMaxThrds = nProcs;
                 if (dbgNumThreads > 0) nMaxThrds = dbgNumThreads; //@@@DBG allow for debugging from above
