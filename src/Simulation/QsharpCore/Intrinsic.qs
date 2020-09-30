@@ -666,10 +666,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
+    @Capability("QPRGen0")
     operation Reset (target : Qubit) : Unit {
-        
-        if (M(target) == One)
-        {
+        if (M(target) == One) {
             X(target);
         }
     }
@@ -683,12 +682,8 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubits
     /// An array of qubits whose states are to be reset to $\ket{0}$.
     operation ResetAll (qubits : Qubit[]) : Unit {
-
         for (qubit in qubits) {
             Reset(qubit);
         }
     }
-    
 }
-
-

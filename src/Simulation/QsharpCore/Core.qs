@@ -151,5 +151,3 @@ namespace Microsoft.Quantum.Core {
     }
 
 }
-
-
