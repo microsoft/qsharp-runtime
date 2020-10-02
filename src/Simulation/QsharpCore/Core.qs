@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Core {
     /// # Summary
     /// Compiler-recognized attribute used to mark a type or callable as deprecated.
     /// 
-    /// # Input
+    /// # Named Items
     /// ## NewName
     /// The full name of the type or callable to use instead. 
     /// Is set to the empty String if a type or callable has been deprecated without substitution. 
@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Core {
     /// # Summary
     /// Compiler-recognized attribute used to mark a callable with the runtime capabilities it requires.
     ///
-    /// # Input
+    /// # Named Items
     /// ## Level
     /// The name of the runtime capability level required by the callable.
     /// 
