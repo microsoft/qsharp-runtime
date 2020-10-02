@@ -1636,51 +1636,6 @@ module SimulationCode =
             let msg = l.LoaderExceptions |> Array.fold (fun msg e -> msg + ";" + e.Message) ""
             failwith msg
 
-    /// Builds the SyntaxTree for callables and types loaded via test names,
-    /// formats it and returns it as a string.
-    /// Returns null if no elements have been loaded via test name.
-    let loadedViaTestNames (dllName : NonNullable<string>) (globalContext : CodegenContext) =
-        let isLoadedViaTestName nsElement =
-            if globalContext.ExposeReferencesViaTestNames then
-                let asOption = function | Value _ -> Some nsElement | _ -> None
-                match nsElement with
-                | QsCallable c -> SymbolResolution.TryGetTestName c.Attributes
-                | QsCustomType t -> SymbolResolution.TryGetTestName t.Attributes
-                |> asOption
-            else None
-        let context = {globalContext with fileName = Some dllName.Value}
-        let localElements = findLocalElements isLoadedViaTestName dllName context.allQsElements
-
-        let getNameCollisions (_, elems : QsNamespaceElement list) =
-            let tryGetCollision = function
-                | QsCustomType t ->
-                    match SymbolResolution.TryGetOriginalName t.Attributes with
-                    | Value origName ->
-                        match context.allUdts.TryGetValue origName with
-                        | true, collision ->
-                            if context.GenerateCodeForSource collision.SourceFile then None
-                            else Some (origName.Namespace, QsCustomType collision)
-                        | _ -> None
-                    | Null -> None
-                | QsCallable c ->
-                    match SymbolResolution.TryGetOriginalName c.Attributes with
-                    | Value origName ->
-                        match context.allCallables.TryGetValue origName with
-                        | true, collision ->
-                            if context.GenerateCodeForSource collision.SourceFile then None
-                            else Some (origName.Namespace, QsCallable collision)
-                        | _ -> None
-                    | Null -> None
-            elems |> List.choose tryGetCollision
-
-        if localElements.Any() then
-            let collisions =
-                (localElements |> Seq.collect getNameCollisions).ToLookup(fst, snd)
-                |> Seq.map (fun g -> g.Key, g |> Seq.toList) |> Seq.toList
-            buildSyntaxTree (localElements @ collisions) context
-            |> formatSyntaxTree
-        else null
-
     /// Main entry method for a CodeGenerator.
     /// Builds the SyntaxTree for the given Q# syntax tree, formats it and returns it as a string.
     /// Omits code generation for intrinsic callables in references.
