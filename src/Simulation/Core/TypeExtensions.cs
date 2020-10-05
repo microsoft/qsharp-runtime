@@ -165,12 +165,6 @@ namespace Microsoft.Quantum.Simulation.Core
                 return op.Name;
             }
 
-            // If object is an IApplyData, recursively extract arguments
-            if (o is IApplyData data)
-            {
-                return data.Value?.GetNonQubitArgumentsAsString();
-            }
-
             // If object is a string, enclose it in quotations
             if (o is string s)
             {
@@ -195,6 +189,15 @@ namespace Microsoft.Quantum.Simulation.Core
                     .Select(f => f.GetValue(o).GetNonQubitArgumentsAsString())
                     .WhereNotNull();
                 return (items.Any()) ? $"({string.Join(", ", items)})" : null;
+            }
+
+            // If object is an IApplyData, recursively extract arguments
+            if (o is IApplyData data)
+            {
+                if (data.Value != data)
+                {
+                    return data.Value?.GetNonQubitArgumentsAsString();
+                }
             }
 
             // Otherwise, return argument as a string

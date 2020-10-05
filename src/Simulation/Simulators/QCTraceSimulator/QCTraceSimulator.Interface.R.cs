@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             }
 
             public override Func<(Pauli, double, Qubit), QVoid>
-                Body => (arg) =>
+                __Body__ => (arg) =>
                 {
                     (Pauli axis, double angle, Qubit target) = arg;
                     tracerCore.R(axis, angle, target);

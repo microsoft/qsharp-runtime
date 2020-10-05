@@ -99,6 +99,7 @@ namespace SIMULATOR
     bool release(unsigned q)
     {
       recursive_lock_type l(mutex());
+      flush();
       bool allok = isclassical(q);
       if (allok)
       allok = (psi.getvalue(q)==false);

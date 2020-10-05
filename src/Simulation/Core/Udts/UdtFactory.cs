@@ -47,7 +47,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public ICallable Partial(object partialTuple) => this.Partial<ICallable>(partialTuple);
 
-        public override void Init()
+        public override void __Init__()
         { }
     }
 }

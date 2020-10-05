@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Core
     {
         private Lazy<Qubit[]> __qubits = null;
 
-        public GenericPartial(GenericCallable baseOp, object partialValues) : base(baseOp.Factory, null)
+        public GenericPartial(GenericCallable baseOp, object partialValues) : base(baseOp.__Factory__, null)
         {
             Debug.Assert(baseOp != null, "Received a null base operation");
             Debug.Assert(partialValues != null, "Received a null partial value");

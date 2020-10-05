@@ -12,6 +12,9 @@
 #include <limits>
 #include <random>
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
+#include <string.h>
 
 #include "types.hpp"
 #include "gates.hpp"
@@ -20,41 +23,122 @@
 
 namespace Microsoft
 {
-namespace Quantum
-{
-namespace SIMULATOR
-{
-    namespace detail
+    namespace Quantum
     {
-        inline std::size_t get_register(const std::vector<unsigned>& qs, std::size_t basis_state)
+        namespace SIMULATOR
         {
-            std::size_t result = 0;
-            for (unsigned i = 0; i < qs.size(); ++i)
-                result |= ((basis_state >> qs[i]) & 1) << i;
-            return result;
+            namespace detail
+            {
+                inline std::size_t get_register(const std::vector<unsigned>& qs, std::size_t basis_state)
+                {
+                    std::size_t result = 0;
+                    for (unsigned i = 0; i < qs.size(); ++i)
+                        result |= ((basis_state >> qs[i]) & 1) << i;
+                    return result;
 
-        }
+                }
 
-        inline std::size_t set_register(const std::vector<unsigned>& qs, std::size_t qmask, std::size_t basis_state, std::size_t original = 0ull)
-        {
-            std::size_t result = original & ~qmask;
-            for (unsigned i = 0; i < qs.size(); ++i)
-                result |= ((basis_state >> i) & 1) << qs[i];
-            return result;
-        }
-    }
+                inline std::size_t set_register(const std::vector<unsigned>& qs, std::size_t qmask, std::size_t basis_state, std::size_t original = 0ull)
+                {
+                    std::size_t result = original & ~qmask;
+                    for (unsigned i = 0; i < qs.size(); ++i)
+                        result |= ((basis_state >> i) & 1) << qs[i];
+                    return result;
+                }
+            }
+
+            // Creating a gate wrapper datatype to represent a gate in a cluster
+            class GateWrapper {
+            public:
+                GateWrapper(std::vector<unsigned> controls, unsigned target, TinyMatrix<ComplexType, 2> mat) : controls_(controls), target_(target), mat_(mat) {}
+                std::vector<unsigned> get_controls() { return controls_; }
+                unsigned get_target() { return target_; }
+                TinyMatrix<ComplexType, 2> get_mat() { return mat_; }
+            private:
+                std::vector<unsigned> controls_;
+                unsigned target_;
+                TinyMatrix<ComplexType, 2> mat_;
+            };
+
+            // Creating a cluster datatype for new scheduling logic
+            class Cluster {
+            public:
+                Cluster(std::vector<unsigned> qids, std::vector<GateWrapper> gates) : qids_(qids), gates_(gates) {}
+                std::vector<unsigned> get_qids() { return qids_; }
+                std::vector<GateWrapper> get_gates() { return gates_; }
+
+                void setQids(std::vector<unsigned> qids) {
+                    qids_ = qids;
+                }
+
+                void append_gates(std::vector<GateWrapper> gates) {
+                    gates_.insert(gates_.end(), gates.begin(), gates.end());
+                }
+
+                size_t size() {
+                    return gates_.size();
+                }
+
+                // Greedy method that finds next appropriate cluster
+                std::pair<Cluster, std::vector<unsigned>> next_cluster(std::vector<Cluster>& nextClusters, unsigned maxWidth) {
+                    std::vector<unsigned>   myUnion;                                // My qubits touched + Next qubits touched
+                    std::vector<unsigned>   myDiff;                                 // New qubits touched by Next
+                    std::vector<unsigned>   myInter;                                // Old qubits touched by Next
+                    std::vector<unsigned>   allInter;                               // My qubits + All touched qubits
+                    std::set<unsigned>      myTouched(qids_.begin(), qids_.end());  // My qubits touched
+                    std::set<unsigned>      allTouched = myTouched;                 // All the qubits touched so far
+
+                    int lastNexts = (int)nextClusters.size() - 1;                   // nexts are in reverse order (from above)
+                    for (int i = 0; i <= lastNexts; i++) {                          // Look at the clusters that follow us
+                        auto   nextQs = nextClusters[lastNexts-i].get_qids();       // Pull off one future cluster
+                        std::sort(nextQs.begin(), nextQs.end());                    // Has to be sorted for set operations
+                        myUnion.clear();
+                        std::set_union(nextQs.begin(), nextQs.end(),                // See what qubits we and the future cluster touch
+                            myTouched.begin(), myTouched.end(),
+                            std::back_inserter(myUnion));
+                        if (myUnion.size() <= maxWidth) {                           // It's a candiate if it's not beyond our allowed width
+                            myDiff.clear();
+                            std::set_difference(nextQs.begin(), nextQs.end(),       // Figure out if any of the future qubits aren't already seen by us
+                                myTouched.begin(), myTouched.end(),
+                                std::back_inserter(myDiff));
+                            allInter.clear();
+                            std::set_intersection(myDiff.begin(), myDiff.end(),     // These are any new qubits that might have already been touched
+                                allTouched.begin(), allTouched.end(),
+                                std::back_inserter(allInter));
+                            if (allInter.size() == 0) {                             // If the new qubits are untouched... then this is allowed
+                                auto cl = nextClusters[lastNexts-i];
+                                nextClusters.erase(nextClusters.begin() + (lastNexts-i));       // Remove the future cluster
+                                return std::make_pair(cl, myUnion);                 // ... and add it to our cluster (done above)
+                            }
+                        }
+                        myInter.clear();
+                        std::set_intersection(nextQs.begin(), nextQs.end(),         // If a future cluster touches any of our qubits... we've hit a hard wall
+                            myTouched.begin(), myTouched.end(),
+                            std::back_inserter(myInter));
+                        if (myInter.size() != 0) break;
+
+                        allTouched.insert(nextQs.begin(), nextQs.end());            // Add in all qubits touched, and try the next cluster
+                    }
+                    Cluster defCl = Cluster({}, {});                                // Couldn't find any more clusters to add
+                    std::vector<unsigned> defVec = {};
+                    return std::make_pair(defCl, defVec);
+                }
+        private:
+            std::vector<unsigned> qids_;
+            std::vector<GateWrapper> gates_;
+            };
 
 /// A wave function class to store and manipulate the state of qubits
 
 template <class T = ComplexType>
 class Wavefunction
 {
-  public:
+public:
     using value_type = T;
     using qubit_t = unsigned;
     using RngEngine = std::mt19937;
 
-    constexpr qubit_t invalid_qubit() const { return std::numeric_limits<qubit_t>::max();}
+    constexpr qubit_t invalid_qubit() const { return std::numeric_limits<qubit_t>::max(); }
 
     /// allocate a wave function for zero qubits
     Wavefunction(unsigned /*ignore*/) : num_qubits_(0), wfn_(1, 1.), usage_(0)
@@ -74,7 +158,7 @@ class Wavefunction
 
     ~Wavefunction()
     {
-      flush();
+        flush();
     }
 
     unsigned qubit(unsigned q) const
@@ -90,10 +174,34 @@ class Wavefunction
 
     void flush() const
     {
-        fused_.flush(wfn_);
+        int maxSpan = fused_.maxSpan();
+        auto clusters = make_clusters(maxSpan, gatelist_); //making clusters with gates in the queue
+
+        if (clusters.size() == 0) {
+            fused_.flush(wfn_);
+        }
+        else {
+            // logic to flush gates in each cluster
+            for (int i = 0; i < clusters.size(); i++) {
+                Cluster cl = clusters.at(i);
+
+                for (GateWrapper gate : cl.get_gates()) {
+                    std::vector<unsigned> cs = gate.get_controls();
+                    if (cs.size() == 0) {
+                        fused_.apply(wfn_, gate.get_mat(), qubit(gate.get_target()));
+                    }
+                    else {
+                        fused_.apply_controlled(wfn_, gate.get_mat(), qubits(cs), qubit(gate.get_target()));
+                    }
+                }
+
+                fused_.flush(wfn_);
+            }
+        }
+        gatelist_.clear();
     }
 
-	/// allocate a qubit and grow the wave function
+    /// allocate a qubit and grow the wave function
     unsigned allocate()
     {
         assert(usage_ != 2);
@@ -113,7 +221,7 @@ class Wavefunction
         }
     }
 
-	/// allocate a qubit and grow the wave function
+    /// allocate a qubit and grow the wave function
     void allocateQubit(unsigned id)
     {
         assert(usage_ != 1);
@@ -134,7 +242,7 @@ class Wavefunction
     /// \pre the qubit has to be in a classical state in the computational basis
     void release(qubit_t q)
     {
-        unsigned p = qubit(q);
+        unsigned p = qubit(q); //returns qubitmap_[q]
         flush();
         kernels::collapse(wfn_, p, getvalue(q), true);
         for (int i = 0; i < qubitmap_.size(); ++i)
@@ -196,9 +304,9 @@ class Wavefunction
     }
 
     void apply_controlled_exp(std::vector<Gates::Basis> const& bs,
-                              double phi,
-                              std::vector<unsigned> const& cs,
-                              std::vector<unsigned> const& qs)
+        double phi,
+        std::vector<unsigned> const& cs,
+        std::vector<unsigned> const& qs)
     {
         flush();
         kernels::apply_controlled_exp(wfn_, bs, phi, qubits(cs), qubits(qs));
@@ -238,11 +346,66 @@ class Wavefunction
         rng_.seed(s);
     }
 
+    //method that makes clusters to be flushed
+    std::vector<Cluster> make_clusters(unsigned fuseSpan, std::vector<GateWrapper> gates) const {
+        std::vector<Cluster> curClusters;
+
+        if (gates.size() > 0) {
+            //creating initial cluster containing one gate each
+            for (int i = 0; i < gates.size(); i++) {
+                std::vector<unsigned> qids;
+                std::vector<unsigned> controlQids = gates[i].get_controls();
+                if (controlQids.size() > 0) {
+                    qids = controlQids;
+                }
+                qids.push_back(gates[i].get_target());
+                Cluster newCl = Cluster(qids, { gates[i] });
+                curClusters.push_back(newCl);
+            }
+            //creating clusters using greedy algorithm
+            for (int i = 1; i < (int)fuseSpan + 1; i++) {                                   // Build clusters of width 1,2,...
+                std::reverse(curClusters.begin(), curClusters.end());                       // Keep everything in reverse order
+                auto prevClusters = curClusters;                                            // Save away the last set of clusters built
+                curClusters.clear();
+                auto prevCluster = prevClusters.back();                                     // Pop the first cluster
+                prevClusters.pop_back();
+                while (prevClusters.size() > 0)  {                                          // While there are more clusters...
+                    auto foundCompat = prevCluster.next_cluster(prevClusters, i);           // See if we can accumlate anyone who follows
+                    Cluster clusterFound = foundCompat.first;
+                    std::vector<unsigned> foundTotQids = foundCompat.second;
+                    if (clusterFound.get_gates().size() == 0 ||                             // Can't append any more clusters to this one
+                        (int)prevCluster.size() >= fused_.maxDepth()) {                     // ... or we're beyond max depth
+                        curClusters.push_back(prevCluster);                                 // Save this cluster
+                        if (prevCluster.size() > 0)
+                        {
+                            prevCluster = prevClusters.back();
+                            prevClusters.pop_back();
+                        }
+                    }
+                    else {
+                        prevCluster.setQids(foundTotQids);                                  // New version of our cluster (appended)
+                        prevCluster.append_gates(clusterFound.get_gates());
+                    }
+                }                                                                           // Keep looking for clusters to add
+                curClusters.push_back(prevCluster);                                         // Save the final cluster
+            }                                                                               // Start all over with the next larger span
+        }
+        
+        return curClusters;
+    }
+
     /// generic application of a gate
     template <class Gate>
     void apply(Gate const& g)
     {
-        fused_.apply(wfn_, g.matrix(), qubit(g));
+        std::vector<qubit_t> cs;
+        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        gatelist_.push_back(gateApplied);
+        if (gatelist_.size() > 999) {
+            flush();
+        }
+
+        int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
     }
 
     /// generic application of a multiply controlled gate
@@ -250,7 +413,13 @@ class Wavefunction
     void apply_controlled(std::vector<qubit_t> cs, Gate const& g)
     {
         std::vector<qubit_t> pcs = qubits(cs);
-        fused_.apply_controlled(wfn_, g.matrix(), pcs, qubit(g));
+        GateWrapper gateApplied = GateWrapper(cs, g.qubit(), g.matrix());
+        gatelist_.push_back(gateApplied);
+        if (gatelist_.size() > 999) {
+            flush();
+        }
+        
+        int doFlush = fused_.shouldFlush(wfn_, cs, g.qubit());
     }
 
     /// generic application of a controlled gate
@@ -274,7 +443,8 @@ class Wavefunction
     template <class A>
     bool subsytemwavefunction(std::vector<unsigned> const& qs, std::vector<T, A>& qubitswfn, double tolerance)
     {
-        return fused_.subsytemwavefunction(wfn_, qubits(qs), qubitswfn, tolerance);
+        flush(); // we have to flush before we can extract the state
+        return kernels::subsytemwavefunction(wfn_, qubits(qs), qubitswfn, tolerance);
     }
 
 
@@ -338,8 +508,9 @@ class Wavefunction
   private:
     unsigned num_qubits_;             // for convenience
     mutable WavefunctionStorage wfn_; // storing the wave function
-    std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
-	  int usage_;
+    mutable std::vector<qubit_t> qubitmap_;   // mapping of logical to physical qubits
+	int usage_;
+    mutable std::vector<GateWrapper> gatelist_;
 
     // randomness support
     RngEngine rng_;

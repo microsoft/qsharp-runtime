@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The implementation of the operation.
             /// For the Toffoli simulator, the implementation throws a run-time error.
             /// </summary>
-            public override Func<Qubit, QVoid> Body => (q1) =>
+            public override Func<Qubit, QVoid> __Body__ => (q1) =>
             {
                 throw new NotImplementedException();
             };
