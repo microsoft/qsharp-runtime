@@ -90,7 +90,7 @@ namespace Microsoft.Quantum.Simulation.Common
             base.ReleaseOneQubit(qubit, usedOnlyForBorrowing);
             if (!DisableBorrowing)
             {
-                bool success = curFrame.Locals.Remove(qubit);
+                bool success = curFrame.Locals.Remove(qubit); // Could be more efficient here going from the end manually.
                 Debug.Assert(success, "Releasing qubit that is not a local variable in scope.");
             }
         }
@@ -176,7 +176,7 @@ namespace Microsoft.Quantum.Simulation.Common
             return base.Borrow(1, ConstructExcludedQubitsArray())[0];
         }
 
-        public virtual IQArray<Qubit> Borrow(long numToBorrow)
+        public IQArray<Qubit> Borrow(long numToBorrow)
         {
             return base.Borrow(numToBorrow, ConstructExcludedQubitsArray());
         }

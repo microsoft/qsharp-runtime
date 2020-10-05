@@ -353,9 +353,9 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            for (long i = qubitsToRelease.Length-1; i>=0; i--)
-            { // Going from the end is more efficient in case we are tracking scope.
-                this.ReleaseOneQubit(qubitsToRelease[i], usedOnlyForBorrowing: false);
+            foreach (Qubit qubit in qubitsToRelease)
+            {
+                this.ReleaseOneQubit(qubit, usedOnlyForBorrowing: false);
             }
         }
 
@@ -589,9 +589,9 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            for (long i = qubitsToReturn.Length - 1; i >= 0; i--)
-            { // Going from the end is more efficient in case we are tracking scope.
-                this.Return(qubitsToReturn[i]);
+            foreach (Qubit qubit in qubitsToReturn)
+            {
+                this.Return(qubit);
             }
         }
 
