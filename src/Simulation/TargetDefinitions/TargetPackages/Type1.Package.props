@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledSWAP.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />

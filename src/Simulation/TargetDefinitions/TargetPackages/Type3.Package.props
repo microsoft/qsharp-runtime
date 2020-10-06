@@ -11,6 +11,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSWAP.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
@@ -48,7 +49,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\SFromSinglyControlled.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SWAP.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SWAPFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\TFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\XFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\YFromSinglyControlled.qs" />

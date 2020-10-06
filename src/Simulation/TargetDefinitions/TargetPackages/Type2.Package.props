@@ -31,6 +31,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRz.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledS.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledSWAP.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledY.qs" />

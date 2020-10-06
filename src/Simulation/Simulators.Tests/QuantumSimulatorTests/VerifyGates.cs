@@ -463,5 +463,40 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 sim.CheckNoQubitLeak();
             }
         }
+
+        [Fact]
+        public void QSimSWAP()
+        {
+            using (var sim = new QuantumSimulator())
+            {
+                var m = sim.Get<Intrinsic.M>();
+
+                var allocate = sim.Get<Intrinsic.Allocate>();
+                var release = sim.Get<Intrinsic.Release>();
+                var x = sim.Get<Intrinsic.X>();
+                var swap = sim.Get<Intrinsic.SWAP>();
+
+                var qubits = allocate.Apply(2);
+                Assert.Equal(qubits.Length, 2);
+
+                Assert.Equal(m.Apply(qubits[0]), Result.Zero);
+                Assert.Equal(m.Apply(qubits[1]), Result.Zero);
+
+                x.Apply(qubits[1]);
+                Assert.Equal(m.Apply(qubits[1]), Result.One);
+
+                swap.Apply((qubits[0], qubits[1]));
+                Assert.Equal(m.Apply(qubits[1]), Result.Zero);
+                Assert.Equal(m.Apply(qubits[0]), Result.One);
+
+                swap.Apply((qubits[0], qubits[1]));
+                Assert.Equal(m.Apply(qubits[1]), Result.One);
+                Assert.Equal(m.Apply(qubits[0]), Result.Zero);
+
+                x.Apply(qubits[1]);
+                release.Apply(qubits);
+                sim.CheckNoQubitLeak();
+            }
+        }
     }
 }
