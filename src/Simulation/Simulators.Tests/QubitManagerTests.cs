@@ -194,7 +194,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.True(q4.Id == 2);
 
                 Qubit q5 = qm.Allocate();
-                Assert.True(q5.Id == 8);
+                Assert.True(q5.Id == 6);
             }
 
             { // BLOCK testing mayExtendCapacity:true
