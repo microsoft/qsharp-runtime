@@ -10,7 +10,7 @@ namespace quantum
     /*==============================================================================
         Provides dynamically extendable storage for TItem_WithId (usually, qubits)
         that never moves previously allocated items, meaning the address of the item
-        can be safely used to access it untill it's released.
+        can be safely used to access it until it's released.
 
         The backing memory is split into contiguous chunks of fixed size, but the
         chunks aren't guaranteed to be located next to each other.

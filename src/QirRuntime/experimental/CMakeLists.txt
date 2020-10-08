@@ -20,6 +20,7 @@ target_link_libraries(experimental-unittests PUBLIC
 
 target_include_directories(experimental-unittests PUBLIC
    ${public_includes}
+   ${test_includes}
 )
 install(TARGETS experimental-unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
 

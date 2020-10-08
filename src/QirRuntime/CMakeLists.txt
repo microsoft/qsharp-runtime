@@ -36,7 +36,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(ProduceIR)
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
+set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2")
 
 add_subdirectory(experimental)
 add_subdirectory(lib)
 add_subdirectory(test)
+

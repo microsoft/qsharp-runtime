@@ -44,15 +44,16 @@ for arg in sys.argv:
     sys.exit()
 
 if not nobuild:
-  build.do_build(root_dir, True, True, False, flavor) # should_make, should_build, no_ir
-
-# TODO: do not run tests if build failed
+  result = build.do_build(root_dir, True, True, False, flavor) # should_make, should_build, no_ir
+  if result.returncode != 0:
+    log("build failed with exit code {0} => won't execute the tests".format(result.returncode))
+    log("to execute the tests from the last successful build run `test.py nobuild`")
+    sys.exit()
 
 install_dir = create_path(root_dir, ["build", platform.system(), flavor, "bin"])
 if not os.path.isdir(install_dir):
   log("please build first: 'build.py [debug|release] [ir]'")
   sys.exit()
-
 
 print("\n")
 exe_ext = ""
@@ -60,11 +61,11 @@ exe_ext = ""
 if platform.system() == "Windows":
   exe_ext = ".exe"
   # copy the binary dependencies
-  fullstate_sim = create_path(root_dir, ["bin", flavor, "Microsoft.Quantum.Simulator.Runtime.dll"])
+  fullstate_sim = create_path(root_dir, ["externals", "QuantumSimulator", "Microsoft.Quantum.Simulator.Runtime.dll"])
   shutil.copy2(fullstate_sim, install_dir)
 else:
   # copy the binary dependencies
-  fullstate_sim = create_path(root_dir, ["bin", flavor, "libMicrosoft.Quantum.Simulator.Runtime.so"])
+  fullstate_sim = create_path(root_dir, ["externals", "QuantumSimulator", "libMicrosoft.Quantum.Simulator.Runtime.so"])
   shutil.copy2(fullstate_sim, install_dir)
   print(install_dir)
 

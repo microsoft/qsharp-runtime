@@ -44,19 +44,25 @@ def do_build(root_dir, should_make, should_build, gen_ir, flavor):
     gen_ir_flag = " -DGENERATE_IR=True" if gen_ir else ""
     cmd = "cmake -G Ninja -DCMAKE_BUILD_TYPE=" + flavor + gen_ir_flag + " ../../.."
     log("running: " + cmd)
-    subprocess.run(cmd, shell = True)
+    result = subprocess.run(cmd, shell = True)
+    if result.returncode != 0:
+      return result
 
   if should_build:
     cmd = "cmake --build . --target install --config " + flavor
     log("running: " + cmd)
-    subprocess.run(cmd, shell = True)
+    result = subprocess.run(cmd, shell = True)
+    if result.returncode != 0:
+      return result
 
     if platform.system() == "Windows":
       interop_tests_dir = os.path.join(root_dir, "test")
       interop_tests_dir = os.path.join(interop_tests_dir, "interop")
       cmd = "dotnet build -c " + flavor +" " + interop_tests_dir
       log("running: " + cmd)
-      subprocess.run(cmd, shell = True)
+      result = subprocess.run(cmd, shell = True)
+
+    return result
 # =============================================================================
 
 if __name__ == '__main__':

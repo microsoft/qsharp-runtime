@@ -12,7 +12,7 @@ namespace quantum
 
         // TODO: Only some simulators 'know' the state -- is it OK to have this method on IQuantumApi?
         // The callback will be invoked on each basis vector (in the standard computational basis) in little-endian
-        // order untill it returns `false` or the state is fully dumped.
+        // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);
         virtual void GetState(TGetStateCallback callback) = 0;
 
