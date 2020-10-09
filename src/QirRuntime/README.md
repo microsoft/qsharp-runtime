@@ -36,21 +36,23 @@ The scrip will place the build artefacts into `build/[Windows|Linux]/[Debug|Rele
     1. Either clone LLVM's repo and build LLVM locally to produce your own `opt.exe` and other IR tools or download LLVM's dev package.
     2. Either modify ProduceIR.cmake to point to these tools, or copy them into a separate folder and add that folder to `%PATH%.` Don't add the whole target build folder to `%PATH%` because it would likely confuse Clang.
     3. To produce IR targets automatically as part of the build, either pass `ir` option to `build.py` or uncomment setting `${GENERATE_IR}` variable in the root `CMakeLists.txt`.
+5. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
 
 ### Linux via WSL pre-reqs
 
-1. On the host Windows machine install WLS.
-2. In WSL install clang/llvm and the other tools:
-    1. NB: the default version of clang/llvm on WSL's Ubuntu are likely to be too old, it's recommended you get the latest packages.
+1. On the host Windows machine install WSL.
+2. In WSL install Clang/llvm and the other tools:
+    1. The default version of Clang/llvm on WSL's Ubuntu might be old, it's recommended you get Clang 10.0.0 (later releases might work but haven't been tested).
     2. $ sudo apt install clang
     3. $ sudo apt install llvm
     4. $ sudo apt-get install ninja-build
     5. Set Clang as the preferred C/C++ compiler:
         - $ export CC=/usr/bin/clang
         - $ export CXX=/usr/bin/clang++
+    6. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
@@ -65,7 +67,7 @@ The script will trigger incremental build unless `nobuild` options is specified.
 
 *NB*: the test script currently doesn't detect build failures, so in case of build failure it will run tests against the previously built binaries.
 
-All test binaries and their dependencies are copied by the build into *install* folder: `build/[Windows|Linux]/[Debug|Release]/bin` and should be run from there (otherwise the tests might fail to load the shared libraries they depend on). On **Linux** `test.py` adds the install folder to LD_LIBRARY_PATH for the duration of the script. If you'd like to run the tests directly, add the path for the session manually. On WLS it might look like this: `$export LD_LIBRARY_PATH=/mnt/d/repos/llvm-project/qtracer/build/Linux/Debug/bin:${LD_LIBRARY_PATH}`.
+All test binaries and their dependencies are copied by the build into *install* folder: `build/[Windows|Linux]/[Debug|Release]/bin` and should be run from there (otherwise the tests might fail to load the shared libraries they depend on). On **Linux** `test.py` adds the install folder to LD_LIBRARY_PATH for the duration of the script. If you'd like to run the tests directly, add the path for the session manually. On WSL it might look like this: `$export LD_LIBRARY_PATH=/mnt/d/repos/llvm-project/qtracer/build/Linux/Debug/bin:${LD_LIBRARY_PATH}`.
 
 The project is using catch2 for all native tests, including QIR. `<test_binary> -help` provides details on how to run a subset of the tests and other options.
 

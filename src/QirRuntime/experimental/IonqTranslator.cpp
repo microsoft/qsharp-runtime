@@ -176,7 +176,7 @@ namespace quantum
         // The decomposer assumes that owner's lifetime exceeds its own.
         IQuantumApi* owner = nullptr;
 
-        static double CalculateAngle(long numerator, long power)
+        static double CalculateAngle(long numerator, int power)
         {
             return -numerator * M_PI / std::pow(2.0, power - 1);
         }
@@ -199,7 +199,7 @@ namespace quantum
             this->owner->ControlledR(numControls, controls, PauliId_Z, qubit, theta);
         }
 
-        void RFraction(PauliId axis, Qubit qubit, long numerator, long power) override
+        void RFraction(PauliId axis, Qubit qubit, long numerator, int power) override
         {
             this->owner->R(axis, qubit, CalculateAngle(numerator, power));
         }
@@ -210,17 +210,17 @@ namespace quantum
             PauliId axis,
             Qubit qubit,
             long numerator,
-            long power) override
+            int power) override
         {
             this->owner->ControlledR(numControls, controls, axis, qubit, CalculateAngle(numerator, power));
         }
 
-        void R1Fraction(Qubit qubit, long numerator, long power) override
+        void R1Fraction(Qubit qubit, long numerator, int power) override
         {
             this->owner->R1(qubit, CalculateAngle(numerator, power));
         }
 
-        void ControlledR1Fraction(long numControls, Qubit* const controls, Qubit qubit, long numerator, long power)
+        void ControlledR1Fraction(long numControls, Qubit* const controls, Qubit qubit, long numerator, int power)
             override
         {
             double theta = -numerator * M_PI / std::pow(2.0, power - 1);

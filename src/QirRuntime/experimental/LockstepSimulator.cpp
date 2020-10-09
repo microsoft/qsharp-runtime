@@ -238,7 +238,7 @@ namespace quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void RFraction(PauliId axis, Qubit target, long numerator, long power) override
+        void RFraction(PauliId axis, Qubit target, long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -246,7 +246,7 @@ namespace quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void R1Fraction(Qubit target, long numerator, long power) override
+        void R1Fraction(Qubit target, long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -254,7 +254,7 @@ namespace quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ExpFraction(long numTargets, PauliId paulis[], Qubit targets[], long numerator, long power) override
+        void ExpFraction(long numTargets, PauliId paulis[], Qubit targets[], long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -310,7 +310,7 @@ namespace quantum
             PauliId axis,
             Qubit target,
             long numerator,
-            long power) override
+            int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -318,7 +318,7 @@ namespace quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledR1Fraction(long numControls, Qubit controls[], Qubit target, long numerator, long power) override
+        void ControlledR1Fraction(long numControls, Qubit controls[], Qubit target, long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -339,7 +339,7 @@ namespace quantum
             PauliId paulis[],
             Qubit targets[],
             long numerator,
-            long power) override
+            int power) override
         {
             throw std::logic_error("not_implemented");
         }

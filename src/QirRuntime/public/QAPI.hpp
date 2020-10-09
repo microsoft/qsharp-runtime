@@ -77,9 +77,9 @@ EXPORTQAPI void QAPI_RFraction(                                                 
     PauliId axis,
     Qubit target,
     long numerator,
-    long power);
+    int power);
 EXPORTQAPI void QAPI_R1(QuantumExecutionContext* context, Qubit target, double theta);                       // NOLINT
-EXPORTQAPI void QAPI_R1Fraction(QuantumExecutionContext* context, Qubit target, long numerator, long power); // NOLINT
+EXPORTQAPI void QAPI_R1Fraction(QuantumExecutionContext* context, Qubit target, long numerator, int power); // NOLINT
 EXPORTQAPI void QAPI_Exp(                                                                                    // NOLINT
     QuantumExecutionContext* context,
     long numTargets,
@@ -92,7 +92,7 @@ EXPORTQAPI void QAPI_ExpFraction( // NOLINT
     PauliId paulis[],
     Qubit targets[],
     long numerator,
-    long power);
+    int power);
 
 // Multicontrolled operations
 EXPORTQAPI void QAPI_ControlledX( // NOLINT
@@ -160,7 +160,7 @@ EXPORTQAPI void QAPI_ControlledRFraction( // NOLINT
     PauliId axis,
     Qubit target,
     long numerator,
-    long power);
+    int power);
 EXPORTQAPI void QAPI_ControlledR1( // NOLINT
     QuantumExecutionContext* context,
     long numControls,
@@ -173,7 +173,7 @@ EXPORTQAPI void QAPI_ControlledR1Fraction( // NOLINT
     Qubit controls[],
     Qubit target,
     long numerator,
-    long power);
+    int power);
 EXPORTQAPI void QAPI_ControlledExp( // NOLINT
     QuantumExecutionContext* context,
     long numControls,
@@ -190,7 +190,7 @@ EXPORTQAPI void QAPI_ControlledExpFraction( // NOLINT
     PauliId paulis[],
     Qubit targets[],
     long numerator,
-    long power);
+    int power);
 
 // Adjoint operations
 EXPORTQAPI void QAPI_SAdjoint(QuantumExecutionContext* context, Qubit target); // NOLINT

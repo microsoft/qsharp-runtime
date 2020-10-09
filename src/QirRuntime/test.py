@@ -84,7 +84,8 @@ test_binaries = [
 for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
   log(test_binary)
-  subprocess.run(test_binary, shell = True)
+  result = subprocess.run(test_binary, shell = True)
+  log("{0} exited with return code {1}".format(name+exe_ext, result.returncode))
 
 
 log("========= Running interop tests =========")

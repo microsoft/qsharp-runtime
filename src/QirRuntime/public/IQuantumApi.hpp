@@ -46,11 +46,11 @@ namespace quantum
         virtual void Reset(Qubit target) = 0;
 
         virtual void R(PauliId axis, Qubit target, double theta) = 0;
-        virtual void RFraction(PauliId axis, Qubit target, long numerator, long power) = 0;
+        virtual void RFraction(PauliId axis, Qubit target, long numerator, int power) = 0;
         virtual void R1(Qubit target, double theta) = 0;
-        virtual void R1Fraction(Qubit target, long numerator, long power) = 0;
+        virtual void R1Fraction(Qubit target, long numerator, int power) = 0;
         virtual void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) = 0;
-        virtual void ExpFraction(long numTargets, PauliId paulis[], Qubit targets[], long numerator, long power) = 0;
+        virtual void ExpFraction(long numTargets, PauliId paulis[], Qubit targets[], long numerator, int power) = 0;
 
         // Multicontrolled operations
         virtual void ControlledX(long numControls, Qubit controls[], Qubit target) = 0;
@@ -80,14 +80,14 @@ namespace quantum
             PauliId axis,
             Qubit target,
             long numerator,
-            long power) = 0;
+            int power) = 0;
         virtual void ControlledR1(long numControls, Qubit controls[], Qubit target, double theta) = 0;
         virtual void ControlledR1Fraction(
             long numControls,
             Qubit controls[],
             Qubit target,
             long numerator,
-            long power) = 0;
+            int power) = 0;
         virtual void ControlledExp(
             long numControls,
             Qubit controls[],
@@ -102,7 +102,7 @@ namespace quantum
             PauliId paulis[],
             Qubit targets[],
             long numerator,
-            long power) = 0;
+            int power) = 0;
 
         // Adjoint operations
         virtual void SAdjoint(Qubit target) = 0;
