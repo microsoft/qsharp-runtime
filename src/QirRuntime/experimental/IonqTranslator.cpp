@@ -178,7 +178,7 @@ namespace quantum
 
         static double CalculateAngle(long numerator, int power)
         {
-            return -numerator * M_PI / std::pow(2.0, power - 1);
+            return static_cast<double>(-numerator) * M_PI / std::pow(2.0, power - 1);
         }
 
       public:
@@ -223,7 +223,6 @@ namespace quantum
         void ControlledR1Fraction(long numControls, Qubit* const controls, Qubit qubit, long numerator, int power)
             override
         {
-            double theta = -numerator * M_PI / std::pow(2.0, power - 1);
             this->owner->ControlledR1(numControls, controls, qubit, CalculateAngle(numerator, power));
         }
 

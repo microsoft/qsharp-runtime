@@ -32,29 +32,38 @@ The scrip will place the build artefacts into `build/[Windows|Linux]/[Debug|Rele
 1. Install Clang, Ninja and CMake from the public distros.
 2. Add all three to your/system `%PATH%`.
 3. Install VS 2019 (Clang uses MSVC's standard library on Windows).
-4. [_optional_]
+4. Install .NET
+4. <_optional_>
     1. Either clone LLVM's repo and build LLVM locally to produce your own `opt.exe` and other IR tools or download LLVM's dev package.
-    2. Either modify ProduceIR.cmake to point to these tools, or copy them into a separate folder and add that folder to `%PATH%.` Don't add the whole target build folder to `%PATH%` because it would likely confuse Clang.
-    3. To produce IR targets automatically as part of the build, either pass `ir` option to `build.py` or uncomment setting `${GENERATE_IR}` variable in the root `CMakeLists.txt`.
 5. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
+6. <_optional_> To use build/test scripts install Python 3.8.
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
 
 ### Linux via WSL pre-reqs
 
-1. On the host Windows machine install WSL.
-2. In WSL install Clang/llvm and the other tools:
-    1. The default version of Clang/llvm on WSL's Ubuntu might be old, it's recommended you get Clang 10.0.0 (later releases might work but haven't been tested).
-    2. $ sudo apt install clang
-    3. $ sudo apt install llvm
-    4. $ sudo apt-get install ninja-build
-    5. Set Clang as the preferred C/C++ compiler:
+1. On the host Windows machine install WSL. The instructions below are for Ubuntu 20.04 LTS.
+2. In WSL:
+    1. `$ sudo apt install cmake` (`$ cmake --version` should return 3.16.3)
+    2. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
+    3. `$ sudo apt install clang` (`$ clang++ --version` should return 10.0.0)
+    4. Set Clang as the preferred C/C++ compiler:
         - $ export CC=/usr/bin/clang
         - $ export CXX=/usr/bin/clang++
-    6. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools
+    5. `$ sudo apt install clang-tidy` (`$ clang-tidy --version` should return 'LLVM version 10.0.0')
+    6. <_optional_> $ sudo apt install llvm
+    7. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
+
+### Generating IR
+
+To generate IR of the native components as part of the build:
+
+1. Install LLVM (see above) so you have opt.exe and other tools that work with IR.
+2. Modify ProduceIR.cmake to point to these tools. (Or copy them into a separate folder and add that folder to `%PATH%.` If you are building LLVM locally, don't add the whole target build folder to `%PATH%` because it would likely confuse Clang.)
+3. To produce IR once pass `ir` option to `build.py`. To do that on every build, uncomment setting `${GENERATE_IR}` variable in the root `CMakeLists.txt`.
 
 ## Test
 
