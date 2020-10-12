@@ -121,6 +121,7 @@ Clang-tidy checks reference: [https://releases.llvm.org/10.0.0/tools/clang/tools
 
 Conventions not covered by .clang-format and .clang-tidy:
 
+- fields of a class/struct must be placed at the top of the class/struct definition;
 - must use `this` to access class and struct members: `this->fooBar`;
 - early returns from guard checks at the beginning of a function are allowed, early returns in all other cases are discouraged;
 - should have one interface declaration per header and prefix the file name with 'I': `IFooBar.hpp`.
