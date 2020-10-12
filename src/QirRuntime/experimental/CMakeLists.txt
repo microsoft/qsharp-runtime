@@ -23,4 +23,4 @@ target_include_directories(experimental-unittests PUBLIC
    ${test_includes}
 )
 install(TARGETS experimental-unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
-
+add_unit_test(experimental-unittests)

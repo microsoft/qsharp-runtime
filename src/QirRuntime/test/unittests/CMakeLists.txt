@@ -22,6 +22,7 @@ target_include_directories(unittests PUBLIC
   "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
 install(TARGETS unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(unittests)
 
 #==============================================================================
 # build against tracing context
@@ -44,3 +45,4 @@ target_include_directories(tracer-tests PUBLIC
   "${public_includes}"
 )
 install(TARGETS tracer-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(tracer-tests)

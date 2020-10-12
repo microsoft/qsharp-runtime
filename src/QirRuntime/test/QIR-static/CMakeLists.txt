@@ -72,4 +72,5 @@ target_include_directories(qir-static-tests PUBLIC
 add_dependencies(qir-static-tests qir_static_test_lib)
 
 install(TARGETS qir-static-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(qir-static-tests)
 

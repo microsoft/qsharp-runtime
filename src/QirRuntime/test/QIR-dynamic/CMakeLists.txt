@@ -72,3 +72,4 @@ target_include_directories(qir-dynamic-tests PUBLIC
 add_dependencies(qir-dynamic-tests qir_dynamic_test_lib)
 
 install(TARGETS qir-dynamic-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(qir-dynamic-tests)

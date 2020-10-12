@@ -60,15 +60,7 @@ exe_ext = ""
 
 if platform.system() == "Windows":
   exe_ext = ".exe"
-  # copy the binary dependencies
-  fullstate_sim = create_path(root_dir, ["externals", "QuantumSimulator", "Microsoft.Quantum.Simulator.Runtime.dll"])
-  shutil.copy2(fullstate_sim, install_dir)
 else:
-  # copy the binary dependencies
-  fullstate_sim = create_path(root_dir, ["externals", "QuantumSimulator", "libMicrosoft.Quantum.Simulator.Runtime.so"])
-  shutil.copy2(fullstate_sim, install_dir)
-  print(install_dir)
-
   # add the folder to the list of locations to load libraries from
   os.environ['LD_LIBRARY_PATH'] = install_dir
 
