@@ -4,8 +4,8 @@
 #include <sstream>
 #include <vector>
 
-#include "ITranslator.hpp"
 #include "ExperimentalSimFactory.hpp"
+#include "ITranslator.hpp"
 
 #include "BitStates.hpp"
 #include "QuantumApiBase.hpp"
@@ -14,37 +14,34 @@ using namespace std;
 
 namespace quantum
 {
-    /*==============================================================================
-      The purpose of the translator is to generate JSON in IonQ format that
-      represents the program which was run by the translator.
+    /*==================================================================================================================
+    The purpose of the translator is to generate JSON that represents the program which was run by the simulator.
 
-      // Sample IonQ JSON object
-      {
+    // Sample ouput JSON object might look like this:
+    {
         "qubits": 4,
         "circuit": [
-          {
-          "gate": "h",
-          "target": [0, 1, 2, 3],
-          },
-          {
-          "gate": "rx",
-          "target:" 0,
-          "rotation": 1
-          },
-          {
-          "gate": "x",
-          "target": 2,
-          "control": 0
-          }
+            {
+            "gate": "h",
+            "target": [0, 1, 2, 3],
+            },
+            {
+            "gate": "rx",
+            "target:" 0,
+            "rotation": 1
+            },
+            {
+            "gate": "x",
+            "target": 2,
+            "control": 0
+            }
         ]
-      }
+    }
 
-      All qubits are measured at the end and the results are reported to the user.
-      We will model this by marking measured qubits as "frozen" so no more quantum
-      operations are allowed on them. The result of the measurement isn't relevant
-      for the translator. Attempts to manipulate frozen or released qubits will be
-      logged by the translator but won't abort it.
-    ==============================================================================*/
+    In this simulator we mark measured qubits as "frozen" so no more quantum operations are allowed on them. The result
+    of the measurement isn't relevant for the translator. Attempts to manipulate frozen or released qubits will be
+    logged by the translator but won't abort it.
+    ==================================================================================================================*/
     // NB: v, vi (square root of x) not supported by the translator
     enum class Gate
     {
@@ -104,10 +101,10 @@ namespace quantum
         }
     }
 
-    /*==============================================================================
-        As the simulator executes along a particular path, the translator would
-        accumulate corresponding instructions and errors.
-    ==============================================================================*/
+    /*==================================================================================================================
+    As the simulator executes along a particular path, the translator would accumulate corresponding instructions
+    and errors.
+    ==================================================================================================================*/
     struct TranslationError
     {
         Gate gate = Gate::undefined;
@@ -230,24 +227,22 @@ namespace quantum
     };
 
     /*==============================================================================
-        CIonqTranslator
+        CCircuitToJsonTranslator
     ==============================================================================*/
-    class CIonqTranslator final : public ITranslator
+    class CCircuitToJsonTranslator final : public ITranslator
     {
-        // List of IonQ instructions that correspond to the commands executed by the
-        // translator.
+        // List of the instructions to be printed that corresponds to the commands executed by the translator.
         vector<Instruction> instructions;
 
         // Errors, encountered by the translator (might or might not be ignorable).
         vector<TranslationError> errors;
 
-        // IonQ allocates all qubits upfront and doesn't reuse them, so the translator
-        // keeps track of the number of allocations to specify the size of quantum register.
+        // To track the width of the circuit.
         long quantumRegisterSize = 0;
 
       public:
-        CIonqTranslator() = default;
-        ~CIonqTranslator() = default;
+        CCircuitToJsonTranslator() = default;
+        ~CCircuitToJsonTranslator() = default;
 
         void AddInstruction(Instruction&& instr)
         {
@@ -288,9 +283,9 @@ namespace quantum
     };
 
     /*==============================================================================
-        CIonqSimulator
+        CCircuitPrintingSimulator
     ==============================================================================*/
-    class CIonqSimulator final : public CQuantumApiBase
+    class CCircuitPrintingSimulator final : public CQuantumApiBase
     {
         unique_ptr<IQuantumApi> decomposer;
 
@@ -303,7 +298,7 @@ namespace quantum
         BitStates frozen;
 
         shared_ptr<ITranslator> itranslator = nullptr;
-        CIonqTranslator* translator = nullptr;
+        CCircuitToJsonTranslator* translator = nullptr;
 
       private:
         static const long invalidQubitId = -1;
@@ -374,13 +369,13 @@ namespace quantum
         }
 
       public:
-        explicit CIonqSimulator(shared_ptr<ITranslator> ionqTranslator)
+        explicit CCircuitPrintingSimulator(shared_ptr<ITranslator> iTranslator)
             : decomposer(make_unique<CCanonicalDecomposer>(this))
-            , itranslator(std::move(ionqTranslator))
+            , itranslator(std::move(iTranslator))
         {
-            translator = (static_cast<CIonqTranslator*>(itranslator.get()));
+            translator = (static_cast<CCircuitToJsonTranslator*>(itranslator.get()));
         }
-        ~CIonqSimulator() = default;
+        ~CCircuitPrintingSimulator() = default;
 
         //============================================================================
         // implementation of the relevant subset of IQuantumApi
@@ -652,13 +647,13 @@ namespace quantum
         }
     };
 
-    std::shared_ptr<ITranslator> CreateIonqTranslator()
+    std::shared_ptr<ITranslator> CreateCircuitToJsonTranslator()
     {
-        return std::make_shared<CIonqTranslator>();
+        return std::make_shared<CCircuitToJsonTranslator>();
     }
-    std::unique_ptr<IQuantumApi> CreateIonqSimulator(shared_ptr<ITranslator> translator)
+    std::unique_ptr<IQuantumApi> CreateCircuitPrintingSimulator(shared_ptr<ITranslator> translator)
     {
-        return std::make_unique<CIonqSimulator>(std::move(translator));
+        return std::make_unique<CCircuitPrintingSimulator>(std::move(translator));
     }
 
 } // namespace quantum

@@ -18,9 +18,9 @@ namespace quantum
         std::vector<IQuantumApi*>&& simulatorsToRunInLockstep,
         ResultValue* resultValuesBuffer /*size of the buffer must be equal the number of simulators*/);
 
-    // IonQ translator traces the quantum program to generate ionq-json that describes the program.
-    std::shared_ptr<ITranslator> CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> CreateIonqSimulator(std::shared_ptr<ITranslator> ionqTranslator);
+    // The circuit to json translator traces the quantum program and generates json that describes the program.
+    std::shared_ptr<ITranslator> CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> CreateCircuitPrintingSimulator(std::shared_ptr<ITranslator> translator);
 
     // Transing simulator is effectively a translator: it traces the quantum program to collect
     // statistics about it, and returns the representation of the statistics.

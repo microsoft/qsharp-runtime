@@ -146,12 +146,12 @@ namespace quantum
         {
             if (this->settings == OptimizeFor_CircuitDepth && !this->qubits.empty())
             {
-                const long cirquitDepth = this->resourceTranslator->stats.cCircuitDepth;
+                const long circuitDepth = this->resourceTranslator->stats.cCircuitDepth;
                 bool found = false;
                 for (CTracingQubit& q : this->qubits)
                 {
-                    found = (found || q.endDepth == cirquitDepth);
-                    assert(q.endDepth < cirquitDepth + 1);
+                    found = (found || q.endDepth == circuitDepth);
+                    assert(q.endDepth < circuitDepth + 1);
                 }
                 assert(found);
 
@@ -161,7 +161,7 @@ namespace quantum
 
             if (this->settings == OptimizeFor_QubitWidth)
             {
-                this->resourceTranslator->stats.cQubitWidth = this->qubitInterferences.EstimateCirquitWidth();
+                this->resourceTranslator->stats.cQubitWidth = this->qubitInterferences.EstimateCircuitWidth();
                 // TODO: figure out the best depth...
                 this->resourceTranslator->stats.cCircuitDepth = -1;
             }

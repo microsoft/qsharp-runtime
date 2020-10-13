@@ -138,7 +138,7 @@ namespace algo
     }
 
     // Binary search between maxQubitsInSingleOperation and maxDegree+1 of the interference graph
-    long CQubitInterferences::EstimateCirquitWidth() const
+    long CQubitInterferences::EstimateCircuitWidth() const
     {
         long maxDegree = 0;
         for (const auto& node : this->interferences)

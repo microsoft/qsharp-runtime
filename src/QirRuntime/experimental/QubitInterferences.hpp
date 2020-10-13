@@ -115,7 +115,7 @@ namespace algo
         bool CanFit(long registersCount) const;
 
         // Binary search between maxQubitsInSingleOperation and maxDegree+1 of the interference graph
-        long EstimateCirquitWidth() const;
+        long EstimateCircuitWidth() const;
     };
 
 } // namespace algo

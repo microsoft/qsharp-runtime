@@ -10,10 +10,10 @@
 using namespace quantum;
 using namespace std;
 
-TEST_CASE("Empty program", "[ionq_translator]")
+TEST_CASE("Empty program", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     ostringstream os, errors;
     itr->PrintRepresentation(os, &errors);
@@ -21,10 +21,10 @@ TEST_CASE("Empty program", "[ionq_translator]")
     REQUIRE(errors.str().empty());
 }
 
-TEST_CASE("Qubit allocation", "[ionq_translator]")
+TEST_CASE("Qubit allocation", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     iqa->ReleaseQubit(iqa->AllocateQubit());
     iqa->ReleaseQubit(iqa->AllocateQubit());
@@ -36,10 +36,10 @@ TEST_CASE("Qubit allocation", "[ionq_translator]")
 }
 
 // measurements aren't recorded in the program
-TEST_CASE("Measurement", "[ionq_translator]")
+TEST_CASE("Measurement", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q = iqa->AllocateQubit();
     iqa->M(q);
@@ -51,10 +51,10 @@ TEST_CASE("Measurement", "[ionq_translator]")
     REQUIRE(errors.str().empty());
 }
 
-TEST_CASE("Simple gates", "[ionq_translator]")
+TEST_CASE("Simple gates", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q = iqa->AllocateQubit();
     iqa->X(q);
@@ -84,10 +84,10 @@ TEST_CASE("Simple gates", "[ionq_translator]")
     REQUIRE(errors.str().empty());
 }
 
-TEST_CASE("Rotations, etc.", "[ionq_translator]")
+TEST_CASE("Rotations, etc.", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q1 = iqa->AllocateQubit();
     Qubit q2 = iqa->AllocateQubit();
@@ -125,10 +125,10 @@ TEST_CASE("Rotations, etc.", "[ionq_translator]")
     REQUIRE(errors.str().empty());
 }
 
-TEST_CASE("Unsupported exponent", "[ionq_translator]")
+TEST_CASE("Unsupported exponent", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q1 = iqa->AllocateQubit();
     Qubit q2 = iqa->AllocateQubit();
@@ -162,10 +162,10 @@ TEST_CASE("Unsupported exponent", "[ionq_translator]")
     REQUIRE(errors.str().find("Exp", 0) != string::npos);
 }
 
-TEST_CASE("Controlled gates", "[ionq_translator]")
+TEST_CASE("Controlled gates", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q1 = iqa->AllocateQubit();
     Qubit q2 = iqa->AllocateQubit();
@@ -194,10 +194,10 @@ TEST_CASE("Controlled gates", "[ionq_translator]")
 
 // Translator should ignore quantum operations on already measured qubit and
 // log an error.
-TEST_CASE("Qubit use after measurement", "[ionq_translator]")
+TEST_CASE("Qubit use after measurement", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q = iqa->AllocateQubit();
     iqa->M(q);
@@ -215,10 +215,10 @@ TEST_CASE("Qubit use after measurement", "[ionq_translator]")
     REQUIRE(errors.str().find("x", 0) != string::npos);
 }
 
-TEST_CASE("Qubit use after release", "[ionq_translator]")
+TEST_CASE("Qubit use after release", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Qubit q = iqa->AllocateQubit();
     iqa->ReleaseQubit(q);
@@ -236,10 +236,10 @@ TEST_CASE("Qubit use after release", "[ionq_translator]")
     REQUIRE(errors.str().find("x", 0) != string::npos);
 }
 
-TEST_CASE("Can get result value only from constants", "[ionq_translator]")
+TEST_CASE("Can get result value only from constants", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Result zero = iqa->UseZero();
     REQUIRE(Result_Zero == iqa->GetResultValue(zero));
@@ -258,10 +258,10 @@ TEST_CASE("Can get result value only from constants", "[ionq_translator]")
     REQUIRE(errors.str().empty());
 }
 
-TEST_CASE("Comparing results is limited", "[ionq_translator]")
+TEST_CASE("Comparing results is limited", "[circuit_printer]")
 {
-    std::shared_ptr<ITranslator> itr = CreateIonqTranslator();
-    std::unique_ptr<IQuantumApi> iqa = CreateIonqSimulator(itr);
+    std::shared_ptr<ITranslator> itr = CreateCircuitToJsonTranslator();
+    std::unique_ptr<IQuantumApi> iqa = CreateCircuitPrintingSimulator(itr);
 
     Result zero = iqa->UseZero();
     Result one = iqa->UseOne();
