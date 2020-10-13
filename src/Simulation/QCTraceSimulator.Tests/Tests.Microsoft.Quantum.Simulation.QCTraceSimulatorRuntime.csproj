@@ -13,7 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
-    <ProjectReference Include="..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
 
   <ItemGroup>

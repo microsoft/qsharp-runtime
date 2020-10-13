@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
