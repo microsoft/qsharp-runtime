@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />
     <ProjectReference Include="..\Library with Spaces\Library with Spaces.csproj" />

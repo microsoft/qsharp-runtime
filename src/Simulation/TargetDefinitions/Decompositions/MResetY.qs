@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Measurement {
         let result = Measure([PauliY], [target]);
 
         // We must return the qubit to the Z basis as well.
-        S(target);
+        Adjoint S(target);
         H(target);
 
         if (result == One) {
