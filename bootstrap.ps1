@@ -17,7 +17,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
         choco install llvm
         choco install ninja
     } else {
-        #brew install llvm -- should be installed already
+        #brew install llvm # llvm should be already installed
         brew install ninja
     }
 } else {

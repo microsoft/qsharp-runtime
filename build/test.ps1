@@ -17,11 +17,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
 
     Write-Host "##[info]Test QIR Runtime"
     $qirRuntimeBuild = (Join-Path $PSScriptRoot "../src/QirRuntime/build")
-    if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
-        $qirRuntimeBuild = (Join-Path $qirRuntimeBuild "Windows")
-    } else {
-        $qirRuntimeBuild = (Join-Path $qirRuntimeBuild "Linux")
-    }
     $qirRuntimeBuild = (Join-Path $qirRuntimeBuild $Env:BUILD_CONFIGURATION)
     pushd ($qirRuntimeBuild)
     ctest --verbose

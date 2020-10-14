@@ -42,7 +42,7 @@ def do_build(root_dir, should_make, should_build, gen_ir, flavor):
 
   if should_make:
     gen_ir_flag = " -DGENERATE_IR=True" if gen_ir else ""
-    cmd = "cmake -G Ninja -DCMAKE_BUILD_TYPE=" + flavor + gen_ir_flag + " ../../.."
+    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavor + gen_ir_flag + " ../../.."
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
     if result.returncode != 0:
