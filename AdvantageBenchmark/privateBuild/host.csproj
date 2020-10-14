@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Simulation\Simulators.Core\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
 
 </Project>

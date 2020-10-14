@@ -3,11 +3,11 @@
   <Import Project="..\Common\Simulators.Impl.props" />
 
   <ItemGroup>
-    <Compile Include="..\Simulators\QCTraceSimulator\*.cs" />
-    <QSharpcompile Include="..\Simulators\QCTraceSimulator\Circuits\*.qs" />
-    <Compile Include="..\Simulators\QuantumProcessor\*.cs" />
-    <Compile Include="..\Simulators\ResourcesEstimator\*.cs" />
-    <Compile Include="..\Simulators\ToffoliSimulator\*.cs" />
+    <Compile Include="..\Simulators.Impl\QCTraceSimulator\*.cs" />
+    <QSharpcompile Include="..\Simulators.Impl\QCTraceSimulator\Circuits\*.qs" />
+    <Compile Include="..\Simulators.Impl\QuantumProcessor\*.cs" />
+    <Compile Include="..\Simulators.Impl\ResourcesEstimator\*.cs" />
+    <Compile Include="..\Simulators.Impl\ToffoliSimulator\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

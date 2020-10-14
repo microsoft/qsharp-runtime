@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulation.Common", "src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj", "{8EC46ADB-7FAA-49EA-BA63-E7B32C4F4445}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulators", "src\Simulation\Simulators.Core\Microsoft.Quantum.Simulators.csproj", "{72B7E75C-D305-45BD-929E-C86298AAA8DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Simulators", "src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj", "{72B7E75C-D305-45BD-929E-C86298AAA8DE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime", "src\Simulation\QCTraceSimulator.Tests\Tests.Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj", "{DD50D2D9-2765-449B-8C4B-835A428E160D}"
 EndProject
