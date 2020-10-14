@@ -19,7 +19,8 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     $oldCC = $env:CC
     $oldCXX = $env:CC
     if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
-        # shouldn't need to set the langauge
+        $env:CC = "clang.exe"
+        $env:CXX = "clang++.exe"
     } else {
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"
@@ -43,12 +44,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     }
 } else {
     Write-Host "Skipping native because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
-}
-
-
-if ($LastExitCode -ne 0) {
-    Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
-    $script:all_ok = $False
 }
 
 function Build-One {

@@ -18,7 +18,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
         choco install ninja
         refreshenv
     } else {
-        brew install llvm
+        #brew install llvm # this seems to mess up native simulator build, probably because of STD libs
         brew install ninja
     }
 } else {

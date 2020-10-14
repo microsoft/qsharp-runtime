@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-# setthe project name and version
-project(qtracer)
+# set the project name and version
+project(qirruntime)
 
 # specify the C++ standard, compiler and other tools
 set(CMAKE_CXX_STANDARD 14)
