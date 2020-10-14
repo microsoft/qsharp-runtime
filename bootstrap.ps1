@@ -16,8 +16,9 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
         choco install llvm
         choco install ninja
+        refreshenv
     } else {
-        #brew install llvm # llvm should be already installed
+        brew install llvm
         brew install ninja
     }
 } else {
