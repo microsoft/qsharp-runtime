@@ -4,8 +4,8 @@
 add_executable(experimental-unittests
   driver.cpp
   IntervalsColoringTests.cpp
-  CircuitToJasonPrinter.cpp
-  CircuitToJasonPrinterTests.cpp
+  CircuitToJsonPrinter.cpp
+  CircuitToJsonPrinterTests.cpp
   LockstepSimulator.cpp
   LockstepSimulatorTests.cpp
   QubitInterferences.cpp

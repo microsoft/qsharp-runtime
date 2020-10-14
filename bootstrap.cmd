@@ -8,12 +8,6 @@
 dotnet  --info || GOTO missingDotnet
 git --version  || GOTO missingGit
 
-:: Install Clang and Ninja
-:prereqs
-ninja --version   || GOTO missingNinja
-clang++ --version || GOTO missingClang
-
-
 :: Initialize C++ runtime project
 CALL :runtimeBootstrap  || EXIT /B 1
 
@@ -52,15 +46,6 @@ echo https://www.microsoft.com/net/download
 echo.
 EXIT /B 1002
 
-:missingNinja
-choco install ninja
-ninja --version || EXIT /B 1003
-GOTO prereqs
-
-:missingClang
-choco install llvm
-clang++ --version || EXIT /B 1004
-GOTO prereqs
 
 :EOF
 echo Your environment is now ready for developement.
