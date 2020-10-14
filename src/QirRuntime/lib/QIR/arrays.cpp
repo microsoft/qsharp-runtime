@@ -360,7 +360,7 @@ extern "C"
             {
                 throw std::runtime_error("invalid range");
             }
-            else if (r.step > 0 && r.end < r.start || r.step < 0 && r.start < r.end)
+            else if ((r.step > 0 && r.end < r.start) || (r.step < 0 && r.start < r.end))
             {
                 // the QirRange generates empty sequence, normalize it
                 this->start = 0;

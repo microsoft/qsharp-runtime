@@ -78,8 +78,8 @@ define %Result* @__quantum__qis__measure(%Array* %.paulis, %Array* %.qubits) {
   ret %Result* %.r
 }
 
-define %Result* @__quantum__qis__mz(%Qubit* %0) {
-  %q = bitcast %Qubit* %0 to %class.QUBIT*
+define %Result* @__quantum__qis__mz(%Qubit* %.q) {
+  %q = bitcast %Qubit* %.q to %class.QUBIT*
   %r = call %class.RESULT* @quantum__qis__mz(%class.QUBIT* %q)
   %.r = bitcast %class.RESULT* %r to %Result*
   ret %Result* %.r
