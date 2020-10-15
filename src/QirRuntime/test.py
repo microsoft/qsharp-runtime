@@ -56,13 +56,16 @@ if not os.path.isdir(install_dir):
   sys.exit()
 
 print("\n")
-exe_ext = ""
 
+# Configure DLL lookup locations to include full state simulator and qdk.dll
+exe_ext = ""
+fullstate_sim_dir = create_path(root_dir, ["externals", "QuantumSimulator"])
 if platform.system() == "Windows":
   exe_ext = ".exe"
+  os.environ['PATH'] = os.environ['PATH'] + ";" + fullstate_sim_dir + ";" + install_dir
 else:
   # add the folder to the list of locations to load libraries from
-  os.environ['LD_LIBRARY_PATH'] = install_dir
+  os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":" + fullstate_sim_dir + ":" + install_dir
 
 log("========= Running native tests =========")
 test_binaries = [
@@ -82,10 +85,6 @@ log("========= Running interop tests =========")
 if platform.system() == "Windows":
   managed_interop_tests_dir = create_path(root_dir, ["build", "Windows", flavor, "test"])
   os.chdir(managed_interop_tests_dir)
-  shutil.copy2(os.path.join(install_dir, "qdk.dll"), os.path.join(managed_interop_tests_dir, "netcoreapp3.1"))
-  shutil.copy2(
-    os.path.join(install_dir, "Microsoft.Quantum.Simulator.Runtime.dll"),
-    os.path.join(managed_interop_tests_dir, "netcoreapp3.1"))
   subprocess.run("dotnet test netcoreapp3.1\interop.dll", shell = True)
 else:
   log("C# interop tests not supported on this platform")

@@ -18,6 +18,12 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     Write-Host "##[info]Test QIR Runtime"
     $qirRuntimeBuild = (Join-Path $PSScriptRoot "../src/QirRuntime/build")
     $qirRuntimeBuild = (Join-Path $qirRuntimeBuild $Env:BUILD_CONFIGURATION)
+    if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
+        $qdkPath = (Join-Path $qirRuntimeBuild "lib/QAPI")
+        $fullSimPath = (Join-Path $PSScriptRoot "../src/QirRuntime/externals/QuantumSimulator")
+        $Env:PATH = $Env:PATH + ";" + $fullSimPath + ";" + $qdkPath
+        Write-Host $Env:PATH
+    }
     pushd ($qirRuntimeBuild)
     ctest --verbose
     if ($LastExitCode -ne 0) {

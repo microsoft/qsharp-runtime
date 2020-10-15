@@ -19,12 +19,13 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     $oldCC = $env:CC
     $oldCXX = $env:CC
     if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
-        $env:CC = "clang.exe"
-        $env:CXX = "clang++.exe"
+        $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
+        $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
     } else {
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"
     }
+    Write-Host $Env:AGENT_OS
     $qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "../src/QirRuntime/build")
     mkdir $qirRuntimeBuildFolder
     $qirRuntimeBuildFolder = (Join-Path $qirRuntimeBuildFolder $Env:BUILD_CONFIGURATION)

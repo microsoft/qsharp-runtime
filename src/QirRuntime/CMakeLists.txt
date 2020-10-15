@@ -34,25 +34,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(ProduceIR)
 
-# Copy the fullstate native simulator library into the install locations where the tests will run from.
-# TODO: replace with proper package handling
-if (WIN32)
-  set(QUANTUM_SIMULATOR "Microsoft.Quantum.Simulator.Runtime.dll" )
-else()
-  set(QUANTUM_SIMULATOR "libMicrosoft.Quantum.Simulator.Runtime.so")
-endif()
-configure_file(
-  "${PROJECT_SOURCE_DIR}/externals/QuantumSimulator/${QUANTUM_SIMULATOR}" 
-  "${CMAKE_BINARY_DIR}/bin/${QUANTUM_SIMULATOR}"
-  COPYONLY
-)
-
 include(CTest)
 macro(add_unit_test target)
     add_test(
         NAME ${target}
-        COMMAND "${CMAKE_BINARY_DIR}/bin/${target}" -o "${CMAKE_BINARY_DIR}/bin/${target}_results.xml" -r junit)
-    set_property(TEST ${target} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/bin")
+        COMMAND ${target} -o "${target}_results.xml" -r junit)
+    set_property(TEST ${target} 
+        PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/externals/QuantumSimulator:${CMAKE_BINARY_DIR}/lib/QAPI")
 endmacro(add_unit_test)
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
