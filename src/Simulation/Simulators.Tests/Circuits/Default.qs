@@ -3,6 +3,11 @@
     open Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 
     @Test("QuantumSimulator")
+    function DefaultUnit() : Unit {
+        AssertEqual((), Default<Unit>());
+    }
+
+    @Test("QuantumSimulator")
     function DefaultInt() : Unit {
         AssertEqual(0, Default<Int>());
     }
