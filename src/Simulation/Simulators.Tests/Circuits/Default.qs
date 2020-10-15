@@ -56,4 +56,19 @@
     function DefaultArray() : Unit {
         AssertEqual(new Unit[0], Default<Unit[]>());
     }
+
+    @Test("QuantumSimulator")
+    function DefaultTuple() : Unit {
+        AssertEqual((false, 0), Default<(Bool, Int)>());
+        AssertEqual((0, Zero, ""), Default<(Int, Result, String)>());
+    }
+
+    newtype BoolInt = (Bool, Int);
+    newtype IntResultString = (Int, Result, String);
+
+    @Test("QuantumSimulator")
+    function DefaultUserDefinedType() : Unit {
+        AssertEqual(BoolInt(false, 0), Default<BoolInt>());
+        AssertEqual(IntResultString(0, Zero, ""), Default<IntResultString>());
+    }
 }
