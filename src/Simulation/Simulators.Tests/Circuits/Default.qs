@@ -32,10 +32,11 @@
         AssertEqual("", Default<String>());
     }
 
-    // @Test("QuantumSimulator")
-    // function DefaultQubit() : Unit {
-    //     AssertEqual(???, Default<Qubit>());
-    // }
+    @Test("QuantumSimulator")
+    function DefaultQubit() : Unit {
+        // Creating a default qubit (without using it) should succeed.
+        let _ = Default<Qubit>();
+    }
 
     @Test("QuantumSimulator")
     function DefaultPauli() : Unit {
@@ -55,10 +56,11 @@
         AssertEqual(0, RangeEnd(range));
     }
 
-    // @Test("QuantumSimulator")
-    // function DefaultCallable() : Unit {
-    //     AssertEqual(???, Default<(Unit -> Unit)>());
-    // }
+    @Test("QuantumSimulator")
+    function DefaultCallable() : Unit {
+        // Creating a default callable (without calling it) should succeed.
+        let _ = Default<(Unit -> Unit)>();
+    }
 
     @Test("QuantumSimulator")
     function DefaultArray() : Unit {

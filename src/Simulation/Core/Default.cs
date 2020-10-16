@@ -30,9 +30,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         public static T OfType<T>() => (T)OfType(typeof(T));
 
-        private static object OfType(Type type) =>
-            OfAnyType(type).FirstOrDefault(value => !(value is null))
-            ?? throw new NotSupportedException("There is no default value for this type.");
+        private static object? OfType(Type type) => OfAnyType(type).FirstOrDefault(value => !(value is null));
 
         private static IEnumerable<object?> OfAnyType(Type type)
         {
