@@ -49,7 +49,10 @@
 
     @Test("QuantumSimulator")
     function DefaultRange() : Unit {
-        AssertEqual(1..1..0, Default<Range>());
+        let range = Default<Range>();
+        AssertEqual(1, RangeStart(range));
+        AssertEqual(1, RangeStep(range));
+        AssertEqual(0, RangeEnd(range));
     }
 
     // @Test("QuantumSimulator")
