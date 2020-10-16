@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
-    internal static class QDefault
+    public static class QDefault
     {
         private static readonly IReadOnlyDictionary<Type, object> Values = new Dictionary<Type, object>
         {
@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.Core
             typeof(ValueTuple<,,,,,,,>)
         };
 
-        internal static T OfType<T>() => (T)OfType(typeof(T));
+        public static T OfType<T>() => (T)OfType(typeof(T));
 
         private static object OfType(Type type) =>
             OfAnyType(type).FirstOrDefault(value => !(value is null))

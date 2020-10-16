@@ -1443,15 +1443,16 @@ module SimulationCode =
         let context = globalContext.setUdt udt
         let name = userDefinedName None udt.FullName.Name.Value
         let qsharpType = udt.Type
-        let buildEmtpyConstructor =
+        let buildEmptyConstructor =
             let baseTupleType =
                 match qsharpType.Resolution with
-                | ArrayType b -> roslynTypeName context b |> sprintf "QArray<%s>"
-                | _ -> (roslynTypeName context qsharpType)
-            let defaultValue = match qsharpType.Resolution with | ArrayType _ -> [ sprintf "new %s()" baseTupleType] | _ -> [ sprintf "default(%s)" baseTupleType ]
-            let args = []
-            ``constructor`` name ``(`` args ``)``
-                ``:`` defaultValue
+                | ArrayType item ->
+                    roslynTypeName context item
+                    |> sprintf "global::Microsoft.Quantum.Simulation.Core.QArray<%s>"
+                | _ -> roslynTypeName context qsharpType
+            let defaultValue = sprintf "global::Microsoft.Quantum.Simulation.Core.QDefault.OfType<%s>()" baseTupleType
+            ``constructor`` name ``(`` [] ``)``
+                ``:`` [ defaultValue ]
                 [ ``public`` ]
                 ``{``
                     []
@@ -1522,7 +1523,7 @@ module SimulationCode =
         let baseClass     = ``simpleBase`` baseClassName
         let modifiers     = [ classAccessModifier udt.Modifiers.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
-        let constructors  = [ buildEmtpyConstructor; buildBaseTupleConstructor ]
+        let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType
         let itemFields    = buildNamedItemFields @ buildItemFields
         let allFields     = itemFields @ qubitsField
