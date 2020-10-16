@@ -15,8 +15,19 @@ namespace Microsoft.Quantum.Runtime.Core
             [typeof(string)] = ""
         };
 
-        private static object OfGenericType(Type type, Type[] args) =>
-            Activator.CreateInstance(type.MakeGenericType(args), args.Select(OfType).ToArray());
+        private static readonly IReadOnlyList<Type> Tuples = new List<Type>
+        {
+            typeof(ValueTuple<>),
+            typeof(ValueTuple<,>),
+            typeof(ValueTuple<,,>),
+            typeof(ValueTuple<,,,>),
+            typeof(ValueTuple<,,,,>),
+            typeof(ValueTuple<,,,,,>),
+            typeof(ValueTuple<,,,,,,>),
+            typeof(ValueTuple<,,,,,,,>)
+        };
+
+        internal static T OfType<T>() => (T)OfType(typeof(T));
 
         private static object OfType(Type type)
         {
@@ -28,37 +39,9 @@ namespace Microsoft.Quantum.Runtime.Core
             {
                 return Activator.CreateInstance(typeof(QArray<>).MakeGenericType(type.GenericTypeArguments));
             }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<>))
+            if (type.IsGenericType && Tuples.Contains(type.GetGenericTypeDefinition()))
             {
-                return OfGenericType(typeof(ValueTuple<>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,,,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,,,,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,,,,,>), type.GenericTypeArguments);
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>))
-            {
-                return OfGenericType(typeof(ValueTuple<,,,,,,,>), type.GenericTypeArguments);
+                return Activator.CreateInstance(type, type.GenericTypeArguments.Select(OfType).ToArray());
             }
             if (!(type.BaseType is null)
                 && type.BaseType.IsGenericType
@@ -70,9 +53,7 @@ namespace Microsoft.Quantum.Runtime.Core
             {
                 return Activator.CreateInstance(type);
             }
-            throw new NotSupportedException("There is no default value for the type.");
+            throw new NotSupportedException("There is no default value for this type.");
         }
-
-        internal static T OfType<T>() => (T)OfType(typeof(T));
     }
 }
