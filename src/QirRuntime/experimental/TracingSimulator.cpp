@@ -14,7 +14,9 @@
 
 using namespace std;
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     class CTracingSimulator;
     struct CResourcesTranslator final : public ITranslator
@@ -37,7 +39,7 @@ namespace quantum
         // the interference graph.
         long lastOperation = 0;
 
-        // To be used by algo::CalculateMinColoringSize algorithm. This algorithm is optimal
+        // To be used by Microsoft::Algorithms::CalculateMinColoringSize algorithm. This algorithm is optimal
         // for our rigid definition of start/end depths. However, it's not optimal in the sense
         // that it doesn't allow delaying a gate execution even if that could reuse a qubit.
         inline long Start() const
@@ -66,7 +68,7 @@ namespace quantum
         vector<CTracingQubit> qubits; // qubit id is the index into this vector
 
         // For optimizing width of the circuit.
-        algo::CQubitInterferences qubitInterferences;
+        Microsoft::Algorithms::CQubitInterferences qubitInterferences;
 
         long GetQubitId(Qubit qubit) const
         {
@@ -156,7 +158,8 @@ namespace quantum
                 assert(found);
 
                 // Could any of the qubits be reused to decrease the width of the circuit?
-                this->resourceTranslator->stats.cQubitWidth = algo::CalculateMinColoringSize(this->qubits);
+                this->resourceTranslator->stats.cQubitWidth =
+                    Microsoft::Algorithms::CalculateMinColoringSize(this->qubits);
             }
 
             if (this->settings == OptimizeFor_QubitWidth)
@@ -361,4 +364,5 @@ namespace quantum
     {
         return std::make_unique<CTracingSimulator>(std::move(translator), settings);
     }
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

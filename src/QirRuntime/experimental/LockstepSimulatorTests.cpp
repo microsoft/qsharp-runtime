@@ -7,7 +7,7 @@
 #include "IQuantumApi.hpp"
 #include "QuantumApiBase.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 using namespace std;
 
 struct CMockSimulatorForLockstepTests final : public CQuantumApiBase

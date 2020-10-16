@@ -4,7 +4,9 @@
 
 #include "CoreTypes.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     struct IQuantumApi
     {
@@ -138,6 +140,7 @@ namespace quantum
         virtual Result UseOne() = 0;
     };
 
-    void SetCurrentQuantumApiForQIR(quantum::IQuantumApi* qapi);
-    
-} // namespace quantum
+    void SetCurrentQuantumApiForQIR(Microsoft::Quantum::IQuantumApi* qapi);
+
+} // namespace Quantum
+} // namespace Microsoft

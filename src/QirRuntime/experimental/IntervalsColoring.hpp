@@ -5,7 +5,9 @@
 
 using namespace std;
 
-namespace algo
+namespace Microsoft
+{
+namespace Algorithms
 {
     // This is the classical "interval-graph coloring problem" or 16.1-3 from Introduction to Algorithms by Cormen's et
     // al (also known as "meetings room scheduling problem"):
@@ -72,4 +74,5 @@ namespace algo
         }
         return minColors;
     }
-} // namespace algo
+} // namespace Algorithms
+} // namespace Microsoft

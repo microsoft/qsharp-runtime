@@ -1,7 +1,9 @@
 #pragma once
 #include <sstream>
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     // Currently, there is implicit expectation that the simulator knows the runtime type of the translator and can cast
     // to it in order to access callbacks that allow the translator to accumulate necessary information. The client must
@@ -14,4 +16,5 @@ namespace quantum
         virtual void PrintRepresentation(std::ostringstream& os, std::ostringstream* errors = nullptr) = 0;
     };
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

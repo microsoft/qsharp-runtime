@@ -25,7 +25,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"
     }
-    Write-Host $Env:AGENT_OS
     $qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "../src/QirRuntime/build")
     mkdir $qirRuntimeBuildFolder
     $qirRuntimeBuildFolder = (Join-Path $qirRuntimeBuildFolder $Env:BUILD_CONFIGURATION)

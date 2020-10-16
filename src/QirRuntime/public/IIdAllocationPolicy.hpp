@@ -1,6 +1,8 @@
 #pragma once
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*=================================================================================
         The Id Allocation Policy assignes and keeps track of ids that can be used by
@@ -12,4 +14,5 @@ namespace quantum
         virtual long AcquireId() = 0;
         virtual void ReleaseId(long id) = 0;
     };
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

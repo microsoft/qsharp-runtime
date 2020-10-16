@@ -5,7 +5,7 @@
 #include "QAPI.hpp"
 #include "ResourceStatistics.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 ResourceStatistics g_stats;
 
 void QAPI_DestroyContext(QuantumExecutionContext* context) // NOLINT
@@ -19,34 +19,34 @@ void QAPI_DestroyContext(QuantumExecutionContext* context) // NOLINT
 }
 
 // Qubit management
-EXPORTQAPI Qubit QAPI_AllocateQubit(QuantumExecutionContext* context) // NOLINT
+EXPORTQAPI Qubit QAPI_AllocateQubit(QuantumExecutionContext*) // NOLINT
 {
     g_stats.cQubits++;
     g_stats.cQubitWidth = std::max(g_stats.cQubitWidth, g_stats.cQubits);
     return nullptr;
 }
-EXPORTQAPI void QAPI_ReleaseQubit(QuantumExecutionContext* context, Qubit qubit) // NOLINT
+EXPORTQAPI void QAPI_ReleaseQubit(QuantumExecutionContext*, Qubit qubit) // NOLINT
 {
     g_stats.cQubits--;
 }
 
-EXPORTQAPI void QAPI_CNOT(QuantumExecutionContext* context, Qubit control, Qubit target) // NOLINT
+EXPORTQAPI void QAPI_CNOT(QuantumExecutionContext*, Qubit control, Qubit target) // NOLINT
 {
     g_stats.cCX++;
 }
 
-EXPORTQAPI void QAPI_CX(QuantumExecutionContext* context, Qubit control, Qubit target) // NOLINT
+EXPORTQAPI void QAPI_CX(QuantumExecutionContext*, Qubit control, Qubit target) // NOLINT
 {
     g_stats.cCX++;
 }
 
-EXPORTQAPI void QAPI_X(QuantumExecutionContext* context, Qubit target) // NOLINT
+EXPORTQAPI void QAPI_X(QuantumExecutionContext*, Qubit target) // NOLINT
 {
     g_stats.cX++;
 }
 
 EXPORTQAPI void QAPI_ControlledX( // NOLINT
-    QuantumExecutionContext* context,
+    QuantumExecutionContext*,
     long numControls,
     Qubit controls[],
     Qubit target)
@@ -54,13 +54,13 @@ EXPORTQAPI void QAPI_ControlledX( // NOLINT
     g_stats.cCX++;
 }
 
-EXPORTQAPI void QAPI_Y(QuantumExecutionContext* context, Qubit target) // NOLINT
+EXPORTQAPI void QAPI_Y(QuantumExecutionContext*, Qubit target) // NOLINT
 {
     g_stats.cY++;
 }
 
 EXPORTQAPI void QAPI_ControlledY( // NOLINT
-    QuantumExecutionContext* context,
+    QuantumExecutionContext*,
     long numControls,
     Qubit controls[],
     Qubit target)
@@ -68,13 +68,13 @@ EXPORTQAPI void QAPI_ControlledY( // NOLINT
     g_stats.cCY++;
 }
 
-EXPORTQAPI void QAPI_H(QuantumExecutionContext* context, Qubit target) // NOLINT
+EXPORTQAPI void QAPI_H(QuantumExecutionContext*, Qubit target) // NOLINT
 {
     g_stats.cH++;
 }
 
 EXPORTQAPI void QAPI_ControlledH( // NOLINT
-    QuantumExecutionContext* context,
+    QuantumExecutionContext*,
     long numControls,
     Qubit controls[],
     Qubit target)
@@ -83,7 +83,7 @@ EXPORTQAPI void QAPI_ControlledH( // NOLINT
 }
 
 EXPORTQAPI void QAPI_R( // NOLINT
-    QuantumExecutionContext* context,
+    QuantumExecutionContext*,
     PauliId axis,
     Qubit target,
     double theta)
@@ -92,7 +92,7 @@ EXPORTQAPI void QAPI_R( // NOLINT
 }
 
 EXPORTQAPI void QAPI_ControlledR( // NOLINT
-    QuantumExecutionContext* context,
+    QuantumExecutionContext*,
     long numControls,
     Qubit controls[],
     PauliId axis,

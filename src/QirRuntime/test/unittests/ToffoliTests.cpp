@@ -5,7 +5,7 @@
 #include "IQuantumApi.hpp"
 #include "SimFactory.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 TEST_CASE("Basis vector", "[toffoli]")
 {

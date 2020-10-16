@@ -12,7 +12,9 @@
 
 using namespace std;
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==================================================================================================================
     The purpose of the translator is to generate JSON that represents the program which was run by the simulator.
@@ -157,18 +159,16 @@ namespace quantum
         }
     };
 
-    /*==============================================================================
-        The decomposer provides classical "text book" decompositions for some of the
-        unitaries without any hardware specific optimizations.
+    /*==================================================================================================================
+    The decomposer demonstrates how handling of the intrinsics can be layered across multiple IQuantumApi instances.
 
-        A quantum processor, that wants to avail of the decompositions, should
-        implement the primitive operations, pass itself to the decomposer and then
-        delegate to it calls that should be decomposed.
+    The top level IQuantumApi, that wants to avail of the layering, implements the intrinsic operations it
+    supports and passes itself to the decomposer for the intrinsics it doesn't support.
 
-        NB: because the owner opts-in for each decomposition separately the decomposer
-        will call back for each step, even if it might come back to it (R1Frac -> R1).
-    ==============================================================================*/
-    class CCanonicalDecomposer final : public CQuantumApiBase
+    NB: because the owner opts-in for each decomposition separately the decomposer will call back for each step, even if
+    it might immediately resolve to calling the decomposer again (R1Frac -> R1).
+    ==================================================================================================================*/
+    class CSampleDecomposer final : public CQuantumApiBase
     {
         // The decomposer assumes that owner's lifetime exceeds its own.
         IQuantumApi* owner = nullptr;
@@ -179,7 +179,7 @@ namespace quantum
         }
 
       public:
-        CCanonicalDecomposer(IQuantumApi* ownerIQP)
+        CSampleDecomposer(IQuantumApi* ownerIQP)
             : owner(ownerIQP)
         {
         }
@@ -370,7 +370,7 @@ namespace quantum
 
       public:
         explicit CCircuitPrintingSimulator(shared_ptr<ITranslator> iTranslator)
-            : decomposer(make_unique<CCanonicalDecomposer>(this))
+            : decomposer(make_unique<CSampleDecomposer>(this))
             , itranslator(std::move(iTranslator))
         {
             translator = (static_cast<CCircuitToJsonTranslator*>(itranslator.get()));
@@ -655,5 +655,10 @@ namespace quantum
     {
         return std::make_unique<CCircuitPrintingSimulator>(std::move(translator));
     }
+    std::unique_ptr<IQuantumApi> CreateSampleDecomposer(IQuantumApi* owner)
+    {
+        return std::make_unique<CSampleDecomposer>(owner);
+    }
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

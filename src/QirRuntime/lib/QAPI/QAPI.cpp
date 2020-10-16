@@ -8,7 +8,7 @@
 #include "__quantum__rt.hpp"
 
 using namespace std;
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 static IQuantumApi* GetQuantumExecutor(QuantumExecutionContext* context)
 {

@@ -9,7 +9,9 @@
 
 using namespace std;
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==============================================================================
         CLockstepSimulator
@@ -527,4 +529,5 @@ namespace quantum
     {
         return make_unique<CLockstepSimulator>(std::move(simulatorsToRunInLockstep), resultValueBuffer);
     }
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

@@ -6,7 +6,7 @@
 #include "ChunkedStore.hpp"
 
 using namespace std;
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 struct Complex
 {

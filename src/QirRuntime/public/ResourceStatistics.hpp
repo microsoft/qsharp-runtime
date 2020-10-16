@@ -1,7 +1,9 @@
 #pragma once
 #include <sstream>
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     static const char* names[] = {"cX", "cCX", "cY",  "cCY",  "cZ", "cCZ", "cH",  "cCH",  "cR", "cCR",
                                   "cS", "cCS", "cAS", "cCAS", "cT", "cCT", "cAT", "cCAT", "cM"};
@@ -49,4 +51,5 @@ namespace quantum
             os << "]}";
         }
     };
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

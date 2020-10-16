@@ -16,9 +16,12 @@ struct QirCallable;
 struct QirString;
 struct QirBigInt;
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     struct IQuantumApi;
+}
 }
 
 /*

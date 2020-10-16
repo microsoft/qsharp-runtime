@@ -58,6 +58,9 @@ struct QirCallable
 
   private:
     static int constexpr TableSize = 4;
+    static_assert(
+        QirCallable::Adjoint + QirCallable::Controlled < QirCallable::TableSize,
+        L"functor kind is used as index into the function_table");
 
     std::atomic<long> refCount;
     t_CallableEntry function_table[QirCallable::TableSize];
@@ -114,7 +117,16 @@ struct QirCallable
     void ApplyFunctor(int functor)
     {
         assert(functor == QirCallable::Adjoint || functor == QirCallable::Controlled);
-        this->appliedFunctor ^= functor;
+
+        // A + A = I; A + C = C + A = CA; C + C = C; CA + A = C; CA + C = CA
+        if (functor == QirCallable::Adjoint)
+        {
+            this->appliedFunctor ^= QirCallable::Adjoint;
+        }
+        else if (functor == QirCallable::Controlled)
+        {
+            this->appliedFunctor |= QirCallable::Controlled;
+        }
     }
 };
 

@@ -8,7 +8,7 @@
 #include "SimFactory.hpp"
 #include "ResourceStatistics.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 using namespace std;
 
 extern ResourceStatistics g_stats;

@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <vector>
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==============================================================================
         Provides dynamically extendable storage for packed bits
@@ -72,4 +74,5 @@ namespace quantum
         }
     };
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

@@ -3,11 +3,13 @@
 #include <memory>
 #include <vector>
 
-#include "QAPI.hpp"
 #include "IQuantumApi.hpp"
 #include "ITranslator.hpp"
+#include "QAPI.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     // Lockstep simulator executes the provided simulators "in lockstep", one operation
     // at a time. The result value buffer should be allocated by the caller and would contain
@@ -21,8 +23,9 @@ namespace quantum
     // The circuit to json translator traces the quantum program and generates json that describes the program.
     std::shared_ptr<ITranslator> CreateCircuitToJsonTranslator();
     std::unique_ptr<IQuantumApi> CreateCircuitPrintingSimulator(std::shared_ptr<ITranslator> translator);
+    std::unique_ptr<IQuantumApi> CreateSampleDecomposer(IQuantumApi* owner);
 
-    // Transing simulator is effectively a translator: it traces the quantum program to collect
+    // Tracing simulator is effectively a translator: it traces the quantum program to collect
     // statistics about it, and returns the representation of the statistics.
     enum OptimizeFor
     {
@@ -34,4 +37,5 @@ namespace quantum
         std::shared_ptr<ITranslator> resourcesTranslator,
         OptimizeFor settings);
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

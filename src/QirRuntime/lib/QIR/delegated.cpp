@@ -1,7 +1,7 @@
 /*=============================================================================
     QIR assumes a single global execution context.
     To support the dispatch over the qir-bridge, the clients must implement
-    quantum::IQuantumApi* g_qapi;
+    Microsoft::Quantum::IQuantumApi* g_qapi;
 =============================================================================*/
 #include <assert.h>
 #include <unordered_map>
@@ -11,10 +11,12 @@
 #include "IQuantumApi.hpp"
 #include "qirTypes.hpp"
 
-quantum::IQuantumApi* g_qapi = nullptr;
+Microsoft::Quantum::IQuantumApi* g_qapi = nullptr;
 extern "C" QIR_SHARED_API Result ResultOne = nullptr;
 extern "C" QIR_SHARED_API Result ResultZero = nullptr;
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     void SetCurrentQuantumApiForQIR(IQuantumApi* qapi)
     {
@@ -30,7 +32,8 @@ namespace quantum
             ResultZero = nullptr;
         }
     }
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft
 
 std::unordered_map<RESULT*, int>& AllocatedResults()
 {

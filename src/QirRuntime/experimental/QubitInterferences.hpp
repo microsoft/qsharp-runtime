@@ -6,9 +6,11 @@
 
 using namespace std;
 
+namespace Microsoft
+{
 // The optimization is formulated in terms of qubits and operations on them, but it doesn't depend on any of the core
 // quantum types so we've placed it into 'algo' namespace.
-namespace algo
+namespace Algorithms
 {
     /*------------------------------------------------------------------------------------------------------------------
     The sequential execution of the quantum program by the simulator imposes a strict full order on the operations.
@@ -38,7 +40,7 @@ namespace algo
         CNOT(q1, q2)
         CNOT(q3, q4)
         CNOT(q2, q3)
-    It will identify interferences as: q1 ~ q2, q2 ~ q3, q3 ~ q4 (which can be colored with exactly two colors), 
+    It will identify interferences as: q1 ~ q2, q2 ~ q3, q3 ~ q4 (which can be colored with exactly two colors),
     but this curcuit cannot be compacted to use only two logical qubits.
 
     To handle this case we'll extend the notion of linear interference to union interferences of all qubits that
@@ -118,4 +120,5 @@ namespace algo
         long EstimateCircuitWidth() const;
     };
 
-} // namespace algo
+} // namespace Algorithms
+} // namespace Microsoft

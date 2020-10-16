@@ -8,7 +8,9 @@
 
 using namespace std;
 
-namespace algo
+namespace Microsoft
+{
+namespace Algorithms
 {
 
     void CQubitInterferences::AddOperation(
@@ -134,7 +136,7 @@ namespace algo
         }
 
         unordered_map<long, unordered_set<long>> copy = this->interferences;
-        return algo::CanFit(registersCount, copy);
+        return Microsoft::Algorithms::CanFit(registersCount, copy);
     }
 
     // Binary search between maxQubitsInSingleOperation and maxDegree+1 of the interference graph
@@ -175,4 +177,5 @@ namespace algo
         assert(requiredNumber == sufficientNumber - 1);
         return CanFit(requiredNumber) ? requiredNumber : sufficientNumber;
     }
-} // namespace algo
+} // namespace Algorithms
+} // namespace Microsoft

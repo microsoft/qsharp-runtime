@@ -10,7 +10,7 @@
 #include "qirTypes.hpp"
 
 using namespace std;
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 extern "C"
 {

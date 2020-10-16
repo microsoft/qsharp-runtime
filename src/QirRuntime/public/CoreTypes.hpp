@@ -3,7 +3,6 @@
 // The core types will be exposed in the C-interfaces for interop, thus no
 // namespaces or scoped enums can be used to define them.
 
-
 /*==============================================================================
   Helper types
 ==============================================================================*/
@@ -22,10 +21,10 @@ enum TernaryBool
   dereferenced in client's code.
 ==============================================================================*/
 class QUBIT;
-typedef QUBIT *Qubit;
+typedef QUBIT* Qubit;
 
 class RESULT;
-typedef RESULT *Result;
+typedef RESULT* Result;
 
 enum ResultValue
 {

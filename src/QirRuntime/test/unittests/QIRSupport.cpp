@@ -12,7 +12,7 @@
 #include "BitStates.hpp"
 #include "QuantumApiBase.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 struct ResultsReferenceCountingTestQAPI : public CQuantumApiBase
 {

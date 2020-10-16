@@ -6,8 +6,9 @@
 #include "ExperimentalSimFactory.hpp"
 #include "IQuantumApi.hpp"
 #include "ITranslator.hpp"
+#include "QuantumApiBase.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 using namespace std;
 
 TEST_CASE("Empty program", "[circuit_printer]")
@@ -282,4 +283,43 @@ TEST_CASE("Comparing results is limited", "[circuit_printer]")
 
     INFO(errors.str());
     REQUIRE(errors.str().find("\"error_count\":2", 0) != string::npos);
+}
+
+struct LayeringTestQAPI : public CQuantumApiBase
+{
+    IQuantumApi* inner = nullptr;
+    int cR = 0;
+    Qubit curQubit = nullptr;
+    int id = -1;
+
+    Qubit AllocateQubit() override
+    {
+        return reinterpret_cast<Qubit>(++id);
+    }
+    void ReleaseQubit(Qubit q) override {}
+    void R1(Qubit qubit, double theta) override
+    {
+        curQubit = qubit;
+        this->inner->R1(qubit, theta);
+    }
+    void R(PauliId pauli, Qubit qubit, double theta) override
+    {
+        REQUIRE(qubit == curQubit);
+        cR++;
+    }
+};
+TEST_CASE("Layering handling of intrinsics", "[sample_decomposer]")
+{
+    LayeringTestQAPI iqa;
+    std::unique_ptr<IQuantumApi> iqaInner = CreateSampleDecomposer(&iqa);
+    iqa.inner = iqaInner.get();
+
+    Qubit q1 = iqa.AllocateQubit();
+    Qubit q2 = iqa.AllocateQubit();
+    iqa.R1(q1, 0.42);
+    iqa.R1(q2, 0.42);
+    iqa.ReleaseQubit(q1);
+    iqa.ReleaseQubit(q2);
+
+    REQUIRE(iqa.cR == 4);
 }

@@ -1,7 +1,7 @@
 /*=============================================================================
     QIR assumes a single global execution context.
     To support the dispatch over the qir-bridge, the clients must register their
-    quantum::IQuantumApi* first.
+    Microsoft::Quantum::IQuantumApi* first.
 =============================================================================*/
 #include <assert.h>
 #include <vector>
@@ -11,7 +11,7 @@
 #include "IQuantumApi.hpp"
 #include "qirTypes.hpp"
 
-extern quantum::IQuantumApi* g_qapi;
+extern Microsoft::Quantum::IQuantumApi* g_qapi;
 
 extern "C"
 {

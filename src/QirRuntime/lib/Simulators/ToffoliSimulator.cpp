@@ -7,7 +7,9 @@
 #include "BitStates.hpp"
 #include "QuantumApiBase.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==============================================================================
         CToffoliSimulator
@@ -143,4 +145,5 @@ namespace quantum
         return std::make_unique<CToffoliSimulator>();
     }
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

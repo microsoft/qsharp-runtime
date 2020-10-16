@@ -4,7 +4,9 @@
 
 #include "IQuantumApi.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     class CQuantumApiBase : public IQuantumApi
     {
@@ -257,4 +259,5 @@ namespace quantum
         }
     };
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

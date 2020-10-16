@@ -8,7 +8,7 @@
 #include "QuantumApiBase.hpp"
 #include "QubitAllocationPolicies.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 
 class CDeferredResultsTestSimulator final : public CQuantumApiBase
 {

@@ -47,7 +47,9 @@ void* LoadProc(QUANTUM_SIMULATOR handle, const char* procName)
 #endif
 }
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
     class CFullstateSimulator : public CQuantumApiBase
@@ -381,4 +383,5 @@ namespace quantum
     {
         return std::make_unique<CFullstateSimulator>();
     }
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

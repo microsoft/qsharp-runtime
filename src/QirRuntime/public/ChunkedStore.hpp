@@ -5,7 +5,9 @@
 
 #include "BitStates.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==============================================================================
         Provides dynamically extendable storage for TItem_WithId (usually, qubits)
@@ -126,4 +128,5 @@ namespace quantum
         }
     };
 
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

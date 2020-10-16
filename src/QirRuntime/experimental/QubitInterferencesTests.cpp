@@ -40,7 +40,7 @@ static string InterferencesToString(const unordered_map<long, unordered_set<long
 
 TEST_CASE("Qubit interference: no dependencies", "[qubit_interference]")
 {
-    algo::CQubitInterferences interferences;
+    Microsoft::Algorithms::CQubitInterferences interferences;
     for (long i = 0; i < 10; i++)
     {
         interferences.AddOperation(i, {}, {i});
@@ -53,7 +53,7 @@ TEST_CASE("Qubit interference: no dependencies", "[qubit_interference]")
 
 TEST_CASE("Qubit interference: single op across all qubits", "[qubit_interference]")
 {
-    algo::CQubitInterferences interferences;
+    Microsoft::Algorithms::CQubitInterferences interferences;
     for (long i = 0; i < 5; i++)
     {
         interferences.AddOperation(i, {}, {i});
@@ -68,7 +68,7 @@ TEST_CASE("Qubit interference: single op across all qubits", "[qubit_interferenc
 
 TEST_CASE("Qubit interference: cascading dependency", "[qubit_interference]")
 {
-    algo::CQubitInterferences interferences;
+    Microsoft::Algorithms::CQubitInterferences interferences;
     interferences.AddOperation(0, {}, {0, 1});
     for (long i = 1; i < 10; i++)
     {

@@ -6,7 +6,7 @@
 #include "IQuantumApi.hpp"
 #include "ITranslator.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 using namespace std;
 
 static void AllocateQubits(IQuantumApi* iqa, int count, Qubit* qubits)
@@ -343,4 +343,3 @@ TEST_CASE("Tracing Simulator: triangle of CNOTs", "[tracing_simulator]")
     REQUIRE(os.str().find("\"qubit_width\":3") != string::npos);
     REQUIRE(errors.str().empty());
 }
-

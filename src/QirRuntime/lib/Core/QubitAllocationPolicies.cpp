@@ -2,7 +2,9 @@
 
 #include "QubitAllocationPolicies.hpp"
 
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     long CReuseLastReleasedQubitAllocationPolicy::AcquireId()
     {
@@ -32,4 +34,5 @@ namespace quantum
         // consists of released ids and reset lastUsedId instead of
         // growing the stack
     }
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

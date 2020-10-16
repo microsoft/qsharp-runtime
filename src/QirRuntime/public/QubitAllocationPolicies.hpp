@@ -2,14 +2,16 @@
 
 #include <stack>
 
-#include "IIdAllocationPolicy.hpp"
 #include "BitStates.hpp"
+#include "IIdAllocationPolicy.hpp"
 
 using namespace std;
-namespace quantum
+namespace Microsoft
+{
+namespace Quantum
 {
     /*==============================================================================
-        The default qubit manager reuses released qubit ids in "Last released - 
+        The default qubit manager reuses released qubit ids in "Last released -
         first reused" order.
     ==============================================================================*/
     class CReuseLastReleasedQubitAllocationPolicy : public IIdAllocationPolicy
@@ -36,7 +38,11 @@ namespace quantum
         long lastUsedId = -1;
 
       public:
-        long AcquireId() override { return ++this->lastUsedId; }
-        void ReleaseId(long id) override {};
+        long AcquireId() override
+        {
+            return ++this->lastUsedId;
+        }
+        void ReleaseId(long id) override{};
     };
-} // namespace quantum
+} // namespace Quantum
+} // namespace Microsoft

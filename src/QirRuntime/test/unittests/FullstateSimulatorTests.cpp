@@ -7,7 +7,7 @@
 #include "IQuantumApi.hpp"
 #include "SimFactory.hpp"
 
-using namespace quantum;
+using namespace Microsoft::Quantum;
 using namespace std;
 
 // The tests rely on the implementation detail of CFullstateSimulator that the qubits are nothing more but contiguously

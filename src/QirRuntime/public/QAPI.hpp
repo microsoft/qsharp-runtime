@@ -78,9 +78,9 @@ EXPORTQAPI void QAPI_RFraction(                                                 
     Qubit target,
     long numerator,
     int power);
-EXPORTQAPI void QAPI_R1(QuantumExecutionContext* context, Qubit target, double theta);                       // NOLINT
+EXPORTQAPI void QAPI_R1(QuantumExecutionContext* context, Qubit target, double theta);                      // NOLINT
 EXPORTQAPI void QAPI_R1Fraction(QuantumExecutionContext* context, Qubit target, long numerator, int power); // NOLINT
-EXPORTQAPI void QAPI_Exp(                                                                                    // NOLINT
+EXPORTQAPI void QAPI_Exp(                                                                                   // NOLINT
     QuantumExecutionContext* context,
     long numTargets,
     PauliId paulis[],
