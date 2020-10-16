@@ -178,20 +178,16 @@ namespace Microsoft.Quantum.Simulation.Core
         // ValueTuples, it returns an empty instance of that value tuple.
         private static T CreateDefault()
         {
-            if (typeof(T).IsValueType || typeof(T).IsAbstract || typeof(T) == typeof(String) || typeof(T) == typeof(QVoid))
-            {
-                return default(T);
-            }
-            else
-            {
-                // First look for an empty constructor
-                ConstructorInfo defaultConstructor = typeof(T).GetConstructor(Type.EmptyTypes);
-                return defaultConstructor != null
-                    ? (T)(defaultConstructor.Invoke(new object[] { }))
-                    : Activator.CreateInstance<T>();
-            }
+            var type = typeof(T);
+            var isArray = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>);
+            return isArray ? (T)Activator.CreateInstance(typeof(QArray<>).MakeGenericType(type.GenericTypeArguments))
+                : type == typeof(QRange) ? (T)(object)QRange.Empty
+                : type == typeof(QVoid) ? (T)(object)QVoid.Instance
+                : type == typeof(Result) ? (T)(object)Result.Zero
+                : type == typeof(string) ? (T)(object)""
+                : type.GetConstructor(Type.EmptyTypes) is null ? default
+                : Activator.CreateInstance<T>();
         }
-
 
         /// <summary>
         /// Create an array of length 0.
