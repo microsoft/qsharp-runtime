@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
@@ -29,31 +31,36 @@ namespace Microsoft.Quantum.Runtime.Core
 
         internal static T OfType<T>() => (T)OfType(typeof(T));
 
-        private static object OfType(Type type)
+        private static object OfType(Type type) =>
+            OfAnyType(type).FirstOrDefault(value => !(value is null))
+            ?? throw new NotSupportedException("There is no default value for this type.");
+
+        private static IEnumerable<object?> OfAnyType(Type type)
         {
-            if (Values.TryGetValue(type, out var value))
-            {
-                return value;
-            }
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>))
-            {
-                return Activator.CreateInstance(typeof(QArray<>).MakeGenericType(type.GenericTypeArguments));
-            }
-            if (type.IsGenericType && Tuples.Contains(type.GetGenericTypeDefinition()))
-            {
-                return Activator.CreateInstance(type, type.GenericTypeArguments.Select(OfType).ToArray());
-            }
-            if (!(type.BaseType is null)
-                && type.BaseType.IsGenericType
-                && type.BaseType.GetGenericTypeDefinition() == typeof(UDTBase<>))
-            {
-                return Activator.CreateInstance(type, type.BaseType.GenericTypeArguments.Select(OfType).ToArray());
-            }
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            throw new NotSupportedException("There is no default value for this type.");
+            yield return Values.GetValueOrDefault(type);
+            yield return OfArrayType(type);
+            yield return OfTupleType(type);
+            yield return OfUserDefinedType(type);
+            yield return OfValueType(type);
         }
+
+        private static object? OfArrayType(Type type) =>
+            type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>)
+                ? Activator.CreateInstance(typeof(QArray<>).MakeGenericType(type.GenericTypeArguments))
+                : null;
+
+        private static object? OfTupleType(Type type) =>
+            type.IsGenericType && Tuples.Contains(type.GetGenericTypeDefinition())
+                ? Activator.CreateInstance(type, type.GenericTypeArguments.Select(OfType).ToArray())
+                : null;
+
+        private static object? OfUserDefinedType(Type type) =>
+            !(type.BaseType is null)
+            && type.BaseType.IsGenericType
+            && type.BaseType.GetGenericTypeDefinition() == typeof(UDTBase<>)
+                ? Activator.CreateInstance(type, type.BaseType.GenericTypeArguments.Select(OfType).ToArray())
+                : null;
+
+        private static object? OfValueType(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
     }
 }
