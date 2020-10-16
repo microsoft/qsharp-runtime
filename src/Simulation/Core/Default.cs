@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Core
@@ -28,7 +29,8 @@ namespace Microsoft.Quantum.Simulation.Core
             typeof(ValueTuple<,,,,,,,>)
         };
 
-        public static T OfType<T>() => (T)OfType(typeof(T));
+        [return: MaybeNull]
+        public static T OfType<T>() => OfType(typeof(T)) is T value ? value : default;
 
         private static object? OfType(Type type) => OfAnyType(type).FirstOrDefault(value => !(value is null));
 
@@ -38,7 +40,6 @@ namespace Microsoft.Quantum.Simulation.Core
             yield return OfArrayType(type);
             yield return OfTupleType(type);
             yield return OfUserDefinedType(type);
-            yield return OfValueType(type);
         }
 
         private static object? OfArrayType(Type type) =>
@@ -57,7 +58,5 @@ namespace Microsoft.Quantum.Simulation.Core
             && type.BaseType.GetGenericTypeDefinition() == typeof(UDTBase<>)
                 ? Activator.CreateInstance(type, type.BaseType.GenericTypeArguments.Select(OfType).ToArray())
                 : null;
-
-        private static object? OfValueType(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
     }
 }
