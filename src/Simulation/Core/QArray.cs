@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 storage = new List<T>((int)capacity);
                 for (var i = 0L; i < capacity; ++i)
                 {
-                    storage.Add(QDefault.OfType<T>());
+                    storage.Add(Default.OfType<T>());
                 }
             }
 
@@ -149,7 +149,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 long oldLength = storage.Count;
                 for (int i = 0; i < (newLength - oldLength); i++)
                 {
-                    storage.Add(QDefault.OfType<T>());
+                    storage.Add(Default.OfType<T>());
                 }
             }
         }
@@ -487,7 +487,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 currentIndex = -1;
             }
 
-            public T Current => currentIndex >= 0 ? array[currentIndex] : QDefault.OfType<T>();
+            public T Current => currentIndex >= 0 ? array[currentIndex] : Default.OfType<T>();
 
             object IEnumerator.Current => this.Current;
 

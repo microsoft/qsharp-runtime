@@ -1450,7 +1450,7 @@ module SimulationCode =
                     roslynTypeName context item
                     |> sprintf "global::Microsoft.Quantum.Simulation.Core.QArray<%s>"
                 | _ -> roslynTypeName context qsharpType
-            let defaultValue = sprintf "global::Microsoft.Quantum.Simulation.Core.QDefault.OfType<%s>()" baseTupleType
+            let defaultValue = sprintf "global::Microsoft.Quantum.Simulation.Core.Default.OfType<%s>()" baseTupleType
             ``constructor`` name ``(`` [] ``)``
                 ``:`` [ defaultValue ]
                 [ ``public`` ]

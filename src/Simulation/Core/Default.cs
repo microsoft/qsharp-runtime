@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
-    public static class QDefault
+    public static class Default
     {
         private static readonly IReadOnlyDictionary<Type, object> Values = new Dictionary<Type, object>
         {
