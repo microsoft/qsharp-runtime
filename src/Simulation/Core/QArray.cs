@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Quantum.Runtime.Core;
 using Newtonsoft.Json;
 
 namespace Microsoft.Quantum.Simulation.Core

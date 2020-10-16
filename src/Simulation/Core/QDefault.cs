@@ -3,9 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Runtime.Core
+namespace Microsoft.Quantum.Simulation.Core
 {
     internal static class QDefault
     {
