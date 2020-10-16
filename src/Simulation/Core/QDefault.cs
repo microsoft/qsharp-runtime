@@ -15,6 +15,9 @@ namespace Microsoft.Quantum.Runtime.Core
             [typeof(string)] = ""
         };
 
+        private static object OfGenericType(Type type, Type[] args) =>
+            Activator.CreateInstance(type.MakeGenericType(args), args.Select(OfType).ToArray());
+
         private static object OfType(Type type)
         {
             if (Values.TryGetValue(type, out var value))
@@ -27,24 +30,39 @@ namespace Microsoft.Quantum.Runtime.Core
             }
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<>))
             {
-                return Activator.CreateInstance(
-                    typeof(ValueTuple<>).MakeGenericType(type.GenericTypeArguments),
-                    type.GenericTypeArguments.Select(OfType).ToArray());
+                return OfGenericType(typeof(ValueTuple<>), type.GenericTypeArguments);
             }
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
             {
-                return Activator.CreateInstance(
-                    typeof(ValueTuple<,>).MakeGenericType(type.GenericTypeArguments),
-                    type.GenericTypeArguments.Select(OfType).ToArray());
+                return OfGenericType(typeof(ValueTuple<,>), type.GenericTypeArguments);
             }
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,>))
             {
-                return Activator.CreateInstance(
-                    typeof(ValueTuple<,,>).MakeGenericType(type.GenericTypeArguments),
-                    type.GenericTypeArguments.Select(OfType).ToArray());
+                return OfGenericType(typeof(ValueTuple<,,>), type.GenericTypeArguments);
             }
-            // TODO: ValueTuple...
-            if (!(type.BaseType is null) && type.BaseType.IsGenericType && type.BaseType.GetGenericTypeDefinition() == typeof(UDTBase<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>))
+            {
+                return OfGenericType(typeof(ValueTuple<,,,>), type.GenericTypeArguments);
+            }
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>))
+            {
+                return OfGenericType(typeof(ValueTuple<,,,,>), type.GenericTypeArguments);
+            }
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>))
+            {
+                return OfGenericType(typeof(ValueTuple<,,,,,>), type.GenericTypeArguments);
+            }
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>))
+            {
+                return OfGenericType(typeof(ValueTuple<,,,,,,>), type.GenericTypeArguments);
+            }
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>))
+            {
+                return OfGenericType(typeof(ValueTuple<,,,,,,,>), type.GenericTypeArguments);
+            }
+            if (!(type.BaseType is null)
+                && type.BaseType.IsGenericType
+                && type.BaseType.GetGenericTypeDefinition() == typeof(UDTBase<>))
             {
                 return Activator.CreateInstance(type, type.BaseType.GenericTypeArguments.Select(OfType).ToArray());
             }

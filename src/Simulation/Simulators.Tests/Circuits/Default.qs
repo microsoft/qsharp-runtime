@@ -66,6 +66,12 @@
     function DefaultTuple() : Unit {
         AssertEqual((false, 0), Default<(Bool, Int)>());
         AssertEqual((0, Zero, ""), Default<(Int, Result, String)>());
+        AssertEqual(("", "", "", ""), Default<(String, String, String, String)>());
+        AssertEqual(("", "", "", "", ""), Default<(String, String, String, String, String)>());
+        AssertEqual(("", "", "", "", "", ""), Default<(String, String, String, String, String, String)>());
+        AssertEqual(("", "", "", "", "", "", ""), Default<(String, String, String, String, String, String, String)>());
+        AssertEqual(("", "", "", "", "", "", "", ""), Default<(String, String, String, String, String, String, String, String)>());
+        AssertEqual(("", "", "", "", "", "", "", "", ""), Default<(String, String, String, String, String, String, String, String, String)>());
     }
 
     newtype BoolInt = (Bool, Int);
