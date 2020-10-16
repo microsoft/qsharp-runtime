@@ -81,5 +81,6 @@
     function DefaultUserDefinedType() : Unit {
         AssertEqual(BoolInt(false, 0), Default<BoolInt>());
         AssertEqual(IntResultString(0, Zero, ""), Default<IntResultString>());
+        AssertEqual((BoolInt(false, 0), IntResultString(0, Zero, "")), Default<(BoolInt, IntResultString)>());
     }
 }
