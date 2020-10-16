@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using Microsoft.Quantum.Runtime.Core;
 using Newtonsoft.Json;
 
 namespace Microsoft.Quantum.Simulation.Core
@@ -106,7 +106,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 storage = new List<T>((int)capacity);
                 for (var i = 0L; i < capacity; ++i)
                 {
-                    storage.Add(CreateDefault());
+                    storage.Add(QDefault.OfType<T>());
                 }
             }
 
@@ -150,8 +150,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 long oldLength = storage.Count;
                 for (int i = 0; i < (newLength - oldLength); i++)
                 {
-                    T obj = CreateDefault();
-                    storage.Add(obj);
+                    storage.Add(QDefault.OfType<T>());
                 }
             }
         }
@@ -172,21 +171,6 @@ namespace Microsoft.Quantum.Simulation.Core
             storage = array;
             start = 0;
             step = 1;
-        }
-
-        // Returns the default value of an object of this type of array. Normally null or 0, but for things like
-        // ValueTuples, it returns an empty instance of that value tuple.
-        private static T CreateDefault()
-        {
-            var type = typeof(T);
-            var isArray = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQArray<>);
-            return isArray ? (T)Activator.CreateInstance(typeof(QArray<>).MakeGenericType(type.GenericTypeArguments))
-                : type == typeof(QRange) ? (T)(object)QRange.Empty
-                : type == typeof(QVoid) ? (T)(object)QVoid.Instance
-                : type == typeof(Result) ? (T)(object)Result.Zero
-                : type == typeof(string) ? (T)(object)""
-                : type.GetConstructor(Type.EmptyTypes) is null ? default
-                : Activator.CreateInstance<T>();
         }
 
         /// <summary>
@@ -504,7 +488,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 currentIndex = -1;
             }
 
-            public T Current => currentIndex >= 0 ? array[currentIndex] : CreateDefault();
+            public T Current => currentIndex >= 0 ? array[currentIndex] : QDefault.OfType<T>();
 
             object IEnumerator.Current => this.Current;
 
