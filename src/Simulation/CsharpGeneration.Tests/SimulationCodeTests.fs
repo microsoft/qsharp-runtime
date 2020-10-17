@@ -2924,7 +2924,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class U : UDTBase<IUnitary>, IApplyData
     {
-        public U() : base(default(IUnitary))
+        public U() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IUnitary>())
         {
         }
 
@@ -2950,7 +2950,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class AA : UDTBase<A>, IApplyData
     {
-        public AA() : base(default(A))
+        public AA() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<A>())
         {
         }
 
@@ -2976,7 +2976,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class Q : UDTBase<Qubit>, IApplyData
     {
-        public Q() : base(default(Qubit))
+        public Q() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Qubit>())
         {
         }
 
@@ -3002,7 +3002,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class QQ : UDTBase<Q>, IApplyData
     {
-        public QQ() : base(default(Q))
+        public QQ() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Q>())
         {
         }
 
@@ -3028,7 +3028,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class Qubits : UDTBase<IQArray<Qubit>>, IApplyData
     {
-        public Qubits() : base(new QArray<Qubit>())
+        public Qubits() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IQArray<Qubit>>())
         {
         }
 
@@ -3054,7 +3054,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_args1 : UDTBase<(Int64,IQArray<Qubit>)>, IApplyData
     {
-        public udt_args1() : base(default((Int64,IQArray<Qubit>)))
+        public udt_args1() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,IQArray<Qubit>)>())
         {
         }
 
@@ -3084,7 +3084,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_Real : UDTBase<Double>, IApplyData
     {
-        public udt_Real() : base(default(Double))
+        public udt_Real() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Double>())
         {
         }
 
@@ -3104,7 +3104,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_Complex : UDTBase<(udt_Real,udt_Real)>, IApplyData
     {
-        public udt_Complex() : base(default((udt_Real,udt_Real)))
+        public udt_Complex() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(udt_Real,udt_Real)>())
         {
         }
 
@@ -3127,7 +3127,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_TwoDimArray : UDTBase<IQArray<IQArray<Result>>>, IApplyData
     {
-        public udt_TwoDimArray() : base(new QArray<IQArray<Result>>())
+        public udt_TwoDimArray() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IQArray<IQArray<Result>>>())
         {
         }
 
@@ -3149,7 +3149,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
 internal class InternalType : UDTBase<QVoid>, IApplyData
 {
-    public InternalType() : base(default(QVoid))
+    public InternalType() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<QVoid>())
     {
     }
 
@@ -3171,7 +3171,7 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
         """
 public class NamedTuple : UDTBase<((Int64,Double),Int64)>, IApplyData
 {
-    public NamedTuple() : base(default(((Int64,Double),Int64)))
+    public NamedTuple() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<((Int64,Double),Int64)>())
     {
     }
 
@@ -3231,7 +3231,7 @@ namespace Microsoft.Quantum
 {
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Pair() : base(default((Int64,Int64)))
+        public Pair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3251,7 +3251,7 @@ namespace Microsoft.Quantum
 
     public class Unused : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Unused() : base(default((Int64,Int64)))
+        public Unused() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3337,7 +3337,7 @@ namespace Microsoft.Quantum
 {
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Pair() : base(default((Int64,Int64)))
+        public Pair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3361,7 +3361,7 @@ namespace Microsoft.Quantum
 
     public class NestedPair : UDTBase<(Double,((Boolean,String),Int64))>, IApplyData
     {
-        public NestedPair() : base(default((Double,((Boolean,String),Int64))))
+        public NestedPair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Double,((Boolean,String),Int64))>())
         {
         }
 
@@ -3616,7 +3616,7 @@ namespace Microsoft.Quantum.Core
 {
     public class Attribute : UDTBase<QVoid>, IApplyData
     {
-        public Attribute() : base(default(QVoid))
+        public Attribute() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<QVoid>())
         {
         }
 
@@ -3636,7 +3636,7 @@ namespace Microsoft.Quantum.Diagnostics
 {
     public class Test : UDTBase<String>, IApplyData
     {
-        public Test() : base(default(String))
+        public Test() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<String>())
         {
         }
 

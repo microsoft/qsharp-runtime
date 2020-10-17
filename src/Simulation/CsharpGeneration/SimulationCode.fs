@@ -1444,13 +1444,9 @@ module SimulationCode =
         let name = userDefinedName None udt.FullName.Name.Value
         let qsharpType = udt.Type
         let buildEmptyConstructor =
-            let baseTupleType =
-                match qsharpType.Resolution with
-                | ArrayType item ->
-                    roslynTypeName context item
-                    |> sprintf "global::Microsoft.Quantum.Simulation.Core.QArray<%s>"
-                | _ -> roslynTypeName context qsharpType
-            let defaultValue = sprintf "global::Microsoft.Quantum.Simulation.Core.Default.OfType<%s>()" baseTupleType
+            let defaultValue =
+                roslynTypeName context qsharpType
+                |> sprintf "global::Microsoft.Quantum.Simulation.Core.Default.OfType<%s>()"
             ``constructor`` name ``(`` [] ``)``
                 ``:`` [ defaultValue ]
                 [ ``public`` ]
