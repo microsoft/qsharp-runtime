@@ -24,7 +24,9 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
 {
 #ifdef _WIN32
     return ::LoadLibraryA("Microsoft.Quantum.Simulator.Runtime.dll");
-#else // not _WIN32
+#elif __APPLE__
+    return ::dlopen("libMicrosoft.Quantum.Simulator.Runtime.dylib", RTLD_LAZY);
+#else
     return ::dlopen("libMicrosoft.Quantum.Simulator.Runtime.so", RTLD_LAZY);
 #endif
 }

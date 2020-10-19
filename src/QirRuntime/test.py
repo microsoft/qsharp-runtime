@@ -65,7 +65,11 @@ if platform.system() == "Windows":
   os.environ['PATH'] = os.environ['PATH'] + ";" + fullstate_sim_dir + ";" + install_dir
 else:
   # add the folder to the list of locations to load libraries from
-  os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":" + fullstate_sim_dir + ":" + install_dir
+  old = os.environ.get("LD_LIBRARY_PATH")
+  if old:
+      os.environ["LD_LIBRARY_PATH"] = old + ":" + fullstate_sim_dir + ":" + install_dir
+  else:
+      os.environ["LD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
 
 log("========= Running native tests =========")
 test_binaries = [
