@@ -45,17 +45,17 @@ namespace Microsoft.Quantum.Core {
     /// The valid capability level names, in order of increasing capabilities (or decreasing
     /// restrictions), are:
     ///
-    /// ## QPRGen0
+    /// ## BasicQuantumFunctionality
     /// Measurement results cannot be compared for equality.
     ///
-    /// ## QPRGen1
+    /// ## BasicMeasurementFeedback
     /// Measurement results can be compared for equality only in if-statement conditional
     /// expressions in operations. The block of an if-statement that depends on a result cannot
     /// contain set statements for mutable variables declared outside the block, or return
     /// statements.
     ///
-    /// ## Unknown
-    /// No known runtime restrictions. Any Q# program can be executed.
+    /// ## FullComputation
+    /// No runtime restrictions. Any Q# program can be executed.
     @Attribute()
     newtype RequiresCapability = (Level : String, Reason : String);
 

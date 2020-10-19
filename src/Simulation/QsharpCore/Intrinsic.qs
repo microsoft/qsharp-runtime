@@ -657,23 +657,26 @@ namespace Microsoft.Quantum.Intrinsic {
     operation M (qubit : Qubit) : Result {
         return Measure([PauliZ], [qubit]);
     }
-    
-    
+
+
     /// # Summary
     /// Given a single qubit, measures it and ensures it is in the |0⟩ state
     /// such that it can be safely released.
     ///
     /// # Input
-    /// ## qubit
+    /// ## target
     /// The qubit whose state is to be reset to $\ket{0}$.
-    @RequiresCapability("QPRGen0", "Reset may be replaced by a supported implementation on all execution targets.")
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "Reset is replaced by a supported implementation on all execution targets."
+    )
     operation Reset (target : Qubit) : Unit {
         if (M(target) == One) {
             X(target);
         }
     }
-    
-    
+
+
     /// # Summary
     /// Given an array of qubits, measure them and ensure they are in the |0⟩ state
     /// such that they can be safely released.
