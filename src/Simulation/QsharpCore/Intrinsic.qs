@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;
+    open Microsoft.Quantum.Targeting;
 
     @Deprecated("Microsoft.Quantum.Random.DrawCategorical")
     operation Random (probs : Double[]) : Int {
