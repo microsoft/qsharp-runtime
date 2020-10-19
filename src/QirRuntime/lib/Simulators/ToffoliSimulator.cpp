@@ -30,7 +30,7 @@ namespace Quantum
 
         static long GetQubitId(Qubit qubit)
         {
-            return reinterpret_cast<long>(qubit);
+            return static_cast<long>(reinterpret_cast<int64_t>(qubit));
         }
 
       public:

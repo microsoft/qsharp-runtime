@@ -20,6 +20,11 @@ struct ResultsReferenceCountingTestQAPI : public CQuantumApiBase
     const int maxResults;
     BitStates allocated;
 
+    static int GetResultId(Result r)
+    {
+        return static_cast<int>(reinterpret_cast<int64_t>(r));
+    }
+
     ResultsReferenceCountingTestQAPI(int maxResults)
         : maxResults(maxResults + 2)
     {
@@ -43,7 +48,7 @@ struct ResultsReferenceCountingTestQAPI : public CQuantumApiBase
     }
     void ReleaseResult(Result result) override
     {
-        const int id = static_cast<int>(reinterpret_cast<long>(result));
+        const int id = GetResultId(result);
         INFO(id);
         REQUIRE(this->allocated.IsBitSetAt(id));
         this->allocated.FlipBitAt(id);
@@ -626,6 +631,11 @@ struct QubitTestQAPI : public CQuantumApiBase
     const int maxQubits;
     BitStates allocated;
 
+    static int GetQubitId(Qubit q)
+    {
+        return static_cast<int>(reinterpret_cast<int64_t>(q));
+    }
+
     QubitTestQAPI(int maxQubits)
         : maxQubits(maxQubits)
     {
@@ -640,14 +650,14 @@ struct QubitTestQAPI : public CQuantumApiBase
     }
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = static_cast<int>(reinterpret_cast<long>(qubit));
+        const int id = GetQubitId(qubit);
         INFO(id);
         REQUIRE(this->allocated.IsBitSetAt(id));
         this->allocated.FlipBitAt(id);
     }
     std::string DumpQubit(Qubit qubit) override
     {
-        const int id = static_cast<int>(reinterpret_cast<long>(qubit));
+        const int id = GetQubitId(qubit);
         return std::to_string(id);
     }
     Result UseZero() override

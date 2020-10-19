@@ -19,8 +19,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #    set(CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 #elseif(WIN32)
 #    set(CMAKE_AR      "llvm-ar.exe")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 #endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
@@ -49,7 +51,7 @@ macro(add_unit_test target)
     elseif(WIN32)
         set_property(TEST ${target} PROPERTY ENVIRONMENT
             "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${PATH}")
-    elseif(APPLE)
+    else()
         set_property(TEST ${target} PROPERTY ENVIRONMENT
             "DYLD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${DYLD_LIBRARY_PATH}")
     endif()

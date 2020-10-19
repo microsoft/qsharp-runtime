@@ -305,7 +305,7 @@ namespace Quantum
 
         long GetQubitId(Qubit qubit)
         {
-            long id = reinterpret_cast<long>(qubit);
+            long id = static_cast<long>(reinterpret_cast<int64_t>(qubit));
             assert(id <= this->lastUsedId);
             return id;
         }
@@ -319,6 +319,12 @@ namespace Quantum
                 qubitIds.push_back(GetQubitId(qubits[i]));
             }
             return qubitIds;
+        }
+
+        long GetResultId(Result result)
+        {
+            long id = static_cast<long>(reinterpret_cast<int64_t>(result));
+            return id;
         }
 
         bool IsFrozen(Qubit qubit)
@@ -422,16 +428,16 @@ namespace Quantum
             vector<long> targets;
             if (r1 == UseZero() || r1 == UseOne())
             {
-                targets.push_back(reinterpret_cast<long>(r2));
+                targets.push_back(GetResultId(r2));
             }
             else if (r2 == UseZero() || r2 == UseOne())
             {
-                targets.push_back(reinterpret_cast<long>(r1));
+                targets.push_back(GetResultId(r1));
             }
             else
             {
-                targets.push_back(reinterpret_cast<long>(r1));
-                targets.push_back(reinterpret_cast<long>(r2));
+                targets.push_back(GetResultId(r1));
+                targets.push_back(GetResultId(r2));
             }
 
             TranslationError error{

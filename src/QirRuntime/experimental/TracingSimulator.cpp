@@ -72,7 +72,7 @@ namespace Quantum
 
         long GetQubitId(Qubit qubit) const
         {
-            return reinterpret_cast<long>(qubit);
+            return static_cast<long>(reinterpret_cast<int64_t>(qubit));
         }
 
         static void UpdateQubit(CTracingQubit& qubit, long depth, long operation)
@@ -341,7 +341,7 @@ namespace Quantum
 
         void ReleaseQubit(Qubit qubit) override
         {
-            long id = reinterpret_cast<long>(qubit);
+            long id = GetQubitId(qubit);
             this->idAllocationPolicy->ReleaseId(id);
             this->resourceTranslator->stats.cQubits--;
         }

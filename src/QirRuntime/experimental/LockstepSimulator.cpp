@@ -52,7 +52,7 @@ namespace Quantum
         ==========================================================================*/
         long GetQubitId(Qubit qubit) const
         {
-            long id = reinterpret_cast<long>(qubit);
+            long id = static_cast<long>(reinterpret_cast<int64_t>(qubit));
 
             assert(id >= 0);
             assert(id < this->allocatedQubits.size());
@@ -75,7 +75,7 @@ namespace Quantum
 
         long GetResultId(Result result) const
         {
-            long id = reinterpret_cast<long>(result);
+            long id = static_cast<long>(reinterpret_cast<int64_t>(result));
 
             assert(id >= 0);
             assert(id < this->trackedResults.size());

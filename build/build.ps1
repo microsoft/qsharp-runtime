@@ -34,7 +34,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     pushd $qirRuntimeBuildFolder
 
     cmake -G Ninja -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ../..
-    cmake --build .
+    cmake --build . --target install
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX

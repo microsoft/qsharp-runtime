@@ -212,6 +212,11 @@ struct CallablesTestQAPI : public Microsoft::Quantum::CQuantumApiBase
         return std::abs(x - y) < 0.01;
     }
 
+    static int GetQubitId(Qubit qubit)
+    {
+        return static_cast<int>(reinterpret_cast<int64_t>(qubit));
+    }
+
     CallablesTestQAPI(int maxQubits)
         : maxQubits(maxQubits)
         , rotations(maxQubits, 0.0)
@@ -227,7 +232,7 @@ struct CallablesTestQAPI : public Microsoft::Quantum::CQuantumApiBase
 
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = static_cast<int>(reinterpret_cast<long>(qubit));
+        const int id = GetQubitId(qubit);
         assert(id < this->maxQubits);
         assert(AreApproximatelyEqual(0.0, this->rotations[id]));
         this->rotations[id] = 0.0;
@@ -236,14 +241,14 @@ struct CallablesTestQAPI : public Microsoft::Quantum::CQuantumApiBase
     void R(PauliId axis, Qubit qubit, double theta) override
     {
         assert(axis == PauliId_Z);
-        const int id = static_cast<int>(reinterpret_cast<long>(qubit));
+        const int id = GetQubitId(qubit);
         assert(id < this->maxQubits);
         this->rotations[id] += theta;
     }
 
     Result M(Qubit qubit) override
     {
-        const int id = static_cast<int>(reinterpret_cast<long>(qubit));
+        const int id = GetQubitId(qubit);
         assert(id < this->maxQubits);
         const int result = (AreApproximatelyEqual(0.0, this->rotations[id]) ? Result_Zero : Result_Pending);
         return reinterpret_cast<Result>(result);
@@ -278,18 +283,18 @@ TEST_CASE("QIR: Partial application of a callable", "[qir]")
 
 struct ControlFunctorTestQAPI : public Microsoft::Quantum::CQuantumApiBase
 {
-    long lastId = -1;
-    std::unordered_set<long> releasedQubits;
+    int lastId = -1;
+    std::unordered_set<int> releasedQubits;
 
-    long GetQubitId(Qubit qubit) const
+    static int GetQubitId(Qubit qubit)
     {
-        return reinterpret_cast<long>(qubit);
+        return static_cast<int>(reinterpret_cast<int64_t>(qubit));
     }
 
     bool IsValid(Qubit qubit) const
     {
-        const long id = GetQubitId(qubit);
-        return id >= 0 && id <= lastId && this->releasedQubits.count(id) == 0;
+        const int id = GetQubitId(qubit);
+        return id >= 0 && id <= this->lastId && this->releasedQubits.count(id) == 0;
     }
 
     Qubit AllocateQubit() override
