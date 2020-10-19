@@ -666,7 +666,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
-    @RequiresCapability("QPRGen0")
+    @RequiresCapability("QPRGen0", "Reset may be replaced by a supported implementation on all execution targets.")
     operation Reset (target : Qubit) : Unit {
         if (M(target) == One) {
             X(target);

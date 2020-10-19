@@ -37,6 +37,9 @@ namespace Microsoft.Quantum.Core {
     /// # Named Items
     /// ## Level
     /// The name of the runtime capability level required by the callable.
+    ///
+    /// ## Reason
+    /// A description of why the callable requires this runtime capability.
     /// 
     /// # Remarks
     /// The valid capability level names, in order of increasing capabilities (or decreasing
@@ -54,7 +57,7 @@ namespace Microsoft.Quantum.Core {
     /// ## Unknown
     /// No known runtime restrictions. Any Q# program can be executed.
     @Attribute()
-    newtype RequiresCapability = (Level : String);
+    newtype RequiresCapability = (Level : String, Reason : String);
 
     /// # Summary
     /// Returns a default instance of the specified type. 
