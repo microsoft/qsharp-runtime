@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Core {
     /// ## Unknown
     /// No known runtime restrictions. Any Q# program can be executed.
     @Attribute()
-    newtype Capability = (Level : String);
+    newtype RequiresCapability = (Level : String);
 
     /// # Summary
     /// Returns a default instance of the specified type. 
