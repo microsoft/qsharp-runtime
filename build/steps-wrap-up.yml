@@ -11,6 +11,14 @@ steps:
     testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*.trx'
     testRunTitle: 'Q# runtime tests'
 
+- task: PublishTestResults@2
+  displayName: 'Publish tests results for QirRuntime'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: JUnit
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*_results.xml'
+    testRunTitle: 'QirRuntime tests'
+
 - task: PublishSymbols@1
   displayName: 'Publish symbols (Windows only)'
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))

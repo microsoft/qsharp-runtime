@@ -45,16 +45,12 @@ macro(add_unit_test target)
     # set the environment path for loading shared libs the tests are using
     set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/externals/QuantumSimulator")
     set(TEST_DEPS2 "${CMAKE_BINARY_DIR}/bin")
-    if(UNIX)
-        set_property(TEST ${target} PROPERTY ENVIRONMENT
-            "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${LD_LIBRARY_PATH}")
-    elseif(WIN32)
-        set_property(TEST ${target} PROPERTY ENVIRONMENT
-            "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${PATH}")
-    else()
-        set_property(TEST ${target} PROPERTY ENVIRONMENT
-            "DYLD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${DYLD_LIBRARY_PATH}")
-    endif()
+    set_property(TEST ${target} PROPERTY ENVIRONMENT
+        "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${LD_LIBRARY_PATH}")
+    set_property(TEST ${target} PROPERTY ENVIRONMENT
+        "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${PATH}")
+    set_property(TEST ${target} PROPERTY ENVIRONMENT
+        "DYLD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${DYLD_LIBRARY_PATH}")
 endmacro(add_unit_test)
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
