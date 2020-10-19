@@ -79,7 +79,7 @@ All test binaries and their dependencies are copied by the build into *install* 
 
 The project is using catch2 for all native tests, including QIR. `<test_binary> -help` provides details on how to run a subset of the tests and other options.
 
-All native tests are fully integrated with CTest. The coverage is the same as when using `test.py` or running the test binaries individually, but CTest logs the results into the corresponding `build/[Windows|Linux]/[Debug|Release]/bin/<test_binary_name>_results.xml` file. To trigger tests this way, navigate into `build/[Windows|Linux]/[Debug|Release]` folder and run `ctest`. No configuration options required.
+All native tests are fully integrated with CTest. The coverage is the same as when using `test.py` or running the test binaries individually, but CTest logs the results into the corresponding `build/[Windows|Linux]/[Debug|Release]/<target_path>/<test_binary_name>_results.xml` file. To trigger tests this way, navigate into `build/[Windows|Linux]/[Debug|Release]` folder and run `ctest`. No configuration options required.
 
 ## QIR Bridge and Runtime
 

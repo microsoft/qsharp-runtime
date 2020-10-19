@@ -10,6 +10,7 @@ endif()
 
 set(TEST_FILES
   qir-test-arrays
+  qir-test-controlls
   qir-test-partials
   qir-test-range
   qir-test-vqe

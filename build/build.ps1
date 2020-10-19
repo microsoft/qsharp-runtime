@@ -21,6 +21,8 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     if (-not (Test-Path Env:AGENT_OS) -or ($Env:AGENT_OS.StartsWith("Win"))) {
         $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
         $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
+        $llvmExtras = (Join-Path $PSScriptRoot "../externals/LLVM")
+        $env:PATH += ";$llvmExtras"
     } else {
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"

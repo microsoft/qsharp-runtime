@@ -85,6 +85,7 @@ struct QirCallable
     QirCallable(const QirCallable* other)
         : refCount(1)
         , capture(other->capture)
+        , appliedFunctor(other->appliedFunctor)
     {
         memcpy(this->function_table, other->function_table, QirCallable::TableSize * sizeof(void*));
     }
