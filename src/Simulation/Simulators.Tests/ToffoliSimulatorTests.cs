@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Xunit;
@@ -113,12 +113,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var measure = sim.Get<Intrinsic.M>();
             var set = sim.Get<SetQubit>();
 
-            var ctrlX = x.ControlledBody.AsAction();
+            var ctrlX = x.__ControlledBody__.AsAction();
 
             OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>
             {
                 set.Apply((Result.Zero, q));
-                x.ControlledBody((ctrls, q));
+                x.__ControlledBody__((ctrls, q));
 
                 var result = measure.Apply(q);
                 var expected = (enabled) ? Result.One : Result.Zero;
@@ -141,6 +141,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var sim = new ToffoliSimulator();
 
             await Circuits.SwapTest.Run(sim);
+        }
+
+        [Fact]
+        public async Task ToffoliRotations()
+        {
+            var sim = new ToffoliSimulator();
+
+            var result = await Circuits.IncrementWithRotationsTest.Run(sim, 4);
+            Assert.Equal(5, result);
         }
 
         [Fact]

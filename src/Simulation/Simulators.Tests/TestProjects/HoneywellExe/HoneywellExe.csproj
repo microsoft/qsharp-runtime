@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.Quantum.Sdk/0.12.20082705-beta">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- we will provide our own -->
+    <CsharpGeneration>false</CsharpGeneration>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <IncludeProviderPackages>false</IncludeProviderPackages>
+    <NoEntryPoint>true</NoEntryPoint>
+    <ExecutionTarget>honeywell.qpu</ExecutionTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+  </ItemGroup>
+
+  <Target Name="BeforeCsharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+
+</Project>

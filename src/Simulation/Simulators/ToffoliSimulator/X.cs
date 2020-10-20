@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The implementation of the operation.
             /// For the Toffoli simulator, the implementation flips the target qubit.
             /// </summary>
-            public override Func<Qubit, QVoid> Body => (q1) =>
+            public override Func<Qubit, QVoid> __Body__ => (q1) =>
             {
                 if (q1 == null) return QVoid.Instance;
 
@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// For the Toffoli simulator, the implementation flips the target qubit 
             /// if all of the control qubits are 1.
             /// </summary>
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, q) = args;
                 if (q == null) return QVoid.Instance;

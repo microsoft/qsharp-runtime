@@ -9,14 +9,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
     public partial class QCTraceSimulatorImpl
     {
-        public class TracerAssertProb : Intrinsic.AssertProb
+        public class TracerAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private readonly QCTraceSimulatorCore core;
             public TracerAssertProb(QCTraceSimulatorImpl m) : base(m){
                 core = m.tracingCore;
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> Body
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> __Body__
                 => (args) =>
                 {
                     (IQArray<Pauli> observable,
@@ -29,11 +29,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                     return QVoid.Instance;
                 };
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> AdjointBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> __AdjointBody__ => (_args) => { return QVoid.Instance; };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> ControlledBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> __ControlledBody__ => (_args) => { return QVoid.Instance; };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> ControlledAdjointBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> __ControlledAdjointBody__ => (_args) => { return QVoid.Instance; };
         }
     }
 }

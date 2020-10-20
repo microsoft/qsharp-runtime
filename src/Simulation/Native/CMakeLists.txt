@@ -19,12 +19,12 @@ set(MICROSOFT_QUANTUM_SIMULATOR_VERSION $ENV{ASSEMBLY_VERSION})
 set(MICROSOFT_QUANTUM_VERSION_STRING "quarcsw simulator version ${MICROSOFT_QUANTUM_SIMULATOR_VERSION}")
 MESSAGE(STATUS "QUARCSW version: ${MICROSOFT_QUANTUM_SIMULATOR_VERSION}")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 # Configuration options (choose one to turn on)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(ENABLE_OPENMP  "Enable OpenMP Parallelization" ON)
 option(USE_SINGLE_PRECISION "Use single-precision floating point operations" OFF)
 option(HAVE_INTRINSICS "Have AVX intrinsics" OFF)
@@ -61,6 +61,8 @@ ENABLE_TESTING()
 # include directories
 add_subdirectory("src")
 
+# Copy test file depedencies
+configure_file(advantage_44_4.log advantage_44_4.log COPYONLY)
 
 # RPATH setting
 

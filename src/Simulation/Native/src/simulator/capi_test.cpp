@@ -23,12 +23,12 @@ void CZ(unsigned sim_id, unsigned c, unsigned q)
 
 void Ry(unsigned sim_id, double phi, unsigned q)
 {
-    R(sim_id,2,phi,q);
+    R(sim_id,3,phi,q);
 }
 
 void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
 {
-    MCR(sim_id,3,phi,1,&c,q);
+    MCR(sim_id,2,phi,1,&c,q);
 }
 
 void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
@@ -107,31 +107,30 @@ void test_gates()
     allocateQubit(sim_id, 0);
     allocateQubit(sim_id, 1);
 
-     CRx(sim_id, 1.0, 0, 1);
+    dump(sim_id, "test_gatesA");
+    CRx(sim_id, 1.0, 0, 1);
 
-    assert(M(sim_id, 1)==false);
+    dump(sim_id, "test_gatesB");
+    assert(M(sim_id, 1) == false);
 
     X(sim_id, 0);
-     CRx(sim_id, 1.0, 0, 1);
+    CRx(sim_id, 1.0, 0, 1);
 
     H(sim_id, 1);
-    CRx(sim_id, -1.0, 0, 1);
+    CRz(sim_id, -1.0, 0, 1);
     H(sim_id, 1);
 
-    assert(M(sim_id, 1)==false);
+    assert(M(sim_id, 1) == false);
 
     X(sim_id, 1);
 
-    assert(M(sim_id, 1)==true);
-
-    X(sim_id, 1);
+    assert(M(sim_id, 1) == true);
 
     release(sim_id, 0);
     release(sim_id, 1);
 
     destroy(sim_id);
 }
-
 
 void test_allocate()
 {
@@ -348,14 +347,13 @@ void test_permute_basis()
     Ry(sim_id, -1.1, 3);
     CX(sim_id, 1, 2);
     H(sim_id, 1);
-
     // Dump(sim_id, "permute-end.txt");
     assert(M(sim_id, 0) == false);
     assert(M(sim_id, 1) == false);
     assert(M(sim_id, 2) == false);
     assert(M(sim_id, 3) == false);
     assert(M(sim_id, 4) == false);
-
+ 
     for (unsigned i = 0; i < nqubits + 1; ++i)
         release(sim_id, i);
     destroy(sim_id);

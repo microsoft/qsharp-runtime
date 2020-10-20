@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     public partial class QuantumProcessorDispatcher
     {
-        public class QuantumProcessorDispatcherAssertProb : Quantum.Intrinsic.AssertProb
+        public class QuantumProcessorDispatcherAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private QuantumProcessorDispatcher Simulator { get; }
 
@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> __Body__ => (_args) =>
             {
                 (IQArray<Pauli> paulis, IQArray<Qubit> qubits, Result result, double expectedPr, string msg, double tol) = _args;
                 if (paulis.Length != qubits.Length)
@@ -33,11 +33,11 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> AdjointBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid> __AdjointBody__ => (_args) => { return QVoid.Instance; };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> ControlledBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> __ControlledBody__ => (_args) => { return QVoid.Instance; };
 
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> ControlledAdjointBody => (_args) => { return QVoid.Instance; };
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)), QVoid> __ControlledAdjointBody__ => (_args) => { return QVoid.Instance; };
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(long, long, Qubit), QVoid> Body => (_args) =>
+            public override Func<(long, long, Qubit), QVoid> __Body__ => (_args) =>
             {
                 (long num, long denom, Qubit q1) = _args;
                 (long numNew, long denomNew) = CommonUtils.Reduce(num, denom);
@@ -27,13 +27,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(long, long, Qubit), QVoid> AdjointBody => (_args) =>
+            public override Func<(long, long, Qubit), QVoid> __AdjointBody__ => (_args) =>
             {
                 (long num, long denom, Qubit q1) = _args;
-                return this.Body.Invoke((-num, denom, q1));
+                return this.__Body__.Invoke((-num, denom, q1));
             };
 
-            public override Func<(IQArray<Qubit>, (long, long, Qubit)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (long, long, Qubit)), QVoid> __ControlledBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (long num, long denom, Qubit q1)) = _args;
                 (long numNew, long denomNew) = CommonUtils.Reduce(num, denom);
@@ -50,10 +50,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (long, long, Qubit)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (long, long, Qubit)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (long num, long denom, Qubit q1)) = _args;
-                return this.ControlledBody.Invoke((ctrls, (-num, denom, q1)));
+                return this.__ControlledBody__.Invoke((ctrls, (-num, denom, q1)));
             };
         }
     }

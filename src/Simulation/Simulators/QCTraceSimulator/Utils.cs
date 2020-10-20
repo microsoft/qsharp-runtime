@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 
@@ -196,50 +199,5 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Name of the Width Counting component of <see cref="QCTraceSimulator"/>. 
         /// </summary>
         public const string widthCounter = nameof(WidthCounter);
-    }
-
-    static class SimulatorsUtils
-    {
-        /// <summary>
-        /// Takes an array of doubles as
-        /// input, and returns a randomly-selected index into the array 
-        /// as an `Int`. The probability of selecting a specific index
-        /// is proportional to the value of the array element at that index.
-        /// Array elements that are equal to zero are ignored and their indices
-        /// are never returned.If any array element is less than zero, or if
-        /// no array element is greater than zero, then the operation fails.
-        /// As a source of randomness uses a number uniformly distributed between 0 and 1. 
-        /// Used for Quantum.Intrinsic.Random
-        /// </summary>
-        /// <param name="uniformZeroOneSample"> Number between Zero and one, uniformly distributed</param>
-        public static long SampleDistribution(IQArray<double> unnormalizedDistribution, double uniformZeroOneSample)
-        {
-            double total = 0.0;
-            foreach (double prob in unnormalizedDistribution)
-            {
-                if (prob < 0)
-                {
-                    throw new ExecutionFailException("Random expects array of non-negative doubles.");
-                }
-                total += prob;
-            }
-
-            if (total == 0)
-            {
-                throw new ExecutionFailException("Random expects array of non-negative doubles with positive sum.");
-            }
-
-            double sample = uniformZeroOneSample * total;
-            double sum = unnormalizedDistribution[0];
-            for (int i = 0; i < unnormalizedDistribution.Length - 1; ++i)
-            {
-                if (sum >= sample)
-                {
-                    return i;
-                }
-                sum += unnormalizedDistribution[i];
-            }
-            return unnormalizedDistribution.Length;
-        }
     }
 }

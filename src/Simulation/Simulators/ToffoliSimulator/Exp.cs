@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// For the Toffoli simulator, the implementation flips a target qubit
             /// if the respective rotation is effectively an X gate.
             /// </summary>
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Body => (_args) =>
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __Body__ => (_args) =>
             {
                 var (bases, angle, qubits) = _args;
 
@@ -58,7 +58,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The implementation of the adjoint specialization of the operation.
             /// For the Toffoli simulator *only*, this operation is self-adjoint.
             /// </summary>
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> AdjointBody => Body;
+            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __AdjointBody__ => __Body__;
 
             /// <summary>
             /// The implementation of the controlled specialization of the operation.
@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// if the rotation is effectively an X gate and all of the control qubits
             /// are in the One state.
             /// </summary>
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledBody__ => (_args) =>
             {
                 var (ctrls, (bases, angle, qubits)) = _args;
 
@@ -96,7 +96,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The implementation of the controlled adjoint specialization of the operation.
             /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
             /// </summary>
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> ControlledAdjointBody => ControlledBody;
+            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => __ControlledBody__;
         }
     }
 }

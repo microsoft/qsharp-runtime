@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.Quantum.Sdk/0.12.20082705-beta">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <CsharpGeneration>false</CsharpGeneration>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+  
+    <!-- Use EmbedAllSources so that the #line annotations in the generated C# are checked by the C# compiler. If the
+       - file paths in the annotations are invalid, the test will fail.
+       -->
+    <EmbedAllSources>true</EmbedAllSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+  </ItemGroup>
+
+  <Target Name="BeforeCsharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+</Project>
