@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 /// # Summary
-/// This namespace includes Q# core functions and operations.
+/// This namespace provides functionality for targeting specific quantum processors.
 namespace Microsoft.Quantum.Targeting {
     /// # Summary
     /// Compiler-recognized attribute used to mark a callable with the runtime capabilities it
