@@ -23,6 +23,8 @@ namespace Microsoft.Azure.Quantum
             var machineName =
                 targetName is null
                 ? null
+                : targetName.StartsWith("qci.")
+                ? "Microsoft.Quantum.Providers.QCI.Targets.QCIQuantumMachine, Microsoft.Quantum.Providers.QCI"
                 : targetName.StartsWith("ionq.")
                 ? "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ"
                 : targetName.StartsWith("honeywell.")

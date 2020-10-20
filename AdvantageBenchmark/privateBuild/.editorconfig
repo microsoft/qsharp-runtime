@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# SA1025: Code should not contain multiple whitespace in a row
+dotnet_diagnostic.SA1025.severity = none

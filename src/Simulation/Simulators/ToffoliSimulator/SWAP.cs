@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The implementation of the operation.
             /// For the Toffoli simulator, the implementation swaps the states of the two qubits.
             /// </summary>
-            public override Func<(Qubit, Qubit), QVoid> Body => (args) =>
+            public override Func<(Qubit, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (q1, q2) = args;
 
@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// For the Toffoli simulator, the implementation swaps the states of the
             /// target qubits if all of the control qubits are 1.
             /// </summary>
-            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 var (ctrls, (q1, q2)) = args;
 

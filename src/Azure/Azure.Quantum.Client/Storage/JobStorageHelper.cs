@@ -7,7 +7,6 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Bond;
     using global::Azure.Storage.Blobs;
     using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
@@ -43,7 +42,6 @@ namespace Microsoft.Azure.Quantum.Storage
         /// </summary>
         /// <param name="jobId">The job id.</param>
         /// <param name="input">The input.</param>
-        /// <param name="protocol">Serialization protocol of the input to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// Container uri + Input uri.
@@ -51,7 +49,6 @@ namespace Microsoft.Azure.Quantum.Storage
         public override async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
             Stream input,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
@@ -62,7 +59,6 @@ namespace Microsoft.Azure.Quantum.Storage
                 containerClient,
                 Constants.Storage.InputBlobName,
                 input,
-                protocol,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
@@ -86,13 +82,11 @@ namespace Microsoft.Azure.Quantum.Storage
         /// </summary>
         /// <param name="jobId">The job id.</param>
         /// <param name="mapping">The job program output mapping.</param>
-        /// <param name="protocol">Serialization protocol of the mapping to upload.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Container uri + Mapping uri.</returns>
         public override async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
             string jobId,
             Stream mapping,
-            ProtocolType protocol = ProtocolType.COMPACT_PROTOCOL,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
@@ -102,7 +96,6 @@ namespace Microsoft.Azure.Quantum.Storage
                 containerClient,
                 Constants.Storage.MappingBlobName,
                 mapping,
-                protocol,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(
