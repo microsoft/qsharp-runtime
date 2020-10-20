@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Targeting {
     /// contain set statements for mutable variables declared outside the block, or return
     /// statements.
     ///
-    /// ## FullComputation
+    /// ## `"FullComputation"`
     /// No runtime restrictions. Any Q# program can be executed.
     @Attribute()
     newtype RequiresCapability = (Level : String, Reason : String);
