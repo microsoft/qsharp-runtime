@@ -16,8 +16,11 @@ namespace Microsoft.Quantum.Targeting {
     /// A description of why the callable requires this runtime capability.
     /// 
     /// # Remarks
-    /// The valid capability level names, in order of increasing capabilities (or decreasing
-    /// restrictions), are:
+    /// This attribute is added automatically by the compiler. It should not be used except in rare
+    /// cases where the compiler does not infer the required capability correctly.
+    ///
+    /// Below is the list of capability level names, in order of increasing capabilities or
+    /// decreasing restrictions:
     ///
     /// ## `"BasicQuantumFunctionality"`
     /// Measurement results cannot be compared for equality.
