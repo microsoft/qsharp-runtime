@@ -97,17 +97,10 @@ namespace Microsoft.Quantum.Simulation.Core
             }
 
             /// <summary>
-            /// Creates an array of size given by capacity and default-initializes 
-            /// array elements. Uses C# keyword <code>default</code> to initialize array elements. 
+            /// Creates an array of size given by capacity and default-initializes array elements. Uses the default Q#
+            /// value to initialize array elements.
             /// </summary>
-            public QArrayInner(long capacity)
-            {
-                storage = new List<T>((int)capacity);
-                for (var i = 0L; i < capacity; ++i)
-                {
-                    storage.Add(Default.OfType<T>());
-                }
-            }
+            public QArrayInner(long capacity) => Extend(capacity);
 
             public T GetElement(long index) =>
                 storage == null
@@ -142,18 +135,18 @@ namespace Microsoft.Quantum.Simulation.Core
 
             public void Extend(long newLength)
             {
-                if (storage == null)
+                var newLengthInt = Convert.ToInt32(newLength);
+                if (storage is null)
                 {
-                    storage = new List<T>();
+                    storage = new List<T>(newLengthInt);
                 }
-                long oldLength = storage.Count;
-                for (int i = 0; i < (newLength - oldLength); i++)
+                else if (storage.Capacity < newLengthInt)
                 {
-                    storage.Add(Default.OfType<T>());
+                    storage.Capacity = newLengthInt;
                 }
+                storage.AddRange(Enumerable.Repeat(Default.OfType<T>(), newLengthInt - storage.Count));
             }
         }
-
 
         private QArrayInner storage;
         private long start = 0;
