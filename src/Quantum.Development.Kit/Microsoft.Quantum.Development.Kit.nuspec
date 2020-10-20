@@ -19,6 +19,10 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>Quantum Q# Qsharp </tags>
 
+    <packageTypes>
+      <packageType name="SymbolsPackage"/>
+    </packageTypes>
+
     <dependencies>
       <dependency id="Microsoft.Quantum.Simulators" version="$version$" />
     </dependencies>
