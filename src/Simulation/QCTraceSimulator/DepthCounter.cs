@@ -152,8 +152,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             foreach (QubitTimeMetrics q in qubitsMetrics )
             {
                 qubitAvailabilityTime[q.QubitId] = startTime + primitiveOperationDuration;
-                // TODO: Remove! This is not needed. If qubit id is in the metrics data, it was already seen by this class.
-                // this.MaxQubitId = System.Math.Max(this.MaxQubitId, qubitId);
             }
         }
 
