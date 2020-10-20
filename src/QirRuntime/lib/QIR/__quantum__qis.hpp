@@ -4,6 +4,9 @@
 
 #include "CoreTypes.hpp"
 
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #ifdef _WIN32
 #define QIR_SHARED_API __declspec(dllexport)
 #else

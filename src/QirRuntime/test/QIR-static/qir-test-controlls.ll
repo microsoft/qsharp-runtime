@@ -1,3 +1,5 @@
+; Copyright (c) Microsoft Corporation. All rights reserved.
+; Licensed under the MIT License.
 
 %Result = type opaque
 %Range = type { i64, i64, i64 }

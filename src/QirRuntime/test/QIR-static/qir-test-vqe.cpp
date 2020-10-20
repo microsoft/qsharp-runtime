@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // Implement vqe.qs so can compare the results of running it and the generated QIR against the full state
 // simulator.
 #include <bitset>

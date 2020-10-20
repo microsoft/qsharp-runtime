@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #define _USE_MATH_DEFINES
 #include <assert.h>
 #include <cmath>

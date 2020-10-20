@@ -1,3 +1,6 @@
+; Copyright (c) Microsoft Corporation. All rights reserved.
+; Licensed under the MIT License.
+
 ; QIR is generated on the assumption of a single IR file per project (as users won't be touching them). However, it's 
 ; more convenient for the tests to have multiple separate IR files, which means we have to extract some common bits
 ; into shared.ll and manually delete them from the auto-generated QIR to avoid the linker errors about duplicated defs.
