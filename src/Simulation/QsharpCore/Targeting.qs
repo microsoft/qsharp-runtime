@@ -16,8 +16,9 @@ namespace Microsoft.Quantum.Targeting {
     /// A description of why the callable requires this runtime capability.
     /// 
     /// # Remarks
-    /// This attribute is added automatically by the compiler. It should not be used except in rare
-    /// cases where the compiler does not infer the required capability correctly.
+    /// This attribute is automatically added to callables by the compiler, unless an instance of
+    /// this attribute already exists on the callable. It should not be used except in rare cases
+    /// where the compiler does not infer the required capability correctly.
     ///
     /// Below is the list of capability level names, in order of increasing capabilities or
     /// decreasing restrictions:
