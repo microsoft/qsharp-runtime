@@ -80,9 +80,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 gateTimes[i] = config.TraceGateTimes[(PrimitiveOperationsGroups)i];
             }
 
-            tCoreConfig = new QCTraceSimulatorCoreConfiguration
-            {
-                ThrowOnUnconstrainedMeasurement = configuration.ThrowOnUnconstrainedMeasurement
+            tCoreConfig = new QCTraceSimulatorCoreConfiguration {
+                ThrowOnUnconstrainedMeasurement = configuration.ThrowOnUnconstrainedMeasurement,
+                OptimizeDepth = configuration.OptimizeDepth
             };
 
             tCoreConfig.CallStackDepthLimit = config.CallStackDepthLimit; 

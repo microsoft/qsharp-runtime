@@ -99,6 +99,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         public bool UseWidthCounter = false;
 
         /// <summary>
+        /// Constrols if depth or width optimization is favored.
+        /// If set to <c>true</c>, resulting circuit is optimized for depth by discouraging qubit reuse.
+        /// If set to <c>false</c>, resulting circuit is optimized for width be encouraging qubit reuse.
+        /// Optimization is only limited to reuse of qubits after they are released by user code.
+        /// </summary>
+        public bool OptimizeDepth;
+
+        /// <summary>
         /// Specifies the time it takes to execute each gate.
         /// In other words, specifies the depth of each primitive operation. 
         /// These fields are used by the 

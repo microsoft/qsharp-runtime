@@ -1,44 +1,63 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
-
-    using System;
-    using System.Diagnostics;
-
-    class QubitsMetricsUtils
+    internal class QubitAvailabilityTimeTracker
     {
-        public static double MaxQubitAvailableTime(QubitTimeMetrics[] qubitMetrics)
-        {
-            Debug.Assert(qubitMetrics != null);
-            if (qubitMetrics.Length == 0)
-            {
-                return 0; // if there are no qubits to depend on, we start at the beginning e.g. 0
-            }
+        private double DefaultAvailabilityTime = 0;
+        private List<double> QubitAvailableAt;
+        private long MaxQubitId = -1;
 
-            double maxStartTime = 0;
-            for (int i = 0; i < qubitMetrics.Length; ++i)
-            {
-                maxStartTime = Math.Max(maxStartTime, qubitMetrics[i].AvailableAt);
-            }
-            return maxStartTime;
+        internal QubitAvailabilityTimeTracker(int initialCapacity, double defaultAvailabilityTime)
+        {
+            DefaultAvailabilityTime = defaultAvailabilityTime;
+            QubitAvailableAt = new List<double>(initialCapacity);
         }
 
-        public static double MinQubitAvailableTime(QubitTimeMetrics[] qubitMetrics)
-        {
-            Debug.Assert(qubitMetrics != null);
-            if (qubitMetrics.Length == 0)
+         internal double this[long index]
+         {
+            get
             {
-                return 0; // if there are no qubits to depend on, we start at the beginning e.g. 0
+                if (index < QubitAvailableAt.Count)
+                {
+                    return QubitAvailableAt[(int)index];
+                }
+                return DefaultAvailabilityTime;
             }
-
-            double minStartTime = double.MaxValue;
-            for (int i = 0; i < qubitMetrics.Length; ++i)
+            set
             {
-                minStartTime = Math.Min(minStartTime, qubitMetrics[i].AvailableAt);
+                if (index == QubitAvailableAt.Count)
+                {
+                    QubitAvailableAt.Add(value);
+                    return;
+                }
+                else if (index >= int.MaxValue)
+                {
+                    throw new IndexOutOfRangeException("Too many qubits to track.");
+                }
+                else if (index > QubitAvailableAt.Count)
+                {
+                    QubitAvailableAt.AddRange(Enumerable.Repeat(DefaultAvailabilityTime, (int)index - QubitAvailableAt.Count + 1));
+                }
+                QubitAvailableAt[(int)index] = value;
             }
-            return minStartTime;
         }
+
+        internal long GetMaxQubitId()
+        {
+            return MaxQubitId;
+        }
+
+        internal void MarkQubitIdUsed(long qubitId)
+        {
+            MaxQubitId = System.Math.Max(MaxQubitId, qubitId);
+        }
+
     }
+
 }

@@ -31,6 +31,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// of the call graph.
         /// </summary>
         public uint CallStackDepthLimit = uint.MaxValue;
+
+        /// <summary>
+        /// Constrols if depth or width optimization is favored.
+        /// If set to true, resulting circuit is optimized for depth by discouraging qubit reuse.
+        /// If set to false, resulting circuit is optimized for width be encouraging qubit reuse.
+        /// </summary>
+        public bool OptimizeDepth = false;
     }
 
     /// <summary>
@@ -102,7 +109,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 tracingDataInQubitsIsNeeded = listenerNeedsTracingData[i] || tracingDataInQubitsIsNeeded;
             }
 
-            qubitManager = (IQubitManager) new TraceableQubitManager(qubitDataInitializers);
+            qubitManager = (IQubitManager) new TraceableQubitManager(qubitDataInitializers, configuration.OptimizeDepth);
             callStackDepthLimit = Math.Max( 1, configuration.CallStackDepthLimit );
         }
 
