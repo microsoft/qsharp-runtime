@@ -23,6 +23,7 @@ function Pack-One() {
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
         -Verbosity detailed `
+        -Symbols `
         -SymbolPackageFormat snupkg `
         $option1 `
         $option2 `
