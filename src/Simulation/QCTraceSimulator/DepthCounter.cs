@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     public class DepthCounter : IQCTraceSimulatorListener, ICallGraphStatistics
     {
-        class OperationCallRecord
+        private class OperationCallRecord
         {
             public HashedString OperationName;
             public OperationFunctor FunctorSpecialization;
