@@ -65,7 +65,7 @@ Pack-One '../src/Simulation/CsharpGeneration/Microsoft.Quantum.CsharpGeneration.
 Pack-Dotnet '../src/Simulation/EntryPointDriver/Microsoft.Quantum.EntryPointDriver.csproj'
 Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
 Pack-Dotnet '../src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj'
-Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec' -Symbols
+Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 
