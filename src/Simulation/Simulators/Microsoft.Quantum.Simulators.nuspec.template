@@ -20,10 +20,10 @@
     <file src="..\Native\osx\*" target="runtimes\osx-x64\native" />
     <file src="..\Native\linux\*" target="runtimes\linux-x64\native" />
     <file src="..\Native\win10\*" target="runtimes\win-x64\native" />
-    <file src="..\Simulation\Common\bin\$Configuration$\**\Microsoft.Quantum.Simulation.Common.xml" target="lib" />
-    <file src="..\Simulation\Common\bin\$Configuration$\**\Microsoft.Quantum.Simulation.Common.pdb" target="lib" />
-    <file src="..\Simulation\QCTraceSimulator\bin\$Configuration$\**\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.xml" target="lib" />
-    <file src="..\Simulation\QCTraceSimulator\bin\$Configuration$\**\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.pdb" target="lib" />
+    <file src="..\Common\bin\$Configuration$\**\Microsoft.Quantum.Simulation.Common.xml" target="lib" />
+    <file src="..\Common\bin\$Configuration$\**\Microsoft.Quantum.Simulation.Common.pdb" target="lib" />
+    <file src="..\QCTraceSimulator\bin\$Configuration$\**\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.xml" target="lib" />
+    <file src="..\QCTraceSimulator\bin\$Configuration$\**\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.pdb" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulators.dll" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulators.xml" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulators.pdb" target="lib" />
