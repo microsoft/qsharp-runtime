@@ -342,6 +342,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
 
 // Using a different namespace, so tests can be auto-discovered.
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
+    open Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.Generics;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Convert;
     open Microsoft.Quantum.Diagnostics;
@@ -556,6 +557,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             X(q);
             let r = M(q);
             // Should not raise an exception
+        }
+    }
+
+    operation ReleaseMeasureMultipleQubitCheck() : Unit {
+        using (qs = Qubit[2]) {
+            ApplyToEach(H, qs);
+            let r = Measure([PauliZ, PauliZ], qs);
+            // Should raise an exception
         }
     }
 
