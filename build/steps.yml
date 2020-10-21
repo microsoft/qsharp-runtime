@@ -27,5 +27,9 @@ steps:
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)/build
 
+- pwsh: .\manifest.ps1
+  displayName: "List built packages & assemblies"
+  workingDirectory: '$(System.DefaultWorkingDirectory)/build'
+  condition: succeededOrFailed()
 
 - template: steps-wrap-up.yml
