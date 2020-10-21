@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
