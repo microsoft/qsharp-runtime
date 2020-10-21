@@ -60,9 +60,9 @@ if not os.path.isdir(install_dir):
 
 print("\n")
 
-# Configure DLL lookup locations to include full state simulator and qdk.dll
+# Configure DLL lookup locations to include full state simulator and qdk
 exe_ext = ""
-fullstate_sim_dir = create_path(root_dir, ["externals", "QuantumSimulator"])
+fullstate_sim_dir = os.path.join(root_dir, "..", "Simulation", "Native", "build", flavor)
 if platform.system() == "Windows":
   exe_ext = ".exe"
   os.environ['PATH'] = os.environ['PATH'] + ";" + fullstate_sim_dir + ";" + install_dir
@@ -73,6 +73,12 @@ else:
       os.environ["LD_LIBRARY_PATH"] = old + ":" + fullstate_sim_dir + ":" + install_dir
   else:
       os.environ["LD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
+
+  old = os.environ.get("DYLD_LIBRARY_PATH")
+  if old:
+      os.environ["DYLD_LIBRARY_PATH"] = old + ":" + fullstate_sim_dir + ":" + install_dir
+  else:
+      os.environ["DYLD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
 
 log("========= Running native tests =========")
 test_binaries = [
@@ -86,7 +92,7 @@ test_binaries = [
 for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
   log(test_binary)
-  subprocess.run(test_binary, shell = True)
+  subprocess.run(test_binary + " ~[skip]", shell = True)
 
 log("========= Running interop tests =========")
 if platform.system() == "Windows":

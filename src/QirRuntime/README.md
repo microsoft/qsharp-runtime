@@ -7,6 +7,7 @@ simulators, and the QIR-to-native bridge to support running QIR files against si
 - `lib` folder contains the implementation of the runtime, the simulators and the QIR bridge
 - `test` folder contains tests for the runtime
 - `experimental` folder contains features for which specifications and design are in too early stage to include into the QDK.
+- `externals` folder contains external dependencies. We'll strive to keep those minimal.
 
 ## Build
 
@@ -27,7 +28,7 @@ Or you can run `build.py` script from QirRuntime folder. The default options for
 
 The script will place the build artifacts into `build/[Windows|Linux]/[Debug|Release]` folder. We strongly recommend doing local builds using the build script because it also runs clang-tidy.
 
-Note: OsX support will be added in the future.
+CI builds and tests are enabled for this project.
 
 ### Windows pre-reqs
 
@@ -68,18 +69,30 @@ To generate IR of the native components as part of the build:
 
 ## Test
 
-To execute all tests locally, including QIR and managed interop (the interop is currently implemented for Windows only) run `test.py` from the project's root folder:
+Some of the tests depend on Microsoft.Quantum.Simulator.Runtime library. To run them make sure to build Native simulator from this repository first.
+
+### Running tests with test.py
+
+To execute all tests locally, including QIR and managed interop (the interop tests are currently implemented for Windows only) run `test.py` from the project's root folder:
 
 - (Windows) `python test.py [nobuild] [debug/release]`
 - (Linux) `python3 test.py [nobuild] [debug/release]`
 
-The script will trigger an incremental build unless `nobuild` options is specified.
+The script will trigger an incremental build unless `nobuild` options is specified. Tests from the "[skip]" category won't be run.
 
-All test binaries and their dependencies are copied by the build into *install* folder: `build/[Windows|Linux]/[Debug|Release]/bin` and should be run from there (otherwise the tests might fail to load the shared libraries they depend on). On **Linux** `test.py` adds the install folder to LD_LIBRARY_PATH for the duration of the script. If you'd like to run the tests directly, add the path for the session manually. On WSL it might look like this: `$export LD_LIBRARY_PATH=/mnt/d/repos/qsharp-runtime/src/QirRuntime/build/Linux/Debug/bin:${LD_LIBRARY_PATH}`.
+### Running tests with CTest
 
-The project is using catch2 for all native tests, including QIR. `<test_binary> -help` provides details on how to run a subset of the tests and other options.
+All native tests, including QIR, use catch2 and are fully integrated with CTest. Navigate into `build/[Windows|Linux]/[Debug|Release]` folder and run `ctest`. No configuration options required. The results will be logged into the corresponding `build/[Windows|Linux]/[Debug|Release]/<target_path>/<test_binary_name>_results.xml` file. Tests from the "[skip]" category won't be run.
 
-All native tests are fully integrated with CTest. The coverage is the same as when using `test.py` or running the test binaries individually, but CTest logs the results into the corresponding `build/[Windows|Linux]/[Debug|Release]/<target_path>/<test_binary_name>_results.xml` file. To trigger tests this way, navigate into `build/[Windows|Linux]/[Debug|Release]` folder and run `ctest`. No configuration options required.
+### Running test binaries individually
+
+`<test_binary> -help` provides details on how to run a subset of the tests and other options. For example, you can filter tests from the "[skip]" category out by `<test_binary> ~[skip]`.
+
+For tests that depend on the native simulator and qdk shared libraries, you might need to updated the look up path environment variables:
+
+- (Windows) PATH
+- (Unix) LD_LIBRARY_PATH
+- (Darwin) DYLD_LIBRARY_PATH
 
 ## QIR Bridge and Runtime
 
