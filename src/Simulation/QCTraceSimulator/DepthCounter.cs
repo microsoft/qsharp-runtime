@@ -83,8 +83,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             double maxReturnedQubitsAvailableTime = 0;
             if ( returnedQubitsTraceData != null )
             {
-                QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(returnedQubitsTraceData);
-                maxReturnedQubitsAvailableTime = MaxAvailableTime(qubitsMetrics);
+                maxReturnedQubitsAvailableTime = MaxAvailableTime(returnedQubitsTraceData.Cast<QubitTimeMetrics>());
             }
             OperationCallRecord opRec = operationCallStack.Pop();
             Debug.Assert(operationCallStack.Count != 0, "Operation call stack must never get empty");
@@ -121,7 +120,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             operationCallStack.Push(opRec);
         }
 
-        private double MinAvailableTime(QubitTimeMetrics[] qubitTimeMetrics)
+        private double MinAvailableTime(IEnumerable<QubitTimeMetrics> qubitTimeMetrics)
         {
             Debug.Assert(qubitTimeMetrics != null);
             double min = Double.MaxValue;
@@ -132,7 +131,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             return min != Double.MaxValue ? min : 0;
         }
 
-        private double MaxAvailableTime(QubitTimeMetrics[] qubitTimeMetrics)
+        private double MaxAvailableTime(IEnumerable<QubitTimeMetrics> qubitTimeMetrics)
         {
             Debug.Assert(qubitTimeMetrics != null);
             double max = 0;
@@ -145,7 +144,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
         public void OnPrimitiveOperation(int id, object[] qubitsTraceData, double primitiveOperationDuration)
         {
-            QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
+            IEnumerable<QubitTimeMetrics> qubitsMetrics = qubitsTraceData.Cast<QubitTimeMetrics>();
 
             double startTime = MaxAvailableTime(qubitsMetrics);
             foreach (QubitTimeMetrics q in qubitsMetrics)
@@ -157,15 +156,17 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         public void OnRelease(object[] qubitsTraceData)
         {
             OperationCallRecord opRec = operationCallStack.Peek();
-            QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
-            opRec.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, MaxAvailableTime(qubitsMetrics));
+            opRec.ReleasedQubitsAvailableTime = Max(
+                opRec.ReleasedQubitsAvailableTime,
+                MaxAvailableTime(qubitsTraceData.Cast<QubitTimeMetrics>()));
         }
 
         public void OnReturn(object[] qubitsTraceData, long qubitReleased)
         {
             OperationCallRecord opRec = operationCallStack.Peek();
-            QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
-            opRec.ReturnedQubitsAvailableTime = Max(opRec.ReturnedQubitsAvailableTime, MaxAvailableTime(qubitsMetrics));
+            opRec.ReturnedQubitsAvailableTime = Max(
+                opRec.ReturnedQubitsAvailableTime,
+                MaxAvailableTime(qubitsTraceData.Cast<QubitTimeMetrics>()));
         }
 
         /// <summary>
