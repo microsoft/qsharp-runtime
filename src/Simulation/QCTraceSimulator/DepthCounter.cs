@@ -97,8 +97,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             OperationCallRecord caller = operationCallStack.Peek();
             HashedString callerName = caller.OperationName;
 
-            caller.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, caller.ReleasedQubitsAvailableTime );
-            caller.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, caller.ReleasedQubitsAvailableTime );
+            caller.ReleasedQubitsAvailableTime = Max(opRec.ReleasedQubitsAvailableTime, caller.ReleasedQubitsAvailableTime);
+            caller.ReturnedQubitsAvailableTime = Max(opRec.ReturnedQubitsAvailableTime, caller.ReturnedQubitsAvailableTime);
 
             double[] metrics =
                 StatisticsRecord( 
