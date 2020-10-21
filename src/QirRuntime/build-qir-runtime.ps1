@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# should replace ENABLE_NATIVE with ENABLE_QIRRUNTIME
-if ($Env:ENABLE_NATIVE -ne "false") {
+if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     Write-Host "##[info]Build QIR Runtime"
     $oldCC = $env:CC
     $oldCXX = $env:CC
@@ -15,22 +14,24 @@ if ($Env:ENABLE_NATIVE -ne "false") {
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"
     }
-    $qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "build")
-    mkdir $qirRuntimeBuildFolder
-    $qirRuntimeBuildFolder = (Join-Path $qirRuntimeBuildFolder $Env:BUILD_CONFIGURATION)
-    mkdir $qirRuntimeBuildFolder
-    pushd $qirRuntimeBuildFolder
+
+    $qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
+    if (-not (Test-Path $qirRuntimeBuildFolder)) {
+        New-Item -Path $qirRuntimeBuildFolder -ItemType "directory"
+    }
+
+    Push-Location $qirRuntimeBuildFolder
 
     cmake -G Ninja -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ../..
     cmake --build . --target install
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX
-    popd
+    Pop-Location
 
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
     }
 } else {
-    Write-Host "Skipping build of qir runtime because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
+    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
 }
