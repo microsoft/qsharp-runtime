@@ -7,10 +7,25 @@ using System.Linq;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
+    /// <summary>
+    /// Tracks time when qubits were last used and therefore, time when qubits become available.
+    /// Tracking is done by qubit id, which survives during reuse of qubit.
+    /// </summary>
     internal class QubitAvailabilityTimeTracker
     {
-        private double DefaultAvailabilityTime = 0;
+        /// <summary>
+        /// Availability time of all qubits starts at 0.
+        /// </summary>
+        private double DefaultAvailabilityTime = 0.0;
+
+        /// <summary>
+        /// This tracks time when a qubit was last used, indexed by qubit id.
+        /// </summary>
         private List<double> QubitAvailableAt;
+
+        /// <summary>
+        /// Maximum qubit id seen so far.
+        /// </summary>
         private long MaxQubitId = -1;
 
         internal QubitAvailabilityTimeTracker(int initialCapacity, double defaultAvailabilityTime)
@@ -19,32 +34,32 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             QubitAvailableAt = new List<double>(initialCapacity);
         }
 
-        internal double this[long index]
+        internal double this[long qubitId]
         {
             get
             {
-                if (index < QubitAvailableAt.Count)
+                if (qubitId < QubitAvailableAt.Count)
                 {
-                    return QubitAvailableAt[(int)index];
+                    return QubitAvailableAt[(int)qubitId];
                 }
                 return DefaultAvailabilityTime;
             }
             set
             {
-                if (index == QubitAvailableAt.Count)
+                if (qubitId == QubitAvailableAt.Count)
                 {
                     QubitAvailableAt.Add(value);
                     return;
                 }
-                else if (index >= int.MaxValue)
+                else if (qubitId >= int.MaxValue)
                 {
                     throw new IndexOutOfRangeException("Too many qubits to track.");
                 }
-                else if (index > QubitAvailableAt.Count)
+                else if (qubitId > QubitAvailableAt.Count)
                 {
-                    QubitAvailableAt.AddRange(Enumerable.Repeat(DefaultAvailabilityTime, (int)index - QubitAvailableAt.Count + 1));
+                    QubitAvailableAt.AddRange(Enumerable.Repeat(DefaultAvailabilityTime, (int)qubitId - QubitAvailableAt.Count + 1));
                 }
-                QubitAvailableAt[(int)index] = value;
+                QubitAvailableAt[(int)qubitId] = value;
             }
         }
 

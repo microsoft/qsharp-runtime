@@ -486,7 +486,7 @@ let private resourceSummary =
      T               0   0
      Depth           0   0
      Width           1   1
-     ExtraWidth      1   1
+     QubitCount      1   1
      BorrowedWidth   0   0"
 
 [<Fact>]
