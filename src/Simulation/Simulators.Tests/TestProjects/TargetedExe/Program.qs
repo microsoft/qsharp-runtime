@@ -10,6 +10,7 @@
         let arr = Default<Qubit[]>();
         using (qs = Qubit[2])  {
             Ignore(Measure([PauliX, PauliX], qs));
+            ResetAll(qs);
             return "TargetedExe";
         }
     }

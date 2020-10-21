@@ -22,14 +22,13 @@ namespace Microsoft.Quantum.Core {
     /// # Summary
     /// Compiler-recognized attribute used to mark a type or callable as deprecated.
     /// 
-    /// # Input
+    /// # Named Items
     /// ## NewName
     /// The full name of the type or callable to use instead. 
     /// Is set to the empty String if a type or callable has been deprecated without substitution. 
     ///
     @Attribute()
     newtype Deprecated = (NewName : String);
-
 
     /// # Summary
     /// Returns a default instance of the specified type. 
@@ -136,5 +135,3 @@ namespace Microsoft.Quantum.Core {
     }
 
 }
-
-
