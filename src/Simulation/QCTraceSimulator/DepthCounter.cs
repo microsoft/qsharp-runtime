@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             operationCallStack.Push(opRec);
         }
 
-        public class Metrics
+        public static class Metrics
         {
             public const string Depth = "Depth";
             public const string StartTimeDifference = "StartTimeDifference";
@@ -68,8 +68,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
         public void OnAllocate(object[] qubitsTraceData)
         {
-            QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
-            foreach (QubitTimeMetrics metric in qubitsMetrics)
+            foreach (QubitTimeMetrics metric in qubitsTraceData.Cast<QubitTimeMetrics>())
             {
                 qubitAvailabilityTime.MarkQubitIdUsed(metric.QubitId);
             }
@@ -149,7 +148,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             QubitTimeMetrics[] qubitsMetrics = Utils.UnboxAs<QubitTimeMetrics>(qubitsTraceData);
 
             double startTime = MaxAvailableTime(qubitsMetrics);
-            foreach (QubitTimeMetrics q in qubitsMetrics )
+            foreach (QubitTimeMetrics q in qubitsMetrics)
             {
                 qubitAvailabilityTime[q.QubitId] = startTime + primitiveOperationDuration;
             }
