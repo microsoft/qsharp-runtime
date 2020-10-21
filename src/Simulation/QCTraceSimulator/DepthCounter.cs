@@ -30,8 +30,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         StatisticsCollector<CallGraphEdge> stats;
         Stack<OperationCallRecord> operationCallStack;
         QubitAvailabilityTimeTracker qubitAvailabilityTime = new QubitAvailabilityTimeTracker(
-            initialCapacity: 128,
-            defaultAvailabilityTime: 0);
+            initialCapacity: 128, // Reasonable number to preallocate.
+            defaultAvailabilityTime: 0.0);
 
         public IStatisticCollectorResults<CallGraphEdge> Results => stats;
 

@@ -19,8 +19,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             QubitAvailableAt = new List<double>(initialCapacity);
         }
 
-         internal double this[long index]
-         {
+        internal double this[long index]
+        {
             get
             {
                 if (index < QubitAvailableAt.Count)

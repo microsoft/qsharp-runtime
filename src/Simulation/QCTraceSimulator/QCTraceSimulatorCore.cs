@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// <summary>
         /// Constrols if depth or width optimization is favored.
         /// If set to true, resulting circuit is optimized for depth by discouraging qubit reuse.
-        /// If set to false, resulting circuit is optimized for width be encouraging qubit reuse.
+        /// If set to false, resulting circuit is optimized for width by encouraging qubit reuse.
         /// </summary>
         public bool OptimizeDepth = false;
     }

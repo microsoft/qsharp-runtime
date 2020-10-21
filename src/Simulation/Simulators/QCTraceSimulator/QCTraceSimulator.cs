@@ -104,7 +104,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// If set to <c>false</c>, resulting circuit is optimized for width be encouraging qubit reuse.
         /// Optimization is only limited to reuse of qubits after they are released by user code.
         /// </summary>
-        public bool OptimizeDepth;
+        public bool OptimizeDepth = false;
 
         /// <summary>
         /// Specifies the time it takes to execute each gate.

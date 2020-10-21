@@ -131,21 +131,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             // using(q = Qubit()) { T(q); } using(q = Qubit()) { T(q); } (yes, twice)
 
             // First run with width optimization
-            DataTable data = RunDepthVersusWidthTest(false);
+            DataTable data = RunDepthVersusWidthTest(optimizeDepth: false);
             Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("ExtraWidth")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("Width")["Sum"]);
             Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
 
             // Now run with depth optimization
-            data = RunDepthVersusWidthTest(true);
+            data = RunDepthVersusWidthTest(optimizeDepth: true);
             Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("ExtraWidth")["Sum"]);
             Assert.Equal(2.0, data.Rows.Find("Width")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("Depth")["Sum"]);
         }
 
-        private DataTable RunDepthVersusWidthTest(bool optimizeDepth) {
+        private DataTable RunDepthVersusWidthTest(bool optimizeDepth)
+        {
             QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
             config.OptimizeDepth = optimizeDepth;
             var sim = new ResourcesEstimator(config);
