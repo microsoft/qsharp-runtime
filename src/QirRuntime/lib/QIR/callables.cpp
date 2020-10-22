@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "__quantum__rt.hpp"
+#include "qirTypes.hpp"
 
 /*==============================================================================
     The types and methods, expected by QIR for tuples:
@@ -69,6 +70,7 @@ struct QirCallable
     t_CallableEntry function_table[QirCallable::TableSize];
     QirTupleHeader* const capture;
     int appliedFunctor = 0; // by default the callable is neither adjoint nor controlled
+    int controlledDepth = 0;
 
     // prevent stack allocations
     ~QirCallable()
@@ -126,10 +128,29 @@ struct QirCallable
         if (functor == QirCallable::Adjoint)
         {
             this->appliedFunctor ^= QirCallable::Adjoint;
+            if (this->function_table[this->appliedFunctor] == nullptr)
+            {
+                this->appliedFunctor ^= QirCallable::Adjoint;
+                quantum__rt__fail(new QirString("The callable doesn't provide adjoint operation"));
+            }
         }
         else if (functor == QirCallable::Controlled)
         {
+            if (this->controlledDepth > 0)
+            {
+                throw new std::exception("multi-level controlled operations not implemented yet");
+            }
+
             this->appliedFunctor |= QirCallable::Controlled;
+            if (this->function_table[this->appliedFunctor] == nullptr)
+            {
+                if (this->controlledDepth == 0)
+                {
+                    this->appliedFunctor ^= QirCallable::Controlled;
+                }
+                quantum__rt__fail(new QirString("The callable doesn't provide controlled operation"));
+            }
+            this->controlledDepth++;
         }
     }
 };

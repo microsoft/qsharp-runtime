@@ -59,14 +59,6 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
-### Generating IR
-
-To generate IR of the native components as part of the build:
-
-1. Install LLVM (see above) so you have opt.exe and other tools that work with IR.
-2. Modify ProduceIR.cmake to point to these tools. (Or copy them into a separate folder and add that folder to `%PATH%.` If you are building LLVM locally, don't add the whole target build folder to `%PATH%` because it would likely confuse Clang.)
-3. To produce IR once pass `ir` option to `build.py`. To do that on every build, uncomment setting `${GENERATE_IR}` variable in the root `CMakeLists.txt`.
-
 ## Test
 
 Some of the tests depend on Microsoft.Quantum.Simulator.Runtime library. To run them make sure to build Native simulator from this repository first.

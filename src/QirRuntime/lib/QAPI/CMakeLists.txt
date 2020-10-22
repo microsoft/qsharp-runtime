@@ -15,7 +15,6 @@ set(includes
 #
 add_library(${component_name} STATIC ${source_files})
 target_include_directories(${component_name} PUBLIC ${includes})
-produce_ir(${component_name})
 
 
 #===============================================================================

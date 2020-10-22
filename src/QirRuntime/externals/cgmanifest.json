@@ -9,6 +9,14 @@
                     "DownloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe"
                 }
             }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "Git": { 
+                    "RepositoryUrl": "https://github.com/catchorg/Catch2", 
+                    "CommitHash": "87074da73ecb1c2e7c35fd14f50ca21c4c002adc" }
+            }
         }
     ]
 }

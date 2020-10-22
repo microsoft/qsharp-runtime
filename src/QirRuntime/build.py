@@ -13,7 +13,6 @@ import sys, os, platform, subprocess, datetime
 #       if omitted will make and then build the project
 #    debug/release
 #       default: debug
-#    ir [to use it must provide llvm-tools, only valid with 'make']
 #
 #  For example: "build.py nomake debug ir" or "build.py release"
 # =============================================================================
@@ -39,13 +38,12 @@ def create_folder_structure(start_dir, dirs):
 # =============================================================================
 
 # =============================================================================
-def do_build(root_dir, should_make, should_build, gen_ir, flavor):
+def do_build(root_dir, should_make, should_build, flavor):
   build_dir = create_folder_structure(root_dir, ["build", platform.system(), flavor])
   os.chdir(build_dir)
 
   if should_make:
-    gen_ir_flag = " -DGENERATE_IR=True" if gen_ir else ""
-    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavor + gen_ir_flag + " ../../.."
+    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavor + " ../../.."
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
     if result.returncode != 0:
@@ -72,7 +70,6 @@ if __name__ == '__main__':
   # this script is executed as script
   # parameters
   flavor = "Debug"
-  gen_ir = False
   should_make = True
   should_build = True
 
@@ -84,8 +81,6 @@ if __name__ == '__main__':
       flavor = "Debug"
     elif arg == "release":
       flavor = "Release"
-    elif arg == "ir":
-      gen_ir = True
     elif arg == "nomake":
       should_make = False
     elif arg == "make":
@@ -95,4 +90,4 @@ if __name__ == '__main__':
       sys.exit()
   
   root_dir = os.path.dirname(os.path.abspath(__file__))
-  do_build(root_dir, should_make, should_build, gen_ir, flavor)
+  do_build(root_dir, should_make, should_build, flavor)

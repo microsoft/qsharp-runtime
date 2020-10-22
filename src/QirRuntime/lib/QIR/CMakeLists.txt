@@ -40,7 +40,6 @@ set(rt_sup_source_files
 add_library(qir-rt-support ${rt_sup_source_files})
 
 target_include_directories(qir-rt-support PUBLIC ${public_includes})
-produce_ir(qir-rt-support)
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
@@ -113,7 +112,6 @@ set(qis_sup_source_files
 add_library(qir-qis-support ${qis_sup_source_files})
 
 target_include_directories(qir-qis-support PUBLIC ${public_includes})
-produce_ir(qir-qis-support)
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-qis-support-obj OBJECT ${qis_sup_source_files})

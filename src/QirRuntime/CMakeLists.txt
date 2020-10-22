@@ -21,11 +21,8 @@ endif()
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline")
-#set(GENERATE_IR true)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-include(ProduceIR)
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
 set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2")

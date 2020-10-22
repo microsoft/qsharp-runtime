@@ -19,14 +19,6 @@ def log(message):
   print(current_time + ": " + message)
 # =============================================================================
 
-# =============================================================================
-def create_path(start_dir, dirs):
-  new_dir = start_dir
-  for dir in dirs:
-    new_dir = os.path.join(new_dir, dir)
-  return new_dir
-# =============================================================================
-
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
 # parameters
@@ -47,13 +39,13 @@ for arg in sys.argv:
     sys.exit()
 
 if not nobuild:
-  result = build.do_build(root_dir, True, True, False, flavor) # should_make, should_build, no_ir
+  result = build.do_build(root_dir, True, True, flavor) # should_make, should_build
   if result.returncode != 0:
     log("build failed with exit code {0} => won't execute the tests".format(result.returncode))
     log("to execute the tests from the last successful build run `test.py nobuild`")
     sys.exit()
 
-install_dir = create_path(root_dir, ["build", platform.system(), flavor, "bin"])
+install_dir = os.path.join(root_dir, "build", platform.system(), flavor, "bin")
 if not os.path.isdir(install_dir):
   log("please build first: 'build.py [debug|release] [ir]'")
   sys.exit()
@@ -96,7 +88,7 @@ for name in test_binaries:
 
 log("========= Running interop tests =========")
 if platform.system() == "Windows":
-  managed_interop_tests_dir = create_path(root_dir, ["build", "Windows", flavor, "test"])
+  managed_interop_tests_dir = os.path.join(root_dir, "build", "Windows", flavor, "test")
   os.chdir(managed_interop_tests_dir)
   subprocess.run("dotnet test netcoreapp3.1\interop.dll", shell = True)
 else:

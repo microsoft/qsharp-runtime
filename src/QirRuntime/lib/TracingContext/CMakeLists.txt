@@ -11,5 +11,3 @@ set(includes
 add_library(${component_name} ${source_files})
 target_include_directories(${component_name} PUBLIC ${includes})
 #set_property(TARGET ${component_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-
-produce_ir(${component_name})
