@@ -99,7 +99,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         public bool UseWidthCounter = false;
 
         /// <summary>
-        /// Constrols if depth or width optimization is favored.
+        /// Controls if depth or width optimization is favored.
         /// If set to <c>true</c>, resulting circuit is optimized for depth by discouraging qubit reuse.
         /// If set to <c>false</c>, resulting circuit is optimized for width be encouraging qubit reuse.
         /// Optimization is only limited to reuse of qubits after they are released by user code.
