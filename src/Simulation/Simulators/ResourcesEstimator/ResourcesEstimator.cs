@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
             else if (name == MetricsNames.WidthCounter.ExtraWidth)
             {
-                return "Width";
+                return "QubitCount";
             }
             else
             {
