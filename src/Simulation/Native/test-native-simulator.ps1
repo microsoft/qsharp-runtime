@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 Write-Host "##[info]Test Native simulator"
-Push-Location (Join-Path $PSScriptRoot "../src/Simulation/Native/build")
+Push-Location (Join-Path $PSScriptRoot "build")
 cmake --build . --config $Env:BUILD_CONFIGURATION
 ctest -C $Env:BUILD_CONFIGURATION --verbose
 if ($LastExitCode -ne 0) {
