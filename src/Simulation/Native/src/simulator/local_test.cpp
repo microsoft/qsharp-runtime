@@ -122,21 +122,14 @@ void test_allocate()
     auto const q1 = sim.allocate();
     auto q2 = sim.allocate();
     assert(q1 == 0);
-    assert(sim.qubit(q1) == 0);
     assert(q2 == 1);
-    assert(sim.qubit(q2) == 1);
 
     auto q3 = sim.allocate();
     assert(q3 == 2);
-    assert(sim.qubit(q3) == 2);
 
     sim.release(q2);
-    assert(sim.qubit(q1) == 0);
-    assert(sim.qubit(q3) == 1);
-
     q2 = sim.allocate();
     assert(q2 == 1);
-    assert(sim.qubit(q2) == 2);
 
     assert(sim.num_qubits() == 3);
 
@@ -145,6 +138,44 @@ void test_allocate()
     sim.release(q3);
 
     assert(sim.num_qubits() == 0);
+}
+
+// This test is poking at the implementation detail of the wave function store and might not be the greatest idea as in
+// general the positions of qubits aren't guaranteed to be maintained in specific order and can be optimized by the wave
+// function they way it sees fit. However, for simple allocate/release pattern it documents well the difference between
+// logical and positional qubit ids.
+void test_qubit_positions()
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+    assert(q1 == 0);
+    assert(psi.get_qubit_position(q1) == 0);
+    assert(q2 == 1);
+    assert(psi.get_qubit_position(q2) == 1);
+
+    logical_qubit_id q3 = psi.allocate_qubit();
+    assert(q3 == 2);
+    assert(psi.get_qubit_position(q3) == 2);
+
+    // After release the qubits after the released one should be compacted forward.
+    psi.release(q2);
+    assert(psi.get_qubit_position(q1) == 0);
+    assert(psi.get_qubit_position(q3) == 1);
+
+    // We expect the released id to be reused but the position of the new qubit to be at the end.
+    q2 = psi.allocate_qubit();
+    assert(q2 == 1);
+    assert(psi.get_qubit_position(q2) == 2);
+
+    assert(psi.num_qubits() == 3);
+
+    psi.release(q1);
+    psi.release(q2);
+    psi.release(q3);
+
+    assert(psi.num_qubits() == 0);
 }
 
 template <class SIM>
@@ -331,6 +362,8 @@ int main()
 {
     std::cerr << "Testing allocate\n";
     test_allocate();
+    std::cerr << "Testing qubit postions\n";
+    test_qubit_positions();
     std::cerr << "Testing gates\n";
     test_gates();
     std::cerr << "Testing Exp\n";
