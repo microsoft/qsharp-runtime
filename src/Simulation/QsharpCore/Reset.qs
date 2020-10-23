@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Targeting;
 
     internal operation BasisChangeZtoY(target : Qubit) : Unit is Adj + Ctl {
         H(target);
@@ -45,6 +46,10 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $Z$ basis.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "MResetZ is replaced by a supported implementation on all execution targets."
+    )
     operation MResetZ (target : Qubit) : Result {
         let result = M(target);
 
@@ -75,6 +80,10 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $X$ basis.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "MResetX is replaced by a supported implementation on all execution targets."
+    )
     operation MResetX (target : Qubit) : Result {
         let result = Measure([PauliX], [target]);
 
@@ -108,6 +117,10 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $Y$ basis.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "MResetY is replaced by a supported implementation on all execution targets."
+    )
     operation MResetY (target : Qubit) : Result {
         let result = Measure([PauliY], [target]);
 
