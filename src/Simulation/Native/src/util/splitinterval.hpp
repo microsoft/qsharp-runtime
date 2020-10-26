@@ -32,5 +32,5 @@ static std::vector<std::size_t> split_interval_in_chunks(std::size_t max, std::s
     assert(res[res.size() - 1] == max);
     return res;
 }
-}
-}
+} // namespace Quantum
+} // namespace Microsoft

@@ -19,8 +19,7 @@
 
 #define BUILD_SHARED_LIBS
 
-
-#if defined (_MSC_VER) && defined (BUILD_SHARED_LIBS)
+#if defined(_MSC_VER) && defined(BUILD_SHARED_LIBS)
 
 #ifdef BUILD_DLL
 #define MICROSOFT_QUANTUM_DECL __declspec(dllexport)
@@ -46,5 +45,3 @@
 #else
 #define SIMULATOR SimulatorGeneric
 #endif
-
-
