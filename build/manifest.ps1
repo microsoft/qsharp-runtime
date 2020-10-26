@@ -44,7 +44,7 @@ $artifacts = @{
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
     
     Native = @(
-        "..\submodules\qsharp-runtime\src\simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulator.Runtime.dll"
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulator.Runtime.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
 }
 
