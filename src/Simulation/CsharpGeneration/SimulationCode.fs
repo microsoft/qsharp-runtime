@@ -1261,7 +1261,7 @@ module SimulationCode =
                     ``sim.Execute``
                 ]
                 [
-                    ``catch`` (Some ("Exception", "e"))
+                    ``catch`` None
                         [
                             (``ident`` "Xunit.Assert") <.> ((``ident`` "True"), [``false`` :> ExpressionSyntax; errMsg]) |> (statement >> ``#line`` (opStart + 1) opSourceFile)
                         ]
