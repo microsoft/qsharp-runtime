@@ -26,7 +26,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     using WaveFunctionType = WFN;
 
     Simulator(unsigned maxlocal = 0u)
-        : psi(maxlocal)
+        : psi()
     {
     }
 
@@ -44,7 +44,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return dist(psi.rng());
     }
 
-    double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<unsigned> qs)
+    double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<logical_qubit_id> qs)
     {
         removeIdentities(bs, qs);
         if (bs.empty())
@@ -59,43 +59,46 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return p;
     }
 
-    bool isclassical(unsigned q)
+    bool isclassical(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
         return psi.isclassical(q);
     }
 
     // allocate and release
-    unsigned allocate()
+    logical_qubit_id allocate()
     {
         recursive_lock_type l(mutex());
-        return psi.allocate();
+        return psi.allocate_qubit();
     }
 
-    std::vector<unsigned> allocate(unsigned n)
+    std::vector<logical_qubit_id> allocate(unsigned n)
     {
-        std::vector<unsigned> qubits;
+        std::vector<logical_qubit_id> qubits;
+        qubits.reserve(n);
         recursive_lock_type l(mutex());
 
         for (unsigned i = 0; i < n; ++i)
-            qubits.push_back(psi.allocate());
+        {
+            qubits.push_back(psi.allocate_qubit());
+        }
         return qubits;
     }
 
-    void allocateQubit(unsigned q)
+    void allocateQubit(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
-        psi.allocateQubit(q);
+        psi.allocate_qubit(q);
     }
 
-    void allocateQubit(std::vector<unsigned> const& qubits)
+    void allocateQubit(std::vector<logical_qubit_id> const& qubits)
     {
         recursive_lock_type l(mutex());
         for (auto q : qubits)
-            psi.allocateQubit(q);
+            psi.allocate_qubit(q);
     }
 
-    bool release(unsigned q)
+    bool release(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
         flush();
@@ -108,7 +111,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return allok;
     }
 
-    bool release(std::vector<unsigned> const& qs)
+    bool release(std::vector<logical_qubit_id> const& qs)
     {
         recursive_lock_type l(mutex());
         bool allok = true;
@@ -120,19 +123,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     // single-qubit gates
 
 #define GATE1IMPL(OP)                                                                                                  \
-    void OP(unsigned q)                                                                                                \
+    void OP(logical_qubit_id q)                                                                                        \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply(Gates::OP(q));                                                                                       \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
-    void C##OP(unsigned c, unsigned q)                                                                                 \
+    void C##OP(logical_qubit_id c, logical_qubit_id q)                                                                 \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
-    void C##OP(std::vector<unsigned> const& c, unsigned q)                                                             \
+    void C##OP(std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                             \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
@@ -156,19 +159,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #undef GATE1MCIMPL
 
 #define GATE1IMPL(OP)                                                                                                  \
-    void OP(double phi, unsigned q)                                                                                    \
+    void OP(double phi, logical_qubit_id q)                                                                            \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply(Gates::OP(phi, q));                                                                                  \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
-    void C##OP(double phi, unsigned c, unsigned q)                                                                     \
+    void C##OP(double phi, logical_qubit_id c, logical_qubit_id q)                                                     \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
-    void C##OP(double phi, std::vector<unsigned> const& c, unsigned q)                                                 \
+    void C##OP(double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                 \
     {                                                                                                                  \
         recursive_lock_type l(mutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
@@ -185,25 +188,29 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #undef GATE1MCIMPL
 
     // rotations
-    void R(Gates::Basis b, double phi, unsigned q)
+    void R(Gates::Basis b, double phi, logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
         psi.apply(Gates::R(b, phi, q));
     }
 
     // multi-controlled rotations
-    void CR(Gates::Basis b, double phi, std::vector<unsigned> const& c, unsigned q)
+    void CR(Gates::Basis b, double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
         psi.apply_controlled(c, Gates::R(b, phi, q));
     }
 
     // Exponential of Pauli operators
-    void CExp(std::vector<Gates::Basis> bs, double phi, std::vector<unsigned> const& cs, std::vector<unsigned> qs)
+    void CExp(
+        std::vector<Gates::Basis> bs,
+        double phi,
+        std::vector<logical_qubit_id> const& cs,
+        std::vector<logical_qubit_id> qs)
     {
         if (bs.size() == 0) return;
 
-        unsigned somequbit = qs.front();
+        logical_qubit_id somequbit = qs.front();
         removeIdentities(bs, qs);
 
         recursive_lock_type l(mutex());
@@ -215,21 +222,21 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
             psi.apply_controlled_exp(bs, phi, cs, qs);
     }
 
-    void Exp(std::vector<Gates::Basis> const& bs, double phi, std::vector<unsigned> const& qs)
+    void Exp(std::vector<Gates::Basis> const& bs, double phi, std::vector<logical_qubit_id> const& qs)
     {
         recursive_lock_type l(mutex());
-        CExp(bs, phi, std::vector<unsigned>(), qs);
+        CExp(bs, phi, std::vector<logical_qubit_id>(), qs);
     }
 
     // measurements
 
-    bool M(unsigned q)
+    bool M(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());
         return psi.measure(q);
     }
 
-    std::vector<bool> MultiM(std::vector<unsigned> const& qs)
+    std::vector<bool> MultiM(std::vector<logical_qubit_id> const& qs)
     {
         // ***TODO*** optimized implementation
         recursive_lock_type l(mutex());
@@ -239,7 +246,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return res;
     }
 
-    bool Measure(std::vector<Gates::Basis> bs, std::vector<unsigned> qs)
+    bool Measure(std::vector<Gates::Basis> bs, std::vector<logical_qubit_id> qs)
     {
         recursive_lock_type l(mutex());
         removeIdentities(bs, qs);
@@ -260,11 +267,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         recursive_lock_type l(mutex());
         psi.reset();
     }
-    unsigned qubit(unsigned id) const
-    {
-        recursive_lock_type l(mutex());
-        return psi.qubit(id);
-    }
+
     unsigned num_qubits() const
     {
         recursive_lock_type l(mutex());
@@ -293,19 +296,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         }
     }
 
-    void dumpIds(void (*callback)(unsigned))
+    void dumpIds(void (*callback)(logical_qubit_id))
     {
         recursive_lock_type l(mutex());
         flush();
 
-        auto qubits = psi.logicalQubits();
-        for (auto it = qubits.begin(); it != qubits.end(); ++it)
+        std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
+        for (logical_qubit_id q : qubits)
         {
-            callback(*it);
+            callback(q);
         }
     }
 
-    bool dumpQubits(std::vector<unsigned> const& qs, bool (*callback)(size_t, double, double))
+    bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
     {
         assert(qs.size() <= num_qubits());
 
@@ -327,7 +330,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     // apply permutation of basis states to the wave function
     void permuteBasis(
-        std::vector<unsigned> const& qs,
+        std::vector<logical_qubit_id> const& qs,
         std::size_t table_size,
         std::size_t const* permutation_table,
         bool adjoint = false)
@@ -345,7 +348,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         psi.permute_basis(qs, table_size, permutation_table, adjoint);
     }
 
-    bool subsytemwavefunction(std::vector<unsigned> const& qs, WavefunctionStorage& qubitswfn, double tolerance)
+    bool subsytemwavefunction(std::vector<logical_qubit_id> const& qs, WavefunctionStorage& qubitswfn, double tolerance)
     {
         recursive_lock_type l(mutex());
         flush();
@@ -353,7 +356,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     }
 
   private:
-    void changebasis(Gates::Basis b, unsigned q, bool back)
+    void changebasis(Gates::Basis b, logical_qubit_id q, bool back)
     {
         if (b == Gates::PauliX)
             H(q);
@@ -366,14 +369,14 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         }
     }
 
-    void changebasis(std::vector<Gates::Basis> const& bs, std::vector<unsigned> const& qs, bool back)
+    void changebasis(std::vector<Gates::Basis> const& bs, std::vector<logical_qubit_id> const& qs, bool back)
     {
         assert(bs.size() == qs.size());
         for (unsigned i = 0; i < bs.size(); ++i)
             changebasis(bs[i], qs[i], back);
     }
 
-    inline static void removeIdentities(std::vector<Gates::Basis>& b, std::vector<unsigned>& qs)
+    inline static void removeIdentities(std::vector<Gates::Basis>& b, std::vector<logical_qubit_id>& qs)
     {
         unsigned i = 0;
         while (i != b.size())
