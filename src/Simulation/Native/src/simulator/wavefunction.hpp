@@ -216,7 +216,6 @@ class Wavefunction
 
   public:
     using value_type = T;
-    using RngEngine = std::mt19937;
 
     /// allocate a wave function for zero qubits
     Wavefunction()
