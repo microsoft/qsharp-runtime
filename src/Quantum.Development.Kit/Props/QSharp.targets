@@ -24,7 +24,7 @@
     <Delete Files="@(QsharpCodegenFiles)" />
     <Exec Command="$(QscCommand)" />
     <ItemGroup>
-      <EmbeddedResource Include="$(QsharpOutDir)/$(QsharpTree).bson" LogicalName="__qsharp_data__.bson" Visible="false" />
+      <EmbeddedResource Include="$(QsharpOutDir)/$(QsharpTree).bson" LogicalName="__qsharp_data_bond_fast_binary__.bson" Visible="false" />
       <Compile Include="$(QsharpSrcOutDir)**/*.g.cs" Visible="false" AutoGen="true" />
     </ItemGroup>
   </Target>
