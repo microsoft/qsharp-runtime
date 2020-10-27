@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Targeting;
 
     /// # Summary
     /// Measures a single qubit in the X basis,
@@ -21,6 +22,10 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $X$ basis.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "MResetX is replaced by a supported implementation on all execution targets."
+    )
     @EnableTestingViaName("Test.TargetDefinitions.MResetX")
     operation MResetX (target : Qubit) : Result {
         let result = Measure([PauliX], [target]);

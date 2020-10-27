@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Targeting;
 
     /// # Summary
     /// Measures a single qubit in the Z basis,
@@ -21,6 +22,10 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $Z$ basis.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "MResetZ is replaced by a supported implementation on all execution targets."
+    )
     @EnableTestingViaName("Test.TargetDefinitions.MResetZ")
     operation MResetZ (target : Qubit) : Result {
         let result = M(target);

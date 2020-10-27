@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     @EnableTestingViaName("Test.TargetDefinitions.RFrac")
     operation RFrac (pauli : Pauli, numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
-        let angle = ((-2.0 * PI()) * IntAsDouble(numerator)) / IntAsDouble(2 ^ power);
+        let angle = ((-2.0 * PI()) * IntAsDouble(numerator)) / (2.0 ^ IntAsDouble(power));
         R(pauli, angle, qubit);
     }
 }
