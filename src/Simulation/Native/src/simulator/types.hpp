@@ -5,26 +5,23 @@
 #include "util/alignedalloc.hpp"
 #include <vector>
 
-
 namespace Microsoft
 {
-  namespace Quantum
-  {
-    namespace SIMULATOR
-    {
-      
+namespace Quantum
+{
+namespace SIMULATOR
+{
+
 #ifndef USE_SINGLE_PRECISION
-      using RealType = double;
+using RealType = double;
 #else
-      using RealType = float;
+using RealType = float;
 #endif
-      
-      using ComplexType = std::complex<RealType>;
-      
-      using WavefunctionStorage = std::vector<ComplexType, AlignedAlloc<ComplexType,64>>;
 
-    }
-  }
-}
+using ComplexType = std::complex<RealType>;
 
+using WavefunctionStorage = std::vector<ComplexType, AlignedAlloc<ComplexType, 64>>;
 
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft

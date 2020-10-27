@@ -3689,7 +3689,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 22 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
@@ -3732,7 +3732,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 22 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
@@ -3804,7 +3804,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest2, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 26 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");

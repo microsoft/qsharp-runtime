@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             AddToCallStack(CallGraphEdge.CallGraphRootHashed, OperationFunctor.Body);
         }
 
-        public class Metrics
+        public static class Metrics
         {
             public const string InputWidth = "InputWidth";
             public const string ExtraWidth = "ExtraWidth";

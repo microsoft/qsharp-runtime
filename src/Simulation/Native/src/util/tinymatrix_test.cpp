@@ -37,8 +37,7 @@ void testsize()
     assert(matc == matb);
     assert(matc == matc);
 
-    if (mat.size() != 0)
-        assert(&mat(0, 0) == mat.data());
+    if (mat.size() != 0) assert(&mat(0, 0) == mat.data());
 
     // test assignments
     Microsoft::Quantum::SIMULATOR::TinyMatrix<T, N, M> mate;
