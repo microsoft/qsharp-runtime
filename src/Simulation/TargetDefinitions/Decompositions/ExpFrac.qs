@@ -31,6 +31,8 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Register to apply the given rotation to.
     @EnableTestingViaName("Test.TargetDefinitions.ExpFrac")
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {
+        // Note that power must be converted to a double and used with 2.0 instead of 2 to allow for
+        // negative exponents that result in a fractional denominator.
         let angle = (PI() * IntAsDouble(numerator)) / (2.0 ^ IntAsDouble(power));
         Exp(paulis, angle, qubits);
     }
