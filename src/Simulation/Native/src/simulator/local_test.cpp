@@ -12,10 +12,10 @@ using namespace Microsoft::Quantum::SIMULATOR;
 void test_exp()
 {
     SimulatorType sim;
-  
+
     // prepare a test state
     auto qs = sim.allocate(4);
-	  for (auto q : qs)
+    for (auto q : qs)
         sim.H(q);
 
     // apply the Exp gate
@@ -40,7 +40,8 @@ void test_exp()
         sim.H(q);
 
     // measure and test
-    for (auto q : qs) {
+    for (auto q : qs)
+    {
         bool m = sim.M(q);
         assert(!m);
     }
@@ -75,8 +76,8 @@ void test_teleport()
     // check teleportation success
     sim.Rz((-1.1), q1);
     sim.H(q1);
-    
-    assert(sim.M(q1)==false);
+
+    assert(sim.M(q1) == false);
 
     sim.release(q1);
     sim.release(q2);
@@ -92,7 +93,7 @@ void test_gates()
 
     sim.CRx(1.0, q1, q2);
 
-    assert(sim.M(q2)==false);
+    assert(sim.M(q2) == false);
 
     sim.X(q1);
     sim.CRx(1.0, q1, q2);
@@ -102,18 +103,17 @@ void test_gates()
     sim.CRz(-1.0, q1, q2);
     sim.H(q2);
 
-    assert(sim.M(q2)==false);
+    assert(sim.M(q2) == false);
 
     sim.X(q2);
 
-    assert(sim.M(q2)==true);
+    assert(sim.M(q2) == true);
 
     sim.X(q2);
 
     sim.release(q1);
     sim.release(q2);
 }
-
 
 void test_allocate()
 {
@@ -143,17 +143,15 @@ void test_allocate()
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
-  
-    assert(sim.num_qubits() == 0);
 
+    assert(sim.num_qubits() == 0);
 }
 
 template <class SIM>
 void set(SIM& sim, bool val, unsigned qubit)
 {
     bool is = sim.M(qubit);
-    if (val != is)
-        sim.X(qubit);
+    if (val != is) sim.X(qubit);
 }
 
 void test_multicontrol()
@@ -172,11 +170,11 @@ void test_multicontrol()
         {
             // set control bits to match i:
             for (unsigned j = 0; j < n; j++)
-                set(sim,((i & (1 << j)) != 0), ctrls[j]);
+                set(sim, ((i & (1 << j)) != 0), ctrls[j]);
 
             // controlled is enabled only when all ctrls are 1 (e.g. last one):
             unsigned enabled = (i == ((1 << n) - 1));
-            set(sim,0, q);
+            set(sim, 0, q);
             assert(sim.M(q) == 0);
 
             sim.CX(ctrls, q);
@@ -252,9 +250,10 @@ void assert_cat_state(WavefunctionStorage const& wfn, double tol)
     assert(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
 }
 
-void test_extract_qubits_cat_state(unsigned qubits_number,
-                                   std::vector<unsigned> const& subset,
-                                   std::vector<unsigned> const& negative_test)
+void test_extract_qubits_cat_state(
+    unsigned qubits_number,
+    std::vector<unsigned> const& subset,
+    std::vector<unsigned> const& negative_test)
 {
     SimulatorType sim;
     double tol = 1e-5;

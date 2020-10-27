@@ -28,9 +28,7 @@ class TinyMatrix
     using const_reference = value_type const&;
     using size_type = unsigned;
 
-    TinyMatrix()
-    {
-    }
+    TinyMatrix() {}
 
     TinyMatrix(TinyMatrix const&) = default;
     TinyMatrix& operator=(TinyMatrix const&) = default;
@@ -127,8 +125,7 @@ class TinyMatrix
     {
         for (unsigned i = 0; i < this->rows(); ++i)
             for (unsigned j = 0; j < this->cols(); ++j)
-                if (mat_[i][j] != rhs(i, j))
-                    return false;
+                if (mat_[i][j] != rhs(i, j)) return false;
         return true;
     }
 
@@ -142,6 +139,6 @@ class TinyMatrix
   private:
     value_type mat_[M][N];
 };
-}
-}
-}
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft
