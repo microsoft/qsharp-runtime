@@ -290,11 +290,6 @@ class Cluster
 
                 if (clusterFound == prevClusters.end() || prevCluster.size() >= maxFusedDepth)
                 {
-                    // This is a bug, because the found cluster won't be incorporated if the branch was taken due to
-                    // maxFusedDepth condition. The bug existed prior to the refactor, but was hidden by the fact that
-                    // the found cluster was removed from the list inside `find_compatible_cluster`.
-                    if (clusterFound != prevClusters.end()) prevClusters.erase(clusterFound);
-
                     // Cannot extend this cluster anymore, stash it away for the next pass and try to extend the next
                     // one from the list. Doing swap/move/pop in this order allows us to avoid copying clusters.
                     prevCluster.swap(prevClusters.front());
