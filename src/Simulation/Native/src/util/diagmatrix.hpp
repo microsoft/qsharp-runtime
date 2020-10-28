@@ -26,9 +26,7 @@ class DiagMatrix
     using const_reference = value_type const&;
     using size_type = unsigned;
 
-    DiagMatrix()
-    {
-    }
+    DiagMatrix() {}
 
     DiagMatrix(DiagMatrix const&) = default;
     DiagMatrix& operator=(DiagMatrix const&) = default;
@@ -108,8 +106,7 @@ class DiagMatrix
     bool operator==(DiagMatrix<U, N> const& rhs) const
     {
         for (unsigned i = 0; i < this->rows(); ++i)
-            if (diag_[i] != rhs(i, i))
-                return false;
+            if (diag_[i] != rhs(i, i)) return false;
         return true;
     }
 
@@ -123,6 +120,6 @@ class DiagMatrix
   private:
     value_type diag_[N];
 };
-}
-}
-}
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft

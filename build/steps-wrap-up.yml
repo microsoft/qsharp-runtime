@@ -12,12 +12,12 @@ steps:
     testRunTitle: 'Q# runtime tests'
 
 - task: PublishTestResults@2
-  displayName: 'Publish tests results for QirRuntime'
+  displayName: 'Publish tests results for Native Simulator and QIR runtime'
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/**/*_results.xml'
-    testRunTitle: 'QirRuntime tests'
+    testRunTitle: 'Native tests'
 
 - task: PublishSymbols@1
   displayName: 'Publish symbols (Windows only)'

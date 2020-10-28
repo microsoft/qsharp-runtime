@@ -31,10 +31,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
                 }
-                foreach (Qubit q in qubits)
+                if (qubits.Length == 1)
                 {
-                    //setting qubit as measured to allow for release
-                    q.IsMeasured = true;
+                    // When we are operating on a single qubit we will collapse the state, so mark
+                    // that qubit as measured.
+                    qubits[0].IsMeasured = true;
                 }
                 return Measure(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult();
             };
