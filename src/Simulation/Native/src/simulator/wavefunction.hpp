@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <list>
 #include <random>
 #include <string.h>
 #include <vector>
@@ -47,11 +48,18 @@ inline std::size_t set_register(
 }
 } // namespace detail
 
-// Creating a gate wrapper datatype to represent a gate in a cluster
-class GateWrapper
+///
+/// When a gate is invoked, we might not apply it immediately but save all its pertinent information into an immutable
+/// cache so we can apply the gate later, possibly fused with other gates to improve performance.
+///
+class DeferredGate
 {
+    std::vector<logical_qubit_id> controls_;
+    logical_qubit_id target_;
+    TinyMatrix<ComplexType, 2> mat_;
+
   public:
-    GateWrapper(
+    DeferredGate(
         const std::vector<logical_qubit_id>& controls,
         logical_qubit_id target,
         const TinyMatrix<ComplexType, 2>& mat)
@@ -60,6 +68,7 @@ class GateWrapper
         , mat_(mat)
     {
     }
+    
     const std::vector<logical_qubit_id>& get_controls() const
     {
         return controls_;
@@ -72,21 +81,16 @@ class GateWrapper
     {
         return mat_;
     }
-
-  private:
-    std::vector<logical_qubit_id> controls_;
-    logical_qubit_id target_;
-    TinyMatrix<ComplexType, 2> mat_;
 };
 
 // Creating a cluster datatype for new scheduling logic
 class Cluster
 {
     std::vector<logical_qubit_id> qids_;
-    std::vector<GateWrapper> gates_;
+    std::vector<DeferredGate> gates_;
 
   public:
-    Cluster(const std::vector<logical_qubit_id>& qids, const std::vector<GateWrapper>& gates)
+    Cluster(const std::vector<logical_qubit_id>& qids, const std::vector<DeferredGate>& gates)
         : qids_(qids)
         , gates_(gates)
     {
@@ -95,7 +99,7 @@ class Cluster
     {
         return qids_;
     }
-    const std::vector<GateWrapper>& get_gates() const
+    const std::vector<DeferredGate>& get_gates() const
     {
         return gates_;
     }
@@ -105,7 +109,7 @@ class Cluster
         qids_ = qids;
     }
 
-    void append_gates(const std::vector<GateWrapper>& gates)
+    void append_gates(const std::vector<DeferredGate>& gates)
     {
         gates_.insert(gates_.end(), gates.begin(), gates.end());
     }
@@ -170,7 +174,7 @@ class Cluster
     static std::vector<Cluster> make_clusters(
         unsigned fuseSpan,
         int maxFusedDepth,
-        const std::vector<GateWrapper>& gates)
+        const std::vector<DeferredGate>& gates)
     {
         std::vector<Cluster> curClusters;
 
@@ -181,7 +185,7 @@ class Cluster
             {
                 std::vector<logical_qubit_id> qids = gates[i].get_controls();
                 qids.push_back(gates[i].get_target());
-                curClusters.emplace_back(qids, std::vector<GateWrapper>{gates[i]});
+                curClusters.emplace_back(qids, std::vector<DeferredGate>{gates[i]});
             }
             // creating clusters using greedy algorithm
             for (int i = 1; i < (int)fuseSpan + 1; i++)
@@ -254,7 +258,7 @@ class Wavefunction
 
     /// Cache of the pending gates that haven't been applied (i.e. flushed) to the wave function storage yet.
     static constexpr int MAX_PENDING_GATES = 999;
-    mutable std::vector<GateWrapper> pending_gates_;
+    mutable std::vector<DeferredGate> pending_gates_;
 
     /// TODO: add comment
     Fused fused_;
@@ -347,7 +351,7 @@ class Wavefunction
             // logic to flush gates in each cluster
             for (const Cluster& cl : clusters)
             {
-                for (const GateWrapper& gate : cl.get_gates())
+                for (const DeferredGate& gate : cl.get_gates())
                 {
                     const std::vector<logical_qubit_id>& cs = gate.get_controls();
                     if (cs.size() == 0)

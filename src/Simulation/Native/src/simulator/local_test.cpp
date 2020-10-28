@@ -188,18 +188,18 @@ TEST_CASE("Clustering", "[local_test]")
     TinyMatrix<ComplexType, 2> ignore;
     const int unlimited = 99;
 
-    GateWrapper g_n_1({} /*controls*/, 1 /*target*/, ignore);
-    GateWrapper g_n_2({} /*controls*/, 2 /*target*/, ignore);
-    GateWrapper g_n_3({} /*controls*/, 3 /*target*/, ignore);
-    GateWrapper g_n_4({} /*controls*/, 4 /*target*/, ignore);
-    GateWrapper g_1_2({1} /*controls*/, 2 /*target*/, ignore);
-    GateWrapper g_1_3({1} /*controls*/, 3 /*target*/, ignore);
-    GateWrapper g_2_3({2} /*controls*/, 3 /*target*/, ignore);
-    GateWrapper g_3_4({3} /*controls*/, 4 /*target*/, ignore);
+    DeferredGate g_n_1({} /*controls*/, 1 /*target*/, ignore);
+    DeferredGate g_n_2({} /*controls*/, 2 /*target*/, ignore);
+    DeferredGate g_n_3({} /*controls*/, 3 /*target*/, ignore);
+    DeferredGate g_n_4({} /*controls*/, 4 /*target*/, ignore);
+    DeferredGate g_1_2({1} /*controls*/, 2 /*target*/, ignore);
+    DeferredGate g_1_3({1} /*controls*/, 3 /*target*/, ignore);
+    DeferredGate g_2_3({2} /*controls*/, 3 /*target*/, ignore);
+    DeferredGate g_3_4({3} /*controls*/, 4 /*target*/, ignore);
 
     SECTION("Single qubit gates only") // {X(q1), Y(q1), X(q2), Z(q1), Y(q2)}
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_1, g_n_2, g_n_1, g_n_2};
+        std::vector<DeferredGate> gates{g_n_1, g_n_1, g_n_2, g_n_1, g_n_2};
         auto cls = Cluster::make_clusters(1 /*cluster qubit width*/, unlimited /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 2);
 
@@ -214,7 +214,7 @@ TEST_CASE("Clustering", "[local_test]")
 
     SECTION("CNOT as barrier") // {X(q1), Y(q1), CNOT(q1, q2), Z(q1)}
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_1, g_1_2, g_n_1};
+        std::vector<DeferredGate> gates{g_n_1, g_n_1, g_1_2, g_n_1};
         auto cls = Cluster::make_clusters(1 /*cluster qubit width*/, unlimited /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 3);
 
@@ -233,7 +233,7 @@ TEST_CASE("Clustering", "[local_test]")
 
     SECTION("Pull gate through a CNOT (width 1)") // X(q1), X(q2), CNOT(q2, q3), Y(q1)
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_2, g_2_3, g_n_1};
+        std::vector<DeferredGate> gates{g_n_1, g_n_2, g_2_3, g_n_1};
         auto cls = Cluster::make_clusters(2 /*cluster qubit width*/, unlimited /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 2);
 
@@ -253,7 +253,7 @@ TEST_CASE("Clustering", "[local_test]")
     // {X(q1), Y(q1), X(q2)}, {CNOT(q2, q3), Y(q2), X(q3)}
     SECTION("Pull gate through a CNOT (width 2)")
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_2, g_2_3, g_n_2, g_n_3, g_n_1};
+        std::vector<DeferredGate> gates{g_n_1, g_n_2, g_2_3, g_n_2, g_n_3, g_n_1};
         auto cls = Cluster::make_clusters(2 /*cluster qubit width*/, unlimited /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 2);
 
@@ -273,7 +273,7 @@ TEST_CASE("Clustering", "[local_test]")
     // cannot be merged into the first cluster and terminates it, preventing addition of Y(q2))
     SECTION("Many CNOT gates")
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_2, g_n_3, g_1_2, g_1_3, g_n_1, g_n_2, g_n_3};
+        std::vector<DeferredGate> gates{g_n_1, g_n_2, g_n_3, g_1_2, g_1_3, g_n_1, g_n_2, g_n_3};
         auto cls = Cluster::make_clusters(2 /*cluster qubit width*/, unlimited /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 3);
 
@@ -292,7 +292,7 @@ TEST_CASE("Clustering", "[local_test]")
 
     SECTION("Fusion limit on single qubit")
     {
-        std::vector<GateWrapper> gates{g_n_1, g_n_1, g_n_1, g_n_1};
+        std::vector<DeferredGate> gates{g_n_1, g_n_1, g_n_1, g_n_1};
         auto cls = Cluster::make_clusters(1 /*cluster qubit width*/, 2 /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 2);
 
@@ -307,7 +307,7 @@ TEST_CASE("Clustering", "[local_test]")
 
     SECTION("Fusion limit on multiple qubits")
     {
-        std::vector<GateWrapper> gates{g_n_1, g_1_2, g_3_4, g_n_3};
+        std::vector<DeferredGate> gates{g_n_1, g_1_2, g_3_4, g_n_3};
         auto cls = Cluster::make_clusters(unlimited /*cluster qubit width*/, 2 /*gates per cluster*/, gates);
         REQUIRE(cls.size() == 2);
 
