@@ -8,9 +8,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    struct SimulatorStub : public ISimulator, public IQuantumApi
+    struct SimulatorStub : public ISimulator, public IQuantumGateSet
     {
-        IQuantumApi* AsQuantumApi() override
+        IQuantumGateSet* AsQuantumGateSet() override
         {
             return this;
         }

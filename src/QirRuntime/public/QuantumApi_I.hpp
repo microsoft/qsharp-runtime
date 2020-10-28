@@ -8,9 +8,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    struct IQuantumApi
+    struct IQuantumGateSet
     {
-        virtual ~IQuantumApi() {}
+        virtual ~IQuantumGateSet() {}
 
         // Elementary operatons
         virtual void X(Qubit target) = 0;
@@ -49,9 +49,9 @@ namespace Quantum
     {
         virtual ~ISimulator() {}
 
-        virtual IQuantumApi* AsQuantumApi() = 0;
+        virtual IQuantumGateSet* AsQuantumGateSet() = 0;
 
-        // TODO: Only some simulators 'know' the state -- is it OK to have this method on IQuantumApi?
+        // TODO: Only some simulators 'know' the state -- is it OK to have this method on IQuantumGateSet?
         // The callback will be invoked on each basis vector (in the standard computational basis) in little-endian
         // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);

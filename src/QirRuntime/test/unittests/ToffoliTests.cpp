@@ -13,7 +13,7 @@ using namespace Microsoft::Quantum;
 TEST_CASE("Basis vector", "[toffoli]")
 {
     std::unique_ptr<ISimulator> sim = CreateToffoliSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     constexpr int n = 1000;
     std::vector<Qubit> qubits;
@@ -42,7 +42,7 @@ TEST_CASE("Basis vector", "[toffoli]")
 TEST_CASE("Controlled X", "[toffoli]")
 {
     std::unique_ptr<ISimulator> sim = CreateToffoliSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q[4];
     q[0] = sim->AllocateQubit();
@@ -86,7 +86,7 @@ TEST_CASE("Controlled X", "[toffoli]")
 TEST_CASE("Measure and assert probability", "[toffoli]")
 {
     std::unique_ptr<ISimulator> sim = CreateToffoliSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     const int count = 3;
     Qubit qs[count];

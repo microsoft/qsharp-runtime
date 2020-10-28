@@ -23,14 +23,14 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    struct IQuantumApi;
+    struct IQuantumGateSet;
 }
 }
 
 /*
     Methods from __quantum__qis namespace are specific to the target. When QIR is generated it might limit or extend
     the set of intrinsics, supported by the target (known to QIR generator at compile time). As part of the runtime
-    we provide _optional_ implementation of the common intrinsics that redirects to IQuantumApi.
+    we provide _optional_ implementation of the common intrinsics that redirects to IQuantumGateSet.
 */
 extern "C"
 {

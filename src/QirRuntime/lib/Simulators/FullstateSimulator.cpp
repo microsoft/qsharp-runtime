@@ -55,7 +55,7 @@ namespace Microsoft
 namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
-    class CFullstateSimulator : public ISimulator, public IQuantumApi
+    class CFullstateSimulator : public ISimulator, public IQuantumGateSet
     {
         typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -133,7 +133,7 @@ namespace Quantum
             // UnloadQuantumSimulator(this->handle);
         }
 
-        IQuantumApi* AsQuantumApi() override
+        IQuantumGateSet* AsQuantumGateSet() override
         {
             return this;
         }

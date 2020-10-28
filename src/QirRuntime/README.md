@@ -95,7 +95,7 @@ There are two ways to compile and run the QIR files against the runtime.
 1. Link against the runtime libraries *statically*. For the example of this approach see `test/QIR-static` tests. It allows the client to access the target simulator directly, if so desired.
 1. Link against the *shared qdk* library. The example of this approach can be found in `test/QIR-dynamic` folder. In the future we'll provide fully self-contained packages of the runtime to enable this workflow completely outside of the current project. For now, this way of consuming QIR only supports running against the native full state simulator.
 
-QIR's architecture assumes a single target, whether that be hardware or a particular simulator. As a result, there is no provision in the QIR specifications to choose a target dynamically. To connect QIR to the simulators from this runtime, we provide `SetSimulatorForQIR(IQuantumApi*)` method. Switching simulators while executing QIR isn't supported and would yield undefined behavior.
+QIR's architecture assumes a single target, whether that be hardware or a particular simulator. As a result, there is no provision in the QIR specifications to choose a target dynamically. To connect QIR to the simulators from this runtime, we provide `SetSimulatorForQIR(IQuantumGateSet*)` method. Switching simulators while executing QIR isn't supported and would yield undefined behavior.
 
 ### Building from IR files
 CMake doesn't support using LLVM's IR files as input so instead we invoke Clang directly from custom commands to create utility libs that can be linked into other targets using their absolute paths.

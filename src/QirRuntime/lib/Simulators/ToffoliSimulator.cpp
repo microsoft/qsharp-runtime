@@ -17,7 +17,7 @@ namespace Quantum
         CToffoliSimulator
         Simulator for reversible classical logic.
     ==============================================================================*/
-    class CToffoliSimulator final : public ISimulator, public IQuantumApi
+    class CToffoliSimulator final : public ISimulator, public IQuantumGateSet
     {
         long lastUsedId = -1;
 
@@ -39,7 +39,7 @@ namespace Quantum
         CToffoliSimulator() = default;
         ~CToffoliSimulator() = default;
 
-        IQuantumApi* AsQuantumApi() override
+        IQuantumGateSet* AsQuantumGateSet() override
         {
             return this;
         }

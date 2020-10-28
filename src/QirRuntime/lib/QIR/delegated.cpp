@@ -4,7 +4,7 @@
 /*=============================================================================
     QIR assumes a single global execution context.
     To support the dispatch over the qir-bridge, the clients must implement
-    Microsoft::Quantum::IQuantumApi* g_qapi;
+    Microsoft::Quantum::IQuantumGateSet* g_qapi;
 =============================================================================*/
 #include <assert.h>
 #include <unordered_map>

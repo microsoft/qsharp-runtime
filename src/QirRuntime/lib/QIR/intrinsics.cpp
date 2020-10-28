@@ -28,12 +28,12 @@ extern "C"
 
     void quantum__qis__cnot(Qubit control, Qubit qubit)
     {
-        g_sim->AsQuantumApi()->ControlledX(1, &control, qubit);
+        g_sim->AsQuantumGateSet()->ControlledX(1, &control, qubit);
     }
 
     void quantum__qis__h(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->H(qubit);
+        g_sim->AsQuantumGateSet()->H(qubit);
     }
 
     Result quantum__qis__measure(QirArray* paulis, QirArray* qubits)
@@ -64,41 +64,41 @@ extern "C"
 
     void quantum__qis__s(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->S(qubit);
+        g_sim->AsQuantumGateSet()->S(qubit);
     }
 
     void quantum__qis__t(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->T(qubit);
+        g_sim->AsQuantumGateSet()->T(qubit);
     }
 
     void quantum__qis__rx(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumApi()->R(PauliId_X, qubit, theta);
+        g_sim->AsQuantumGateSet()->R(PauliId_X, qubit, theta);
     }
 
     void quantum__qis__ry(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumApi()->R(PauliId_Y, qubit, theta);
+        g_sim->AsQuantumGateSet()->R(PauliId_Y, qubit, theta);
     }
 
     void quantum__qis__rz(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumApi()->R(PauliId_Z, qubit, theta);
+        g_sim->AsQuantumGateSet()->R(PauliId_Z, qubit, theta);
     }
 
     void quantum__qis__x(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->X(qubit);
+        g_sim->AsQuantumGateSet()->X(qubit);
     }
 
     void quantum__qis__y(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->Y(qubit);
+        g_sim->AsQuantumGateSet()->Y(qubit);
     }
 
     void quantum__qis__z(Qubit qubit)
     {
-        g_sim->AsQuantumApi()->Z(qubit);
+        g_sim->AsQuantumGateSet()->Z(qubit);
     }
 }

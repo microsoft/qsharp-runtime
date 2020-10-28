@@ -50,7 +50,7 @@ TEST_CASE("Fullstate simulator: multiple instances", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q = sim->AllocateQubit();
     Result r1 = sim->M(q);
@@ -70,7 +70,7 @@ TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q1 = sim->AllocateQubit();
     Qubit q2 = sim->AllocateQubit();
@@ -89,7 +89,7 @@ TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q[2];
     PauliId paulis[2] = {PauliId_Z, PauliId_Z};
@@ -112,7 +112,7 @@ TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit qs[2];
     qs[0] = sim->AllocateQubit();
@@ -139,7 +139,7 @@ TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit qs[3];
     for (int i = 0; i < 3; i++)
@@ -164,7 +164,7 @@ TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: SSZ=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q = sim->AllocateQubit();
 
@@ -186,7 +186,7 @@ TEST_CASE("Fullstate simulator: SSZ=Id", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: TTSAdj=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q = sim->AllocateQubit();
 
@@ -208,7 +208,7 @@ TEST_CASE("Fullstate simulator: TTSAdj=Id", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: TTAdj=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q = sim->AllocateQubit();
 
@@ -230,7 +230,7 @@ TEST_CASE("Fullstate simulator: R", "[fullstate_simulator]")
 {
     constexpr double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062;
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     Qubit q = sim->AllocateQubit();
     bool identity = true;
@@ -254,7 +254,7 @@ TEST_CASE("Fullstate simulator: R", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
     const int n = 5;
 
     Qubit qs[n];
@@ -279,7 +279,7 @@ TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simulator]")
 {
     std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-    IQuantumApi* iqa = sim->AsQuantumApi();
+    IQuantumGateSet* iqa = sim->AsQuantumGateSet();
 
     const int n = 3;
     static double norm = 0.0;
