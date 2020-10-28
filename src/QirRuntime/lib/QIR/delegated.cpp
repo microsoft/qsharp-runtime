@@ -11,24 +11,25 @@
 
 #include "quantum__rt.hpp"
 
-#include "IQuantumApi.hpp"
+#include "QuantumApi_I.hpp"
 #include "qirTypes.hpp"
 #include "SimFactory.hpp"
 
-Microsoft::Quantum::IQuantumApi* g_qapi = nullptr;
+Microsoft::Quantum::ISimulator* g_sim = nullptr;
 extern "C" QIR_SHARED_API Result ResultOne = nullptr;
 extern "C" QIR_SHARED_API Result ResultZero = nullptr;
 namespace Microsoft
 {
 namespace Quantum
 {
-    void SetCurrentQuantumApiForQIR(IQuantumApi* qapi)
+    void SetSimulatorForQIR(ISimulator* sim)
     {
-        g_qapi = qapi;
-        if (g_qapi != nullptr)
+        g_sim = sim;
+
+        if (g_sim != nullptr)
         {
-            ResultOne = g_qapi->UseOne();
-            ResultZero = g_qapi->UseZero();
+            ResultOne = g_sim->UseOne();
+            ResultZero = g_sim->UseZero();
         }
         else
         {
@@ -47,7 +48,7 @@ namespace Quantum
 EXPORTAPI void SetupQirToRunOnFullStateSimulator()
 {
     // Leak the simulator, because the QIR only creates one and it will exist for the duration of the session
-    SetCurrentQuantumApiForQIR(Microsoft::Quantum::CreateFullstateSimulator().release());
+    SetSimulatorForQIR(Microsoft::Quantum::CreateFullstateSimulator().release());
 }
 
 std::unordered_map<RESULT*, int>& AllocatedResults()
@@ -58,14 +59,24 @@ std::unordered_map<RESULT*, int>& AllocatedResults()
 
 extern "C"
 {
+    Result UseZero()
+    {
+        return g_sim->UseZero();
+    }
+
+    Result UseOne()
+    {
+        return g_sim->UseOne();
+    }
+
     QUBIT* quantum__rt__qubit_allocate() // NOLINT
     {
-        return g_qapi->AllocateQubit();
+        return g_sim->AllocateQubit();
     }
 
     void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
     {
-        g_qapi->ReleaseQubit(qubit);
+        g_sim->ReleaseQubit(qubit);
     }
 
     // Increments the reference count of a Result pointer.
@@ -93,7 +104,7 @@ extern "C"
         auto rit = trackedResults.find(r);
         if (rit == trackedResults.end())
         {
-            g_qapi->ReleaseResult(r);
+            g_sim->ReleaseResult(r);
         }
         else
         {
@@ -102,7 +113,7 @@ extern "C"
             if (refcount == 1)
             {
                 trackedResults.erase(rit);
-                g_qapi->ReleaseResult(r);
+                g_sim->ReleaseResult(r);
             }
             else
             {
@@ -117,7 +128,7 @@ extern "C"
         {
             return true;
         }
-        const TernaryBool res = g_qapi->AreEqualResults(r1, r2);
+        const TernaryBool res = g_sim->AreEqualResults(r1, r2);
         assert(res != TernaryBool_Undefined);
         return res == TernaryBool_True;
     }
@@ -125,7 +136,7 @@ extern "C"
     // Returns a string representation of the result.
     QirString* quantum__rt__result_to_string(RESULT* result) // NOLINT
     {
-        ResultValue rv = g_qapi->GetResultValue(result);
+        ResultValue rv = g_sim->GetResultValue(result);
         assert(rv != Result_Pending);
 
         return (rv == Result_Zero) ? quantum__rt__string_create("Zero") : quantum__rt__string_create("One");
@@ -134,6 +145,6 @@ extern "C"
     // Returns a string representation of the qubit.
     QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(g_qapi->DumpQubit(qubit).c_str());
+        return quantum__rt__string_create(g_sim->QubitToString(qubit).c_str());
     }
 }

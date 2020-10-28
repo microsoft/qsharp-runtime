@@ -25,7 +25,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
-set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2")
+set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2" "${PROJECT_SOURCE_DIR}/test")
 
 # testing related
 include(CTest)

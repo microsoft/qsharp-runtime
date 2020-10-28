@@ -4,29 +4,21 @@
 /*=============================================================================
     QIR assumes a single global execution context.
     To support the dispatch over the qir-bridge, the clients must register their
-    Microsoft::Quantum::IQuantumApi* first.
+    Microsoft::Quantum::ISimulator* first.
 =============================================================================*/
 #include <assert.h>
 #include <vector>
 
 #include "quantum__qis.hpp"
 
-#include "IQuantumApi.hpp"
+#include "QuantumApi_I.hpp"
 #include "qirTypes.hpp"
 
-extern Microsoft::Quantum::IQuantumApi* g_qapi;
+extern Microsoft::Quantum::ISimulator* g_sim;
 
 extern "C"
 {
-    Result UseZero()
-    {
-        return g_qapi->UseZero();
-    }
 
-    Result UseOne()
-    {
-        return g_qapi->UseOne();
-    }
 
     double quantum__qis__intAsDouble(long value)
     {
@@ -36,12 +28,12 @@ extern "C"
 
     void quantum__qis__cnot(Qubit control, Qubit qubit)
     {
-        g_qapi->ControlledX(1, &control, qubit);
+        g_sim->AsQuantumApi()->ControlledX(1, &control, qubit);
     }
 
     void quantum__qis__h(Qubit qubit)
     {
-        g_qapi->H(qubit);
+        g_sim->AsQuantumApi()->H(qubit);
     }
 
     Result quantum__qis__measure(QirArray* paulis, QirArray* qubits)
@@ -61,52 +53,52 @@ extern "C"
             pauliIds.push_back(static_cast<PauliId>(*paulis->GetItemPointer(i)));
         }
 
-        return g_qapi->Measure(
+        return g_sim->Measure(
             count, reinterpret_cast<PauliId*>(pauliIds.data()), count, reinterpret_cast<Qubit*>(qubits->buffer));
     }
 
     Result quantum__qis__mz(Qubit qubit)
     {
-        return g_qapi->M(qubit);
+        return g_sim->M(qubit);
     }
 
     void quantum__qis__s(Qubit qubit)
     {
-        g_qapi->S(qubit);
+        g_sim->AsQuantumApi()->S(qubit);
     }
 
     void quantum__qis__t(Qubit qubit)
     {
-        g_qapi->T(qubit);
+        g_sim->AsQuantumApi()->T(qubit);
     }
 
     void quantum__qis__rx(double theta, Qubit qubit)
     {
-        g_qapi->R(PauliId_X, qubit, theta);
+        g_sim->AsQuantumApi()->R(PauliId_X, qubit, theta);
     }
 
     void quantum__qis__ry(double theta, Qubit qubit)
     {
-        g_qapi->R(PauliId_Y, qubit, theta);
+        g_sim->AsQuantumApi()->R(PauliId_Y, qubit, theta);
     }
 
     void quantum__qis__rz(double theta, Qubit qubit)
     {
-        g_qapi->R(PauliId_Z, qubit, theta);
+        g_sim->AsQuantumApi()->R(PauliId_Z, qubit, theta);
     }
 
     void quantum__qis__x(Qubit qubit)
     {
-        g_qapi->X(qubit);
+        g_sim->AsQuantumApi()->X(qubit);
     }
 
     void quantum__qis__y(Qubit qubit)
     {
-        g_qapi->Y(qubit);
+        g_sim->AsQuantumApi()->Y(qubit);
     }
 
     void quantum__qis__z(Qubit qubit)
     {
-        g_qapi->Z(qubit);
+        g_sim->AsQuantumApi()->Z(qubit);
     }
 }

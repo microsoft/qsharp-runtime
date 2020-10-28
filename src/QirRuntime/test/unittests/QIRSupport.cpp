@@ -13,11 +13,11 @@
 #include "qirTypes.hpp"
 
 #include "BitStates.hpp"
-#include "QuantumApiBase.hpp"
+#include "SimulatorStub.hpp"
 
 using namespace Microsoft::Quantum;
 
-struct ResultsReferenceCountingTestQAPI : public CQuantumApiBase
+struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
     int lastId = 1;
     const int maxResults;
@@ -69,7 +69,7 @@ struct ResultsReferenceCountingTestQAPI : public CQuantumApiBase
 TEST_CASE("Results: comparison and reference counting", "[qir_support]")
 {
     std::unique_ptr<ResultsReferenceCountingTestQAPI> qapi = std::make_unique<ResultsReferenceCountingTestQAPI>(3);
-    SetCurrentQuantumApiForQIR(qapi.get());
+    SetSimulatorForQIR(qapi.get());
 
     Result r1 = qapi->M(nullptr); // we don't need real qubits for this test
     Result r2 = qapi->M(nullptr);
@@ -94,7 +94,7 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     quantum__rt__result_unreference(r3);
 
     REQUIRE(!qapi->HaveResultsInFlight()); // no leaks
-    SetCurrentQuantumApiForQIR(nullptr);
+    SetSimulatorForQIR(nullptr);
 }
 
 TEST_CASE("Arrays: one dimensional", "[qir_support]")
@@ -628,7 +628,7 @@ TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
     quantum__rt__string_unreference(qstr2);
 }
 
-struct QubitTestQAPI : public CQuantumApiBase
+struct QubitTestQAPI : public SimulatorStub
 {
     int lastId = -1;
     const int maxQubits;
@@ -658,7 +658,7 @@ struct QubitTestQAPI : public CQuantumApiBase
         REQUIRE(this->allocated.IsBitSetAt(id));
         this->allocated.FlipBitAt(id);
     }
-    std::string DumpQubit(Qubit qubit) override
+    std::string QubitToString(Qubit qubit) override
     {
         const int id = GetQubitId(qubit);
         return std::to_string(id);
@@ -680,7 +680,7 @@ struct QubitTestQAPI : public CQuantumApiBase
 TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 {
     std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(3);
-    SetCurrentQuantumApiForQIR(qapi.get());
+    SetSimulatorForQIR(qapi.get());
     QirString* qstr = nullptr;
 
     Qubit q = quantum__rt__qubit_allocate();
@@ -701,5 +701,5 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     quantum__rt__qubit_release_array(qs);
     REQUIRE(!qapi->HaveQubitsInFlight());
 
-    SetCurrentQuantumApiForQIR(nullptr);
+    SetSimulatorForQIR(nullptr);
 }

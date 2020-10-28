@@ -3,16 +3,17 @@
 #include <memory>
 #include <vector>
 
-#include "IQuantumApi.hpp"
+#include "QuantumApi_I.hpp"
 
 namespace Microsoft
 {
 namespace Quantum
 {
     // Toffoli Simulator
-    std::unique_ptr<IQuantumApi> CreateToffoliSimulator();
+    std::unique_ptr<ISimulator> CreateToffoliSimulator();
 
     // Full State Simulator
-    std::unique_ptr<IQuantumApi> CreateFullstateSimulator();
+    std::unique_ptr<ISimulator> CreateFullstateSimulator();
+
 } // namespace Quantum
 } // namespace Microsoft

@@ -4,11 +4,10 @@
 #include <assert.h>
 #include <vector>
 
-#include "IQuantumApi.hpp"
+#include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 
 #include "BitStates.hpp"
-#include "QuantumApiBase.hpp"
 
 namespace Microsoft
 {
@@ -18,7 +17,7 @@ namespace Quantum
         CToffoliSimulator
         Simulator for reversible classical logic.
     ==============================================================================*/
-    class CToffoliSimulator final : public CQuantumApiBase
+    class CToffoliSimulator final : public ISimulator, public IQuantumApi
     {
         long lastUsedId = -1;
 
@@ -39,6 +38,11 @@ namespace Quantum
       public:
         CToffoliSimulator() = default;
         ~CToffoliSimulator() = default;
+
+        IQuantumApi* AsQuantumApi() override
+        {
+            return this;
+        }
 
         void X(Qubit qubit) override
         {
@@ -115,7 +119,7 @@ namespace Quantum
 
         void ReleaseQubit(Qubit qubit) override
         {
-            long id = GetQubitId(qubit);
+            const long id = GetQubitId(qubit);
             assert(id <= this->lastUsedId);
             assert(!this->states.IsBitSetAt(id));
         }
@@ -141,9 +145,100 @@ namespace Quantum
             const double actualZeroProbability = (Measure(numTargets, bases, numTargets, targets) == zero) ? 1.0 : 0.0;
             return std::abs(actualZeroProbability - probabilityOfZero) < precision;
         }
+        virtual std::string QubitToString(Qubit qubit) override
+        {
+            const long id = GetQubitId(qubit);
+            return std::to_string(id) + ":" + (this->states.IsBitSetAt(id) ? "1" : "0");
+        }
+
+        //
+        // Parts of the interface Toffoli Simulator doesn't support
+        //
+        void GetState(TGetStateCallback callback) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void Y(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void Z(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void H(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void S(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void T(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void R(PauliId axis, Qubit target, double theta) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledY(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledZ(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledH(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledS(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledT(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledR(long numControls, Qubit controls[], PauliId axis, Qubit target, double theta) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledExp(
+            long numControls,
+            Qubit controls[],
+            long numTargets,
+            PauliId paulis[],
+            Qubit targets[],
+            double theta) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void SAdjoint(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void TAdjoint(Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
     };
 
-    std::unique_ptr<IQuantumApi> CreateToffoliSimulator()
+    std::unique_ptr<ISimulator> CreateToffoliSimulator()
     {
         return std::make_unique<CToffoliSimulator>();
     }

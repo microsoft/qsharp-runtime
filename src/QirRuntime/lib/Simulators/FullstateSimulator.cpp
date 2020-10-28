@@ -9,9 +9,7 @@
 #include <vector>
 
 #include "SimFactory.hpp"
-
-#include "IQuantumApi.hpp"
-#include "QuantumApiBase.hpp"
+#include "QuantumApi_I.hpp"
 
 using namespace std;
 
@@ -57,7 +55,7 @@ namespace Microsoft
 namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
-    class CFullstateSimulator : public CQuantumApiBase
+    class CFullstateSimulator : public ISimulator, public IQuantumApi
     {
         typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -135,11 +133,21 @@ namespace Quantum
             // UnloadQuantumSimulator(this->handle);
         }
 
+        IQuantumApi* AsQuantumApi() override
+        {
+            return this;
+        }
+
         void GetState(TGetStateCallback callback) override
         {
             typedef bool (*TDump)(unsigned, TGetStateCallback);
             static TDump dump = reinterpret_cast<TDump>(LoadProc(this->handle, "Dump"));
             dump(this->simulatorId, callback);
+        }
+
+        virtual std::string QubitToString(Qubit q) override
+        {
+            return std::to_string(GetQubitId(q));
         }
 
         Qubit AllocateQubit() override
@@ -384,7 +392,7 @@ namespace Quantum
         }
     };
 
-    std::unique_ptr<IQuantumApi> CreateFullstateSimulator()
+    std::unique_ptr<ISimulator> CreateFullstateSimulator()
     {
         return std::make_unique<CFullstateSimulator>();
     }

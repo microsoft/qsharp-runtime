@@ -2,16 +2,19 @@
 
 #include <exception>
 
-#include "IQuantumApi.hpp"
+#include "QuantumApi_I.hpp"
 
 namespace Microsoft
 {
 namespace Quantum
 {
-    class CQuantumApiBase : public IQuantumApi
+    struct SimulatorStub : public ISimulator, public IQuantumApi
     {
-      public:
-        // Qubit management
+        IQuantumApi* AsQuantumApi() override
+        {
+            return this;
+        }
+        
         Qubit AllocateQubit() override
         {
             throw std::logic_error("not_implemented");
@@ -24,26 +27,10 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        virtual std::string DumpQubit(Qubit qubit) override
+        virtual std::string QubitToString(Qubit qubit) override
         {
             throw std::logic_error("not_implemented");
         }
-
-        // Shortcuts
-        void CX(Qubit control, Qubit target) override
-        {
-            ControlledX(1, &control, target);
-        }
-        void CY(Qubit control, Qubit target) override
-        {
-            ControlledY(1, &control, target);
-        }
-        void CZ(Qubit control, Qubit target) override
-        {
-            ControlledZ(1, &control, target);
-        }
-
-        // Elementary operatons
         void X(Qubit target) override
         {
             throw std::logic_error("not_implemented");
@@ -68,32 +55,7 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void SWAP(Qubit target1, Qubit target2) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void Clifford(CliffordId cliffordId, PauliId pauli, Qubit target) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void Unitary(long numTargets, double** unitary, Qubit targets[]) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-
         void R(PauliId axis, Qubit target, double theta) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void RFraction(PauliId axis, Qubit target, long numerator, int power) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void R1(Qubit target, double theta) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void R1Fraction(Qubit target, long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -101,12 +63,6 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ExpFraction(long numTargets, PauliId paulis[], Qubit targets[], long numerator, int power) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-
-        // Multicontrolled operations
         void ControlledX(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("not_implemented");
@@ -131,40 +87,7 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledSWAP(long numControls, Qubit controls[], Qubit target1, Qubit target2) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void ControlledClifford(long numControls, Qubit controls[], CliffordId cliffordId, PauliId pauli, Qubit target)
-            override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void ControlledUnitary(long numControls, Qubit controls[], long numTargets, double** unitary, Qubit targets[])
-            override
-        {
-            throw std::logic_error("not_implemented");
-        }
-
         void ControlledR(long numControls, Qubit controls[], PauliId axis, Qubit target, double theta) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void ControlledRFraction(
-            long numControls,
-            Qubit controls[],
-            PauliId axis,
-            Qubit target,
-            long numerator,
-            int power) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void ControlledR1(long numControls, Qubit controls[], Qubit target, double theta) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void ControlledR1Fraction(long numControls, Qubit controls[], Qubit target, long numerator, int power) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -178,19 +101,6 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledExpFraction(
-            long numControls,
-            Qubit controls[],
-            long numTargets,
-            PauliId paulis[],
-            Qubit targets[],
-            long numerator,
-            int power) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-
-        // Adjoint operations
         void SAdjoint(Qubit target) override
         {
             throw std::logic_error("not_implemented");
@@ -207,7 +117,6 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-
         bool Assert(long numTargets, PauliId bases[], Qubit targets[], Result result, const char* failureMessage)
             override
         {
@@ -223,17 +132,11 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-
-        // Results
         Result M(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
         Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void Reset(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
