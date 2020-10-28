@@ -9,10 +9,11 @@
 #include <assert.h>
 #include <unordered_map>
 
-#include "__quantum__rt.hpp"
+#include "quantum__rt.hpp"
 
 #include "IQuantumApi.hpp"
 #include "qirTypes.hpp"
+#include "SimFactory.hpp"
 
 Microsoft::Quantum::IQuantumApi* g_qapi = nullptr;
 extern "C" QIR_SHARED_API Result ResultOne = nullptr;
@@ -37,6 +38,17 @@ namespace Quantum
     }
 } // namespace Quantum
 } // namespace Microsoft
+
+#ifdef _WIN32
+#define EXPORTAPI extern "C" __declspec(dllexport)
+#else
+#define EXPORTAPI extern "C"
+#endif
+EXPORTAPI void SetupQirToRunOnFullStateSimulator()
+{
+    // Leak the simulator, because the QIR only creates one and it will exist for the duration of the session
+    SetCurrentQuantumApiForQIR(Microsoft::Quantum::CreateFullstateSimulator().release());
+}
 
 std::unordered_map<RESULT*, int>& AllocatedResults()
 {

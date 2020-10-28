@@ -42,7 +42,6 @@ macro(add_unit_test target)
         set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../Simulation/native/build/${CMAKE_BUILD_TYPE}")
     endif()
 
-    #set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/externals/QuantumSimulator")
     set(TEST_DEPS2 "${CMAKE_BINARY_DIR}/bin")
     set_property(TEST ${target} PROPERTY ENVIRONMENT
         "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${LD_LIBRARY_PATH}"
@@ -52,7 +51,6 @@ macro(add_unit_test target)
 endmacro(add_unit_test)
 
 
-add_subdirectory(experimental)
 add_subdirectory(lib)
 add_subdirectory(test)
 

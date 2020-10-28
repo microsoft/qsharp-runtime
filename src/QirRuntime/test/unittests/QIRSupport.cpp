@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "__quantum__rt.hpp"
+#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
 
 #include "BitStates.hpp"

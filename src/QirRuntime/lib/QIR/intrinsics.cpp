@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <vector>
 
-#include "__quantum__qis.hpp"
+#include "quantum__qis.hpp"
 
 #include "IQuantumApi.hpp"
 #include "qirTypes.hpp"

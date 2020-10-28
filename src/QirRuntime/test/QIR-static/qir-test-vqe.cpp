@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "CoreTypes.hpp"
-#include "__quantum__qis.hpp"
-#include "__quantum__rt.hpp"
+#include "quantum__qis.hpp"
+#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
 
 using namespace std;

@@ -1,48 +1,22 @@
 #==============================================================================
-# produce the unit tests binary: unittests.exe
+# produce the unit tests binary: qir-runtime-unittests.exe
 #
-add_executable(unittests
+add_executable(qir-runtime-unittests
   driver.cpp
-  ChunkedStoreTests.cpp
-  DeferredResultsTests.cpp
   FullstateSimulatorTests.cpp
   QIRSupport.cpp
   ToffoliTests.cpp
 )
 
-target_link_libraries(unittests PUBLIC
+target_link_libraries(qir-runtime-unittests PUBLIC
   simulators
-  core
   qir-rt
 )
 
-target_include_directories(unittests PUBLIC 
+target_include_directories(qir-runtime-unittests PUBLIC 
   "${test_includes}"
    ${public_includes}
   "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
-install(TARGETS unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
-add_unit_test(unittests)
-
-#==============================================================================
-# build against tracing context
-#
-add_executable(tracer-tests
-  "TracingContextTests.cpp")
-
-target_link_libraries(tracer-tests PUBLIC
-  simulators
-  core
-  resource-tracer
-)
-
-# this setting enables LTO (link time optimizations), but to benefit across
-# libraries, the linked libraries also should enable it.
-#set_property(TARGET tracer-tests PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-
-target_include_directories(tracer-tests PUBLIC 
-  "${test_includes}"
-  "${public_includes}"
-)
-install(TARGETS tracer-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
-add_unit_test(tracer-tests)
+install(TARGETS qir-runtime-unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(qir-runtime-unittests)

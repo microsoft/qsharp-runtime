@@ -74,9 +74,7 @@ else:
 
 log("========= Running native tests =========")
 test_binaries = [
-  "unittests",
-  "experimental-unittests",
-  "tracer-tests",
+  "qir-runtime-unittests",
   "qir-static-tests",
   "qir-dynamic-tests"
 ]
@@ -85,13 +83,5 @@ for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
   log(test_binary)
   subprocess.run(test_binary + " ~[skip]", shell = True)
-
-log("========= Running interop tests =========")
-if platform.system() == "Windows":
-  managed_interop_tests_dir = os.path.join(root_dir, "build", "Windows", flavor, "test")
-  os.chdir(managed_interop_tests_dir)
-  subprocess.run("dotnet test netcoreapp3.1\interop.dll", shell = True)
-else:
-  log("C# interop tests not supported on this platform")
 
 print("\n")

@@ -62,7 +62,6 @@ target_link_libraries(qir-static-tests PUBLIC
   qir-rt
   qir-qis
   simulators
-  core
 )
 
 target_include_directories(qir-static-tests PUBLIC

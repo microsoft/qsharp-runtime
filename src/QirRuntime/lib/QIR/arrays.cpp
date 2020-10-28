@@ -9,7 +9,7 @@
 #include <string.h> // for memcpy
 #include <vector>
 
-#include "__quantum__rt.hpp"
+#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
 
 #include "CoreTypes.hpp"

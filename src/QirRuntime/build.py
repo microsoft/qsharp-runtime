@@ -53,15 +53,6 @@ def do_build(root_dir, should_make, should_build, flavor):
     cmd = "cmake --build . --target install --config " + flavor
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
-    if result.returncode != 0:
-      return result
-
-    if platform.system() == "Windows":
-      interop_tests_dir = os.path.join(root_dir, "test")
-      interop_tests_dir = os.path.join(interop_tests_dir, "interop")
-      cmd = "dotnet build -c " + flavor +" " + interop_tests_dir
-      log("running: " + cmd)
-      result = subprocess.run(cmd, shell = True)
 
     return result
 # =============================================================================
