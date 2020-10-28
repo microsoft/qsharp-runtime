@@ -3685,10 +3685,21 @@ namespace Microsoft.Quantum.Tests.UnitTests
                     baseSim.OnLog += this.Output.WriteLine;
                 }
 
-                sim.Run<UnitTest1, QVoid, QVoid>(QVoid.Instance).Wait();
-                if (sim is IDisposable disposeSim)
+                try
                 {
-                    disposeSim.Dispose();
+                    sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
+                }
+                catch
+                {
+#line 22 "%%"
+                    Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
+                }
+                finally
+                {
+                    if (sim is IDisposable disposeSim)
+                    {
+                        disposeSim.Dispose();
+                    }
                 }
             }
         }
@@ -3717,10 +3728,21 @@ namespace Microsoft.Quantum.Tests.UnitTests
                     baseSim.OnLog += this.Output.WriteLine;
                 }
 
-                sim.Run<UnitTest1, QVoid, QVoid>(QVoid.Instance).Wait();
-                if (sim is IDisposable disposeSim)
+                try
                 {
-                    disposeSim.Dispose();
+                    sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
+                }
+                catch
+                {
+#line 22 "%%"
+                    Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
+                }
+                finally
+                {
+                    if (sim is IDisposable disposeSim)
+                    {
+                        disposeSim.Dispose();
+                    }
                 }
             }
         }
@@ -3778,10 +3800,21 @@ namespace Microsoft.Quantum.Tests.UnitTests
                     baseSim.OnLog += this.Output.WriteLine;
                 }
 
-                sim.Run<UnitTest2, QVoid, QVoid>(QVoid.Instance).Wait();
-                if (sim is IDisposable disposeSim)
+                try
                 {
-                    disposeSim.Dispose();
+                    sim.Execute<UnitTest2, QVoid, QVoid>(QVoid.Instance);
+                }
+                catch
+                {
+#line 26 "%%"
+                    Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
+                }
+                finally
+                {
+                    if (sim is IDisposable disposeSim)
+                    {
+                        disposeSim.Dispose();
+                    }
                 }
             }
         }

@@ -1240,7 +1240,7 @@ module SimulationCode =
         let disposeSim = ``ident`` "disposeSim"
         let ``this.Output`` = ``ident`` "this" <|.|> ``ident`` "Output"
         let ``sim.OnLog`` = baseSim <|.|> ``ident`` "OnLog"
-        let Run = generic "Run" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
+        let Execute = generic "Execute" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
 
         let simCond = sim |> ``is assign`` "Microsoft.Quantum.Simulation.Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
 
@@ -1248,10 +1248,28 @@ module SimulationCode =
         let assignLogEvent =
             ``if`` ``(`` simCond ``)``
                 [ ``sim.OnLog`` <+=> (``this.Output`` <|.|> ``ident`` "WriteLine") ] None
-        let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
+        let ``sim.Execute`` = sim <.> (Execute, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) |> statement
         let disposeOfRun =
             ``if`` ``(`` (sim |> ``is assign`` "IDisposable" disposeSim) ``)``
                 [ disposeSim <.> ((``ident`` "Dispose"), []) |> statement ] None
+
+        let errMsg = ``literal`` "Q# Test failed. For details see the Standard output below."
+
+        let tryRunCatch =
+            ``try``
+                [
+                    ``sim.Execute``
+                ]
+                [
+                    ``catch`` None
+                        [
+                            (``ident`` "Xunit.Assert") <.> ((``ident`` "True"), [``false`` :> ExpressionSyntax; errMsg]) |> (statement >> ``#line`` (opStart + 1) opSourceFile)
+                        ]
+                ]
+                (Some (``finally`` 
+                    [
+                        ``disposeOfRun``
+                    ]))
 
         ``attributes``
             [
@@ -1261,7 +1279,7 @@ module SimulationCode =
             ]
             (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``
-                    [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
+                    [getSimulator; assignLogEvent; tryRunCatch]
                 ``}``
                 |> ``with trivia`` (``#lineNr`` (opStart + 1) opSourceFile) // we need 1-based line numbers here, and opStart is zero-based
             )
