@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#ifdef CATCH2_TESTS
+#include "catch.hpp"
+#endif
+
 #include "simulator/simulator.hpp"
 #include "util/bititerator.hpp"
 #include "util/bitops.hpp"
@@ -12,10 +16,10 @@ using namespace Microsoft::Quantum::SIMULATOR;
 void test_exp()
 {
     SimulatorType sim;
-  
+
     // prepare a test state
     auto qs = sim.allocate(4);
-	  for (auto q : qs)
+    for (auto q : qs)
         sim.H(q);
 
     // apply the Exp gate
@@ -40,7 +44,8 @@ void test_exp()
         sim.H(q);
 
     // measure and test
-    for (auto q : qs) {
+    for (auto q : qs)
+    {
         bool m = sim.M(q);
         assert(!m);
     }
@@ -75,8 +80,8 @@ void test_teleport()
     // check teleportation success
     sim.Rz((-1.1), q1);
     sim.H(q1);
-    
-    assert(sim.M(q1)==false);
+
+    assert(sim.M(q1) == false);
 
     sim.release(q1);
     sim.release(q2);
@@ -92,7 +97,7 @@ void test_gates()
 
     sim.CRx(1.0, q1, q2);
 
-    assert(sim.M(q2)==false);
+    assert(sim.M(q2) == false);
 
     sim.X(q1);
     sim.CRx(1.0, q1, q2);
@@ -102,18 +107,17 @@ void test_gates()
     sim.CRz(-1.0, q1, q2);
     sim.H(q2);
 
-    assert(sim.M(q2)==false);
+    assert(sim.M(q2) == false);
 
     sim.X(q2);
 
-    assert(sim.M(q2)==true);
+    assert(sim.M(q2) == true);
 
     sim.X(q2);
 
     sim.release(q1);
     sim.release(q2);
 }
-
 
 void test_allocate()
 {
@@ -122,38 +126,69 @@ void test_allocate()
     auto const q1 = sim.allocate();
     auto q2 = sim.allocate();
     assert(q1 == 0);
-    assert(sim.qubit(q1) == 0);
     assert(q2 == 1);
-    assert(sim.qubit(q2) == 1);
 
     auto q3 = sim.allocate();
     assert(q3 == 2);
-    assert(sim.qubit(q3) == 2);
 
     sim.release(q2);
-    assert(sim.qubit(q1) == 0);
-    assert(sim.qubit(q3) == 1);
-
     q2 = sim.allocate();
     assert(q2 == 1);
-    assert(sim.qubit(q2) == 2);
 
     assert(sim.num_qubits() == 3);
 
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
-  
-    assert(sim.num_qubits() == 0);
 
+    assert(sim.num_qubits() == 0);
 }
+
+#ifdef CATCH2_TESTS
+// This test is poking at the implementation detail of the wave function store and might not be the best idea as the
+// positions of qubits aren't guaranteed to be maintained in specific order and can be optimized by the wave function as
+// it sees fit. However, for simple allocate/release pattern the test is useful to document the difference between
+// logical and positional qubit ids.
+TEST_CASE("Logical vs positional qubit ids", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+    REQUIRE(q1 == 0);
+    REQUIRE(psi.get_qubit_position(q1) == 0);
+    REQUIRE(q2 == 1);
+    REQUIRE(psi.get_qubit_position(q2) == 1);
+
+    logical_qubit_id q3 = psi.allocate_qubit();
+    REQUIRE(q3 == 2);
+    REQUIRE(psi.get_qubit_position(q3) == 2);
+
+    // After release the qubits after the released one should be compacted forward.
+    psi.release(q2);
+    REQUIRE(psi.get_qubit_position(q1) == 0);
+    REQUIRE(psi.get_qubit_position(q3) == 1);
+
+    // We expect the released id to be reused but the position of the new qubit to be at the end.
+    q2 = psi.allocate_qubit();
+    REQUIRE(q2 == 1);
+    REQUIRE(psi.get_qubit_position(q2) == 2);
+
+    REQUIRE(psi.num_qubits() == 3);
+
+    psi.release(q1);
+    psi.release(q2);
+    psi.release(q3);
+
+    REQUIRE(psi.num_qubits() == 0);
+}
+#endif
 
 template <class SIM>
 void set(SIM& sim, bool val, unsigned qubit)
 {
     bool is = sim.M(qubit);
-    if (val != is)
-        sim.X(qubit);
+    if (val != is) sim.X(qubit);
 }
 
 void test_multicontrol()
@@ -172,11 +207,11 @@ void test_multicontrol()
         {
             // set control bits to match i:
             for (unsigned j = 0; j < n; j++)
-                set(sim,((i & (1 << j)) != 0), ctrls[j]);
+                set(sim, ((i & (1 << j)) != 0), ctrls[j]);
 
             // controlled is enabled only when all ctrls are 1 (e.g. last one):
             unsigned enabled = (i == ((1 << n) - 1));
-            set(sim,0, q);
+            set(sim, 0, q);
             assert(sim.M(q) == 0);
 
             sim.CX(ctrls, q);
@@ -252,9 +287,10 @@ void assert_cat_state(WavefunctionStorage const& wfn, double tol)
     assert(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
 }
 
-void test_extract_qubits_cat_state(unsigned qubits_number,
-                                   std::vector<unsigned> const& subset,
-                                   std::vector<unsigned> const& negative_test)
+void test_extract_qubits_cat_state(
+    unsigned qubits_number,
+    std::vector<unsigned> const& subset,
+    std::vector<unsigned> const& negative_test)
 {
     SimulatorType sim;
     double tol = 1e-5;
@@ -328,6 +364,7 @@ void test_extract_qubits_state()
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
 }
 
+#ifndef CATCH2_TESTS
 int main()
 {
     std::cerr << "Testing allocate\n";
@@ -344,3 +381,4 @@ int main()
     test_extract_qubits_state();
     return 0;
 }
+#endif

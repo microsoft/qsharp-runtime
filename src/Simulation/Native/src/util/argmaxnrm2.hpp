@@ -57,5 +57,5 @@ std::size_t argmaxnrm2(const std::vector<T, A>& values)
 
     return argmaxs[argmax - begin(argmaxvals)] - begin(values);
 }
-}
-}
+} // namespace Quantum
+} // namespace Microsoft

@@ -66,7 +66,8 @@ struct bititerator
     std::uint64_t const_bits_mask;
     std::uint64_t mask_values;
 
-    bititerator(std::uint64_t start, const std::vector<unsigned>& bits_positions_to_iterate) : b(start)
+    bititerator(std::uint64_t start, const std::vector<unsigned>& bits_positions_to_iterate)
+        : b(start)
     {
         const unsigned bitsize = sizeof(b) * 8;
         std::vector<unsigned> const_bits_positions = complement(bits_positions_to_iterate, bitsize);
@@ -89,9 +90,10 @@ struct bititerator
         mask_values = mask.to_ullong();
     }
 
-    bititerator(std::uint64_t start_for_bits_to_iterate,
-                std::uint64_t rest,
-                const std::vector<unsigned>& bits_positions_to_iterate)
+    bititerator(
+        std::uint64_t start_for_bits_to_iterate,
+        std::uint64_t rest,
+        const std::vector<unsigned>& bits_positions_to_iterate)
         : bititerator(sparse_map(bits_positions_to_iterate, start_for_bits_to_iterate, rest), bits_positions_to_iterate)
     {
     }
@@ -105,5 +107,5 @@ struct bititerator
         return *this;
     }
 };
-}
-}
+} // namespace Quantum
+} // namespace Microsoft
