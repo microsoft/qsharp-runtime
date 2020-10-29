@@ -5,12 +5,14 @@
 // No Options
 //
 
+// --- Returns Unit
+
 namespace EntryPointTest {
     @EntryPoint()
     operation ReturnUnit() : Unit { }
 }
 
-// ---
+// --- Returns Int
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -19,7 +21,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Returns String
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -28,18 +30,18 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Namespace and callable use same name
 
 namespace EntryPointTest {
     @EntryPoint()
     operation EntryPointTest() : Unit { }
 }
 
-// ---
-
 //
 // Single Option
 //
+
+// --- Accepts Int
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -48,7 +50,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts BigInt
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -57,7 +59,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Double
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -66,7 +68,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Bool
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -75,7 +77,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Pauli
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -84,7 +86,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Result
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -93,7 +95,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Range
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -102,7 +104,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts String
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -111,7 +113,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Unit
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -120,7 +122,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts String array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -129,7 +131,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts BigInt array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -138,7 +140,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Pauli array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -147,7 +149,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Range array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -156,7 +158,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Result array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -165,7 +167,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts Unit array
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -174,11 +176,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Multiple Options
 //
+
+// --- Accepts two options
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -187,7 +189,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts three options
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -196,11 +198,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Tuples
 //
+
+// --- Accepts redundant one-tuple
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -209,7 +211,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts redundant two-tuple
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -218,7 +220,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts one-tuple
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -227,7 +229,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Accepts two-tuple
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -236,11 +238,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Name Conversion
 //
+
+// --- Uses kebab-case
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -249,7 +251,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Uses single-dash short names
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -258,11 +260,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Shadowing
 //
+
+// --- Shadows --simulator
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -271,7 +273,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Shadows -s
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -280,7 +282,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Shadows --version
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -289,7 +291,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Shadows --target
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -298,7 +300,7 @@ namespace EntryPointTest {
     }
 }
 
-// ---
+// --- Shadows --shots
 
 namespace EntryPointTest {
     @EntryPoint()
@@ -307,11 +309,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Simulators
 //
+
+// --- X or H
 
 namespace EntryPointTest {
     open Microsoft.Quantum.Intrinsic;
@@ -333,11 +335,11 @@ namespace EntryPointTest {
     }
 }
 
-// ---
-
 //
 // Help
 //
+
+// --- Help
 
 namespace EntryPointTest {
     /// # Summary
