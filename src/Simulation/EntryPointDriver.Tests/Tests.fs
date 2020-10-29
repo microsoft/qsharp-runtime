@@ -47,7 +47,7 @@ let private testCase =
     fun name -> cases |> Map.find name
 
 /// Compiles the Q# source code.
-let private compileQsharp source =
+let private compileQSharp source =
     let uri name = Uri ("file://" + name)
     let fileManager name content =
         CompilationUnitManager.InitializeFileManager (uri name, content)
@@ -65,7 +65,7 @@ let private compileQsharp source =
     compilation.BuiltCompilation
 
 /// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
-let private generateCsharp constants (compilation : QsCompilation) =
+let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
@@ -83,7 +83,7 @@ let private referencedAssembly name =
     path |> Option.defaultWith (fun () -> failwith (sprintf "Missing reference to assembly '%s'." name))
 
 /// Compiles the C# sources into an assembly.
-let private compileCsharp (sources : string seq) =
+let private compileCSharp (sources : string seq) =
     let references : MetadataReference list =
         [
             "netstandard"
@@ -116,9 +116,9 @@ let private compileCsharp (sources : string seq) =
 let private testAssembly testNum constants =
     testNum
     |> testCase
-    |> compileQsharp
-    |> generateCsharp constants
-    |> compileCsharp
+    |> compileQSharp
+    |> generateCSharp constants
+    |> compileCSharp
 
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
 /// code.
