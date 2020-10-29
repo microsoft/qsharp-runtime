@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Microsoft.Quantum.Core;
 using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -291,6 +292,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Circuits.BigIntTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
         }
+
+        [Fact]
+        public void DefaultQubitIsNull() => OperationsTestHelper.RunWithMultipleSimulators(async simulator =>
+            Assert.Null(await Default<Qubit>.Run(simulator)));
+
+        [Fact]
+        public void DefaultCallableIsNull() => OperationsTestHelper.RunWithMultipleSimulators(async simulator =>
+            Assert.Null(await Default<ICallable>.Run(simulator)));
 
         [Fact]
         public void CatchFail()
