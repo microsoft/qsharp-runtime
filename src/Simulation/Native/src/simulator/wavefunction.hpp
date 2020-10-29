@@ -549,6 +549,14 @@ class Wavefunction
         return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
     }
 
+    /// \pre: Qubits, listed in `q`, must be unentangled and in state |0>.
+    /// place these `n` qubits into superposition of 2^n basis vectors with (re, im) amplitudes, where the order of
+    /// qubits in array `q` defines (big or little endian?) order of the basis vectors.
+    void prepare_state(unsigned n, logical_qubit_id* q, double* re, double* im)
+    {
+        
+    }
+
     /// measure a qubit
     bool measure(logical_qubit_id q)
     {

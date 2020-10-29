@@ -59,6 +59,12 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return p;
     }
 
+    
+    void PrepareState(unsigned n, logical_qubit_id* q, double* re, double* im) {
+        recursive_lock_type l(mutex());
+        psi.prepare_state(n, q, re, im);
+    }
+
     bool isclassical(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());

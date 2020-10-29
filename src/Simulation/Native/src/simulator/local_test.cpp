@@ -10,6 +10,7 @@
 #include "util/bitops.hpp"
 
 #include <cmath>
+#include <bitset>
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
@@ -318,6 +319,57 @@ TEST_CASE("Clustering", "[local_test]")
         ++it;
         CHECK(it->get_qids() == std::vector<logical_qubit_id>{3, 4});
         CHECK(it->get_gates().size() == 2);
+    }
+}
+
+TEST_CASE("Prepare total cat state", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+    constexpr int n = 2;
+    constexpr int N = (1 << n);
+
+    logical_qubit_id qs[n];
+    for (int i = 0; i < n; i++)
+    {
+        qs[i] = psi.allocate_qubit();
+    }
+
+    double re[N] = {1.0 / std::sqrt(2.0), 0.0, 0.0, 1.0 / std::sqrt(2.0)};
+    double im[N] = {0.0, 0.0, 0.0, 0.0};
+    psi.prepare_state(2, qs, re, im);
+
+    const WavefunctionStorage& data = psi.data();
+    for (int i = 0; i < N; i++)
+    {
+        INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
+        INFO(psi);
+        REQUIRE(data[i] == ComplexType{re[i], im[i]});
+    }
+}
+
+TEST_CASE("Prepare total W state", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+    constexpr int n = 3;
+    constexpr int N = (1 << n);
+
+    logical_qubit_id qs[n];
+    for (int i = 0; i < n; i++)
+    {
+        qs[i] = psi.allocate_qubit();
+    }
+
+    const double amp = 1.0 / std::sqrt(n);
+    double re[N] = {0.0, amp, amp, 0.0, amp, 0.0, 0.0, 0.0};
+    double im[N] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    psi.prepare_state(2, qs, re, im);
+
+    const WavefunctionStorage& data = psi.data();
+    for (int i = 0; i < N; i++)
+    {
+        INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
+        INFO(psi);
+        REQUIRE(data[i] == ComplexType{re[i], im[i]});
     }
 }
 #endif

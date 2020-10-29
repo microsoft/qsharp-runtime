@@ -38,10 +38,21 @@ extern "C"
         _In_reads_(n) unsigned* q)
     {
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (unsigned i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<unsigned> qv(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->JointEnsembleProbability(bv, qv);
+    }
+
+    MICROSOFT_QUANTUM_DECL void PrepareState(
+        _In_ unsigned sid,
+        _In_ unsigned n,
+        _In_reads_(n) unsigned* q,
+        _In_ double* re,
+        _In_ double* im)
+    {
+        Microsoft::Quantum::Simulator::get(sid)->PrepareState(n, q, re, im);
     }
 
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned id, _In_ unsigned q)
