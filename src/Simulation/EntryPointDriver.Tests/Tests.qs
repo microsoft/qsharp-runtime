@@ -5,14 +5,14 @@
 // No Options
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ReturnUnit() : Unit { }
 }
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ReturnInt() : Int {
         return 42;
@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ReturnString() : String {
         return "Hello, World!";
@@ -30,11 +30,18 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
+namespace EntryPointTest {
+    @EntryPoint()
+    operation EntryPointTest() : Unit { }
+}
+
+// ---
+
 //
 // Single Option
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptInt(n : Int) : Int {
         return n;
@@ -43,7 +50,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptBigInt(n : BigInt) : BigInt {
         return n;
@@ -52,7 +59,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptDouble(n : Double) : Double {
         return n;
@@ -61,7 +68,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptBool(b : Bool) : Bool {
         return b;
@@ -70,7 +77,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptPauli(p : Pauli) : Pauli {
         return p;
@@ -79,7 +86,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptResult(r : Result) : Result {
         return r;
@@ -88,7 +95,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptRange(r : Range) : Range {
         return r;
@@ -97,7 +104,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptString(s : String) : String {
         return s;
@@ -106,7 +113,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptUnit(u : Unit) : Unit {
         return u;
@@ -115,7 +122,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptStringArray(xs : String[]) : String[] {
         return xs;
@@ -124,7 +131,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptBigIntArray(bs : BigInt[]) : BigInt[] {
         return bs;
@@ -133,7 +140,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptPauliArray(ps : Pauli[]) : Pauli[] {
         return ps;
@@ -142,7 +149,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptRangeArray(rs : Range[]) : Range[] {
         return rs;
@@ -151,7 +158,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptResultArray(rs : Result[]) : Result[] {
         return rs;
@@ -160,7 +167,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation AcceptUnitArray(us : Unit[]) : Unit[] {
         return us;
@@ -173,7 +180,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Multiple Options
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation TwoOptions(n : Int, b : Bool) : String {
         return $"{n} {b}";
@@ -182,7 +189,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ThreeOptions(n : Int, b : Bool, xs : String[]) : String {
         return $"{n} {b} {xs}";
@@ -195,7 +202,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Tuples
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation RedundantOneTuple((x : Int)) : String {
         return $"{x}";
@@ -204,7 +211,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation RedundantTwoTuple((x : Int, y : Int)) : String {
         return $"{x} {y}";
@@ -213,7 +220,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation OneTuple(x : Int, (y : Int)) : String {
         return $"{x} {y}";
@@ -222,7 +229,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation TwoTuple(x : Int, (y : Int, z : Int)) : String {
         return $"{x} {y} {z}";
@@ -235,7 +242,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Name Conversion
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation CamelCase(camelCaseName : String) : String {
         return camelCaseName;
@@ -244,7 +251,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation SingleLetter(x : String) : String {
         return x;
@@ -257,7 +264,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Shadowing
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ShadowSimulator(simulator : String) : String {
         return simulator;
@@ -266,7 +273,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ShadowS(s : String) : String {
         return s;
@@ -275,7 +282,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ShadowVersion(version : String) : String {
         return version;
@@ -284,7 +291,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ShadowTarget(target : String) : String {
         return target;
@@ -293,7 +300,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 
 // ---
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     @EntryPoint()
     operation ShadowShots(shots : Int) : Int {
         return shots;
@@ -306,7 +313,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Simulators
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
@@ -332,7 +339,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Tests {
 // Help
 //
 
-namespace Microsoft.Quantum.EntryPointDriver.Tests {
+namespace EntryPointTest {
     /// # Summary
     /// This test checks that the entry point documentation appears correctly in the command line help message.
     ///
