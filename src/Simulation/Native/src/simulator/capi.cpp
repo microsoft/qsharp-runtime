@@ -52,7 +52,17 @@ extern "C"
         _In_ double* re,
         _In_ double* im)
     {
-        Microsoft::Quantum::Simulator::get(sid)->PrepareState(n, q, re, im);
+        const size_t N = (static_cast<size_t>(1) << n);
+        std::vector<ComplexType> amplitudes;
+        amplitudes.reserve(N);
+        for (size_t i = 0; i < N; i++)
+        {
+            amplitudes.push_back({re[i], im[i]});
+        }
+        std::vector<unsigned> qubits(n);
+        std::memcpy(qubits.data(), q, n*sizeof(unsigned));
+
+        Microsoft::Quantum::Simulator::get(sid)->PrepareState(qubits, amplitudes);
     }
 
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned id, _In_ unsigned q)

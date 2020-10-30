@@ -30,7 +30,9 @@ class SimulatorInterface
 
     virtual double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<unsigned> qs) = 0;
 
-    virtual void PrepareState(unsigned n, unsigned* q, double* re, double* im) = 0;
+    virtual void PrepareState(
+        const std::vector<logical_qubit_id>& qubits,
+        const std::vector<ComplexType>& amplitudes) = 0;
 
     // allocate and release
     virtual void allocateQubit(unsigned q) = 0;

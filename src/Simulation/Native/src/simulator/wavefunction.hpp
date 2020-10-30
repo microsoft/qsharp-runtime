@@ -552,9 +552,16 @@ class Wavefunction
     /// \pre: Qubits, listed in `q`, must be unentangled and in state |0>.
     /// place these `n` qubits into superposition of 2^n basis vectors with (re, im) amplitudes, where the order of
     /// qubits in array `q` defines (big or little endian?) order of the basis vectors.
-    void prepare_state(unsigned n, logical_qubit_id* q, double* re, double* im)
+    void prepare_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
-        
+        assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
+        if (num_qubits_ != qubits.size()) throw std::exception("wip!");
+
+        flush();
+        for (size_t i = 0; i < wfn_.size(); i++)
+        {
+            wfn_[i] = amplitudes[i];
+        }
     }
 
     /// measure a qubit

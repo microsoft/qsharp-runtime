@@ -9,8 +9,8 @@
 #include "util/bititerator.hpp"
 #include "util/bitops.hpp"
 
-#include <cmath>
 #include <bitset>
+#include <cmath>
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
@@ -326,24 +326,27 @@ TEST_CASE("Prepare total cat state", "[local_test]")
 {
     Wavefunction<ComplexType> psi;
     constexpr int n = 2;
-    constexpr int N = (1 << n);
+    constexpr size_t N = (static_cast<size_t>(1) << n);
 
-    logical_qubit_id qs[n];
+    std::vector<logical_qubit_id> qs;
     for (int i = 0; i < n; i++)
     {
-        qs[i] = psi.allocate_qubit();
+        qs.push_back(psi.allocate_qubit());
     }
 
-    double re[N] = {1.0 / std::sqrt(2.0), 0.0, 0.0, 1.0 / std::sqrt(2.0)};
-    double im[N] = {0.0, 0.0, 0.0, 0.0};
-    psi.prepare_state(2, qs, re, im);
+    std::vector<ComplexType> amplitudes = {
+        {1.0 / std::sqrt(2.0), 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0 / std::sqrt(2.0), 0.0}};
+    REQUIRE(amplitudes.size() == N);
+
+    psi.prepare_state(qs, amplitudes);
 
     const WavefunctionStorage& data = psi.data();
-    for (int i = 0; i < N; i++)
+    REQUIRE(N == data.size());
+    for (size_t i = 0; i < N; i++)
     {
         INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
         INFO(psi);
-        REQUIRE(data[i] == ComplexType{re[i], im[i]});
+        REQUIRE(data[i] == amplitudes[i]);
     }
 }
 
@@ -351,26 +354,50 @@ TEST_CASE("Prepare total W state", "[local_test]")
 {
     Wavefunction<ComplexType> psi;
     constexpr int n = 3;
-    constexpr int N = (1 << n);
+    constexpr size_t N = (static_cast<size_t>(1) << n);
 
-    logical_qubit_id qs[n];
+    std::vector<logical_qubit_id> qs;
     for (int i = 0; i < n; i++)
     {
-        qs[i] = psi.allocate_qubit();
+        qs.push_back(psi.allocate_qubit());
     }
 
     const double amp = 1.0 / std::sqrt(n);
-    double re[N] = {0.0, amp, amp, 0.0, amp, 0.0, 0.0, 0.0};
-    double im[N] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    psi.prepare_state(2, qs, re, im);
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                           {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    REQUIRE(N == amplitudes.size());
+
+    psi.prepare_state(qs, amplitudes);
 
     const WavefunctionStorage& data = psi.data();
-    for (int i = 0; i < N; i++)
+    REQUIRE(N == data.size());
+    for (size_t i = 0; i < N; i++)
     {
         INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
         INFO(psi);
-        REQUIRE(data[i] == ComplexType{re[i], im[i]});
+        REQUIRE(data[i] == amplitudes[i]);
     }
+}
+
+TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+    constexpr size_t N = (static_cast<size_t>(1) << n);
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+    sim.H(qs[1]);
+
+    const double amp = 1.0 / std::sqrt(n);
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                           {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    REQUIRE(N == amplitudes.size());
+
+    REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
 }
 #endif
 
