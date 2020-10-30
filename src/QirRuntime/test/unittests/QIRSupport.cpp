@@ -56,9 +56,9 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         REQUIRE(this->allocated.IsBitSetAt(id));
         this->allocated.FlipBitAt(id);
     }
-    TernaryBool AreEqualResults(Result r1, Result r2) override
+    bool AreEqualResults(Result r1, Result r2) override
     {
-        return (r1 == r2 ? TernaryBool_True : TernaryBool_False);
+        return (r1 == r2);
     }
 
     bool HaveResultsInFlight() const

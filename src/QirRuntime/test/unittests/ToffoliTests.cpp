@@ -99,23 +99,24 @@ TEST_CASE("Measure and assert probability", "[toffoli]")
     PauliId ziz[count] = {PauliId_Z, PauliId_I, PauliId_Z};
 
     // initial state is |000>
+    IDiagnostics* idig = sim->AsDiagnostics();
     REQUIRE(sim->GetResultValue(sim->Measure(count, zzz, count, qs)) == Result_Zero);
     REQUIRE(sim->GetResultValue(sim->Measure(count, ziz, count, qs)) == Result_Zero);
-    REQUIRE(sim->Assert(count, zzz, qs, sim->UseZero(), ""));
-    REQUIRE(sim->AssertProbability(count, zzz, qs, 1.0, 0.01, ""));
+    REQUIRE(idig->Assert(count, zzz, qs, sim->UseZero(), ""));
+    REQUIRE(idig->AssertProbability(count, zzz, qs, 1.0, 0.01, ""));
 
     // set state to: |010>
     iqa->X(qs[1]);
     REQUIRE(sim->GetResultValue(sim->Measure(count, zzz, count, qs)) == Result_One);
     REQUIRE(sim->GetResultValue(sim->Measure(count, ziz, count, qs)) == Result_Zero);
-    REQUIRE(sim->Assert(count, zzz, qs, sim->UseOne(), ""));
-    REQUIRE(sim->AssertProbability(count, ziz, qs, 1.0, 0.01, ""));
+    REQUIRE(idig->Assert(count, zzz, qs, sim->UseOne(), ""));
+    REQUIRE(idig->AssertProbability(count, ziz, qs, 1.0, 0.01, ""));
 
     // set state to: |111>
     iqa->X(qs[0]);
     iqa->X(qs[2]);
     REQUIRE(sim->GetResultValue(sim->Measure(count, zzz, count, qs)) == Result_One);
     REQUIRE(sim->GetResultValue(sim->Measure(count, ziz, count, qs)) == Result_Zero);
-    REQUIRE(sim->Assert(count, ziz, qs, sim->UseZero(), ""));
-    REQUIRE(sim->AssertProbability(count, zzz, qs, 0.0, 0.01, ""));
+    REQUIRE(idig->Assert(count, ziz, qs, sim->UseZero(), ""));
+    REQUIRE(idig->AssertProbability(count, zzz, qs, 0.0, 0.01, ""));
 }

@@ -45,18 +45,45 @@ namespace Quantum
         virtual void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) = 0;
     };
 
-    struct ISimulator
+    struct IDiagnostics
     {
-        virtual ~ISimulator() {}
+        virtual ~IDiagnostics() {}
 
-        virtual IQuantumGateSet* AsQuantumGateSet() = 0;
-
-        // TODO: Only some simulators 'know' the state -- is it OK to have this method on IQuantumGateSet?
-        // The callback will be invoked on each basis vector (in the standard computational basis) in little-endian
+        // The callback should be invoked on each basis vector (in the standard computational basis) in little-endian
         // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);
         virtual void GetState(TGetStateCallback callback) = 0;
 
+        // Both Assert methods return `true`, if the assert holds, `false` otherwise.
+        virtual bool Assert(
+            long numTargets,
+            PauliId bases[],
+            Qubit targets[],
+            Result result,
+            const char* failureMessage) = 0;
+
+        virtual bool AssertProbability(
+            long numTargets,
+            PauliId bases[],
+            Qubit targets[],
+            double probabilityOfZero,
+            double precision,
+            const char* failureMessage) = 0;
+    };
+
+    struct ISimulator
+    {
+        virtual ~ISimulator() {}
+
+        // The caller is responsible for never accessing the returned pointer beyond the lifetime of the source
+        // ISimulator instance.
+        virtual IQuantumGateSet* AsQuantumGateSet() = 0;
+
+        // Might return nullptr if the simulator doesn't support diagnostics. The caller is responsible for never
+        // accessing the returned pointer beyond the lifetime of the source ISimulator instance.
+        virtual IDiagnostics* AsDiagnostics() = 0;
+
+        // Doesn't necessarily provide insight into the state of the qubit (for that look at IDiagnostics)
         virtual std::string QubitToString(Qubit qubit) = 0;
 
         // Qubit management
@@ -68,28 +95,13 @@ namespace Quantum
         virtual Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) = 0;
 
         virtual void ReleaseResult(Result result) = 0;
-        virtual TernaryBool AreEqualResults(Result r1, Result r2) = 0;
+        virtual bool AreEqualResults(Result r1, Result r2) = 0;
         virtual ResultValue GetResultValue(Result result) = 0;
         // The caller *should not* release results obtained via these two methods. The
         // results are guaranteed to be finalized to the corresponding ResultValue, but
         // it's not required from the runtime to return same Result on subsequent calls.
         virtual Result UseZero() = 0;
         virtual Result UseOne() = 0;
-
-        // Both Assert methods return `true`, if the assert holds, `false` otherwise.
-        virtual bool Assert(
-            long numTargets,
-            PauliId bases[],
-            Qubit targets[],
-            Result result,
-            const char* failureMessage) = 0;
-        virtual bool AssertProbability(
-            long numTargets,
-            PauliId bases[],
-            Qubit targets[],
-            double probabilityOfZero,
-            double precision,
-            const char* failureMessage) = 0;
     };
 
     void SetSimulatorForQIR(ISimulator* sim);

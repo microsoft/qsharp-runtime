@@ -55,7 +55,7 @@ namespace Microsoft
 namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
-    class CFullstateSimulator : public ISimulator, public IQuantumGateSet
+    class CFullstateSimulator : public ISimulator, public IQuantumGateSet, public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -137,6 +137,10 @@ namespace Quantum
         {
             return this;
         }
+        IDiagnostics* AsDiagnostics() override
+        {
+            return this;
+        }
 
         void GetState(TGetStateCallback callback) override
         {
@@ -206,9 +210,9 @@ namespace Quantum
             return reinterpret_cast<Result>(1);
         }
 
-        TernaryBool AreEqualResults(Result r1, Result r2) override
+        bool AreEqualResults(Result r1, Result r2) override
         {
-            return (r1 == r2) ? TernaryBool_True : TernaryBool_False;
+            return (r1 == r2);
         }
 
         void X(Qubit q) override

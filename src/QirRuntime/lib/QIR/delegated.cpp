@@ -128,9 +128,7 @@ extern "C"
         {
             return true;
         }
-        const TernaryBool res = g_sim->AreEqualResults(r1, r2);
-        assert(res != TernaryBool_Undefined);
-        return res == TernaryBool_True;
+        return g_sim->AreEqualResults(r1, r2);
     }
 
     // Returns a string representation of the result.

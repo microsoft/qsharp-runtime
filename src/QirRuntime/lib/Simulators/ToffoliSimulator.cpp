@@ -17,7 +17,7 @@ namespace Quantum
         CToffoliSimulator
         Simulator for reversible classical logic.
     ==============================================================================*/
-    class CToffoliSimulator final : public ISimulator, public IQuantumGateSet
+    class CToffoliSimulator final : public ISimulator, public IQuantumGateSet, public IDiagnostics
     {
         long lastUsedId = -1;
 
@@ -39,32 +39,16 @@ namespace Quantum
         CToffoliSimulator() = default;
         ~CToffoliSimulator() = default;
 
+        ///
+        /// Implementation of ISimulator
+        ///
         IQuantumGateSet* AsQuantumGateSet() override
         {
             return this;
         }
-
-        void X(Qubit qubit) override
+        IDiagnostics* AsDiagnostics() override
         {
-            this->states.FlipBitAt(GetQubitId(qubit));
-        }
-
-        void ControlledX(long numControls, Qubit* const controls, Qubit qubit) override
-        {
-            bool allControlsSet = true;
-            for (long i = 0; i < numControls; i++)
-            {
-                if (!this->states.IsBitSetAt(GetQubitId(controls[i])))
-                {
-                    allControlsSet = false;
-                    break;
-                }
-            }
-
-            if (allControlsSet)
-            {
-                this->states.FlipBitAt(GetQubitId(qubit));
-            }
+            return this;
         }
 
         Result M(Qubit qubit) override
@@ -91,9 +75,9 @@ namespace Quantum
 
         void ReleaseResult(Result result) override {}
 
-        TernaryBool AreEqualResults(Result r1, Result r2) override
+        bool AreEqualResults(Result r1, Result r2) override
         {
-            return r1 == r2 ? TernaryBool_True : TernaryBool_False;
+            return (r1 == r2);
         }
 
         ResultValue GetResultValue(Result result) override
@@ -124,6 +108,15 @@ namespace Quantum
             assert(!this->states.IsBitSetAt(id));
         }
 
+        std::string QubitToString(Qubit qubit) override
+        {
+            const long id = GetQubitId(qubit);
+            return std::to_string(id) + ":" + (this->states.IsBitSetAt(id) ? "1" : "0");
+        }
+
+        ///
+        /// Implementation of IDiagnostics
+        ///
         bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* failureMessage) override
         {
             // Measurements in Toffoli simulator don't change the state.
@@ -145,19 +138,43 @@ namespace Quantum
             const double actualZeroProbability = (Measure(numTargets, bases, numTargets, targets) == zero) ? 1.0 : 0.0;
             return std::abs(actualZeroProbability - probabilityOfZero) < precision;
         }
-        virtual std::string QubitToString(Qubit qubit) override
-        {
-            const long id = GetQubitId(qubit);
-            return std::to_string(id) + ":" + (this->states.IsBitSetAt(id) ? "1" : "0");
-        }
 
-        //
-        // Parts of the interface Toffoli Simulator doesn't support
-        //
         void GetState(TGetStateCallback callback) override
         {
             throw std::logic_error("operation_not_supported");
         }
+
+
+        ///
+        /// Implementation of IQuantumGateSet
+        ///
+        void X(Qubit qubit) override
+        {
+            this->states.FlipBitAt(GetQubitId(qubit));
+        }
+
+        void ControlledX(long numControls, Qubit* const controls, Qubit qubit) override
+        {
+            bool allControlsSet = true;
+            for (long i = 0; i < numControls; i++)
+            {
+                if (!this->states.IsBitSetAt(GetQubitId(controls[i])))
+                {
+                    allControlsSet = false;
+                    break;
+                }
+            }
+
+            if (allControlsSet)
+            {
+                this->states.FlipBitAt(GetQubitId(qubit));
+            }
+        }
+
+
+        //
+        // The rest of the gate set Toffoli simulator doesn't support
+        //
         void Y(Qubit target) override
         {
             throw std::logic_error("operation_not_supported");

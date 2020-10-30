@@ -14,16 +14,15 @@ namespace Quantum
         {
             return this;
         }
-        
+        IDiagnostics* AsDiagnostics() override
+        {
+            return nullptr;
+        }
         Qubit AllocateQubit() override
         {
             throw std::logic_error("not_implemented");
         }
         void ReleaseQubit(Qubit qubit) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        void GetState(TGetStateCallback callback) override
         {
             throw std::logic_error("not_implemented");
         }
@@ -117,21 +116,6 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        bool Assert(long numTargets, PauliId bases[], Qubit targets[], Result result, const char* failureMessage)
-            override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        bool AssertProbability(
-            long numTargets,
-            PauliId bases[],
-            Qubit targets[],
-            double probabilityOfZero,
-            double precision,
-            const char* failureMessage) override
-        {
-            throw std::logic_error("not_implemented");
-        }
         Result M(Qubit target) override
         {
             throw std::logic_error("not_implemented");
@@ -144,7 +128,7 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        TernaryBool AreEqualResults(Result r1, Result r2) override
+        bool AreEqualResults(Result r1, Result r2) override
         {
             throw std::logic_error("not_implemented");
         }

@@ -3,15 +3,6 @@
 // The core types will be exposed in the C-interfaces for interop, thus no
 // namespaces or scoped enums can be used to define them.
 
-/*==============================================================================
-  Helper types
-==============================================================================*/
-enum TernaryBool
-{
-    TernaryBool_False = 0,
-    TernaryBool_True = 1,
-    TernaryBool_Undefined,
-};
 
 /*==============================================================================
   Qubit & Result
@@ -44,16 +35,4 @@ enum PauliId
     PauliId_Y = 3,
 };
 
-static const char PauliChars[4] = {'I', 'X', 'Z', 'Y'};
 
-/*==============================================================================
-  Clifford operators
-==============================================================================*/
-enum CliffordId
-{
-    CliffordId_H = 1,
-    CliffordId_S = 2,
-    CliffordId_SH = 3,
-    CliffordId_HS = 4,
-    CliffordId_HSH = 5,
-};

@@ -55,12 +55,12 @@ TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
     Qubit q = sim->AllocateQubit();
     Result r1 = sim->M(q);
     REQUIRE(Result_Zero == sim->GetResultValue(r1));
-    REQUIRE(TernaryBool_True == sim->AreEqualResults(r1, sim->UseZero()));
+    REQUIRE(sim->AreEqualResults(r1, sim->UseZero()));
 
     iqa->X(q);
     Result r2 = sim->M(q);
     REQUIRE(Result_One == sim->GetResultValue(r2));
-    REQUIRE(TernaryBool_True == sim->AreEqualResults(r2, sim->UseOne()));
+    REQUIRE(sim->AreEqualResults(r2, sim->UseOne()));
 
     sim->ReleaseQubit(q);
     sim->ReleaseResult(r1);
@@ -80,7 +80,7 @@ TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 
     Result r1 = sim->M(q1);
     Result r2 = sim->M(q2);
-    REQUIRE(TernaryBool_True == sim->AreEqualResults(r1, r2));
+    REQUIRE(sim->AreEqualResults(r1, r2));
 
     sim->ReleaseQubit(q1);
     sim->ReleaseQubit(q2);
@@ -123,14 +123,15 @@ TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
     PauliId iz[2] = {PauliId_I, PauliId_Z};
     PauliId xi[2] = {PauliId_X, PauliId_I};
 
-    REQUIRE(sim->AssertProbability(2, zz, qs, 0.0, 1e-10, ""));
-    REQUIRE(sim->AssertProbability(2, iz, qs, 1.0, 1e-10, ""));
-    REQUIRE(sim->AssertProbability(2, xi, qs, 0.5, 1e-10, ""));
+    IDiagnostics* idig = sim->AsDiagnostics();
+    REQUIRE(idig->AssertProbability(2, zz, qs, 0.0, 1e-10, ""));
+    REQUIRE(idig->AssertProbability(2, iz, qs, 1.0, 1e-10, ""));
+    REQUIRE(idig->AssertProbability(2, xi, qs, 0.5, 1e-10, ""));
 
-    REQUIRE(sim->Assert(2, zz, qs, sim->UseOne(), ""));
-    REQUIRE(sim->Assert(2, iz, qs, sim->UseZero(), ""));
-    REQUIRE(!sim->Assert(2, xi, qs, sim->UseZero(), ""));
-    REQUIRE(!sim->Assert(2, xi, qs, sim->UseOne(), ""));
+    REQUIRE(idig->Assert(2, zz, qs, sim->UseOne(), ""));
+    REQUIRE(idig->Assert(2, iz, qs, sim->UseZero(), ""));
+    REQUIRE(!idig->Assert(2, xi, qs, sim->UseZero(), ""));
+    REQUIRE(!idig->Assert(2, xi, qs, sim->UseOne(), ""));
 
     sim->ReleaseQubit(qs[0]);
     sim->ReleaseQubit(qs[1]);
@@ -294,7 +295,7 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     iqa->ControlledX(1, &qs[0], qs[1]);
     // 1/sqrt(2)(|00> + |11>)x|0>
 
-    sim->GetState([](size_t idx, double re, double im) {
+    sim->AsDiagnostics()->GetState([](size_t idx, double re, double im) {
         norm += re * re + im * im;
         REQUIRE(idx < 4);
         switch (idx)
@@ -317,7 +318,7 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     iqa->Y(qs[2]);
     // 1/sqrt(2)(|00> + |11>)xi|1>
 
-    sim->GetState([](size_t idx, double re, double im) {
+    sim->AsDiagnostics()->GetState([](size_t idx, double re, double im) {
         norm += re * re + im * im;
         switch (idx)
         {

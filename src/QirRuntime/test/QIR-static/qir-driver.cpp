@@ -104,7 +104,7 @@ TEST_CASE("QIR: VQE with full state simulator", "[qir]")
     }
 
     // State of the simulator should be fully reset now
-    qapi->GetState([](size_t idx, double re, double im) {
+    qapi->AsDiagnostics()->GetState([](size_t idx, double re, double im) {
         INFO(std::string("|") + std::to_string(idx) + ">:" + std::to_string(re) + "+" + std::to_string(im) + "i");
         if (idx == 0)
         {
@@ -257,10 +257,10 @@ struct CallablesTestQAPI : public Microsoft::Quantum::SimulatorStub
         return reinterpret_cast<Result>(result);
     }
 
-    TernaryBool AreEqualResults(Result r1, Result r2) override
+    bool AreEqualResults(Result r1, Result r2) override
     {
         // those are bogus pointers but it's ok to compare them _as pointers_
-        return r1 == r2 ? TernaryBool_True : TernaryBool_False;
+        return (r1 == r2);
     }
 
     void ReleaseResult(Result result) override {} // the results aren't allocated by this test simulator
@@ -316,10 +316,10 @@ struct ControlFunctorTestQAPI : public Microsoft::Quantum::SimulatorStub
         return UseZero();
     }
 
-    TernaryBool AreEqualResults(Result r1, Result r2) override
+    bool AreEqualResults(Result r1, Result r2) override
     {
         // those are bogus pointers but it's ok to compare them _as pointers_
-        return r1 == r2 ? TernaryBool_True : TernaryBool_False;
+        return (r1 == r2);
     }
 
     void ReleaseResult(Result result) override {} // the results aren't allocated by this test simulator
