@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             {
                 var actual = new TupleC();
-                Assert.Equal(default((Qubit, TupleB)), ((IApplyData)actual).Value);
+                Assert.Equal((null as Qubit, new TupleB()), ((IApplyData)actual).Value);
                 NullOrEmptyQubits(actual);
             }
             {
@@ -47,7 +47,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             {
                 var actual = new TupleE();
-                Assert.Equal(default((Int64, IQArray<Qubit>)), ((IApplyData)actual).Value);
+                var value = ((IApplyData)actual).Value as (long, IQArray<Qubit>)?;
+                Assert.True(value.HasValue);
+                Assert.Equal(0, value.Value.Item1);
+                Assert.Equal(0, value.Value.Item2?.Length);
                 NullOrEmptyQubits(actual);
             }
             {
@@ -57,7 +60,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             {
                 var actual = new TupleH();
-                Assert.Equal(default((TupleD, TupleG)), ((IApplyData)actual).Value);
+                var value = ((IApplyData)actual).Value as (TupleD, TupleG)?;
+                Assert.True(value.HasValue);
+                Assert.NotNull(value.Value.Item1);
+                Assert.NotNull(value.Value.Item2);
+                Assert.Equal(0, value.Value.Item1.Data?.Length);
+                Assert.Null(value.Value.Item2.Item1);
+                Assert.Equal(new TupleF(), value.Value.Item2.Item2);
+                Assert.Equal(new TupleC(), value.Value.Item2.Item3);
+                Assert.Equal(0, value.Value.Item2.Item4?.Data?.Length);
                 NullOrEmptyQubits(actual);
             }
             {
