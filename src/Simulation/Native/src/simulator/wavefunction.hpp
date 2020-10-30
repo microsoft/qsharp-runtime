@@ -558,6 +558,14 @@ class Wavefunction
         if (num_qubits_ != qubits.size()) throw std::exception("wip!");
 
         flush();
+        for (logical_qubit_id q : qubits)
+        {
+            if (!isclassical(q) || getvalue(q))
+            {
+                throw std::exception("Cannot prepare state of entangled qubits or if they are not in state |0>");
+            }
+        }
+
         for (size_t i = 0; i < wfn_.size(); i++)
         {
             wfn_[i] = amplitudes[i];

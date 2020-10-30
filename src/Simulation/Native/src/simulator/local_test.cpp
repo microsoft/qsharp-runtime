@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#ifdef CATCH2_TESTS
 #include "catch.hpp"
-#endif
 
 #include "simulator/simulator.hpp"
 #include "util/bititerator.hpp"
@@ -14,7 +12,7 @@
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
-void test_exp()
+TEST_CASE("test_exp", "[local_test]")
 {
     SimulatorType sim;
 
@@ -48,13 +46,13 @@ void test_exp()
     for (auto q : qs)
     {
         bool m = sim.M(q);
-        assert(!m);
+        CHECK(!m);
     }
 
     sim.release(qs);
 }
 
-void test_teleport()
+TEST_CASE("test_teleport", "[local_test]")
 {
     SimulatorType sim;
 
@@ -82,14 +80,14 @@ void test_teleport()
     sim.Rz((-1.1), q1);
     sim.H(q1);
 
-    assert(sim.M(q1) == false);
+    CHECK_FALSE(sim.M(q1));
 
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
 }
 
-void test_gates()
+TEST_CASE("test_gates", "[local_test]")
 {
     SimulatorType sim;
 
@@ -98,21 +96,21 @@ void test_gates()
 
     sim.CRx(1.0, q1, q2);
 
-    assert(sim.M(q2) == false);
+    CHECK_FALSE(sim.M(q2));
 
     sim.X(q1);
     sim.CRx(1.0, q1, q2);
-    assert(!sim.isclassical(q2));
+    CHECK_FALSE(sim.isclassical(q2));
 
     sim.H(q2);
     sim.CRz(-1.0, q1, q2);
     sim.H(q2);
 
-    assert(sim.M(q2) == false);
+    CHECK_FALSE(sim.M(q2));
 
     sim.X(q2);
 
-    assert(sim.M(q2) == true);
+    CHECK(sim.M(q2));
 
     sim.X(q2);
 
@@ -120,32 +118,31 @@ void test_gates()
     sim.release(q2);
 }
 
-void test_allocate()
+TEST_CASE("test_allocate", "[local_test]")
 {
     SimulatorType sim;
 
     auto const q1 = sim.allocate();
     auto q2 = sim.allocate();
-    assert(q1 == 0);
-    assert(q2 == 1);
+    CHECK(q1 == 0);
+    CHECK(q2 == 1);
 
     auto q3 = sim.allocate();
-    assert(q3 == 2);
+    CHECK(q3 == 2);
 
     sim.release(q2);
     q2 = sim.allocate();
-    assert(q2 == 1);
+    CHECK(q2 == 1);
 
-    assert(sim.num_qubits() == 3);
+    CHECK(sim.num_qubits() == 3);
 
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
 
-    assert(sim.num_qubits() == 0);
+    CHECK(sim.num_qubits() == 0);
 }
 
-#ifdef CATCH2_TESTS
 // This test is poking at the implementation detail of the wave function store and might not be the best idea as the
 // positions of qubits aren't guaranteed to be maintained in specific order and can be optimized by the wave function as
 // it sees fit. However, for simple allocate/release pattern the test is useful to document the difference between
@@ -390,16 +387,52 @@ TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]"
     {
         qs.push_back(sim.allocate());
     }
-    sim.H(qs[1]);
 
     const double amp = 1.0 / std::sqrt(n);
     std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
                                            {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
     REQUIRE(N == amplitudes.size());
 
+    // unentangled but not |0>
+    sim.H(qs[1]);
+    REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
+
+    // entanglement doesn't make things any better
+    sim.CX({qs[1]}, qs[2]);
     REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
 }
-#endif
+
+TEST_CASE("Prepare cat state on two qubits out of three", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+    constexpr size_t N = (static_cast<size_t>(1) << n);
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0},
+                                           {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    REQUIRE(N == amplitudes.size());
+
+    // Notice, that we are listing the qubits in order that doesn't match their allocation order. We are saying here,
+    // that PrepareState should create Bell pair from qs[2] and qs[0]!
+    sim.PrepareState({qs[1], qs[2], qs[0]}, amplitudes);
+    REQUIRE((sim.isclassical(qs[1]) && !sim.M(qs[1])));
+
+    // undo the state change and check that get back into |000>
+    sim.CX({qs[2]}, qs[0]);
+    sim.H(qs[2]);
+    for (int i = 0; i < n; i++)
+    {
+        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
+        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+    }
+}
 
 template <class SIM>
 void set(SIM& sim, bool val, unsigned qubit)
@@ -408,7 +441,7 @@ void set(SIM& sim, bool val, unsigned qubit)
     if (val != is) sim.X(qubit);
 }
 
-void test_multicontrol()
+TEST_CASE("test_multicontrol", "[local_test]")
 {
     SimulatorType sim;
     for (unsigned n = 0; n < 4; ++n)
@@ -427,18 +460,18 @@ void test_multicontrol()
                 set(sim, ((i & (1 << j)) != 0), ctrls[j]);
 
             // controlled is enabled only when all ctrls are 1 (e.g. last one):
-            unsigned enabled = (i == ((1 << n) - 1));
+            bool enabled = (i == ((1 << n) - 1));
             set(sim, 0, q);
-            assert(sim.M(q) == 0);
+            CHECK_FALSE(sim.M(q));
 
             sim.CX(ctrls, q);
-            assert(sim.M(q) == (enabled ? 1 : 0));
+            CHECK(sim.M(q) == enabled);
         }
 
         sim.release(qbits);
         sim.release(ctrls);
 
-        assert(sim.num_qubits() == 0);
+        CHECK(sim.num_qubits() == 0);
     }
 }
 
@@ -475,13 +508,13 @@ void test_extract_qubits_state_simple(int qubits_number)
             auto is2 = std::complex<double>(0, 1.0 / sqrt(2.0));
             if (bits[i])
             {
-                assert(std::norm(res[0] * std::conj(s2) + res[1] * std::conj(is2)) > 1 - tol * tol);
+                CHECK(std::norm(res[0] * std::conj(s2) + res[1] * std::conj(is2)) > 1 - tol * tol);
             }
             else
             {
-                assert(std::norm(res[0]) > 1 - tol * tol);
+                CHECK(std::norm(res[0]) > 1 - tol * tol);
             }
-            assert(issep);
+            CHECK(issep);
         }
 
         for (size_t j = 0; j < qubits_number; ++j)
@@ -499,9 +532,9 @@ void test_extract_qubits_state_simple(int qubits_number)
 void assert_cat_state(WavefunctionStorage const& wfn, double tol)
 {
     std::size_t total_qubits = Microsoft::Quantum::ilog2(wfn.size());
-    assert(abs(norm(wfn[0]) - 0.5) < tol);
-    assert(abs(norm(wfn[(1ull << total_qubits) - 1]) - 0.5) < tol);
-    assert(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
+    CHECK(abs(norm(wfn[0]) - 0.5) < tol);
+    CHECK(abs(norm(wfn[(1ull << total_qubits) - 1]) - 0.5) < tol);
+    CHECK(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
 }
 
 void test_extract_qubits_cat_state(
@@ -512,8 +545,8 @@ void test_extract_qubits_cat_state(
     SimulatorType sim;
     double tol = 1e-5;
 
-    assert(subset.size() >= 2);
-    assert(qubits_number - subset.size() >= 2);
+    CHECK(subset.size() >= 2);
+    CHECK(qubits_number - subset.size() >= 2);
 
     auto const q1 = sim.allocate(qubits_number);
 
@@ -539,9 +572,9 @@ void test_extract_qubits_cat_state(
     bool issep2 = sim.subsytemwavefunction(cmpl, wfn2, tol);
     bool issep3 = sim.subsytemwavefunction(negative_test, wfn3, tol);
 
-    assert(issep1);
-    assert(issep2);
-    assert(!issep3);
+    CHECK(issep1);
+    CHECK(issep2);
+    CHECK(!issep3);
     assert_cat_state(wfn1, tol);
     assert_cat_state(wfn2, tol);
 
@@ -567,7 +600,7 @@ void test_extract_qubits_cat_state(
     sim.release(q1);
 }
 
-void test_extract_qubits_state()
+TEST_CASE("test_extract_qubits_state", "[local_test]")
 {
     test_extract_qubits_state_simple(5);
     test_extract_qubits_cat_state(4, {0, 1}, {0, 2});
@@ -581,21 +614,3 @@ void test_extract_qubits_state()
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
 }
 
-#ifndef CATCH2_TESTS
-int main()
-{
-    std::cerr << "Testing allocate\n";
-    test_allocate();
-    std::cerr << "Testing gates\n";
-    test_gates();
-    std::cerr << "Testing Exp\n";
-    test_exp();
-    std::cerr << "Testing Multicontrol\n";
-    test_multicontrol();
-    std::cerr << "Testing teleport\n";
-    test_teleport();
-    std::cerr << "Testing state extraction\n";
-    test_extract_qubits_state();
-    return 0;
-}
-#endif
