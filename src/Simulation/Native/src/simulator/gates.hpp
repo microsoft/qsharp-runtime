@@ -36,11 +36,11 @@ enum Basis
 class OneQubitGate
 {
   public:
-    OneQubitGate(unsigned q)
+    OneQubitGate(logical_qubit_id q)
         : qubit_(q)
     {
     }
-    unsigned qubit() const
+    logical_qubit_id qubit() const
     {
         return qubit_;
     }
@@ -51,14 +51,14 @@ class OneQubitGate
     }
 
   private:
-    unsigned qubit_;
+    logical_qubit_id qubit_;
 };
 
 /// a general one qubit roitation gate, storing the qubit number and angle
 class RotationGate : public OneQubitGate
 {
   public:
-    RotationGate(double phi, unsigned q)
+    RotationGate(double phi, logical_qubit_id q)
         : OneQubitGate(q)
         , angle_(phi)
     {
@@ -76,7 +76,7 @@ class RotationGate : public OneQubitGate
 class X : public OneQubitGate
 {
   public:
-    X(unsigned q)
+    X(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -97,7 +97,7 @@ class X : public OneQubitGate
 class Y : public OneQubitGate
 {
   public:
-    Y(unsigned q)
+    Y(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -121,7 +121,7 @@ class Y : public OneQubitGate
 class Z : public OneQubitGate
 {
   public:
-    Z(unsigned q)
+    Z(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -142,7 +142,7 @@ class Z : public OneQubitGate
 class H : public OneQubitGate
 {
   public:
-    H(unsigned q)
+    H(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -164,7 +164,7 @@ class H : public OneQubitGate
 class HY : public OneQubitGate
 {
   public:
-    HY(unsigned q)
+    HY(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -187,7 +187,7 @@ class HY : public OneQubitGate
 class AdjHY : public OneQubitGate
 {
   public:
-    AdjHY(unsigned q)
+    AdjHY(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -210,7 +210,7 @@ class AdjHY : public OneQubitGate
 class S : public OneQubitGate
 {
   public:
-    S(unsigned q)
+    S(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -232,7 +232,7 @@ class S : public OneQubitGate
 class AdjS : public OneQubitGate
 {
   public:
-    AdjS(unsigned q)
+    AdjS(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -254,7 +254,7 @@ class AdjS : public OneQubitGate
 class T : public OneQubitGate
 {
   public:
-    T(unsigned q)
+    T(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -277,7 +277,7 @@ class T : public OneQubitGate
 class AdjT : public OneQubitGate
 {
   public:
-    AdjT(unsigned q)
+    AdjT(logical_qubit_id q)
         : OneQubitGate(q)
     {
     }
@@ -300,7 +300,7 @@ class AdjT : public OneQubitGate
 class G : public RotationGate
 {
   public:
-    G(RealType phi, unsigned q)
+    G(RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
     {
     }
@@ -323,7 +323,7 @@ class G : public RotationGate
 class Rx : public RotationGate
 {
   public:
-    Rx(RealType phi, unsigned q)
+    Rx(RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
     {
     }
@@ -347,7 +347,7 @@ class Rx : public RotationGate
 class Ry : public RotationGate
 {
   public:
-    Ry(RealType phi, unsigned q)
+    Ry(RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
     {
     }
@@ -371,7 +371,7 @@ class Ry : public RotationGate
 class Rz : public RotationGate
 {
   public:
-    Rz(RealType phi, unsigned q)
+    Rz(RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
     {
     }
@@ -395,7 +395,7 @@ class Rz : public RotationGate
 class R1 : public RotationGate
 {
   public:
-    R1(RealType phi, unsigned q)
+    R1(RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
     {
     }
@@ -419,7 +419,7 @@ class R1 : public RotationGate
 class R1Frac : public R1
 {
   public:
-    R1Frac(int k, int n, unsigned q)
+    R1Frac(int k, int n, logical_qubit_id q)
         : R1(M_PI * static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
     {
     }
@@ -434,7 +434,7 @@ class R1Frac : public R1
 class R : public RotationGate
 {
   public:
-    R(Basis b, RealType phi, unsigned q)
+    R(Basis b, RealType phi, logical_qubit_id q)
         : RotationGate(phi, q)
         , b_(b)
     {
@@ -475,7 +475,7 @@ class R : public RotationGate
 class RFrac : public R
 {
   public:
-    RFrac(Basis b, int k, int n, unsigned q)
+    RFrac(Basis b, int k, int n, logical_qubit_id q)
         : R(b, -2. * M_PI * static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
     {
     }
@@ -484,6 +484,7 @@ class RFrac : public R
         return "RFrac";
     }
 };
+
 } // namespace Gates
 } // namespace SIMULATOR
 } // namespace Quantum
