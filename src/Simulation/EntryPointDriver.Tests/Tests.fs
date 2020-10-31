@@ -36,7 +36,7 @@ let private testFile = Path.GetFullPath "Tests.qs"
 let private testNamespace = "EntryPointTest"
 
 /// <summary>
-/// The source code for each test case, indexed by the test case name.
+/// A map where each key is a test case name, and each value is the source code of the test case.
 /// </summary>
 /// <remarks>
 /// Each test case corresponds to a section from <see cref="testFile"/>, separated by "// ---". The text immediately
