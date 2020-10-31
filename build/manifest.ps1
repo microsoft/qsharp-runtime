@@ -37,7 +37,7 @@ $artifacts = @{
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
         ".\src\Simulation\CsharpGeneration\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.CsharpGeneration.dll",
         ".\src\Simulation\CsharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.CsharpGeneration.App.dll",
-        ".\src\Simulation\CsharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.RoslynWrapper.dll",
+        ".\src\Simulation\RoslynWrapper\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.RoslynWrapper.dll",
         ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
         ".\src\Simulation\QsharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
