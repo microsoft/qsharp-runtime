@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+// Each test case is separated by "// ---". The text immediately after "// ---" until the end of the line is the name of
+// the test case, which usually corresponds to a test name in Tests.fs.
+
 //
 // No Options
 //

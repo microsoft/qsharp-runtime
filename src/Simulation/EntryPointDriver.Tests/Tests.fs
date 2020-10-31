@@ -35,16 +35,20 @@ let private testFile = Path.GetFullPath "Tests.qs"
 /// The namespace used for the test cases.
 let private testNamespace = "EntryPointTest"
 
-/// The test case for the given test name.
-let private testCase =
-    let cases =
-        File.ReadAllText testFile
-        |> fun text -> text.Split "// ---"
-        |> Seq.map (fun case ->
-            let parts = case.Split (Environment.NewLine, 2)
-            parts.[0].Trim (), parts.[1])
-        |> Map.ofSeq
-    fun name -> cases |> Map.find name
+/// <summary>
+/// The source code for each test case, indexed by the test case name.
+/// </summary>
+/// <remarks>
+/// Each test case corresponds to a section from <see cref="testFile"/>, separated by "// ---". The text immediately
+/// after "// ---" until the end of the line is the name of the test case.
+/// </remarks>
+let private testCases =
+    File.ReadAllText testFile
+    |> fun text -> text.Split "// ---"
+    |> Seq.map (fun case ->
+        let parts = case.Split (Environment.NewLine, 2)
+        parts.[0].Trim (), parts.[1])
+    |> Map.ofSeq
 
 /// Compiles the Q# source code.
 let private compileQSharp source =
@@ -113,9 +117,9 @@ let private compileCSharp (sources : string seq) =
     Assembly.Load (stream.ToArray ())
 
 /// The assembly for the given test case assembly constants.
-let private testAssembly testNum constants =
-    testNum
-    |> testCase
+let private testAssembly testName constants =
+    testCases
+    |> Map.find testName
     |> compileQSharp
     |> generateCSharp constants
     |> compileCSharp
