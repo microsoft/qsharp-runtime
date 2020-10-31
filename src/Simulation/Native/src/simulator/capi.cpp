@@ -59,8 +59,7 @@ extern "C"
         {
             amplitudes.push_back({re[i], im[i]});
         }
-        std::vector<unsigned> qubits(n);
-        std::memcpy(qubits.data(), q, n*sizeof(unsigned));
+        std::vector<unsigned> qubits(q, q + n);
 
         Microsoft::Quantum::Simulator::get(sid)->PrepareState(qubits, amplitudes);
     }

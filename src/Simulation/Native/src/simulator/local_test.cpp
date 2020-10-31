@@ -319,44 +319,49 @@ TEST_CASE("Clustering", "[local_test]")
     }
 }
 
+void CheckAllZeros(SimulatorType& sim, const std::vector<logical_qubit_id>& qs)
+{
+    for (size_t i = 0; i < qs.size(); i++)
+    {
+        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
+        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+    }
+}
+
 TEST_CASE("Prepare total cat state", "[local_test]")
 {
-    Wavefunction<ComplexType> psi;
+    SimulatorType sim;
     constexpr int n = 2;
     constexpr size_t N = (static_cast<size_t>(1) << n);
 
     std::vector<logical_qubit_id> qs;
     for (int i = 0; i < n; i++)
     {
-        qs.push_back(psi.allocate_qubit());
+        qs.push_back(sim.allocate());
     }
 
-    std::vector<ComplexType> amplitudes = {
-        {1.0 / std::sqrt(2.0), 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0 / std::sqrt(2.0), 0.0}};
+    const double amp = 1.0 / std::sqrt(n);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
     REQUIRE(amplitudes.size() == N);
 
-    psi.prepare_state(qs, amplitudes);
+    sim.PrepareState(qs, amplitudes);
 
-    const WavefunctionStorage& data = psi.data();
-    REQUIRE(N == data.size());
-    for (size_t i = 0; i < N; i++)
-    {
-        INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
-        INFO(psi);
-        REQUIRE(data[i] == amplitudes[i]);
-    }
+    // undo the injected state back to |00>
+    sim.CX({qs[0]}, qs[1]);
+    sim.H(qs[0]);
+    CheckAllZeros(sim, qs);
 }
 
 TEST_CASE("Prepare total W state", "[local_test]")
 {
-    Wavefunction<ComplexType> psi;
+    SimulatorType sim;
     constexpr int n = 3;
     constexpr size_t N = (static_cast<size_t>(1) << n);
 
     std::vector<logical_qubit_id> qs;
     for (int i = 0; i < n; i++)
     {
-        qs.push_back(psi.allocate_qubit());
+        qs.push_back(sim.allocate());
     }
 
     const double amp = 1.0 / std::sqrt(n);
@@ -364,19 +369,11 @@ TEST_CASE("Prepare total W state", "[local_test]")
                                            {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
     REQUIRE(N == amplitudes.size());
 
-    psi.prepare_state(qs, amplitudes);
-
-    const WavefunctionStorage& data = psi.data();
-    REQUIRE(N == data.size());
-    for (size_t i = 0; i < N; i++)
-    {
-        INFO(std::string("amplitudes not equal at |") + std::bitset<n>(i).to_string() + std::string(">"));
-        INFO(psi);
-        REQUIRE(data[i] == amplitudes[i]);
-    }
+    sim.PrepareState(qs, amplitudes);
+    CHECK(sim.Measure({Gates::PauliZ, Gates::PauliZ, Gates::PauliZ}, qs));
 }
 
-TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]")
+TEST_CASE("Should fail to inject total state if qubits aren't all |0>", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 3;
@@ -402,7 +399,7 @@ TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]"
     REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
 }
 
-TEST_CASE("Prepare cat state on two qubits out of three", "[local_test]")
+TEST_CASE("Prepare total state on reordered qubits", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 3;
@@ -420,13 +417,58 @@ TEST_CASE("Prepare cat state on two qubits out of three", "[local_test]")
     REQUIRE(N == amplitudes.size());
 
     // Notice, that we are listing the qubits in order that doesn't match their allocation order. We are saying here,
-    // that PrepareState should create Bell pair from qs[2] and qs[0]!
+    // that PrepareState should create Bell pair from qs[1] and qs[2]!
     sim.PrepareState({qs[1], qs[2], qs[0]}, amplitudes);
-    REQUIRE((sim.isclassical(qs[1]) && !sim.M(qs[1])));
+    REQUIRE((sim.isclassical(qs[0]) && !sim.M(qs[0])));
 
-    // undo the state change and check that get back into |000>
-    sim.CX({qs[2]}, qs[0]);
-    sim.H(qs[2]);
+    // undo the state change and check that the whole system is back to |000>
+    sim.CX({qs[1]}, qs[2]);
+    sim.H(qs[1]);
+    for (int i = 0; i < n; i++)
+    {
+        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
+        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+    }
+}
+
+TEST_CASE("Subsystem state preparation not supported yet", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 2;
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}};
+
+    REQUIRE_THROWS(sim.PrepareState({qs[1]}, amplitudes));
+}
+
+TEST_CASE("Prepare cat state on two qubits out of three", "[skip]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+
+    sim.H(qs[0]);
+    sim.PrepareState({qs[1], qs[2]}, amplitudes);
+
+    // undo the changes and check that the whole system is back to |000>
+    sim.CX({qs[1]}, qs[2]);
+    sim.H(qs[1]);
+    sim.H(qs[0]);
     for (int i = 0; i < n; i++)
     {
         INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
@@ -613,4 +655,3 @@ TEST_CASE("test_extract_qubits_state", "[local_test]")
     test_extract_qubits_cat_state(6, {0, 1, 3}, {0, 1});
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
 }
-
