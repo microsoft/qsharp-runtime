@@ -23,8 +23,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// The qubit manager makes sure that trace data array for qubits 
         /// is initialized with objects created by qubitTraceDataInitializers callbacks
         /// </summary>
-        public TraceableQubitManager( Func<long,object>[] qubitTraceDataInitializers ) 
-            : base(NumQubits, mayExtendCapacity : true, disableBorrowing : false)
+        public TraceableQubitManager( Func<long,object>[] qubitTraceDataInitializers, bool optimizeDepth ) 
+            : base(NumQubits, mayExtendCapacity : true, disableBorrowing : false, encourageReuse: !optimizeDepth)
         {
             this.qubitTraceDataInitializers = qubitTraceDataInitializers.Clone() as
                 Func<long, object>[];

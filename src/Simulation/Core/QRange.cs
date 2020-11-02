@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Core
     /// </summary>
     public class QRange : IEnumerable<long>
     {
-        public QRange() : this(0, 1, 0)
+        public QRange() : this(1, 1, 0)
         {
         }
 
@@ -61,8 +61,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// Returns an empty range.
         /// </summary>
-        public static QRange Empty =>
-            new QRange(0L, -1L);
+        public static QRange Empty => new QRange();
 
         /// <summary>
         /// Returns true if the range is empty.

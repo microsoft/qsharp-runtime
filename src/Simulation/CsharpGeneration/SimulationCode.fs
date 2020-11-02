@@ -1240,7 +1240,7 @@ module SimulationCode =
         let disposeSim = ``ident`` "disposeSim"
         let ``this.Output`` = ``ident`` "this" <|.|> ``ident`` "Output"
         let ``sim.OnLog`` = baseSim <|.|> ``ident`` "OnLog"
-        let Run = generic "Run" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
+        let Execute = generic "Execute" ``<<`` [opName; "QVoid"; "QVoid"] ``>>``
 
         let simCond = sim |> ``is assign`` "Microsoft.Quantum.Simulation.Common.SimulatorBase" baseSim .&&. ``this.Output`` .!=. ``null``
 
@@ -1248,10 +1248,28 @@ module SimulationCode =
         let assignLogEvent =
             ``if`` ``(`` simCond ``)``
                 [ ``sim.OnLog`` <+=> (``this.Output`` <|.|> ``ident`` "WriteLine") ] None
-        let ``sim.Run.Wait`` = sim <.> (Run, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) <.> ((``ident`` "Wait"), []) |> statement
+        let ``sim.Execute`` = sim <.> (Execute, [ ``ident`` "QVoid" <|.|> ``ident`` "Instance"]) |> statement
         let disposeOfRun =
             ``if`` ``(`` (sim |> ``is assign`` "IDisposable" disposeSim) ``)``
                 [ disposeSim <.> ((``ident`` "Dispose"), []) |> statement ] None
+
+        let errMsg = ``literal`` "Q# Test failed. For details see the Standard output below."
+
+        let tryRunCatch =
+            ``try``
+                [
+                    ``sim.Execute``
+                ]
+                [
+                    ``catch`` None
+                        [
+                            (``ident`` "Xunit.Assert") <.> ((``ident`` "True"), [``false`` :> ExpressionSyntax; errMsg]) |> (statement >> ``#line`` (opStart + 1) opSourceFile)
+                        ]
+                ]
+                (Some (``finally`` 
+                    [
+                        ``disposeOfRun``
+                    ]))
 
         ``attributes``
             [
@@ -1261,7 +1279,7 @@ module SimulationCode =
             ]
             (``method`` "void" opName ``<<`` [] ``>>`` ``(`` [] ``)`` [``public``]
                 ``{``
-                    [getSimulator; assignLogEvent; ``sim.Run.Wait``; disposeOfRun]
+                    [getSimulator; assignLogEvent; tryRunCatch]
                 ``}``
                 |> ``with trivia`` (``#lineNr`` (opStart + 1) opSourceFile) // we need 1-based line numbers here, and opStart is zero-based
             )
@@ -1443,15 +1461,12 @@ module SimulationCode =
         let context = globalContext.setUdt udt
         let name = userDefinedName None udt.FullName.Name.Value
         let qsharpType = udt.Type
-        let buildEmtpyConstructor =
-            let baseTupleType =
-                match qsharpType.Resolution with
-                | ArrayType b -> roslynTypeName context b |> sprintf "QArray<%s>"
-                | _ -> (roslynTypeName context qsharpType)
-            let defaultValue = match qsharpType.Resolution with | ArrayType _ -> [ sprintf "new %s()" baseTupleType] | _ -> [ sprintf "default(%s)" baseTupleType ]
-            let args = []
-            ``constructor`` name ``(`` args ``)``
-                ``:`` defaultValue
+        let buildEmptyConstructor =
+            let defaultValue =
+                roslynTypeName context qsharpType
+                |> sprintf "global::Microsoft.Quantum.Simulation.Core.Default.OfType<%s>()"
+            ``constructor`` name ``(`` [] ``)``
+                ``:`` [ defaultValue ]
                 [ ``public`` ]
                 ``{``
                     []
@@ -1522,7 +1537,7 @@ module SimulationCode =
         let baseClass     = ``simpleBase`` baseClassName
         let modifiers     = [ classAccessModifier udt.Modifiers.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
-        let constructors  = [ buildEmtpyConstructor; buildBaseTupleConstructor ]
+        let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType
         let itemFields    = buildNamedItemFields @ buildItemFields
         let allFields     = itemFields @ qubitsField

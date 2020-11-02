@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # Summary
     /// Given two operations, asserts that they act identically for all input states.
     ///
-    /// This assertion is implemented by using the Choi–Jamiłkowski isomorphism to reduce
+    /// This assertion is implemented by using the Choi–Jamiołkowski isomorphism to reduce
     /// the assertion to one of a qubit state assertion on two entangled registers.
     /// Thus, this operation needs only a single call to each operation being tested,
     /// but requires twice as many qubits to be allocated.

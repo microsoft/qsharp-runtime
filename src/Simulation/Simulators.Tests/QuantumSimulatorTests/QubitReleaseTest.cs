@@ -33,6 +33,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             await ReleaseMeasuredQubitCheck.Run(sim);
         }
 
+        //test to check that qubits cannot be released after multiple qubit measure
+        [Fact]
+        public async Task MeasuredMultipleQubitsReleaseTest()
+        {
+            var sim = new QuantumSimulator();
+
+            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => ReleaseMeasureMultipleQubitCheck.Run(sim));
+        }
+
         //test to check that qubit that is released and reallocated is in state |0>
         [Fact]
         public async Task ReallocateQubitInGroundStateTest()

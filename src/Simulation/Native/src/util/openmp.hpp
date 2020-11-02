@@ -5,8 +5,8 @@
 
 #include "config.hpp"
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
 #ifdef _OPENMP
 #include "omp.h"
@@ -89,20 +89,19 @@ class omp_recursive_mutex
     omp_nest_lock_t _mutex;
 };
 
-  using mutex_type = omp_mutex;
-  using recursive_mutex_type = omp_recursive_mutex;
+using mutex_type = omp_mutex;
+using recursive_mutex_type = omp_recursive_mutex;
 
 #else
-  using mutex_type = std::mutex;
-  using recursive_mutex_type = std::recursive_mutex;
+using mutex_type = std::mutex;
+using recursive_mutex_type = std::recursive_mutex;
 #endif
-  
 
-}
-  using openmp::mutex_type;
-  using openmp::recursive_mutex_type;
-  using lock_type = std::lock_guard<mutex_type>;
-  using recursive_lock_type = std::lock_guard<recursive_mutex_type>;
+} // namespace openmp
+using openmp::mutex_type;
+using openmp::recursive_mutex_type;
+using lock_type = std::lock_guard<mutex_type>;
+using recursive_lock_type = std::lock_guard<recursive_mutex_type>;
 
-}
-}
+} // namespace Quantum
+} // namespace Microsoft
