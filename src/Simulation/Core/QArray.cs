@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Newtonsoft.Json;
 
 namespace Microsoft.Quantum.Simulation.Core
@@ -98,17 +97,10 @@ namespace Microsoft.Quantum.Simulation.Core
             }
 
             /// <summary>
-            /// Creates an array of size given by capacity and default-initializes 
-            /// array elements. Uses C# keyword <code>default</code> to initialize array elements. 
+            /// Creates an array of size given by capacity and default-initializes array elements. Uses the default Q#
+            /// value to initialize array elements.
             /// </summary>
-            public QArrayInner(long capacity)
-            {
-                storage = new List<T>((int)capacity);
-                for (var i = 0L; i < capacity; ++i)
-                {
-                    storage.Add(CreateDefault());
-                }
-            }
+            public QArrayInner(long capacity) => Extend(capacity);
 
             public T GetElement(long index) =>
                 storage == null
@@ -143,19 +135,18 @@ namespace Microsoft.Quantum.Simulation.Core
 
             public void Extend(long newLength)
             {
-                if (storage == null)
+                var newLengthInt = Convert.ToInt32(newLength);
+                if (storage is null)
                 {
-                    storage = new List<T>();
+                    storage = new List<T>(newLengthInt);
                 }
-                long oldLength = storage.Count;
-                for (int i = 0; i < (newLength - oldLength); i++)
+                else if (storage.Capacity < newLengthInt)
                 {
-                    T obj = CreateDefault();
-                    storage.Add(obj);
+                    storage.Capacity = newLengthInt;
                 }
+                storage.AddRange(Enumerable.Repeat(Default.OfType<T>(), newLengthInt - storage.Count));
             }
         }
-
 
         private QArrayInner storage;
         private long start = 0;
@@ -173,25 +164,6 @@ namespace Microsoft.Quantum.Simulation.Core
             start = 0;
             step = 1;
         }
-
-        // Returns the default value of an object of this type of array. Normally null or 0, but for things like
-        // ValueTuples, it returns an empty instance of that value tuple.
-        private static T CreateDefault()
-        {
-            if (typeof(T).IsValueType || typeof(T).IsAbstract || typeof(T) == typeof(String) || typeof(T) == typeof(QVoid))
-            {
-                return default(T);
-            }
-            else
-            {
-                // First look for an empty constructor
-                ConstructorInfo defaultConstructor = typeof(T).GetConstructor(Type.EmptyTypes);
-                return defaultConstructor != null
-                    ? (T)(defaultConstructor.Invoke(new object[] { }))
-                    : Activator.CreateInstance<T>();
-            }
-        }
-
 
         /// <summary>
         /// Create an array of length 0.
@@ -508,7 +480,7 @@ namespace Microsoft.Quantum.Simulation.Core
                 currentIndex = -1;
             }
 
-            public T Current => currentIndex >= 0 ? array[currentIndex] : CreateDefault();
+            public T Current => currentIndex >= 0 ? array[currentIndex] : Default.OfType<T>();
 
             object IEnumerator.Current => this.Current;
 
