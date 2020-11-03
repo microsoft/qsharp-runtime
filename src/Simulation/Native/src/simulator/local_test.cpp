@@ -319,7 +319,7 @@ TEST_CASE("Clustering", "[local_test]")
     }
 }
 
-TEST_CASE("isclassical", "[local_test")
+TEST_CASE("isclassical", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 2;
@@ -337,6 +337,144 @@ TEST_CASE("isclassical", "[local_test")
     sim.CX({q1}, q2);
     CHECK_FALSE(sim.isclassical(q1));
     CHECK_FALSE(sim.isclassical(q2));
+}
+
+TEST_CASE("get_register", "[local_test]")
+{
+    // 174 ~     |10101110>
+    // positions: 76543210
+    //           |_0__11__>
+    CHECK(3 == detail::get_register({2, 3, 6}, 174)); // {1,1,0} ~ |011> ~ 3
+    CHECK(5 == detail::get_register({3, 6, 2}, 174)); // {1,0,1} ~ |101> ~ 5
+    CHECK(6 == detail::get_register({6, 3, 2}, 174)); // {0,1,1} ~ |110> ~ 6
+}
+
+TEST_CASE("set_register", "[local_test]")
+{
+    // 174 ~     |10101110>
+    // positions: 76543210
+    //           |1_10__10>
+
+    // no reordering
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 174 /*|10101110>*/));
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 162 /*|10100010>*/));
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 226 /*|11100010>*/));
+
+    // with reordering
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|110>*/, 174 /*|10101110>*/));
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|110>*/, 162 /*|10100010>*/));
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|011>*/, 226 /*|11100010>*/));
+}
+
+void CheckWaveFunction(const std::vector<ComplexType>& expected, const WavefunctionStorage& wfn)
+{
+    REQUIRE(expected.size() == wfn.size());
+    for (size_t i = 0; i < expected.size(); i++)
+    {
+        INFO(std::string("amplitude mismatch at ") + std::to_string(i));
+        CHECK(expected[i] == wfn[i]);
+    }
+}
+
+TEST_CASE("permute_basis", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+
+    // Inject state, which is an equal superposition of |000> + |001> + |010> + |110> + |111>
+    // For this test we don't need to normalize the wave function but `amp` makes it more readable.
+    const double amp = 1.0 / std::sqrt(5);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                           {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}, {amp, 0.0}};
+    psi.inject_state({q0, q1, q2}, amplitudes);
+
+    SECTION("identity permutation")
+    {
+        size_t permutations[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+        CheckWaveFunction(amplitudes, psi.data());
+    }
+
+    SECTION("swap q0 and q1")
+    {
+        size_t permutations[4] = {0, 2, 1, 3};
+        psi.permute_basis({q0, q1}, 4, permutations);
+
+        // |000> + |001> + |010> + |110> + |111> -> |000> + |010> + |001> + |101> + |111>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                             {0.0, 0.0}, {amp, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("cycle q0 -> q1 -> q2 -> q0")
+    {
+        size_t permutations[8] = {0, 2, 4, 6, 1, 3, 5, 7};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        // |000> + |001> + |010> + |110> + |111> -> |000> + |010> + |100> + |101> + |111>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {0.0, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                             {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("permutation of basis vectors of a single qubit")
+    {
+        size_t permutations[2] = {1, 0};
+        psi.permute_basis({q1}, 2, permutations); // this is equivalent to X(q1)
+
+        // |000> + |001> + |010> + |110> + |111> -> |010> + |011> + |000> + |100> + |101>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {0.0, 0.0}, {amp, 0.0}, {amp, 0.0},
+                                             {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("a more complex permutation of basis")
+    {
+        size_t permutations[8] = {4, 2, 3, 6, 0, 5, 1, 7}; // (04)(1236)(5)(7)
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {amp, 0.0},
+                                             {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+}
+
+TEST_CASE("permute_basis depends on the order of logical qubits", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+
+    // Inject state, which would allow us to easily check permutations. It's not a normalized state but for this
+    // test it doesn't matter.
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0},
+                                           {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0}, {7.0, 0.0}};
+    psi.inject_state({q0, q1, q2}, amplitudes);
+
+    SECTION("q0-q1-q2 order")
+    {
+        size_t permutations[8] = {1, 2, 3, 4, 5, 6, 7, 0};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{7.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0},
+                                             {3.0, 0.0}, {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("q1-q0-q2 order")
+    {
+        size_t permutations[8] = {1, 2, 3, 4, 5, 6, 7, 0};
+        psi.permute_basis({q1, q0, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{7.0, 0.0}, {2.0, 0.0}, {0.0, 0.0}, {1.0, 0.0},
+                                             {3.0, 0.0}, {6.0, 0.0}, {4.0, 0.0}, {5.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
 }
 
 void CheckAllZeros(SimulatorType& sim, const std::vector<logical_qubit_id>& qs)
