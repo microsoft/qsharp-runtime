@@ -550,9 +550,10 @@ class Wavefunction
         return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
     }
 
-    /// \pre: Qubits, listed in `q`, must be unentangled and in state |0>.
-    /// place these `n` qubits into superposition of 2^n basis vectors with (re, im) amplitudes, where the order of
-    /// qubits in array `q` defines (big or little endian?) order of the basis vectors.
+    /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
+    /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
+    /// qubits in array `q` defines the order of the basis vectors (little endian).
+    /// NB: at the moment supported only total state injection on all currently allocated qubits
     void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());

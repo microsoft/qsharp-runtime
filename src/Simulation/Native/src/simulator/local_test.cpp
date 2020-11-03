@@ -319,6 +319,26 @@ TEST_CASE("Clustering", "[local_test]")
     }
 }
 
+TEST_CASE("isclassical", "[local_test")
+{
+    SimulatorType sim;
+    constexpr int n = 2;
+    logical_qubit_id q1 = sim.allocate();
+    logical_qubit_id q2 = sim.allocate();
+
+    CHECK(sim.isclassical(q1));
+    CHECK(sim.isclassical(q2));
+
+    sim.H(q1);
+    sim.X(q2);
+    CHECK_FALSE(sim.isclassical(q1));
+    CHECK(sim.isclassical(q2));
+
+    sim.CX({q1}, q2);
+    CHECK_FALSE(sim.isclassical(q1));
+    CHECK_FALSE(sim.isclassical(q2));
+}
+
 void CheckAllZeros(SimulatorType& sim, const std::vector<logical_qubit_id>& qs)
 {
     for (size_t i = 0; i < qs.size(); i++)
@@ -350,27 +370,6 @@ TEST_CASE("Prepare total cat state", "[local_test]")
     sim.CX({qs[0]}, qs[1]);
     sim.H(qs[0]);
     CheckAllZeros(sim, qs);
-}
-
-TEST_CASE("Prepare total W state", "[local_test]")
-{
-    SimulatorType sim;
-    constexpr int n = 3;
-    constexpr size_t N = (static_cast<size_t>(1) << n);
-
-    std::vector<logical_qubit_id> qs;
-    for (int i = 0; i < n; i++)
-    {
-        qs.push_back(sim.allocate());
-    }
-
-    const double amp = 1.0 / std::sqrt(n);
-    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
-                                           {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
-    REQUIRE(N == amplitudes.size());
-
-    sim.InjectState(qs, amplitudes);
-    CHECK(sim.Measure({Gates::PauliZ, Gates::PauliZ, Gates::PauliZ}, qs));
 }
 
 TEST_CASE("Should fail to inject total state if qubits aren't all |0>", "[local_test]")
