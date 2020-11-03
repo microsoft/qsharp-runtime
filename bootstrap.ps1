@@ -11,6 +11,14 @@ Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators")
     .\FindNuspecReferences.ps1
 Pop-Location
 
+if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+    Push-Location (Join-Path $PSScriptRoot "src/QirRuntime")
+        .\install-prereqs.ps1
+    Pop-Location
+} else {
+    Write-Host "Skipping installing prerequisites for qir runtime because ENABLE_QIRRUNTIME variable set to: $Env:ENABLE_QIRRUNTIME."
+}
+
 # bootstrap native folder
 if ($Env:ENABLE_NATIVE -ne "false") {
     ## Run the right script based on the OS.
