@@ -557,7 +557,7 @@ class Wavefunction
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
 
-        if (num_qubits_ != qubits.size()) throw std::exception("Subsystem state injection not supported (yet)");
+        if (num_qubits_ != qubits.size()) throw std::runtime_error("Subsystem state injection not supported (yet)");
 
         flush();
 
@@ -567,7 +567,7 @@ class Wavefunction
             if (!kernels::isclassical(wfn_, get_qubit_position(q))
                 || kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
             {
-                throw std::exception("Cannot prepare state of entangled qubits or if they are not in state |0>");
+                throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
             }
         }
 
