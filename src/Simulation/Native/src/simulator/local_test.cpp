@@ -344,7 +344,7 @@ TEST_CASE("Prepare total cat state", "[local_test]")
     std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
     REQUIRE(amplitudes.size() == N);
 
-    sim.PrepareState(qs, amplitudes);
+    sim.InjectState(qs, amplitudes);
 
     // undo the injected state back to |00>
     sim.CX({qs[0]}, qs[1]);
@@ -369,7 +369,7 @@ TEST_CASE("Prepare total W state", "[local_test]")
                                            {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
     REQUIRE(N == amplitudes.size());
 
-    sim.PrepareState(qs, amplitudes);
+    sim.InjectState(qs, amplitudes);
     CHECK(sim.Measure({Gates::PauliZ, Gates::PauliZ, Gates::PauliZ}, qs));
 }
 
@@ -392,11 +392,11 @@ TEST_CASE("Should fail to inject total state if qubits aren't all |0>", "[local_
 
     // unentangled but not |0>
     sim.H(qs[1]);
-    REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
+    REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
 
     // entanglement doesn't make things any better
     sim.CX({qs[1]}, qs[2]);
-    REQUIRE_THROWS(sim.PrepareState(qs, amplitudes));
+    REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
 }
 
 TEST_CASE("Prepare total state on reordered qubits", "[local_test]")
@@ -417,8 +417,8 @@ TEST_CASE("Prepare total state on reordered qubits", "[local_test]")
     REQUIRE(N == amplitudes.size());
 
     // Notice, that we are listing the qubits in order that doesn't match their allocation order. We are saying here,
-    // that PrepareState should create Bell pair from qs[1] and qs[2]!
-    sim.PrepareState({qs[1], qs[2], qs[0]}, amplitudes);
+    // that InjectState should create Bell pair from qs[1] and qs[2]!
+    sim.InjectState({qs[1], qs[2], qs[0]}, amplitudes);
     REQUIRE((sim.isclassical(qs[0]) && !sim.M(qs[0])));
 
     // undo the state change and check that the whole system is back to |000>
@@ -445,7 +445,7 @@ TEST_CASE("Subsystem state preparation not supported yet", "[local_test]")
     const double amp = 1.0 / std::sqrt(2);
     std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}};
 
-    REQUIRE_THROWS(sim.PrepareState({qs[1]}, amplitudes));
+    REQUIRE_THROWS(sim.InjectState({qs[1]}, amplitudes));
 }
 
 TEST_CASE("Prepare cat state on two qubits out of three", "[skip]")
@@ -463,7 +463,7 @@ TEST_CASE("Prepare cat state on two qubits out of three", "[skip]")
     std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
 
     sim.H(qs[0]);
-    sim.PrepareState({qs[1], qs[2]}, amplitudes);
+    sim.InjectState({qs[1], qs[2]}, amplitudes);
 
     // undo the changes and check that the whole system is back to |000>
     sim.CX({qs[1]}, qs[2]);

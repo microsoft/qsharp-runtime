@@ -30,7 +30,7 @@ class SimulatorInterface
 
     virtual double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<unsigned> qs) = 0;
 
-    virtual void PrepareState(
+    virtual void InjectState(
         const std::vector<logical_qubit_id>& qubits,
         const std::vector<ComplexType>& amplitudes) = 0;
 
