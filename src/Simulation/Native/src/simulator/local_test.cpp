@@ -503,6 +503,8 @@ TEST_CASE("Perf of injecting equal superposition state", "[micro_benchmark]")
         {
             sim.H(q);
         }
+        // force the simulator to flush
+        sim.M(qs[0]);
         std::cout << "Quantum state preparation:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
@@ -517,6 +519,7 @@ TEST_CASE("Perf of injecting equal superposition state", "[micro_benchmark]")
 
         auto start = high_resolution_clock::now();
         sim.InjectState(qs, amplitudes);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "    Total state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
@@ -532,22 +535,10 @@ TEST_CASE("Perf of injecting equal superposition state", "[micro_benchmark]")
         auto start = std::chrono::high_resolution_clock::now();
         sim.InjectState(qs, amplitudes);
         sim.H(q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "  Partial state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
-
-        // for the revert check to be uniform
-        qs.push_back(q_last);
-    }
-
-    // revert back to |0...0> state using quantum operations (to confirm the state injection above is correct)
-    for (logical_qubit_id q : qs)
-    {
-        sim.H(q);
-    }
-    for (logical_qubit_id q : qs)
-    {
-        CHECK((sim.isclassical(q) && !sim.M(q)));
     }
 }
 
@@ -573,6 +564,8 @@ TEST_CASE("Perf of injecting cat state", "[micro_benchmark]")
         {
             sim.CX({qs[0]}, qs[i]);
         }
+        // force the simulator to flush
+        sim.M(qs[0]);
         std::cout << "Quantum cat state preparation:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
@@ -590,6 +583,7 @@ TEST_CASE("Perf of injecting cat state", "[micro_benchmark]")
 
         auto start = std::chrono::high_resolution_clock::now();
         sim.InjectState(qs, amplitudes);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "    Total cat state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
@@ -607,23 +601,10 @@ TEST_CASE("Perf of injecting cat state", "[micro_benchmark]")
         auto start = std::chrono::high_resolution_clock::now();
         sim.InjectState(qs, amplitudes);
         sim.CX({qs[0]}, q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "  Partial cat state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
         std::cout << std::endl;
-
-        // for the revert check to be uniform
-        qs.push_back(q_last);
-    }
-
-    // revert back to |0...0> state using quantum operations (to confirm the state injection above is correct)
-    for (size_t i = 1; i < n; i++)
-    {
-        sim.CX({qs[0]}, qs[i]);
-    }
-    sim.H(qs[0]);
-    for (logical_qubit_id q : qs)
-    {
-        CHECK((sim.isclassical(q) && !sim.M(q)));
     }
 }
 

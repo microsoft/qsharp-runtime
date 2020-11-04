@@ -572,7 +572,7 @@ class Wavefunction
         if (qubits.size() == num_qubits_)
         {
             // For full state injection we can simply copy the user's wave function into our store and reorder the
-            // positions map, but is it actually/meaningfully faster to special case total state injection?
+            // positions map.
             for (unsigned i = 0; i < qubits.size(); i++)
             {
                 qubitmap_[qubits[i]] = i;
