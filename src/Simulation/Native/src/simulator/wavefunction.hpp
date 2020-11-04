@@ -459,6 +459,13 @@ class Wavefunction
         pending_gates_.clear();
     }
 
+    void transpose_positions(logical_qubit_id q1, logical_qubit_id q2)
+    {
+        if (q1 == q2) return;
+        kernels::swap(get_qubit_position(q1), get_qubit_position(q2));
+        std::swap(qubitmap_(q1), qubitmap_(q2));
+    }
+
     /// Allocate a qubit with implicitly assigned logical qubit id.
     logical_qubit_id allocate_qubit()
     {
@@ -553,35 +560,46 @@ class Wavefunction
     /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
     /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
     /// qubits in array `q` defines the order of the basis vectors (little endian).
-    /// NB: at the moment supported only total state injection on all currently allocated qubits
     void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
-
-        if (num_qubits_ != qubits.size()) throw std::runtime_error("Subsystem state injection not supported (yet)");
 
         flush();
 
         // Check prerequisites.
         for (logical_qubit_id q : qubits)
         {
-            if (!kernels::isclassical(wfn_, get_qubit_position(q))
-                || kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
+            if (!kernels::isclassical(wfn_, get_qubit_position(q)) ||
+                kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
             {
                 throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
             }
         }
 
-        // Reorder the qubits to the positions that match the wave function provided by the user.
-        for (unsigned i = 0; i < qubits.size(); i++)
+        if (qubits.size() == num_qubits_)
         {
-            qubitmap_[qubits[i]] = i;
+            // For full state injection we can simply copy the user's wave function into our store and reorder the
+            // positions map, but is it actually/meaningfully faster to special case total state injection?
+            for (unsigned i = 0; i < qubits.size(); i++)
+            {
+                qubitmap_[qubits[i]] = i;
+            }
+            wfn_.assign(amplitudes.begin(), amplitudes.end());
         }
-
-        // For full state injection we can simply copy the user's wave function into our store.
-        for (size_t i = 0; i < wfn_.size(); i++)
+        else
         {
-            wfn_[i] = amplitudes[i];
+            const size_t num_states = wfn_.size();
+            std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
+            const size_t mask = kernels::make_mask(positions);
+            WavefunctionStorage wfn_new(num_states);
+
+            for (size_t basis_index = 0; basis_index < num_states; basis_index++)
+            {
+                const size_t injected_index = detail::get_register(positions, basis_index);
+                const size_t original_term = detail::set_register(positions, mask, 0, basis_index);
+                wfn_new[basis_index] = wfn_[original_term] * amplitudes[injected_index];
+            }
+            std::swap(wfn_, wfn_new);
         }
     }
 
