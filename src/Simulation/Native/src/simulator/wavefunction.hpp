@@ -332,8 +332,9 @@ class Wavefunction
     /// Number of currently allocated qubits.
     unsigned num_qubits_;
 
-    /// Represents the state of the system with num_qubits_ qubits. Might not reflect the current state if there are
-    /// pending fused gates.
+    /// Represents the state of the system with num_qubits_ qubits in little-endian notation (that is, the qubit
+    /// with positional id = 0 corresponds to the least significant bit in the index of the standard computational
+    /// basic vector of this wave function). Might not reflect the current state if there are pending fused gates.
     mutable WavefunctionStorage wfn_;
 
     /// Each qubit has a client-facing id, which we call "logical qubit id" or just "logical qubit". However, the order
@@ -547,6 +548,41 @@ class Wavefunction
     {
         flush();
         return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
+    }
+
+    /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
+    /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
+    /// qubits in array `q` defines the order of the basis vectors (little endian).
+    /// NB: at the moment supported only total state injection on all currently allocated qubits
+    void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
+    {
+        assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
+
+        if (num_qubits_ != qubits.size()) throw std::runtime_error("Subsystem state injection not supported (yet)");
+
+        flush();
+
+        // Check prerequisites.
+        for (logical_qubit_id q : qubits)
+        {
+            if (!kernels::isclassical(wfn_, get_qubit_position(q))
+                || kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
+            {
+                throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
+            }
+        }
+
+        // Reorder the qubits to the positions that match the wave function provided by the user.
+        for (unsigned i = 0; i < qubits.size(); i++)
+        {
+            qubitmap_[qubits[i]] = i;
+        }
+
+        // For full state injection we can simply copy the user's wave function into our store.
+        for (size_t i = 0; i < wfn_.size(); i++)
+        {
+            wfn_[i] = amplitudes[i];
+        }
     }
 
     /// measure a qubit

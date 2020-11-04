@@ -38,10 +38,30 @@ extern "C"
         _In_reads_(n) unsigned* q)
     {
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (unsigned i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<unsigned> qv(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->JointEnsembleProbability(bv, qv);
+    }
+
+    MICROSOFT_QUANTUM_DECL void InjectState(
+        _In_ unsigned sid,
+        _In_ unsigned n,
+        _In_reads_(n) unsigned* q,
+        _In_ double* re,
+        _In_ double* im)
+    {
+        const size_t N = (static_cast<size_t>(1) << n);
+        std::vector<ComplexType> amplitudes;
+        amplitudes.reserve(N);
+        for (size_t i = 0; i < N; i++)
+        {
+            amplitudes.push_back({re[i], im[i]});
+        }
+        std::vector<unsigned> qubits(q, q + n);
+
+        Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
     }
 
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned id, _In_ unsigned q)
