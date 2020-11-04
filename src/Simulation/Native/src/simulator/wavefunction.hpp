@@ -459,13 +459,6 @@ class Wavefunction
         pending_gates_.clear();
     }
 
-    void transpose_positions(logical_qubit_id q1, logical_qubit_id q2)
-    {
-        if (q1 == q2) return;
-        kernels::swap(get_qubit_position(q1), get_qubit_position(q2));
-        std::swap(qubitmap_(q1), qubitmap_(q2));
-    }
-
     /// Allocate a qubit with implicitly assigned logical qubit id.
     logical_qubit_id allocate_qubit()
     {
