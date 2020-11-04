@@ -14,12 +14,10 @@
 
 #include <bitset>
 
-
 namespace Microsoft
 {
 namespace Quantum
 {
-
 
 /// the logarithm base 2 of  an integer
 
@@ -28,8 +26,7 @@ unsigned ilog2(Int n)
 {
 #ifdef _WIN32
     for (unsigned width = 0; width < 8 * sizeof(Int); ++width)
-        if ((static_cast<Int>(1) << width) == n)
-            return width;
+        if ((static_cast<Int>(1) << width) == n) return width;
     // not a power of 2
     assert(false);
     return std::numeric_limits<unsigned>::max(); // dummy return
@@ -39,8 +36,6 @@ unsigned ilog2(Int n)
     return l;
 #endif
 }
-
-
 
 // bit count
 inline unsigned popcnt(uint64_t x)
@@ -52,7 +47,7 @@ inline unsigned popcnt(uint64_t x)
     return _popcnt64(x);
 #endif
 #else
-  return static_cast<unsigned>(std::bitset<64>(x).count());
+    return static_cast<unsigned>(std::bitset<64>(x).count());
 #endif
 }
 
@@ -62,5 +57,5 @@ inline bool poppar(uint64_t x)
     return popcnt(x) & 1u;
 }
 
-}
-}
+} // namespace Quantum
+} // namespace Microsoft

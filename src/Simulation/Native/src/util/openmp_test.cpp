@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 #include "util/openmp.hpp"
-#include <mutex>
 #include <cassert>
+#include <mutex>
 
 int main()
 {

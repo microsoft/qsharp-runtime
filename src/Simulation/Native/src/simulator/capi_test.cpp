@@ -2,40 +2,39 @@
 // Licensed under the MIT License.
 
 #include "simulator/capi.hpp"
+#include <array>
 #include <cassert>
 #include <cmath>
+#include <complex>
 #include <iostream>
 #include <vector>
-#include <complex>
-#include <array>
 
 // some convenience functions
 
 void CX(unsigned sim_id, unsigned c, unsigned q)
 {
-    MCX(sim_id,1,&c,q);
+    MCX(sim_id, 1, &c, q);
 }
 
 void CZ(unsigned sim_id, unsigned c, unsigned q)
 {
-    MCZ(sim_id,1,&c,q);
+    MCZ(sim_id, 1, &c, q);
 }
 
 void Ry(unsigned sim_id, double phi, unsigned q)
 {
-    R(sim_id,3,phi,q);
+    R(sim_id, 3, phi, q);
 }
 
 void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
 {
-    MCR(sim_id,2,phi,1,&c,q);
+    MCR(sim_id, 2, phi, 1, &c, q);
 }
 
 void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
 {
-    MCR(sim_id,1,phi,1,&c,q);
+    MCR(sim_id, 1, phi, 1, &c, q);
 }
-
 
 void dump(unsigned sim_id, const char* label)
 {
@@ -45,18 +44,18 @@ void dump(unsigned sim_id, const char* label)
     };
     auto sim_ids_callback = [](unsigned idx) { std::cout << idx << " "; };
 
-    std::cout << label << "\n" << "wave function for ids (least to most significant): ["; 
+    std::cout << label << "\n"
+              << "wave function for ids (least to most significant): [";
     DumpIds(sim_id, sim_ids_callback);
     std::cout << "]\n";
     Dump(sim_id, dump_callback);
 }
 
-
 void test_teleport()
 {
     auto sim_id = init();
 
-    unsigned qs[] = { 0, 1, 2 };
+    unsigned qs[] = {0, 1, 2};
 
     dump(sim_id, "teleport-pre.txt");
 
@@ -87,7 +86,7 @@ void test_teleport()
     // check teleportation success
     R(sim_id, 3, (-1.1), 0);
     H(sim_id, 0);
-    assert(M(sim_id, 0)==false);
+    assert(M(sim_id, 0) == false);
 
     dump(sim_id, "teleport-end.txt");
 
@@ -136,21 +135,20 @@ void test_allocate()
 {
     auto sim_id = init();
 
-    allocateQubit(sim_id,0);
-    allocateQubit(sim_id,1);
-    allocateQubit(sim_id,2);
-    release(sim_id,1);
-    allocateQubit(sim_id,1);
+    allocateQubit(sim_id, 0);
+    allocateQubit(sim_id, 1);
+    allocateQubit(sim_id, 2);
+    release(sim_id, 1);
+    allocateQubit(sim_id, 1);
 
     assert(num_qubits(sim_id) == 3);
 
-    release(sim_id,0);
-    release(sim_id,1);
-    release(sim_id,2);
+    release(sim_id, 0);
+    release(sim_id, 1);
+    release(sim_id, 2);
 
     assert(num_qubits(sim_id) == 0);
     destroy(sim_id);
-
 }
 /*
 // We can't use a lambda with captures to pass to a callback with __stdcall signature,
@@ -216,7 +214,7 @@ void test_dump()
   qs[1] = 1;
   assert(sim_DumpQubits(sim_id, 2, qs, check_state));
 
-  // check that when we ask for a different order of all the qubits, 
+  // check that when we ask for a different order of all the qubits,
   // the corresponding basis state is correct
   _state = wavefunction_type{ 0., 0., 0., 0., 0., 0., 1., 0. };
   qs[0] = 2;
@@ -318,7 +316,8 @@ void test_permute_basis()
     constexpr auto nqubits = 4u;
     constexpr auto nstates = 1ul << nqubits;
     std::size_t table[nstates];
-    for (std::size_t i = 0; i < nstates; ++i) {
+    for (std::size_t i = 0; i < nstates; ++i)
+    {
         table[i] = permutation(i);
     }
 
@@ -353,7 +352,7 @@ void test_permute_basis()
     assert(M(sim_id, 2) == false);
     assert(M(sim_id, 3) == false);
     assert(M(sim_id, 4) == false);
- 
+
     for (unsigned i = 0; i < nqubits + 1; ++i)
         release(sim_id, i);
     destroy(sim_id);
@@ -372,7 +371,8 @@ void test_permute_basis_adjoint()
     constexpr auto nqubits = 4u;
     constexpr auto nstates = 1ul << nqubits;
     std::size_t table[nstates];
-    for (std::size_t i = 0; i < nstates; ++i) {
+    for (std::size_t i = 0; i < nstates; ++i)
+    {
         table[i] = permutation(i);
     }
 
