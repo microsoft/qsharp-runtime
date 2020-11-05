@@ -9,22 +9,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         mutable innerBorrow = 0;
         borrowing (qb = Qubit())
         {
-            set innerBorrow = GetQubitsAvailableToBorrow();
+            set innerBorrow = GetQubitsAvailableToBorrow() + GetQubitsAvailableToUse();
         }
-        return (GetQubitsAvailableToBorrow(), innerBorrow);
+        return (GetQubitsAvailableToBorrow() + GetQubitsAvailableToUse(), innerBorrow);
     }
 
     operation GetAvailableTest (allocSize : Int) : (Int, Int, Int, Int, Int, Int)
     {
         let initialUse = GetQubitsAvailableToUse();
-        let initialBorrow = GetQubitsAvailableToBorrow();
+        let initialBorrow = GetQubitsAvailableToBorrow() + initialUse;
 
         mutable result = (0, 0, 0, 0, 0, 0);
 
         using (qs = Qubit[allocSize])
         {
             let afterUse = GetQubitsAvailableToUse();
-            let afterBorrow = GetQubitsAvailableToBorrow();
+            let afterBorrow = GetQubitsAvailableToBorrow() + afterUse;
             let (subBorrow, innerBorrow) = BorrowSubTest();
             set result = (initialUse, initialBorrow, afterUse, afterBorrow, subBorrow, innerBorrow);
         }
