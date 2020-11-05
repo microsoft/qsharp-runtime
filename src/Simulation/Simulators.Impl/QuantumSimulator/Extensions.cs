@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Simulation
         ///  a subclass of T and registers as the override of the BaseType 
         ///  it implements.
         /// </summary>
-        public static void InitBuiltinOperations<T>(this AbstractFactory<T> factory, Type t)
+        public static void InitBuiltinOperations<T>(this Factory<T> factory, Type t)
         {
             if (t == null)
             {

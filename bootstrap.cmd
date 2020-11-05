@@ -8,7 +8,6 @@
 dotnet  --info || GOTO missingDotnet
 git --version  || GOTO missingGit
 
-
 :: Initialize C++ runtime project
 CALL :runtimeBootstrap  || EXIT /B 1
 

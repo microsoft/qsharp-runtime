@@ -59,6 +59,12 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return p;
     }
 
+    void InjectState(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
+    {
+        recursive_lock_type l(mutex());
+        psi.inject_state(qubits, amplitudes);
+    }
+
     bool isclassical(logical_qubit_id q)
     {
         recursive_lock_type l(mutex());

@@ -3,40 +3,36 @@
 
 namespace Microsoft.Quantum.Simulation.Common
 {
-    using Microsoft.Quantum.Simulation.Core;
     using System.Collections.Generic;
+    using Microsoft.Quantum.Simulation.Core;
 
     public interface IQubitManager
     {
+        bool DisableBorrowing { get; }
+
+        bool IsValid(Qubit qubit);
+        bool IsFree(Qubit qubit);
+        bool IsDisabled(Qubit qubit);
+
+        long FreeQubitsCount { get; }
+        long AllocatedQubitsCount { get; }
+        IEnumerable<long> AllocatedIds();
+        long QubitsAvailableToBorrowCount(int stackFrame = 0);
+
+        void Disable(Qubit qubit);
+        void Disable(IQArray<Qubit> qubits);
+
         Qubit Allocate();
         IQArray<Qubit> Allocate(long count);
 
         void Release(Qubit qubit);
         void Release(IQArray<Qubit> qubits);
 
-        void Disable(Qubit qubit);
-        void Disable(IQArray<Qubit> qubits);
-
         Qubit Borrow();
         IQArray<Qubit> Borrow(long count);
 
         void Return(Qubit q);
         void Return(IQArray<Qubit> qubits);
-
-        bool ToBeReleasedAfterReturn(Qubit qubit);
-        long ToBeReleasedAfterReturnCount(IQArray<Qubit> qubitsToReturn);
-
-        bool IsValid(Qubit qubit);
-        bool IsFree(Qubit qubit);
-        bool IsDisabled(Qubit qubit);
-
-        long GetFreeQubitsCount();
-        long GetQubitsAvailableToBorrowCount();
-        long GetParentQubitsAvailableToBorrowCount(); // Required for GetAvailableQubitsToBorrow
-        long GetAllocatedQubitsCount();
-        IEnumerable<long> GetAllocatedIds();
-
-        bool DisableBorrowing { get; }
 
         /// <summary>
         /// Callback to notify QubitManager that an operation execution has started. 

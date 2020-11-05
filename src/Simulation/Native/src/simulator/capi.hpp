@@ -35,6 +35,14 @@ extern "C"
         _In_reads_(n) int* b,
         _In_reads_(n) unsigned* q);
 
+    MICROSOFT_QUANTUM_DECL void InjectState(
+        _In_ unsigned sid,
+        _In_ unsigned n,
+        _In_reads_(n) unsigned* q, // The listed qubits must be unentangled and in state |0>
+        _In_ double* re, // 2^n real parts of the amplitudes of the superposition the listed qubits should be put into
+        _In_ double* im  // 2^n imaginary parts of the amplitudes
+    );
+
     // allocate and release
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid);
     MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q);
@@ -110,4 +118,5 @@ extern "C"
         _In_reads_(n) unsigned* q,
         _In_ std::size_t table_size,
         _In_reads_(table_size) std::size_t* permutation_table);
+
 }
