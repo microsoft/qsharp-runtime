@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// There is an overhead of one byte of memory usage per allocated qubit.
         /// There is no time overhead from allocating more qubits.</param>
         public ToffoliSimulator(uint qubitCount)
-            : base(new QubitManagerTrackingScope(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
+            : base(new QubitManager(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
         {
             this.State = new bool[qubitCount];
             this.borrowedQubitStates = new Dictionary<int, Stack<bool>>();

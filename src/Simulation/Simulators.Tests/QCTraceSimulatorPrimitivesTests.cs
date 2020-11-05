@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
             this.output = output;
         }
 
-        private static void OverrideOperation<OperationType, TypeToOverride, TypeToOverrideBy>(AbstractFactory<AbstractCallable> sim)
+        private static void OverrideOperation<OperationType, TypeToOverride, TypeToOverrideBy>(Factory<AbstractCallable> sim)
             where TypeToOverrideBy : AbstractCallable, OperationType
             where TypeToOverride : AbstractCallable, OperationType
         {
