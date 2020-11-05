@@ -482,7 +482,7 @@ TEST_CASE("Inject state on two qubits out of three", "[local_test]")
     CHECK((sim.isclassical(y) && !sim.M(y)));
 }
 
-TEST_CASE("Perf of injecting equal superposition state", "[micro_benchmark]")
+TEST_CASE("Perf of injecting equal superposition state", "[skip]") // local micro_benchmark
 {
     using namespace std::chrono;
 
@@ -542,7 +542,7 @@ TEST_CASE("Perf of injecting equal superposition state", "[micro_benchmark]")
     }
 }
 
-TEST_CASE("Perf of injecting cat state", "[micro_benchmark]")
+TEST_CASE("Perf of injecting cat state", "[skip]") // local micro_benchmark
 {
     using namespace std::chrono;
 

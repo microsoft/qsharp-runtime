@@ -581,12 +581,18 @@ class Wavefunction
         }
         else
         {
-            const size_t num_states = wfn_.size();
+            const int64_t num_states = static_cast<int64_t>(wfn_.size());
             std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
             const size_t mask = kernels::make_mask(positions);
             WavefunctionStorage wfn_new(num_states);
 
-            for (size_t basis_index = 0; basis_index < num_states; basis_index++)
+            // For systems with more qubits (>16) the pragma yields x2-x4 performance boost in the micro benchmarks run
+            // on a machine with 16 cores. For systems with fewer qubits (<10) the pragma might regress perf somewhat
+            // but for small systems the overall time of state injection is negligible and might still outperform
+            // quantum preparation (and might fall short of it even without the pragma), so to avoid extra complexity
+            // we are not conditioning enabling the pragma on the size of the system.
+#pragma omp parallel for schedule(static)
+            for (int64_t basis_index = 0; basis_index < num_states; basis_index++)
             {
                 const size_t injected_index = detail::get_register(positions, basis_index);
                 const size_t original_term = detail::set_register(positions, mask, 0, basis_index);
