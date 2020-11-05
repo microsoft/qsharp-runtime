@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     /// 
     public class TrivialSimulator : SimulatorBase
     {
-        public TrivialSimulator() : base(new QubitManagerTrackingScope(32))
+        public TrivialSimulator() : base(new QubitManager(32))
         {
         }
 

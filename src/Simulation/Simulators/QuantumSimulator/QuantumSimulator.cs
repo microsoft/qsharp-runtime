@@ -200,7 +200,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 var ids = new List<uint>();
                 sim_QubitsIds(this.Id, ids.Add);
-                Debug.Assert(ids.Count == this.QubitManager.GetAllocatedQubitsCount());
+                Debug.Assert(ids.Count == this.QubitManager.AllocatedQubitsCount);
                 return ids.ToArray();
             }
         }
