@@ -552,7 +552,7 @@ class Wavefunction
 
     /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
     /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
-    /// qubits in array `q` defines the order of the basis vectors (little endian).
+    /// qubits in array `q` defines the standard computational basis in little endian order.
     void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
@@ -560,10 +560,10 @@ class Wavefunction
         flush();
 
         // Check prerequisites.
-        for (logical_qubit_id q : qubits)
+        std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
+        for (positional_qubit_id p : positions)
         {
-            if (!kernels::isclassical(wfn_, get_qubit_position(q)) ||
-                kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
+            if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
             {
                 throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
             }
@@ -571,8 +571,8 @@ class Wavefunction
 
         if (qubits.size() == num_qubits_)
         {
-            // For full state injection we can simply copy the user's wave function into our store and reorder the
-            // positions map.
+            // For full state injection we can copy the user's wave function into our store and reorder the
+            // positions map without doing any math.
             for (unsigned i = 0; i < qubits.size(); i++)
             {
                 qubitmap_[qubits[i]] = i;
@@ -581,8 +581,12 @@ class Wavefunction
         }
         else
         {
+            // The current state can be thought of as Sum(a_i*|i>|0...0>), after the state injection it will become
+            // Sum(a_i*|i>Sum(b_j*|j>)) = Sum(a_i*b_j|i>|j>). Thus, to compute amplitude of a term |k> after the state
+            // injection we need to find the corresponding |i> vector from the original wave function and |j> vector
+            // from the state being injected, and multiply their amplitudes. The things are complicated by the fact that
+            // the state might not be injected on adjacently positioned qubits, but get/set_register takes care of that.
             const int64_t num_states = static_cast<int64_t>(wfn_.size());
-            std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
             const size_t mask = kernels::make_mask(positions);
             WavefunctionStorage wfn_new(num_states);
 
