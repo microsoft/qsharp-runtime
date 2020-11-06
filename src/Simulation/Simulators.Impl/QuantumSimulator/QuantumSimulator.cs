@@ -43,7 +43,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             bool disableBorrowing = false)
         : base(
             new QSimQubitManager(throwOnReleasingQubitsNotInZeroState, disableBorrowing : disableBorrowing),
-            (int?)randomNumberGeneratorSeed
+            (int?)randomNumberGeneratorSeed,
+            true
         )
         {
             Id = Init();

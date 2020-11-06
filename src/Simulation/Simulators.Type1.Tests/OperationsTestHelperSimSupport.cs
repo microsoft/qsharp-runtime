@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.Quantum.Simulation.Common;
-using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {

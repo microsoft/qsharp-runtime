@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Reflection;
 using System.Diagnostics;
 using System.Linq;
 
@@ -30,7 +31,7 @@ namespace Microsoft.Quantum.Simulation
         ///  a subclass of T and registers as the override of the BaseType 
         ///  it implements.
         /// </summary>
-        public static void InitBuiltinOperations<T>(this Factory<T> factory, Type t)
+        public static void InitBuiltinOperations<T>(this Factory<T> factory, Type t, bool onlyOverrideBodyIntrinsic = false)
         {
             if (t == null)
             {
@@ -48,7 +49,12 @@ namespace Microsoft.Quantum.Simulation
                 where op.IsSubclassOf(typeof(T))
                 select op;
 
-            foreach (var op in ops.Where(o => o.BaseType.IsAbstract))
+            if (onlyOverrideBodyIntrinsic)
+            {
+                ops = ops.Where(o => o.BaseType.IsAbstract);
+            }
+
+            foreach (var op in ops)
             {
                 factory.Register(op.BaseType, op);
             }

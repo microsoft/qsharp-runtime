@@ -25,10 +25,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override Func<(Qubit, Qubit), QVoid> __Body__ => (args) =>
             {
                 var (qubit1, qubit2) = args;
-                var ctrls = new QArray<Qubit>(qubit1);
-                Simulator.CheckQubits(ctrls, qubit2);
+                var ctrls1 = new QArray<Qubit>(qubit1);
+                var ctrls2 = new QArray<Qubit>(qubit2);
+                Simulator.CheckQubits(ctrls1, qubit2);
 
-                MCX(Simulator.Id, (uint)ctrls.Length, ctrls.GetIds(), (uint)qubit2.Id);
+                MCX(Simulator.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)qubit2.Id);
+                MCX(Simulator.Id, (uint)ctrls2.Length, ctrls2.GetIds(), (uint)qubit1.Id);
+                MCX(Simulator.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)qubit2.Id);
 
                 return QVoid.Instance;
             };
