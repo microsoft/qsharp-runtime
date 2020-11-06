@@ -2715,7 +2715,7 @@ SOFTWARE.
 
 -------------------------------------------------------------------
 
-Microsoft.Quantum.Compiler 0.12.20082705-beta - MIT
+Microsoft.Quantum.Compiler 0.13.20102604 - MIT
 
 
 (c) 2008 VeriSign, Inc.
