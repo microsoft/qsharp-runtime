@@ -442,7 +442,48 @@ TEST_CASE("permute_basis", "[local_test]")
     }
 }
 
-TEST_CASE("permute_basis depends on the order of logical qubits", "[local_test]")
+TEST_CASE("permute_basis depends on the order of logical qubits (2)", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+
+    // Inject state, which would allow us to easily check permutations. It's not a normalized state but for this
+    // test it doesn't matter.
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0}};
+    psi.inject_state({q0, q1}, amplitudes);
+    // after the state injection, positions of the qubits are q0:0 and q1:1
+
+    SECTION("q0-q1 order (matches the current positions of the qubits in the standard basis)")
+    {
+        size_t permutations[4] = {1, 0, 2, 3};
+        psi.permute_basis({q0, q1}, 4, permutations);
+
+        std::vector<ComplexType> expected = {{1.0, 0.0}, {0.0, 0.0}, {2.0, 0.0}, {3.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("q1-q0 order (opposite to the current positions of the qubits in the standard basis")
+    {
+        size_t permutations[4] = {1, 0, 2, 3};
+        psi.permute_basis({q1, q0}, 4, permutations);
+
+        // to match qubits' posistions:
+        // |0> -> |0>; |1> -> |2>; |2> -> |1>; |3> -> |3>
+        // apply (01)(2)(3) permutation of the basis:
+        // |0> -> |0> -> |1>; |1> -> |2> -> |2>; |2> -> |1> -> |0>; |3> -> |3> -> |3>
+        // revert to the original positions:
+        //   |0> -> |0> -> |1> -> |2>
+        //   |1> -> |2> -> |2> -> |1>
+        //   |2> -> |1> -> |0> -> |0>
+        //   |3> -> |3> -> |3> -> |3>
+        std::vector<ComplexType> expected = {{2.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {3.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+}
+
+TEST_CASE("permute_basis depends on the order of logical qubits (3)", "[local_test]")
 {
     Wavefunction<ComplexType> psi;
 

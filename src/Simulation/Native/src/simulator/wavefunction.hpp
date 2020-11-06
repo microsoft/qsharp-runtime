@@ -27,33 +27,37 @@ namespace SIMULATOR
 {
 namespace detail
 {
-/// Computes for the given basis vector's index in the standard computational basis the index that would correspond to
-/// the projection of this vector onto the subsystem of the specified qubits, possibly reordered. For example,
-/// `basis_index = 174` is |10101110> in an 8-qubit system. If this basis vector is projected onto a subsystem of three
-/// qubits {6,3,2} (|_0__11__>), the corresponding reordered basis vector would be |110> with index 6.
-inline size_t get_register(const std::vector<positional_qubit_id>& qs, size_t basis_index)
+/// Projects `basis_vector` onto the subsystem defined by `ps`, in the standard computational basis imposed by the order
+/// in which the positions are listed (little-endian). For example, consider `basis_vector` = |174> = |10101110> in an
+/// 8-qubit system. If this basis vector is projected onto a subsystem of three qubits with positions {6,3,2}
+/// (|_0__11__>), the corresponding -- reordered -- basis vector would be |110> = |6>.
+inline size_t get_register(const std::vector<positional_qubit_id>& ps, size_t basis_vector)
 {
     size_t result = 0;
-    for (unsigned i = 0; i < qs.size(); ++i)
+    for (unsigned i = 0; i < ps.size(); ++i)
     {
-        result |= ((basis_index >> qs[i]) & 1) << i;
+        result |= ((basis_vector >> ps[i]) & 1) << i;
     }
     return result;
 }
 
+/// Lifts `basis_vector_in_ps` from the subsystem defined by `ps` into the linear subspace of the full system, defined
+/// by the complimentary positions in `basis_vector_target`.
+/// Implementation notes: `qmask` can be computed from `ps` but is passed in for performance reasons as most clients
+/// make repeated calls to `set_register` with the same set of positions.
 inline size_t set_register(
-    const std::vector<positional_qubit_id>& qs,
+    const std::vector<positional_qubit_id>& ps,
     size_t qmask,
-    size_t basis_index_in_qs,
-    size_t basis_index)
+    size_t basis_vector_in_ps,
+    size_t basis_vector_target)
 {
-    assert(qmask == kernels::make_mask(qs)); // `qmask` is passed in to avoid recomputing it multiple times
-    assert(basis_index_in_qs < (1ull << qs.size()));
+    assert(qmask == kernels::make_mask(ps));
+    assert(basis_vector_in_ps < (1ull << ps.size()));
 
-    size_t result = basis_index & ~qmask;
-    for (unsigned i = 0; i < qs.size(); ++i)
+    size_t result = basis_vector_target & ~qmask;
+    for (unsigned i = 0; i < ps.size(); ++i)
     {
-        result |= ((basis_index_in_qs >> i) & 1) << qs[i];
+        result |= ((basis_vector_in_ps >> i) & 1) << ps[i];
     }
     return result;
 }
@@ -709,7 +713,17 @@ class Wavefunction
         return kernels::subsytemwavefunction(wfn_, get_qubit_positions(qs), qubitswfn, tolerance);
     }
 
-    /// apply permutation of basis states to the wave function
+    /// Apply the unitary operator that permutes the standard computational basis of the subsystem, defined by the
+    /// provided qubits. `qs` lists the qubits of the subsystem in little-endian order (the front qubit in the list
+    /// corresponds to the last position of the standard computational basis). `table_size` must be equal 2^n, where n
+    /// is the number of qubits in `qs` `permutation_table` must point to an array of `table_size` integers that
+    /// describes a permutation of set {0, 1, ... , 2^n -1}. `adjoint` specifies whether should apply the adjoint of the
+    /// unitary.
+    ///
+    /// Implementation notes: the current positions of the provided qubits might not match the order in which they are
+    /// listed, so the unitary has to be Adjoint(V)*U*V, where V permutes the _provided qubits_ to match their positions
+    /// to the requested, and U does the specified permutation of the _standard computational basis_ of these qubits.
+    /// Note, that the positions of the qubits in the end remain unchanged.
     void permute_basis(
         std::vector<logical_qubit_id> const& qs,
         size_t table_size,
@@ -730,11 +744,6 @@ class Wavefunction
         flush();
 
         std::vector<positional_qubit_id> positions = get_qubit_positions(qs);
-
-        // The result of the code below depends on the order in which logical qubits, that define the subsystem, are
-        // listed (because that determines the order of retrieved positions). Was that intended? Shouldn't the positions
-        // be sorted before proceding?
-        // std::sort(positions.begin(), positions.end());
 
         const size_t num_states = wfn_.size();
         WavefunctionStorage psi_new(num_states);
