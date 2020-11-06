@@ -323,7 +323,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Func<Qubit, (Pauli, double, Qubit)> mapper = (q)
                 => (Pauli.PauliI, angle, q);
             Func<(double, Qubit), (Pauli, double, Qubit)> needsAngle = (__arg) 
-                => (Pauli.PauliI, __arg.Item1, __arg.Item2);
+                => (Pauli.PauliX, __arg.Item1, __arg.Item2);
 
             using (var sim = new QuantumSimulator())
             {
@@ -373,8 +373,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Func<(double, Qubit), (IQArray<Pauli>, double, IQArray<Qubit>)> needsAngle = (__arg)
                     => (new QArray<Pauli> (pauli), __arg.Item1, new QArray<Qubit> (__arg.Item2));
                 var angleGate = sim.Get<Intrinsic.Exp>().Partial(needsAngle);
-
-                VerifyInvalidAngles(sim, angleGate);
+                if (pauli != Pauli.PauliI)
+                {
+                    VerifyInvalidAngles(sim, angleGate);
+                }
             }
         }
 

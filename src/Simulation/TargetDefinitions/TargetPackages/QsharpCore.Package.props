@@ -14,8 +14,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
-
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Checks.qs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -18,8 +18,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
-
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Checks.qs" />
   </ItemGroup>
 
   <ItemGroup>

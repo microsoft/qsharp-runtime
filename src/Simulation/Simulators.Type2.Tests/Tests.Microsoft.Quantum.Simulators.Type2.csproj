@@ -16,7 +16,11 @@
     <QsharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
     <QsharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
   </ItemGroup>
-  
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);SKIP_DISTINCT_QUBIT_CHECK</DefineConstants>
+  </PropertyGroup>
+
 </Project>
 
 
