@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.IO;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 
@@ -13,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Implementation of the DumpMachine operation for the Toffoli simulator.
         /// </summary>
-        public class DumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
+        public class DumpMachine<T> : Diagnostics.DumpMachine<T>
         {
             private ToffoliSimulator simulator { get; }
 
@@ -33,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 if (location == null) { throw new ArgumentNullException(nameof(location)); }
 
-                var ids = this.simulator.QubitManager.GetAllocatedIds().ToArray();
+                var ids = this.simulator.QubitManager.AllocatedIds().ToArray();
                 var filename = (location is QVoid) ? "" : location.ToString();
                 this.simulator.DumpState(ids, filename);
 
@@ -44,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Implementation of the DumpRegister operation for the Toffoli simulator.
         /// </summary>
-        public class DumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
+        public class DumpRegister<T> : Diagnostics.DumpRegister<T>
         {
             private ToffoliSimulator simulator { get; }
 

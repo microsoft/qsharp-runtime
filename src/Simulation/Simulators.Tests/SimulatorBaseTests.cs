@@ -47,12 +47,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             // are actually called.
             var calledOnAllocate = false;
             var calledOnRelease = false;
-            subject.OnAllocateQubits += count =>
+            subject.BeforeAllocateQubits += count =>
             {
                 output.WriteLine($"Allocate count = {count}");
                 calledOnAllocate = true;
             };
-            subject.OnReleaseQubits += register =>
+            subject.BeforeReleaseQubits += register =>
             {
                 output.WriteLine($"Release qubits = {register}");
                 calledOnRelease = true;
