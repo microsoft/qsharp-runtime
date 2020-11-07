@@ -8,6 +8,7 @@
     <QsharpDocsGeneration>true</QsharpDocsGeneration>
     <CsharpGeneration>false</CsharpGeneration> <!-- we will provide our own -->
     <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
 
   <PropertyGroup>
