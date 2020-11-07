@@ -737,8 +737,8 @@ class Wavefunction
     /// Apply the unitary operator that permutes the standard computational basis of the subsystem, defined by the
     /// provided qubits. `qs` lists the qubits of the subsystem in little-endian order (the front qubit in the list
     /// corresponds to the last position of the standard computational basis). `table_size` must be equal 2^n, where n
-    /// is the number of qubits in `qs` `permutation_table` must point to an array of `table_size` integers that
-    /// describes a permutation of set {0, 1, ... , 2^n -1}. `adjoint` specifies whether should apply the adjoint of the
+    /// is the number of qubits in `qs`. `permutation_table` must point to an array of `table_size` integers that
+    /// describes a permutation of set {0, 1, ... , 2^n -1}. `adjoint` specifies whether to apply the adjoint of the
     /// unitary.
     ///
     /// Implementation notes: the current positions of the provided qubits might not match the order in which they are
