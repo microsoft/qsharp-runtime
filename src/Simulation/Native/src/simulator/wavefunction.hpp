@@ -552,36 +552,57 @@ class Wavefunction
 
     /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
     /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
-    /// qubits in array `q` defines the order of the basis vectors (little endian).
-    /// NB: at the moment supported only total state injection on all currently allocated qubits
+    /// qubits in array `q` defines the standard computational basis in little endian order.
     void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
 
-        if (num_qubits_ != qubits.size()) throw std::runtime_error("Subsystem state injection not supported (yet)");
-
         flush();
 
         // Check prerequisites.
-        for (logical_qubit_id q : qubits)
+        std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
+        for (positional_qubit_id p : positions)
         {
-            if (!kernels::isclassical(wfn_, get_qubit_position(q))
-                || kernels::getvalue(wfn_, get_qubit_position(q)) != 0)
+            if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
             {
                 throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
             }
         }
 
-        // Reorder the qubits to the positions that match the wave function provided by the user.
-        for (unsigned i = 0; i < qubits.size(); i++)
+        if (qubits.size() == num_qubits_)
         {
-            qubitmap_[qubits[i]] = i;
+            // For full state injection we can copy the user's wave function into our store and reorder the
+            // positions map without doing any math.
+            for (unsigned i = 0; i < qubits.size(); i++)
+            {
+                qubitmap_[qubits[i]] = i;
+            }
+            wfn_.assign(amplitudes.begin(), amplitudes.end());
         }
-
-        // For full state injection we can simply copy the user's wave function into our store.
-        for (size_t i = 0; i < wfn_.size(); i++)
+        else
         {
-            wfn_[i] = amplitudes[i];
+            // The current state can be thought of as Sum(a_i*|i>|0...0>), after the state injection it will become
+            // Sum(a_i*|i>Sum(b_j*|j>)) = Sum(a_i*b_j|i>|j>). Thus, to compute amplitude of a term |k> after the state
+            // injection we need to find the corresponding |i> vector from the original wave function and |j> vector
+            // from the state being injected, and multiply their amplitudes. The things are complicated by the fact that
+            // the state might not be injected on adjacently positioned qubits, but get/set_register takes care of that.
+            const int64_t num_states = static_cast<int64_t>(wfn_.size());
+            const size_t mask = kernels::make_mask(positions);
+            WavefunctionStorage wfn_new(num_states);
+
+            // For systems with more qubits (>16) the pragma yields x2-x4 performance boost in the micro benchmarks run
+            // on a machine with 16 cores. For systems with fewer qubits (<10) the pragma might regress perf somewhat
+            // but for small systems the overall time of state injection is negligible and might still outperform
+            // quantum preparation (and might fall short of it even without the pragma), so to avoid extra complexity
+            // we are not conditioning enabling the pragma on the size of the system.
+#pragma omp parallel for schedule(static)
+            for (int64_t basis_index = 0; basis_index < num_states; basis_index++)
+            {
+                const size_t injected_index = detail::get_register(positions, basis_index);
+                const size_t original_term = detail::set_register(positions, mask, 0, basis_index);
+                wfn_new[basis_index] = wfn_[original_term] * amplitudes[injected_index];
+            }
+            std::swap(wfn_, wfn_new);
         }
     }
 
