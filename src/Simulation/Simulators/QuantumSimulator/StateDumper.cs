@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
                 var count = qubits == null
-                    ? this.Simulator.QubitManager.GetAllocatedQubitsCount()
+                    ? this.Simulator.QubitManager.AllocatedQubitsCount
                     : qubits.Length;
                 this._maxCharsStateId = ((1 << (int)count) - 1).ToString().Length;
 

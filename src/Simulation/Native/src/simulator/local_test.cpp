@@ -8,6 +8,7 @@
 #include "util/bitops.hpp"
 
 #include <bitset>
+#include <chrono>
 #include <cmath>
 
 using namespace Microsoft::Quantum::SIMULATOR;
@@ -527,7 +528,7 @@ void CheckAllZeros(SimulatorType& sim, const std::vector<logical_qubit_id>& qs)
     }
 }
 
-TEST_CASE("Prepare total cat state", "[local_test]")
+TEST_CASE("Inject total cat state", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 2;
@@ -551,11 +552,10 @@ TEST_CASE("Prepare total cat state", "[local_test]")
     CheckAllZeros(sim, qs);
 }
 
-TEST_CASE("Should fail to inject total state if qubits aren't all |0>", "[local_test]")
+TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 3;
-    constexpr size_t N = (static_cast<size_t>(1) << n);
 
     std::vector<logical_qubit_id> qs;
     for (int i = 0; i < n; i++)
@@ -566,18 +566,21 @@ TEST_CASE("Should fail to inject total state if qubits aren't all |0>", "[local_
     const double amp = 1.0 / std::sqrt(n);
     std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
                                            {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
-    REQUIRE(N == amplitudes.size());
+
+    std::vector<ComplexType> amplitudes_sub = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}};
 
     // unentangled but not |0>
     sim.H(qs[1]);
     REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
+    REQUIRE_THROWS(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
 
     // entanglement doesn't make things any better
     sim.CX({qs[1]}, qs[2]);
     REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
+    REQUIRE_THROWS(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
 }
 
-TEST_CASE("Prepare total state on reordered qubits", "[local_test]")
+TEST_CASE("Inject total state on reordered qubits", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 3;
@@ -609,48 +612,178 @@ TEST_CASE("Prepare total state on reordered qubits", "[local_test]")
     }
 }
 
-TEST_CASE("Subsystem state preparation not supported yet", "[local_test]")
-{
-    SimulatorType sim;
-    constexpr int n = 2;
-
-    std::vector<logical_qubit_id> qs;
-    for (int i = 0; i < n; i++)
-    {
-        qs.push_back(sim.allocate());
-    }
-
-    const double amp = 1.0 / std::sqrt(2);
-    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}};
-
-    REQUIRE_THROWS(sim.InjectState({qs[1]}, amplitudes));
-}
-
-TEST_CASE("Prepare cat state on two qubits out of three", "[skip]")
+TEST_CASE("Inject state on two qubits out of three", "[local_test]")
 {
     SimulatorType sim;
     constexpr int n = 3;
 
+    logical_qubit_id q0 = sim.allocate();
+    logical_qubit_id q1 = sim.allocate();
+    logical_qubit_id q2 = sim.allocate();
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    // this state injections is the same as applying H to the first qubit in the subsystem list
+
+    logical_qubit_id x;
+    logical_qubit_id y;
+    SECTION("q0 & q1")
+    {
+        x = q0;
+        y = q1;
+        sim.H(q2);
+    }
+    SECTION("q0 & q2")
+    {
+        x = q0;
+        y = q2;
+        sim.H(q1);
+    }
+    SECTION("q1 & q2")
+    {
+        x = q1;
+        y = q2;
+        sim.H(q0);
+    }
+    SECTION("q2 & q1")
+    {
+        x = q2;
+        y = q1;
+        sim.H(q0);
+    }
+
+    sim.InjectState({x, y}, amplitudes);
+
+    // undo the state injection with quantum op and check that the qubits we injected state for are back to |0>
+    sim.H(x);
+
+    CHECK((sim.isclassical(x) && !sim.M(x)));
+    CHECK((sim.isclassical(y) && !sim.M(y)));
+}
+
+TEST_CASE("Perf of injecting equal superposition state", "[skip]") // local micro_benchmark
+{
+    using namespace std::chrono;
+
+    SimulatorType sim;
+    constexpr int n = 20;
     std::vector<logical_qubit_id> qs;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n - 1; i++)
     {
         qs.push_back(sim.allocate());
     }
 
-    const double amp = 1.0 / std::sqrt(2);
-    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
-
-    sim.H(qs[0]);
-    sim.InjectState({qs[1], qs[2]}, amplitudes);
-
-    // undo the changes and check that the whole system is back to |000>
-    sim.CX({qs[1]}, qs[2]);
-    sim.H(qs[1]);
-    sim.H(qs[0]);
-    for (int i = 0; i < n; i++)
+    SECTION("Prepare the state with quantum operations")
     {
-        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
-        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+        qs.push_back(sim.allocate());
+
+        auto start = high_resolution_clock::now();
+        for (logical_qubit_id q : qs)
+        {
+            sim.H(q);
+        }
+        // force the simulator to flush
+        sim.M(qs[0]);
+        std::cout << "Quantum state preparation:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject total state")
+    {
+        qs.push_back(sim.allocate());
+        constexpr size_t N = (static_cast<size_t>(1) << n);
+        const double amp = 1.0 / std::sqrt(N);
+        std::vector<ComplexType> amplitudes(N, {amp, 0.0});
+
+        auto start = high_resolution_clock::now();
+        sim.InjectState(qs, amplitudes);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "    Total state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject partial state")
+    {
+        logical_qubit_id q_last = sim.allocate();
+        constexpr size_t N = (static_cast<size_t>(1) << (n - 1));
+        const double amp = 1.0 / std::sqrt(N);
+        std::vector<ComplexType> amplitudes(N, {amp, 0.0});
+
+        auto start = std::chrono::high_resolution_clock::now();
+        sim.InjectState(qs, amplitudes);
+        sim.H(q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "  Partial state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+}
+
+TEST_CASE("Perf of injecting cat state", "[skip]") // local micro_benchmark
+{
+    using namespace std::chrono;
+
+    SimulatorType sim;
+    constexpr int n = 20;
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n - 1; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    SECTION("Prepare the state with quantum operations")
+    {
+        qs.push_back(sim.allocate());
+
+        auto start = std::chrono::high_resolution_clock::now();
+        sim.H(qs[0]);
+        for (size_t i = 1; i < n; i++)
+        {
+            sim.CX({qs[0]}, qs[i]);
+        }
+        // force the simulator to flush
+        sim.M(qs[0]);
+        std::cout << "Quantum cat state preparation:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject total state")
+    {
+        qs.push_back(sim.allocate());
+        constexpr size_t N = (static_cast<size_t>(1) << n);
+
+        std::vector<ComplexType> amplitudes(N, {0.0, 0.0});
+        const double amp = 1.0 / std::sqrt(2);
+        amplitudes[0] = {amp, 0.0};
+        amplitudes[N - 1] = {amp, 0.0};
+
+        auto start = std::chrono::high_resolution_clock::now();
+        sim.InjectState(qs, amplitudes);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "    Total cat state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject partial state")
+    {
+        logical_qubit_id q_last = sim.allocate();
+        constexpr size_t N = (static_cast<size_t>(1) << (n - 1));
+        std::vector<ComplexType> amplitudes(N, {0.0, 0.0});
+        const double amp = 1.0 / std::sqrt(2);
+        amplitudes[0] = {amp, 0.0};
+        amplitudes[N - 1] = {amp, 0.0};
+
+        auto start = std::chrono::high_resolution_clock::now();
+        sim.InjectState(qs, amplitudes);
+        sim.CX({qs[0]}, q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "  Partial cat state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
     }
 }
 

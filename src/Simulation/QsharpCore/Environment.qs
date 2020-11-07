@@ -20,11 +20,10 @@ namespace Microsoft.Quantum.Environment {
 
     /// # Summary
     /// Returns the number of qubits currently available to borrow.
-    /// This includes unused qubits; that is, this includes the qubits
-    /// returned by `GetQubitsAvailableToUse`.
     ///
     /// # Output
-    /// The number of qubits that could be allocated in a `borrowing` statement.
+    /// The number of qubits that could be borrowed and 
+    /// won't be allocated as part of a `borrowing` statement.
     /// If the target machine being used does not provide this information, then
     /// `-1` is returned.
     ///
