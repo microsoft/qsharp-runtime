@@ -5,15 +5,23 @@
 
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Exp.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\Exp.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\I.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\H.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Measure.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\Measure.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\R.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\R.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\S.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\S.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\T.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\T.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
+    <Qompile Include="..\TargetDefinitions\Intrinsic\X.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\Y.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\Z.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +41,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFrac.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingXX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingYY.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingZZ.qs" />

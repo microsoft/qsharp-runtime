@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
     @EnableTestingViaName("Test.TargetDefinitions.Reset")
-    operation Reset (target : Qubit) : Unit {
+    operation Reset (qubit : Qubit) : Unit {
         body intrinsic;
     }
 }
