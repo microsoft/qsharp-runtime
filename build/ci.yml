@@ -10,7 +10,7 @@ pr:
 
 variables:
   Build.Major: 0
-  Build.Minor: 11
+  Build.Minor: 13
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
 
