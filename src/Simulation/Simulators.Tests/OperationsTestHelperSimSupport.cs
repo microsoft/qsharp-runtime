@@ -9,6 +9,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     static partial class OperationsTestHelper
     {
+        public static bool ShouldPerformQubitUniquenessTest = true;
+
         private static void InitSimulator(SimulatorBase sim)
         {
             sim.InitBuiltinOperations(typeof(OperationsTestHelper));

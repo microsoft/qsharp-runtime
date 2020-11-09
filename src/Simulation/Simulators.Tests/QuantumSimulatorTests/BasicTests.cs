@@ -221,11 +221,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             // Some decompositions actually allow for duplications in controls, so these tests
             // should be skipped for those packages.
-#if (!SKIP_DISTINCT_QUBIT_CHECK)
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeTarget, target)));
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls1, target)));
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls2, target)));
-#endif
+            if (OperationsTestHelper.ShouldPerformQubitUniquenessTest)
+            {
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeTarget, target)));
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls1, target)));
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls2, target)));
+            }
         }
 
         private static void TestUnitary(IUnitary<Qubit> gate, IQArray<Qubit> ctrls, IQArray<Qubit> target)
@@ -241,9 +242,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var mapper = new Func<Qubit, IQArray<Qubit>>(q => new QArray<Qubit>(q, targets[1], targets[2]));
             var dupTargets = new QArray<Qubit>(targets[0], targets[1], targets[0]);
 
-#if (!SKIP_DISTINCT_QUBIT_CHECK)
-            Assert.Throws<NotDistinctQubits>(() => gate.Apply(dupTargets));
-#endif
+            if (OperationsTestHelper.ShouldPerformQubitUniquenessTest)
+            {
+                Assert.Throws<NotDistinctQubits>(() => gate.Apply(dupTargets));
+            }
             TestCallable(gate.Partial(mapper), targets[0]);
         }
 
