@@ -27,23 +27,38 @@ namespace SIMULATOR
 {
 namespace detail
 {
-inline std::size_t get_register(const std::vector<positional_qubit_id>& qs, std::size_t basis_state)
+/// Projects `basis_vector` onto the subsystem defined by `ps`, in the standard computational basis imposed by the order
+/// in which the positions are listed (little-endian). For example, consider `basis_vector` = |174> = |10101110> in an
+/// 8-qubit system. If this basis vector is projected onto a subsystem of three qubits with positions {6,3,2}
+/// (|_0__11__>), the corresponding -- reordered -- basis vector would be |110> = |6>.
+inline size_t get_register(const std::vector<positional_qubit_id>& ps, size_t basis_vector)
 {
-    std::size_t result = 0;
-    for (unsigned i = 0; i < qs.size(); ++i)
-        result |= ((basis_state >> qs[i]) & 1) << i;
+    size_t result = 0;
+    for (unsigned i = 0; i < ps.size(); ++i)
+    {
+        result |= ((basis_vector >> ps[i]) & 1) << i;
+    }
     return result;
 }
 
-inline std::size_t set_register(
-    const std::vector<positional_qubit_id>& qs,
-    std::size_t qmask,
-    std::size_t basis_state,
-    std::size_t original = 0ull)
+/// Lifts `basis_vector_in_ps` from the subsystem defined by `ps` into the linear subspace of the full system, defined
+/// by the complimentary positions in `basis_vector_target`.
+/// Implementation notes: `qmask` can be computed from `ps` but is passed in for performance reasons as most clients
+/// make repeated calls to `set_register` with the same set of positions.
+inline size_t set_register(
+    const std::vector<positional_qubit_id>& ps,
+    size_t qmask,
+    size_t basis_vector_in_ps,
+    size_t basis_vector_target)
 {
-    std::size_t result = original & ~qmask;
-    for (unsigned i = 0; i < qs.size(); ++i)
-        result |= ((basis_state >> i) & 1) << qs[i];
+    assert(qmask == kernels::make_mask(ps));
+    assert(basis_vector_in_ps < (1ull << ps.size()));
+
+    size_t result = basis_vector_target & ~qmask;
+    for (unsigned i = 0; i < ps.size(); ++i)
+    {
+        result |= ((basis_vector_in_ps >> i) & 1) << ps[i];
+    }
     return result;
 }
 } // namespace detail
@@ -719,36 +734,73 @@ class Wavefunction
         return kernels::subsytemwavefunction(wfn_, get_qubit_positions(qs), qubitswfn, tolerance);
     }
 
-    // apply permutation of basis states to the wave function
+    /// Apply the unitary operator that permutes the standard computational basis of the subsystem, defined by the
+    /// provided qubits. `qs` lists the qubits of the subsystem in little-endian order (the front qubit in the list
+    /// corresponds to the last position of the standard computational basis). `table_size` must be equal 2^n, where n
+    /// is the number of qubits in `qs`. `permutation_table` must point to an array of `table_size` integers that
+    /// describes a permutation of set {0, 1, ... , 2^n -1}. `adjoint` specifies whether to apply the adjoint of the
+    /// unitary.
+    ///
+    /// Implementation notes: the current positions of the provided qubits might not match the order in which they are
+    /// listed, so the unitary has to be Adjoint(V)*U*V, where V permutes the _provided qubits_ to match their positions
+    /// to the requested, and U does the specified permutation of the _standard computational basis_ of these qubits.
+    /// Note, that the positions of the qubits in the end remain unchanged.
     void permute_basis(
         std::vector<logical_qubit_id> const& qs,
-        std::size_t table_size,
-        std::size_t const* permutation_table,
+        size_t table_size,
+        size_t const* permutation_table,
         bool adjoint = false)
     {
-        assert(table_size == 1ull << qs.size());
-        flush();
-        auto real_qs = get_qubit_positions(qs);
-        auto num_states = wfn_.size();
-        auto psi_new = WavefunctionStorage(num_states);
-        auto qmask = kernels::make_mask(real_qs);
+        if (qs.empty()) return;
 
-        auto permute = [&real_qs, qmask, table_size, permutation_table](std::size_t state) {
-            auto qstate = detail::get_register(real_qs, state);
-            assert(qstate < table_size);
-            return detail::set_register(real_qs, qmask, permutation_table[qstate], state);
+#ifndef NDEBUG
+        assert(table_size == (1ull << qs.size()));
+        // permutation_table should describe a permutation of {0, 1, 2, ..., table_size - 1}
+        std::set<size_t> permutations(permutation_table, permutation_table + table_size);
+        assert(permutations.size() == table_size);         // no duplicates
+        assert(*permutations.begin() == 0);                // min element in ordered set
+        assert(*(--permutations.end()) == table_size - 1); // max element in ordered set
+#endif
+
+        flush();
+
+        std::vector<positional_qubit_id> positions = get_qubit_positions(qs);
+
+        const size_t num_states = wfn_.size();
+        WavefunctionStorage psi_new(num_states);
+        const size_t qmask = kernels::make_mask(positions);
+
+        auto permute = [&positions, qmask, table_size, permutation_table](size_t basis_vector) {
+            size_t qstate = detail::get_register(positions, basis_vector);
+            return detail::set_register(positions, qmask, permutation_table[qstate], basis_vector);
         };
 
+#ifndef NDEBUG
+        std::set<size_t> permuted;
+#endif
         if (!adjoint)
         {
             for (size_t i = 0; i < num_states; ++i)
-                psi_new[permute(i)] = wfn_[i];
+            {
+                const size_t target = permute(i);
+                assert(permuted.insert(target).second); // should see no duplicates
+                psi_new[target] = wfn_[i];
+            }
         }
         else
         {
             for (size_t i = 0; i < num_states; ++i)
-                psi_new[i] = wfn_[permute(i)];
+            {
+                const size_t source = permute(i);
+                assert(permuted.insert(source).second); // should see no duplicates
+                psi_new[i] = wfn_[source];
+            }
         }
+
+        // check that this was, indeed, a permutation of the basis
+        assert(permuted.size() == num_states);         // would follow if no duplicates encountered above
+        assert(*permuted.begin() == 0);                // min element in ordered set
+        assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
 
         std::swap(wfn_, psi_new);
     }
