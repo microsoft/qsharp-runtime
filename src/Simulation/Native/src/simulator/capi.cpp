@@ -45,7 +45,7 @@ extern "C"
         return Microsoft::Quantum::Simulator::get(id)->JointEnsembleProbability(bv, qv);
     }
 
-    MICROSOFT_QUANTUM_DECL void InjectState(
+    MICROSOFT_QUANTUM_DECL bool InjectState(
         _In_ unsigned sid,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q,
@@ -61,7 +61,7 @@ extern "C"
         }
         std::vector<unsigned> qubits(q, q + n);
 
-        Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
+        return Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
     }
 
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned id, _In_ unsigned q)

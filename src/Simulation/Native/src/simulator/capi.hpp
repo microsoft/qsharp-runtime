@@ -35,7 +35,7 @@ extern "C"
         _In_reads_(n) int* b,
         _In_reads_(n) unsigned* q);
 
-    MICROSOFT_QUANTUM_DECL void InjectState(
+    MICROSOFT_QUANTUM_DECL bool InjectState(
         _In_ unsigned sid,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q, // The listed qubits must be unentangled and in state |0>

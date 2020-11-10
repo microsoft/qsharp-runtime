@@ -565,27 +565,27 @@ class Wavefunction
         return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
     }
 
-    /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>.
+    /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>. If the prerequisite isn't satisfied,
+    /// the method returns `false` and leaves the state of the system unchanged.
     /// Place qubits, listed in `q` into superposition of basis vectors with provided `amplitudes`, where the order of
-    /// qubits in array `q` defines the standard computational basis in little endian order.
-    void inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
+    /// qubits in array `q` defines the standard computational basis in little endian order. Returns `true` if the state
+    /// is successfuly injected.
+    bool inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
 
         flush();
 
-        // Check prerequisites.
-        std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
-        for (positional_qubit_id p : positions)
-        {
-            if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
-            {
-                throw std::runtime_error("Cannot prepare state of entangled qubits or if they are not in state |0>");
-            }
-        }
-
         if (qubits.size() == num_qubits_)
         {
+            // Check prerequisites. In the case of total state injection the wave function must consist of a single
+            // term |0...0> (so we can avoid checking each qubit individually).
+            double eps = 100. * std::numeric_limits<double>::epsilon();
+            if (std::norm(wfn_[0]) < 1.0 - eps)
+            {
+                return false;
+            }
+
             // For full state injection we can copy the user's wave function into our store and reorder the
             // positions map without doing any math.
             for (unsigned i = 0; i < qubits.size(); i++)
@@ -596,6 +596,16 @@ class Wavefunction
         }
         else
         {
+            // Check prerequisites.
+            std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
+            for (positional_qubit_id p : positions)
+            {
+                if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
+                {
+                    return false;
+                }
+            }
+
             // The current state can be thought of as Sum(a_i*|i>|0...0>), after the state injection it will become
             // Sum(a_i*|i>Sum(b_j*|j>)) = Sum(a_i*b_j|i>|j>). Thus, to compute amplitude of a term |k> after the state
             // injection we need to find the corresponding |i> vector from the original wave function and |j> vector
@@ -619,6 +629,8 @@ class Wavefunction
             }
             std::swap(wfn_, wfn_new);
         }
+
+        return true;
     }
 
     /// measure a qubit
