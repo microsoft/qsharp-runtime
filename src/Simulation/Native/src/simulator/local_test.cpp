@@ -390,7 +390,7 @@ TEST_CASE("permute_basis", "[local_test]")
     const double amp = 1.0 / std::sqrt(5);
     std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
                                            {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}, {amp, 0.0}};
-    psi.inject_state({q0, q1, q2}, amplitudes);
+    REQUIRE(psi.inject_state({q0, q1, q2}, amplitudes));
 
     SECTION("identity permutation")
     {
@@ -453,7 +453,7 @@ TEST_CASE("permute_basis depends on the order of logical qubits (2)", "[local_te
     // Inject state, which would allow us to easily check permutations. It's not a normalized state but for this
     // test it doesn't matter.
     std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0}};
-    psi.inject_state({q0, q1}, amplitudes);
+    REQUIRE(psi.inject_state({q0, q1}, amplitudes));
     // after the state injection, positions of the qubits are q0:0 and q1:1
 
     SECTION("q0-q1 order (matches the current positions of the qubits in the standard basis)")
@@ -496,7 +496,7 @@ TEST_CASE("permute_basis depends on the order of logical qubits (3)", "[local_te
     // test it doesn't matter.
     std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0},
                                            {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0}, {7.0, 0.0}};
-    psi.inject_state({q0, q1, q2}, amplitudes);
+    REQUIRE(psi.inject_state({q0, q1, q2}, amplitudes));
 
     SECTION("q0-q1-q2 order")
     {
@@ -544,7 +544,7 @@ TEST_CASE("Inject total cat state", "[local_test]")
     std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
     REQUIRE(amplitudes.size() == N);
 
-    sim.InjectState(qs, amplitudes);
+    REQUIRE(sim.InjectState(qs, amplitudes));
 
     // undo the injected state back to |00>
     sim.CX({qs[0]}, qs[1]);
@@ -571,13 +571,13 @@ TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]"
 
     // unentangled but not |0>
     sim.H(qs[1]);
-    REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
-    REQUIRE_THROWS(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
+    REQUIRE_FALSE(sim.InjectState(qs, amplitudes));
+    REQUIRE_FALSE(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
 
     // entanglement doesn't make things any better
     sim.CX({qs[1]}, qs[2]);
-    REQUIRE_THROWS(sim.InjectState(qs, amplitudes));
-    REQUIRE_THROWS(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
+    REQUIRE_FALSE(sim.InjectState(qs, amplitudes));
+    REQUIRE_FALSE(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
 }
 
 TEST_CASE("Inject total state on reordered qubits", "[local_test]")
@@ -599,7 +599,7 @@ TEST_CASE("Inject total state on reordered qubits", "[local_test]")
 
     // Notice, that we are listing the qubits in order that doesn't match their allocation order. We are saying here,
     // that InjectState should create Bell pair from qs[1] and qs[2]!
-    sim.InjectState({qs[1], qs[2], qs[0]}, amplitudes);
+    REQUIRE(sim.InjectState({qs[1], qs[2], qs[0]}, amplitudes));
     REQUIRE((sim.isclassical(qs[0]) && !sim.M(qs[0])));
 
     // undo the state change and check that the whole system is back to |000>
@@ -652,7 +652,7 @@ TEST_CASE("Inject state on two qubits out of three", "[local_test]")
         sim.H(q0);
     }
 
-    sim.InjectState({x, y}, amplitudes);
+    REQUIRE(sim.InjectState({x, y}, amplitudes));
 
     // undo the state injection with quantum op and check that the qubits we injected state for are back to |0>
     sim.H(x);
@@ -697,7 +697,7 @@ TEST_CASE("Perf of injecting equal superposition state", "[skip]") // local micr
         std::vector<ComplexType> amplitudes(N, {amp, 0.0});
 
         auto start = high_resolution_clock::now();
-        sim.InjectState(qs, amplitudes);
+        REQUIRE(sim.InjectState(qs, amplitudes));
         sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "    Total state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
@@ -712,7 +712,7 @@ TEST_CASE("Perf of injecting equal superposition state", "[skip]") // local micr
         std::vector<ComplexType> amplitudes(N, {amp, 0.0});
 
         auto start = std::chrono::high_resolution_clock::now();
-        sim.InjectState(qs, amplitudes);
+        REQUIRE(sim.InjectState(qs, amplitudes));
         sim.H(q_last);
         sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "  Partial state injection:\t";
@@ -761,7 +761,7 @@ TEST_CASE("Perf of injecting cat state", "[skip]") // local micro_benchmark
         amplitudes[N - 1] = {amp, 0.0};
 
         auto start = std::chrono::high_resolution_clock::now();
-        sim.InjectState(qs, amplitudes);
+        REQUIRE(sim.InjectState(qs, amplitudes));
         sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "    Total cat state injection:\t";
         std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
@@ -778,7 +778,7 @@ TEST_CASE("Perf of injecting cat state", "[skip]") // local micro_benchmark
         amplitudes[N - 1] = {amp, 0.0};
 
         auto start = std::chrono::high_resolution_clock::now();
-        sim.InjectState(qs, amplitudes);
+        REQUIRE(sim.InjectState(qs, amplitudes));
         sim.CX({qs[0]}, q_last);
         sim.M(qs[0]); // to have the same overhead compared to preparation test case
         std::cout << "  Partial cat state injection:\t";
