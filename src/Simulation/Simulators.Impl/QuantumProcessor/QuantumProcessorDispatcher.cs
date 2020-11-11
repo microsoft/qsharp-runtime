@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using Microsoft.Quantum.Simulation.Common;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     /// <summary>
     /// Dispatcher (Simulator) that redirects all the calls to a class implementing <see cref="IQuantumProcessor"/> interface.
     /// </summary>
-    public partial class QuantumProcessorDispatcher : SimulatorBase
+    public partial class QuantumProcessorDispatcher : SimulatorBase, IQsharpCore
     {
         private const int PreallocatedQubitCount = 256;
 
@@ -40,6 +42,19 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             onlyOverrideBodyIntrinsic
         )
         {
+            // Initialize the overrides for the target intrinsics. If any intrinsics are not found
+            // and overriden, they will throw an error when used at runtime because they are still
+            // abstract.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
+                if (targetIntrinsics != null)
+                {
+                    this.InitBuiltinOperations(targetIntrinsics, true);
+                    break;
+                }
+            }
+
             QuantumProcessor = quantumProcessor;
             OnOperationStart += QuantumProcessor.OnOperationStart;
             OnOperationEnd += QuantumProcessor.OnOperationEnd;

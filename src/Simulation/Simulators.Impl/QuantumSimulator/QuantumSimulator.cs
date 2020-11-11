@@ -48,10 +48,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
             true
         )
         {
-            //TODO(swernli): This can't directly refer to the type, so we need another way to 
-            // do this...
-            // Initialize the overrides for the target intrinsics.
-            this.InitBuiltinOperations(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), true);
+            // Initialize the overrides for the target intrinsics. If any intrinsics are not found
+            // and overriden, they will throw an error when used at runtime because they are still
+            // abstract.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
+                if (targetIntrinsics != null)
+                {
+                    this.InitBuiltinOperations(targetIntrinsics, true);
+                    break;
+                }
+            }
 
             Id = Init();
             // Make sure that the same seed used by the built-in System.Random
@@ -220,7 +228,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
             else
             {
-                uint count = (uint)ctrls.Length;                
+                uint count = (uint)ctrls.Length;
                 controlledAction(count, ctrls.GetIds());
             }
         }

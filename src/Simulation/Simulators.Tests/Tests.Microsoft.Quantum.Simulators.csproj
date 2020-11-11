@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.Qsharp.Core.csproj" />
     <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

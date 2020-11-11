@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>

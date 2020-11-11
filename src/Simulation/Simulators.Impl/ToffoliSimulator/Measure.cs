@@ -10,50 +10,33 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class ToffoliSimulator
     {
         /// <summary>
-        /// Implementation of the Measure operation for the Toffoli simulator.
+        /// The implementation of the operation.
+        /// For the Toffoli simulator, the implementation returns the joint parity of the 
+        /// states of the measured qubits.
+        /// That is, Result.One is returned if an odd number of the measured qubits are
+        /// in the One state.
         /// </summary>
-        public class Measure : Intrinsic.Measure
+        public Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
         {
-            private ToffoliSimulator simulator { get; }
+            Qubit? f(Pauli p, Qubit q) =>
+                p switch {
+                    Pauli.PauliI => null,
+                    Pauli.PauliZ => q,
+                    _ => throw new InvalidOperationException($"The Toffoli simulator can only Measure in the Z basis.")
+                };
 
-            /// <summary>
-            /// Constructs a new operation instance.
-            /// </summary>
-            /// <param name="m">The simulator that this operation affects.</param>
-            public Measure(ToffoliSimulator m) : base(m)
+            var (paulis, qubits) = _args;
+
+            if (paulis.Length != qubits.Length)
             {
-                this.simulator = m;
+                throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
             }
 
-            /// <summary>
-            /// The implementation of the operation.
-            /// For the Toffoli simulator, the implementation returns the joint parity of the 
-            /// states of the measured qubits.
-            /// That is, Result.One is returned if an odd number of the measured qubits are
-            /// in the One state.
-            /// </summary>
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (_args) =>
-            {
-                Qubit? f(Pauli p, Qubit q) =>
-                    p switch {
-                        Pauli.PauliI => null,
-                        Pauli.PauliZ => q,
-                        _ => throw new InvalidOperationException($"The Toffoli simulator can only Measure in the Z basis.")
-                    };
+            var qubitsToMeasure = paulis.Zip(qubits, f).WhereNotNull();
 
-                var (paulis, qubits) = _args;
+            var result = this.GetParity(qubitsToMeasure);
 
-                if (paulis.Length != qubits.Length)
-                {
-                    throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
-                }
-
-                var qubitsToMeasure = paulis.Zip(qubits, f).WhereNotNull();
-
-                var result = simulator.GetParity(qubitsToMeasure);
-
-                return result.ToResult();
-            };
-        }
+            return result.ToResult();
+        };
     }
 }

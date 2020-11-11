@@ -9,94 +9,77 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class ToffoliSimulator
     {
         /// <summary>
-        /// Implementation of the Exp operation for the Toffoli simulator.
+        /// The implementation of the operation.
+        /// For the Toffoli simulator, the implementation flips a target qubit
+        /// if the respective rotation is effectively an X gate.
         /// </summary>
-        public class Exp : Intrinsic.Exp
+        public Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_Body() => (_args) =>
         {
-            private ToffoliSimulator simulator { get; }
+            var (bases, angle, qubits) = _args;
 
-            /// <summary>
-            /// Constructs a new operation instance.
-            /// </summary>
-            /// <param name="m">The simulator that this operation affects.</param>
-            public Exp(ToffoliSimulator m) : base(m)
+            if (qubits == null) return QVoid.Instance;
+
+            this.CheckQubits(qubits, "qubits");
+
+            if (qubits.Length != bases.Length)
             {
-                simulator = m;
+                throw new InvalidOperationException($"Both input arrays for {GetType().Name} (paulis,qubits), must be of same size");
             }
 
-            /// <summary>
-            /// The implementation of the operation.
-            /// For the Toffoli simulator, the implementation flips a target qubit
-            /// if the respective rotation is effectively an X gate.
-            /// </summary>
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __Body__ => (_args) =>
+            for (var i = 0; i < qubits.Length; i++)
             {
-                var (bases, angle, qubits) = _args;
-
-                if (qubits == null) return QVoid.Instance;
-
-                simulator.CheckQubits(qubits, "qubits");
-
-                if (qubits.Length != bases.Length)
+                var (isX, safe) = CheckRotation(bases[i], angle);
+                if (isX)
                 {
-                    throw new InvalidOperationException($"Both input arrays for {GetType().Name} (paulis,qubits), must be of same size");
+                    this.State[qubits[i].Id] = !this.State[qubits[i].Id];
                 }
+            }
 
-                for (var i = 0; i < qubits.Length; i++)
-                {
-                    var (isX, safe) = CheckRotation(bases[i], angle);
-                    if (isX)
-                    {
-                        simulator.State[qubits[i].Id] = !simulator.State[qubits[i].Id];
-                    }
-                }
+            return QVoid.Instance;
+        };
 
-                return QVoid.Instance;
-            };
+        /// <summary>
+        /// The implementation of the adjoint specialization of the operation.
+        /// For the Toffoli simulator *only*, this operation is self-adjoint.
+        /// </summary>
+        public Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_AdjointBody() => Exp_Body();
 
-            /// <summary>
-            /// The implementation of the adjoint specialization of the operation.
-            /// For the Toffoli simulator *only*, this operation is self-adjoint.
-            /// </summary>
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __AdjointBody__ => __Body__;
+        /// <summary>
+        /// The implementation of the controlled specialization of the operation.
+        /// For the Toffoli simulator, the implementation flips the target qubit
+        /// if the rotation is effectively an X gate and all of the control qubits
+        /// are in the One state.
+        /// </summary>
+        public Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledBody() => (_args) =>
+        {
+            var (ctrls, (bases, angle, qubits)) = _args;
 
-            /// <summary>
-            /// The implementation of the controlled specialization of the operation.
-            /// For the Toffoli simulator, the implementation flips the target qubit
-            /// if the rotation is effectively an X gate and all of the control qubits
-            /// are in the One state.
-            /// </summary>
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledBody__ => (_args) =>
+            if (qubits == null) return QVoid.Instance;
+
+            this.CheckControlQubits(ctrls, qubits);
+
+            if (qubits.Length != bases.Length)
             {
-                var (ctrls, (bases, angle, qubits)) = _args;
+                throw new InvalidOperationException($"Both input arrays for {GetType().Name} (paulis,qubits), must be of same size");
+            }
 
-                if (qubits == null) return QVoid.Instance;
-
-                simulator.CheckControlQubits(ctrls, qubits);
-
-                if (qubits.Length != bases.Length)
+            for (var i = 0; i < qubits.Length; i++)
+            {
+                var (id, safe) = CheckRotation(bases[i], angle);
+                if (!safe)
                 {
-                    throw new InvalidOperationException($"Both input arrays for {GetType().Name} (paulis,qubits), must be of same size");
+                    throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
                 }
+                // We never need to do anything since only the identity is safe to control
+            }
 
-                for (var i = 0; i < qubits.Length; i++)
-                {
-                    var (id, safe) = CheckRotation(bases[i], angle);
-                    if (!safe)
-                    {
-                        throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
-                    }
-                    // We never need to do anything since only the identity is safe to control
-                }
+            return QVoid.Instance;
+        };
 
-                return QVoid.Instance;
-            };
-
-            /// <summary>
-            /// The implementation of the controlled adjoint specialization of the operation.
-            /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
-            /// </summary>
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => __ControlledBody__;
-        }
+        /// <summary>
+        /// The implementation of the controlled adjoint specialization of the operation.
+        /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
+        /// </summary>
+        public Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledAdjointBody() => Exp_ControlledBody();
     }
 }

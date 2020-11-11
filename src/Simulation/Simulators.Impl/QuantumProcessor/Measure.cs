@@ -9,29 +9,19 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     public partial class QuantumProcessorDispatcher
     {
-        public class QuantumProcessorDispatcherMeasure : Quantum.Intrinsic.Measure
+        public Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
         {
-            private QuantumProcessorDispatcher Simulator { get; }
+            (IQArray<Pauli> paulis, IQArray<Qubit> qubits) = _args;
 
-            public QuantumProcessorDispatcherMeasure(QuantumProcessorDispatcher m) : base(m)
+            if (paulis.Length != qubits.Length)
             {
-                this.Simulator = m;
+                throw new InvalidOperationException(
+                    $"Both input arrays for Measure (paulis,qubits), must be of same size");
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (_args) =>
-            {
-                (IQArray<Pauli> paulis, IQArray<Qubit> qubits) = _args;
+            CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
 
-                if (paulis.Length != qubits.Length)
-                {
-                    throw new InvalidOperationException(
-                        $"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
-                }
-
-                CommonUtils.PruneObservable(paulis, qubits, out QArray<Pauli> newPaulis, out QArray<Qubit> newQubits);
-
-                return Simulator.QuantumProcessor.Measure( newPaulis, newQubits);
-            };
-        }
+            return this.QuantumProcessor.Measure( newPaulis, newQubits);
+        };
     }
 }

@@ -3,7 +3,8 @@
   <Import Project="..\Common\Simulators.Test.props" />
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulators.Type2\Microsoft.Quantum.Simulators.Type2.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Type2Core\Microsoft.Quantum.Type2.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

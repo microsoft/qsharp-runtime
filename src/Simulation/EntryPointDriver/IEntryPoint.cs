@@ -60,5 +60,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <returns>The argument to the entry point.</returns>
         TIn CreateArgument(ParseResult parseResult);
+
+        Type TargetIntrinsicsType { get; }
     }
 }

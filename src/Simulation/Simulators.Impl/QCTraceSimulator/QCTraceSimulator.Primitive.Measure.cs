@@ -8,21 +8,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
     public partial class QCTraceSimulatorImpl
     {
-        public class TracerMeasure : Intrinsic.Measure
+        public Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (args) =>
         {
-            private readonly QCTraceSimulatorImpl core;
-            public TracerMeasure(QCTraceSimulatorImpl m) : base(m){
-                core = m;
-            }
-
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result>
-                __Body__ => (args) =>
-                {
-                    (IQArray<Pauli> observable, IQArray<Qubit> target) = args;
-                    return core.Measure(observable, target);
-                };
-        }
-
-
+            (IQArray<Pauli> observable, IQArray<Qubit> target) = args;
+            return this.Measure(observable, target);
+        };
     }
 }

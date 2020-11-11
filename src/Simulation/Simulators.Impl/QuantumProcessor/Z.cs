@@ -8,36 +8,26 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     public partial class QuantumProcessorDispatcher
     {
-        public class QuantumProcessorDispatcherZ : Quantum.Intrinsic.Z
+        public Func<Qubit, QVoid> Z_Body() => (q1) =>
         {
-            private QuantumProcessorDispatcher Simulator { get; }
+            this.QuantumProcessor.Z(q1);
+            return QVoid.Instance;
+        };
 
-            public QuantumProcessorDispatcherZ(QuantumProcessorDispatcher m) : base(m)
+        public Func<(IQArray<Qubit>, Qubit), QVoid> Z_ControlledBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
+
+            if ((ctrls == null) || (ctrls.Count == 0))
             {
-                this.Simulator = m;
+                this.QuantumProcessor.Z(q1);
+            }
+            else
+            {
+                this.QuantumProcessor.ControlledZ(ctrls, q1);
             }
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.QuantumProcessor.Z(q1);
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (_args) =>
-            {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
-
-                if ((ctrls == null) || (ctrls.Count == 0))
-                {
-                    Simulator.QuantumProcessor.Z(q1);
-                }
-                else
-                {
-                    Simulator.QuantumProcessor.ControlledZ(ctrls, q1);
-                }
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
@@ -23,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     /// <summary>
     /// The Toffoli simulator implementation class.
     /// </summary>
-    public partial class ToffoliSimulator : SimulatorBase
+    public partial class ToffoliSimulator : SimulatorBase, IQsharpCore
     {
         /// <summary>
         /// The default number of qubits to allocate.
@@ -50,6 +51,19 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.State = new bool[qubitCount];
             this.borrowedQubitStates = new Dictionary<int, Stack<bool>>();
+
+            // Initialize the overrides for the target intrinsics. If any intrinsics are not found
+            // and overriden, they will throw an error when used at runtime because they are still
+            // abstract.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
+                if (targetIntrinsics != null)
+                {
+                    this.InitBuiltinOperations(targetIntrinsics, true);
+                    break;
+                }
+            }
         }
 
         /// <summary>

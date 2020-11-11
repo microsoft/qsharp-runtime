@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
+    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.Qsharp.Core.csproj" />
   </ItemGroup>
 
   <Target Name="BeforeCsharpCompile">

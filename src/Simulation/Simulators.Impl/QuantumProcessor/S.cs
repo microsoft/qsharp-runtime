@@ -8,58 +8,48 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
 {
     public partial class QuantumProcessorDispatcher
     {
-        public class QuantumProcessorDispatcherS : Quantum.Intrinsic.S
+        public Func<Qubit, QVoid> S_Body() => (q1) =>
         {
-            private QuantumProcessorDispatcher Simulator { get; }
+            this.QuantumProcessor.S(q1);
+            return QVoid.Instance;
+        };
 
-            public QuantumProcessorDispatcherS(QuantumProcessorDispatcher m) : base(m)
+        public Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
+
+            if ((ctrls == null) || (ctrls.Count == 0))
             {
-                this.Simulator = m;
+                this.QuantumProcessor.S(q1);
+            }
+            else
+            {
+                this.QuantumProcessor.ControlledS(ctrls, q1);
             }
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
+            return QVoid.Instance;
+        };
+
+        public Func<Qubit, QVoid> S_AdjointBody() => (q1) =>
+        {
+            this.QuantumProcessor.SAdjoint(q1);
+            return QVoid.Instance;
+        };
+
+        public Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledAdjointBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
+
+            if ((ctrls == null) || (ctrls.Count == 0))
             {
-                Simulator.QuantumProcessor.S(q1);
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (_args) =>
+                this.QuantumProcessor.SAdjoint(q1);
+            }
+            else
             {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
+                this.QuantumProcessor.ControlledSAdjoint(ctrls, q1);
+            }
 
-                if ((ctrls == null) || (ctrls.Count == 0))
-                {
-                    Simulator.QuantumProcessor.S(q1);
-                }
-                else
-                {
-                    Simulator.QuantumProcessor.ControlledS(ctrls, q1);
-                }
-
-                return QVoid.Instance;
-            };
-
-            public override Func<Qubit, QVoid> __AdjointBody__ => (q1) =>
-            {
-                Simulator.QuantumProcessor.SAdjoint(q1);
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => (_args) =>
-            {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
-
-                if ((ctrls == null) || (ctrls.Count == 0))
-                {
-                    Simulator.QuantumProcessor.SAdjoint(q1);
-                }
-                else
-                {
-                    Simulator.QuantumProcessor.ControlledSAdjoint(ctrls, q1);
-                }
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

@@ -2,8 +2,4 @@
 
   <Import Project="..\Common\Simulators.Impl.props" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\Type2Core\Microsoft.Quantum.Type2.Core.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -8,13 +8,14 @@ using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Common;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation
 {
     /// <summary>
     /// Internals of <see cref="QCTraceSimulator"/>. For internal use only.
     /// </summary>
-    public partial class QCTraceSimulatorImpl : SimulatorBase
+    public partial class QCTraceSimulatorImpl : SimulatorBase, IGate_Measure
     {
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
@@ -107,6 +108,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             OnOperationStart += tracingCore.OnOperationStart;
             OnOperationEnd += tracingCore.OnOperationEnd;
 
+            // Override the Measure operation.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
+                if (targetIntrinsics != null)
+                {
+                    var measureShim = 
+                        (from nestedType in targetIntrinsics.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                        where nestedType.BaseType?.FullName == "Microsoft.Quantum.Intrinsic.Measure"
+                        select nestedType).SingleOrDefault();
+                    if (measureShim != null)
+                    {
+                        this.Register(measureShim.BaseType, measureShim);
+                        break;
+                    }
+                }
+            }
+
             RegisterPrimitiveOperationsGivenAsCircuits();
         }
 
@@ -148,8 +167,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         private void RegisterPrimitiveOperationsGivenAsCircuits()
         {
+            var intrinsicAssembly = 
+                (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
+                select assembly).Single();
             IEnumerable<Type> primitiveOperationTypes =
-                from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
+                from op in intrinsicAssembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
                 select op;
 

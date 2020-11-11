@@ -12,9 +12,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
     @EnableTestingViaName("Test.TargetDefinitions.Reset")
-    operation Reset (target : Qubit) : Unit {
+    operation Reset (qubit : Qubit) : Unit {
         // This platform doesn't support use of a qubit after measurement, so 
         // `Reset` is really just marking the qubit as measured.
-        let r = M(target);
+        let r = M(qubit);
     }
 }

@@ -9,55 +9,38 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class ToffoliSimulator
     {
         /// <summary>
-        /// Implementation of the X operation for the Toffoli simulator.
+        /// The implementation of the operation.
+        /// For the Toffoli simulator, the implementation flips the target qubit.
         /// </summary>
-        public class X : Intrinsic.X
+        public Func<Qubit, QVoid> X_Body() => (q1) =>
         {
-            private ToffoliSimulator simulator;
+            if (q1 == null) return QVoid.Instance;
 
-            /// <summary>
-            /// Constructs a new operation instance.
-            /// </summary>
-            /// <param name="m">The simulator that this operation affects.</param>
-            public X(ToffoliSimulator m) : base(m)
+            this.CheckQubit(q1, "q1");
+
+            this.DoX(q1);
+
+            return QVoid.Instance;
+        };
+
+        /// <summary>
+        /// The implementation of the controlled specialization of the operation.
+        /// For the Toffoli simulator, the implementation flips the target qubit 
+        /// if all of the control qubits are 1.
+        /// </summary>
+        public Func<(IQArray<Qubit>, Qubit), QVoid> X_ControlledBody() => (args) =>
+        {
+            var (ctrls, q) = args;
+            if (q == null) return QVoid.Instance;
+
+            this.CheckControlQubits(ctrls, q);
+
+            if (this.VerifyControlCondition(ctrls))
             {
-                simulator = m;
+                this.DoX(q);
             }
 
-            /// <summary>
-            /// The implementation of the operation.
-            /// For the Toffoli simulator, the implementation flips the target qubit.
-            /// </summary>
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                if (q1 == null) return QVoid.Instance;
-
-                simulator.CheckQubit(q1, "q1");
-
-                simulator.DoX(q1);
-
-                return QVoid.Instance;
-            };
-
-            /// <summary>
-            /// The implementation of the controlled specialization of the operation.
-            /// For the Toffoli simulator, the implementation flips the target qubit 
-            /// if all of the control qubits are 1.
-            /// </summary>
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (args) =>
-            {
-                var (ctrls, q) = args;
-                if (q == null) return QVoid.Instance;
-
-                simulator.CheckControlQubits(ctrls, q);
-
-                if (simulator.VerifyControlCondition(ctrls))
-                {
-                    simulator.DoX(q);
-                }
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }
