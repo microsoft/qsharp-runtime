@@ -9,43 +9,26 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimX : Intrinsic.X
+        public Func<Qubit, QVoid> X_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "X")]
-            private static extern void X(uint id, uint qubit);
+            this.CheckQubit(q1);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCX")]
-            private static extern void MCX(uint id, uint count, uint[] ctrls, uint qubit);
+            X(this.Id, (uint)q1.Id);
 
-            private QuantumSimulator Simulator { get; }
+            return QVoid.Instance;
+        };
 
+        public Func<(IQArray<Qubit>, Qubit), QVoid> X_ControlledBody() => (args) =>
+        {
+            var (ctrls, q1) = args;
 
-            public QSimX(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
+            this.CheckQubits(ctrls, q1);
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
+            SafeControlled(ctrls,
+                () => X_Body().Invoke(q1),
+                (count, ids) => MCX(this.Id, count, ids, (uint)q1.Id));
 
-                X(Simulator.Id, (uint)q1.Id);
-
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (args) =>
-            {
-                var (ctrls, q1) = args;
-
-                Simulator.CheckQubits(ctrls, q1);
-
-                SafeControlled(ctrls,
-                    () => this.Apply(q1),
-                    (count, ids) => MCX(Simulator.Id, count, ids, (uint)q1.Id));
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

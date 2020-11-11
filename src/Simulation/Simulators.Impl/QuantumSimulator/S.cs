@@ -9,71 +9,48 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimS : Intrinsic.S
+        public Func<Qubit, QVoid> S_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "S")]
-            private static extern void S(uint id, uint qubit);
+            this.CheckQubit(q1);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdjS")]
-            private static extern void AdjS(uint id, uint qubit);
+            S(this.Id, (uint)q1.Id);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCS")]
-            private static extern void MCS(uint id, uint count, uint[] ctrls, uint qubit);
+            return QVoid.Instance;
+        };
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCAdjS")]
-            private static extern void MCAdjS(uint id, uint count, uint[] ctrls, uint qubit);
+        public Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
 
-            private QuantumSimulator Simulator { get; }
+            this.CheckQubits(ctrls, q1);
 
+            SafeControlled(ctrls,
+                () => S_Body().Invoke(q1),
+                (count, ids) => MCS(this.Id, count, ids, (uint)q1.Id));
 
-            public QSimS(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
+            return QVoid.Instance;
+        };
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
+        public Func<Qubit, QVoid> S_AdjointBody() => (q1) =>
+        {
+            this.CheckQubit(q1);
 
-                S(Simulator.Id, (uint)q1.Id);
+            AdjS(this.Id, (uint)q1.Id);
 
-                return QVoid.Instance;
-            };
+            return QVoid.Instance;
+        };
 
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (_args) =>
-            {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
+        public Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledAdjointBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
 
-                Simulator.CheckQubits(ctrls, q1);
+            this.CheckQubits(ctrls, q1);
 
-                SafeControlled(ctrls,
-                    () => this.Apply(q1),
-                    (count, ids) => MCS(Simulator.Id, count, ids, (uint)q1.Id));
+            SafeControlled(ctrls,
+                () => S_AdjointBody().Invoke(q1),
+                (count, ids) => MCAdjS(this.Id, count, ids, (uint)q1.Id));
 
-                return QVoid.Instance;
-            };
-
-            public override Func<Qubit, QVoid> __AdjointBody__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
-
-                AdjS(Simulator.Id, (uint)q1.Id);
-
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledAdjointBody__ => (_args) =>
-            {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
-
-                Simulator.CheckQubits(ctrls, q1);
-
-                SafeControlled(ctrls,
-                    () => this.__AdjointBody__(q1),
-                    (count, ids) => MCAdjS(Simulator.Id, count, ids, (uint)q1.Id));
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

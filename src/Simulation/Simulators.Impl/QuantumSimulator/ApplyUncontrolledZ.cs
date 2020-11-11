@@ -9,27 +9,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        internal class QSimApplyUncontrolledZ : Intrinsic.ApplyUncontrolledZ
+        public Func<Qubit, QVoid> ApplyUncontrolledZ_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Z")]
-            private static extern void Z(uint id, uint qubit);
+            this.CheckQubit(q1);
 
-            private QuantumSimulator Simulator { get; }
+            Z(this.Id, (uint)q1.Id);
 
-
-            public QSimApplyUncontrolledZ(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
-
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
-
-                Z(Simulator.Id, (uint)q1.Id);
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

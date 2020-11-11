@@ -10,62 +10,45 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public class QSimR : Intrinsic.R
+        public Func<(Pauli, double, Qubit), QVoid> R_Body() => (_args) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "R")]
-            private static extern void R(uint id, Pauli basis, double angle, uint qubit);
+            var (basis, angle, q1) = _args;
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCR")]
-            private static extern void MCR(uint id, Pauli basis, double angle, uint count, uint[] ctrls, uint qubit);
+            this.CheckQubit(q1);
+            CheckAngle(angle);
 
-            private QuantumSimulator Simulator { get; }
+            R(this.Id, basis, angle, (uint)q1.Id);
 
+            return QVoid.Instance;
+        };
 
-            public QSimR(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
+        public Func<(Pauli, double, Qubit), QVoid> R_AdjointBody() => (_args) =>
+        {
+            var (basis, angle, q1) = _args;
 
-            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => (_args) =>
-            {
-                var (basis, angle, q1) = _args;
+            return R_Body().Invoke((basis, -angle, q1));
+        };
 
-                Simulator.CheckQubit(q1);
-                CheckAngle(angle);
+        public Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> R_ControlledBody() => (_args) =>
+        {
+            var (ctrls, (basis, angle, q1)) = _args;
 
-                R(Simulator.Id, basis, angle, (uint)q1.Id);
+            this.CheckQubits(ctrls, q1);
+            CheckAngle(angle);
 
-                return QVoid.Instance;
-            };
+            SafeControlled(ctrls,
+                () => R_Body().Invoke((basis, angle, q1)),
+                (count, ids) => MCR(this.Id, basis, angle, count, ids, (uint)q1.Id));
 
-            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => (_args) =>
-            {
-                var (basis, angle, q1) = _args;
-
-                return this.__Body__.Invoke((basis, -angle, q1));
-            };
-
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => (_args) =>
-            {
-                var (ctrls, (basis, angle, q1)) = _args;
-
-                Simulator.CheckQubits(ctrls, q1);
-                CheckAngle(angle);
-
-                SafeControlled(ctrls,
-                    () => this.__Body__.Invoke((basis, angle, q1)),
-                    (count, ids) => MCR(Simulator.Id, basis, angle, count, ids, (uint)q1.Id));
-
-                return QVoid.Instance;
-            };
+            return QVoid.Instance;
+        };
 
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => (_args) =>
-            {
-                var (ctrls, (basis, angle, q1)) = _args;
+        public Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> R_ControlledAdjointBody() => (_args) =>
+        {
+            var (ctrls, (basis, angle, q1)) = _args;
 
-                return this.__ControlledBody__.Invoke((ctrls, (basis, -angle, q1)));
-            };
-        }
+            return R_ControlledBody().Invoke((ctrls, (basis, -angle, q1)));
+        };
     }
 }

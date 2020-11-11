@@ -8,12 +8,13 @@ using Microsoft.Quantum.Simulation.Common;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : SimulatorBase, IDisposable
+    public partial class QuantumSimulator : SimulatorBase, IQsharpCore, IType1Core, IType2Core, IDisposable
     {
         public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime.dll";
 
@@ -47,6 +48,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             true
         )
         {
+            //TODO(swernli): This can't directly refer to the type, so we need another way to 
+            // do this...
+            // Initialize the overrides for the target intrinsics.
+            this.InitBuiltinOperations(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), true);
+
             Id = Init();
             // Make sure that the same seed used by the built-in System.Random
             // instance is also used by the native simulator itself.

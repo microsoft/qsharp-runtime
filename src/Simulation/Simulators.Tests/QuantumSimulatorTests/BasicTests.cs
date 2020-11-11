@@ -290,12 +290,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 var gateTypes = new Type[]
                 {
-                    typeof(Intrinsic.H),
-                    typeof(Intrinsic.S),
-                    typeof(Intrinsic.T),
+                    // typeof(Intrinsic.H),
+                    // typeof(Intrinsic.S),
+                    // typeof(Intrinsic.T),
                     typeof(Intrinsic.X),
-                    typeof(Intrinsic.Y),
-                    typeof(Intrinsic.Z)
+                    // typeof(Intrinsic.Y),
+                    // typeof(Intrinsic.Z)
                 };
 
                 foreach (var t in gateTypes)

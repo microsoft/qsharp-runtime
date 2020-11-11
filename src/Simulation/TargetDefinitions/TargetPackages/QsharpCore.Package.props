@@ -17,7 +17,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\T.qs" />
     <Compile Include="..\TargetDefinitions\Intrinsic\T.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
-    <Qompile Include="..\TargetDefinitions\Intrinsic\X.cs" />
+    <Compile Include="..\TargetDefinitions\Intrinsic\X.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
     <Compile Include="..\TargetDefinitions\Intrinsic\Y.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />

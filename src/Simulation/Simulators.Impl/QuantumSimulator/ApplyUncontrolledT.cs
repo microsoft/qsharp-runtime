@@ -9,37 +9,21 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        internal class QSimApplyUncontrolledT : Intrinsic.ApplyUncontrolledT
+        public Func<Qubit, QVoid> ApplyUncontrolledT_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "T")]
-            private static extern void T(uint id, uint qubit);
+            this.CheckQubit(q1);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdjT")]
-            private static extern void AdjT(uint id, uint qubit);
+            T(this.Id, (uint)q1.Id);
+            return QVoid.Instance;
+        };
 
-            private QuantumSimulator Simulator { get; }
+        public Func<Qubit, QVoid> ApplyUncontrolledT_AdjointBody() => (q1) =>
+        {
+            this.CheckQubit(q1);
+            
+            AdjT(this.Id, (uint)q1.Id);
 
-
-            public QSimApplyUncontrolledT(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
-
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
-
-                T(Simulator.Id, (uint)q1.Id);
-                return QVoid.Instance;
-            };
-
-            public override Func<Qubit, QVoid> __AdjointBody__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
-                
-                AdjT(this.Simulator.Id, (uint)q1.Id);
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

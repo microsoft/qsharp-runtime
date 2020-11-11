@@ -9,43 +9,26 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimY : Intrinsic.Y
+        public Func<Qubit, QVoid> Y_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Y")]
-            private static extern void Y(uint id, uint qubit);
+            this.CheckQubit(q1);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCY")]
-            private static extern void MCY(uint id, uint count, uint[] ctrls, uint qubit);
+            Y(this.Id, (uint)q1.Id);
 
-            private QuantumSimulator Simulator { get; }
+            return QVoid.Instance;
+        };
 
+        public Func<(IQArray<Qubit>, Qubit), QVoid> Y_ControlledBody() => (_args) =>
+        {
+            (IQArray<Qubit> ctrls, Qubit q1) = _args;
 
-            public QSimY(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
+            this.CheckQubits(ctrls, q1);
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                Simulator.CheckQubit(q1);
+            SafeControlled(ctrls,
+                () => Y_Body().Invoke(q1),
+                (count, ids) => MCY(this.Id, count, ids, (uint)q1.Id));
 
-                Y(Simulator.Id, (uint)q1.Id);
-
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, Qubit), QVoid> __ControlledBody__ => (_args) =>
-            {
-                (IQArray<Qubit> ctrls, Qubit q1) = _args;
-
-                Simulator.CheckQubits(ctrls, q1);
-
-                SafeControlled(ctrls,
-                    () => this.Apply(q1),
-                    (count, ids) => MCY(Simulator.Id, count, ids, (uint)q1.Id));
-
-                return QVoid.Instance;
-            };            
-        }
+            return QVoid.Instance;
+        };
     }
 }

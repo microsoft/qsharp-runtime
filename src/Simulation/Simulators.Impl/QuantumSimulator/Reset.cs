@@ -9,35 +9,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimReset : Intrinsic.Reset
+        public Func<Qubit, QVoid> Reset_Body() => (q1) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "X")]
-            private static extern void X(uint id, uint qubit);
-
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "M")]
-            private static extern uint M(uint id, uint q);
-
-            private QuantumSimulator Simulator { get; }
-
-
-            public QSimReset(QuantumSimulator m) : base(m)
+            // The native simulator doesn't have a reset operation, so simulate
+            // it via an M follow by a conditional X.
+            this.CheckQubit(q1);
+            var res = M(this.Id, (uint)q1.Id);
+            if (res == 1)
             {
-                this.Simulator = m;
+                X(this.Id, (uint)q1.Id);
             }
 
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                // The native simulator doesn't have a reset operation, so simulate
-                // it via an M follow by a conditional X.
-                Simulator.CheckQubit(q1);
-                var res = M(Simulator.Id, (uint)q1.Id);
-                if (res == 1)
-                {
-                    X(Simulator.Id, (uint)q1.Id);
-                }
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }

@@ -7,36 +7,22 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-
     public partial class QuantumSimulator
     {
-        internal class QSimApplyUncontrolledRz : Intrinsic.ApplyUncontrolledRz
+        public Func<(double, Qubit), QVoid> ApplyUncontrolledRz_Body() => (args) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "R")]
-            private static extern void R(uint id, Pauli basis, double angle, uint qubit);
+            var (angle, target) = args;
+            this.CheckQubit(target, nameof(target));
+            CheckAngle(angle);
+            R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
+            return QVoid.Instance;
+        };
 
-            private QuantumSimulator Simulator { get; }
+        public Func<(double, Qubit), QVoid> ApplyUncontrolledRz_AdjointBody() => (_args) =>
+        {
+            var (angle, q1) = _args;
 
-            public QSimApplyUncontrolledRz(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
-
-            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
-            {
-                var (angle, target) = args;
-                Simulator.CheckQubit(target, nameof(target));
-                CheckAngle(angle);
-                R(Simulator.Id, Pauli.PauliZ, angle, (uint)target.Id);
-                return QVoid.Instance;
-            };
-
-            public override Func<(double, Qubit), QVoid> __AdjointBody__ => (_args) =>
-            {
-                var (angle, q1) = _args;
-
-                return this.__Body__.Invoke((-angle, q1));
-            };
-        }
+            return ApplyUncontrolledRz_Body().Invoke((-angle, q1));
+        };
     }
 }

@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

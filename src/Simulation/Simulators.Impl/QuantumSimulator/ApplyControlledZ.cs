@@ -9,28 +9,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        internal class QSimApplyControlledZ : Intrinsic.ApplyControlledZ
+        public Func<(Qubit, Qubit), QVoid> ApplyControlledZ_Body() => (args) =>
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCZ")]
-            private static extern void MCZ(uint id, uint count, uint[] ctrls, uint qubit);
+            var (control, target) = args;
 
-            private QuantumSimulator Simulator { get; }
+            this.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
 
-            public QSimApplyControlledZ(QuantumSimulator m) : base(m)
-            {
-                this.Simulator = m;
-            }
+            MCZ(this.Id, 1, new uint[]{(uint)control.Id}, (uint)target.Id);
 
-            public override Func<(Qubit, Qubit), QVoid> __Body__ => (args) =>
-            {
-                var (control, target) = args;
-
-                Simulator.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
-
-                MCZ(Simulator.Id, 1, new uint[]{(uint)control.Id}, (uint)target.Id);
-
-                return QVoid.Instance;
-            };
-        }
+            return QVoid.Instance;
+        };
     }
 }
