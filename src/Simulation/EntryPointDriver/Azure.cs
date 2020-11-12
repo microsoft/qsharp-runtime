@@ -239,6 +239,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         public Uri? BaseUri { get; set; }
 
         /// <summary>
+        /// The location to use with the default Azure Quantum endpoint.
+        /// </summary>
+        public string? Location { get; set; }
+
+        /// <summary>
         /// The name of the submitted job.
         /// </summary>
         public string? JobName { get; set; }
