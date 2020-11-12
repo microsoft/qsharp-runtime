@@ -241,7 +241,7 @@ namespace Microsoft.Azure.Quantum
         /// <returns>
         /// Sas Uri.
         /// </returns>
-        public async Task<string> GetSasUriAsync(string containerName, string blobName = null, CancellationToken cancellationToken = default)
+        public async Task<Uri> GetSasUriAsync(string containerName, string blobName = null, CancellationToken cancellationToken = default)
         {
             BlobDetails details = new BlobDetails
             {

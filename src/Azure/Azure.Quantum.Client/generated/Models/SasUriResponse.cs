@@ -10,8 +10,8 @@
 
 namespace Microsoft.Azure.Quantum.Client.Models
 {
+    using System;
     using Newtonsoft.Json;
-    using System.Linq;
 
     /// <summary>
     /// Get SAS URL operation response.
@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// </summary>
         /// <param name="sasUri">A URL with a SAS token to upload a blob for
         /// execution in the given workspace.</param>
-        public SasUriResponse(string sasUri = default(string))
+        public SasUriResponse(Uri sasUri = default(Uri))
         {
             SasUri = sasUri;
             CustomInit();
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// in the given workspace.
         /// </summary>
         [JsonProperty(PropertyName = "sasUri")]
-        public string SasUri { get; set; }
+        public Uri SasUri { get; set; }
 
     }
 }

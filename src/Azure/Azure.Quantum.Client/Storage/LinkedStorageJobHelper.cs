@@ -89,7 +89,7 @@ namespace Microsoft.Azure.Quantum.Storage
                 containerName: containerName, 
                 cancellationToken: cancellationToken);
 
-            return new BlobContainerClient(new Uri(containerUri));
+            return new BlobContainerClient(containerUri);
         }
 
         private string GetUriPath(Uri uri)

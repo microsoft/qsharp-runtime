@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Sas Uri.</returns>
-        Task<string> GetSasUriAsync(
+        Task<Uri> GetSasUriAsync(
             string containerName,
             string blobName = null,
             CancellationToken cancellationToken = default);

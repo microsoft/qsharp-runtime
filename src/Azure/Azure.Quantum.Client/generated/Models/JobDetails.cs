@@ -12,6 +12,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
 {
     using Microsoft.Rest;
     using Newtonsoft.Json;
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -65,7 +66,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// cancelled.</param>
         /// <param name="errorData">The error data for the job. This is
         /// expected only when Status 'Failed'.</param>
-        public JobDetails(string containerUri, string inputDataFormat, string providerId, string target, string id = default(string), string name = default(string), string inputDataUri = default(string), object inputParams = default(object), IDictionary<string, string> metadata = default(IDictionary<string, string>), string outputDataUri = default(string), string outputDataFormat = default(string), string status = default(string), string creationTime = default(string), string beginExecutionTime = default(string), string endExecutionTime = default(string), string cancellationTime = default(string), RestError errorData = default(RestError))
+        public JobDetails(string containerUri, string inputDataFormat, string providerId, string target, string id = default(string), string name = default(string), Uri inputDataUri = default(Uri), object inputParams = default(object), IDictionary<string, string> metadata = default(IDictionary<string, string>), Uri outputDataUri = default(Uri), string outputDataFormat = default(string), string status = default(string), string creationTime = default(string), string beginExecutionTime = default(string), string endExecutionTime = default(string), string cancellationTime = default(string), RestError errorData = default(RestError))
         {
             Id = id;
             Name = name;
@@ -117,7 +118,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// the default input blob in the container.
         /// </summary>
         [JsonProperty(PropertyName = "inputDataUri")]
-        public string InputDataUri { get; set; }
+        public Uri InputDataUri { get; set; }
 
         /// <summary>
         /// Gets or sets the format of the input data.
@@ -158,7 +159,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// successfully, results will be uploaded to this blob.
         /// </summary>
         [JsonProperty(PropertyName = "outputDataUri")]
-        public string OutputDataUri { get; set; }
+        public Uri OutputDataUri { get; set; }
 
         /// <summary>
         /// Gets or sets the format of the output data.
