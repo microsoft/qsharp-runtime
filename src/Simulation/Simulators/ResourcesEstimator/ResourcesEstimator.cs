@@ -47,7 +47,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// Parameter-less constructor. It initializes the ResourceEstimator
         /// with a QCTraceSimulatorConfiguration as returned by <see cref="RecommendedConfig"/>.
         /// </summary>
-        public ResourcesEstimator() : this(RecommendedConfig())
+        public ResourcesEstimator() : this(FindTargetIntrinsicsType(), RecommendedConfig())
+        {
+        }
+
+        public ResourcesEstimator(Type targetIntrinsicsType) : this(targetIntrinsicsType, RecommendedConfig())
         {
         }
 
@@ -56,7 +60,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// It is recommended to use <see cref="RecommendedConfig"/> to create a new config instance
         /// and tweak it, to make sure the data collection is correctly configured.
         /// </summary>
-        public ResourcesEstimator(QCTraceSimulatorConfiguration config) : base(config)
+        public ResourcesEstimator(Type targetIntrinsicsType, QCTraceSimulatorConfiguration config) : base(targetIntrinsicsType, config)
         {
         }
 

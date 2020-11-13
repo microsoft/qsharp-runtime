@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             if (simulator == settings.ResourcesEstimatorName)
             {
-                var resourcesEstimator = new ResourcesEstimator();
+                var resourcesEstimator = new ResourcesEstimator(entryPoint.TargetIntrinsicsType);
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }
@@ -48,9 +48,9 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 var (isCustom, createSimulator) =
                     simulator == settings.QuantumSimulatorName
-                        ? (false, () => new QuantumSimulator())
+                        ? (false, () => new QuantumSimulator(entryPoint.TargetIntrinsicsType))
                         : simulator == settings.ToffoliSimulatorName
-                        ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
+                        ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator(entryPoint.TargetIntrinsicsType)))
                         : (true, entryPoint.CreateDefaultCustomSimulator);
                 if (isCustom && simulator != entryPoint.DefaultSimulatorName)
                 {

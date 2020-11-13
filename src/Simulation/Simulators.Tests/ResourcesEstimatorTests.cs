@@ -39,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void VerifyCollectorsTest()
         {
-            var sim = new ResourcesEstimator();
+            var sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             foreach(var l in sim.CoreConfig.Listeners)
             {
@@ -65,7 +65,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void VerifyDataTest()
         {
-            var sim = new ResourcesEstimator();
+            var sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             VerySimpleEstimate.Run(sim).Wait();
             var data = sim.Data;
@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ToTSVTest()
         {
-            var sim = new ResourcesEstimator();
+            var sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             VerySimpleEstimate.Run(sim).Wait();
             var data = sim.ToTSV();
@@ -108,7 +108,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void DepthDifferentQubitsTest()
         {
-            var sim = new ResourcesEstimator();
+            var sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             // using(q = Qubit[3]) { T(q[0]); T(q[1]); T(q[3]); T(q[0]); }
             DepthDifferentQubits.Run(sim).Wait();
@@ -149,7 +149,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
             config.OptimizeDepth = optimizeDepth;
-            var sim = new ResourcesEstimator(config);
+            var sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), config);
 
             DepthVersusWidth.Run(sim).Wait();
             return sim.Data;
@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void VerifyTracingMultipleOperationsTest()
         {
-            ResourcesEstimator sim = new ResourcesEstimator();
+            ResourcesEstimator sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             Operation_1_of_2.Run(sim).Wait();
             DataTable data1 = sim.Data;

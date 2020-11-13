@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimConstructor()
         {
-            using (var subject = new QuantumSimulator())
+            using (var subject = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
             {
                 Assert.Equal("Quantum Simulator", subject.Name);
             }
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimVerifyPrimitivesCompleteness()
         {
-            using (var sim = new QuantumSimulator())
+            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
             {
                 var ops =
                     from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimX()
         {
-            using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
             {
                 var x = sim.Get<Intrinsic.X>();
                 var measure = sim.Get<Intrinsic.M>();
@@ -101,7 +101,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimRandom()
         {
-            using (var sim = new QuantumSimulator())
+            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
             {
                 var r = sim.Get<Intrinsic.Random>();
                 var probs = new QArray<double> (0.0, 0.0, 0.0, 0.7, 0.0, 0.0);
@@ -113,7 +113,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimAssert()
         {
-            using (var sim = new QuantumSimulator())
+            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
             {
                 var assert = sim.Get<Intrinsic.Assert>();
                 var h = sim.Get<Intrinsic.H>();
@@ -144,7 +144,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimAssertProb()
         {
-            using (var sim = new QuantumSimulator())
+            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
             {
                 var tolerance = 0.02;
                 var assertProb = sim.Get<Intrinsic.AssertProb>();
@@ -300,7 +300,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 foreach (var t in gateTypes)
                 {
-                    using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+                    using (var qsim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
                     {
                         var gate = qsim.Get<IUnitary<Qubit>>(t);
                         TestOne(qsim, gate, TestUnitary);
@@ -312,7 +312,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestRCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            using (var qsim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
             {
                 // R
                 var mapper = new Func<Qubit, (Pauli, Double, Qubit)>(qubit => (Pauli.PauliZ, 1.0, qubit));
@@ -325,7 +325,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestExpCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            using (var qsim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
             {
                 // Exp
                 {
@@ -349,7 +349,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestMeasureCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            using (var qsim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
             {
                 // M
                 {
@@ -373,7 +373,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestAssertCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            using (var qsim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), throwOnReleasingQubitsNotInZeroState: false))
             {
                 // Assert
                 {

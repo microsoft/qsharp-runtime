@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         public static void RunWithMultipleSimulators(Action<SimulatorBase> test)
         {
-            var simulators = new SimulatorBase[] { new QuantumSimulator(), new ToffoliSimulator() };
+            var simulators = new SimulatorBase[] { new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)), new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)) };
 
             foreach (var s in simulators)
             {

@@ -62,10 +62,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             return this.GetInstance(typeof(T)).GetType().FullName;
         }
 
+        public QCTraceSimulatorImpl(Type targetIntrinsicsType) : this(targetIntrinsicsType, new QCTraceSimulatorConfiguration()) { }
 
-        public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
-
-        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config)
+        public QCTraceSimulatorImpl(Type targetIntrinsicsType, QCTraceSimulatorConfiguration config)
         {
             configuration = Utils.DeepClone(config);
             Utils.FillDictionaryForEnumNames<PrimitiveOperationsGroups, int>(primitiveOperationsIdToNames);
@@ -109,21 +108,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             OnOperationEnd += tracingCore.OnOperationEnd;
 
             // Override the Measure operation.
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            var measureShim = 
+                (from nestedType in targetIntrinsicsType.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                where nestedType.BaseType?.FullName == "Microsoft.Quantum.Intrinsic.Measure"
+                select nestedType).SingleOrDefault();
+            if (measureShim != null)
             {
-                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
-                if (targetIntrinsics != null)
-                {
-                    var measureShim = 
-                        (from nestedType in targetIntrinsics.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                        where nestedType.BaseType?.FullName == "Microsoft.Quantum.Intrinsic.Measure"
-                        select nestedType).SingleOrDefault();
-                    if (measureShim != null)
-                    {
-                        this.Register(measureShim.BaseType, measureShim);
-                        break;
-                    }
-                }
+                this.Register(measureShim.BaseType, measureShim);
             }
 
             RegisterPrimitiveOperationsGivenAsCircuits();

@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ZeroStateQubitReleaseTest()
         {
-            var sim = new QuantumSimulator();
+            var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
         }
@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task MeasuredQubitReleaseTest()
         {
-            var sim = new QuantumSimulator();
+            var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             //should not throw an exception, as Measured qubits are allowed to be released, and the release aspect is handled in the C++ code
             await ReleaseMeasuredQubitCheck.Run(sim);
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task MeasuredMultipleQubitsReleaseTest()
         {
-            var sim = new QuantumSimulator();
+            var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => ReleaseMeasureMultipleQubitCheck.Run(sim));
         }
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public async Task ReallocateQubitInGroundStateTest()
         {
-            var sim = new QuantumSimulator();
+            var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
             var q1 = allocate.Apply(1);

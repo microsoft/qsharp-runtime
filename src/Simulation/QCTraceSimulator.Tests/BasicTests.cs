@@ -19,13 +19,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         {
             QCTraceSimulatorConfiguration tracerCoreConfiguration = new QCTraceSimulatorConfiguration();
             tracerCoreConfiguration.UsePrimitiveOperationsCounter = true;
-            QCTraceSimulator tracerCore = new QCTraceSimulator(tracerCoreConfiguration);
+            QCTraceSimulator tracerCore = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), tracerCoreConfiguration);
         }
 
         [Fact]
         public void GetPrimitiveOperations()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            QCTraceSimulator tracerCore = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             var measureOp = tracerCore.Get<Intrinsic.Measure, Intrinsic.Measure>();
             Assert.NotNull(measureOp);
@@ -52,7 +52,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void GetInterfaceOperations()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            QCTraceSimulator tracerCore = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             var CX = tracerCore.Get<Interface_CX, Interface_CX>();
             Assert.NotNull(CX);
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void TracerVerifyPrimitivesCompleteness()
         {
-            QCTraceSimulator tracerCore = new QCTraceSimulator();
+            QCTraceSimulator tracerCore = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
 
             var ops =
                 from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()

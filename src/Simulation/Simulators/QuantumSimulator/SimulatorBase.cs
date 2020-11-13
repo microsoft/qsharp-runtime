@@ -753,5 +753,18 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             OnFail?.Invoke(exceptionInfo);
         }
+
+        public static Type FindTargetIntrinsicsType()
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
+                if (targetIntrinsics != null)
+                {
+                    return targetIntrinsics;
+                }
+            }
+            throw new TypeLoadException("Unable to load Microsoft.Quantum.Intrinsic.TargetIntrinsics type, possibly due to missing target package reference.");
+        }
     }
 }
