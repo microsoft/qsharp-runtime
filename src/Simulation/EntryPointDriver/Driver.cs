@@ -254,6 +254,12 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
 
         /// <summary>
+        /// The base URI option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
+            ImmutableList.Create("--location"), default, "The base URI of the Azure Quantum endpoint.");
+
+        /// <summary>
         /// The job name option.
         /// </summary>
         internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
