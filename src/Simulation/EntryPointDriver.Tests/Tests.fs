@@ -601,8 +601,6 @@ let ``Submit allows overriding default values`` () =
         "myToken"
         "--base-uri"
         "myBaseUri"
-        "--location"
-        "myLocation"
         "--job-name"
         "myJobName"
         "--shots"
@@ -615,7 +613,7 @@ let ``Submit allows overriding default values`` () =
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
-               Location: myLocation
+               Location:
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -635,8 +633,6 @@ let ``Submit allows overriding default values with default target`` () =
         "myToken"
         "--base-uri"
         "myBaseUri"
-        "--location"
-        "myLocation"
         "--job-name"
         "myJobName"
         "--shots"
@@ -649,7 +645,7 @@ let ``Submit allows overriding default values with default target`` () =
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
-               Location: myLocation
+               Location:
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -657,6 +653,8 @@ let ``Submit allows overriding default values with default target`` () =
                Verbose: True
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+// TODO: Add tests to check mutually exclusive options.
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =

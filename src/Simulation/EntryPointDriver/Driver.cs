@@ -106,6 +106,29 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
 
+            // TODO: Create MarkAsMutuallyExclusive method to encapsulate this in a more generic way.
+            // --base-uri and --location options are mutually exclusive.
+            submit.AddValidator(result =>
+                {
+                    var baseUriAlias = "base-uri";
+                    var isBaseUriPresent = result.Children.Contains(baseUriAlias) ?
+                        result.Children.GetByAlias(baseUriAlias).Tokens.Count > 0 : // TODO: check option arity in case there's options that are just present or not.
+                        false;
+
+                    var locationAlias = "location";
+                    var isLocationPresent = result.Children.Contains(locationAlias) ?
+                        result.Children.GetByAlias(locationAlias).Tokens.Count > 0 :
+                        false;
+
+                    if (isBaseUriPresent &&
+                        isLocationPresent)
+                    {
+                        return "Options '--base-uri' and '--location' cannot be used together.";
+                    }
+
+                    return null;
+                });
+
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
             {
@@ -256,7 +279,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
 
         /// <summary>
-        /// The base URI option.
+        /// The location to use with the default endpoint option.
         /// </summary>
         internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
             ImmutableList.Create("--location"), default, "The location to use with the default endpoint.");
