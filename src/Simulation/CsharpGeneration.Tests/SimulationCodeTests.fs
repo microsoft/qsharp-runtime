@@ -19,7 +19,6 @@ open Xunit
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
-open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 
@@ -116,13 +115,12 @@ namespace N1
     let globalContext = CodegenContext.Create syntaxTree
 
     let findCallable name =
-        let key = NonNullable<string>.New name
-        match globalContext.byName.TryGetValue key with
+        match globalContext.byName.TryGetValue name with
         | true, v -> v |> List.sort |> List.head
         | false, _ -> sprintf "no callable with name %s has been successfully compiled" name |> failwith
 
     let findUdt name =
-        let key = globalContext.allUdts.Keys |> Seq.sort |> Seq.find (fun n -> n.Name.Value = name)
+        let key = globalContext.allUdts.Keys |> Seq.sort |> Seq.find (fun n -> n.Name = name)
         match globalContext.allUdts.TryGetValue key with
         | true, v -> key.Namespace, v
         | false, _ -> sprintf "no type with name %s has been successfully compiled" name |> failwith
@@ -229,7 +227,7 @@ namespace N1
         let tree = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
         let actual =
             CodegenContext.Create (tree, ImmutableDictionary.Empty)
-            |> generate (Path.GetFullPath fileName |> NonNullable<string>.New)
+            |> generate (Path.GetFullPath fileName)
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
     let testOneBody (builder:SyntaxBuilder) (expected: string list) =
@@ -297,7 +295,7 @@ namespace N1
             let actual =
                 op
                 |> operationDependencies
-                |> List.map (fun n -> ((n.Namespace.Value, n.Name.Value), (n |> roslynCallableTypeName context)))
+                |> List.map (fun n -> ((n.Namespace, n.Name), (n |> roslynCallableTypeName context)))
 
             List.zip (expected |> sortByNames) (actual |> sortByNames)
             |> List.iter Assert.Equal
@@ -853,7 +851,7 @@ namespace N1
         |> testOne nestedArgTuple2
 
 
-    let depsByName (l : QsQualifiedName list) = l |> List.sortBy (fun n -> n.Namespace.Value) |> List.sortBy (fun n -> n.Name.Value)
+    let depsByName (l : QsQualifiedName list) = l |> List.sortBy (fun n -> n.Namespace) |> List.sortBy (fun n -> n.Name)
 
     [<Fact>]
     let ``buildInit test`` () =
@@ -2333,7 +2331,7 @@ namespace N1
         false |> testOne randomOperation
 
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
-        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
+        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile)
         let assemblyConstants =
             new Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ProcessorArchitecture, executionTarget)
             |> Seq.singleton
@@ -3388,11 +3386,11 @@ namespace Microsoft.Quantum
 
     [<Fact>]
     let ``find local elements `` () =
-        let oneName = function | QsCustomType udt -> udt.FullName.Name.Value | QsCallable  op -> op.FullName.Name.Value
+        let oneName = function | QsCustomType udt -> udt.FullName.Name | QsCallable  op -> op.FullName.Name
         let expected = [ "H"; "M"; "Qubits"; "Qubits"; "R"; "S"; "X"; "Z"; ]     // Qubits is two times: one for UDT and one for constructor.
-        let local    = syntaxTree |> findLocalElements Some (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")) |> NonNullable<string>.New)
+        let local    = syntaxTree |> findLocalElements Some (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")))
         Assert.Equal(1, local.Length)
-        Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]).Value)
+        Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]))
         let actual   = (snd local.[0]) |> List.map oneName |> List.sort
         List.zip expected actual |> List.iter Assert.Equal
 

@@ -18,7 +18,6 @@ open Xunit
 
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
-open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.Simulation.Simulators
@@ -73,7 +72,7 @@ let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
-        SimulationCode.generate (NonNullable<_>.New testFile) context
+        SimulationCode.generate testFile context
         EntryPoint.generate context entryPoint
     ]
 
