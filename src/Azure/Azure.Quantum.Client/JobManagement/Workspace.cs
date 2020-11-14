@@ -95,6 +95,29 @@ namespace Microsoft.Azure.Quantum
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Workspace"/> class.
+        /// </summary>
+        /// <param name="subscriptionId">The subscription identifier.</param>
+        /// <param name="resourceGroupName">Name of the resource group.</param>
+        /// <param name="workspaceName">Name of the workspace.</param>
+        /// <param name="accessToken">The access token.</param>
+        /// <param name="location">Location to use with the default endpoint.</param>
+        public Workspace(
+            string subscriptionId,
+            string resourceGroupName,
+            string workspaceName,
+            string accessToken,
+            string location)
+            : this(
+                  subscriptionId,
+                  resourceGroupName,
+                  workspaceName,
+                  new StaticAccessTokenProvider(accessToken),
+                  new Uri($"https://{NormalizeLocation(location)}.{Constants.DefaultLocationlessEndpoint}/"))
+        {
+        }
+
         private Workspace(
             string subscriptionId,
             string resourceGroupName,

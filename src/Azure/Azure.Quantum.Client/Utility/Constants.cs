@@ -5,7 +5,6 @@ namespace Microsoft.Azure.Quantum.Utility
 {
     internal static class Constants
     {
-        internal const string DefaultBaseUri = "https://app-jobscheduler-prod.azurewebsites.net/";
         internal const string DefaultLocation = "westus";
         internal const string DefaultLocationlessEndpoint = "quantum.azure.com";
 

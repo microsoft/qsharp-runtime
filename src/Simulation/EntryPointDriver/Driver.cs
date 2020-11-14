@@ -99,6 +99,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
+            AddOptionIfAvailable(submit, LocationOption);
             AddOptionIfAvailable(submit, JobNameOption);
             AddOptionIfAvailable(submit, ShotsOption);
             AddOptionIfAvailable(submit, OutputOption);
@@ -151,6 +152,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
+                Location = DefaultIfShadowed(LocationOption, azureSettings.Location),
                 JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
                 Shots = DefaultIfShadowed(ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(OutputOption, azureSettings.Output),
@@ -257,7 +259,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The base URI option.
         /// </summary>
         internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
-            ImmutableList.Create("--location"), default, "The base URI of the Azure Quantum endpoint.");
+            ImmutableList.Create("--location"), default, "The location to use with the default endpoint.");
 
         /// <summary>
         /// The job name option.

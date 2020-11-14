@@ -272,10 +272,27 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
-        internal Workspace CreateWorkspace() =>
-            AadToken is null
-                ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
+        internal Workspace CreateWorkspace()
+        {
+            if (BaseUri != null)
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
+            }
+            else if (Location != null)
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: Location)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: Location);
+            }
+            else
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
+            }
+        }
 
         public override string ToString() =>
             string.Join(System.Environment.NewLine,
@@ -286,6 +303,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Storage: {Storage}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
+                $"Location: {Location}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
