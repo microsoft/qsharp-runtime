@@ -46,13 +46,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             qm.Release(qa2);
 
             Qubit q3 = qm.Allocate();
-            Assert.True(q3.Id == 5);
+            Assert.True(q3.Id == 7);
 
             Qubit q4 = qm.Allocate();
             Assert.True(q4.Id == 6);
 
             Qubit q5 = qm.Allocate();
-            Assert.True(q5.Id == 7);
+            Assert.True(q5.Id == 5);
 
             // Test borrowing
             Qubit[] exclusion = new Qubit[4];
@@ -69,7 +69,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(qab[0].Id == 0);
             Assert.True(qab[1].Id == 2);
             Assert.True(qab[2].Id == 4);
-            Assert.True(qab[3].Id == 7);
+            Assert.True(qab[3].Id == 5);
             Assert.True(qab[4].Id == 8);
 
             Qubit q6 = qm.Allocate();
@@ -110,8 +110,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             qm.Return(qab2);
             
             IQArray<Qubit> qa4 = qm.Allocate(2);
-            Assert.True(qa4[0].Id == 12); // make sure 11 is not reused.
-            Assert.True(qa4[1].Id == 13); // make sure 11 is not reused.
+            Assert.True(qa4[0].Id == 23); // make sure 11 is not reused.
+            Assert.True(qa4[1].Id == 22); // make sure 11 is not reused.
             qm.Release(qa4);
 
             
@@ -194,7 +194,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.True(q4.Id == 2);
 
                 Qubit q5 = qm.Allocate();
-                Assert.True(q5.Id == 8);
+                Assert.True(q5.Id == 6);
             }
 
             { // BLOCK testing mayExtendCapacity:true
