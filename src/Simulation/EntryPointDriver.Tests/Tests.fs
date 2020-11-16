@@ -654,7 +654,64 @@ let ``Submit allows overriding default values with default target`` () =
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
-// TODO: Add tests to check mutually exclusive options.
+[<Fact>]
+let ``Submit does not allow to include mutually exclusive options`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--base-uri"
+        "myBaseUri"
+        "--location"
+        "myLocation"
+    ])
+    |> fails
+
+[<Fact>]
+let ``Submit allows to include --base-uri option when --location is not present`` () =
+    let given = testWithTarget "foo.target" "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--base-uri"
+        "myBaseUri"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI: myBaseUri
+               Location:
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit allows to include --location option when --base-uri is not present`` () =
+    let given = testWithTarget "foo.target" "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--location"
+        "myLocation"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI:
+               Location: myLocation
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
