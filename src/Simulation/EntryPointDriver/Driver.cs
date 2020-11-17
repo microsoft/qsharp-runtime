@@ -227,12 +227,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 foreach (var rawAlias in primaryAliases)
                 {
                     var option = command.Options.Where(o => o.RawAliases.Contains(rawAlias)).FirstOrDefault();
-                    if (option == null)
-                    {
-                        continue;
-                    }
-
-                    var presentAlias = option.RawAliases.Where(result.Children.Contains).FirstOrDefault();
+                    var presentAlias = option?.RawAliases.Where(result.Children.Contains).FirstOrDefault();
                     if (!string.IsNullOrEmpty(presentAlias) &&
                         result.Children.GetByAlias(presentAlias).Tokens.Count > 0)
                     {
