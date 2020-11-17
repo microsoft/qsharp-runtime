@@ -108,7 +108,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, VerboseOption);
             MarkOptionsAsMutuallyExclusive(
                 submit, 
-                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First()});
+                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() });
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -225,7 +225,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             command.AddValidator(result =>
             {
                 var presentAliases = new List<string>();
-                foreach(var rawAlias in primaryAliases)
+                foreach (var rawAlias in primaryAliases)
                 {
                     var (prefix, alias) = Options.PrefixAliasTuple(rawAlias);
                     var option = command.Options.Where(o => o.Aliases.Contains(alias)).FirstOrDefault();
@@ -234,9 +234,9 @@ namespace Microsoft.Quantum.EntryPointDriver
                         continue;
                     }
 
-                    var presentAlias = option.Aliases.Where(a => result.Children.Contains(a)).FirstOrDefault();
-                    if ((!string.IsNullOrEmpty(presentAlias)) &&
-                        (result.Children.GetByAlias(presentAlias).Tokens.Count > 0))
+                    var presentAlias = option.Aliases.Where(result.Children.Contains).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(presentAlias) &&
+                        result.Children.GetByAlias(presentAlias).Tokens.Count > 0)
                     {
                         presentAliases.Add($"{prefix}{presentAlias}");
                     }
