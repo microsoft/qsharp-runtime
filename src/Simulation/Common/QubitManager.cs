@@ -81,20 +81,20 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             internal IApplyData? Data;
             internal IEnumerable<Qubit>? QubitsInArgument => Data?.Qubits;
-            private List<Qubit>? _locals; // Qubits allocated/borrowed in the current operation
+            private HashSet<Qubit>? _locals; // Qubits allocated/borrowed in the current operation
 
             public StackFrame(IApplyData data = null)
             {
                 Data = data;
             }
 
-            public List<Qubit> Locals
+            public HashSet<Qubit> Locals
             {
                 get
                 {
                     if (_locals == null)
                     {
-                        _locals = new List<Qubit>();
+                        _locals = new HashSet<Qubit>();
                     }
 
                     return _locals;
@@ -401,7 +401,12 @@ namespace Microsoft.Quantum.Simulation.Common
                 return QArray<Qubit>.Create(0);
             }
 
-            QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate); 
+            QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate);
+            if (!DisableBorrowing)
+            {
+                var locals = operationStack.Peek().Locals;
+                locals.EnsureCapacity(locals.Count + (int)numToAllocate);
+            }
             for (int i = 0; i < numToAllocate; i++)
             {
                 Qubit? allocated = Allocate(usedOnlyForBorrowing: false);
@@ -488,8 +493,6 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            // When tracking scopes for borrowing, it's more efficient to release qubits in the same order
-            // they were allocated in (which in case of allocated arrays is from left to right).
             foreach (var qubit in qubitsToRelease)
             {
                 this.Release(qubit, wasUsedOnlyForBorrowing: false);
@@ -648,7 +651,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
-                    bool success = operationStack.Peek().Locals.Remove(qubit); // Could be more efficient here going from the end manually.
+                    bool success = operationStack.Peek().Locals.Remove(qubit);
                     Debug.Assert(success, "Returning qubit that is not a local variable in scope.");
                 }
             }
@@ -665,8 +668,6 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            // When tracking scopes for borrowing, it's more efficient to release qubits in the same order
-            // they were allocated in (which in case of borrowed arrays is from left to right if we had to allocate).
             foreach (var qubit in qubitsToReturn)
             {
                 this.Return(qubit);
