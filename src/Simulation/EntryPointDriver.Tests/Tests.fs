@@ -663,7 +663,7 @@ let ``Submit does not allow to include mutually exclusive options`` () =
         "--location"
         "myLocation"
     ])
-    |> fails
+    |> failsWith "Options --base-uri, --location cannot be used together."
 
 [<Fact>]
 let ``Submit allows to include --base-uri option when --location is not present`` () =

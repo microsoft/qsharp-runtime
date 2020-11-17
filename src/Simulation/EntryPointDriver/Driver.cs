@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Builder;
@@ -105,29 +106,9 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
-
-            // TODO: Create MarkAsMutuallyExclusive method to encapsulate this in a more generic way.
-            // --base-uri and --location options are mutually exclusive.
-            submit.AddValidator(result =>
-                {
-                    var baseUriAlias = "base-uri";
-                    var isBaseUriPresent = result.Children.Contains(baseUriAlias) ?
-                        result.Children.GetByAlias(baseUriAlias).Tokens.Count > 0 : // TODO: check option arity in case there's options that are just present or not.
-                        false;
-
-                    var locationAlias = "location";
-                    var isLocationPresent = result.Children.Contains(locationAlias) ?
-                        result.Children.GetByAlias(locationAlias).Tokens.Count > 0 :
-                        false;
-
-                    if (isBaseUriPresent &&
-                        isLocationPresent)
-                    {
-                        return "Options '--base-uri' and '--location' cannot be used together.";
-                    }
-
-                    return null;
-                });
+            MarkOptionsAsMutuallyExclusive(
+                submit, 
+                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First()});
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -233,6 +214,41 @@ namespace Microsoft.Quantum.EntryPointDriver
                     $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.");
             }
         }
+
+        /// <summary>
+        /// Adds a validator to the command such that the specified options cannot be simultaneously included.
+        /// </summary>
+        /// <param name="command">The command to add the validator to.</param>
+        /// <param name="primaryAliases">The primary aliases of the options to be marked as mutually exclusive.</param>
+        /// <remarks>Options must already be added to the command before invoking this method.</remarks>
+        private void MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases) =>
+            command.AddValidator(result =>
+            {
+                var presentAliases = new List<string>();
+                foreach(var rawAlias in primaryAliases)
+                {
+                    var (prefix, alias) = Options.PrefixAliasTuple(rawAlias);
+                    var option = command.Options.Where(o => o.Aliases.Contains(alias)).FirstOrDefault();
+                    if (option == null)
+                    {
+                        continue;
+                    }
+
+                    var presentAlias = option.Aliases.Where(a => result.Children.Contains(a)).FirstOrDefault();
+                    if ((!string.IsNullOrEmpty(presentAlias)) &&
+                        (result.Children.GetByAlias(presentAlias).Tokens.Count > 0))
+                    {
+                        presentAliases.Add($"{prefix}{presentAlias}");
+                    }
+                }
+
+                if (presentAliases.Count > 1)
+                {
+                    return $"Options {string.Join(", ", presentAliases)} cannot be used together.";
+                }
+
+                return default;
+            });
     }
 
     /// <summary>
