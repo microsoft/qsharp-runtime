@@ -235,11 +235,13 @@ namespace Microsoft.Quantum.EntryPointDriver
 
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
+        /// If both BaseUri and Location properties are not null, BaseUri takes precedence.
         /// </summary>
         public Uri? BaseUri { get; set; }
 
         /// <summary>
         /// The location to use with the default Azure Quantum endpoint.
+        /// If both BaseUri and Location properties are not null, BaseUri takes precedence.
         /// </summary>
         public string? Location { get; set; }
 

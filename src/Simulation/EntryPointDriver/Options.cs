@@ -80,36 +80,5 @@ namespace Microsoft.Quantum.EntryPointDriver
                     Arity = ArgumentArity.OneOrMore
                 }
             };
-
-        /// <summary>
-        /// Creates a prefix and alias tuple from a string representing an option alias provided through the command line
-        /// following the convention that muti-character aliases start with '--' and single-character aliases start with '-'.
-        /// </summary>
-        /// <param name="commandLineAlias">Option alias provided through the command line.</param>
-        /// <returns>TODO.</returns>
-        internal static Tuple<string, string> PrefixAliasTuple(string commandLineAlias)
-        {
-            var multiCharacterAliasPrefix = "--";
-            var singleCharacterAliasPrefix = "-";
-            string prefix;
-            string alias;
-            if (commandLineAlias.StartsWith(multiCharacterAliasPrefix))
-            {
-                prefix = multiCharacterAliasPrefix;
-                alias = commandLineAlias.Substring(prefix.Length);
-            }
-            else if (commandLineAlias.StartsWith(singleCharacterAliasPrefix))
-            {
-                prefix = singleCharacterAliasPrefix;
-                alias = commandLineAlias.Substring(prefix.Length);
-            }
-            else
-            {
-                prefix = commandLineAlias.Length > 1 ? multiCharacterAliasPrefix : singleCharacterAliasPrefix;
-                alias = commandLineAlias;
-            }
-
-            return new Tuple<string, string>(prefix, alias);
-        }
     }
 }

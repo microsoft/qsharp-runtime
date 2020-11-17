@@ -220,25 +220,23 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="command">The command to add the validator to.</param>
         /// <param name="primaryAliases">The primary aliases of the options to be marked as mutually exclusive.</param>
-        /// <remarks>Options must already be added to the command before invoking this method.</remarks>
         private void MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases) =>
             command.AddValidator(result =>
             {
                 var presentAliases = new List<string>();
                 foreach (var rawAlias in primaryAliases)
                 {
-                    var (prefix, alias) = Options.PrefixAliasTuple(rawAlias);
-                    var option = command.Options.Where(o => o.Aliases.Contains(alias)).FirstOrDefault();
+                    var option = command.Options.Where(o => o.RawAliases.Contains(rawAlias)).FirstOrDefault();
                     if (option == null)
                     {
                         continue;
                     }
 
-                    var presentAlias = option.Aliases.Where(result.Children.Contains).FirstOrDefault();
+                    var presentAlias = option.RawAliases.Where(result.Children.Contains).FirstOrDefault();
                     if (!string.IsNullOrEmpty(presentAlias) &&
                         result.Children.GetByAlias(presentAlias).Tokens.Count > 0)
                     {
-                        presentAliases.Add($"{prefix}{presentAlias}");
+                        presentAliases.Add(presentAlias);
                     }
                 }
 
