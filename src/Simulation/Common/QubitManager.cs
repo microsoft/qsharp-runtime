@@ -81,20 +81,20 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             internal IApplyData? Data;
             internal IEnumerable<Qubit>? QubitsInArgument => Data?.Qubits;
-            private HashSet<Qubit>? _locals; // Qubits allocated/borrowed in the current operation
+            private Dictionary<Qubit, int>? _locals; // Qubits allocated/borrowed in the current operation
 
             public StackFrame(IApplyData data = null)
             {
                 Data = data;
             }
 
-            public HashSet<Qubit> Locals
+            public Dictionary<Qubit, int> Locals
             {
                 get
                 {
                     if (_locals == null)
                     {
-                        _locals = new HashSet<Qubit>();
+                        _locals = new Dictionary<Qubit, int>();
                     }
 
                     return _locals;
@@ -127,7 +127,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Qubit.NO_QUBITS;
             }
 
-            return frame.Locals.Concat(frame.QubitsInArgument ?? Array.Empty<Qubit>())
+            return frame.Locals.Keys.Concat(frame.QubitsInArgument ?? Array.Empty<Qubit>())
                 .Where(q => q != null && !this.IsDisabled(q));
         }
 
@@ -367,7 +367,10 @@ namespace Microsoft.Quantum.Simulation.Common
             NumAllocatedQubits++;
             if (!DisableBorrowing)
             {
-                operationStack.Peek().Locals.Add(ret);
+                if (!operationStack.Peek().Locals.TryAdd(ret, 1))
+                {
+                    operationStack.Peek().Locals[ret]++;
+                }
             }
             return ret;
         }
@@ -470,8 +473,13 @@ namespace Microsoft.Quantum.Simulation.Common
 
             if (!DisableBorrowing)
             {
-                bool success = operationStack.Peek().Locals.Remove(qubit);
-                Debug.Assert(success, "Releasing qubit that is not a local variable in scope.");
+                var locals = operationStack.Peek().Locals;
+                Debug.Assert(locals.ContainsKey(qubit) && locals[qubit] > 0, "Releasing qubit that is not a local variable in scope.");
+                locals[qubit]--;
+                if (locals[qubit] == 0)
+                {
+                    locals.Remove(qubit);
+                }
             }
         }
 
@@ -535,7 +543,10 @@ namespace Microsoft.Quantum.Simulation.Common
                 Qubit ret = CreateQubitObject(curQubit);
                 if (!DisableBorrowing)
                 {
-                    operationStack.Peek().Locals.Add(ret);
+                    if (!operationStack.Peek().Locals.TryAdd(ret, 1))
+                    {
+                        operationStack.Peek().Locals[ret]++;
+                    }
                 }
                 return ret;
             }
@@ -651,8 +662,13 @@ namespace Microsoft.Quantum.Simulation.Common
                 }
                 else
                 {
-                    bool success = operationStack.Peek().Locals.Remove(qubit);
-                    Debug.Assert(success, "Returning qubit that is not a local variable in scope.");
+                    var locals = operationStack.Peek().Locals;
+                    Debug.Assert(locals.ContainsKey(qubit) && locals[qubit] > 0, "Releasing qubit that is not a local variable in scope.");
+                    locals[qubit]--;
+                    if (locals[qubit] == 0)
+                    {
+                        locals.Remove(qubit);
+                    }
                 }
             }
         }
