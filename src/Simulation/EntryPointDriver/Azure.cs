@@ -3,6 +3,7 @@
 
 using System;
 using System.CommandLine.Parsing;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
@@ -285,8 +286,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             else if (Location != null)
             {
                 return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: Location)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: Location);
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
             }
             else
             {
@@ -311,5 +312,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Output: {Output}",
                 $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
+
+        internal static string NormalizeLocation(string location) =>
+            string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
     }
 }

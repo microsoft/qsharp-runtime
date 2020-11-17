@@ -714,6 +714,39 @@ let ``Submit allows to include --location option when --base-uri is not present`
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
+let ``Submit allows spaces for the --location option`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--location"
+        "My Location"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI:
+               Location: My Location
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit does not allow an invalid value for the --location option`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--location"
+        "my!nv@lidLocation"
+    ])
+    |> failsWith "\"my!nv@lidLocation\" is an invalid value for the --location option."
+
+[<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test "Returns Unit"
     given (submitWithNothingTarget @ ["--shots"; "1"])

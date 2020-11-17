@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="subscriptionId">The subscription identifier.</param>
         /// <param name="resourceGroupName">Name of the resource group.</param>
         /// <param name="workspaceName">Name of the workspace.</param>
-        /// <param name="location">Location to use with the default endpoint.</param>
+        /// <param name="location">Normalized location to use with the default endpoint.</param>
         /// <param name="tokenCredential">The token credential.</param>
         public Workspace(
             string subscriptionId,
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Quantum
                 resourceGroupName,
                 workspaceName,
                 tokenCredential,
-                new Uri($"https://{NormalizeLocation(location)}.{Constants.DefaultLocationlessEndpoint}/"))
+                new Uri($"https://{location}.{Constants.DefaultLocationlessEndpoint}/"))
         {
         }
 
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="resourceGroupName">Name of the resource group.</param>
         /// <param name="workspaceName">Name of the workspace.</param>
         /// <param name="accessToken">The access token.</param>
-        /// <param name="location">Location to use with the default endpoint.</param>
+        /// <param name="location">Normalized location to use with the default endpoint.</param>
         public Workspace(
             string subscriptionId,
             string resourceGroupName,
@@ -114,7 +114,7 @@ namespace Microsoft.Azure.Quantum
                   resourceGroupName,
                   workspaceName,
                   new StaticAccessTokenProvider(accessToken),
-                  new Uri($"https://{NormalizeLocation(location)}.{Constants.DefaultLocationlessEndpoint}/"))
+                  new Uri($"https://{location}.{Constants.DefaultLocationlessEndpoint}/"))
         {
         }
 
@@ -313,8 +313,5 @@ namespace Microsoft.Azure.Quantum
                 jobId,
                 inner);
         }
-
-        private static string NormalizeLocation(string location) =>
-            string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
     }
 }

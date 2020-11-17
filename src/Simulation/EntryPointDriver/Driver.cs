@@ -296,7 +296,22 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The location to use with the default endpoint option.
         /// </summary>
         internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
-            ImmutableList.Create("--location"), default, "The location to use with the default endpoint.");
+            ImmutableList.Create("--location"),
+            default,
+            "The location to use with the default endpoint.",
+            validator: result =>
+                {
+                    var location = result.Tokens.SingleOrDefault()?.Value;
+                    if (location == null)
+                    {
+                        return default;
+                    }
+
+                    var normalizedLocation = AzureSettings.NormalizeLocation(location);
+                    return Uri.CheckHostName(normalizedLocation) == UriHostNameType.Unknown ?
+                        $"\"{location}\" is an invalid value for the --location option." :
+                        default;
+                });
 
         /// <summary>
         /// The job name option.
