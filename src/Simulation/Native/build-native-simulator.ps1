@@ -9,7 +9,7 @@ if (-not (Test-Path $nativeBuild)) {
 }
 Push-Location $nativeBuild
 
-cmake -A "x64" -DBUILD_SHARED_LIBS:BOOL="1" ..
+cmake -DBUILD_SHARED_LIBS:BOOL="1" ..
 cmake --build . --config $Env:BUILD_CONFIGURATION
 
 Pop-Location
