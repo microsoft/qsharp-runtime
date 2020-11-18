@@ -25,8 +25,6 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     }
 } else {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
-    Write-Host "Build agent is set to: $Env:BUILD_AGENT"
-    Write-Host "Build reason is set to: $Env:BUILD_REASON"
 }
 
 
