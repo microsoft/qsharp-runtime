@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 $ErrorActionPreference = 'Stop'
+& "$PSScriptRoot/build/set-env.ps1"
 
 Push-Location (Join-Path $PSScriptRoot "src/Simulation/CsharpGeneration")
     .\FindNuspecReferences.ps1
