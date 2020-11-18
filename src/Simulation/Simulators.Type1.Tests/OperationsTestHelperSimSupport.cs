@@ -3,12 +3,13 @@
 
 using System;
 using Microsoft.Quantum.Simulation.Common;
-using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     static partial class OperationsTestHelper
     {
+        public static bool ShouldPerformQubitUniquenessTest = false;
+
         private static void InitSimulator(SimulatorBase sim)
         {
             sim.InitBuiltinOperations(typeof(OperationsTestHelper));

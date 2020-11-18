@@ -19,7 +19,6 @@ open Xunit
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
-open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 
@@ -116,13 +115,12 @@ namespace N1
     let globalContext = CodegenContext.Create syntaxTree
 
     let findCallable name =
-        let key = NonNullable<string>.New name
-        match globalContext.byName.TryGetValue key with
+        match globalContext.byName.TryGetValue name with
         | true, v -> v |> List.sort |> List.head
         | false, _ -> sprintf "no callable with name %s has been successfully compiled" name |> failwith
 
     let findUdt name =
-        let key = globalContext.allUdts.Keys |> Seq.sort |> Seq.find (fun n -> n.Name.Value = name)
+        let key = globalContext.allUdts.Keys |> Seq.sort |> Seq.find (fun n -> n.Name = name)
         match globalContext.allUdts.TryGetValue key with
         | true, v -> key.Namespace, v
         | false, _ -> sprintf "no type with name %s has been successfully compiled" name |> failwith
@@ -229,7 +227,7 @@ namespace N1
         let tree = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
         let actual =
             CodegenContext.Create (tree, ImmutableDictionary.Empty)
-            |> generate (Path.GetFullPath fileName |> NonNullable<string>.New)
+            |> generate (Path.GetFullPath fileName)
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
     let testOneBody (builder:SyntaxBuilder) (expected: string list) =
@@ -297,7 +295,7 @@ namespace N1
             let actual =
                 op
                 |> operationDependencies
-                |> List.map (fun n -> ((n.Namespace.Value, n.Name.Value), (n |> roslynCallableTypeName context)))
+                |> List.map (fun n -> ((n.Namespace, n.Name), (n |> roslynCallableTypeName context)))
 
             List.zip (expected |> sortByNames) (actual |> sortByNames)
             |> List.iter Assert.Equal
@@ -853,7 +851,7 @@ namespace N1
         |> testOne nestedArgTuple2
 
 
-    let depsByName (l : QsQualifiedName list) = l |> List.sortBy (fun n -> n.Namespace.Value) |> List.sortBy (fun n -> n.Name.Value)
+    let depsByName (l : QsQualifiedName list) = l |> List.sortBy (fun n -> n.Namespace) |> List.sortBy (fun n -> n.Name)
 
     [<Fact>]
     let ``buildInit test`` () =
@@ -2333,7 +2331,7 @@ namespace N1
         false |> testOne randomOperation
 
     let testOneClass (_,op : QsCallable) executionTarget (expected : string) =
-        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile.Value)
+        let expected = expected.Replace("%%%", HttpUtility.JavaScriptStringEncode op.SourceFile)
         let assemblyConstants =
             new Collections.Generic.KeyValuePair<_,_> (AssemblyConstants.ProcessorArchitecture, executionTarget)
             |> Seq.singleton
@@ -2924,7 +2922,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class U : UDTBase<IUnitary>, IApplyData
     {
-        public U() : base(default(IUnitary))
+        public U() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IUnitary>())
         {
         }
 
@@ -2950,7 +2948,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class AA : UDTBase<A>, IApplyData
     {
-        public AA() : base(default(A))
+        public AA() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<A>())
         {
         }
 
@@ -2976,7 +2974,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class Q : UDTBase<Qubit>, IApplyData
     {
-        public Q() : base(default(Qubit))
+        public Q() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Qubit>())
         {
         }
 
@@ -3002,7 +3000,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class QQ : UDTBase<Q>, IApplyData
     {
-        public QQ() : base(default(Q))
+        public QQ() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Q>())
         {
         }
 
@@ -3028,7 +3026,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class Qubits : UDTBase<IQArray<Qubit>>, IApplyData
     {
-        public Qubits() : base(new QArray<Qubit>())
+        public Qubits() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IQArray<Qubit>>())
         {
         }
 
@@ -3054,7 +3052,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_args1 : UDTBase<(Int64,IQArray<Qubit>)>, IApplyData
     {
-        public udt_args1() : base(default((Int64,IQArray<Qubit>)))
+        public udt_args1() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,IQArray<Qubit>)>())
         {
         }
 
@@ -3084,7 +3082,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_Real : UDTBase<Double>, IApplyData
     {
-        public udt_Real() : base(default(Double))
+        public udt_Real() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<Double>())
         {
         }
 
@@ -3104,7 +3102,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_Complex : UDTBase<(udt_Real,udt_Real)>, IApplyData
     {
-        public udt_Complex() : base(default((udt_Real,udt_Real)))
+        public udt_Complex() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(udt_Real,udt_Real)>())
         {
         }
 
@@ -3127,7 +3125,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
     public class udt_TwoDimArray : UDTBase<IQArray<IQArray<Result>>>, IApplyData
     {
-        public udt_TwoDimArray() : base(new QArray<IQArray<Result>>())
+        public udt_TwoDimArray() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<IQArray<IQArray<Result>>>())
         {
         }
 
@@ -3149,7 +3147,7 @@ internal partial class EmptyInternalOperation : Operation<QVoid, QVoid>, ICallab
         """
 internal class InternalType : UDTBase<QVoid>, IApplyData
 {
-    public InternalType() : base(default(QVoid))
+    public InternalType() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<QVoid>())
     {
     }
 
@@ -3171,7 +3169,7 @@ internal class InternalType : UDTBase<QVoid>, IApplyData
         """
 public class NamedTuple : UDTBase<((Int64,Double),Int64)>, IApplyData
 {
-    public NamedTuple() : base(default(((Int64,Double),Int64)))
+    public NamedTuple() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<((Int64,Double),Int64)>())
     {
     }
 
@@ -3231,7 +3229,7 @@ namespace Microsoft.Quantum
 {
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Pair() : base(default((Int64,Int64)))
+        public Pair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3251,7 +3249,7 @@ namespace Microsoft.Quantum
 
     public class Unused : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Unused() : base(default((Int64,Int64)))
+        public Unused() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3337,7 +3335,7 @@ namespace Microsoft.Quantum
 {
     public class Pair : UDTBase<(Int64,Int64)>, IApplyData
     {
-        public Pair() : base(default((Int64,Int64)))
+        public Pair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Int64,Int64)>())
         {
         }
 
@@ -3361,7 +3359,7 @@ namespace Microsoft.Quantum
 
     public class NestedPair : UDTBase<(Double,((Boolean,String),Int64))>, IApplyData
     {
-        public NestedPair() : base(default((Double,((Boolean,String),Int64))))
+        public NestedPair() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<(Double,((Boolean,String),Int64))>())
         {
         }
 
@@ -3388,11 +3386,11 @@ namespace Microsoft.Quantum
 
     [<Fact>]
     let ``find local elements `` () =
-        let oneName = function | QsCustomType udt -> udt.FullName.Name.Value | QsCallable  op -> op.FullName.Name.Value
+        let oneName = function | QsCustomType udt -> udt.FullName.Name | QsCallable  op -> op.FullName.Name
         let expected = [ "H"; "M"; "Qubits"; "Qubits"; "R"; "S"; "X"; "Z"; ]     // Qubits is two times: one for UDT and one for constructor.
-        let local    = syntaxTree |> findLocalElements Some (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")) |> NonNullable<string>.New)
+        let local    = syntaxTree |> findLocalElements Some (Path.GetFullPath (Path.Combine("Circuits","Intrinsic.qs")))
         Assert.Equal(1, local.Length)
-        Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]).Value)
+        Assert.Equal("Microsoft.Quantum.Intrinsic", (fst local.[0]))
         let actual   = (snd local.[0]) |> List.map oneName |> List.sort
         List.zip expected actual |> List.iter Assert.Equal
 
@@ -3616,7 +3614,7 @@ namespace Microsoft.Quantum.Core
 {
     public class Attribute : UDTBase<QVoid>, IApplyData
     {
-        public Attribute() : base(default(QVoid))
+        public Attribute() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<QVoid>())
         {
         }
 
@@ -3636,7 +3634,7 @@ namespace Microsoft.Quantum.Diagnostics
 {
     public class Test : UDTBase<String>, IApplyData
     {
-        public Test() : base(default(String))
+        public Test() : base(global::Microsoft.Quantum.Simulation.Core.Default.OfType<String>())
         {
         }
 
@@ -3689,7 +3687,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 22 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
@@ -3732,7 +3730,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest1, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 22 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");
@@ -3804,7 +3802,7 @@ namespace Microsoft.Quantum.Tests.UnitTests
                 {
                     sim.Execute<UnitTest2, QVoid, QVoid>(QVoid.Instance);
                 }
-                catch (Exception e)
+                catch
                 {
 #line 26 "%%"
                     Xunit.Assert.True(false, "Q# Test failed. For details see the Standard output below.");

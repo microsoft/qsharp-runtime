@@ -42,13 +42,9 @@ class AlignedAlloc
         using other = AlignedAlloc<U, Align>;
     };
 
-    AlignedAlloc() noexcept
-    {
-    }
+    AlignedAlloc() noexcept {}
 
-    AlignedAlloc(AlignedAlloc const&) noexcept
-    {
-    }
+    AlignedAlloc(AlignedAlloc const&) noexcept {}
 
     template <typename U>
     AlignedAlloc(AlignedAlloc<U, Align> const&) noexcept
@@ -58,15 +54,13 @@ class AlignedAlloc
     pointer allocate(size_type n)
     {
         pointer ptr;
-        SafeInt<size_type> sz (n);
+        SafeInt<size_type> sz(n);
         sz *= sizeof(T);
 #ifdef _WIN32
         ptr = reinterpret_cast<pointer>(_aligned_malloc(sz, Align));
-        if (ptr == 0)
-            throw std::bad_alloc();
+        if (ptr == 0) throw std::bad_alloc();
 #else
-        if (posix_memalign(reinterpret_cast<void**>(&ptr), Align, sz))
-            throw std::bad_alloc();
+        if (posix_memalign(reinterpret_cast<void**>(&ptr), Align, sz)) throw std::bad_alloc();
 #endif
         return ptr;
     }
@@ -118,6 +112,6 @@ class AlignedAlloc
     }
 };
 
-}
-}
-}
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft

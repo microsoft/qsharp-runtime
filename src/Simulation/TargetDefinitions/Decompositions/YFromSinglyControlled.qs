@@ -25,7 +25,6 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledY(qubit);
         }
         controlled (ctls, ...) {
-            CheckQubitUniqueness(ctls + [qubit]);
             if (Length(ctls) == 0) {
                 ApplyUncontrolledY(qubit);
             }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.12.20082705-beta">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
 
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\Simulators.Dev.props" />
@@ -23,4 +23,3 @@
   </ItemGroup>
 
 </Project>
-

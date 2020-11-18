@@ -237,7 +237,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         internal static void CheckNoQubitLeak(this SimulatorBase sim)
         {
-            Assert.True(sim.QubitManager.GetAllocatedQubitsCount() == 0);
+            Assert.True(sim.QubitManager.AllocatedQubitsCount == 0);
         }
 
         /// <summary>

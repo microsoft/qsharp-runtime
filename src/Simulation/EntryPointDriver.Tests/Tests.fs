@@ -18,11 +18,9 @@ open Xunit
 
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
 open Microsoft.Quantum.QsCompiler.CsharpGeneration
-open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.Simulation.Simulators
-
 
 /// The path to the Q# file that provides the Microsoft.Quantum.Core namespace.
 let private coreFile = Path.GetFullPath "Core.qs"
@@ -34,16 +32,25 @@ let private intrinsicFile = Path.GetFullPath "Intrinsic.qs"
 let private testFile = Path.GetFullPath "Tests.qs"
 
 /// The namespace used for the test cases.
-let private testNamespace = "Microsoft.Quantum.EntryPointDriver.Tests"
+let private testNamespace = "EntryPointTest"
 
-/// The test case for the given test number.
-let private testCase =
+/// <summary>
+/// A map where each key is a test case name, and each value is the source code of the test case.
+/// </summary>
+/// <remarks>
+/// Each test case corresponds to a section from <see cref="testFile"/>, separated by "// ---". The text immediately
+/// after "// ---" until the end of the line is the name of the test case.
+/// </remarks>
+let private testCases =
     File.ReadAllText testFile
-    |> fun text -> text.Split "// ---"
-    |> fun cases num -> cases.[num - 1]
+    |> fun text -> Environment.NewLine + "// ---" |> text.Split
+    |> Seq.map (fun case ->
+        let parts = case.Split (Environment.NewLine, 2)
+        parts.[0].Trim (), parts.[1])
+    |> Map.ofSeq
 
 /// Compiles the Q# source code.
-let private compileQsharp source =
+let private compileQSharp source =
     let uri name = Uri ("file://" + name)
     let fileManager name content =
         CompilationUnitManager.InitializeFileManager (uri name, content)
@@ -61,11 +68,11 @@ let private compileQsharp source =
     compilation.BuiltCompilation
 
 /// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
-let private generateCsharp constants (compilation : QsCompilation) =
+let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
     [
-        SimulationCode.generate (NonNullable<_>.New testFile) context
+        SimulationCode.generate testFile context
         EntryPoint.generate context entryPoint
     ]
 
@@ -79,7 +86,7 @@ let private referencedAssembly name =
     path |> Option.defaultWith (fun () -> failwith (sprintf "Missing reference to assembly '%s'." name))
 
 /// Compiles the C# sources into an assembly.
-let private compileCsharp (sources : string seq) =
+let private compileCSharp (sources : string seq) =
     let references : MetadataReference list =
         [
             "netstandard"
@@ -110,12 +117,12 @@ let private compileCsharp (sources : string seq) =
     Assembly.Load (stream.ToArray ())
 
 /// The assembly for the given test case assembly constants.
-let private testAssembly testNum constants =
-    testNum
-    |> testCase
-    |> compileQsharp
-    |> generateCsharp constants
-    |> compileCsharp
+let private testAssembly testName constants =
+    testCases
+    |> Map.find testName
+    |> compileQSharp
+    |> generateCSharp constants
+    |> compileCSharp
 
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
 /// code.
@@ -198,30 +205,33 @@ let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.n
 /// Standard command-line arguments for the "submit" command using the "test.error" target.
 let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
 
-
 // No Option
 
 [<Fact>]
 let ``Returns Unit`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given [] |> yields ""
-    
+
 [<Fact>]
 let ``Returns Int`` () =
-    let given = test 2
+    let given = test "Returns Int"
     given [] |> yields "42"
 
 [<Fact>]
 let ``Returns String`` () =
-    let given = test 3
+    let given = test "Returns String"
     given [] |> yields "Hello, World!"
 
+[<Fact>]
+let ``Namespace and callable use same name`` () =
+    let given = test "Namespace and callable use same name"
+    given [] |> yields ""
 
 // Single Option
 
 [<Fact>]
 let ``Accepts Int`` () =
-    let given = test 4
+    let given = test "Accepts Int"
     given ["-n"; "42"] |> yields "42"
     given ["-n"; "4.2"] |> fails
     given ["-n"; "9223372036854775807"] |> yields "9223372036854775807"
@@ -230,7 +240,7 @@ let ``Accepts Int`` () =
 
 [<Fact>]
 let ``Accepts BigInt`` () =
-    let given = test 5
+    let given = test "Accepts BigInt"
     given ["-n"; "42"] |> yields "42"
     given ["-n"; "4.2"] |> fails
     given ["-n"; "9223372036854775807"] |> yields "9223372036854775807"
@@ -239,13 +249,13 @@ let ``Accepts BigInt`` () =
 
 [<Fact>]
 let ``Accepts Double`` () =
-    let given = test 6
+    let given = test "Accepts Double"
     given ["-n"; "4.2"] |> yields "4.2"
     given ["-n"; "foo"] |> fails
 
 [<Fact>]
 let ``Accepts Bool`` () =
-    let given = test 7
+    let given = test "Accepts Bool"
     given ["-b"; "false"] |> yields "False"
     given ["-b"; "true"] |> yields "True"
     given ["-b"; "one"] |> fails
@@ -253,7 +263,7 @@ let ``Accepts Bool`` () =
 
 [<Fact>]
 let ``Accepts Pauli`` () =
-    let given = test 8
+    let given = test "Accepts Pauli"
     given ["-p"; "PauliI"] |> yields "PauliI"
     given ["-p"; "PauliX"] |> yields "PauliX"
     given ["-p"; "PauliY"] |> yields "PauliY"
@@ -266,7 +276,7 @@ let ``Accepts Pauli`` () =
 
 [<Fact>]
 let ``Accepts Result`` () =
-    let given = test 9
+    let given = test "Accepts Result"
     given ["-r"; "Zero"] |> yields "Zero"
     given ["-r"; "zero"] |> yields "Zero"
     given ["-r"; "One"] |> yields "One"
@@ -277,7 +287,7 @@ let ``Accepts Result`` () =
 
 [<Fact>]
 let ``Accepts Range`` () =
-    let given = test 10
+    let given = test "Accepts Range"
     given ["-r"; "0..0"] |> yields "0..1..0"
     given ["-r"; "0..1"] |> yields "0..1..1"
     given ["-r"; "0..2..10"] |> yields "0..2..10"
@@ -300,18 +310,18 @@ let ``Accepts Range`` () =
 
 [<Fact>]
 let ``Accepts String`` () =
-    let given = test 11
+    let given = test "Accepts String"
     given ["-s"; "Hello, World!"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Accepts Unit`` () =
-    let given = test 12
+    let given = test "Accepts Unit"
     given ["-u"; "()"] |> yields ""
     given ["-u"; "42"] |> fails
 
 [<Fact>]
 let ``Accepts String array`` () =
-    let given = test 13
+    let given = test "Accepts String array"
     given ["--xs"; "foo"] |> yields "[foo]"
     given ["--xs"; "foo"; "bar"] |> yields "[foo,bar]"
     given ["--xs"; "foo bar"; "baz"] |> yields "[foo bar,baz]"
@@ -320,14 +330,14 @@ let ``Accepts String array`` () =
 
 [<Fact>]
 let ``Accepts BigInt array`` () =
-    let given = test 14
+    let given = test "Accepts BigInt array"
     given ["--bs"; "9223372036854775808"] |> yields "[9223372036854775808]"
     given ["--bs"; "1"; "2"; "9223372036854775808"] |> yields "[1,2,9223372036854775808]"
     given ["--bs"; "1"; "2"; "4.2"] |> fails
 
 [<Fact>]
 let ``Accepts Pauli array`` () =
-    let given = test 15
+    let given = test "Accepts Pauli array"
     given ["--ps"; "PauliI"] |> yields "[PauliI]"
     given ["--ps"; "PauliZ"; "PauliX"] |> yields "[PauliZ,PauliX]"
     given ["--ps"; "PauliY"; "PauliY"; "PauliY"] |> yields "[PauliY,PauliY,PauliY]"
@@ -335,7 +345,7 @@ let ``Accepts Pauli array`` () =
 
 [<Fact>]
 let ``Accepts Range array`` () =
-    let given = test 16
+    let given = test "Accepts Range array"
     given ["--rs"; "1..10"] |> yields "[1..1..10]"
     given ["--rs"; "1..10"; "2..4..20"] |> yields "[1..1..10,2..4..20]"
     given ["--rs"; "1 ..10"; "2 ..4 ..20"] |> yields "[1..1..10,2..4..20]"
@@ -344,14 +354,14 @@ let ``Accepts Range array`` () =
 
 [<Fact>]
 let ``Accepts Result array`` () =
-    let given = test 17
+    let given = test "Accepts Result array"
     given ["--rs"; "One"] |> yields "[One]"
     given ["--rs"; "One"; "Zero"] |> yields "[One,Zero]"
     given ["--rs"; "Zero"; "One"; "Two"] |> fails
 
 [<Fact>]
 let ``Accepts Unit array`` () =
-    let given = test 18
+    let given = test "Accepts Unit array"
     given ["--us"; "()"] |> yields "[()]"
     given ["--us"; "()"; "()"] |> yields "[(),()]"
     given ["--us"; "()"; "()"; "()"] |> yields "[(),(),()]"
@@ -359,24 +369,23 @@ let ``Accepts Unit array`` () =
 
 [<Fact>]
 let ``Supports repeat-name array syntax`` () =
-    let given = test 13
+    let given = test "Accepts String array"
     given ["--xs"; "Hello"; "--xs"; "World"] |> yields "[Hello,World]"
     given ["--xs"; "foo"; "bar"; "--xs"; "baz"] |> yields "[foo,bar,baz]"
     given ["--xs"; "foo"; "--xs"; "bar"; "--xs"; "baz"] |> yields "[foo,bar,baz]"
     given ["--xs"; "foo bar"; "--xs"; "baz"] |> yields "[foo bar,baz]"
 
-
 // Multiple Options
 
 [<Fact>]
 let ``Accepts two options`` () =
-    let given = test 19
+    let given = test "Accepts two options"
     given ["-n"; "7"; "-b"; "true"] |> yields "7 True"
     given ["-b"; "true"; "-n"; "7"] |> yields "7 True"
 
 [<Fact>]
 let ``Accepts three options`` () =
-    let given = test 20
+    let given = test "Accepts three options"
     given ["-n"; "7"; "-b"; "true"; "--xs"; "foo"] |> yields "7 True [foo]"
     given ["--xs"; "foo"; "-n"; "7"; "-b"; "true"] |> yields "7 True [foo]"
     given ["-n"; "7"; "--xs"; "foo"; "-b"; "true"] |> yields "7 True [foo]"
@@ -384,7 +393,7 @@ let ``Accepts three options`` () =
 
 [<Fact>]
 let ``Requires all options`` () =
-    let given = test 20
+    let given = test "Accepts three options"
     given ["-b"; "true"; "--xs"; "foo"] |> fails
     given ["-n"; "7"; "--xs"; "foo"] |> fails
     given ["-n"; "7"; "-b"; "true"] |> fails
@@ -393,50 +402,47 @@ let ``Requires all options`` () =
     given ["--xs"; "foo"] |> fails
     given [] |> fails
 
-
 // Tuples
 
 [<Fact>]
 let ``Accepts redundant one-tuple`` () =
-    let given = test 21
+    let given = test "Accepts redundant one-tuple"
     given ["-x"; "7"] |> yields "7"
-    
+
 [<Fact>]
 let ``Accepts redundant two-tuple`` () =
-    let given = test 22
+    let given = test "Accepts redundant two-tuple"
     given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
-    
+
 [<Fact>]
 let ``Accepts one-tuple`` () =
-    let given = test 23
+    let given = test "Accepts one-tuple"
     given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
 
 [<Fact>]    
 let ``Accepts two-tuple`` () =
-    let given = test 24
+    let given = test "Accepts two-tuple"
     given ["-x"; "7"; "-y"; "8"; "-z"; "9"] |> yields "7 8 9"
-
 
 // Name Conversion
 
 [<Fact>]
 let ``Uses kebab-case`` () =
-    let given = test 25
+    let given = test "Uses kebab-case"
     given ["--camel-case-name"; "foo"] |> yields "foo"
     given ["--camelCaseName"; "foo"] |> fails
 
 [<Fact>]
 let ``Uses single-dash short names`` () =
-    let given = test 26
+    let given = test "Uses single-dash short names"
     given ["-x"; "foo"] |> yields "foo"
     given ["--x"; "foo"] |> fails
-
 
 // Shadowing
 
 [<Fact>]
 let ``Shadows --simulator`` () =
-    let given = test 27
+    let given = test "Shadows --simulator"
     given ["--simulator"; "foo"]
     |> yields "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
                foo"
@@ -449,35 +455,34 @@ let ``Shadows --simulator`` () =
 
 [<Fact>]
 let ``Shadows -s`` () =
-    let given = test 28
+    let given = test "Shadows -s"
     given ["-s"; "foo"] |> yields "foo"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "-s"; "foo"] |> yields "foo"
     given ["--simulator"; "bar"; "-s"; "foo"] |> fails
 
 [<Fact>]
 let ``Shadows --version`` () =
-    let given = test 29
+    let given = test "Shadows --version"
     given ["--version"; "foo"] |> yields "foo"
 
 [<Fact>]
 let ``Shadows --target`` () =
-    let given = test 30
+    let given = test "Shadows --target"
     given ["--target"; "foo"] |> yields "foo"
     given submitWithNothingTarget
     |> failsWith "The required option --target conflicts with an entry point parameter name."
 
 [<Fact>]
 let ``Shadows --shots`` () =
-    let given = test 31
+    let given = test "Shadows --shots"
     given ["--shots"; "7"] |> yields "7"
     given (submitWithNothingTarget @ ["--shots"; "7"])
     |> yields "Warning: Option --shots is overridden by an entry point parameter name. Using default value 500.
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
-
 // Simulators
 
-// The expected output from the resources estimator.
+/// The expected output from the resources estimator.
 let private resourceSummary =
     "Metric          Sum Max
      CNOT            0   0
@@ -492,30 +497,30 @@ let private resourceSummary =
 
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
-    let given = test 32
+    let given = test "X or H"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports ToffoliSimulator`` () =
-    let given = test 32
+    let given = test "X or H"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
 let ``Supports ResourcesEstimator`` () =
-    let given = test 32
+    let given = test "X or H"
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
 
 [<Fact>]
 let ``Rejects unknown simulator`` () =
-    let given = test 32
+    let given = test "X or H"
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
 
 [<Fact>]
 let ``Supports default standard simulator`` () =
-    let given = testWithSim AssemblyConstants.ResourcesEstimator 32
+    let given = testWithSim AssemblyConstants.ResourcesEstimator "X or H"
     given ["--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
@@ -523,7 +528,7 @@ let ``Supports default standard simulator`` () =
 let ``Supports default custom simulator`` () =
     // This is not really a "custom" simulator, but the driver does not recognize the fully-qualified name of the
     // standard simulators, so it is treated as one.
-    let given = testWithSim typeof<ToffoliSimulator>.FullName 32
+    let given = testWithSim typeof<ToffoliSimulator>.FullName "X or H"
     given ["--use-h"; "false"] |> yields "Hello, World!"
     given ["--use-h"; "true"] |> fails
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "false"] |> yields "Hello, World!"
@@ -533,23 +538,22 @@ let ``Supports default custom simulator`` () =
     given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
-
 // Azure Quantum Submission
 
 [<Fact>]
 let ``Submit can submit a job`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given submitWithNothingTarget
     |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithNothingTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithNothingTarget @ ["--verbose"])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -568,7 +572,7 @@ let ``Submit uses default values`` () =
 
 [<Fact>]
 let ``Submit uses default values with default target`` () =
-    let given = testWithTarget "test.nothing" 1
+    let given = testWithTarget "test.nothing" "Returns Unit"
     given (submitWithoutTarget @ ["--verbose"])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -587,7 +591,7 @@ let ``Submit uses default values with default target`` () =
 
 [<Fact>]
 let ``Submit allows overriding default values`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithNothingTarget @ [
         "--verbose"
         "--storage"
@@ -618,7 +622,7 @@ let ``Submit allows overriding default values`` () =
 
 [<Fact>]
 let ``Submit allows overriding default values with default target`` () =
-    let given = testWithTarget "foo.target" 1
+    let given = testWithTarget "foo.target" "Returns Unit"
     given (submitWithNothingTarget @ [
         "--verbose"
         "--storage"
@@ -649,7 +653,7 @@ let ``Submit allows overriding default values with default target`` () =
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithNothingTarget @ ["--shots"; "1"])
     |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
     given (submitWithNothingTarget @ ["--shots"; "0"]) |> fails
@@ -657,12 +661,12 @@ let ``Submit requires a positive number of shots`` () =
 
 [<Fact>]
 let ``Submit fails with unknown target`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given (submitWithNothingTarget @ ["--dry-run"]) |> yields "✔️  The program is valid!"
     given (submitWithErrorTarget @ ["--dry-run"])
     |> failsWith "❌  The program is invalid.
@@ -677,7 +681,7 @@ let ``Submit has required options`` () =
         | x :: xs ->
             let next = powerSet xs
             List.map (fun list -> x :: list) next @ next
-    let given = test 1
+    let given = test "Returns Unit"
 
     // Try every possible combination of arguments. The command should succeed only when all of the arguments are
     // included.
@@ -691,12 +695,11 @@ let ``Submit has required options`` () =
 
 [<Fact>]
 let ``Submit catches exceptions`` () =
-    let given = test 1
+    let given = test "Returns Unit"
     given submitWithErrorTarget
     |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
 
                   This quantum machine always has an error."
-
 
 // Help
 
@@ -722,7 +725,7 @@ let ``Uses documentation`` () =
                      Commands:
                        simulate    (default) Run the program using a local simulator."
 
-    let given = test 33
+    let given = test "Help"
     given ["--help"] |> yields message
     given ["-h"] |> yields message
     given ["-?"] |> yields message
@@ -752,7 +755,7 @@ let ``Shows help text for submit command`` () =
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
-    let given = test 33
+    let given = test "Help"
     given ["submit"; "--help"] |> yields message
 
 [<Fact>]
@@ -780,5 +783,5 @@ let ``Shows help text for submit command with default target`` () =
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
-    let given = testWithTarget "foo.target" 33
+    let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message

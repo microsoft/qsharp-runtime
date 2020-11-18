@@ -38,7 +38,6 @@ namespace Microsoft.Quantum.Intrinsic {
             Rz(theta, qubit);
         }
         else { // PauliI
-            RotationAngleValidation(theta);
             ApplyGlobalPhase( - theta / 2.0 );
         }
     }
