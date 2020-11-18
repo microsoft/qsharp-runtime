@@ -3,14 +3,14 @@
 
 Write-Host "##[info]Build Native simulator"
 
-$nativeBuild = (Join-Path $PSScriptRoot "build")
+$nativeBuild = (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
 if (-not (Test-Path $nativeBuild)) {
     New-Item -Path $nativeBuild -ItemType "directory"
 }
 Push-Location $nativeBuild
 
-cmake -DBUILD_SHARED_LIBS:BOOL="1" ..
-cmake --build . --config $Env:BUILD_CONFIGURATION
+cmake -DBUILD_SHARED_LIBS:BOOL="1" ../..
+cmake --build .
 
 Pop-Location
 
