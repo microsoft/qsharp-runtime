@@ -15,7 +15,7 @@ If ($Env:NUGET_VERSION -eq $null) { $Env:NUGET_VERSION ="$Env:ASSEMBLY_VERSION-a
 If ($Env:BUILD_REASON -ne $null) {
     If ($Env:ENABLE_QIRRUNTIME -eq $null) { $Env:ENABLE_QIRRUNTIME ="true" }
     If (($Env:ENABLE_NATIVE -ne "false") -and ($Env:NATIVE_SIMULATOR -eq $null) ) {
-        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build")
+        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\$Env:BUILD_CONFIGURATION")
     }
 }
 
