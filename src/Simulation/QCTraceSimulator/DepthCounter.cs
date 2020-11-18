@@ -32,10 +32,11 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         QubitAvailabilityTimeTracker qubitAvailabilityTime = new QubitAvailabilityTimeTracker(
             initialCapacity: 128, // Reasonable number to preallocate.
             defaultAvailabilityTime: 0.0);
+        bool optimizeDepth = false;
 
         public IStatisticCollectorResults<CallGraphEdge> Results => stats;
 
-        public DepthCounter(IDoubleStatistic[] statisticsToCollect = null)
+        public DepthCounter(IDoubleStatistic[] statisticsToCollect = null, bool optimizeDepth = false)
         {
             stats = new StatisticsCollector<CallGraphEdge>(
                 Utils.MethodParametersNames(this, "StatisticsRecord"),
@@ -46,6 +47,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             OperationCallRecord opRec = new OperationCallRecord();
             opRec.OperationName = CallGraphEdge.CallGraphRootHashed;
             operationCallStack.Push(opRec);
+            this.optimizeDepth = optimizeDepth;
         }
 
         public static class Metrics
@@ -63,7 +65,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         #region IQCTraceSimulatorListener implementation 
         public object NewTracingData(long qubitId)
         {
-            return new QubitTimeMetrics(qubitId);
+            return new QubitTimeMetrics(qubitId) { StartTime = ComplexTime.MinValue, EndTime = ComplexTime.Zero };
         }
 
         public void OnAllocate(object[] qubitsTraceData)
@@ -102,7 +104,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 StatisticsRecord( 
                     Depth : operationEndTime - opRec.MaxOperationStartTime,
                     StartTimeDifference: opRec.MaxOperationStartTime - opRec.MinOperationStartTime,
-                    Width: qubitAvailabilityTime.GetMaxQubitId() - opRec.MaxQubitIdAtStart );
+                    Width: optimizeDepth ? WidthWithReuse : qubitAvailabilityTime.GetMaxQubitId() - opRec.MaxQubitIdAtStart );
 
             stats.AddSample(new CallGraphEdge(opRec.OperationName, callerName,opRec.FunctorSpecialization, caller.FunctorSpecialization), metrics);
         }
@@ -151,7 +153,35 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             {
                 qubitAvailabilityTime[q.QubitId] = startTime + primitiveOperationDuration;
             }
+
+            // Doing adjustments for width-with-reuse computation.
+            if (qubitsTraceData.Length == 1) {
+                // Single qubit gate always advances end time by operation duration
+                // in case qubit is fixed or not fixed in time.
+                ((QubitTimeMetrics)qubitsTraceData[0]).EndTime =
+                    ((QubitTimeMetrics)qubitsTraceData[0]).EndTime.Advance(primitiveOperationDuration);
+            } else {
+                // Multi-qubit gate fixes all qubits in time and advances end time
+                // First, figure out what time it is. It's max over fixed and not fixed times.
+                ComplexTime maxEndTime = ComplexTime.Zero;
+                foreach (QubitTimeMetrics q in qubitsMetrics) {
+                    maxEndTime = ComplexTime.Max(maxEndTime, q.EndTime);
+                }
+                // Now we fix qubits that are not yet fixed by adjusting their start time.
+                // And adjust end time for all qubits involved.
+                foreach (QubitTimeMetrics q in qubitsMetrics) {
+                    if (ComplexTime.Compare(q.StartTime, ComplexTime.MinValue) == 0) {
+                        q.StartTime = maxEndTime.Retreat(q.EndTime);
+                    }
+                    q.EndTime = maxEndTime.Advance(primitiveOperationDuration);
+                }
+            }
+
         }
+
+        QubitPool qubitStartTimes = new QubitPool();
+        QubitPool qubitEndTimes = new QubitPool();
+        long WidthWithReuse = 0;
 
         public void OnRelease(object[] qubitsTraceData)
         {
@@ -159,6 +189,45 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             opRec.ReleasedQubitsAvailableTime = Max(
                 opRec.ReleasedQubitsAvailableTime,
                 MaxAvailableTime(qubitsTraceData.Cast<QubitTimeMetrics>()));
+
+            // Doing width reuse heuristics and width computation.
+            foreach (QubitTimeMetrics q in qubitsTraceData.Cast<QubitTimeMetrics>()) {
+                // If qubit wasn't used in any gate. We don't allocate it.
+                if (ComplexTime.Compare(q.EndTime, ComplexTime.Zero) == 0) {
+                    continue;
+                }
+
+                // If qubit is not fixed in time we fix it at zero.
+                if (ComplexTime.Compare(q.StartTime, ComplexTime.MinValue) == 0) {
+                    q.StartTime = ComplexTime.Zero;
+                }
+
+                // Then we find if we can reuse
+                bool reuseExistingAfterNew = qubitStartTimes.FindBound(q.EndTime, getLowerBound: false, out ComplexTime existingStart);
+                bool reuseNewAfterExising = qubitEndTimes.FindBound(q.StartTime, getLowerBound: true, out ComplexTime existingEnd);
+                if (reuseNewAfterExising && reuseExistingAfterNew) {
+                    if (ComplexTime.Compare(q.StartTime.Retreat(existingEnd), existingStart.Retreat(q.EndTime)) > 0) {
+                        reuseNewAfterExising = false;
+                    } else {
+                        reuseExistingAfterNew = false;
+                    }
+                }
+
+                if (reuseNewAfterExising) {
+                    long idToReuse = qubitEndTimes.Remove(existingEnd);
+                    qubitEndTimes.Add(idToReuse, q.EndTime);
+                } else if (reuseExistingAfterNew) {
+                    long idToReuse = qubitStartTimes.Remove(existingStart);
+                    qubitStartTimes.Add(idToReuse, q.StartTime);
+                } else {
+                    // Cannot reuse existing qubits. Use new qubit.
+                    long id = WidthWithReuse;
+                    WidthWithReuse++;
+                    qubitStartTimes.Add(id, q.StartTime);
+                    qubitEndTimes.Add(id, q.EndTime);
+                }
+
+            }
         }
 
         public void OnReturn(object[] qubitsTraceData, long qubitReleased)

@@ -13,9 +13,22 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         // Consider changing architecture to pass qubits rather than metrics in IQCTraceSimulatorListener.
         public long QubitId { get; }
 
+        // If qubit is not fixed in time, this is depth of single-qubit-gate chain on this qubit
+        // If qubit is fixed in time, this is absolute end time for this qubit
+        internal ComplexTime EndTime { get; set; }
+
+
+        // If qubit is not fixed in time, this is ComplexTime.MinValue
+        // If qubit is fixed in time, this is absolute start time
+        internal ComplexTime StartTime { get; set; }
+
         public QubitTimeMetrics(long qubitId)
         {
             QubitId = qubitId;
+        }
+
+        public override string ToString() {
+            return $"{QubitId}: {StartTime} - {EndTime}";
         }
     }
 }

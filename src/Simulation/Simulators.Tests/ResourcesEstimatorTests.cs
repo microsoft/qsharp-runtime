@@ -119,6 +119,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
         }
 
+        [Fact]
+        public void QubitReuseWithOptimizedDepthTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            QubitReuseWithOptimizedDepth.Run(sim).Wait();
+
+            Assert.Equal(2.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
         /// <summary>
         /// Documents that the QubitCount and Depth statistics reflect independent lower
         /// bounds for each (two T gates cannot be combined into a circuit of depth
