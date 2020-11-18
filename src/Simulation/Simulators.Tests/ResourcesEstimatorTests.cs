@@ -185,6 +185,45 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0, data.Rows.Find("Depth")["Sum"]);
         }
 
+        [Fact]
+        public void QubitReuseWithOptimizedDepthTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            QubitReuseWithOptimizedDepth.Run(sim).Wait();
+
+            Assert.Equal(2.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
+        /// <summary>
+        /// Documents that the QubitCount and Depth statistics reflect independent lower
+        /// bounds for each (two T gates cannot be combined into a circuit of depth
+        /// one and width one). Width on the other hand is compatible with Depth.
+        /// </summary>
+        [Fact]
+        public void DepthVersusWidthTest()
+        {
+            // Operation to execute:
+            // using(q = Qubit()) { T(q); } using(q = Qubit()) { T(q); } (yes, twice)
+
+            // First run with width optimization
+            DataTable data = RunDepthVersusWidthTest(optimizeDepth: false);
+            Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
+
+            // Now run with depth optimization
+            data = RunDepthVersusWidthTest(optimizeDepth: true);
+            Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("Depth")["Sum"]);
+        }
+
         private DataTable RunDepthVersusWidthTest(bool optimizeDepth)
         {
             QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
