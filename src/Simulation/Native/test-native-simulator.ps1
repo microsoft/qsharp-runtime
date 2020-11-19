@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 Write-Host "##[info]Test Native simulator"
-Push-Location (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
+Push-Location (Join-Path $PSScriptRoot "build")
 
-ctest --verbose
+ctest -C $Env:BUILD_CONFIGURATION --verbose
 
 if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
