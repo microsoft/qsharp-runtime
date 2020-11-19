@@ -5,19 +5,18 @@ Write-Host "##[info]Build QIR Runtime"
 $oldCC = $env:CC
 $oldCXX = $env:CXX
 
-if (Test-Path Env:AGENT_OS) {
-    if ($Env:AGENT_OS.StartsWith("Win")) {
-        $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
-        $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
-        $llvmExtras = (Join-Path $PSScriptRoot "externals/LLVM")
-        $env:PATH += ";$llvmExtras"
-    } else {
-        $env:CC = "/usr/bin/clang"
-        $env:CXX = "/usr/bin/clang++"
-    }
+if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+    Write-Host "On Windows build QIR Runtime using Clang"
+    $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
+    $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
+    $llvmExtras = (Join-Path $PSScriptRoot "externals/LLVM")
+    $env:PATH += ";$llvmExtras"
 } else {
-    Write-Host "QIR Runtime should be built with Clang. Please set env:CXX to point to clang++"
+    Write-Host "On non-Windows platforms build QIR Runtime using Clang"
+    $env:CC = "/usr/bin/clang"
+    $env:CXX = "/usr/bin/clang++"
 }
+
 
 $qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
 if (-not (Test-Path $qirRuntimeBuildFolder)) {
