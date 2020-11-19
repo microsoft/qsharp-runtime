@@ -4,7 +4,7 @@
   <PropertyGroup>
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
-    <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/$(Configuration)))</NativeBuildPath>
+    <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(QsimDll)' == ''">

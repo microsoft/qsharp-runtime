@@ -16,7 +16,7 @@ If ($Env:BUILD_REASON -ne $null) {
     If ($Env:ENABLE_QIRRUNTIME -eq $null) { $Env:ENABLE_QIRRUNTIME ="true" }
     If (($Env:ENABLE_NATIVE -ne "false") -and ($Env:NATIVE_SIMULATOR -eq $null) ) {
         # For the CIs we always build release native simulator
-        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\$Env:BUILD_CONFIGURATION")
+        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\drop")
     }
 }
 
