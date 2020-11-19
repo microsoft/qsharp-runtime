@@ -69,7 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC562DAE-FE2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{9008B252-2DF7-404B-B626-D4497BB70A05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QsharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj", "{DB45AD73-4D91-43F3-85CC-C63614A96FB0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QsharpFoundation\Microsoft.Quantum.Qsharp.Foundation.csproj", "{DB45AD73-4D91-43F3-85CC-C63614A96FB0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Quantum.Type2.Core", "src\Simulation\Type2Core\Microsoft.Quantum.Type2.Core.csproj", "{AF6CD304-8E03-433D-AAA2-6E0094B53071}"
 EndProject
