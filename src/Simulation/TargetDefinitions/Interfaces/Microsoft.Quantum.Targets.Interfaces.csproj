@@ -17,7 +17,7 @@
   </PropertyGroup>  
   
   <ItemGroup>
-    <Compile Include="..\..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+    <Compile Include="..\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
   <ItemGroup>
