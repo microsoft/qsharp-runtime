@@ -3,6 +3,7 @@
 
 using System;
 using System.CommandLine.Parsing;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
@@ -235,8 +236,15 @@ namespace Microsoft.Quantum.EntryPointDriver
 
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
         /// </summary>
         public Uri? BaseUri { get; set; }
+
+        /// <summary>
+        /// The location to use with the default Azure Quantum endpoint.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// </summary>
+        public string? Location { get; set; }
 
         /// <summary>
         /// The name of the submitted job.
@@ -267,10 +275,27 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
-        internal Workspace CreateWorkspace() =>
-            AadToken is null
-                ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
+        internal Workspace CreateWorkspace()
+        {
+            if (BaseUri != null)
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
+            }
+            else if (Location != null)
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
+            }
+            else
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
+            }
+        }
 
         public override string ToString() =>
             string.Join(System.Environment.NewLine,
@@ -281,10 +306,14 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Storage: {Storage}",
                 $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
+                $"Location: {Location}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
                 $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
+
+        internal static string NormalizeLocation(string location) =>
+            string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
     }
 }

@@ -55,6 +55,29 @@ namespace Microsoft.Azure.Quantum
         /// <param name="subscriptionId">The subscription identifier.</param>
         /// <param name="resourceGroupName">Name of the resource group.</param>
         /// <param name="workspaceName">Name of the workspace.</param>
+        /// <param name="location">Normalized location to use with the default endpoint.</param>
+        /// <param name="tokenCredential">The token credential.</param>
+        public Workspace(
+            string subscriptionId,
+            string resourceGroupName,
+            string workspaceName,
+            string location,
+            TokenCredential tokenCredential = null)
+            : this(
+                subscriptionId,
+                resourceGroupName,
+                workspaceName,
+                tokenCredential,
+                new Uri($"https://{location}.{Constants.DefaultLocationlessEndpoint}/"))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Workspace"/> class.
+        /// </summary>
+        /// <param name="subscriptionId">The subscription identifier.</param>
+        /// <param name="resourceGroupName">Name of the resource group.</param>
+        /// <param name="workspaceName">Name of the workspace.</param>
         /// <param name="accessToken">The access token.</param>
         /// <param name="baseUri">The base URI.</param>
         public Workspace(
@@ -72,6 +95,29 @@ namespace Microsoft.Azure.Quantum
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Workspace"/> class.
+        /// </summary>
+        /// <param name="subscriptionId">The subscription identifier.</param>
+        /// <param name="resourceGroupName">Name of the resource group.</param>
+        /// <param name="workspaceName">Name of the workspace.</param>
+        /// <param name="accessToken">The access token.</param>
+        /// <param name="location">Normalized location to use with the default endpoint.</param>
+        public Workspace(
+            string subscriptionId,
+            string resourceGroupName,
+            string workspaceName,
+            string accessToken,
+            string location)
+            : this(
+                  subscriptionId,
+                  resourceGroupName,
+                  workspaceName,
+                  new StaticAccessTokenProvider(accessToken),
+                  new Uri($"https://{location}.{Constants.DefaultLocationlessEndpoint}/"))
+        {
+        }
+
         private Workspace(
             string subscriptionId,
             string resourceGroupName,
@@ -79,7 +125,7 @@ namespace Microsoft.Azure.Quantum
             IAccessTokenProvider accessTokenProvider,
             Uri baseUri = null)
         {
-            this.baseUri = baseUri ?? new Uri(Constants.DefaultBaseUri);
+            this.baseUri = baseUri ?? new Uri($"https://{Constants.DefaultLocation}.{Constants.DefaultLocationlessEndpoint}/");
             Ensure.NotNullOrWhiteSpace(subscriptionId, nameof(subscriptionId));
             this.subscriptionId = subscriptionId;
             Ensure.NotNullOrWhiteSpace(resourceGroupName, nameof(resourceGroupName));

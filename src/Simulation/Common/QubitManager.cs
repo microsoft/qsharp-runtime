@@ -488,9 +488,11 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            for (long i = qubitsToRelease.Length-1; i>=0; i--)
-            { // Going from the end is more efficient in case we are tracking scope.
-                this.Release(qubitsToRelease[i], wasUsedOnlyForBorrowing: false);
+            // When tracking scopes for borrowing, it's more efficient to release qubits in the same order
+            // they were allocated in (which in case of allocated arrays is from left to right).
+            foreach (var qubit in qubitsToRelease)
+            {
+                this.Release(qubit, wasUsedOnlyForBorrowing: false);
             }
         }
 
@@ -663,9 +665,11 @@ namespace Microsoft.Quantum.Simulation.Common
                 return;
             }
 
-            for (long i = qubitsToReturn.Length - 1; i >= 0; i--)
-            { // Going from the end is more efficient in case we are tracking scope.
-                this.Return(qubitsToReturn[i]);
+            // When tracking scopes for borrowing, it's more efficient to release qubits in the same order
+            // they were allocated in (which in case of borrowed arrays is from left to right if we had to allocate).
+            foreach (var qubit in qubitsToReturn)
+            {
+                this.Return(qubit);
             }
         }
     }
