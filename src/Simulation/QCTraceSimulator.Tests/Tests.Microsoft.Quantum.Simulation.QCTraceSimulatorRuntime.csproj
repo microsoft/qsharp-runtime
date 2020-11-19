@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.Qsharp.Core.csproj" />
+    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

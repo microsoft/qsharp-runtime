@@ -54,7 +54,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.Qsharp.Core.csproj" />
+    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>
