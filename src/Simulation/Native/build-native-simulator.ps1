@@ -3,10 +3,6 @@
 
 Write-Host "##[info]Build Native simulator"
 
-# Cmake on MacOS might insist on using AppleClang even when gcc is specified in the compiler flags. So we use 
-# both the flags and the environtment.
-$oldCC = $env:CC
-$oldCXX = $env:CXX
 
 $nativeBuild = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $nativeBuild)) {
@@ -24,9 +20,9 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
     Write-Host "On MacOS build native simulator using gcc (needed for OpenMP)"
-    $env:CC = "/usr/bin/gcc"
-    $env:CXX = "/usr/bin/g++"
-    cmake -DBUILD_SHARED_LIBS:BOOL="1" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ..
+    # `gcc`on Darwin seems to be a shim that redirects to AppleClang, to get real gcc, must point to the specific
+    # version of gcc.
+    cmake -DBUILD_SHARED_LIBS:BOOL="1" -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ..
 }
 else {
     Write-Host "Failed to recognize the platform, will attempt to build with default compiler"
@@ -36,8 +32,6 @@ cmake --build . --config $Env:BUILD_CONFIGURATION --target install
 
 Pop-Location
 
-$env:CC = $oldCC
-$env:CXX = $oldCXX
 
 if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
