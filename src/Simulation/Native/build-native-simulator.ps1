@@ -24,8 +24,8 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
     Write-Host "On MacOS build native simulator using gcc (needed for OpenMP)"
-    $env:CC = "gcc"
-    $env:CXX = "g++"
+    $env:CC = "/usr/bin/gcc"
+    $env:CXX = "/usr/bin/g++"
     cmake -DBUILD_SHARED_LIBS:BOOL="1" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ..
 }
 else {
