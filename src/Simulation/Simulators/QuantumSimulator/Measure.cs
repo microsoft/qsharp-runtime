@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
+        public virtual Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
         {
             var (paulis, qubits) = _args;
 

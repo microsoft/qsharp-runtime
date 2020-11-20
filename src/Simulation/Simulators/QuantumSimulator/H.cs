@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<Qubit, QVoid> H_Body() => (q1) =>
+        public virtual Func<Qubit, QVoid> H_Body() => (q1) =>
         {
             this.CheckQubit(q1);
 
@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Qubit>, Qubit), QVoid> H_ControlledBody() => (args) =>
+        public virtual Func<(IQArray<Qubit>, Qubit), QVoid> H_ControlledBody() => (args) =>
         {
             var (ctrls, q1) = args;
 

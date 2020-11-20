@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public Func<(Qubit, Qubit), QVoid> SWAP_Body() => (args) =>
+        public virtual Func<(Qubit, Qubit), QVoid> SWAP_Body() => (args) =>
         {
             var (qubit1, qubit2) = args;
             var ctrls1 = new QArray<Qubit>(qubit1);
@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> SWAP_ControlledBody() => (args) =>
+        public virtual Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> SWAP_ControlledBody() => (args) =>
         {
             var (ctrls, (qubit1, qubit2)) = args;
 

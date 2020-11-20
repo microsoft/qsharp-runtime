@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_Body() => (_args) =>
+        public virtual Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_Body() => (_args) =>
         {
             var (paulis, theta, qubits) = _args;
 
@@ -27,14 +27,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_AdjointBody() => (_args) =>
+        public virtual Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> Exp_AdjointBody() => (_args) =>
         {
             var (paulis, angle, qubits) = _args;
 
             return Exp_Body().Invoke((paulis, -angle, qubits));
         };
 
-        public Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledBody() => (_args) =>
+        public virtual Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledBody() => (_args) =>
         {
             var (ctrls, (paulis, angle, qubits)) = _args;
 
@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledAdjointBody() => (_args) =>
+        public virtual Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> Exp_ControlledAdjointBody() => (_args) =>
         {
             var (ctrls, (paulis, angle, qubits)) = _args;
 

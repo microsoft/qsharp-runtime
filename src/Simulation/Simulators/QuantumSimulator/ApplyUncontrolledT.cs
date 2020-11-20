@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<Qubit, QVoid> ApplyUncontrolledT_Body() => (q1) =>
+        public virtual Func<Qubit, QVoid> ApplyUncontrolledT_Body() => (q1) =>
         {
             this.CheckQubit(q1);
 
@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<Qubit, QVoid> ApplyUncontrolledT_AdjointBody() => (q1) =>
+        public virtual Func<Qubit, QVoid> ApplyUncontrolledT_AdjointBody() => (q1) =>
         {
             this.CheckQubit(q1);
             

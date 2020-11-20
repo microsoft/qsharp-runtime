@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public Func<(double, Qubit), QVoid> Ry_Body() => (args) =>
+        public virtual Func<(double, Qubit), QVoid> Ry_Body() => (args) =>
         {
             var (angle, target) = args;
             this.CheckQubit(target, nameof(target));
@@ -19,14 +19,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(double, Qubit), QVoid> Ry_AdjointBody() => (_args) =>
+        public virtual Func<(double, Qubit), QVoid> Ry_AdjointBody() => (_args) =>
         {
             var (angle, q1) = _args;
 
             return Ry_Body().Invoke((-angle, q1));
         };
 
-        public Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledBody() => (args) =>
+        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledBody() => (args) =>
         {
             var (ctrls, (angle, target)) = args;
             this.CheckQubits(ctrls, target);
@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledAdjointBody() => (_args) =>
+        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledAdjointBody() => (_args) =>
         {
             var (ctrls, (angle, q1)) = _args;
 

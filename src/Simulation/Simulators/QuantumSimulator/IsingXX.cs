@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<(double, Qubit, Qubit), QVoid> IsingXX_Body() => (args) =>
+        public virtual Func<(double, Qubit, Qubit), QVoid> IsingXX_Body() => (args) =>
         {
             var (angle, qubit1, qubit2) = args;
             var paulis = new Pauli[]{ Pauli.PauliX, Pauli.PauliX };
@@ -22,14 +22,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(double, Qubit, Qubit), QVoid> IsingXX_AdjointBody() => (args) =>
+        public virtual Func<(double, Qubit, Qubit), QVoid> IsingXX_AdjointBody() => (args) =>
         {
             var (angle, qubit1, qubit2) = args;
 
             return IsingXX_Body().Invoke((-angle, qubit1, qubit2));
         };
 
-        public Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingXX_ControlledBody() => (args) =>
+        public virtual Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingXX_ControlledBody() => (args) =>
         {
             var (ctrls, (angle, qubit1, qubit2)) = args;
 
@@ -50,7 +50,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return QVoid.Instance;
         };
 
-        public Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingXX_ControlledAdjointBody() => (args) =>
+        public virtual Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingXX_ControlledAdjointBody() => (args) =>
         {
             var (ctrls, (angle, qubit1, qubit2)) = args;
 

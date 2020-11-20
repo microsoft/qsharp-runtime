@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<Qubit, QVoid> ApplyUncontrolledZ_Body() => (q1) =>
+        public virtual Func<Qubit, QVoid> ApplyUncontrolledZ_Body() => (q1) =>
         {
             this.CheckQubit(q1);
 
