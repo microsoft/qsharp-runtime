@@ -40,13 +40,14 @@ To build on Windows:
         * **Desktop development with C++**
         * **From the Individual Components tab in VS Installer add Spectre-mitigated libs that match your C++ build tools version**
         * **.NET Core 3 cross-platform development**
-2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2019`.
+2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
-    * This script prepares and builds the native (C++) full-state simulator.
+    * The script might install additional tools (a specific compiler, build tools, etc)
+    * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
     * You only need to run it once.
 3. Open and build the [`Simulation.sln`](./Simulation.sln) solution in Visual Studio.
 
-The `Simulation.sln` solution does not include the full-state quantum simulator. To change it, you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must first manually build it using the `Release` configuration.
+The `Simulation.sln` solution does not include the full-state quantum simulator. To change it, you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must manually build it.
 
 
 ### macOS/Linux ###
@@ -56,8 +57,9 @@ To build on other platforms:
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
-2. Run [bootstrap.sh](./bootstrap.sh)
-    * This script prepares and builds the native (C++) full-state simulator.
+2. Run [bootstrap.ps1](./bootstrap.ps1)
+    * The script might install additional tools (a specific compiler, build tools, etc)
+    * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
     * You only need to run it once.
 3. From the command line, run:
     * `dotnet build Simulation.sln`

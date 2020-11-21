@@ -2,19 +2,19 @@
 # Licensed under the MIT License.
 
 $ErrorActionPreference = 'Stop'
-& "$PSScriptRoot/build/set-env.ps1"
+& "$PSScriptRoot/set-env.ps1"
 
-Push-Location (Join-Path $PSScriptRoot "src/Simulation/CsharpGeneration")
+Push-Location (Join-Path $PSScriptRoot "../src/Simulation/CsharpGeneration")
     .\FindNuspecReferences.ps1
 Pop-Location
 
-Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators")
+Push-Location (Join-Path $PSScriptRoot "../src/Simulation/Simulators")
     .\FindNuspecReferences.ps1
 Pop-Location
 
 # Native Quantum Simulator pre-reqs
 if ($Env:ENABLE_NATIVE -ne "false") {
-    Push-Location (Join-Path $PSScriptRoot "src/Simulation/Native")
+    Push-Location (Join-Path $PSScriptRoot "../src/Simulation/Native")
         .\install-prereqs.ps1
     Pop-Location
 } else {
@@ -23,7 +23,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
 
 # At the moment the QIR Runtime build isn't enabled locally by default.
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
-    Push-Location (Join-Path $PSScriptRoot "src/QirRuntime")
+    Push-Location (Join-Path $PSScriptRoot "../src/QirRuntime")
         .\install-prereqs.ps1
     Pop-Location
 } else {
