@@ -9,12 +9,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 set(TEST_FILES
-  qir-test-arrays
-  qir-test-controlls
-  qir-test-partials
-  qir-test-range
-  qir-test-vqe
   qir-test-shared-intrinsics
+  vqe
 )
 
 foreach(file ${TEST_FILES})

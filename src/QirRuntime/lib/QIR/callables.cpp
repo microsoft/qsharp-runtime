@@ -138,7 +138,7 @@ struct QirCallable
         {
             if (this->controlledDepth > 0)
             {
-                throw new std::exception("multi-level controlled operations not implemented yet");
+                throw new std::runtime_error("multi-level controlled operations not implemented yet");
             }
 
             this->appliedFunctor |= QirCallable::Controlled;

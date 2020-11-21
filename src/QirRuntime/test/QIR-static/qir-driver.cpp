@@ -31,6 +31,30 @@ extern "C" void DebugLogPtr(char* value)
     std::cout << (const void*)value << std::endl;
 }
 
+/* forward declaration in C */
+extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body( // NOLINT
+    double theta1,
+    double theta2,
+    double theta3,
+    long nSamples
+);
+
+TEST_CASE("QIR: StandaloneVQE with full state simulator", "[qir]")
+{
+    /* Create full state simulator, set QIR to execute with that simulator, this is the connection point*/
+    unique_ptr<ISimulator> qapi = CreateFullstateSimulator();
+    SetSimulatorForQIR(qapi.get());
+
+    const double theta1 = 0.001;
+    const double theta2 = -0.001;
+    const double theta3 = 0.001;
+    const long nSamples = 10;
+
+    const double ret1 = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(theta1, theta2, theta3, nSamples);
+    CHECK(-1.0==ret1);
+}
+
+#if 0
 /*
     state1__count is the number of entries in the state1 array of integers.
     state1 is an array of indices into the qubit array that get Xs applied to them in the state prep.
@@ -376,3 +400,4 @@ TEST_CASE("QIR: application of controlled functor", "[skip]")
     SetSimulatorForQIR(nullptr);
     g_ctrqapi = nullptr;
 }
+#endif
