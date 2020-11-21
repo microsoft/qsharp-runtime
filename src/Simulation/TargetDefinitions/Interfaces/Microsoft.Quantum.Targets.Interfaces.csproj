@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
+    <ProjectReference Include="..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 </Project>
