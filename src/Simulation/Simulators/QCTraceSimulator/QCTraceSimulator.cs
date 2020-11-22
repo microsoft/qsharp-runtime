@@ -398,6 +398,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Creates a new instance of the simulator with the default 
         /// <see cref="QCTraceSimulatorConfiguration"/>.
         /// </summary>
+        public QCTraceSimulator() : this(FindTargetIntrinsicsType(), new QCTraceSimulatorConfiguration() ) { }
+
+        /// <summary>
+        /// Creates a new instance of the simulator with the target intrinsics from <paramref name="targetIntrinsicsType"/>
+        /// <see cref="QCTraceSimulatorConfiguration"/>.
+        /// </summary>
         public QCTraceSimulator(Type targetIntrinsicsType) : this(targetIntrinsicsType, new QCTraceSimulatorConfiguration() ) { }
 
         /// <summary>
