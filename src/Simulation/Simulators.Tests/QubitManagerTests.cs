@@ -6,6 +6,7 @@ using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using System;
 using Xunit;
+using System.Collections.Generic;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
@@ -55,11 +56,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.True(q5.Id == 5);
 
             // Test borrowing
-            Qubit[] exclusion = new Qubit[4];
-            exclusion[0] = qa1[0];
-            exclusion[1] = qa1[2];
-            exclusion[2] = q4;
-            exclusion[3] = q3;
+            HashSet<Qubit> exclusion = new HashSet<Qubit>();
+            exclusion.Add(qa1[0]);
+            exclusion.Add(qa1[2]);
+            exclusion.Add(q4);
+            exclusion.Add(q3);
 
             long qubitsAvailable;
 
