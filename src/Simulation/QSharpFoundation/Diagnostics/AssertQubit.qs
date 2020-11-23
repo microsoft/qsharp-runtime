@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # Remarks
     /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
-    operation AssertQubit (expected : Result, q : Qubit) : Unit {
+    operation AssertQubit (expected : Result, q : Qubit) : Unit is Adj + Ctl {
         AssertMeasurement([PauliZ], [q], expected, $"Qubit in invalid state. Expecting: {expected}");
     }
 
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # Remarks
     /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
-    operation AssertQubitWithinTolerance(expected : Result, q : Qubit, tolerance : Double) : Unit {
+    operation AssertQubitWithinTolerance(expected : Result, q : Qubit, tolerance : Double) : Unit is Adj + Ctl {
         AssertMeasurementProbability([PauliZ], [q], expected, 1.0, $"Qubit in invalid state. Expecting: {expected} with tolerance {tolerance}", tolerance);
     }
 
@@ -101,7 +101,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// This is only true under the assumption that Tr(ρ) and Tr(|ψ⟩⟨ψ|) are both 1 (e.g. x₁ = 1/2, y₁ = 1/2).
     /// If this is not the case, the function asserts that l∞ distance between
     /// (x₂-x₁,x₃-x₁,x₄-x₁,x₄+x₁) and (y₂-y₁,y₃-y₁,y₄-y₁,y₄+y₁) is less than the tolerance parameter.
-    operation AssertQubitIsInStateWithinTolerance(expected : (Complex, Complex), register : Qubit, tolerance : Double) : Unit {
+    operation AssertQubitIsInStateWithinTolerance(expected : (Complex, Complex), register : Qubit, tolerance : Double) : Unit is Adj + Ctl {
         let (a, b) = expected;
         let (reA, imA) = a!;
         let (reB, imB) = b!;
