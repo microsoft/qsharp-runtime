@@ -19,6 +19,9 @@ If (Test-Path Env:AGENT_OS) {
         $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\drop")
     }
 }
+If ($Env:NATIVE_SIMULATOR_BUILD_CONFIGURATION -eq $null) { 
+    $Env:NATIVE_SIMULATOR_BUILD_CONFIGURATION = $Env:BUILD_CONFIGURATION
+}
 
 If ($Env:DROPS_DIR -eq $null) { $Env:DROPS_DIR =  [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\drops")) }
 
