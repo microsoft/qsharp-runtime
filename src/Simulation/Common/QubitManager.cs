@@ -43,7 +43,6 @@ namespace Microsoft.Quantum.Simulation.Common
         private long AllocatedForBorrowing; // All qubits allocated only for borrowing, will be marked with this number or higher.
         private long free; // Points to the first free (unallocated) qubit.
         private long freeTail; // Points to the last free (unallocated) qubit. Only valid iff (!EncourageReuse).
-        private static HashSet<Qubit> EMPTY_SET = new HashSet<Qubit>();
 
         // Options
         protected readonly bool MayExtendCapacity;
@@ -123,12 +122,15 @@ namespace Microsoft.Quantum.Simulation.Common
 
         protected HashSet<Qubit> QubitsInUse(StackFrame frame)
         {
-            if (DisableBorrowing || frame == null)
+            Debug.Assert(!DisableBorrowing);
+            
+            if (frame == null)
             {
-                return EMPTY_SET;
+                return new HashSet<Qubit>();
             }
 
             HashSet<Qubit> inUse = new HashSet<Qubit>();
+            inUse.EnsureCapacity(frame.Locals.Keys.Count);
             foreach (Qubit q in frame.Locals.Keys)
             {
                 if (q != null && !this.IsDisabled(q))
