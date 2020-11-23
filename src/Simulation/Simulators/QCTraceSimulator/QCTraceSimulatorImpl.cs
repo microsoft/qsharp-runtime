@@ -110,7 +110,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             // Override the Measure operation.
             var measureShim = 
                 (from nestedType in targetIntrinsicsType.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                where nestedType.BaseType?.FullName == "Microsoft.Quantum.Intrinsic.Measure"
+                where nestedType.Name == "Shim_Measure"
                 select nestedType).SingleOrDefault();
             if (measureShim != null)
             {
