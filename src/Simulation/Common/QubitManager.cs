@@ -43,6 +43,7 @@ namespace Microsoft.Quantum.Simulation.Common
         private long AllocatedForBorrowing; // All qubits allocated only for borrowing, will be marked with this number or higher.
         private long free; // Points to the first free (unallocated) qubit.
         private long freeTail; // Points to the last free (unallocated) qubit. Only valid iff (!EncourageReuse).
+        private static HashSet<Qubit> EMPTY_SET = new HashSet<Qubit>();
 
         // Options
         protected readonly bool MayExtendCapacity;
@@ -120,23 +121,37 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        protected IEnumerable<Qubit> QubitsInUse(StackFrame frame)
+        protected HashSet<Qubit> QubitsInUse(StackFrame frame)
         {
             if (DisableBorrowing || frame == null)
             {
-                return Qubit.NO_QUBITS;
+                return EMPTY_SET;
             }
 
-            return frame.Locals.Keys.Concat(frame.QubitsInArgument ?? Array.Empty<Qubit>())
-                .Where(q => q != null && !this.IsDisabled(q));
+            HashSet<Qubit> inUse = new HashSet<Qubit>();
+            foreach (Qubit q in frame.Locals.Keys)
+            {
+                if (q != null && !this.IsDisabled(q))
+                {
+                    inUse.Add(q);
+                }
+            }
+            if (frame.QubitsInArgument != null)
+            {
+                foreach (Qubit q in frame.QubitsInArgument)
+                {
+                    if (q != null && !this.IsDisabled(q))
+                    {
+                        inUse.Add(q);
+                    };
+                }
+            }
+            return inUse;
         }
 
         protected int QubitsInUseCount(StackFrame frame)
         {
-            // The following is not really efficient, but let's wait to see if distinct can be part of the contract
-            // for the qubitsInArgument parameter of StartOperation call.
-            // Well, we are talking about really small arrays here anyway.
-            return QubitsInUse(frame).Distinct().Count();
+            return QubitsInUse(frame).Count();
         }
 
         #endregion
@@ -554,9 +569,9 @@ namespace Microsoft.Quantum.Simulation.Common
         }
 
         // internal for testing purposes
-        internal IQArray<Qubit> Borrow(long numToBorrow, IEnumerable<Qubit> qubitsInUse)
+        internal IQArray<Qubit> Borrow(long numToBorrow, HashSet<Qubit> qubitsInUse)
         {
-            var inUse = new Stack<Qubit>(qubitsInUse.Distinct().OrderByDescending(q => q.Id));
+            var inUse = new Stack<Qubit>(qubitsInUse.OrderByDescending(q => q.Id));
             var borrowed = QArray<Qubit>.Create(numToBorrow);
             long numBorrowed = System.Math.Min(NumAllocatedQubits - inUse.Count, numToBorrow);
 
@@ -623,7 +638,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 return Allocate();
             }
 
-            var inUse = new Stack<Qubit>(QubitsInUse(operationStack.Peek()).Distinct().OrderByDescending(q => q.Id));
+            var inUse = new Stack<Qubit>(QubitsInUse(operationStack.Peek()).OrderByDescending(q => q.Id));
             return NumAllocatedQubits == inUse.Count ? Allocate() : (Borrow(inUse) ?? Allocate());
         }
 
