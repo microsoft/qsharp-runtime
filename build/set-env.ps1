@@ -11,11 +11,8 @@ If ($Env:BUILD_VERBOSITY -eq $null) { $Env:BUILD_VERBOSITY ="m" }
 If ($Env:ASSEMBLY_VERSION -eq $null) { $Env:ASSEMBLY_VERSION ="$Env:BUILD_BUILDNUMBER" }
 If ($Env:NUGET_VERSION -eq $null) { $Env:NUGET_VERSION ="$Env:ASSEMBLY_VERSION-alpha" }
 
-# By default don't build QIR Runtime locally. CI builds are identified by presence of AGENT_OS.
-If (Test-Path Env:AGENT_OS) {
-    If ($Env:ENABLE_QIRRUNTIME -eq $null) { $Env:ENABLE_QIRRUNTIME ="true" }
+If ($Env:ENABLE_QIRRUNTIME -eq "true") {
     If (($Env:ENABLE_NATIVE -ne "false") -and ($Env:NATIVE_SIMULATOR -eq $null) ) {
-        # For the CIs we always build release native simulator
         $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\drop")
     }
 }
