@@ -12,35 +12,30 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the operation.
         /// For the Toffoli simulator, the implementation flips the target qubit.
         /// </summary>
-        public Func<Qubit, QVoid> X_Body() => (q1) =>
+        public void X_Body(Qubit target)
         {
-            if (q1 == null) return QVoid.Instance;
+            if (target == null) return;
 
-            this.CheckQubit(q1, "q1");
+            this.CheckQubit(target, "target");
 
-            this.DoX(q1);
-
-            return QVoid.Instance;
-        };
+            this.DoX(target);
+        }
 
         /// <summary>
         /// The implementation of the controlled specialization of the operation.
         /// For the Toffoli simulator, the implementation flips the target qubit 
         /// if all of the control qubits are 1.
         /// </summary>
-        public Func<(IQArray<Qubit>, Qubit), QVoid> X_ControlledBody() => (args) =>
+        public void X_ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            var (ctrls, q) = args;
-            if (q == null) return QVoid.Instance;
+            if (target == null) return;
 
-            this.CheckControlQubits(ctrls, q);
+            this.CheckControlQubits(controls, target);
 
-            if (this.VerifyControlCondition(ctrls))
+            if (this.VerifyControlCondition(controls))
             {
-                this.DoX(q);
+                this.DoX(target);
             }
-
-            return QVoid.Instance;
-        };
+        }
     }
 }

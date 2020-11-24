@@ -13,28 +13,24 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// For the Toffoli simulator, the implementation flips the target qubit
         /// if the rotation is effectively an X gate.
         /// </summary>
-        public Func<(Pauli, double, Qubit), QVoid> R_Body() => (_args) =>
+        public void R_Body(Pauli pauli, double angle, Qubit target)
         {
-            var (basis, angle, q1) = _args;
+            if (target == null) return;
 
-            if (q1 == null) return QVoid.Instance;
+            this.CheckQubit(target, "target");
 
-            this.CheckQubit(q1, "q1");
-
-            var (isX, safe) = CheckRotation(basis, angle / 2.0);
+            var (isX, safe) = CheckRotation(pauli, angle / 2.0);
             if (isX)
             {
-                this.DoX(q1);
+                this.DoX(target);
             }
-
-            return QVoid.Instance;
-        };
+        }
 
         /// <summary>
         /// The implementation of the adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, this operation is self-adjoint.
         /// </summary>
-        public Func<(Pauli, double, Qubit), QVoid> R_AdjointBody() => R_Body();
+        public void R_AdjointBody(Pauli pauli, double angle, Qubit target) => R_Body(pauli, angle, target);
 
         /// <summary>
         /// The implementation of the controlled specialization of the operation.
@@ -42,28 +38,24 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// if the rotation is effectively an X gate and all of the control qubits
         /// are in the One state.
         /// </summary>
-        public Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> R_ControlledBody() => (_args) =>
+        public void R_ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            var (ctrls, (basis, angle, q1)) = _args;
+            if (target == null) return;
 
-            if (q1 == null) return QVoid.Instance;
+            this.CheckControlQubits(controls, target);
 
-            this.CheckControlQubits(ctrls, q1);
-
-            var (isX, safe) = CheckRotation(basis, angle / 2.0);
+            var (isX, safe) = CheckRotation(pauli, angle / 2.0);
             if (!safe)
             {
                 throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
             }
             // We never need to do anything since only the identity is safe to control
-
-            return QVoid.Instance;
-        };
+        }
 
         /// <summary>
         /// The implementation of the controlled adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
         /// </summary>
-        public Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> R_ControlledAdjointBody() => R_ControlledBody();
+        public void R_ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target) => R_ControlledBody(controls, pauli, angle, target);
     }
 }

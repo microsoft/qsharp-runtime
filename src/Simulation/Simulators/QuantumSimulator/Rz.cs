@@ -7,39 +7,30 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-
     public partial class QuantumSimulator
     {
-        public virtual Func<(double, Qubit), QVoid> Rz_Body() => (args) =>
+        public virtual void Rz_Body(double angle, Qubit target)
         {
-            var (angle, target) = args;
             this.CheckQubit(target, nameof(target));
             CheckAngle(angle);
             R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
-            return QVoid.Instance;
-        };
+        }
 
-        public virtual Func<(double, Qubit), QVoid> Rz_AdjointBody() => (_args) =>
+        public virtual void Rz_AdjointBody(double angle, Qubit target)
         {
-            var (angle, q1) = _args;
+            Rz_Body(-angle, target);
+        }
 
-            return Rz_Body().Invoke((-angle, q1));
-        };
-
-        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Rz_ControlledBody() => (args) =>
+        public virtual void Rz_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target)
         {
-            var (ctrls, (angle, target)) = args;
-            this.CheckQubits(ctrls, target);
+            this.CheckQubits(controls, target);
             CheckAngle(angle);
-            MCR(this.Id, Pauli.PauliZ, angle, (uint)ctrls.Length, ctrls.GetIds(), (uint)target.Id);
-            return QVoid.Instance;
-        };
+            MCR(this.Id, Pauli.PauliZ, angle, (uint)controls.Length, controls.GetIds(), (uint)target.Id);
+        }
 
-        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Rz_ControlledAdjointBody() => (_args) =>
+        public virtual void Rz_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target)
         {
-            var (ctrls, (angle, q1)) = _args;
-
-            return Rz_ControlledBody().Invoke((ctrls, (-angle, q1)));
-        };
+            Rz_ControlledBody(controls, -angle, target);
+        }
     }
 }

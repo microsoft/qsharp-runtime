@@ -9,13 +9,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<Qubit, QVoid> ApplyUncontrolledY_Body() => (q1) =>
+        public virtual void ApplyUncontrolledY_Body(Qubit target)
         {
-            this.CheckQubit(q1);
+            this.CheckQubit(target);
 
-            Y(this.Id, (uint)q1.Id);
-
-            return QVoid.Instance;
-        };
+            Y(this.Id, (uint)target.Id);
+        }
     }
 }

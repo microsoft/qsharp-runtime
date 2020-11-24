@@ -8,6 +8,6 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_ApplyUncontrolledZ : IOperationFactory
     {
-        Func<Qubit, QVoid> ApplyUncontrolledZ_Body();
+        void ApplyUncontrolledZ_Body(Qubit target);
     }
 }

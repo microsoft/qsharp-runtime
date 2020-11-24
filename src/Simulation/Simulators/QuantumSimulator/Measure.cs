@@ -9,22 +9,20 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
+        public virtual Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
-            var (paulis, qubits) = _args;
-
-            this.CheckQubits(qubits);
-            if (paulis.Length != qubits.Length)
+            this.CheckQubits(targets);
+            if (paulis.Length != targets.Length)
             {
-                throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
+                throw new InvalidOperationException($"Both input arrays for Measure (paulis, targets), must be of same size");
             }
-            if (qubits.Length == 1)
+            if (targets.Length == 1)
             {
                 // When we are operating on a single qubit we will collapse the state, so mark
                 // that qubit as measured.
-                qubits[0].IsMeasured = true;
+                targets[0].IsMeasured = true;
             }
-            return Measure(this.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult();
-        };
+            return Measure(this.Id, (uint)paulis.Length, paulis.ToArray(), targets.GetIds()).ToResult();
+        }
     }
 }

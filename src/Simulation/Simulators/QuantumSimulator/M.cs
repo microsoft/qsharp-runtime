@@ -11,12 +11,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<Qubit, Result> M_Body() => (q) =>
+        public virtual Result M_Body(Qubit target)
         {
-            this.CheckQubit(q);
+            this.CheckQubit(target);
             //setting qubit as measured to allow for release
-            q.IsMeasured = true;
-            return M(this.Id, (uint)q.Id).ToResult();
-        };
+            target.IsMeasured = true;
+            return M(this.Id, (uint)target.Id).ToResult();
+        }
     }
 }

@@ -9,18 +9,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public Func<Qubit, QVoid> Reset_Body() => (q1) =>
+        public void Reset_Body(Qubit target)
         {
             // The native simulator doesn't have a reset operation, so simulate
             // it via an M follow by a conditional X.
-            this.CheckQubit(q1);
-            var res = M(this.Id, (uint)q1.Id);
+            this.CheckQubit(target);
+            var res = M(this.Id, (uint)target.Id);
             if (res == 1)
             {
-                X(this.Id, (uint)q1.Id);
+                X(this.Id, (uint)target.Id);
             }
-
-            return QVoid.Instance;
-        };
+        }
     }
 }

@@ -19,13 +19,33 @@ namespace Microsoft.Quantum.Intrinsic
                 this.Gate = g;
             }
 
-            public override Func<(double, Qubit, Qubit), QVoid> __Body__ => Gate.IsingYY_Body();
+            public override Func<(double, Qubit, Qubit), QVoid> __Body__ => (args) =>
+            {
+                var (angle, target1, target2) = args;
+                Gate.IsingYY_Body(angle, target1, target2);
+                return QVoid.Instance;
+            };
 
-            public override Func<(double, Qubit, Qubit), QVoid> __AdjointBody__ => Gate.IsingYY_AdjointBody();
+            public override Func<(double, Qubit, Qubit), QVoid> __AdjointBody__ => (args) =>
+            {
+                var (angle, target1, target2) = args;
+                Gate.IsingYY_AdjointBody(angle, target1, target2);
+                return QVoid.Instance;
+            };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledBody__ => Gate.IsingYY_ControlledBody();
+            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledBody__ => (args) =>
+            {
+                var (ctls, (angle, target1, target2)) = args;
+                Gate.IsingYY_ControlledBody(ctls, angle, target1, target2);
+                return QVoid.Instance;
+            };
 
-            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledAdjointBody__ => Gate.IsingYY_ControlledAdjointBody();
+            public override Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> __ControlledAdjointBody__ => (args) =>
+            {
+                var (ctls, (angle, target1, target2)) = args;
+                Gate.IsingYY_ControlledAdjointBody(ctls, angle, target1, target2);
+                return QVoid.Instance;
+            };
         }
     }
 }

@@ -9,15 +9,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<(Qubit, Qubit), QVoid> ApplyControlledZ_Body() => (args) =>
+        public virtual void ApplyControlledZ_Body(Qubit control, Qubit target)
         {
-            var (control, target) = args;
-
             this.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
 
             MCZ(this.Id, 1, new uint[]{(uint)control.Id}, (uint)target.Id);
-
-            return QVoid.Instance;
-        };
+        }
     }
 }

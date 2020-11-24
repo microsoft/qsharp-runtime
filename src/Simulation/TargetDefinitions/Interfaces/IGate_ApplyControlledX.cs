@@ -8,6 +8,6 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_ApplyControlledX : IOperationFactory
     {
-        Func<(Qubit, Qubit), QVoid> ApplyControlledX_Body();
+        void ApplyControlledX_Body(Qubit control, Qubit target);
     }
 }

@@ -7,39 +7,30 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-
     public partial class QuantumSimulator
     {
-        public virtual Func<(double, Qubit), QVoid> Ry_Body() => (args) =>
+        public virtual void Ry_Body(double angle, Qubit target)
         {
-            var (angle, target) = args;
             this.CheckQubit(target, nameof(target));
             CheckAngle(angle);
             R(this.Id, Pauli.PauliY, angle, (uint)target.Id);
-            return QVoid.Instance;
-        };
+        }
 
-        public virtual Func<(double, Qubit), QVoid> Ry_AdjointBody() => (_args) =>
+        public virtual void Ry_AdjointBody(double angle, Qubit target)
         {
-            var (angle, q1) = _args;
+            Ry_Body(-angle, target);
+        }
 
-            return Ry_Body().Invoke((-angle, q1));
-        };
-
-        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledBody() => (args) =>
+        public virtual void Ry_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target)
         {
-            var (ctrls, (angle, target)) = args;
-            this.CheckQubits(ctrls, target);
+            this.CheckQubits(controls, target);
             CheckAngle(angle);
-            MCR(this.Id, Pauli.PauliY, angle, (uint)ctrls.Length, ctrls.GetIds(), (uint)target.Id);
-            return QVoid.Instance;
-        };
+            MCR(this.Id, Pauli.PauliY, angle, (uint)controls.Length, controls.GetIds(), (uint)target.Id);
+        }
 
-        public virtual Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Ry_ControlledAdjointBody() => (_args) =>
+        public virtual void Ry_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target)
         {
-            var (ctrls, (angle, q1)) = _args;
-
-            return Ry_ControlledBody().Invoke((ctrls, (-angle, q1)));
-        };
+            Ry_ControlledBody(controls, -angle, target);
+        }
     }
 }

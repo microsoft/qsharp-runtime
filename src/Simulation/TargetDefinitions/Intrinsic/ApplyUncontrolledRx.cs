@@ -19,9 +19,19 @@ namespace Microsoft.Quantum.Intrinsic
                 this.Gate = g;
             }
 
-            public override Func<(double, Qubit), QVoid> __Body__ => Gate.ApplyUncontrolledRx_Body();
+            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
+            {
+                var (angle, target) = args;
+                Gate.ApplyUncontrolledRx_Body(angle, target);
+                return QVoid.Instance;
+            };
 
-            public override Func<(double, Qubit), QVoid> __AdjointBody__ => Gate.ApplyUncontrolledRx_AdjointBody();
+            public override Func<(double, Qubit), QVoid> __AdjointBody__ => (args) =>
+            {
+                var (angle, target) = args;
+                Gate.ApplyUncontrolledRx_AdjointBody(angle, target);
+                return QVoid.Instance;
+            };
         }
     }
 }

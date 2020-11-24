@@ -9,48 +9,36 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<Qubit, QVoid> S_Body() => (q1) =>
+        public virtual void S_Body(Qubit target)
         {
-            this.CheckQubit(q1);
+            this.CheckQubit(target);
 
-            S(this.Id, (uint)q1.Id);
+            S(this.Id, (uint)target.Id);
+        }
 
-            return QVoid.Instance;
-        };
-
-        public virtual Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledBody() => (_args) =>
+        public virtual void S_ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            (IQArray<Qubit> ctrls, Qubit q1) = _args;
+            this.CheckQubits(controls, target);
 
-            this.CheckQubits(ctrls, q1);
+            SafeControlled(controls,
+                () => S_Body(target),
+                (count, ids) => MCS(this.Id, count, ids, (uint)target.Id));
+        }
 
-            SafeControlled(ctrls,
-                () => S_Body().Invoke(q1),
-                (count, ids) => MCS(this.Id, count, ids, (uint)q1.Id));
-
-            return QVoid.Instance;
-        };
-
-        public virtual Func<Qubit, QVoid> S_AdjointBody() => (q1) =>
+        public virtual void S_AdjointBody(Qubit target)
         {
-            this.CheckQubit(q1);
+            this.CheckQubit(target);
 
-            AdjS(this.Id, (uint)q1.Id);
+            AdjS(this.Id, (uint)target.Id);
+        }
 
-            return QVoid.Instance;
-        };
-
-        public virtual Func<(IQArray<Qubit>, Qubit), QVoid> S_ControlledAdjointBody() => (_args) =>
+        public virtual void S_ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
-            (IQArray<Qubit> ctrls, Qubit q1) = _args;
+            this.CheckQubits(controls, target);
 
-            this.CheckQubits(ctrls, q1);
-
-            SafeControlled(ctrls,
-                () => S_AdjointBody().Invoke(q1),
-                (count, ids) => MCAdjS(this.Id, count, ids, (uint)q1.Id));
-
-            return QVoid.Instance;
-        };
+            SafeControlled(controls,
+                () => S_AdjointBody(target),
+                (count, ids) => MCAdjS(this.Id, count, ids, (uint)target.Id));
+        }
     }
 }

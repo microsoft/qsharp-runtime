@@ -8,6 +8,6 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_Reset : IOperationFactory
     {
-        Func<Qubit, QVoid> Reset_Body();
+        void Reset_Body(Qubit target);
     }
 }

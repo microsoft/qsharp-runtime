@@ -8,10 +8,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
     public partial class QCTraceSimulatorImpl
     {
-        public virtual Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (args) =>
+        public virtual Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
-            (IQArray<Pauli> observable, IQArray<Qubit> target) = args;
-            return this.Measure(observable, target);
-        };
+            return this.Measure(paulis, targets);
+        }
     }
 }

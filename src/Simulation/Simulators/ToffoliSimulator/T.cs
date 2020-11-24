@@ -12,16 +12,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the operation.
         /// For the Toffoli simulator, the implementation throws a run-time error.
         /// </summary>
-        public Func<Qubit, QVoid> T_Body() => (q1) =>
-            throw new NotImplementedException();
+        public void T_Body(Qubit target) => throw new NotImplementedException();
 
-        public Func<(IQArray<Qubit>, Qubit), QVoid> T_ControlledBody() => (_args) =>
-            throw new NotImplementedException();
+        public void T_ControlledBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
 
-        public Func<Qubit, QVoid> T_AdjointBody() => (q1) =>
-            throw new NotImplementedException();
+        public void T_AdjointBody(Qubit target) => throw new NotImplementedException();
 
-        public Func<(IQArray<Qubit>, Qubit), QVoid> T_ControlledAdjointBody() => (_args) =>
-            throw new NotImplementedException();
+        public void T_ControlledAdjointBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
     }
 }

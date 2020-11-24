@@ -18,7 +18,11 @@ namespace Microsoft.Quantum.Intrinsic
                 this.Gate = g;
             }
 
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => Gate.Measure_Body();
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (args) =>
+            {
+                var (paulis, targets) = args;
+                return Gate.Measure_Body(paulis, targets);
+            };
         }
     }
 }

@@ -10,40 +10,33 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public virtual Func<(Qubit, Qubit), QVoid> SWAP_Body() => (args) =>
+        public virtual void SWAP_Body(Qubit target1, Qubit target2)
         {
-            var (qubit1, qubit2) = args;
-            var ctrls1 = new QArray<Qubit>(qubit1);
-            var ctrls2 = new QArray<Qubit>(qubit2);
-            this.CheckQubits(ctrls1, qubit2);
+            var ctrls1 = new QArray<Qubit>(target1);
+            var ctrls2 = new QArray<Qubit>(target2);
+            this.CheckQubits(ctrls1, target2);
 
-            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)qubit2.Id);
-            MCX(this.Id, (uint)ctrls2.Length, ctrls2.GetIds(), (uint)qubit1.Id);
-            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)qubit2.Id);
+            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
+            MCX(this.Id, (uint)ctrls2.Length, ctrls2.GetIds(), (uint)target1.Id);
+            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
+        }
 
-            return QVoid.Instance;
-        };
-
-        public virtual Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> SWAP_ControlledBody() => (args) =>
+        public virtual void SWAP_ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2)
         {
-            var (ctrls, (qubit1, qubit2)) = args;
-
-            if ((ctrls == null) || (ctrls.Count == 0))
+            if ((controls == null) || (controls.Count == 0))
             {
-                SWAP_Body().Invoke((qubit1, qubit2));
+                SWAP_Body(target1, target2);
             }
             else
             {
-                var ctrls_1 = QArray<Qubit>.Add(ctrls, new QArray<Qubit>(qubit1));
-                var ctrls_2 = QArray<Qubit>.Add(ctrls, new QArray<Qubit>(qubit2));
-                this.CheckQubits(ctrls_1, qubit2);
+                var ctrls_1 = QArray<Qubit>.Add(controls, new QArray<Qubit>(target1));
+                var ctrls_2 = QArray<Qubit>.Add(controls, new QArray<Qubit>(target2));
+                this.CheckQubits(ctrls_1, target2);
                 
-                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)qubit2.Id);
-                MCX(this.Id, (uint)ctrls_2.Length, ctrls_2.GetIds(), (uint)qubit1.Id);
-                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)qubit2.Id);
+                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
+                MCX(this.Id, (uint)ctrls_2.Length, ctrls_2.GetIds(), (uint)target1.Id);
+                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
             }
-
-            return QVoid.Instance;
-        };
+        }
     }
 }

@@ -18,7 +18,10 @@ namespace Microsoft.Quantum.Intrinsic
                 this.Gate = g;
             }
 
-            public override Func<Qubit, Result> __Body__ => Gate.M_Body();
+            public override Func<Qubit, Result> __Body__ => (target) =>
+            {
+                return Gate.M_Body(target);
+            };
         }
     }
 }

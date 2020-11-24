@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// That is, Result.One is returned if an odd number of the measured qubits are
         /// in the One state.
         /// </summary>
-        public Func<(IQArray<Pauli>, IQArray<Qubit>), Result> Measure_Body() => (_args) =>
+        public Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             Qubit? f(Pauli p, Qubit q) =>
                 p switch {
@@ -25,18 +25,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     _ => throw new InvalidOperationException($"The Toffoli simulator can only Measure in the Z basis.")
                 };
 
-            var (paulis, qubits) = _args;
-
-            if (paulis.Length != qubits.Length)
+            if (paulis.Length != targets.Length)
             {
-                throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
+                throw new InvalidOperationException($"Both input arrays for Measure (paulis, targets), must be of same size");
             }
 
-            var qubitsToMeasure = paulis.Zip(qubits, f).WhereNotNull();
+            var qubitsToMeasure = paulis.Zip(targets, f).WhereNotNull();
 
             var result = this.GetParity(qubitsToMeasure);
 
             return result.ToResult();
-        };
+        }
     }
 }

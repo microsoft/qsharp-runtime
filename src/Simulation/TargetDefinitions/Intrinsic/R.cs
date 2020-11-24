@@ -19,13 +19,33 @@ namespace Microsoft.Quantum.Intrinsic
                 this.Gate = g;
             }
 
-            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => Gate.R_Body();
+            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => (args) =>
+            {
+                var (pauli, angle, target) = args;
+                Gate.R_Body(pauli, angle, target);
+                return QVoid.Instance;
+            };
 
-            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => Gate.R_AdjointBody();
+            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => (args) =>
+            {
+                var (pauli, angle, target) = args;
+                Gate.R_AdjointBody(pauli, angle, target);
+                return QVoid.Instance;
+            };
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => Gate.R_ControlledBody();
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => (args) =>
+            {
+                var (ctls, (pauli, angle, target)) = args;
+                Gate.R_ControlledBody(ctls, pauli, angle, target);
+                return QVoid.Instance;
+            };
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => Gate.R_ControlledAdjointBody();
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => (args) =>
+            {
+                var (ctls, (pauli, angle, target)) = args;
+                Gate.R_ControlledAdjointBody(ctls, pauli, angle, target);
+                return QVoid.Instance;
+            };
         }
     }
 }

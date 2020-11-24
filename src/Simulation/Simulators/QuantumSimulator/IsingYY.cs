@@ -9,52 +9,41 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Func<(double, Qubit, Qubit), QVoid> IsingYY_Body() => (args) =>
+        public virtual void IsingYY_Body(double angle, Qubit target1, Qubit target2)
         {
-            var (angle, qubit1, qubit2) = args;
             var paulis = new Pauli[]{ Pauli.PauliY, Pauli.PauliY };
-            var targets = new QArray<Qubit>(new Qubit[]{ qubit1, qubit2 });
+            var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
             CheckAngle(angle);
             this.CheckQubits(targets);
 
             Exp(this.Id, (uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
+        }
 
-            return QVoid.Instance;
-        };
-
-        public virtual Func<(double, Qubit, Qubit), QVoid> IsingYY_AdjointBody() => (args) =>
+        public virtual void IsingYY_AdjointBody(double angle, Qubit target1, Qubit target2)
         {
-            var (angle, qubit1, qubit2) = args;
+            IsingYY_Body(-angle, target1, target2);
+        }
 
-            return IsingYY_Body().Invoke((-angle, qubit1, qubit2));
-        };
-
-        public virtual Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingYY_ControlledBody() => (args) =>
+        public virtual void IsingYY_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
-            var (ctrls, (angle, qubit1, qubit2)) = args;
-
-            if (ctrls == null || ctrls.Length == 0)
+            if (controls == null || controls.Length == 0)
             {
-                IsingYY_Body().Invoke((angle, qubit1, qubit2));
+                IsingYY_Body(angle, target1, target2);
             }
             else
             {
-                var targets = new QArray<Qubit>(new Qubit[]{ qubit1, qubit2 });
+                var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
                 var paulis = new Pauli[]{ Pauli.PauliY, Pauli.PauliY };
                 CheckAngle(angle);
-                this.CheckQubits(QArray<Qubit>.Add(ctrls, targets));
+                this.CheckQubits(QArray<Qubit>.Add(controls, targets));
 
-                MCExp(this.Id, (uint)targets.Length, paulis, angle * 2.0, (uint)ctrls.Length, ctrls.GetIds(), targets.GetIds());
+                MCExp(this.Id, (uint)targets.Length, paulis, angle * 2.0, (uint)controls.Length, controls.GetIds(), targets.GetIds());
             }
+        }
 
-            return QVoid.Instance;
-        };
-
-        public virtual Func<(IQArray<Qubit>, (double, Qubit, Qubit)), QVoid> IsingYY_ControlledAdjointBody() => (args) =>
+        public virtual void IsingYY_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
-            var (ctrls, (angle, qubit1, qubit2)) = args;
-
-            return IsingYY_ControlledBody().Invoke((ctrls, (-angle, qubit1, qubit2)));
-        };
+            IsingYY_ControlledBody(controls, -angle, target1, target2);
+        }
     }
 }

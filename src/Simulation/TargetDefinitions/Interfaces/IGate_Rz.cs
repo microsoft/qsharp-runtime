@@ -8,12 +8,12 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_Rz : IOperationFactory
     {
-        Func<(double, Qubit), QVoid> Rz_Body();
+        void Rz_Body(double angle, Qubit target);
 
-        Func<(double, Qubit), QVoid> Rz_AdjointBody();
+        void Rz_AdjointBody(double angle, Qubit target);
 
-        Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Rz_ControlledBody();
+        void Rz_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target);
 
-        Func<(IQArray<Qubit>, (double, Qubit)), QVoid> Rz_ControlledAdjointBody();
+        void Rz_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target);
     }
 }
