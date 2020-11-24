@@ -35,3 +35,6 @@ add_test(
     NAME quantum_simulator_unittests
     COMMAND quantum_simulator_unittests ~[skip] -o "quantum_simulator_unittests_results.xml" -r junit
 )
+
+add_executable(abm abm.cpp)
+target_link_libraries(abm Microsoft.Quantum.Simulator.Runtime)

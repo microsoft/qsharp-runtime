@@ -691,7 +691,7 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(!qapi->HaveQubitsInFlight());
 
     QirArray* qs = quantum__rt__qubit_allocate_array(3);
-    REQUIRE(qs->containsQubits);
+    REQUIRE(qs->ownsQubits);
     REQUIRE(qs->count == 3);
     REQUIRE(qs->itemSizeInBytes == sizeof(void*));
     Qubit last = *reinterpret_cast<Qubit*>(quantum__rt__array_get_element_ptr_1d(qs, 2));

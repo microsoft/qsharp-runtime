@@ -48,9 +48,10 @@ struct QirArray
 
     char* buffer = nullptr;
 
-    // Arrays of qubits aren't reference-counted. The client must explicitly
-    // allocate and Release them.
-    const bool containsQubits = false;
+    // If the client allocates an array of qubits, using quantum__rt__qubit_allocate_array, the array owns the qubits
+    // and will deallocate them on quantum__rt__qubit_release_array. Copies or other derivatives from such arrays don't
+    // own the qubits and must follow the usual addref/release semantics.
+    const bool ownsQubits = false;
     std::atomic<long> refCount;
 
     // NB: Release doesn't trigger destruction of the Array itself to allow for it
