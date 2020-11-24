@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-Write-Host "##[info]Build Native simulator"
+Write-Host "##[info]Build Native simulator for $Env:NATIVE_SIMULATOR_BUILD_CONFIGURATION"
 
 
 $nativeBuild = (Join-Path $PSScriptRoot "build")
