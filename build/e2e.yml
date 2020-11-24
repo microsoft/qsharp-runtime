@@ -10,11 +10,6 @@ parameters:
   - normal
   - full
 
-variables:
-  E2E: "true"
-  ENABLE_QIRRUNTIME: "false"
-  NATIVE_SIMULATOR_BUILD_CONFIGURATION: "Release"
-
 trigger: none
 
 pr:
