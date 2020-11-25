@@ -32,11 +32,9 @@ CI builds and tests are enabled for this project. The build has no external depe
 
 1. Install Clang, Ninja and CMake from the public distros.
 2. Add all three to your/system `%PATH%`.
-3. Install VS 2019 (Clang uses MSVC's standard library on Windows).
-4. Install .NET Core 3.1
-5. <_optional_> Either clone LLVM's repo and build LLVM locally to produce your own `opt.exe` and other IR tools or download LLVM's dev package.
-6. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
-7. <_optional_> To use build/test scripts install Python 3.8.
+3. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
+4. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
+5. <_optional_> To use build/test scripts install Python 3.8.
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
@@ -52,8 +50,7 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
         - $ export CC=/usr/bin/clang
         - $ export CXX=/usr/bin/clang++
     5. `$ sudo apt install clang-tidy` (`$ clang-tidy --version` should return 'LLVM version 10.0.0')
-    6. <_optional_> $ sudo apt install llvm
-    7. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
+    6. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
