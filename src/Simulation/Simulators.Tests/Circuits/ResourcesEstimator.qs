@@ -72,4 +72,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             T(q);
         }
     }
+
+
+    operation SimultaneousUse() : Unit {
+        body (...){
+            using (register = Qubit[10]){
+                for (idx in 0..9){
+                    SomeOp(register[idx]);
+                }
+                ResetAll(register);
+            }
+        }
+    }
+
+    operation SequentialUse() : Unit {
+        body (...){
+            using (register = Qubit[10]){
+                for (idy in 0..10){
+                    for (idx in 0..9){
+                        SomeOp(register[idx]);
+                    }
+                }
+                ClearRegister(register);
+            }
+        }
+    }
+
+    operation SomeOp(test : Qubit) : Unit {
+        body (...){
+            using (spareQubit = Qubit()){
+                T(test);
+                CNOT(test, spareQubit);
+            }
+        }
+    }
+
 }
