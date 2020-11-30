@@ -29,7 +29,7 @@ target_include_directories(quantum_simulator_unittests PUBLIC
   "${PROJECT_SOURCE_DIR}/src/catch2"
 )
 
-install(TARGETS quantum_simulator_unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
+install(TARGETS quantum_simulator_unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/tests")
 
 add_test(
     NAME quantum_simulator_unittests
