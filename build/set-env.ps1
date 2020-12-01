@@ -11,11 +11,13 @@ If ($Env:BUILD_VERBOSITY -eq $null) { $Env:BUILD_VERBOSITY ="m" }
 If ($Env:ASSEMBLY_VERSION -eq $null) { $Env:ASSEMBLY_VERSION ="$Env:BUILD_BUILDNUMBER" }
 If ($Env:NUGET_VERSION -eq $null) { $Env:NUGET_VERSION ="$Env:ASSEMBLY_VERSION-alpha" }
 
-If (-not $Env:BUILD_AGENT -eq $null) {
-    If ($Env:ENABLE_QIRRUNTIME -eq $null) { $Env:ENABLE_QIRRUNTIME ="true" }
+If ($Env:ENABLE_QIRRUNTIME -eq "true") {
     If (($Env:ENABLE_NATIVE -ne "false") -and ($Env:NATIVE_SIMULATOR -eq $null) ) {
-        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\$Env:BUILD_CONFIGURATION")
+        $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\drop")
     }
+}
+If ($Env:NATIVE_SIMULATOR_BUILD_CONFIGURATION -eq $null) { 
+    $Env:NATIVE_SIMULATOR_BUILD_CONFIGURATION = $Env:BUILD_CONFIGURATION
 }
 
 If ($Env:DROPS_DIR -eq $null) { $Env:DROPS_DIR =  [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\drops")) }
