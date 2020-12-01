@@ -77,7 +77,8 @@ test_binaries = [
   "fullstate-simulator-tests",
   "qir-runtime-unittests",
   "qir-static-tests",
-  "qir-dynamic-tests"
+  "qir-dynamic-tests",
+  "qir-tracer-tests"
 ]
 
 for name in test_binaries:

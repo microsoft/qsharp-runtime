@@ -5,6 +5,7 @@ add_executable(qir-runtime-unittests
   driver.cpp
   QirRuntimeTests.cpp
   ToffoliTests.cpp
+  TracerTests.cpp
 )
 
 target_link_libraries(qir-runtime-unittests PUBLIC
