@@ -34,7 +34,12 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 
     Push-Location $qirRuntimeBuildFolder
 
-    cmake -G Ninja -DCMAKE_BUILD_TYPE= $Env:BUILD_CONFIGURATION ../..
+    if ($Env:BUILD_CONFIGURATION -eq "Release") {
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../..
+    }
+    else {
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ../..
+    }
     cmake --build . --target install
 
     Pop-Location
