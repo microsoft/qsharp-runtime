@@ -4,11 +4,12 @@
 #include <assert.h>
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 #include <string.h> // for memcpy
 #include <vector>
 
-#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
+#include "quantum__rt.hpp"
 
 /*==============================================================================
     The types and methods, expected by QIR for tuples:
@@ -138,7 +139,7 @@ struct QirCallable
         {
             if (this->controlledDepth > 0)
             {
-                throw new std::exception("multi-level controlled operations not implemented yet");
+                throw new std::runtime_error("multi-level controlled operations not implemented yet");
             }
 
             this->appliedFunctor |= QirCallable::Controlled;

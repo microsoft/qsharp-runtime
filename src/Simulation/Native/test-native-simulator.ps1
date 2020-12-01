@@ -3,10 +3,12 @@
 
 Write-Host "##[info]Test Native simulator"
 Push-Location (Join-Path $PSScriptRoot "build")
-cmake --build . --config $Env:BUILD_CONFIGURATION
-ctest -C $Env:BUILD_CONFIGURATION --verbose
+
+ctest -C "$Env:BUILD_CONFIGURATION" --verbose
+
 if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test Native Simulator"
     $script:all_ok = $False
 }
+
 Pop-Location
