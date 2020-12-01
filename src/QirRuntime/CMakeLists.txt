@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
+
 # set the project name and version
 project(qirruntime)
 
