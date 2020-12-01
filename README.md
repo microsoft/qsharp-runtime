@@ -26,9 +26,9 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 [![Build Status](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_apis/build/status/microsoft.qsharp-runtime?branchName=main)](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/latest?definitionId=15&branchName=main)
 
+
 Note that when building from source, this repository is configured so that .NET Core will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
-Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/QirRuntime/README.md) for details.
 
 ### Windows ###
 
@@ -40,14 +40,13 @@ To build on Windows:
         * **Desktop development with C++**
         * **From the Individual Components tab in VS Installer add Spectre-mitigated libs that match your C++ build tools version**
         * **.NET Core 3 cross-platform development**
-2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
+2. Run [bootstrap.cmd](bootstrap.cmd) from the `Developer Command Prompt for VS 2019`.
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
-    * The script might install additional tools (a specific compiler, build tools, etc)
-    * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
+    * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
 3. Open and build the [`Simulation.sln`](./Simulation.sln) solution in Visual Studio.
 
-The `Simulation.sln` solution does not include the full-state quantum simulator. To change it, you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must manually build it.
+The `Simulation.sln` solution does not include the full-state quantum simulator. To change it, you can open the `quantum-simulator.sln` solution created during bootstrap in the `src\Simulation\Native\build`. To integrate your changes with the rest of the simulation components, you must first manually build it using the `Release` configuration.
 
 
 ### macOS/Linux ###
@@ -57,9 +56,8 @@ To build on other platforms:
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
-2. Run [bootstrap.ps1](./bootstrap.ps1)
-    * The script might install additional tools (a specific compiler, build tools, etc)
-    * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
+2. Run [bootstrap.sh](./bootstrap.sh)
+    * This script prepares and builds the native (C++) full-state simulator.
     * You only need to run it once.
 3. From the command line, run:
     * `dotnet build Simulation.sln`

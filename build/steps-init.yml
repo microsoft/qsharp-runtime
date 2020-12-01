@@ -16,8 +16,8 @@ steps:
 
 
 ##
-# Custom pre-reqs
+# Bootstrap
 ##
 - pwsh: ./bootstrap.ps1
-  displayName: "Custom prerequisites for the build"
+  displayName: "Bootstrap repository"
   workingDirectory: $(System.DefaultWorkingDirectory)

@@ -19,11 +19,3 @@ add_test(NAME argmaxnrm2 COMMAND  ./argmaxnrm2_test WORKING_DIRECTORY ${CMAKE_BI
 add_test(NAME bititerator COMMAND  ./bititerator_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME cpuid_test COMMAND  ./cpuid_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
-install(TARGETS tinymatrix_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS diagmatrix_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS bitops_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS openmp_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS argmaxnrm2_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS bititerator_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-install(TARGETS cpuid_test RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop")
-

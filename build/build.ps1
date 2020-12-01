@@ -24,7 +24,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
         $script:all_ok = $False
     }
 } else {
-    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
 }
 
 

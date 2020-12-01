@@ -13,9 +13,6 @@ variables:
   Build.Minor: 14
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
-  CI: "true"
-  ENABLE_QIRRUNTIME: "true"
-  NATIVE_SIMULATOR_BUILD_CONFIGURATION: "Debug"
 
 jobs:
 - job: build

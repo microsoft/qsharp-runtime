@@ -43,6 +43,8 @@ else(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 
 install(TARGETS Microsoft.Quantum.Simulator.Runtime
-        RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop"
-        LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/drop"
+        COMPONENT libraries
+        RUNTIME DESTINATION bin
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
        )
