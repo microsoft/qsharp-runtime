@@ -4,8 +4,8 @@ namespace ShippingSample
 {
     using System;
     using System.Linq;
+    using System.Text.Json;
     using Microsoft.Azure.Quantum.Optimization;
-    using Newtonsoft.Json;
 
     partial class Program
     {
@@ -36,7 +36,7 @@ namespace ShippingSample
             // Improving the Cost Function
             // The cost function we"ve built works well so far, but let"s take a closer look at the `Problem` that was generated:
             Console.Out.WriteLine("The original problem has {0} terms for {1} containers:", problem.Terms.Count(), containerWeights.Length);
-            Console.Out.WriteLine(JsonConvert.SerializeObject(problem.Terms));
+            Console.Out.WriteLine(JsonSerializer.Serialize(problem.Terms));
 
             // Check that this creates a smaller problem
             // Create the simplified problem

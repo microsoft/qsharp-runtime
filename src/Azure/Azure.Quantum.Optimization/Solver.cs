@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.Azure.Quantum.Client.Models;
 using Microsoft.Azure.Quantum.Storage;
-using Microsoft.Azure.Quantum.Utility;
-using Microsoft.Quantum.Runtime;
-using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Quantum.Optimization
 {
@@ -57,12 +55,11 @@ namespace Microsoft.Azure.Quantum.Optimization
             string intermediaryFile = Path.GetTempFileName();
 
             // Save to the intermediary file
-            using (var intermediaryWriter = File.Create(intermediaryFile))
-            {
-                using var compressionStream = new GZipStream(intermediaryWriter, CompressionLevel.Fastest);
-                problem.SerializeTo(compressionStream);
+            using var intermediaryWriter = File.Create(intermediaryFile);
+            using var compressionStream = new GZipStream(intermediaryWriter, CompressionLevel.Fastest);
+                
+            await problem.SerializeAsync(compressionStream);
                 //                problem.SerializeTo(intermediaryWriter);
-            }
 
             using var intermediaryReader = File.OpenRead(intermediaryFile);
             var jobStorageHelper = new LinkedStorageJobHelper(workspace);
@@ -142,11 +139,13 @@ namespace Microsoft.Azure.Quantum.Optimization
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            var jsonSerializer = new JsonSerializer();
+            var result = await JsonSerializer.DeserializeAsync<Result>(stream);
 
-            using var textReader = new StreamReader(stream);
-            using var jsonReader = new JsonTextReader(textReader);
-            var result = jsonSerializer.Deserialize<Result>(jsonReader);
+            string ser = JsonSerializer.Serialize(result);
+
+            Console.Out.WriteLine(ser);
+
+            var result2 = JsonSerializer.Deserialize<Result>(ser);
 
             return result;
         }

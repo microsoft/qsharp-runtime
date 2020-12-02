@@ -1,15 +1,14 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Microsoft.Azure.Quantum.Optimization
 {
     public class Term
     {
-        [JsonProperty(PropertyName = "c")]
+        [JsonPropertyName("c")]
         public float Weight
         { get; private set; }
 
-        [JsonProperty(PropertyName = "ids")]
+        [JsonPropertyName("ids")]
         public int[] IDs
         { get; private set; }
 

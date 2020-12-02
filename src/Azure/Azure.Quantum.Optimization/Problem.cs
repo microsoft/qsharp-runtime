@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Quantum.Optimization
 {
@@ -12,22 +12,27 @@ namespace Microsoft.Azure.Quantum.Optimization
         ising = 1
     }
 
+    struct ProblemSerializationWrapper
+    {
+        public Problem cost_function { get; set; }
+    }
+
     public class Problem
     {
         [JsonIgnore]
         public string Name
         { get; private set; }
 
-        [JsonProperty(PropertyName = "version")]
+        [JsonPropertyName("version")]
         public string Version
         { get => (initialConfiguration == null) ? "1.0" : "1.1"; }
 
-        [JsonProperty(PropertyName = "type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProblemType ProblemType
         { get; set; }
 
-        [JsonProperty(PropertyName = "terms")]
+        [JsonPropertyName("terms")]
         public IEnumerable<Term> Terms
         { get => terms; }
 
@@ -80,31 +85,24 @@ namespace Microsoft.Azure.Quantum.Optimization
             }
         }
 
-        public void SerializeTo(Stream stream)
+        public Task SerializeAsync(Stream stream)
         {
-            var root = new
+            var root = new ProblemSerializationWrapper
             {
                 cost_function = this
             };
 
             // Save to the writer
-            var jsonSerializer = new JsonSerializer
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            };
-
-            using var textWriter = new StreamWriter(stream);
-            using var jsonWriter = new JsonTextWriter(textWriter);
-            jsonSerializer.Serialize(jsonWriter, root);
+            return JsonSerializer.SerializeAsync(stream, root);
         }
 
         public override string ToString()
         {
-            var root = new
+            var root = new ProblemSerializationWrapper
             {
                 cost_function = this
             };
-            return JsonConvert.SerializeObject(root);
+            return JsonSerializer.Serialize(root);
         }
     }
 }

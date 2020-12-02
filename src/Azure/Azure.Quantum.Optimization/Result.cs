@@ -1,24 +1,23 @@
-﻿using System;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Quantum.Optimization
 {
     public class Result
     {
-        [JsonProperty(PropertyName = "version")]
+        [JsonPropertyName("version")]
         public string Version
         { get; set; }
 
-        [JsonProperty(PropertyName = "configuration")]
+        [JsonPropertyName("configuration")]
         public Dictionary<string, int> Configuration
         { get; set; }
 
-        [JsonProperty(PropertyName = "cost")]
+        [JsonPropertyName("cost")]
         public float Cost
         { get; set; }
 
-        [JsonProperty(PropertyName = "parameters")]
+        [JsonPropertyName("parameters")]
         public Dictionary<string, object> Parameters
         { get; set; }
     }
