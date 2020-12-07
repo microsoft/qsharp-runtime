@@ -20,6 +20,11 @@ namespace Microsoft.Quantum.Core {
     newtype EntryPoint = Unit;
 
     /// # Summary
+    /// Compiler-recognized attribute used to indicate that a callable should always be inlined.
+    @Attribute()
+    newtype Inline = Unit;
+
+    /// # Summary
     /// Compiler-recognized attribute used to mark a type or callable as deprecated.
     /// 
     /// # Named Items

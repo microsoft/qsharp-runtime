@@ -4,6 +4,7 @@
 /// # Summary
 /// This namespace provides functionality for targeting specific quantum processors.
 namespace Microsoft.Quantum.Targeting {
+
     /// # Summary
     /// Compiler-recognized attribute used to mark a callable with the runtime capabilities it
     /// requires.
@@ -36,4 +37,10 @@ namespace Microsoft.Quantum.Targeting {
     /// No runtime restrictions. Any Q# program can be executed.
     @Attribute()
     newtype RequiresCapability = (Level : String, Reason : String);
+
+    /// # Summary
+    /// Compiler-recognized attribute for usage within target packages 
+    /// to specify the name of the instruction on the target machine.
+    @Attribute()
+    newtype TargetInstruction = String;
 }
