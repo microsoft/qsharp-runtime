@@ -7,16 +7,26 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 if ($Env:ENABLE_NATIVE -ne "false") {
-    Write-Host "##[info]Build Native simulator"
-    $nativeBuild = (Join-Path $PSScriptRoot "../src/Simulation/Native/build") 
-    cmake --build $nativeBuild --config $Env:BUILD_CONFIGURATION
+    $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
+    & "$nativeSimulator/build-native-simulator.ps1"
     if ($LastExitCode -ne 0) {
-        Write-Host "##vso[task.logissue type=error;]Failed to build Native simulator."
         $script:all_ok = $False
     }
 } else {
-    Write-Host "Skipping native. ENABLE_NATIVE variable set to: $Env:ENABLE_NATIVE."
+    Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }
+
+
+if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
+    & "$qirRuntime/build-qir-runtime.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+}
+
 
 function Build-One {
     param(

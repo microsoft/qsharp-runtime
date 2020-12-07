@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
+
 project(quantum-simulator)
 cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
 

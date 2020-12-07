@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#ifdef CATCH2_TESTS
 #include "catch.hpp"
-#endif
 
 #include "simulator/simulator.hpp"
 #include "util/bititerator.hpp"
 #include "util/bitops.hpp"
 
+#include <bitset>
+#include <chrono>
 #include <cmath>
 
 using namespace Microsoft::Quantum::SIMULATOR;
 
-void test_exp()
+TEST_CASE("test_exp", "[local_test]")
 {
     SimulatorType sim;
 
@@ -47,13 +47,13 @@ void test_exp()
     for (auto q : qs)
     {
         bool m = sim.M(q);
-        assert(!m);
+        CHECK(!m);
     }
 
     sim.release(qs);
 }
 
-void test_teleport()
+TEST_CASE("test_teleport", "[local_test]")
 {
     SimulatorType sim;
 
@@ -81,14 +81,14 @@ void test_teleport()
     sim.Rz((-1.1), q1);
     sim.H(q1);
 
-    assert(sim.M(q1) == false);
+    CHECK_FALSE(sim.M(q1));
 
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
 }
 
-void test_gates()
+TEST_CASE("test_gates", "[local_test]")
 {
     SimulatorType sim;
 
@@ -97,21 +97,21 @@ void test_gates()
 
     sim.CRx(1.0, q1, q2);
 
-    assert(sim.M(q2) == false);
+    CHECK_FALSE(sim.M(q2));
 
     sim.X(q1);
     sim.CRx(1.0, q1, q2);
-    assert(!sim.isclassical(q2));
+    CHECK_FALSE(sim.isclassical(q2));
 
     sim.H(q2);
     sim.CRz(-1.0, q1, q2);
     sim.H(q2);
 
-    assert(sim.M(q2) == false);
+    CHECK_FALSE(sim.M(q2));
 
     sim.X(q2);
 
-    assert(sim.M(q2) == true);
+    CHECK(sim.M(q2));
 
     sim.X(q2);
 
@@ -119,32 +119,31 @@ void test_gates()
     sim.release(q2);
 }
 
-void test_allocate()
+TEST_CASE("test_allocate", "[local_test]")
 {
     SimulatorType sim;
 
     auto const q1 = sim.allocate();
     auto q2 = sim.allocate();
-    assert(q1 == 0);
-    assert(q2 == 1);
+    CHECK(q1 == 0);
+    CHECK(q2 == 1);
 
     auto q3 = sim.allocate();
-    assert(q3 == 2);
+    CHECK(q3 == 2);
 
     sim.release(q2);
     q2 = sim.allocate();
-    assert(q2 == 1);
+    CHECK(q2 == 1);
 
-    assert(sim.num_qubits() == 3);
+    CHECK(sim.num_qubits() == 3);
 
     sim.release(q1);
     sim.release(q2);
     sim.release(q3);
 
-    assert(sim.num_qubits() == 0);
+    CHECK(sim.num_qubits() == 0);
 }
 
-#ifdef CATCH2_TESTS
 // This test is poking at the implementation detail of the wave function store and might not be the best idea as the
 // positions of qubits aren't guaranteed to be maintained in specific order and can be optimized by the wave function as
 // it sees fit. However, for simple allocate/release pattern the test is useful to document the difference between
@@ -320,7 +319,473 @@ TEST_CASE("Clustering", "[local_test]")
         CHECK(it->get_gates().size() == 2);
     }
 }
-#endif
+
+TEST_CASE("isclassical", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 2;
+    logical_qubit_id q1 = sim.allocate();
+    logical_qubit_id q2 = sim.allocate();
+
+    CHECK(sim.isclassical(q1));
+    CHECK(sim.isclassical(q2));
+
+    sim.H(q1);
+    sim.X(q2);
+    CHECK_FALSE(sim.isclassical(q1));
+    CHECK(sim.isclassical(q2));
+
+    sim.CX({q1}, q2);
+    CHECK_FALSE(sim.isclassical(q1));
+    CHECK_FALSE(sim.isclassical(q2));
+}
+
+TEST_CASE("get_register", "[local_test]")
+{
+    // 174 ~     |10101110>
+    // positions: 76543210
+    //           |_0__11__>
+    CHECK(3 == detail::get_register({2, 3, 6}, 174)); // {1,1,0} ~ |011> ~ 3
+    CHECK(5 == detail::get_register({3, 6, 2}, 174)); // {1,0,1} ~ |101> ~ 5
+    CHECK(6 == detail::get_register({6, 3, 2}, 174)); // {0,1,1} ~ |110> ~ 6
+}
+
+TEST_CASE("set_register", "[local_test]")
+{
+    // 174 ~     |10101110>
+    // positions: 76543210
+    //           |1_10__10>
+
+    // no reordering
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 174 /*|10101110>*/));
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 162 /*|10100010>*/));
+    CHECK(174 == detail::set_register({2, 3, 6}, 76 /*mask*/, 3 /*|011>*/, 226 /*|11100010>*/));
+
+    // with reordering
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|110>*/, 174 /*|10101110>*/));
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|110>*/, 162 /*|10100010>*/));
+    CHECK(174 == detail::set_register({6, 3, 2}, 76 /*mask*/, 6 /*|011>*/, 226 /*|11100010>*/));
+}
+
+void CheckWaveFunction(const std::vector<ComplexType>& expected, const WavefunctionStorage& wfn)
+{
+    REQUIRE(expected.size() == wfn.size());
+    for (size_t i = 0; i < expected.size(); i++)
+    {
+        INFO(std::string("amplitude mismatch at ") + std::to_string(i));
+        CHECK(expected[i] == wfn[i]);
+    }
+}
+
+TEST_CASE("permute_basis", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+
+    // Inject state, which is an equal superposition of |000> + |001> + |010> + |110> + |111>
+    // For this test we don't need to normalize the wave function but `amp` makes it more readable.
+    const double amp = 1.0 / std::sqrt(5);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                           {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}, {amp, 0.0}};
+    REQUIRE(psi.inject_state({q0, q1, q2}, amplitudes));
+
+    SECTION("identity permutation")
+    {
+        size_t permutations[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+        CheckWaveFunction(amplitudes, psi.data());
+    }
+
+    SECTION("swap q0 and q1")
+    {
+        size_t permutations[4] = {0, 2, 1, 3};
+        psi.permute_basis({q0, q1}, 4, permutations);
+
+        // |000> + |001> + |010> + |110> + |111> -> |000> + |010> + |001> + |101> + |111>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                             {0.0, 0.0}, {amp, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("cycle q0 -> q1 -> q2 -> q0")
+    {
+        size_t permutations[8] = {0, 2, 4, 6, 1, 3, 5, 7};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        // |000> + |001> + |010> + |110> + |111> -> |000> + |010> + |100> + |101> + |111>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {0.0, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                             {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("permutation of basis vectors of a single qubit")
+    {
+        size_t permutations[2] = {1, 0};
+        psi.permute_basis({q1}, 2, permutations); // this is equivalent to X(q1)
+
+        // |000> + |001> + |010> + |110> + |111> -> |010> + |011> + |000> + |100> + |101>
+        std::vector<ComplexType> expected = {{amp, 0.0}, {0.0, 0.0}, {amp, 0.0}, {amp, 0.0},
+                                             {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("a more complex permutation of basis")
+    {
+        size_t permutations[8] = {4, 2, 3, 6, 0, 5, 1, 7}; // (04)(1236)(5)(7)
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {amp, 0.0},
+                                             {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+}
+
+TEST_CASE("permute_basis depends on the order of logical qubits (2)", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+
+    // Inject state, which would allow us to easily check permutations. It's not a normalized state but for this
+    // test it doesn't matter.
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0}};
+    REQUIRE(psi.inject_state({q0, q1}, amplitudes));
+    // after the state injection, positions of the qubits are q0:0 and q1:1
+
+    SECTION("q0-q1 order (matches the current positions of the qubits in the standard basis)")
+    {
+        size_t permutations[4] = {1, 0, 2, 3};
+        psi.permute_basis({q0, q1}, 4, permutations);
+
+        std::vector<ComplexType> expected = {{1.0, 0.0}, {0.0, 0.0}, {2.0, 0.0}, {3.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("q1-q0 order (opposite to the current positions of the qubits in the standard basis")
+    {
+        size_t permutations[4] = {1, 0, 2, 3};
+        psi.permute_basis({q1, q0}, 4, permutations);
+
+        // to match qubits' posistions:
+        // |0> -> |0>; |1> -> |2>; |2> -> |1>; |3> -> |3>
+        // apply (01)(2)(3) permutation of the basis:
+        // |0> -> |0> -> |1>; |1> -> |2> -> |2>; |2> -> |1> -> |0>; |3> -> |3> -> |3>
+        // revert to the original positions:
+        //   |0> -> |0> -> |1> -> |2>
+        //   |1> -> |2> -> |2> -> |1>
+        //   |2> -> |1> -> |0> -> |0>
+        //   |3> -> |3> -> |3> -> |3>
+        std::vector<ComplexType> expected = {{2.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {3.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+}
+
+TEST_CASE("permute_basis depends on the order of logical qubits (3)", "[local_test]")
+{
+    Wavefunction<ComplexType> psi;
+
+    logical_qubit_id q0 = psi.allocate_qubit();
+    logical_qubit_id q1 = psi.allocate_qubit();
+    logical_qubit_id q2 = psi.allocate_qubit();
+
+    // Inject state, which would allow us to easily check permutations. It's not a normalized state but for this
+    // test it doesn't matter.
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0},
+                                           {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0}, {7.0, 0.0}};
+    REQUIRE(psi.inject_state({q0, q1, q2}, amplitudes));
+
+    SECTION("q0-q1-q2 order")
+    {
+        size_t permutations[8] = {1, 2, 3, 4, 5, 6, 7, 0};
+        psi.permute_basis({q0, q1, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{7.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {2.0, 0.0},
+                                             {3.0, 0.0}, {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+
+    SECTION("q1-q0-q2 order")
+    {
+        size_t permutations[8] = {1, 2, 3, 4, 5, 6, 7, 0};
+        psi.permute_basis({q1, q0, q2}, 8, permutations);
+
+        std::vector<ComplexType> expected = {{7.0, 0.0}, {2.0, 0.0}, {0.0, 0.0}, {1.0, 0.0},
+                                             {3.0, 0.0}, {6.0, 0.0}, {4.0, 0.0}, {5.0, 0.0}};
+        CheckWaveFunction(expected, psi.data());
+    }
+}
+
+void CheckAllZeros(SimulatorType& sim, const std::vector<logical_qubit_id>& qs)
+{
+    for (size_t i = 0; i < qs.size(); i++)
+    {
+        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
+        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+    }
+}
+
+TEST_CASE("Inject total cat state", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 2;
+    constexpr size_t N = (static_cast<size_t>(1) << n);
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(n);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0}};
+    REQUIRE(amplitudes.size() == N);
+
+    REQUIRE(sim.InjectState(qs, amplitudes));
+
+    // undo the injected state back to |00>
+    sim.CX({qs[0]}, qs[1]);
+    sim.H(qs[0]);
+    CheckAllZeros(sim, qs);
+}
+
+TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(n);
+    std::vector<ComplexType> amplitudes = {{0.0, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0},
+                                           {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+
+    std::vector<ComplexType> amplitudes_sub = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}};
+
+    // unentangled but not |0>
+    sim.H(qs[1]);
+    REQUIRE_FALSE(sim.InjectState(qs, amplitudes));
+    REQUIRE_FALSE(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
+
+    // entanglement doesn't make things any better
+    sim.CX({qs[1]}, qs[2]);
+    REQUIRE_FALSE(sim.InjectState(qs, amplitudes));
+    REQUIRE_FALSE(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
+}
+
+TEST_CASE("Inject total state on reordered qubits", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+    constexpr size_t N = (static_cast<size_t>(1) << n);
+
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {amp, 0.0},
+                                           {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    REQUIRE(N == amplitudes.size());
+
+    // Notice, that we are listing the qubits in order that doesn't match their allocation order. We are saying here,
+    // that InjectState should create Bell pair from qs[1] and qs[2]!
+    REQUIRE(sim.InjectState({qs[1], qs[2], qs[0]}, amplitudes));
+    REQUIRE((sim.isclassical(qs[0]) && !sim.M(qs[0])));
+
+    // undo the state change and check that the whole system is back to |000>
+    sim.CX({qs[1]}, qs[2]);
+    sim.H(qs[1]);
+    for (int i = 0; i < n; i++)
+    {
+        INFO(std::string("qubit in non-zero state: ") + std::to_string(qs[i]));
+        CHECK((sim.isclassical(qs[i]) && !sim.M(qs[i])));
+    }
+}
+
+TEST_CASE("Inject state on two qubits out of three", "[local_test]")
+{
+    SimulatorType sim;
+    constexpr int n = 3;
+
+    logical_qubit_id q0 = sim.allocate();
+    logical_qubit_id q1 = sim.allocate();
+    logical_qubit_id q2 = sim.allocate();
+
+    const double amp = 1.0 / std::sqrt(2);
+    std::vector<ComplexType> amplitudes = {{amp, 0.0}, {amp, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    // this state injections is the same as applying H to the first qubit in the subsystem list
+
+    logical_qubit_id x;
+    logical_qubit_id y;
+    SECTION("q0 & q1")
+    {
+        x = q0;
+        y = q1;
+        sim.H(q2);
+    }
+    SECTION("q0 & q2")
+    {
+        x = q0;
+        y = q2;
+        sim.H(q1);
+    }
+    SECTION("q1 & q2")
+    {
+        x = q1;
+        y = q2;
+        sim.H(q0);
+    }
+    SECTION("q2 & q1")
+    {
+        x = q2;
+        y = q1;
+        sim.H(q0);
+    }
+
+    REQUIRE(sim.InjectState({x, y}, amplitudes));
+
+    // undo the state injection with quantum op and check that the qubits we injected state for are back to |0>
+    sim.H(x);
+
+    CHECK((sim.isclassical(x) && !sim.M(x)));
+    CHECK((sim.isclassical(y) && !sim.M(y)));
+}
+
+TEST_CASE("Perf of injecting equal superposition state", "[skip]") // local micro_benchmark
+{
+    using namespace std::chrono;
+
+    SimulatorType sim;
+    constexpr int n = 20;
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n - 1; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    SECTION("Prepare the state with quantum operations")
+    {
+        qs.push_back(sim.allocate());
+
+        auto start = high_resolution_clock::now();
+        for (logical_qubit_id q : qs)
+        {
+            sim.H(q);
+        }
+        // force the simulator to flush
+        sim.M(qs[0]);
+        std::cout << "Quantum state preparation:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject total state")
+    {
+        qs.push_back(sim.allocate());
+        constexpr size_t N = (static_cast<size_t>(1) << n);
+        const double amp = 1.0 / std::sqrt(N);
+        std::vector<ComplexType> amplitudes(N, {amp, 0.0});
+
+        auto start = high_resolution_clock::now();
+        REQUIRE(sim.InjectState(qs, amplitudes));
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "    Total state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject partial state")
+    {
+        logical_qubit_id q_last = sim.allocate();
+        constexpr size_t N = (static_cast<size_t>(1) << (n - 1));
+        const double amp = 1.0 / std::sqrt(N);
+        std::vector<ComplexType> amplitudes(N, {amp, 0.0});
+
+        auto start = std::chrono::high_resolution_clock::now();
+        REQUIRE(sim.InjectState(qs, amplitudes));
+        sim.H(q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "  Partial state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+}
+
+TEST_CASE("Perf of injecting cat state", "[skip]") // local micro_benchmark
+{
+    using namespace std::chrono;
+
+    SimulatorType sim;
+    constexpr int n = 20;
+    std::vector<logical_qubit_id> qs;
+    for (int i = 0; i < n - 1; i++)
+    {
+        qs.push_back(sim.allocate());
+    }
+
+    SECTION("Prepare the state with quantum operations")
+    {
+        qs.push_back(sim.allocate());
+
+        auto start = std::chrono::high_resolution_clock::now();
+        sim.H(qs[0]);
+        for (size_t i = 1; i < n; i++)
+        {
+            sim.CX({qs[0]}, qs[i]);
+        }
+        // force the simulator to flush
+        sim.M(qs[0]);
+        std::cout << "Quantum cat state preparation:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject total state")
+    {
+        qs.push_back(sim.allocate());
+        constexpr size_t N = (static_cast<size_t>(1) << n);
+
+        std::vector<ComplexType> amplitudes(N, {0.0, 0.0});
+        const double amp = 1.0 / std::sqrt(2);
+        amplitudes[0] = {amp, 0.0};
+        amplitudes[N - 1] = {amp, 0.0};
+
+        auto start = std::chrono::high_resolution_clock::now();
+        REQUIRE(sim.InjectState(qs, amplitudes));
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "    Total cat state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+
+    SECTION("Inject partial state")
+    {
+        logical_qubit_id q_last = sim.allocate();
+        constexpr size_t N = (static_cast<size_t>(1) << (n - 1));
+        std::vector<ComplexType> amplitudes(N, {0.0, 0.0});
+        const double amp = 1.0 / std::sqrt(2);
+        amplitudes[0] = {amp, 0.0};
+        amplitudes[N - 1] = {amp, 0.0};
+
+        auto start = std::chrono::high_resolution_clock::now();
+        REQUIRE(sim.InjectState(qs, amplitudes));
+        sim.CX({qs[0]}, q_last);
+        sim.M(qs[0]); // to have the same overhead compared to preparation test case
+        std::cout << "  Partial cat state injection:\t";
+        std::cout << duration_cast<microseconds>(high_resolution_clock::now() - start).count();
+        std::cout << std::endl;
+    }
+}
 
 template <class SIM>
 void set(SIM& sim, bool val, unsigned qubit)
@@ -329,7 +794,7 @@ void set(SIM& sim, bool val, unsigned qubit)
     if (val != is) sim.X(qubit);
 }
 
-void test_multicontrol()
+TEST_CASE("test_multicontrol", "[local_test]")
 {
     SimulatorType sim;
     for (unsigned n = 0; n < 4; ++n)
@@ -348,18 +813,18 @@ void test_multicontrol()
                 set(sim, ((i & (1 << j)) != 0), ctrls[j]);
 
             // controlled is enabled only when all ctrls are 1 (e.g. last one):
-            unsigned enabled = (i == ((1 << n) - 1));
+            bool enabled = (i == ((1 << n) - 1));
             set(sim, 0, q);
-            assert(sim.M(q) == 0);
+            CHECK_FALSE(sim.M(q));
 
             sim.CX(ctrls, q);
-            assert(sim.M(q) == (enabled ? 1 : 0));
+            CHECK(sim.M(q) == enabled);
         }
 
         sim.release(qbits);
         sim.release(ctrls);
 
-        assert(sim.num_qubits() == 0);
+        CHECK(sim.num_qubits() == 0);
     }
 }
 
@@ -396,13 +861,13 @@ void test_extract_qubits_state_simple(int qubits_number)
             auto is2 = std::complex<double>(0, 1.0 / sqrt(2.0));
             if (bits[i])
             {
-                assert(std::norm(res[0] * std::conj(s2) + res[1] * std::conj(is2)) > 1 - tol * tol);
+                CHECK(std::norm(res[0] * std::conj(s2) + res[1] * std::conj(is2)) > 1 - tol * tol);
             }
             else
             {
-                assert(std::norm(res[0]) > 1 - tol * tol);
+                CHECK(std::norm(res[0]) > 1 - tol * tol);
             }
-            assert(issep);
+            CHECK(issep);
         }
 
         for (size_t j = 0; j < qubits_number; ++j)
@@ -420,9 +885,9 @@ void test_extract_qubits_state_simple(int qubits_number)
 void assert_cat_state(WavefunctionStorage const& wfn, double tol)
 {
     std::size_t total_qubits = Microsoft::Quantum::ilog2(wfn.size());
-    assert(abs(norm(wfn[0]) - 0.5) < tol);
-    assert(abs(norm(wfn[(1ull << total_qubits) - 1]) - 0.5) < tol);
-    assert(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
+    CHECK(abs(norm(wfn[0]) - 0.5) < tol);
+    CHECK(abs(norm(wfn[(1ull << total_qubits) - 1]) - 0.5) < tol);
+    CHECK(norm(wfn[(1ull << total_qubits) - 1] / wfn[0] - std::complex<double>(1, 0)) < tol * tol);
 }
 
 void test_extract_qubits_cat_state(
@@ -433,8 +898,8 @@ void test_extract_qubits_cat_state(
     SimulatorType sim;
     double tol = 1e-5;
 
-    assert(subset.size() >= 2);
-    assert(qubits_number - subset.size() >= 2);
+    CHECK(subset.size() >= 2);
+    CHECK(qubits_number - subset.size() >= 2);
 
     auto const q1 = sim.allocate(qubits_number);
 
@@ -460,9 +925,9 @@ void test_extract_qubits_cat_state(
     bool issep2 = sim.subsytemwavefunction(cmpl, wfn2, tol);
     bool issep3 = sim.subsytemwavefunction(negative_test, wfn3, tol);
 
-    assert(issep1);
-    assert(issep2);
-    assert(!issep3);
+    CHECK(issep1);
+    CHECK(issep2);
+    CHECK(!issep3);
     assert_cat_state(wfn1, tol);
     assert_cat_state(wfn2, tol);
 
@@ -488,7 +953,7 @@ void test_extract_qubits_cat_state(
     sim.release(q1);
 }
 
-void test_extract_qubits_state()
+TEST_CASE("test_extract_qubits_state", "[local_test]")
 {
     test_extract_qubits_state_simple(5);
     test_extract_qubits_cat_state(4, {0, 1}, {0, 2});
@@ -501,22 +966,3 @@ void test_extract_qubits_state()
     test_extract_qubits_cat_state(6, {0, 1, 3}, {0, 1});
     test_extract_qubits_cat_state(10, {0, 5}, {5, 6});
 }
-
-#ifndef CATCH2_TESTS
-int main()
-{
-    std::cerr << "Testing allocate\n";
-    test_allocate();
-    std::cerr << "Testing gates\n";
-    test_gates();
-    std::cerr << "Testing Exp\n";
-    test_exp();
-    std::cerr << "Testing Multicontrol\n";
-    test_multicontrol();
-    std::cerr << "Testing teleport\n";
-    test_teleport();
-    std::cerr << "Testing state extraction\n";
-    test_extract_qubits_state();
-    return 0;
-}
-#endif

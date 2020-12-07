@@ -7,8 +7,7 @@
 
     newtype Items = (Item2 : Int, Item1 : Int);
 
-    // TODO:
-    // newtype Bar = (Data : Int);
+    newtype Bar = (Data : Int);
 
     operation Body() : Unit { }
 
@@ -50,12 +49,11 @@
         AssertEqual(3, items::Item2);
         AssertEqual(4, items::Item1);
 
-        // TODO:
-        // let bar = Bar(10);
-        // AssertEqual(10, bar::Data);
+        let bar = Bar(10);
+        AssertEqual(10, bar::Data);
     }
 
-    @Test("QuantumSimulator")    
+    @Test("QuantumSimulator")
     operation AvoidsOperationPropertyShadowing1() : Unit {
         using (q = Qubit()) {
             let MicrosoftQuantumIntrinsicX = Z;
