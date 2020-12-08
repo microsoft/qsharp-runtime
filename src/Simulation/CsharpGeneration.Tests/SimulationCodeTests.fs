@@ -2315,7 +2315,7 @@ namespace N1
     [<Fact>]
     let ``is abstract`` () =
         let testOne (_,op) expected =
-            let actual = op |> isAbstract
+            let actual = op |> isIntrinsic
             Assert.Equal(expected, actual)
 
         true  |> testOne emptyOperation

@@ -42,6 +42,7 @@ module SimulationCode =
             "System"
             "Microsoft.Quantum.Core"
             "Microsoft.Quantum.Intrinsic"
+            "Microsoft.Quantum.Intrinsic.Interfaces"
             "Microsoft.Quantum.Simulation.Core"
         ]
 
@@ -913,6 +914,14 @@ module SimulationCode =
             ``{`` [] ``}``
         :> MemberDeclarationSyntax
 
+    /// Returns the constructor for the given intrinsic operation.
+    let buildIntrinsicConstructor context name : MemberDeclarationSyntax =
+        ``constructor`` name ``(`` [ ("m", ``type`` ("IGate_" + name)) ] ``)``
+            ``:`` [ "m" ]
+            [ ``public`` ]
+            ``{`` [] ``}``
+        :> MemberDeclarationSyntax
+
     /// For each Operation used in the given OperationDeclartion, returns
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
@@ -1217,6 +1226,10 @@ module SimulationCode =
             ``get`` (``=>`` (``literal`` name) )
         :> MemberDeclarationSyntax
 
+    let buildGate name =
+        ``propg`` ("IGate_" + name) "Gate" [ ``private``; ``protected`` ]
+        :> MemberDeclarationSyntax
+
     let buildFullName (name : QsQualifiedName) =
         let fqn =
             let ns = name.Namespace
@@ -1336,7 +1349,7 @@ module SimulationCode =
         let nonGeneric = if typeParameters.IsEmpty then name else sprintf "%s<%s>" name (String.Join(",", typeParameters))
         (name, nonGeneric)
 
-    let isAbstract op =
+    let isIntrinsic op =
         let isBody (sp:QsSpecialization) = match sp.Kind with | QsBody when sp.Implementation <> Intrinsic -> true | _ -> false
         not (op.Specializations |> Seq.exists isBody)
 
@@ -1385,16 +1398,19 @@ module SimulationCode =
         let opNames = operationDependencies op
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
+        let opIsIntrinsic = isIntrinsic op
 
-        let constructors = [ (buildConstructor context name) ]
+        let constructors = [ ((if opIsIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
         let properties =
             let opProperties = buildOpsProperties context opNames
-            buildName name ::
-            buildFullName context.current.Value ::
-            if globalContext.entryPoints |> Seq.contains op.FullName then
-                buildOperationInfoProperty globalContext inType outType nonGenericName ::
-                opProperties
-            else opProperties
+            [
+                yield buildName name
+                yield buildFullName context.current.Value
+                if globalContext.entryPoints |> Seq.contains op.FullName then
+                    yield buildOperationInfoProperty globalContext inType outType nonGenericName
+                if opIsIntrinsic then yield buildGate name
+                yield! opProperties
+            ]
 
         let baseOp =
             if isFunction op then
@@ -1441,7 +1457,7 @@ module SimulationCode =
 
         let modifiers =
             let access = classAccessModifier op.Modifiers.Access
-            if isAbstract op then
+            if opIsIntrinsic then
                 [ access; ``abstract``; ``partial`` ]
             else
                 [ access; ``partial`` ]
