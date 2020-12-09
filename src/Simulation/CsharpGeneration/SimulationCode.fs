@@ -967,41 +967,33 @@ module SimulationCode =
         :> MemberDeclarationSyntax
 
     let buildSpecializationBody context (op:QsCallable) (sp:QsSpecialization) =
-        let buildOne args statements = 
-            let returnType  = sp.Signature.ReturnType
+        let getInputVarWithInit args =
             let inData = ``ident`` "__in__"
-            let ret =
-                match returnType.Resolution with
-                | QsTypeKind.UnitType ->
-                    [
-                        ``#line hidden`` <|
-                        ``return`` ( Some ((``ident`` "QVoid") <|.|> (``ident`` "Instance")) )
-                    ]
-                | _ ->
-                    []
-            let (argName, argsInit) =
-                let name = function | ValidName n -> n | InvalidName -> ""
-                let rec buildVariableName = function
-                    | QsTupleItem  one -> one.VariableName |> name
-                    | QsTuple     many -> "(" + (many |> Seq.map buildVariableName |> String.concat ",") + ")"
-                match args with
-                | QsTupleItem one -> (one.VariableName |> name, [])
-                | QsTuple many    ->
-                    if many.Length = 0 then
-                        ("__in__", [])
-                    elif many.Length = 1 then
-                        ("__in__", [ ``var`` (buildVariableName many.[0]) (``:=`` <| inData) ])
-                    else
-                        ("__in__", [ ``var`` (buildVariableName args) (``:=`` <| inData) ])
-
-            Some (``() => {}`` [ argName ] (argsInit @ statements @ ret) :> ExpressionSyntax)
+            let name = function | ValidName n -> n | InvalidName -> ""
+            let rec buildVariableName = function
+                | QsTupleItem  one -> one.VariableName |> name
+                | QsTuple     many -> "(" + (many |> Seq.map buildVariableName |> String.concat ",") + ")"
+            match args with
+            | QsTupleItem one -> (one.VariableName |> name, [])
+            | QsTuple many    ->
+                if many.Length = 0 then
+                    ("__in__", [])
+                elif many.Length = 1 then
+                    ("__in__", [ ``var`` (buildVariableName many.[0]) (``:=`` <| inData) ])
+                else
+                    ("__in__", [ ``var`` (buildVariableName args) (``:=`` <| inData) ])
         match sp.Implementation with
         | Provided (args, _) ->
+            let argName, argsInit = getInputVarWithInit args
             let statements  =
                 let builder = new SyntaxBuilder(context)
                 builder.Namespaces.OnSpecializationDeclaration sp |> ignore
                 builder.BuiltStatements
-            buildOne args statements
+            let ret =
+                match sp.Signature.ReturnType.Resolution with
+                | QsTypeKind.UnitType -> [ ``return`` ( Some ((``ident`` "QVoid") <|.|> (``ident`` "Instance")) ) |> ``#line hidden`` ]
+                | _ -> []
+            Some (``() => {}`` [ argName ] (argsInit @ statements @ ret) :> ExpressionSyntax)
         | Generated SelfInverse ->
             let adjointedBodyName =
                 match sp.Kind with
@@ -1011,11 +1003,7 @@ module SimulationCode =
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
         | Intrinsic ->
-            let name = function | ValidName n -> ``ident`` n | InvalidName -> ``ident`` ""
-            let rec argsToVars = function
-                | QsTupleItem one -> [one.VariableName |> name]
-                | QsTuple many -> many |> Seq.map argsToVars |> List.concat
-
+            // Add in the control qubits parameter when dealing with a controlled spec
             let args =
                 match sp.Kind with
                 | QsControlled | QsControlledAdjoint ->
@@ -1031,7 +1019,7 @@ module SimulationCode =
                         QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), many.[0]))
                     | _ -> QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), op.ArgumentTuple))
                 | _ -> op.ArgumentTuple
-
+            let argName, argsInit = getInputVarWithInit args
             let specCall =
                 (userDefinedName None op.FullName.Name) + "_" +
                 match sp.Kind with
@@ -1040,10 +1028,20 @@ module SimulationCode =
                 | QsControlled -> "Controlled"
                 | QsControlledAdjoint -> "ControlledAdjoint"
                 + "Body"
-
+            let name = function | ValidName n -> ``ident`` n | InvalidName -> ``ident`` ""
+            let rec argsToVars = function
+                | QsTupleItem one -> [one.VariableName |> name]
+                | QsTuple many -> many |> Seq.map argsToVars |> List.concat
+            let callExp = (``ident`` "Gate") <.> (``ident`` specCall, argsToVars args)
             let statements =
-                [ (``ident`` "Gate") <.> (``ident`` specCall, argsToVars args) |> statement ]
-            buildOne args statements
+                match sp.Signature.ReturnType.Resolution with
+                | QsTypeKind.UnitType ->
+                    [
+                        callExp |> statement
+                        ``return`` ( Some ((``ident`` "QVoid") <|.|> (``ident`` "Instance")) ) |> ``#line hidden``
+                    ]
+                | _ -> [ ``return`` ( Some callExp ) ]
+            Some (``() => {}`` [ argName ] (argsInit @ statements) :> ExpressionSyntax)
         | _ ->
             None
 
