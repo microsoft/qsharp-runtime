@@ -966,15 +966,9 @@ module SimulationCode =
             (``=>`` newInstance)
         :> MemberDeclarationSyntax
 
-    let buildSpecializationBody context (sp:QsSpecialization) =
-        match sp.Implementation with
-        | Provided (args, _) ->
+    let buildSpecializationBody context (op:QsCallable) (sp:QsSpecialization) =
+        let buildOne args statements = 
             let returnType  = sp.Signature.ReturnType
-            let statements  =
-                let builder = new SyntaxBuilder(context)
-                builder.Namespaces.OnSpecializationDeclaration sp |> ignore
-                builder.BuiltStatements
-
             let inData = ``ident`` "__in__"
             let ret =
                 match returnType.Resolution with
@@ -986,7 +980,6 @@ module SimulationCode =
                 | _ ->
                     []
             let (argName, argsInit) =
-//TODO: diagnostics.
                 let name = function | ValidName n -> n | InvalidName -> ""
                 let rec buildVariableName = function
                     | QsTupleItem  one -> one.VariableName |> name
@@ -1002,6 +995,13 @@ module SimulationCode =
                         ("__in__", [ ``var`` (buildVariableName args) (``:=`` <| inData) ])
 
             Some (``() => {}`` [ argName ] (argsInit @ statements @ ret) :> ExpressionSyntax)
+        match sp.Implementation with
+        | Provided (args, _) ->
+            let statements  =
+                let builder = new SyntaxBuilder(context)
+                builder.Namespaces.OnSpecializationDeclaration sp |> ignore
+                builder.BuiltStatements
+            buildOne args statements
         | Generated SelfInverse ->
             let adjointedBodyName =
                 match sp.Kind with
@@ -1010,10 +1010,31 @@ module SimulationCode =
 //TODO: diagnostics.
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
+        | Intrinsic ->
+            let args =
+                match sp.Kind with
+                | QsControlled | QsControlledAdjoint ->
+                    let ctlVar =
+                        let name = ValidName("__controlQubits__")
+                        let varType = Qubit |> ResolvedType.New |> ArrayType |> ResolvedType.New
+                        let info = InferredExpressionInformation.New(false, false)
+                        let pos = QsNullable<Position>.Null
+                        let range = Range.Zero
+                        {VariableName = name; Type = varType; InferredInformation = info; Position = pos; Range = range}
+                    match op.ArgumentTuple with
+                    | QsTuple many when many.Length = 1 ->
+                        QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), many.[0]))
+                    | _ -> QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), op.ArgumentTuple))
+                | _ -> op.ArgumentTuple
+            let statements  =
+                let builder = new SyntaxBuilder(context)
+                builder.Namespaces.OnSpecializationDeclaration sp |> ignore
+                builder.BuiltStatements
+            buildOne args statements
         | _ ->
             None
 
-    let buildSpecialization context (sp:QsSpecialization) : (PropertyDeclarationSyntax * _) option =
+    let buildSpecialization context (op:QsCallable) (sp:QsSpecialization) : (PropertyDeclarationSyntax * _) option =
         let inType  = roslynTypeName context sp.Signature.ArgumentType
         let outType = roslynTypeName context sp.Signature.ReturnType
         let propertyType = "Func<" + inType + ", " + outType + ">"
@@ -1023,7 +1044,7 @@ module SimulationCode =
             | QsAdjoint           -> "Adjoint"
             | QsControlled        -> "Controlled"
             | QsControlledAdjoint -> "ControlledAdjoint"
-        let body = buildSpecializationBody context sp
+        let body = buildSpecializationBody context op sp
         let attributes =
             match sp.Location with
             | Null -> []
@@ -1427,7 +1448,7 @@ module SimulationCode =
         let typeParameters = typeParametersNames op.Signature
         let baseClass = genericBase baseOp ``<<`` typeArgsInterface ``>>``
         let bodies, attr =
-            op.Specializations |> Seq.map (buildSpecialization context) |> Seq.choose id |> Seq.toList
+            op.Specializations |> Seq.map (buildSpecialization context op) |> Seq.choose id |> Seq.toList
             |> List.map (fun (x, y) -> (x :> MemberDeclarationSyntax, y)) |> List.unzip
         let inData  = (buildDataWrapper context "In"  op.Signature.ArgumentType)
         let outData = (buildDataWrapper context "Out" op.Signature.ReturnType)
