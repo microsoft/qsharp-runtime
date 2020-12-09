@@ -3,14 +3,15 @@
 
 // Implement vqe.qs so can compare the results of running it and the generated QIR against the full state
 // simulator.
+#include <assert.h>
 #include <bitset>
 #include <iostream>
 #include <vector>
 
 #include "CoreTypes.hpp"
+#include "qirTypes.hpp"
 #include "quantum__qis.hpp"
 #include "quantum__rt.hpp"
-#include "qirTypes.hpp"
 
 using namespace std;
 using namespace Microsoft::Quantum;
@@ -19,6 +20,15 @@ extern "C"
 {
     extern Result ResultOne;
     extern Result ResultZero;
+}
+
+// The caller is responsible for ensuring that the array actually contains qubits.
+static QUBIT* GetQubit(QirArray* qs, int64_t index)
+{
+    assert(index < qs->count);
+
+    QUBIT** qubits = reinterpret_cast<QUBIT**>(qs->buffer);
+    return qubits[index];
 }
 
 double EstimateTermExpectation(
@@ -77,8 +87,7 @@ double EstimateTermExpectation(
     double coeff,
     int nSamples)
 {
-    const double termExpectation =
-        EstimateFrequency(cState1, state1, cState2, state2, phase, cOps, ops, nSamples);
+    const double termExpectation = EstimateFrequency(cState1, state1, cState2, state2, phase, cOps, ops, nSamples);
     return (2. * termExpectation - 1.) * coeff;
 }
 
@@ -145,7 +154,7 @@ double EstimateFrequency(
 
         for (int i = 0; i < cOps; i++)
         {
-            Qubit q = qs->GetQubit(i);
+            Qubit q = GetQubit(qs, i);
             if (quantum__rt__result_equal(quantum__qis__mz(q), ResultOne))
             {
                 quantum__qis__x(q);
@@ -201,8 +210,8 @@ void PrepareTrialState(
     QirArray* qs,
     QirArray* aux)
 {
-    Qubit aux0 = aux->GetQubit(0);
-    Qubit aux1 = aux->GetQubit(1);
+    Qubit aux0 = GetQubit(aux, 0);
+    Qubit aux1 = GetQubit(aux, 1);
 
     quantum__qis__h(aux0);
     quantum__qis__rz(phase, aux0);
@@ -212,14 +221,14 @@ void PrepareTrialState(
     quantum__qis__x(aux1);
     for (int i = 0; i < cState1; i++)
     {
-        quantum__qis__x(qs->GetQubit(state1[i]));
+        quantum__qis__x(GetQubit(qs, state1[i]));
     }
     quantum__qis__x(aux1);
     quantum__qis__x(aux0);
 
     for (int i = 0; i < cState2; i++)
     {
-        quantum__qis__x(qs->GetQubit(state2[i]));
+        quantum__qis__x(GetQubit(qs, state2[i]));
     }
 
     if (quantum__rt__result_equal(quantum__qis__mz(aux0), ResultOne))

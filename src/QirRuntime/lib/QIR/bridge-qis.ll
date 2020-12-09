@@ -26,11 +26,11 @@
 ;
 %class.QUBIT = type opaque
 %class.RESULT = type opaque
-%"struct.QirArray" = type opaque
-%"struct.QirCallable" = type opaque
-%"struct.QirRange" = type { i64, i64, i64 }
-%"struct.QirString" = type opaque
-%"struct.QirTupleHeader" = type { i32 }
+%struct.QirArray = type opaque
+%struct.QirCallable = type opaque
+%struct.QirRange = type { i64, i64, i64 }
+%struct.QirString = type opaque
+%struct.QirTupleHeader = type { i32 }
 
 ;===============================================================================
 ; declarations of the native methods this bridge delegates to
@@ -38,7 +38,7 @@
 declare double @quantum__qis__intAsDouble(i64)
 declare void @quantum__qis__cnot(%class.QUBIT*, %class.QUBIT*)
 declare void @quantum__qis__h(%class.QUBIT*)
-declare %class.RESULT* @quantum__qis__measure(%"struct.QirArray"*, %"struct.QirArray"*)
+declare %class.RESULT* @quantum__qis__measure(%struct.QirArray*, %struct.QirArray*)
 declare %class.RESULT* @quantum__qis__mz(%class.QUBIT*)
 declare void @quantum__qis__rx(double, %class.QUBIT*)
 declare void @quantum__qis__ry(double, %class.QUBIT*)
@@ -49,7 +49,8 @@ declare void @quantum__qis__x(%class.QUBIT*)
 declare void @quantum__qis__y(%class.QUBIT*)
 declare void @quantum__qis__z(%class.QUBIT*)
 
-
+declare void @quantum__qis__crx(%struct.QirArray*, double, %class.QUBIT*)
+declare void @quantum__qis__crz(%struct.QirArray*, double, %class.QUBIT*)
 
 ;===============================================================================
 ; quantum.qis namespace implementations
@@ -74,9 +75,9 @@ define void @__quantum__qis__h(%Qubit* %.q) {
 }
 
 define %Result* @__quantum__qis__measure(%Array* %.paulis, %Array* %.qubits) {
-  %paulis = bitcast %Array* %.paulis to %"struct.QirArray"*
-  %qubits = bitcast %Array* %.qubits to %"struct.QirArray"*
-  %r = call %class.RESULT* @quantum__qis__measure(%"struct.QirArray"* %paulis, %"struct.QirArray"* %qubits)
+  %paulis = bitcast %Array* %.paulis to %struct.QirArray*
+  %qubits = bitcast %Array* %.qubits to %struct.QirArray*
+  %r = call %class.RESULT* @quantum__qis__measure(%struct.QirArray* %paulis, %struct.QirArray* %qubits)
   %.r = bitcast %class.RESULT* %r to %Result*
   ret %Result* %.r
 }
@@ -133,5 +134,20 @@ define void @__quantum__qis__y(%Qubit* %.q) {
 define void @__quantum__qis__z(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__z(%class.QUBIT* %q)
+  ret void
+}
+
+
+define void @__quantum__qis__crx(%Array* %.ctls, double %.theta, %Qubit* %.q) {
+  %q = bitcast %Qubit* %.q to %class.QUBIT*
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  call void @quantum__qis__crx(%struct.QirArray* %ctls, double %.theta, %class.QUBIT* %q)
+  ret void
+}
+
+define void @__quantum__qis__crz(%Array* %.ctls, double %.theta, %Qubit* %.q) {
+  %q = bitcast %Qubit* %.q to %class.QUBIT*
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  call void @quantum__qis__crz(%struct.QirArray* %ctls, double %.theta, %class.QUBIT* %q)
   ret void
 }

@@ -691,15 +691,23 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(!qapi->HaveQubitsInFlight());
 
     QirArray* qs = quantum__rt__qubit_allocate_array(3);
-    REQUIRE(qs->containsQubits);
+    REQUIRE(qs->ownsQubits);
     REQUIRE(qs->count == 3);
     REQUIRE(qs->itemSizeInBytes == sizeof(void*));
+
     Qubit last = *reinterpret_cast<Qubit*>(quantum__rt__array_get_element_ptr_1d(qs, 2));
     qstr = quantum__rt__qubit_to_string(last);
     REQUIRE(qstr->str == std::string("3"));
     quantum__rt__string_unreference(qstr);
+
+    QirArray* copy = quantum__rt__array_copy(qs);
+    REQUIRE(!copy->ownsQubits);
+
     quantum__rt__qubit_release_array(qs);
     REQUIRE(!qapi->HaveQubitsInFlight());
+
+    // copy array now contains dangling pointers to qubits, but it should be still OK to release the array
+    quantum__rt__array_unreference(copy);
 
     SetSimulatorForQIR(nullptr);
 }
