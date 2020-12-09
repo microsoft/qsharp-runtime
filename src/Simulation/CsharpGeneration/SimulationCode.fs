@@ -1011,6 +1011,11 @@ module SimulationCode =
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
         | Intrinsic ->
+            let name = function | ValidName n -> ``ident`` n | InvalidName -> ``ident`` ""
+            let rec argsToVars = function
+                | QsTupleItem one -> [one.VariableName |> name]
+                | QsTuple many -> many |> Seq.map argsToVars |> List.concat
+
             let args =
                 match sp.Kind with
                 | QsControlled | QsControlledAdjoint ->
@@ -1026,10 +1031,18 @@ module SimulationCode =
                         QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), many.[0]))
                     | _ -> QsTuple(ImmutableArray.Create(QsTupleItem(ctlVar), op.ArgumentTuple))
                 | _ -> op.ArgumentTuple
-            let statements  =
-                let builder = new SyntaxBuilder(context)
-                builder.Namespaces.OnSpecializationDeclaration sp |> ignore
-                builder.BuiltStatements
+
+            let specCall =
+                (userDefinedName None op.FullName.Name) + "_" +
+                match sp.Kind with
+                | QsBody -> ""
+                | QsAdjoint -> "Adjoint"
+                | QsControlled -> "Controlled"
+                | QsControlledAdjoint -> "ControlledAdjoint"
+                + "Body"
+
+            let statements =
+                [ (``ident`` "Gate") <.> (``ident`` specCall, argsToVars args) |> statement ]
             buildOne args statements
         | _ ->
             None
