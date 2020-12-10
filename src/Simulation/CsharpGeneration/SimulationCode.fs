@@ -1489,10 +1489,11 @@ module SimulationCode =
 
         let modifiers =
             let access = classAccessModifier op.Modifiers.Access
-            if opIsIntrinsic then
-                [ access; ``abstract``; ``partial`` ]
-            else
-                [ access; ``partial`` ]
+            // ToDo: allow old setup with Q# project flag
+            //if opIsIntrinsic then
+            //    [ access; ``abstract``; ``partial`` ]
+            //else
+            [ access; ``partial`` ]
 
         ``attributes`` (attr |> List.concat) (
             ``class`` name ``<<`` typeParameters ``>>``
