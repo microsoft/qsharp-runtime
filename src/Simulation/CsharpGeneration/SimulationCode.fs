@@ -37,13 +37,15 @@ module SimulationCode =
         member this.setCallable (op: QsCallable) = { this with current = (Some op.FullName); signature = (Some op.Signature) }
         member this.setUdt (udt: QsCustomType) = { this with current = (Some udt.FullName) }
 
+    let GENERATED_CONCRETE_INTRINSICS = false // ToDo: Make a Q# project property to decide this
+
     let autoNamespaces =
         [
-            "System"
-            "Microsoft.Quantum.Core"
-            "Microsoft.Quantum.Intrinsic"
-            "Microsoft.Quantum.Intrinsic.Interfaces"
-            "Microsoft.Quantum.Simulation.Core"
+            yield "System"
+            yield "Microsoft.Quantum.Core"
+            yield "Microsoft.Quantum.Intrinsic"
+            if GENERATED_CONCRETE_INTRINSICS then yield "Microsoft.Quantum.Intrinsic.Interfaces"
+            yield "Microsoft.Quantum.Simulation.Core"
         ]
 
     let funcsAsProps = [
@@ -967,6 +969,7 @@ module SimulationCode =
         :> MemberDeclarationSyntax
 
     let buildSpecializationBody context (op:QsCallable) (sp:QsSpecialization) =
+        let generateConcreteIntrinsics = GENERATED_CONCRETE_INTRINSICS // ToDo: Make a Q# project property to decide this
         let getInputVarWithInit args =
             let inData = ``ident`` "__in__"
             let name = function | ValidName n -> n | InvalidName -> ""
@@ -1002,7 +1005,7 @@ module SimulationCode =
 //TODO: diagnostics.
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
-        | Intrinsic ->
+        | Intrinsic when generateConcreteIntrinsics = true ->
             // Add in the control qubits parameter when dealing with a controlled spec
             let args =
                 match sp.Kind with
@@ -1431,8 +1434,10 @@ module SimulationCode =
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
         let opIsIntrinsic = isIntrinsic op
+        let generateConcreteIntrinsics = GENERATED_CONCRETE_INTRINSICS // ToDo: Make a Q# project property to decide this
+        let isConcreteIntrinsic = generateConcreteIntrinsics && opIsIntrinsic
 
-        let constructors = [ ((if opIsIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
+        let constructors = [ ((if isConcreteIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
         let properties =
             let opProperties = buildOpsProperties context opNames
             [
@@ -1440,7 +1445,7 @@ module SimulationCode =
                 yield buildFullName context.current.Value
                 if globalContext.entryPoints |> Seq.contains op.FullName then
                     yield buildOperationInfoProperty globalContext inType outType nonGenericName
-                if opIsIntrinsic then yield buildGate name
+                if isConcreteIntrinsic then yield buildGate name
                 yield! opProperties
             ]
 
@@ -1489,11 +1494,10 @@ module SimulationCode =
 
         let modifiers =
             let access = classAccessModifier op.Modifiers.Access
-            // ToDo: allow old setup with Q# project flag
-            //if opIsIntrinsic then
-            //    [ access; ``abstract``; ``partial`` ]
-            //else
-            [ access; ``partial`` ]
+            if opIsIntrinsic && not isConcreteIntrinsic then
+                [ access; ``abstract``; ``partial`` ]
+            else
+                [ access; ``partial`` ]
 
         ``attributes`` (attr |> List.concat) (
             ``class`` name ``<<`` typeParameters ``>>``
