@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Quantum.Simulation.Core;
@@ -112,8 +115,13 @@ namespace Microsoft.Quantum.Simulation.Common {
                     return;
                 }
 
-                // Attach source at the beginning of the list. 
-                sharedQubitStatusArray[source.LastElement] = FirstElement;
+                if (this.IsEmpty()) {
+                    // It this list is empty, we'll just set it to the source list.
+                    LastElement = source.LastElement;
+                } else {
+                    // Attach source at the beginning of the list. 
+                    sharedQubitStatusArray[source.LastElement] = FirstElement;
+                }
                 FirstElement = source.FirstElement;
 
                 // Remove all elements from source.
@@ -338,6 +346,7 @@ namespace Microsoft.Quantum.Simulation.Common {
                 // TODO: Wording of the exception doesn't account for restricted reuse.
                 throw new NotEnoughQubits(1, this.FreeQubitsCount);
             }
+            SharedQubitStatusArray[newQubitId] = Allocated;
             AllocatedQubitsCount++;
             FreeQubitsCount--;
             return CreateQubitObject(newQubitId);
@@ -427,6 +436,7 @@ namespace Microsoft.Quantum.Simulation.Common {
                 throw new ApplicationException("Qubit is not valid.");
             }
             Release(qubit.Id);
+            // TODO: should we clean id of released qubit object?
         }
 
         /// <summary>
