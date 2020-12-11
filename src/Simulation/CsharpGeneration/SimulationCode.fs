@@ -37,8 +37,6 @@ module SimulationCode =
         member this.setCallable (op: QsCallable) = { this with current = (Some op.FullName); signature = (Some op.Signature) }
         member this.setUdt (udt: QsCustomType) = { this with current = (Some udt.FullName) }
 
-    let GENERATED_CONCRETE_INTRINSICS = false // ToDo: Make a Q# project property to decide this
-
     let autoNamespaces =
         [
             "System"
@@ -80,11 +78,20 @@ module SimulationCode =
     let prependNamespaceString (name : QsQualifiedName) =
         name.Namespace.Replace (".", "__") + "__" + name.Name
 
+    // ToDo: whether concrete intrinsics should be generated should be
+    // determined based on Q# project property instead of by hardcoded name
+    let isConcreteIntrinsic (context:CodegenContext) =
+        match context.AssemblyName with
+        | "Microsoft.Quantum.QSharp.Core"
+        | "Microsoft.Quantum.Type1.Core"
+        | "Microsoft.Quantum.Type2.Core" -> true
+        | _ -> false
+
     let needsFullPath context (op:QsQualifiedName) =
         let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
         let sameNamespace = match context.current with | None -> false | Some n -> n.Namespace = op.Namespace
 
-        let namespaces = if context.AssemblyName = "Microsoft.Quantum.QSharp.Core" then autoNamespacesWithInterfaces else autoNamespaces
+        let namespaces = if isConcreteIntrinsic context then autoNamespacesWithInterfaces else autoNamespaces
 
         if sameNamespace then
             false
@@ -928,10 +935,14 @@ module SimulationCode =
 
     /// Returns the constructor for the given intrinsic operation.
     let buildIntrinsicConstructor context name : MemberDeclarationSyntax =
-        ``constructor`` name ``(`` [ ("m", ``type`` ("IGate_" + name)) ] ``)``
+        ``constructor`` name ``(`` [ ("m", ``type`` "IOperationFactory") ] ``)``
             ``:`` [ "m" ]
             [ ``public`` ]
-            ``{`` [] ``}``
+            ``{``
+                [
+                    (``ident`` "this") <|.|> (``ident`` "Gate") <-- (``ident`` "m") |~> ("IGate_" + name) |> statement
+                ]
+            ``}``
         :> MemberDeclarationSyntax
 
     /// For each Operation used in the given OperationDeclartion, returns
@@ -979,7 +990,7 @@ module SimulationCode =
         :> MemberDeclarationSyntax
 
     let buildSpecializationBody (context:CodegenContext) (op:QsCallable) (sp:QsSpecialization) =
-        let generateConcreteIntrinsics = context.AssemblyName = "Microsoft.Quantum.QSharp.Core" // ToDo: Make a Q# project property to decide this
+        let generateConcreteIntrinsics = isConcreteIntrinsic context
         let getInputVarWithInit args =
             let inData = ``ident`` "__in__"
             let name = function | ValidName n -> n | InvalidName -> ""
@@ -1015,7 +1026,7 @@ module SimulationCode =
 //TODO: diagnostics.
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
-        | Intrinsic when generateConcreteIntrinsics = true ->
+        | Intrinsic when generateConcreteIntrinsics ->
             // Add in the control qubits parameter when dealing with a controlled spec
             let args =
                 match sp.Kind with
@@ -1444,7 +1455,7 @@ module SimulationCode =
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
         let opIsIntrinsic = isIntrinsic op
-        let generateConcreteIntrinsics = context.AssemblyName = "Microsoft.Quantum.QSharp.Core" // ToDo: Make a Q# project property to decide this
+        let generateConcreteIntrinsics = isConcreteIntrinsic context
         let isConcreteIntrinsic = generateConcreteIntrinsics && opIsIntrinsic
 
         let constructors = [ ((if isConcreteIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
@@ -1688,7 +1699,7 @@ module SimulationCode =
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
     let buildSyntaxTree localElements (context : CodegenContext) =
-        let namespaces = if context.AssemblyName = "Microsoft.Quantum.QSharp.Core" then autoNamespacesWithInterfaces else autoNamespaces
+        let namespaces = if isConcreteIntrinsic context then autoNamespacesWithInterfaces else autoNamespaces
         let usings = namespaces |> List.map (fun ns -> ``using`` ns)
         let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
