@@ -41,11 +41,19 @@ module SimulationCode =
 
     let autoNamespaces =
         [
-            yield "System"
-            yield "Microsoft.Quantum.Core"
-            yield "Microsoft.Quantum.Intrinsic"
-            if GENERATED_CONCRETE_INTRINSICS then yield "Microsoft.Quantum.Intrinsic.Interfaces"
-            yield "Microsoft.Quantum.Simulation.Core"
+            "System"
+            "Microsoft.Quantum.Core"
+            "Microsoft.Quantum.Intrinsic"
+            "Microsoft.Quantum.Simulation.Core"
+        ]
+
+    let autoNamespacesWithInterfaces =
+        [
+            "System"
+            "Microsoft.Quantum.Core"
+            "Microsoft.Quantum.Intrinsic"
+            "Microsoft.Quantum.Intrinsic.Interfaces"
+            "Microsoft.Quantum.Simulation.Core"
         ]
 
     let funcsAsProps = [
@@ -76,12 +84,14 @@ module SimulationCode =
         let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
         let sameNamespace = match context.current with | None -> false | Some n -> n.Namespace = op.Namespace
 
+        let namespaces = if context.AssemblyName = "Microsoft.Quantum.QSharp.Core" then autoNamespacesWithInterfaces else autoNamespaces
+
         if sameNamespace then
             false
         elif hasMultipleDefinitions() then
             true
         else
-            not (autoNamespaces |> List.contains op.Namespace)
+            not (namespaces |> List.contains op.Namespace)
 
     let getOpName context n =
         if isCurrentOp context n then Directives.Self
@@ -968,8 +978,8 @@ module SimulationCode =
             (``=>`` newInstance)
         :> MemberDeclarationSyntax
 
-    let buildSpecializationBody context (op:QsCallable) (sp:QsSpecialization) =
-        let generateConcreteIntrinsics = GENERATED_CONCRETE_INTRINSICS // ToDo: Make a Q# project property to decide this
+    let buildSpecializationBody (context:CodegenContext) (op:QsCallable) (sp:QsSpecialization) =
+        let generateConcreteIntrinsics = context.AssemblyName = "Microsoft.Quantum.QSharp.Core" // ToDo: Make a Q# project property to decide this
         let getInputVarWithInit args =
             let inData = ``ident`` "__in__"
             let name = function | ValidName n -> n | InvalidName -> ""
@@ -1434,7 +1444,7 @@ module SimulationCode =
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
         let opIsIntrinsic = isIntrinsic op
-        let generateConcreteIntrinsics = GENERATED_CONCRETE_INTRINSICS // ToDo: Make a Q# project property to decide this
+        let generateConcreteIntrinsics = context.AssemblyName = "Microsoft.Quantum.QSharp.Core" // ToDo: Make a Q# project property to decide this
         let isConcreteIntrinsic = generateConcreteIntrinsics && opIsIntrinsic
 
         let constructors = [ ((if isConcreteIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
@@ -1678,7 +1688,8 @@ module SimulationCode =
 
     // Builds the C# syntaxTree for the Q# elements defined in the given file.
     let buildSyntaxTree localElements (context : CodegenContext) =
-        let usings = autoNamespaces |> List.map (fun ns -> ``using`` ns)
+        let namespaces = if context.AssemblyName = "Microsoft.Quantum.QSharp.Core" then autoNamespacesWithInterfaces else autoNamespaces
+        let usings = namespaces |> List.map (fun ns -> ``using`` ns)
         let attributes = localElements |> List.map (snd >> buildDeclarationAttributes) |> List.concat
         let namespaces = localElements |> List.map (buildNamespace context)
 
