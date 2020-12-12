@@ -10,11 +10,10 @@ endif()
 
 set(TEST_FILES
   qir-test-arrays
-  qir-test-controlls
+  qir-test-functors
+  qir-test-noqsharp
   qir-test-partials
-  qir-test-range
-  qir-test-vqe
-  qir-test-shared-intrinsics
+  qir-test-qubits-results
 )
 
 foreach(file ${TEST_FILES})

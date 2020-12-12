@@ -5,25 +5,15 @@ namespace Microsoft.Quantum.Testing.QIR
 {
     open Microsoft.Quantum.Intrinsic;
 
-    @EntryPoint()
-    operation TestPartials () : Bool
+    function Subtract(from : Int, what : Int) : Int
     {
-        let rotate = Rz(0.25, _);
-        let unrotate = Adjoint rotate;
+        return from - what;
+    }
 
-        for (i in 0..100)
-        {
-            using (qb = Qubit())
-            {
-                rotate(qb);
-                unrotate(qb);
-                if (M(qb) != Zero)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+    @EntryPoint()
+    function TestPartials(x : Int, y : Int) : Int
+    {
+        let subtractor = Subtract(x, _);
+        return subtractor(y);
     }
 }

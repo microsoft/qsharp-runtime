@@ -9,8 +9,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
+#include "quantum__rt.hpp"
 
 #include "BitStates.hpp"
 #include "SimulatorStub.hpp"
@@ -710,4 +710,104 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     quantum__rt__array_unreference(copy);
 
     SetSimulatorForQIR(nullptr);
+}
+
+// `src` tuple header must point to a tuple with the following structure (example for depth = 2):
+// case1: { %TupleHeader, %Array*, { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }* }
+// case2: { %TupleHeader, %Array*, { %TupleHeader, %Array*, %Qubit* }* }
+// The function will create a new tuple, where the array contains elements of all nested arrays, respectively:
+// case1: { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }
+// case2: { %TupleHeader, %Array*, %Qubit* }
+QirTupleHeader* UnpackTupleWithNestedArrays(QirTupleHeader* nestedTuple, int depth);
+struct ControlledCallablesTestSimulator : public SimulatorStub
+{
+    int lastId = -1;
+    Qubit AllocateQubit() override
+    {
+        return reinterpret_cast<Qubit>(++this->lastId);
+    }
+    void ReleaseQubit(Qubit qubit) override {}
+    Result UseZero() override
+    {
+        return reinterpret_cast<Result>(0);
+    }
+    Result UseOne() override
+    {
+        return reinterpret_cast<Result>(1);
+    }
+};
+TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
+{
+    std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
+    SetSimulatorForQIR(qapi.get());
+
+    Qubit target = quantum__rt__qubit_allocate();
+    QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
+    QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
+
+    QirTupleHeader* inner =
+        quantum__rt__tuple_create(sizeof(QirTupleHeader) + sizeof(/*QirArrray*/ void*) + sizeof(/*Qubit*/ void*));
+    *reinterpret_cast<QirArray**>(inner->Data()) = controlsInner;
+    *reinterpret_cast<Qubit*>(inner->Data() + sizeof(/*QirArrray*/ void*)) = target;
+    QirTupleHeader* outer = quantum__rt__tuple_create(
+        sizeof(QirTupleHeader) + sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    *reinterpret_cast<QirArray**>(outer->Data()) = controlsOuter;
+    *reinterpret_cast<QirTupleHeader**>(outer->Data() + sizeof(/*QirArrray*/ void*)) = inner;
+
+    QirTupleHeader* unpacked = UnpackTupleWithNestedArrays(outer, 2 /*depth*/);
+    QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->Data()));
+    REQUIRE(5 == combined->count);
+    REQUIRE(!combined->ownsQubits);
+    REQUIRE(target == *reinterpret_cast<Qubit*>(unpacked->Data() + sizeof(/*QirArrray*/ void*)));
+
+    quantum__rt__tuple_unreference(unpacked);
+    quantum__rt__array_unreference(combined);
+    quantum__rt__tuple_unreference(outer);
+    quantum__rt__tuple_unreference(inner);
+
+    // release the original resources
+    quantum__rt__qubit_release_array(controlsOuter);
+    quantum__rt__qubit_release_array(controlsInner);
+    quantum__rt__qubit_release(target);
+}
+
+TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
+{
+    std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
+    SetSimulatorForQIR(qapi.get());
+
+    Qubit target = quantum__rt__qubit_allocate();
+    QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
+    QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
+
+    QirTupleHeader* args = quantum__rt__tuple_create(sizeof(QirTupleHeader) + sizeof(/*Qubit*/ void*) + sizeof(int));
+    *reinterpret_cast<Qubit*>(args->Data()) = target;
+    *reinterpret_cast<int*>(args->Data() + sizeof(/*Qubit*/ void*)) = 42;
+    QirTupleHeader* inner = quantum__rt__tuple_create(
+        sizeof(QirTupleHeader) + sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    *reinterpret_cast<QirArray**>(inner->Data()) = controlsInner;
+    *reinterpret_cast<QirTupleHeader**>(inner->Data() + sizeof(/*QirArrray*/ void*)) = args;
+    QirTupleHeader* outer = quantum__rt__tuple_create(
+        sizeof(QirTupleHeader) + sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    *reinterpret_cast<QirArray**>(outer->Data()) = controlsOuter;
+    *reinterpret_cast<QirTupleHeader**>(outer->Data() + sizeof(/*QirArrray*/ void*)) = inner;
+
+    QirTupleHeader* unpacked = UnpackTupleWithNestedArrays(outer, 2 /*depth*/);
+    QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->Data()));
+    REQUIRE(5 == combined->count);
+    REQUIRE(!combined->ownsQubits);
+    QirTupleHeader* unpackedArgs = *reinterpret_cast<QirTupleHeader**>(unpacked->Data() + sizeof(/*QirArrray*/ void*));
+    REQUIRE(target == *reinterpret_cast<Qubit*>(unpackedArgs->Data()));
+    REQUIRE(42 == *reinterpret_cast<int*>(unpackedArgs->Data() + sizeof(/*Qubit*/ void*)));
+
+    quantum__rt__tuple_unreference(unpacked);
+    quantum__rt__array_unreference(combined);
+    quantum__rt__tuple_unreference(outer);
+    quantum__rt__tuple_unreference(inner);
+    quantum__rt__tuple_unreference(args);
+
+    // release the original resources
+    quantum__rt__qubit_release_array(controlsOuter);
+    quantum__rt__qubit_release_array(controlsInner);
+    quantum__rt__qubit_release(target);
 }

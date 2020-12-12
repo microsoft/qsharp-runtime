@@ -61,14 +61,14 @@ define double @__quantum__qis__intAsDouble(i64 %i)
   ret double %d
 }
 
-define void @__quantum__qis__cnot(%Qubit* %.qc, %Qubit* %.qt) {
+define void @__quantum__qis__cnot__(%Qubit* %.qc, %Qubit* %.qt) {
   %qc = bitcast %Qubit* %.qc to %class.QUBIT*
   %qt = bitcast %Qubit* %.qt to %class.QUBIT*
   call void @quantum__qis__cnot(%class.QUBIT* %qc, %class.QUBIT* %qt)
   ret void
 }
 
-define void @__quantum__qis__h(%Qubit* %.q) {
+define void @__quantum__qis__h__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__h(%class.QUBIT* %q)
   ret void
@@ -89,63 +89,63 @@ define %Result* @__quantum__qis__mz(%Qubit* %.q) {
   ret %Result* %.r
 }
 
-define void @__quantum__qis__s(%Qubit* %.q) {
+define void @__quantum__qis__s__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__s(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__t(%Qubit* %.q) {
+define void @__quantum__qis__t__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__t(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__rx(double %.theta, %Qubit* %.q) {
+define void @__quantum__qis__rx__(double %.theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__rx(double %.theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__ry(double %.theta, %Qubit* %.q) {
+define void @__quantum__qis__ry__(double %.theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__ry(double %.theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__rz(double %.theta, %Qubit* %.q) {
+define void @__quantum__qis__rz__(double %.theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__rz(double %.theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__x(%Qubit* %.q) {
+define void @__quantum__qis__x__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__x(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__y(%Qubit* %.q) {
+define void @__quantum__qis__y__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__y(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__z(%Qubit* %.q) {
+define void @__quantum__qis__z__(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__z(%class.QUBIT* %q)
   ret void
 }
 
 
-define void @__quantum__qis__crx(%Array* %.ctls, double %.theta, %Qubit* %.q) {
+define void @__quantum__qis__crx__(%Array* %.ctls, double %.theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__crx(%struct.QirArray* %ctls, double %.theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__crz(%Array* %.ctls, double %.theta, %Qubit* %.q) {
+define void @__quantum__qis__crz__(%Array* %.ctls, double %.theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__crz(%struct.QirArray* %ctls, double %.theta, %class.QUBIT* %q)

@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-class QUBIT;
-
 /*======================================================================================================================
 QIR deploys the same %Array type for arrays that own qubits and those that contain qubits but don't own them or
 contain values of other types.
@@ -75,4 +73,97 @@ struct QirString
     std::string str;
 
     QirString(std::string&& str);
+};
+
+/*==============================================================================
+    The types and methods, expected by QIR for tuples:
+    %TupleHeader = type { i32, i32 }
+    declare %TupleHeader* @__quantum__rt__tuple_create(i64)
+
+    Argument passed to __quantum__rt__tuple_create is the size (in bytes) of the tuple, including the header.
+    For example:
+    ; to calculate the size of a tuple pretend having an array of them and get
+    ; offset to the first element
+    %t1 = getelementptr { %TupleHeader, %Callable*, %Array* }, { %TupleHeader, %Callable*, %Array* }* null, i32 1
+    ; convert the offset to int and call __quantum__rt__tuple_create
+    %t2 = ptrtoint { %TupleHeader, %Callable*, %Array* }* %t1 to i64
+    %0 = call %TupleHeader* @__quantum__rt__tuple_create(i62 %t2)
+
+    Notice, that the TupleHeader is included into the Tuple's buffer.
+==============================================================================*/
+struct QirTupleHeader
+{
+    int refCount = 0;
+    int size = sizeof(QirTupleHeader);
+
+    char* Data()
+    {
+        return reinterpret_cast<char*>(this) + sizeof(QirTupleHeader);
+    }
+};
+
+/*==============================================================================
+    Example of creating a callable
+
+    ; Single entry of a callable
+    ; (a callable might provide entries for body, controlled, adjoint and controlled-adjoint)
+    define void @UpdateAnsatz-body(
+        %TupleHeader* %capture-tuple, %TupleHeader* %arg-tuple, %TupleHeader* %result-tuple) { ... }
+
+    ; Definition of the callable
+    @UpdateAnsatz =
+        constant [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]
+        [
+            void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* @UpdateAnsatz-body,
+            void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null,
+            void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null,
+            void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null
+        ]
+
+    %3 = call %Callable* @__quantum__rt__callable_create(
+        [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]* @UpdateAnsatz,
+        %TupleHeader* null)
+
+==============================================================================*/
+typedef void (*t_CallableEntry)(QirTupleHeader*, QirTupleHeader*, QirTupleHeader*);
+struct QirCallable
+{
+    static int constexpr Adjoint = 1;
+    static int constexpr Controlled = 1 << 1;
+
+  private:
+    static int constexpr TableSize = 4;
+    static_assert(
+        QirCallable::Adjoint + QirCallable::Controlled < QirCallable::TableSize,
+        L"functor kind is used as index into the functionTable");
+
+    int refCount;
+
+    // If the callable doesn't support Adjoint or Controlled functors, the corresponding entries in the table should be
+    // set to nullptr.
+    t_CallableEntry functionTable[QirCallable::TableSize] = {nullptr, nullptr, nullptr, nullptr};
+
+    // The callable stores the capture, it's given at creation, and passes it to the functions from the function table,
+    // but the runtime doesn't have any knowledge about what the tuple actually is.
+    QirTupleHeader* const capture = nullptr;
+
+    // By default the callable is neither adjoint nor controlled.
+    int appliedFunctor = 0;
+    
+    // Per https://github.com/microsoft/qsharp-language/blob/main/Specifications/QIR/Callables.md, the callable must
+    // unpack the nested controls from the input tuples. Because the tuples aren't typed, the callable will assume
+    // that its input tuples are formed in a particular way and will extract the controls to match its tracked depth.
+    int controlledDepth = 0;
+
+    // Prevent stack allocations.
+    ~QirCallable();
+
+  public:
+    QirCallable(const t_CallableEntry* ftEntries, QirTupleHeader* capture);
+    QirCallable(const QirCallable& other);
+
+    long AddRef();
+    long Release();
+    void Invoke(QirTupleHeader* args, QirTupleHeader* result);
+    void ApplyFunctor(int functor);
 };
