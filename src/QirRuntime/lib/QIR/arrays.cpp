@@ -16,7 +16,7 @@
 
 long QirArray::AddRef()
 {
-    int rc = ++this->refCount;
+    long rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
 }

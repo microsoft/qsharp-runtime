@@ -18,6 +18,10 @@
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
+// Used by a couple test simulators. Catch's REQUIRE macro doesn't deal well with static class members so making it
+// into a global constant.
+constexpr int RELEASED = -1;
+
 using namespace Microsoft::Quantum;
 using namespace std;
 
@@ -64,10 +68,9 @@ TEST_CASE("QIR: Using 1D arrays", "[qir]")
 extern "C" bool Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body(); // NOLINT
 struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
-    static constexpr int RELEASED = -1;
     // no intelligent reuse, we just want to check that QIR releases all qubits
-    vector<int> qubits;           // -1 - released, otherwise |0> or |1> states (no entanglement allowed)
-    vector<int> results = {0, 1}; // -1 - released, otherwise either Zero(0) or One(1)
+    vector<int> qubits;           // released, or |0>, or |1> states (no entanglement allowed)
+    vector<int> results = {0, 1}; // released, or Zero(0) or One(1)
 
     int GetQubitId(Qubit qubit) const
     {
@@ -154,7 +157,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
     for (size_t id = 0; id < sim->qubits.size(); id++)
     {
         INFO(std::string("unreleased qubit: ") + std::to_string(id));
-        CHECK(sim->qubits[id] == QubitsResultsTestSimulator::RELEASED);
+        CHECK(sim->qubits[id] == RELEASED);
     }
 
     // check that all results, allocated by measurements have been released
@@ -162,7 +165,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
     // for (size_t id = 2; id < sim->results.size(); id++)
     // {
     //     INFO(std::string("unreleased results: ") + std::to_string(id));
-    //     CHECK(sim->results[id] == QubitsResultsTestSimulator::RELEASED);
+    //     CHECK(sim->results[id] == RELEASED);
     // }
 
     SetSimulatorForQIR(nullptr);
@@ -212,7 +215,6 @@ TEST_CASE("QIR: Partial application of a callable", "[qir]")
 // The validation is done inside the test and it would return an error code in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
-    static constexpr int RELEASED = -1;
     std::vector<int> qubits;
 
     int GetQubitId(Qubit qubit) const
@@ -284,7 +286,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__(Qubit q) // NOLINT
+extern "C" void __quantum__qis__k__(Qubit q)                                 // NOLINT
 {
     g_ctrqapi->X(q);
 }

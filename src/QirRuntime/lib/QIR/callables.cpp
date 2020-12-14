@@ -43,7 +43,7 @@ extern "C"
             return;
         }
 
-        const int ref = --th->refCount;
+        const long ref = --th->refCount;
         assert(ref >= 0);
 
         if (ref == 0)
@@ -69,7 +69,7 @@ extern "C"
         {
             return;
         }
-        const int ref = callable->Release();
+        const long ref = callable->Release();
         assert(ref >= 0);
     }
 
@@ -136,7 +136,7 @@ QirCallable::QirCallable(const QirCallable& other)
 
 long QirCallable::AddRef()
 {
-    int rc = ++this->refCount;
+    long rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
 }

@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <string>
 #include <vector>
 
@@ -46,7 +45,7 @@ struct QirArray
     char* buffer = nullptr;
 
     const bool ownsQubits = false;
-    std::atomic<long> refCount;
+    long refCount = 1;
 
     // NB: Release doesn't trigger destruction of the Array itself to allow for it
     // being used both on the stack and on the heap. The creator of the array
@@ -69,7 +68,7 @@ struct QirArray
 ==============================================================================*/
 struct QirString
 {
-    std::atomic<long> refCount;
+    long refCount = 1;
     std::string str;
 
     QirString(std::string&& str);
@@ -137,7 +136,7 @@ struct QirCallable
         QirCallable::Adjoint + QirCallable::Controlled < QirCallable::TableSize,
         L"functor kind is used as index into the functionTable");
 
-    int refCount;
+    long refCount = 1;
 
     // If the callable doesn't support Adjoint or Controlled functors, the corresponding entries in the table should be
     // set to nullptr.

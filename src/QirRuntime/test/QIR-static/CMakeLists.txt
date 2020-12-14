@@ -53,13 +53,22 @@ add_custom_target(qir_static_test_lib DEPENDS ${QIR_TESTS_LIBS})
 # The executable target for QIR tests triggers the custom actions to compile ll files
 #
 add_executable(qir-static-tests
-  qir-driver.cpp
-  qir-test-vqe.cpp)
+  qir-driver.cpp)
+
+if (WIN32)
+  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/qir-bridge-u.lib")
+  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/qir-bridge-qis-u.lib")
+else()
+  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libqir-bridge-u.a")
+  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libqir-bridge-qis-u.a")
+endif()
 
 target_link_libraries(qir-static-tests PUBLIC
   ${QIR_TESTS_LIBS}
-  qir-rt
-  qir-qis
+  ${QIR_BRIDGE_UTILITY_LIB}
+  ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  qir-rt-support
+  qir-qis-support
   simulators
 )
 
