@@ -1,6 +1,6 @@
 add_subdirectory(QIR)
 add_subdirectory(Simulators)
-
+add_subdirectory(Tracer)
 
 #===============================================================================
 # Produce the qdk dynamic library
