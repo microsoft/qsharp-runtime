@@ -5,6 +5,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     Write-Host "##[info]Build QIR Runtime"
     $oldCC = $env:CC
     $oldCXX = $env:CXX
+    $oldRC = $env:RC
 
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
@@ -15,12 +16,14 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
         Write-Host "On Linux build QIR Runtime using Clang"
         $env:CC = "/usr/bin/clang"
         $env:CXX = "/usr/bin/clang++"
+        $env:RC = "/usr/bin/clang++"
     }
     elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
     {
         Write-Host "On Windows build QIR Runtime using Clang"
         $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
         $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
+        $env:RC = "C:\Program Files\LLVM\bin\clang++.exe"
         $llvmExtras = (Join-Path $PSScriptRoot "externals/LLVM")
         $env:PATH += ";$llvmExtras"
     } else {
@@ -41,6 +44,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX
+    $env:RC = $oldRC
 
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
