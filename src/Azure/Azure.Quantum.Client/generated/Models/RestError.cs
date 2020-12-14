@@ -52,14 +52,14 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// Gets or sets an identifier for the error. Codes are invariant and
         /// are intended to be consumed programmatically.
         /// </summary>
-        [JsonProperty(PropertyName = "error.code")]
+        [JsonProperty(PropertyName = "code")]
         public string Code { get; set; }
 
         /// <summary>
         /// Gets or sets a message describing the error, intended to be
         /// suitable for displaying in a user interface.
         /// </summary>
-        [JsonProperty(PropertyName = "error.message")]
+        [JsonProperty(PropertyName = "message")]
         public string Message { get; set; }
 
     }
