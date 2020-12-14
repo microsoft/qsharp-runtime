@@ -78,14 +78,12 @@ module SimulationCode =
     let prependNamespaceString (name : QsQualifiedName) =
         name.Namespace.Replace (".", "__") + "__" + name.Name
 
-    // ToDo: whether concrete intrinsics should be generated should be
-    // determined based on Q# project property instead of by hardcoded name
+    // ToDo: change this to use AssemblyConstants.ConcreteIntrinsicGen once that is available from the compiler repo
     let isConcreteIntrinsic (context:CodegenContext) =
-        match context.AssemblyName with
-        | "Microsoft.Quantum.QSharp.Core"
-        | "Microsoft.Quantum.Type1.Core"
-        | "Microsoft.Quantum.Type2.Core" -> true
-        | _ -> false
+        match context.assemblyConstants.TryGetValue "ConcreteIntrinsicGen" with
+        | true, "false" -> false
+        | true, _ -> true
+        | false, _ -> false
 
     let needsFullPath context (op:QsQualifiedName) =
         let hasMultipleDefinitions() = if context.byName.ContainsKey op.Name then context.byName.[op.Name].Length > 1 else false
@@ -990,7 +988,6 @@ module SimulationCode =
         :> MemberDeclarationSyntax
 
     let buildSpecializationBody (context:CodegenContext) (op:QsCallable) (sp:QsSpecialization) =
-        let generateConcreteIntrinsics = isConcreteIntrinsic context
         let getInputVarWithInit args =
             let inData = ``ident`` "__in__"
             let name = function | ValidName n -> n | InvalidName -> ""
@@ -1026,7 +1023,7 @@ module SimulationCode =
 //TODO: diagnostics.
                 | _ -> "__Body__"
             Some (``ident`` adjointedBodyName :> ExpressionSyntax)
-        | Intrinsic when generateConcreteIntrinsics ->
+        | Intrinsic when isConcreteIntrinsic context ->
             // Add in the control qubits parameter when dealing with a controlled spec
             let args =
                 match sp.Kind with
@@ -1455,8 +1452,7 @@ module SimulationCode =
         let inType   = op.Signature.ArgumentType |> roslynTypeName context
         let outType  = op.Signature.ReturnType   |> roslynTypeName context
         let opIsIntrinsic = isIntrinsic op
-        let generateConcreteIntrinsics = isConcreteIntrinsic context
-        let isConcreteIntrinsic = generateConcreteIntrinsics && opIsIntrinsic
+        let isConcreteIntrinsic = opIsIntrinsic && isConcreteIntrinsic context
 
         let constructors = [ ((if isConcreteIntrinsic then buildIntrinsicConstructor else buildConstructor) context name) ]
         let properties =
