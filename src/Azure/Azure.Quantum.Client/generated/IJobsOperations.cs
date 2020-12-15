@@ -71,6 +71,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// Id of the job.
         /// </param>
         /// <param name='jobDefinition'>
+        /// The complete metadata of the job to submit.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -89,7 +90,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// </exception>
         Task<AzureOperationResponse<JobDetails>> PutWithHttpMessagesAsync(string jobId, JobDetails jobDefinition, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
-        /// Delete a job.
+        /// Cancel a job.
         /// </summary>
         /// <param name='jobId'>
         /// Id of the job.

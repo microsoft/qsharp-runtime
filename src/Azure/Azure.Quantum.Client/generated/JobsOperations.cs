@@ -421,6 +421,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// Id of the job.
         /// </param>
         /// <param name='jobDefinition'>
+        /// The complete metadata of the job to submit.
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -634,7 +635,7 @@ namespace Microsoft.Azure.Quantum.Client
         }
 
         /// <summary>
-        /// Delete a job.
+        /// Cancel a job.
         /// </summary>
         /// <param name='jobId'>
         /// Id of the job.

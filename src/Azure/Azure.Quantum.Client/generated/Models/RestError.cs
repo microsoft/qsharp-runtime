@@ -10,15 +10,12 @@
 
 namespace Microsoft.Azure.Quantum.Client.Models
 {
-    using Microsoft.Rest;
-    using Microsoft.Rest.Serialization;
     using Newtonsoft.Json;
     using System.Linq;
 
     /// <summary>
-    /// An Error response.
+    /// An error response from Azure.
     /// </summary>
-    [Rest.Serialization.JsonTransformation]
     public partial class RestError
     {
         /// <summary>

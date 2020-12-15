@@ -93,6 +93,7 @@ namespace Microsoft.Azure.Quantum.Client
             /// Id of the job.
             /// </param>
             /// <param name='jobDefinition'>
+            /// The complete metadata of the job to submit.
             /// </param>
             public static JobDetails Put(this IJobsOperations operations, string jobId, JobDetails jobDefinition)
             {
@@ -109,6 +110,7 @@ namespace Microsoft.Azure.Quantum.Client
             /// Id of the job.
             /// </param>
             /// <param name='jobDefinition'>
+            /// The complete metadata of the job to submit.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -122,7 +124,7 @@ namespace Microsoft.Azure.Quantum.Client
             }
 
             /// <summary>
-            /// Delete a job.
+            /// Cancel a job.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -136,7 +138,7 @@ namespace Microsoft.Azure.Quantum.Client
             }
 
             /// <summary>
-            /// Delete a job.
+            /// Cancel a job.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
