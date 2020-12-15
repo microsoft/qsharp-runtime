@@ -93,7 +93,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                         SomeOp(register[idx]);
                     }
                 }
-                ClearRegister(register);
+                ResetAll(register);
             }
         }
     }

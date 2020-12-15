@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 // Single qubit gate always advances end time by operation duration
                 // in case qubit is fixed or not fixed in time.
                 ((QubitTimeMetrics)qubitsTraceData[0]).EndTime =
-                    ((QubitTimeMetrics)qubitsTraceData[0]).EndTime.Advance(primitiveOperationDuration);
+                    ((QubitTimeMetrics)qubitsTraceData[0]).EndTime.AdvanceBy(primitiveOperationDuration);
             } else {
                 // Multi-qubit gate fixes all qubits in time and advances end time
                 // First, figure out what time it is. It's max over fixed and not fixed times.
@@ -171,16 +171,16 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 // And adjust end time for all qubits involved.
                 foreach (QubitTimeMetrics q in qubitsMetrics) {
                     if (ComplexTime.Compare(q.StartTime, ComplexTime.MinValue) == 0) {
-                        q.StartTime = maxEndTime.Retreat(q.EndTime);
+                        q.StartTime = maxEndTime.Subtract(q.EndTime);
                     }
-                    q.EndTime = maxEndTime.Advance(primitiveOperationDuration);
+                    q.EndTime = maxEndTime.AdvanceBy(primitiveOperationDuration);
                 }
             }
 
         }
 
-        QubitPool qubitStartTimes = new QubitPool();
-        QubitPool qubitEndTimes = new QubitPool();
+        SortedQubitPool qubitStartTimes = new SortedQubitPool();
+        SortedQubitPool qubitEndTimes = new SortedQubitPool();
         long WidthWithReuse = 0;
 
         public void OnRelease(object[] qubitsTraceData)
@@ -206,7 +206,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 bool reuseExistingAfterNew = qubitStartTimes.FindBound(q.EndTime, getLowerBound: false, out ComplexTime existingStart);
                 bool reuseNewAfterExising = qubitEndTimes.FindBound(q.StartTime, getLowerBound: true, out ComplexTime existingEnd);
                 if (reuseNewAfterExising && reuseExistingAfterNew) {
-                    if (ComplexTime.Compare(q.StartTime.Retreat(existingEnd), existingStart.Retreat(q.EndTime)) > 0) {
+                    if (ComplexTime.Compare(q.StartTime.Subtract(existingEnd), existingStart.Subtract(q.EndTime)) > 0) {
                         reuseNewAfterExising = false;
                     } else {
                         reuseExistingAfterNew = false;
