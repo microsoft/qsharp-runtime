@@ -78,9 +78,9 @@ module SimulationCode =
     let prependNamespaceString (name : QsQualifiedName) =
         name.Namespace.Replace (".", "__") + "__" + name.Name
 
-    // ToDo: change this to use AssemblyConstants.ConcreteIntrinsicGen once that is available from the compiler repo
+    // ToDo: change this to use AssemblyConstants.GenerateConcreteIntrinsic once that is available from the compiler repo
     let isConcreteIntrinsic (context:CodegenContext) =
-        match context.assemblyConstants.TryGetValue "ConcreteIntrinsicGen" with
+        match context.assemblyConstants.TryGetValue "GenerateConcreteIntrinsic" with
         | true, "false" -> false
         | true, _ -> true
         | false, _ -> false
