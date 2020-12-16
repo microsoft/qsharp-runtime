@@ -351,7 +351,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         /// <summary>
-        /// This class is not abstract, but depends on X, which is.
+        /// This class is not abstract, but depends on AssertMeasurement, which is.
         /// </summary>
         public class DependsOnAssertMeasurement : Operation<QVoid, QVoid>, ICallable
         {
