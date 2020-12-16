@@ -2,3 +2,6 @@
 // Licensed under the MIT License.
 
 #include <assert.h>
+
+#include "tracer.hpp"
+

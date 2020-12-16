@@ -7,11 +7,13 @@ set(source_files
   "../QIR/callables.cpp"
   "../QIR/strings.cpp"
   "../QIR/utils.cpp"
+  "tracer-qir.cpp"
   "tracer.cpp"
 )
 
 set(includes
   "${public_includes}"
+  "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
 
 
