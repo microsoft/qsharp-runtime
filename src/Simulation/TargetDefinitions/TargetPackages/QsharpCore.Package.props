@@ -5,23 +5,14 @@
 
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Exp.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Exp.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\H.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Measure.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Measure.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\R.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\R.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\S.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\S.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\T.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\T.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\X.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Y.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Z.cs" />
   </ItemGroup>
 
   <ItemGroup>

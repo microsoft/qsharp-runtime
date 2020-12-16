@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void DistinctQubitsTests()
         {
-            QCTraceSimulator sim = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), new QCTraceSimulatorConfiguration() { UseDistinctInputsChecker = true } );
+            QCTraceSimulator sim = new QCTraceSimulator(new QCTraceSimulatorConfiguration() { UseDistinctInputsChecker = true } );
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCapturedTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCaptured2Test>(sim));
@@ -39,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void UseReleasedQubitsTests()
         {
-            QCTraceSimulator sim = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), new QCTraceSimulatorConfiguration() { UseInvalidatedQubitsUseChecker = true });
+            QCTraceSimulator sim = new QCTraceSimulator(new QCTraceSimulatorConfiguration() { UseInvalidatedQubitsUseChecker = true });
             Assert.Throws<InvalidatedQubitsUseCheckerException>(GetTest<UseReleasedQubitTest>(sim));
         }
 
@@ -120,7 +120,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             traceSimCfg.TraceGateTimes[PrimitiveOperationsGroups.CNOT] = CXTime;
             traceSimCfg.TraceGateTimes[PrimitiveOperationsGroups.QubitClifford] = HTime;
 
-            QCTraceSimulator traceSim = new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), traceSimCfg);
+            QCTraceSimulator traceSim = new QCTraceSimulator(traceSimCfg);
 
             output.WriteLine(string.Empty);
             output.WriteLine($"Starting cat state preparation on {1u << powerOfTwo} qubits");
@@ -157,7 +157,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             traceSimCfg.UseDepthCounter = true;
             traceSimCfg.UseWidthCounter = true;
             traceSimCfg.TraceGateTimes[PrimitiveOperationsGroups.CNOT] = 1;
-            return new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics), traceSimCfg);
+            return new QCTraceSimulator(traceSimCfg);
         }
 
         [Fact]

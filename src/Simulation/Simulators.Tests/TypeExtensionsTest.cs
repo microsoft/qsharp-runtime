@@ -36,10 +36,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void OperationTypes()
         {
-            var op = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.H>();
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
             Assert.Equal("H", op.GetNonQubitArgumentsAsString());
 
-            var op2 = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.CNOT>();
+            var op2 = new QuantumSimulator().Get<Intrinsic.CNOT>();
             Assert.Equal("CNOT", op2.GetNonQubitArgumentsAsString());
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal("(\"foo\", (\"bar\", \"car\"))", ("foo", ("bar", "car")).GetNonQubitArgumentsAsString());
             Assert.Equal("((\"foo\"), (\"bar\", \"car\"))", (("foo", new FreeQubit(0)), ("bar", "car")).GetNonQubitArgumentsAsString());
 
-            var op = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.H>();
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
             var opTuple = new QTuple<(ICallable, string)>((op, "foo"));
             Assert.Equal("(H, \"foo\")", opTuple.GetNonQubitArgumentsAsString());
 
@@ -83,9 +83,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal("[\"foo\", \"bar\"]", new[] { "foo", "bar" }.GetNonQubitArgumentsAsString());
 
             var opArr = new ICallable[] {
-                new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.H>(),
-                new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.CNOT>(),
-                new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.Ry>(),
+                new QuantumSimulator().Get<Intrinsic.H>(),
+                new QuantumSimulator().Get<Intrinsic.CNOT>(),
+                new QuantumSimulator().Get<Intrinsic.Ry>(),
             };
             Assert.Equal("[H, CNOT, Ry]", opArr.GetNonQubitArgumentsAsString());
 
@@ -112,7 +112,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             data = new ApplyData<string>("Foo");
             Assert.Equal("\"Foo\"", data.GetNonQubitArgumentsAsString());
 
-            var op = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)).Get<Intrinsic.H>();
+            var op = new QuantumSimulator().Get<Intrinsic.H>();
             data = new ApplyData<ICallable>(op);
             Assert.Equal("H", data.GetNonQubitArgumentsAsString());
 

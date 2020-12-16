@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
         [OperationDriver(TestCasePrefix = "QSim:Circuits:")]
         public void QSimTestTarget(TestOperation op)
         {
-            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
+            using (var sim = new QuantumSimulator())
             {
                 OverrideOperation<
                     ICallable<(Qubit, Qubit), QVoid>,

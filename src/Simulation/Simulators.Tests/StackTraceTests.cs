@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AllocateQubit2Test()
         {
-            using var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            using var sim = new QuantumSimulator();
             try
             {
                 IgnorableAssert.Disable();
@@ -64,7 +64,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AlwaysFail4Test()
         {
-            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)))
+            using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -125,7 +125,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void GenericFail1Test()
         {
-            ResourcesEstimator sim = new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ResourcesEstimator sim = new ResourcesEstimator();
 
             {
                 try
@@ -206,7 +206,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void PartialFail1Test()
         {
-            ToffoliSimulator sim = new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ToffoliSimulator sim = new ToffoliSimulator();
 
             {
                 try
@@ -290,7 +290,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void RecursionFail1Test()
         {
-            ToffoliSimulator sim = new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ToffoliSimulator sim = new ToffoliSimulator();
 
             {
                 StackTraceCollector sc = new StackTraceCollector(sim);
@@ -326,7 +326,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void DivideByZeroTest()
         {
-            ToffoliSimulator sim = new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ToffoliSimulator sim = new ToffoliSimulator();
 
             try
             {
@@ -344,7 +344,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AllGoodTest()
         {
-            ToffoliSimulator sim = new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ToffoliSimulator sim = new ToffoliSimulator();
 
             QVoid res = sim.Execute<AllGood1, QVoid, QVoid>(QVoid.Instance);
             StackFrame[] stackFrames = sim.CallStack;
@@ -362,7 +362,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ErrorLogTest()
         {
-            ToffoliSimulator sim = new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics));
+            ToffoliSimulator sim = new ToffoliSimulator();
 
             var logs = new List<string>();
             sim.OnLog += (msg) => logs.Add(msg);

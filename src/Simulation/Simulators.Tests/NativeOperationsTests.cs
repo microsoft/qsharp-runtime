@@ -34,9 +34,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 if (sim is IDisposable dis) dis.Dispose();
             }
 
-            TestOne(new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)), "Simulator");
-            TestOne(new ToffoliSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)), "Toffoli");
-            TestOne(new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)), "hello");
+            TestOne(new QuantumSimulator(), "Simulator");
+            TestOne(new ToffoliSimulator(), "Toffoli");
+            TestOne(new ResourcesEstimator(), "hello");
         }
 
         [Fact]

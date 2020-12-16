@@ -24,7 +24,7 @@ namespace quantum
             if (args.Length > 1) tstMax  = Convert.ToInt32(args[1]);
             if (args.Length > 2) loopCnt = Convert.ToInt32(args[2]);
 
-            using (var sim = new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics))) 
+            using (var sim = new QuantumSimulator()) 
             {
                 long        gates = 1;
                 TimeSpan    ts;

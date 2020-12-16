@@ -36,8 +36,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 PreallocatedQubitCount,
                 mayExtendCapacity: true, disableBorrowing: false
             ),
-            randomSeed,
-            onlyOverrideBodyIntrinsic
+            randomSeed
         )
         {
             QuantumProcessor = quantumProcessor;

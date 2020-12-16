@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         public static void RunWithMultipleSimulators(Action<SimulatorBase> test)
         {
-            var simulators = new SimulatorBase[] { new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)) };
+            var simulators = new SimulatorBase[] { new QuantumSimulator() };
 
             foreach (var s in simulators)
             {

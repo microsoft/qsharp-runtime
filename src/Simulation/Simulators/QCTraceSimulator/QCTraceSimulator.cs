@@ -398,25 +398,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Creates a new instance of the simulator with the default 
         /// <see cref="QCTraceSimulatorConfiguration"/>.
         /// </summary>
-        public QCTraceSimulator() : this(FindTargetIntrinsicsType(), new QCTraceSimulatorConfiguration() ) { }
-
-        /// <summary>
-        /// Creates a new instance of the simulator with the target intrinsics from <paramref name="targetIntrinsicsType"/>
-        /// <see cref="QCTraceSimulatorConfiguration"/>.
-        /// </summary>
-        public QCTraceSimulator(Type targetIntrinsicsType) : this(targetIntrinsicsType, new QCTraceSimulatorConfiguration() ) { }
-
-        /// <summary>
-        /// Creates a new instance of the simulator with configuration given by 
-        /// the <paramref name="config"/> parameter, using the target intrinsics from <paramref name="targetIntrinsicsType"/>.
-        /// </summary>
-        public QCTraceSimulator(Type targetIntrinsicsType, QCTraceSimulatorConfiguration config) : base(targetIntrinsicsType, config) { }
+        public QCTraceSimulator() : this(new QCTraceSimulatorConfiguration() ) { }
 
         /// <summary>
         /// Creates a new instance of the simulator with configuration given by 
         /// the <paramref name="config"/> parameter.
         /// </summary>
-        public QCTraceSimulator(QCTraceSimulatorConfiguration config) : base(FindTargetIntrinsicsType(), config) { }
+        public QCTraceSimulator(QCTraceSimulatorConfiguration config) : base(config) { }
 
         /// <summary>
         /// Array of the names of all of the metrics collected by this instance of the simulator.

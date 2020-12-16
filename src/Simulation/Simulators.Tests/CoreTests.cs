@@ -214,9 +214,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
-            RunOne(new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)));
-            RunOne(new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)));
-            RunOne(new QuantumSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)));
+            RunOne(new QCTraceSimulator());
+            RunOne(new ResourcesEstimator());
+            RunOne(new QuantumSimulator());
         }
 
 
@@ -249,8 +249,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
-            RunOne(new QCTraceSimulator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)));
-            RunOne(new ResourcesEstimator(typeof(Microsoft.Quantum.Intrinsic.TargetIntrinsics)));
+            RunOne(new QCTraceSimulator());
+            RunOne(new ResourcesEstimator());
         }
 
         [Fact]

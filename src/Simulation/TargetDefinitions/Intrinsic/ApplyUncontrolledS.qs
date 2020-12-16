@@ -23,6 +23,5 @@ namespace Microsoft.Quantum.Intrinsic {
     @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledS")
     internal operation ApplyUncontrolledS (qubit : Qubit) : Unit is Adj {
         body intrinsic;
-        adjoint self;
     }
 }

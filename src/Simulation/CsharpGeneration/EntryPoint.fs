@@ -152,15 +152,12 @@ let private entryPointClass context entryPoint =
     let infoProperty =
         property "Info" (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
                         (ident callableName <|.|> ident "Info")
-    let targetIntrinsicProperty =
-        property "TargetIntrinsicsType" "Type" (invoke (ident "typeof") ``(`` [(ident "Microsoft.Quantum.Intrinsic.TargetIntrinsics")] ``)``)
     let members : MemberDeclarationSyntax list = [
         summaryProperty
         parameterOptionsProperty parameters
         defaultSimulatorNameProperty
         defaultExecutionTargetProperty
         infoProperty
-        targetIntrinsicProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint
         mainMethod context entryPoint

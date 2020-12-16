@@ -5,31 +5,18 @@
 
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledX.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyControlledX.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledZ.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyControlledZ.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledH.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledH.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\M.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Reset.cs" />
   </ItemGroup>
 
   <ItemGroup>

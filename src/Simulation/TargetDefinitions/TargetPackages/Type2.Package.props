@@ -5,33 +5,19 @@
 
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\H.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingXX.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\IsingXX.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingYY.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\IsingYY.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingZZ.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\IsingZZ.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\M.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Rx.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Rx.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Ry.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Ry.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Rz.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Rz.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\S.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\S.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\SWAP.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\SWAP.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\T.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\T.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\X.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Y.cs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
-    <Compile Include="..\TargetDefinitions\Intrinsic\Z.cs" />
   </ItemGroup>
 
   <ItemGroup>

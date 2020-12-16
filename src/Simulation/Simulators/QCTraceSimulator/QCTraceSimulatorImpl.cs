@@ -62,9 +62,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             return this.GetInstance(typeof(T)).GetType().FullName;
         }
 
-        public QCTraceSimulatorImpl(Type targetIntrinsicsType) : this(targetIntrinsicsType, new QCTraceSimulatorConfiguration()) { }
+        public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
 
-        public QCTraceSimulatorImpl(Type targetIntrinsicsType, QCTraceSimulatorConfiguration config)
+        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config)
         {
             configuration = Utils.DeepClone(config);
             Utils.FillDictionaryForEnumNames<PrimitiveOperationsGroups, int>(primitiveOperationsIdToNames);
@@ -106,16 +106,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
             OnOperationStart += tracingCore.OnOperationStart;
             OnOperationEnd += tracingCore.OnOperationEnd;
-
-            // Override the Measure operation.
-            var measureShim = 
-                (from nestedType in targetIntrinsicsType.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                where nestedType.Name == "Shim_Measure"
-                select nestedType).SingleOrDefault();
-            if (measureShim != null)
-            {
-                this.Register(measureShim.BaseType, measureShim);
-            }
 
             RegisterPrimitiveOperationsGivenAsCircuits();
         }

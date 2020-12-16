@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </remarks>
         public StackFrame[]? CallStack { get; private set; }
 
-        public SimulatorBase(IQubitManager? qubitManager = null, int? seed = null, bool onlyOverrideBodyIntrinsic = false)
+        public SimulatorBase(IQubitManager? qubitManager = null, int? seed = null, bool onlyOverrideAbstract = false)
         {
             this.randomSeed = seed ?? Guid.NewGuid().GetHashCode();
             this.randomGenerator = new Lazy<System.Random>(
@@ -74,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Common
             );
             this.QubitManager = qubitManager;
 
-            this.InitBuiltinOperations(this.GetType(), onlyOverrideBodyIntrinsic);
+            this.InitBuiltinOperations(this.GetType(), onlyOverrideAbstract);
 
             EnableLogToConsole();
             EnableExceptionPrinting();
@@ -752,19 +752,6 @@ namespace Microsoft.Quantum.Simulation.Common
         public virtual void Fail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionInfo)
         {
             OnFail?.Invoke(exceptionInfo);
-        }
-
-        public static Type FindTargetIntrinsicsType()
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var targetIntrinsics = assembly.GetType("Microsoft.Quantum.Intrinsic.TargetIntrinsics");
-                if (targetIntrinsics != null)
-                {
-                    return targetIntrinsics;
-                }
-            }
-            throw new TypeLoadException("Unable to load Microsoft.Quantum.Intrinsic.TargetIntrinsics type, possibly due to missing target package reference.");
         }
     }
 }

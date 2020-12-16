@@ -38,30 +38,19 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         /// Constructs a default Toffoli simulator instance.
         /// </summary>
-        public ToffoliSimulator() : this(FindTargetIntrinsicsType(), DEFAULT_QUBIT_COUNT) { }
-
-        /// <summary>
-        /// Constructs a default Toffoli simulator instance.
-        /// </summary>
-        public ToffoliSimulator(Type targetIntrinsicsType) : this(targetIntrinsicsType, DEFAULT_QUBIT_COUNT) { }
+        public ToffoliSimulator() : this(DEFAULT_QUBIT_COUNT) { }
 
         /// <summary>
         /// Constructs a Toffoli simulator instance with the specified qubit count.
         /// </summary>
-        /// <param name="targetIntrinsicsType">The type to use when looking for overrides of the intrinsics supported by the current target.</param>
         /// <param name="qubitCount">The number of qubits to allocate.
         /// There is an overhead of one byte of memory usage per allocated qubit.
         /// There is no time overhead from allocating more qubits.</param>
-        public ToffoliSimulator(Type targetIntrinsicsType, uint qubitCount)
-            : base(new QubitManager(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
+        public ToffoliSimulator(uint qubitCount)
+            : base(new QubitManager(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false), null, true)
         {
             this.State = new bool[qubitCount];
             this.borrowedQubitStates = new Dictionary<int, Stack<bool>>();
-
-            // Initialize the overrides for the target intrinsics. If any intrinsics are not found
-            // and overriden, they will throw an error when used at runtime because they are still
-            // abstract.
-            this.InitBuiltinOperations(targetIntrinsicsType, true);
         }
 
         /// <summary>
