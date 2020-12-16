@@ -93,7 +93,7 @@ struct QirString
 struct QirTupleHeader
 {
     int refCount = 0;
-    int size = sizeof(QirTupleHeader);
+    int tupleSize = 0; // when creating the tuple, must be set to: size of this header + size of the tuple's data buffer
 
     char* Data()
     {

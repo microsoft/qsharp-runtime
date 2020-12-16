@@ -21,7 +21,7 @@ extern "C"
         // at the beginning of the buffer place QirTupleHeader
         QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
         th->refCount = 1;
-        th->size = size;
+        th->tupleSize = size;
 
         return th;
     }
@@ -153,16 +153,21 @@ long QirCallable::Release()
     return rc;
 }
 
-// `src` tuple header must point to a tuple with the following structure (example for depth = 2):
+// The function _assumes_ a particular structure of the passed in tuple (see
+// https://github.com/microsoft/qsharp-language/blob/main/Specifications/QIR/Callables.md) and recurses into it upto
+// the given depth to create a new tuple with a combined array of controls.
+//
+// For example, `src` tuple header might point to a tuple with the following structure (depth = 2):
 // { %TupleHeader, %Array*, { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }* }
-// or
+// or it might point to a tuple where the inner type isn't a tuple itself (depth = 2):
 // { %TupleHeader, %Array*, { %TupleHeader, %Array*, %Qubit* }* }
-// The function will create a new tuple, where the array contains elements of all nested arrays, respectively:
-// { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }
-// { %TupleHeader, %Array*, %Qubit* }
-// The caller is responsible for releasing both the new array and the tuple.
-// The order of the elements in the array is undefined.
-QirTupleHeader* UnpackTupleWithNestedArrays(QirTupleHeader* tuple, int depth)
+// The function will create a new tuple, where the array contains elements of all nested arrays, respectively for the
+// two cases: 
+// { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* } 
+// { %TupleHeader, %Array*, %Qubit* } 
+// The caller is responsible for releasing both the returned tuple and the array it contains.
+// The order of the elements in the array is unspecified.
+QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
 
@@ -201,9 +206,9 @@ QirTupleHeader* UnpackTupleWithNestedArrays(QirTupleHeader* tuple, int depth)
         current = *(reinterpret_cast<QirTupleHeader**>(current->Data() + arrayPtrSize));
     }
 
-    // Create the new "flat" tuple.
-    QirTupleHeader* flatTuple = quantum__rt__tuple_create(last->size);
-    memcpy(flatTuple->Data(), last->Data(), last->size - sizeof(QirTupleHeader));
+    // Create the new tuple with the flattened controls array.
+    QirTupleHeader* flatTuple = quantum__rt__tuple_create(last->tupleSize);
+    memcpy(flatTuple->Data(), last->Data(), last->tupleSize - sizeof(QirTupleHeader));
     QirArray** arr = reinterpret_cast<QirArray**>(flatTuple->Data());
     *arr = combinedControls;
 
@@ -221,8 +226,8 @@ void QirCallable::Invoke(QirTupleHeader* args, QirTupleHeader* result)
     }
     else
     {
-        // Must unpack the `args` tuple into a new "flat" tuple.
-        QirTupleHeader* flat = UnpackTupleWithNestedArrays(args, this->controlledDepth);
+        // Must unpack the `args` tuple into a new tuple with flattened controls.
+        QirTupleHeader* flat = FlattenControlArrays(args, this->controlledDepth);
         QirArray* controls = *reinterpret_cast<QirArray**>(flat->Data());
 
         this->functionTable[this->appliedFunctor](capture, flat, result);

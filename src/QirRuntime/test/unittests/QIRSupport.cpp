@@ -718,7 +718,7 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 // The function will create a new tuple, where the array contains elements of all nested arrays, respectively:
 // case1: { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }
 // case2: { %TupleHeader, %Array*, %Qubit* }
-QirTupleHeader* UnpackTupleWithNestedArrays(QirTupleHeader* nestedTuple, int depth);
+QirTupleHeader* FlattenControlArrays(QirTupleHeader* nestedTuple, int depth);
 struct ControlledCallablesTestSimulator : public SimulatorStub
 {
     int lastId = -1;
@@ -754,7 +754,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     *reinterpret_cast<QirArray**>(outer->Data()) = controlsOuter;
     *reinterpret_cast<QirTupleHeader**>(outer->Data() + sizeof(/*QirArrray*/ void*)) = inner;
 
-    QirTupleHeader* unpacked = UnpackTupleWithNestedArrays(outer, 2 /*depth*/);
+    QirTupleHeader* unpacked = FlattenControlArrays(outer, 2 /*depth*/);
     QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->Data()));
     REQUIRE(5 == combined->count);
     REQUIRE(!combined->ownsQubits);
@@ -792,7 +792,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     *reinterpret_cast<QirArray**>(outer->Data()) = controlsOuter;
     *reinterpret_cast<QirTupleHeader**>(outer->Data() + sizeof(/*QirArrray*/ void*)) = inner;
 
-    QirTupleHeader* unpacked = UnpackTupleWithNestedArrays(outer, 2 /*depth*/);
+    QirTupleHeader* unpacked = FlattenControlArrays(outer, 2 /*depth*/);
     QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->Data()));
     REQUIRE(5 == combined->count);
     REQUIRE(!combined->ownsQubits);
