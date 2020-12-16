@@ -188,7 +188,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     TupleWithControls* current = reinterpret_cast<TupleWithControls*>(tuple);
     for (int i = 0; i < depth; i++)
     {
-        assert(current->header.tupleSize == sizeof(TupleWithControls));
+        assert(i == depth - 1 || current->header.tupleSize == sizeof(TupleWithControls));
         QirArray* controls = current->controls;
         assert(controls->itemSizeInBytes == qubitSize);
         cControls += controls->count;
