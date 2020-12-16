@@ -162,11 +162,20 @@ long QirCallable::Release()
 // or it might point to a tuple where the inner type isn't a tuple itself (depth = 2):
 // { %TupleHeader, %Array*, { %TupleHeader, %Array*, %Qubit* }* }
 // The function will create a new tuple, where the array contains elements of all nested arrays, respectively for the
-// two cases: 
-// { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* } 
-// { %TupleHeader, %Array*, %Qubit* } 
+// two cases:
+// { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }
+// { %TupleHeader, %Array*, %Qubit* }
 // The caller is responsible for releasing both the returned tuple and the array it contains.
 // The order of the elements in the array is unspecified.
+struct TupleWithControls
+{
+    QirTupleHeader th;
+    QirArray* controls;
+    QirTupleHeader* innerTuple;
+};
+static_assert(
+    sizeof(TupleWithControls) == sizeof(QirTupleHeader) + 2 * sizeof(void*),
+    L"TupleWithControls should be tightly packed for FlattenControlArrays to be correct");
 QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
@@ -179,10 +188,12 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     QirTupleHeader* current = tuple;
     for (int i = 0; i < depth; i++)
     {
-        QirArray** inner = reinterpret_cast<QirArray**>(current->Data());
-        assert((*inner)->itemSizeInBytes == qubitSize);
-        cControls += (*inner)->count;
-        current = *(reinterpret_cast<QirTupleHeader**>(current->Data() + arrayPtrSize));
+        assert(current->tupleSize == sizeof(TupleWithControls));
+        TupleWithControls* twc = reinterpret_cast<TupleWithControls*>(current);
+        QirArray* controls = twc->controls;
+        assert(controls->itemSizeInBytes == qubitSize);
+        cControls += controls->count;
+        current = twc->innerTuple;
     }
 
     // Copy the controls into the new array. This array doesn't own the qubits so must use the generic constructor.
@@ -198,12 +209,15 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
             last = current;
         }
 
-        QirArray** inner = reinterpret_cast<QirArray**>(current->Data());
-        const size_t blockSize = qubitSize * (*inner)->count;
+        // The inner-most tuple with controls might not point to another tuple but include data directly, but this is
+        // irrelevant for the computation below as we are not going to access the data here.
+        TupleWithControls* twc = reinterpret_cast<TupleWithControls*>(current);
+        QirArray* controls = twc->controls;
+        const size_t blockSize = qubitSize * controls->count;
         assert(dst + blockSize <= dstEnd);
-        memcpy(dst, (*inner)->buffer, blockSize);
+        memcpy(dst, controls->buffer, blockSize);
         dst += blockSize;
-        current = *(reinterpret_cast<QirTupleHeader**>(current->Data() + arrayPtrSize));
+        current = twc->innerTuple;
     }
 
     // Create the new tuple with the flattened controls array.
