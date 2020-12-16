@@ -1,6 +1,12 @@
 set(component_name "tracer")
 
+# the tracer implements its own management of qubits/results but reuses the rest of the qir-runtime
+# TODO: consider splitting qir-rt into two libs
 set(source_files
+  "../QIR/arrays.cpp"
+  "../QIR/callables.cpp"
+  "../QIR/strings.cpp"
+  "../QIR/utils.cpp"
   "tracer.cpp"
 )
 
@@ -16,10 +22,4 @@ add_library(${component_name} STATIC ${source_files})
 target_include_directories(${component_name} PUBLIC ${includes})
 target_link_libraries(${component_name} ${CMAKE_DL_LIBS})
 
-#===============================================================================
-# Produce object lib we'll use to create a shared lib (so/dll) later on
-
-set(component_name_obj "${component_name}-obj")
-add_library(${component_name_obj} OBJECT ${source_files})
-target_include_directories(${component_name_obj} PUBLIC ${includes})
-set_property(TARGET ${component_name_obj} PROPERTY POSITION_INDEPENDENT_CODE ON)
+# The tracer cannot be included into qdk.dll so we don't build an object lib for it

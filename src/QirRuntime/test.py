@@ -76,7 +76,8 @@ log("========= Running native tests =========")
 test_binaries = [
   "qir-runtime-unittests",
   "qir-static-tests",
-  "qir-dynamic-tests"
+  "qir-dynamic-tests",
+  "qir-tracer-tests"
 ]
 
 for name in test_binaries:
