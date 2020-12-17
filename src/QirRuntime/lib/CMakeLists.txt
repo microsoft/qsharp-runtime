@@ -6,9 +6,9 @@ add_subdirectory(Simulators)
 # Produce the qdk dynamic library
 #
 add_library(qdk SHARED
-    $<TARGET_OBJECTS:simulators-obj>
     $<TARGET_OBJECTS:qir-rt-support-obj>
     $<TARGET_OBJECTS:qir-qis-support-obj>
+    $<TARGET_OBJECTS:simulators-obj>
 )
 
 if (WIN32)
