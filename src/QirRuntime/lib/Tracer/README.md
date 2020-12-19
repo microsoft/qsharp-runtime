@@ -47,7 +47,7 @@ _Definition_: A ___global barrier___ is an identity operation on _all_ qubits th
 
 ### The Resource Tracer's Layering Algorithm ###
 
-As the tracer is executing a sequential quantum program, it will compute a time function and corresponding layering using the following ("tetris") algorithm:
+As the tracer is executing a sequential quantum program, it will compute a time function and corresponding layering using the following logical algorithm ("tetris"):
 
 1. All layers have width one (so we'll shorten the layer notation from L(t, 1) to L(t)).
 2. All gates have duration either 0 or 1, as specified by the user.
@@ -55,17 +55,22 @@ As the tracer is executing a sequential quantum program, it will compute a time 
 4. Suppose, already have layers L(0), ... , L(k) and the operation being executed is _op_ of width __0__. Starting at L(k) and going backwards to L(0) find the _first_ layer that contains a gate that acts on at least one of the qubits _op_ is acting on. Add _op_ into this layer. If no such layer found, add _op_ into L(0). Notice, that operations of width 0 never trigger creation of new layers.
 5. Suppose, already have layers L(0), ... , L(k) and the operation being executed is _op_ of width __1__. Starting at L(k) and going backwards to L(0) find the _last_ layer that does not contain gates that act on any of the qubits _op_ is acting on. Add _op_ into this layer. If no such layer found, assign _op_ time _k+1_ and add it into a new layer L(k+1).
 
+_Note_: the actual implementation of layering might be done differently, as long as the result is the same as after running the logical algorithm described above.
+
 ## Tracking of Hadamard and SWAP gates ##
 
-TBD
+Hadamard and SWAP gates are special in the sense that we might not want to count them as separate operations, but instead modify the later gates in the circuit to incorporate H/SWAP and collect the resource statistics for the updated circuit. For example, H-Rz-Mx is equivalent to Rx-Mz and for some scenarios it's desired to estimate resources for the latter rather than the former. Unfortunately, circuit rewrites like this cannot be done via custom intrinsics in target.qs.
+
+The Resource Trace will have configurations to enable/disable Hadamard tracking and to either treat SWAP as a "normal" gate or implement it as classical qubit renumbering.
 
 ## Output format ##
 
-Need to coordinate with the [Python Estimation Tool](https://ms-quantum.visualstudio.com/Quantum%20Architecture/_git/ResourceEstimation) (AlgorithmLayers.py defines format).
+Can we store enough information about the gates to remap the buckets back to individual gates for the purpose of user friendly output? Could QIR add some kind of "registration" methods, based on the target.qs file?
 
-Can we store enough information about the gates to remap the buckets back to individual gates for the purposes of user friendly output? Could QIR add some kind of "registration" methods, based on the target.qs file?
+TBD: formally describe the format
 
-TBD: describe the format formally
+- should report totals
+- should report statistics _per layer_
 
 ## Depth vs width optimizations ##
 
