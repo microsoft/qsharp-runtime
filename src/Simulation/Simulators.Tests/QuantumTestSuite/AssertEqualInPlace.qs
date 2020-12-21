@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnFirstQubitA (op : (Qubit => Unit : Adjoint), qubits : Qubit[]) : Unit {
+    operation OnFirstQubitA (op : (Qubit => Unit is Adj), qubits : Qubit[]) : Unit {
         
         body (...) {
             op(qubits[0]);
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnFirstQubitAC (op : (Qubit => Unit : Adjoint, Controlled), qubits : Qubit[]) : Unit {
+    operation OnFirstQubitAC (op : (Qubit => Unit is Adj + Ctl), qubits : Qubit[]) : Unit {
         
         body (...) {
             op(qubits[0]);
@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnSecondQubitAC (op : (Qubit => Unit : Adjoint, Controlled), qubits : Qubit[]) : Unit {
+    operation OnSecondQubitAC (op : (Qubit => Unit is Adj + Ctl), qubits : Qubit[]) : Unit {
         
         body (...) {
             op(qubits[1]);
@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnFirstTwoQubitsAC (op : ((Qubit, Qubit) => Unit : Adjoint, Controlled), qubits : Qubit[]) : Unit {
+    operation OnFirstTwoQubitsAC (op : ((Qubit, Qubit) => Unit is Adj + Ctl), qubits : Qubit[]) : Unit {
         
         body (...) {
             op(qubits[0], qubits[1]);
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnFirstThreeQubitsAC (op : ((Qubit, Qubit, Qubit) => Unit : Adjoint, Controlled), qubits : Qubit[]) : Unit {
+    operation OnFirstThreeQubitsAC (op : ((Qubit, Qubit, Qubit) => Unit is Adj + Ctl), qubits : Qubit[]) : Unit {
         
         body (...) {
             op(qubits[0], qubits[1], qubits[2]);
@@ -91,7 +91,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnOneQubitA (op : (Qubit[] => Unit : Adjoint), qubit : Qubit) : Unit {
+    operation OnOneQubitA (op : (Qubit[] => Unit is Adj), qubit : Qubit) : Unit {
         
         body (...) {
             op([qubit]);
@@ -101,7 +101,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation OnOneQubitAC (op : (Qubit[] => Unit : Adjoint, Controlled), qubit : Qubit) : Unit {
+    operation OnOneQubitAC (op : (Qubit[] => Unit is Adj + Ctl), qubit : Qubit) : Unit {
         
         body (...) {
             op([qubit]);

@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Tests.Tuples {
     
     newtype TupleE = (Int, Qubit[]);
     
-    newtype TupleF = ((TupleA, TupleD) => Unit : Adjoint, Controlled);
+    newtype TupleF = ((TupleA, TupleD) => Unit is Adj + Ctl);
     
     newtype TupleG = (Qubit, TupleF, TupleC, TupleD);
     
