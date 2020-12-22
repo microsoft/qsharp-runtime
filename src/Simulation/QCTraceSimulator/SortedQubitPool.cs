@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
 
             /// <summary>
             /// Multiple nodes can correspond to the same time. They are added to the linked list via this field.
-            /// If qubits with the same time is common array may be more efficient than the linked list.
+            /// If qubits with the same time are common, array may be more efficient than the linked list.
             /// </summary>
             internal QubitTimeNode NextNode;
 
@@ -269,15 +269,15 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         /// <param name="requestedTime">Sample time to find</param>
         /// <param name="getLowerBound">"true" to find maximum value less than sample</param>
-        /// <param name="actualTime">"true" if sample was found in the set.</param>
-        /// <returns></returns>
+        /// <param name="actualTime">Time found in the set</param>
+        /// <returns>"true" if sample was found in the set.</returns>
         public bool FindBound(ComplexTime requestedTime, bool getLowerBound, out ComplexTime actualTime) {
             // We use the following approach:
             // We call function TryGetValue on a sorted set. If value is found, we go with it.
             // Otherwise TryGetValue must make conclusion that the value is absent.
             // Any comparison-based algorithm without caching must inspect both
             // maximum value less than the sample and minimum value greater than the sample.
-            // So they msut be among the values seen since reset.
+            // So they must be among the values seen since reset.
             // So we just need to harvest them from VisitingComparer.
             Sample.Time = requestedTime;
             NodeComparer.ResetForComparison(Sample);
