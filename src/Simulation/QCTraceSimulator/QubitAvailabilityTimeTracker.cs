@@ -23,11 +23,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         /// </summary>
         private List<double> QubitAvailableAt;
 
-        /// <summary>
-        /// Maximum qubit id seen so far.
-        /// </summary>
-        private long MaxQubitId = -1;
-
         internal QubitAvailabilityTimeTracker(int initialCapacity, double defaultAvailabilityTime)
         {
             DefaultAvailabilityTime = defaultAvailabilityTime;
@@ -61,16 +56,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 }
                 QubitAvailableAt[(int)qubitId] = value;
             }
-        }
-
-        internal long GetMaxQubitId()
-        {
-            return MaxQubitId;
-        }
-
-        internal void MarkQubitIdUsed(long qubitId)
-        {
-            MaxQubitId = System.Math.Max(MaxQubitId, qubitId);
         }
 
     }
