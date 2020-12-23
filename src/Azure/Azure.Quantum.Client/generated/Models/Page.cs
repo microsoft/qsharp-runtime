@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
          public string NextPageLink { get; private set; }
 
          [JsonProperty("value")]
-         internal IList<T> Items { get; set; }
+         private IList<T> Items{ get; set; }
 
          /// <summary>
          /// Returns an enumerator that iterates through the collection.

@@ -30,6 +30,7 @@ namespace Microsoft.Azure.Quantum.Client
             /// The operations group for this extension method.
             /// </param>
             /// <param name='blobDetails'>
+            /// The details (name and container) of the blob to store or download data.
             /// </param>
             public static SasUriResponse SasUri(this IStorageOperations operations, BlobDetails blobDetails)
             {
@@ -45,6 +46,7 @@ namespace Microsoft.Azure.Quantum.Client
             /// The operations group for this extension method.
             /// </param>
             /// <param name='blobDetails'>
+            /// The details (name and container) of the blob to store or download data.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.

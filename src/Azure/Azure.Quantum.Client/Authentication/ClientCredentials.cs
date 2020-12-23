@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Rest;
 
 namespace Microsoft.Azure.Quantum.Authentication
 {
     /// <summary>
     /// Authorization client handler class.
     /// </summary>
-    internal class AuthorizationClientHandler : HttpClientHandler
+    internal class ClientCredentials : ServiceClientCredentials
     {
         private const string AuthorizationHeaderName = "Authorization";
         private const string BearerScheme = "Bearer";
@@ -18,31 +20,29 @@ namespace Microsoft.Azure.Quantum.Authentication
         private readonly IAccessTokenProvider accessTokenProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthorizationClientHandler"/> class.
+        /// Initializes a new instance of the <see cref="ClientCredentials"/> class.
         /// </summary>
         /// <param name="accessTokenProvider">The access token provider.</param>
-        public AuthorizationClientHandler(IAccessTokenProvider accessTokenProvider)
+        public ClientCredentials(IAccessTokenProvider accessTokenProvider)
         {
             this.accessTokenProvider = accessTokenProvider;
         }
 
-        /// <summary>
-        /// Creates an instance of  <see cref="T:System.Net.Http.HttpResponseMessage" /> based on the information provided in the <see cref="T:System.Net.Http.HttpRequestMessage" /> as an operation that will not block.
-        /// </summary>
-        /// <param name="request">The HTTP request message.</param>
-        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-        /// <returns>
-        /// The task object representing the asynchronous operation.
-        /// </returns>
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        public override async Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
             if (!request.Headers.Contains(AuthorizationHeaderName))
             {
                 string accessToken = await this.accessTokenProvider.GetAccessTokenAsync(cancellationToken);
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, accessToken);
             }
 
-            return await base.SendAsync(request, cancellationToken);
+            //request.Version = new Version(apiVersion);
+            await base.ProcessHttpRequestAsync(request, cancellationToken);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// cancelled.</param>
         /// <param name="errorData">The error data for the job. This is
         /// expected only when Status 'Failed'.</param>
-        public JobDetails(string containerUri, string inputDataFormat, string providerId, string target, string id = default(string), string name = default(string), string inputDataUri = default(string), object inputParams = default(object), IDictionary<string, string> metadata = default(IDictionary<string, string>), string outputDataUri = default(string), string outputDataFormat = default(string), string status = default(string), string creationTime = default(string), string beginExecutionTime = default(string), string endExecutionTime = default(string), string cancellationTime = default(string), RestError errorData = default(RestError))
+        public JobDetails(string containerUri, string inputDataFormat, string providerId, string target, string id = default(string), string name = default(string), string inputDataUri = default(string), object inputParams = default(object), IDictionary<string, string> metadata = default(IDictionary<string, string>), string outputDataUri = default(string), string outputDataFormat = default(string), string status = default(string), System.DateTime? creationTime = default(System.DateTime?), System.DateTime? beginExecutionTime = default(System.DateTime?), System.DateTime? endExecutionTime = default(System.DateTime?), System.DateTime? cancellationTime = default(System.DateTime?), ErrorData errorData = default(ErrorData))
         {
             Id = id;
             Name = name;
@@ -177,32 +177,32 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// Gets the creation time of the job.
         /// </summary>
         [JsonProperty(PropertyName = "creationTime")]
-        public string CreationTime { get; private set; }
+        public System.DateTime? CreationTime { get; private set; }
 
         /// <summary>
         /// Gets the time when the job began execution.
         /// </summary>
         [JsonProperty(PropertyName = "beginExecutionTime")]
-        public string BeginExecutionTime { get; private set; }
+        public System.DateTime? BeginExecutionTime { get; private set; }
 
         /// <summary>
         /// Gets the time when the job finished execution.
         /// </summary>
         [JsonProperty(PropertyName = "endExecutionTime")]
-        public string EndExecutionTime { get; private set; }
+        public System.DateTime? EndExecutionTime { get; private set; }
 
         /// <summary>
         /// Gets the time when a job was successfully cancelled.
         /// </summary>
         [JsonProperty(PropertyName = "cancellationTime")]
-        public string CancellationTime { get; private set; }
+        public System.DateTime? CancellationTime { get; private set; }
 
         /// <summary>
         /// Gets the error data for the job. This is expected only when Status
         /// 'Failed'.
         /// </summary>
         [JsonProperty(PropertyName = "errorData")]
-        public RestError ErrorData { get; private set; }
+        public ErrorData ErrorData { get; private set; }
 
         /// <summary>
         /// Validate the object.
