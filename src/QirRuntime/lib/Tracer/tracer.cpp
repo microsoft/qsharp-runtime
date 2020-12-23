@@ -5,3 +5,7 @@
 
 #include "tracer.hpp"
 
+void InitializeTracer()
+{
+    tracer = std::make_shared<CTracer>();
+}

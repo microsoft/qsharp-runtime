@@ -7,7 +7,8 @@ set(source_files
   "../QIR/callables.cpp"
   "../QIR/strings.cpp"
   "../QIR/utils.cpp"
-  "tracer-qir.cpp"
+  "tracer-rt.cpp"
+  "tracer-trc.cpp"
   "tracer.cpp"
 )
 
