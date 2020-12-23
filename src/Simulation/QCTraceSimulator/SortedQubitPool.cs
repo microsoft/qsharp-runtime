@@ -1,70 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
 
     /// <summary>
-    /// Time to track qubit availability (DepthTime). Time is also used to track dependencies:
-    /// Gates that happen later on a qubit cannot be scheduled before gates on the same qubit.
-    /// This is tracked transitively via time, but zero gate depth prevents this from happening.
-    /// This is solved by having additional time component - DependencyTime.
+    /// Either time interval or point in time on the timeline of the program.
     /// </summary>
     internal struct ComplexTime
     {
         /// <summary>
-        /// Time used to track qubit availability time. Double to match configuration interface.
+        /// Tracer configuration interface uses type "double" to provide duration of gates (aka depth).
+        /// When a gate is performed, time advances by the depth of the gate. DepthTime is used to count
+        /// time cosistent with the depth configuration settings. As a result, if a gate time is set to zero,
+        /// DepthTime won't increase after such gate is performed.
         /// </summary>
         internal double DepthTime { get; private set; }
 
         /// <summary>
-        /// This is only used for comparisons when DepthTime is equal. This time tracks dependencies.
+        /// TrailingZeroDepthGateCount counts number of zero-depth gates after last non-zero depth gate is performed.
+        /// Generally, gates that happen later on a qubit cannot be scheduled before gates on the same qubit.
+        /// This is tracked transitively via qubit availability time, but zero-depth gates do not allow such calculation.
+        /// The situation is resolved by having this time component - TrailingZeroDepthGateCount.
         /// </summary>
-        private long DependencyTime;
+        private long TrailingZeroDepthGateCount;
 
         internal ComplexTime(double time) {
             DepthTime = time;
-            DependencyTime = 0;
+            TrailingZeroDepthGateCount = 0;
         }
 
-        private ComplexTime(double depthTime, long dependencyTime) {
+        private ComplexTime(double depthTime, long trailingZeroDepthGateCount) {
             DepthTime = depthTime;
-            DependencyTime = dependencyTime;
+            TrailingZeroDepthGateCount = trailingZeroDepthGateCount;
         }
 
         public override string ToString() {
-            return $"{DepthTime}d+{DependencyTime}";
+            return $"{DepthTime}d+{TrailingZeroDepthGateCount}";
         }
         /// <summary>
         /// Add gate time to availability time. If gate time is zero, advance dependency time.
         /// </summary>
-        /// <param name="time">Gate time to advance by. Assumed to be precise for comparison with 0.</param>
+        /// <param name="gateTime">Gate time to advance by. Assumed to be precise for comparison with 0.</param>
         /// <returns>ComplexTime advanced by provided gate time</returns>
-        internal ComplexTime AdvanceBy(double time) {
-            if (time == 0.0) {
-                return new ComplexTime(DepthTime, DependencyTime + 1);
+        internal ComplexTime AdvanceBy(double gateTime) {
+            if (gateTime == 0.0) {
+                return new ComplexTime(DepthTime, TrailingZeroDepthGateCount + 1);
             }
-            return new ComplexTime(DepthTime + time);
+            return new ComplexTime(DepthTime + gateTime);
         }
 
         /// <summary>
         /// Subtracts argument ComplexTime from "this" ComplexTime. Returns the result.
-        /// Depth times are assumed to be precise  for comparison.
+        /// Depth times are assumed to be precise for comparison.
         /// </summary>
         /// <param name="time">Time to subtract from this object.</param>
         /// <returns>Result of subtraction.</returns>
         internal ComplexTime Subtract(ComplexTime time) {
-            if (DepthTime < time.DepthTime) {
-                throw new ArgumentException("Result of ComplexTime subtraction is negative.");
-            }
             if (DepthTime == time.DepthTime) {
-                return new ComplexTime(0, DependencyTime - time.DependencyTime);
+                return new ComplexTime(0, TrailingZeroDepthGateCount - time.TrailingZeroDepthGateCount);
             }
-            return new ComplexTime(DepthTime - time.DepthTime, 0);
+            double result = DepthTime - time.DepthTime;
+            if (result <= 0) {
+                // This could only happen due to insufficient floating point calculation precision.
+                throw new ArgumentException("Result of ComplexTime subtraction is not positive.");
+            }
+            return new ComplexTime(result, 0);
         }
 
         /// <summary>
-        /// Compares two complex times. First DepthTime is compared, then DependencyTime is compared.
+        /// Compares two complex times. First DepthTime is compared, then TrailingZeroDepthGateCount is compared.
         /// </summary>
         /// <returns>0 when a = b, -1 when a&lt; b, and 1 when a &gt; b</returns>
         internal static int Compare(ComplexTime a, ComplexTime b) {
@@ -72,7 +78,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             if (result != 0) {
                 return result;
             }
-            return a.DependencyTime.CompareTo(b.DependencyTime);
+            return a.TrailingZeroDepthGateCount.CompareTo(b.TrailingZeroDepthGateCount);
         }
 
         /// <summary>
@@ -108,7 +114,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
     }
 
     /// <summary>
-    /// Stores qubits sorted by corresponding times. Instantiated to store interval start points and end points.
+    /// Stores qubits sorted by corresponding ComplexTime values. For example, a ComplexTime value that correponds to a qubit
+    /// could be the qubit availability time: the end time of the last gate on the qubit.
     /// Supports queries to retrieve qubit with maximum time less than given and minimum time greater than given Sample.
     /// Also supports addition (Add) and removal (Remove) of qubits identified by time. Time is <c>ComplexTime</c>.
     /// Multiple entries per time is supported. Implemented via SortedSet.
@@ -219,9 +226,11 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         }
 
         /// <summary>
-        /// QubitTimeNodes sorted by Time field. Nodes with the same Time field are stored in a linked list.
+        /// QubitTimeNodes sorted by Time field. SortedSet won't accept values with the same Time field.
+        /// When QubitPool needs to store multiple qubits with the same Time, additional QubitTimeNode instances
+        /// are linked to the head node from this set.
         /// </summary>
-        private readonly SortedSet<QubitTimeNode> QubitTime;
+        private readonly SortedSet<QubitTimeNode> QubitsSortedByTime;
 
         /// <summary>
         /// Comparer of two nodes, which compares them by Time field and collects additional data.
@@ -236,7 +245,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
 
         public SortedQubitPool() {
             NodeComparer = new VisitingComparer();
-            QubitTime = new SortedSet<QubitTimeNode>(NodeComparer);
+            QubitsSortedByTime = new SortedSet<QubitTimeNode>(NodeComparer);
         }
 
         /// <summary>
@@ -247,14 +256,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// <param name="time">Time of the qubit.</param>
         public void Add(long qubitId, ComplexTime time) {
             QubitTimeNode newNode = new QubitTimeNode(qubitId, time);
-            if (QubitTime.Add(newNode)) {
+            if (QubitsSortedByTime.Add(newNode)) {
                 // New item was added to the set, we are done.
                 return;
             }
-            if (!QubitTime.TryGetValue(newNode, out QubitTimeNode existingNode)) {
-                // We cannot add, but we cannot find a node with the same value.
-                // Is it a floating point glitch? We'll just ignore this one.
-                // If this happens reuse will be hindered, but program will still work.
+            if (!QubitsSortedByTime.TryGetValue(newNode, out QubitTimeNode existingNode)) {
+                // We cannot add, but we cannot find a node with the same value. Is this a floating point glitch?
+                Debug.Assert(false, "Cannot add a value to SortedSet<QubitTimeNode> that isn't in the set.");
                 return;
             }
             // Add new node to the linked list as a second element.
@@ -281,7 +289,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             // So we just need to harvest them from VisitingComparer.
             Sample.Time = requestedTime;
             NodeComparer.ResetForComparison(Sample);
-            if (QubitTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
+            if (QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
                 actualTime = foundValue.Time;
                 return true;
             }
@@ -301,13 +309,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// <returns>QubitId if qubit is found. Throws exception if it is not found.</returns>
         public long Remove(ComplexTime time) {
             Sample.Time = time;
-            if (!QubitTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
+            if (!QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
                 throw new ApplicationException("Cannot get qubit that should be present in a qubit pool.");
             }
             if (foundValue.NextNode == null) {
                 // Remove only node from the tree.
                 long qubitId = foundValue.QubitId;
-                QubitTime.Remove(Sample);
+                QubitsSortedByTime.Remove(Sample);
                 return qubitId;
             }
             // Get second node in the list.
