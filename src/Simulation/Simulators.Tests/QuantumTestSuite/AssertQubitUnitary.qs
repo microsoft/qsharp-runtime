@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation AssertQubitUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit => Unit : Adjoint)) : Unit {
+    operation AssertQubitUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit => Unit is Adj)) : Unit {
         
         if (Length(unitaryMatrix!) != 2) {
             fail $"qubit unitary matrix must have two rows";

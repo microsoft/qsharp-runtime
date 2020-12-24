@@ -10,11 +10,11 @@ endif()
 
 if (WIN32)
   set(TEST_FILES
-    qir-test-vqe-simple-win
+    qir-test-random-win
   )
 else()
   set(TEST_FILES
-    qir-test-vqe-simple-lnx
+    qir-test-random-lnx
   )
 endif()
 

@@ -42,15 +42,19 @@ def do_build(root_dir, should_make, should_build, flavor):
   build_dir = create_folder_structure(root_dir, ["build", platform.system(), flavor])
   os.chdir(build_dir)
 
+  flavorWithDebInfo = flavor
+  if flavor == "Release" :
+      flavorWithDebInfo = "RelWithDebInfo"
+
   if should_make:
-    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavor + " ../../.."
+    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
     if result.returncode != 0:
       return result
 
   if should_build:
-    cmd = "cmake --build . --target install --config " + flavor
+    cmd = "cmake --build . --target install --config " + flavorWithDebInfo
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
 

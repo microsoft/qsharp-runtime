@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Convert;
     
     
-    newtype SingleQubitOperationDescription = ((Qubit => Unit : Adjoint, Controlled), RowMajorMatrix, Int, Bool);
+    newtype SingleQubitOperationDescription = ((Qubit => Unit is Adj + Ctl), RowMajorMatrix, Int, Bool);
     
     
     function FixesComputationalBasis (record : SingleQubitOperationDescription) : Bool {
@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    function OperationMap (record : SingleQubitOperationDescription) : (Qubit => Unit : Adjoint, Controlled) {
+    function OperationMap (record : SingleQubitOperationDescription) : (Qubit => Unit is Adj + Ctl) {
         
         let (operationMap, operationMatrix, levelOfCliffordHierarchy, fixesComputationalBasis) = record!;
         return operationMap;
