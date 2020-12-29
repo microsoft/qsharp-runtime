@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 #include <assert.h>
-#include <atomic>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string.h> // for memcpy
@@ -11,22 +11,18 @@
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
 
+/*==============================================================================
+    Implementation of quantum__rt__tuple_* and quantum__rt__callable_*
+==============================================================================*/
 extern "C"
 {
-    char* quantum__rt__tuple_create(int64_t size)
+    PTuple quantum__rt__tuple_create(int64_t size)
     {
-        assert(size >= 0);
-        char* buffer = new char[sizeof(QirTupleHeader) + size];
-
-        // at the beginning of the buffer place QirTupleHeader
-        QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
-        th->refCount = 1;
-        th->tupleSize = size;
-
-        return th->AsTuple();
+        assert(size >= 0 && size < std::numeric_limits<int>::max());
+        return QirTupleHeader::Create(static_cast<int>(size))->AsTuple();
     }
 
-    void quantum__rt__tuple_reference(char* tuple)
+    void quantum__rt__tuple_reference(PTuple tuple)
     {
         if (tuple == nullptr)
         {
@@ -36,7 +32,7 @@ extern "C"
         (void)th->AddRef();
     }
 
-    void quantum__rt__tuple_unreference(char* tuple)
+    void quantum__rt__tuple_unreference(PTuple tuple)
     {
         if (tuple == nullptr)
         {
@@ -53,7 +49,7 @@ extern "C"
         {
             return;
         }
-        callable->AddRef();
+        (void)callable->AddRef();
     }
 
     void quantum__rt__callable_unreference(QirCallable* callable)
@@ -66,13 +62,13 @@ extern "C"
         assert(ref >= 0);
     }
 
-    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, char* capture)
+    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, PTuple capture)
     {
         assert(entries != nullptr);
         return new QirCallable(entries, capture);
     }
 
-    void quantum__rt__callable_invoke(QirCallable* callable, char* args, char* result)
+    void quantum__rt__callable_invoke(QirCallable* callable, PTuple args, PTuple result)
     {
         assert(callable != nullptr);
         callable->Invoke(args, result);
@@ -101,6 +97,60 @@ extern "C"
 }
 
 /*==============================================================================
+    Implementation of QirTupleHeader
+==============================================================================*/
+int QirTupleHeader::AddRef()
+{
+    assert(refCount > 0);
+    return ++refCount;
+}
+
+int QirTupleHeader::Release()
+{
+    --refCount;
+    if (refCount == 0)
+    {
+        char* buffer = reinterpret_cast<char*>(this);
+        delete[] buffer;
+    }
+    return refCount;
+}
+
+QirTupleHeader* QirTupleHeader::Create(int size)
+{
+    assert(size >= 0);
+    char* buffer = new char[sizeof(QirTupleHeader) + size];
+
+    // at the beginning of the buffer place QirTupleHeader, leave the buffer uninitialized
+    QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
+    th->refCount = 1;
+    th->tupleSize = size;
+
+    return th;
+}
+
+QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
+{
+    const int size = other->tupleSize;
+    char* buffer = new char[sizeof(QirTupleHeader) + size];
+
+    // at the beginning of the buffer place QirTupleHeader
+    QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
+    th->refCount = 1;
+    th->tupleSize = size;
+
+    // copy the contents of the other tuple
+    memcpy(th->AsTuple(), other->AsTuple(), size);
+
+    return th;
+}
+
+QirTupleHeader* QirTupleHeader::GetHeader(PTuple tuple)
+{
+    return reinterpret_cast<QirTupleHeader*>(tuple - sizeof(QirTupleHeader));
+}
+
+/*==============================================================================
     Implementation of QirCallable
 ==============================================================================*/
 QirCallable::~QirCallable()
@@ -108,7 +158,7 @@ QirCallable::~QirCallable()
     assert(refCount == 0);
 }
 
-QirCallable::QirCallable(const t_CallableEntry* ftEntries, char* capture)
+QirCallable::QirCallable(const t_CallableEntry* ftEntries, PTuple capture)
     : refCount(1)
     , capture(capture)
     , appliedFunctor(0)
@@ -211,7 +261,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     return flatTuple;
 }
 
-void QirCallable::Invoke(char* args, char* result)
+void QirCallable::Invoke(PTuple args, PTuple result)
 {
     assert(this->appliedFunctor < QirCallable::TableSize);
     if (this->controlledDepth < 2)

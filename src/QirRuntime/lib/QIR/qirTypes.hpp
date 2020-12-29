@@ -81,50 +81,23 @@ struct QirString
     a header that contains the relevant data. The header immediately precedes the tuple's buffer in memeory when the
     tuple is created.
 ======================================================================================================================*/
+using PTuple = char*;
 struct QirTupleHeader
 {
     int refCount = 0;
     int tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer
 
-    char* AsTuple()
+    PTuple AsTuple()
     {
-        return reinterpret_cast<char*>(this) + sizeof(QirTupleHeader);
+        return reinterpret_cast<PTuple>(this) + sizeof(QirTupleHeader);
     }
 
-    int AddRef()
-    {
-        assert(refCount > 0);
-        return ++refCount;
-    }
+    int AddRef();
+    int Release();
 
-    int Release()
-    {
-        --refCount;
-        if (refCount == 0)
-        {
-            char* buffer = reinterpret_cast<char*>(this);
-            delete[] buffer;
-        }
-        return refCount;
-    }
-
-    static QirTupleHeader* CreateWithCopiedData(QirTupleHeader* other)
-    {
-        const int size = other->tupleSize;
-        char* buffer = new char[sizeof(QirTupleHeader) + size];
-
-        QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
-        th->refCount = 1;
-        th->tupleSize = size;
-        memcpy(th->AsTuple(), other->AsTuple(), size);
-
-        return th;
-    }
-
-    static QirTupleHeader* GetHeader(char* tuple)
-    {
-        return reinterpret_cast<QirTupleHeader*>(tuple - sizeof(QirTupleHeader));
-    }
+    static QirTupleHeader* Create(int size);
+    static QirTupleHeader* CreateWithCopiedData(QirTupleHeader* other);
+    static QirTupleHeader* GetHeader(PTuple tuple);
 };
 
 /*======================================================================================================================
@@ -135,12 +108,12 @@ struct TupleWithControls
     QirArray* controls;
     TupleWithControls* innerTuple;
 
-    char* AsTuple()
+    PTuple AsTuple()
     {
-        return reinterpret_cast<char*>(this);
+        return reinterpret_cast<PTuple>(this);
     }
 
-    static TupleWithControls* FromTuple(char* tuple)
+    static TupleWithControls* FromTuple(PTuple tuple)
     {
         return reinterpret_cast<TupleWithControls*>(tuple);
     }
@@ -152,7 +125,7 @@ struct TupleWithControls
 
     QirTupleHeader* GetHeader()
     {
-        return QirTupleHeader::GetHeader(reinterpret_cast<char*>(this));
+        return QirTupleHeader::GetHeader(reinterpret_cast<PTuple>(this));
     }
 };
 static_assert(
@@ -181,7 +154,7 @@ static_assert(
         [4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @callable, %Tuple* null)
 
 ======================================================================================================================*/
-typedef void (*t_CallableEntry)(char*, char*, char*);
+typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
 struct QirCallable
 {
     static int constexpr Adjoint = 1;
@@ -201,7 +174,7 @@ struct QirCallable
 
     // The callable stores the capture, it's given at creation, and passes it to the functions from the function table,
     // but the runtime doesn't have any knowledge about what the tuple actually is.
-    char* const capture = nullptr;
+    PTuple const capture = nullptr;
 
     // By default the callable is neither adjoint nor controlled.
     int appliedFunctor = 0;
@@ -215,12 +188,12 @@ struct QirCallable
     ~QirCallable();
 
   public:
-    QirCallable(const t_CallableEntry* ftEntries, char* capture);
+    QirCallable(const t_CallableEntry* ftEntries, PTuple capture);
     QirCallable(const QirCallable& other);
 
     int AddRef();
     int Release();
 
-    void Invoke(char* args, char* result);
+    void Invoke(PTuple args, PTuple result);
     void ApplyFunctor(int functor);
 };
