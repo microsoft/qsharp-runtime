@@ -13,7 +13,6 @@
 %Range = type { i64, i64, i64 }
 %Result = type opaque
 %String = type opaque
-%TupleHeader = type { i32 }
 %Pauli = type {i2}
 
 ;=======================================================================================================================
@@ -30,7 +29,6 @@
 %struct.QirCallable = type opaque
 %struct.QirRange = type { i64, i64, i64 }
 %struct.QirString = type opaque
-%struct.QirTupleHeader = type { i32 }
 
 ;===============================================================================
 ; declarations of the native methods this bridge delegates to

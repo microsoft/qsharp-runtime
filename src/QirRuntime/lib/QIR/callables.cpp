@@ -13,45 +13,38 @@
 
 extern "C"
 {
-    QirTupleHeader* quantum__rt__tuple_create(int64_t size)
+    char* quantum__rt__tuple_create(int64_t size)
     {
-        assert(size >= sizeof(QirTupleHeader));
-        char* buffer = new char[size];
+        assert(size >= 0);
+        char* buffer = new char[sizeof(QirTupleHeader) + size];
 
         // at the beginning of the buffer place QirTupleHeader
         QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
         th->refCount = 1;
         th->tupleSize = size;
 
-        return th;
+        return th->AsTuple();
     }
 
-    void quantum__rt__tuple_reference(QirTupleHeader* th)
+    void quantum__rt__tuple_reference(char* tuple)
     {
-        if (th == nullptr)
+        if (tuple == nullptr)
         {
             return;
         }
-        assert(th->refCount > 0); // no resurrection of deleted tuples
-        ++th->refCount;
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        (void)th->AddRef();
     }
 
-    void quantum__rt__tuple_unreference(QirTupleHeader* th)
+    void quantum__rt__tuple_unreference(char* tuple)
     {
-        if (th == nullptr)
+        if (tuple == nullptr)
         {
             return;
         }
 
-        const long ref = --th->refCount;
-        assert(ref >= 0);
-
-        if (ref == 0)
-        {
-            char* buffer = reinterpret_cast<char*>(th);
-            delete[] buffer;
-        }
-        th = nullptr;
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        (void)th->Release();
     }
 
     void quantum__rt__callable_reference(QirCallable* callable)
@@ -73,13 +66,13 @@ extern "C"
         assert(ref >= 0);
     }
 
-    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, QirTupleHeader* capture)
+    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, char* capture)
     {
         assert(entries != nullptr);
         return new QirCallable(entries, capture);
     }
 
-    void quantum__rt__callable_invoke(QirCallable* callable, QirTupleHeader* args, QirTupleHeader* result)
+    void quantum__rt__callable_invoke(QirCallable* callable, char* args, char* result)
     {
         assert(callable != nullptr);
         callable->Invoke(args, result);
@@ -115,7 +108,7 @@ QirCallable::~QirCallable()
     assert(refCount == 0);
 }
 
-QirCallable::QirCallable(const t_CallableEntry* ftEntries, QirTupleHeader* capture)
+QirCallable::QirCallable(const t_CallableEntry* ftEntries, char* capture)
     : refCount(1)
     , capture(capture)
     , appliedFunctor(0)
@@ -134,14 +127,14 @@ QirCallable::QirCallable(const QirCallable& other)
     memcpy(this->functionTable, other.functionTable, QirCallable::TableSize * sizeof(void*));
 }
 
-long QirCallable::AddRef()
+int QirCallable::AddRef()
 {
     long rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
 }
 
-long QirCallable::Release()
+int QirCallable::Release()
 {
     assert(this->refCount > 0);
 
@@ -157,25 +150,16 @@ long QirCallable::Release()
 // https://github.com/microsoft/qsharp-language/blob/main/Specifications/QIR/Callables.md) and recurses into it upto
 // the given depth to create a new tuple with a combined array of controls.
 //
-// For example, `src` tuple header might point to a tuple with the following structure (depth = 2):
-// { %TupleHeader, %Array*, { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }* }
-// or it might point to a tuple where the inner type isn't a tuple itself (depth = 2):
-// { %TupleHeader, %Array*, { %TupleHeader, %Array*, %Qubit* }* }
+// For example, `src` tuple might point to a tuple with the following structure (depth = 2):
+// { %Array*, { %Array*, { i64, %Qubit* }* }* }
+// or it might point to a tuple where the inner type isn't a tuple but a built-in type (depth = 2):
+// { %Array*, { %Array*, %Qubit* }* }
 // The function will create a new tuple, where the array contains elements of all nested arrays, respectively for the
-// two cases:
-// { %TupleHeader, %Array*, { %TupleHeader, i64, %Qubit* }* }
-// { %TupleHeader, %Array*, %Qubit* }
+// two cases will get:
+// { %Array*, { i64, %Qubit* }* }
+// { %Array*, %Qubit* }
 // The caller is responsible for releasing both the returned tuple and the array it contains.
 // The order of the elements in the array is unspecified.
-struct TupleWithControls
-{
-    QirTupleHeader header;
-    QirArray* controls;
-    TupleWithControls* innerTuple;
-};
-static_assert(
-    sizeof(TupleWithControls) == sizeof(QirTupleHeader) + 2 * sizeof(void*),
-    L"TupleWithControls should be tightly packed for FlattenControlArrays to be correct");
 QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
@@ -183,12 +167,14 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     const size_t qubitSize = sizeof(/*Qubit*/ void*);
     const size_t arrayPtrSize = sizeof(/*QirArrray*/ void*);
 
+    TupleWithControls* outer = TupleWithControls::FromTupleHeader(tuple);
+
     // Discover, how many controls there are in total so can allocate a correctly sized array for them.
     int cControls = 0;
-    TupleWithControls* current = reinterpret_cast<TupleWithControls*>(tuple);
+    TupleWithControls* current = outer;
     for (int i = 0; i < depth; i++)
     {
-        assert(i == depth - 1 || current->header.tupleSize == sizeof(TupleWithControls));
+        assert(i == depth - 1 || current->GetHeader()->tupleSize == sizeof(TupleWithControls));
         QirArray* controls = current->controls;
         assert(controls->itemSizeInBytes == qubitSize);
         cControls += controls->count;
@@ -199,13 +185,13 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     QirArray* combinedControls = new QirArray(cControls, qubitSize);
     char* dst = combinedControls->buffer;
     const char* dstEnd = dst + qubitSize * cControls;
-    current = reinterpret_cast<TupleWithControls*>(tuple);
+    current = outer;
     QirTupleHeader* last = nullptr;
     for (int i = 0; i < depth; i++)
     {
         if (i == depth - 1)
         {
-            last = reinterpret_cast<QirTupleHeader*>(current);
+            last = current->GetHeader();
         }
 
         QirArray* controls = current->controls;
@@ -217,16 +203,15 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
         current = current->innerTuple;
     }
 
-    // Create the new tuple with the flattened controls array.
-    QirTupleHeader* flatTuple = quantum__rt__tuple_create(last->tupleSize);
-    memcpy(flatTuple->Data(), last->Data(), last->tupleSize - sizeof(QirTupleHeader));
-    QirArray** arr = reinterpret_cast<QirArray**>(flatTuple->Data());
+    // Create the new tuple with the flattened controls array and args from the `last` tuple.
+    QirTupleHeader* flatTuple = QirTupleHeader::CreateWithCopiedData(last);
+    QirArray** arr = reinterpret_cast<QirArray**>(flatTuple->AsTuple());
     *arr = combinedControls;
 
     return flatTuple;
 }
 
-void QirCallable::Invoke(QirTupleHeader* args, QirTupleHeader* result)
+void QirCallable::Invoke(char* args, char* result)
 {
     assert(this->appliedFunctor < QirCallable::TableSize);
     if (this->controlledDepth < 2)
@@ -238,12 +223,12 @@ void QirCallable::Invoke(QirTupleHeader* args, QirTupleHeader* result)
     else
     {
         // Must unpack the `args` tuple into a new tuple with flattened controls.
-        QirTupleHeader* flat = FlattenControlArrays(args, this->controlledDepth);
-        QirArray* controls = *reinterpret_cast<QirArray**>(flat->Data());
+        QirTupleHeader* flat = FlattenControlArrays(QirTupleHeader::GetHeader(args), this->controlledDepth);
+        QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
 
-        this->functionTable[this->appliedFunctor](capture, flat, result);
+        this->functionTable[this->appliedFunctor](capture, flat->AsTuple(), result);
 
-        quantum__rt__tuple_unreference(flat);
+        flat->Release();
         quantum__rt__array_unreference(controls);
     }
 }

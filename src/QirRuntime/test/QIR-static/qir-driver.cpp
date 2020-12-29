@@ -286,11 +286,11 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__(Qubit q)                                 // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                                 // NOLINT
 {
     g_ctrqapi->X(q);
 }
-extern "C" void __quantum__qis__kctl__(QirArray* controls, Qubit q) // NOLINT
+extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }

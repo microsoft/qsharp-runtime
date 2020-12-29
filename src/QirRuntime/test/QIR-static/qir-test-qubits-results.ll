@@ -2,7 +2,6 @@
 %Result = type opaque
 %Range = type { i64, i64, i64 }
 %Qubit = type opaque
-%TupleHeader = type { i32, i32 }
 %Array = type opaque
 %String = type opaque
 
