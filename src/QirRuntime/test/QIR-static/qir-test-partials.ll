@@ -6,10 +6,9 @@
 
 @ResultZero = external global %Result*
 @ResultOne = external global %Result*
-
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
 @Microsoft__Quantum__Testing__QIR__Subtract = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Microsoft__Quantum__Testing__QIR__Subtract__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
-@PartialApplication__11 = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Lifted__PartialApplication__11__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
+@PartialApplication__21 = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Lifted__PartialApplication__21__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
 
 @Microsoft_Quantum_Testing_QIR_TestPartials = alias i64 (i64, i64), i64 (i64, i64)* @Microsoft__Quantum__Testing__QIR__TestPartials__body
 
@@ -29,7 +28,7 @@ entry:
   call void @__quantum__rt__callable_reference(%Callable* %3)
   %4 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %1, i64 0, i32 1
   store i64 %x, i64* %4
-  %subtractor = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @PartialApplication__11, %Tuple* %0)
+  %subtractor = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @PartialApplication__21, %Tuple* %0)
   %5 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint (i64* getelementptr (i64, i64* null, i32 1) to i64))
   %6 = bitcast %Tuple* %5 to { i64 }*
   %7 = getelementptr { i64 }, { i64 }* %6, i64 0, i32 0
@@ -67,7 +66,7 @@ declare %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, 
 
 declare void @__quantum__rt__callable_reference(%Callable*)
 
-define void @Lifted__PartialApplication__11__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
+define void @Lifted__PartialApplication__21__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
 entry:
   %0 = bitcast %Tuple* %capture-tuple to { %Callable*, i64 }*
   %1 = bitcast %Tuple* %arg-tuple to { i64 }*
@@ -83,9 +82,10 @@ entry:
   store i64 %9, i64* %7
   %10 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 0
   %11 = load %Callable*, %Callable** %10
-  call void @__quantum__rt__callable_invoke(%Callable* %11, %Tuple* %2, %Tuple* %result-tuple)
   %12 = bitcast { i64, i64 }* %3 to %Tuple*
-  call void @__quantum__rt__tuple_unreference(%Tuple* %12)
+  call void @__quantum__rt__callable_invoke(%Callable* %11, %Tuple* %12, %Tuple* %result-tuple)
+  %13 = bitcast { i64, i64 }* %3 to %Tuple*
+  call void @__quantum__rt__tuple_unreference(%Tuple* %13)
   ret void
 }
 
