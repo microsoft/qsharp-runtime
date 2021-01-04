@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// For the Toffoli simulator, the implementation flips a target qubit
         /// if the respective rotation is effectively an X gate.
         /// </summary>
-        public void Exp_Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             if (targets == null) return;
 
@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, this operation is self-adjoint.
         /// </summary>
-        public void Exp_AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets) => Exp_Body(paulis, angle, targets);
+        public void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets) => Exp__Body(paulis, angle, targets);
 
         /// <summary>
         /// The implementation of the controlled specialization of the operation.
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// if the rotation is effectively an X gate and all of the control qubits
         /// are in the One state.
         /// </summary>
-        public void Exp_ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             if (targets == null) return;
 
@@ -72,6 +72,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the controlled adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
         /// </summary>
-        public void Exp_ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets) => Exp_ControlledBody(controls, paulis, angle, targets);
+        public void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets) => Exp__ControlledBody(controls, paulis, angle, targets);
     }
 }

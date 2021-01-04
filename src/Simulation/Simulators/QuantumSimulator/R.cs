@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void R_Body(Pauli pauli, double angle, Qubit target)
+        public virtual void R__Body(Pauli pauli, double angle, Qubit target)
         {
             this.CheckQubit(target);
             CheckAngle(angle);
@@ -17,25 +17,25 @@ namespace Microsoft.Quantum.Simulation.Simulators
             R(this.Id, pauli, angle, (uint)target.Id);
         }
 
-        public virtual void R_AdjointBody(Pauli pauli, double angle, Qubit target)
+        public virtual void R__AdjointBody(Pauli pauli, double angle, Qubit target)
         {
-            R_Body(pauli, -angle, target);
+            R__Body(pauli, -angle, target);
         }
 
-        public virtual void R_ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        public virtual void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
             this.CheckQubits(controls, target);
             CheckAngle(angle);
 
             SafeControlled(controls,
-                () => R_Body(pauli, angle, target),
+                () => R__Body(pauli, angle, target),
                 (count, ids) => MCR(this.Id, pauli, angle, count, ids, (uint)target.Id));
         }
 
 
-        public virtual void R_ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        public virtual void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            R_ControlledBody(controls, pauli, -angle, target);
+            R__ControlledBody(controls, pauli, -angle, target);
         }
     }
 }

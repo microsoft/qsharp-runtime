@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             
             // Now test control... We'll have 3 control qubits.
             // We will run the test with 1..3 controls at a time.
-            let ctrlsCount = 2;//3;
+            let ctrlsCount = 3;
             
             using (ctrls = Qubit[ctrlsCount]) {
                 

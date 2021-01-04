@@ -8,6 +8,6 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_Measure : IOperationFactory
     {
-        Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets);
+        Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets);
     }
 }

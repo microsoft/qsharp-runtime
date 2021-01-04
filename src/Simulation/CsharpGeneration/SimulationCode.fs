@@ -1041,7 +1041,7 @@ module SimulationCode =
                 | _ -> op.ArgumentTuple
             let argName, argsInit = getInputVarWithInit args
             let specCall =
-                (userDefinedName None op.FullName.Name) + "_" +
+                (userDefinedName None op.FullName.Name) + "__" +
                 match sp.Kind with
                 | QsBody -> ""
                 | QsAdjoint -> "Adjoint"

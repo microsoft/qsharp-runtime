@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void ApplyControlledZ_Body(Qubit control, Qubit target)
+        public virtual void ApplyControlledZ__Body(Qubit control, Qubit target)
         {
             this.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
 

@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public void Reset_Body(Qubit target)
+        public void Reset__Body(Qubit target)
         {
             // The native simulator doesn't have a reset operation, so simulate
             // it via an M follow by a conditional X.

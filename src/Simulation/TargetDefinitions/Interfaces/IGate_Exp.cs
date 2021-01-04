@@ -8,12 +8,12 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_Exp : IOperationFactory
     {
-        void Exp_Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
+        void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
 
-        void Exp_AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
+        void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
 
-        void Exp_ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
+        void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
 
-        void Exp_ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
+        void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets);
     }
 }

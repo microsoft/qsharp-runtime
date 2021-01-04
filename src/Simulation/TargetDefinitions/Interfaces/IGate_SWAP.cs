@@ -8,8 +8,8 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_SWAP : IOperationFactory
     {
-        void SWAP_Body(Qubit target1, Qubit target2);
+        void SWAP__Body(Qubit target1, Qubit target2);
 
-        void SWAP_ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2);
+        void SWAP__ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2);
     }
 }

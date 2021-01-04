@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class QuantumSimulator
     {
-        public virtual void SWAP_Body(Qubit target1, Qubit target2)
+        public virtual void SWAP__Body(Qubit target1, Qubit target2)
         {
             var ctrls1 = new QArray<Qubit>(target1);
             var ctrls2 = new QArray<Qubit>(target2);
@@ -21,11 +21,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
         }
 
-        public virtual void SWAP_ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2)
+        public virtual void SWAP__ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2)
         {
             if ((controls == null) || (controls.Count == 0))
             {
-                SWAP_Body(target1, target2);
+                SWAP__Body(target1, target2);
             }
             else
             {

@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// That is, Result.One is returned if an odd number of the measured qubits are
         /// in the One state.
         /// </summary>
-        public Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        public Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             Qubit? f(Pauli p, Qubit q) =>
                 p switch {

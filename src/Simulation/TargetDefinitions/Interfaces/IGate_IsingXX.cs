@@ -8,12 +8,12 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_IsingXX : IOperationFactory
     {
-        void IsingXX_Body(double angle, Qubit target1, Qubit target2);
+        void IsingXX__Body(double angle, Qubit target1, Qubit target2);
 
-        void IsingXX_AdjointBody(double angle, Qubit target1, Qubit target2);
+        void IsingXX__AdjointBody(double angle, Qubit target1, Qubit target2);
 
-        void IsingXX_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2);
+        void IsingXX__ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2);
 
-        void IsingXX_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2);
+        void IsingXX__ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2);
     }
 }

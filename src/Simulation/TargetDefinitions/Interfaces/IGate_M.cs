@@ -8,6 +8,6 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_M : IOperationFactory
     {
-        Result M_Body(Qubit target);
+        Result M__Body(Qubit target);
     }
 }

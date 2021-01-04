@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void ApplyUncontrolledH_Body(Qubit target)
+        public virtual void ApplyUncontrolledH__Body(Qubit target)
         {
             this.CheckQubit(target);
 

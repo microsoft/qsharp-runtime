@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Result Measure_Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        public virtual Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);
             if (paulis.Length != targets.Length)

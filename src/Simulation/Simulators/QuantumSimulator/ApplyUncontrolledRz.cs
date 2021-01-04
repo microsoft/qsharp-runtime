@@ -9,16 +9,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void ApplyUncontrolledRz_Body(double angle, Qubit target)
+        public virtual void ApplyUncontrolledRz__Body(double angle, Qubit target)
         {
             this.CheckQubit(target, nameof(target));
             CheckAngle(angle);
             R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
         }
 
-        public virtual void ApplyUncontrolledRz_AdjointBody(double angle, Qubit target)
+        public virtual void ApplyUncontrolledRz__AdjointBody(double angle, Qubit target)
         {
-            ApplyUncontrolledRz_Body(-angle, target);
+            ApplyUncontrolledRz__Body(-angle, target);
         }
     }
 }

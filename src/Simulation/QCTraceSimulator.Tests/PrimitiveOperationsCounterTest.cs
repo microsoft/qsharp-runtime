@@ -95,7 +95,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             var config = new QCTraceSimulatorConfiguration();
             config.UseDepthCounter = true;
             config.CallStackDepthLimit = 2;
-            QCTraceSimulator sim = new QCTraceSimulator( config);
+            QCTraceSimulator sim = new QCTraceSimulator(config);
             var res = CCNOTDriver.Run(sim).Result;
 
             double tDepth = sim.GetMetric<Intrinsic.CCNOT, CCNOTDriver>(MetricsNames.DepthCounter.Depth);
@@ -118,7 +118,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             var config = new QCTraceSimulatorConfiguration();
             config.UseWidthCounter = true;
             config.CallStackDepthLimit = 2;
-            var sim = new QCTraceSimulator( config);
+            var sim = new QCTraceSimulator(config);
             int totalNumberOfQubits = 5;
             var res = MultiControlledXDriver.Run(sim, totalNumberOfQubits).Result;
 

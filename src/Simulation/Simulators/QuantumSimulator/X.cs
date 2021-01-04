@@ -9,19 +9,19 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void X_Body(Qubit target)
+        public virtual void X__Body(Qubit target)
         {
             this.CheckQubit(target);
 
             X(this.Id, (uint)target.Id);
         }
 
-        public virtual void X_ControlledBody(IQArray<Qubit> controls, Qubit target)
+        public virtual void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => X_Body(target),
+                () => X__Body(target),
                 (count, ids) => MCX(this.Id, count, ids, (uint)target.Id));
         }
     }

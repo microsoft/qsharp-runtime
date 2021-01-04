@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// For the Toffoli simulator, the implementation flips the target qubit
         /// if the rotation is effectively an X gate.
         /// </summary>
-        public void R_Body(Pauli pauli, double angle, Qubit target)
+        public void R__Body(Pauli pauli, double angle, Qubit target)
         {
             if (target == null) return;
 
@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, this operation is self-adjoint.
         /// </summary>
-        public void R_AdjointBody(Pauli pauli, double angle, Qubit target) => R_Body(pauli, angle, target);
+        public void R__AdjointBody(Pauli pauli, double angle, Qubit target) => R__Body(pauli, angle, target);
 
         /// <summary>
         /// The implementation of the controlled specialization of the operation.
@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// if the rotation is effectively an X gate and all of the control qubits
         /// are in the One state.
         /// </summary>
-        public void R_ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        public void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
             if (target == null) return;
 
@@ -56,6 +56,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the controlled adjoint specialization of the operation.
         /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
         /// </summary>
-        public void R_ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target) => R_ControlledBody(controls, pauli, angle, target);
+        public void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target) => R__ControlledBody(controls, pauli, angle, target);
     }
 }

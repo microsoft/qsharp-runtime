@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void Exp_Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public virtual void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);
             CheckAngle(angle);
@@ -23,12 +23,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
             Exp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, targets.GetIds());
         }
 
-        public virtual void Exp_AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public virtual void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
-            Exp_Body(paulis, -angle, targets);
+            Exp__Body(paulis, -angle, targets);
         }
 
-        public virtual void Exp_ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public virtual void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             this.CheckQubits(controls, targets);
             CheckAngle(angle);
@@ -39,13 +39,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
 
             SafeControlled(controls,
-                () => Exp_Body(paulis, angle, targets),
+                () => Exp__Body(paulis, angle, targets),
                 (count, ids) => MCExp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, count, ids, targets.GetIds()));
         }
 
-        public virtual void Exp_ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        public virtual void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
-            Exp_ControlledBody(controls, paulis, -angle, targets);
+            Exp__ControlledBody(controls, paulis, -angle, targets);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Result M_Body(Qubit target)
+        public virtual Result M__Body(Qubit target)
         {
             this.CheckQubit(target);
             //setting qubit as measured to allow for release

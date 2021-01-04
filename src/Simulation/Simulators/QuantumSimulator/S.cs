@@ -9,35 +9,35 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void S_Body(Qubit target)
+        public virtual void S__Body(Qubit target)
         {
             this.CheckQubit(target);
 
             S(this.Id, (uint)target.Id);
         }
 
-        public virtual void S_ControlledBody(IQArray<Qubit> controls, Qubit target)
+        public virtual void S__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => S_Body(target),
+                () => S__Body(target),
                 (count, ids) => MCS(this.Id, count, ids, (uint)target.Id));
         }
 
-        public virtual void S_AdjointBody(Qubit target)
+        public virtual void S__AdjointBody(Qubit target)
         {
             this.CheckQubit(target);
 
             AdjS(this.Id, (uint)target.Id);
         }
 
-        public virtual void S_ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        public virtual void S__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => S_AdjointBody(target),
+                () => S__AdjointBody(target),
                 (count, ids) => MCAdjS(this.Id, count, ids, (uint)target.Id));
         }
     }

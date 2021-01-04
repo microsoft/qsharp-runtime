@@ -8,12 +8,12 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_Ry : IOperationFactory
     {
-        void Ry_Body(double angle, Qubit target);
+        void Ry__Body(double angle, Qubit target);
 
-        void Ry_AdjointBody(double angle, Qubit target);
+        void Ry__AdjointBody(double angle, Qubit target);
 
-        void Ry_ControlledBody(IQArray<Qubit> controls, double angle, Qubit target);
+        void Ry__ControlledBody(IQArray<Qubit> controls, double angle, Qubit target);
 
-        void Ry_ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target);
+        void Ry__ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target);
     }
 }

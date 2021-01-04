@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the operation.
         /// For the Toffoli simulator, the implementation flips the target qubit.
         /// </summary>
-        public void X_Body(Qubit target)
+        public void X__Body(Qubit target)
         {
             if (target == null) return;
 
@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// For the Toffoli simulator, the implementation flips the target qubit 
         /// if all of the control qubits are 1.
         /// </summary>
-        public void X_ControlledBody(IQArray<Qubit> controls, Qubit target)
+        public void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             if (target == null) return;
 

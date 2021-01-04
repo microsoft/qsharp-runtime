@@ -8,8 +8,8 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_ApplyUncontrolledRz : IOperationFactory
     {
-        void ApplyUncontrolledRz_Body(double angle, Qubit target);
+        void ApplyUncontrolledRz__Body(double angle, Qubit target);
 
-        void ApplyUncontrolledRz_AdjointBody(double angle, Qubit target);
+        void ApplyUncontrolledRz__AdjointBody(double angle, Qubit target);
     }
 }

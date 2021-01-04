@@ -8,8 +8,8 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IGate_H : IOperationFactory
     {
-        void H_Body(Qubit target);
+        void H__Body(Qubit target);
 
-        void H_ControlledBody(IQArray<Qubit> controls, Qubit target);
+        void H__ControlledBody(IQArray<Qubit> controls, Qubit target);
     }
 }
