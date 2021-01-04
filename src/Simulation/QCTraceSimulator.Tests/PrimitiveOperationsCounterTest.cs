@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
             var config = new QCTraceSimulatorConfiguration();
             config.UseDepthCounter = true;
             config.CallStackDepthLimit = 1;
-            QCTraceSimulator sim = new QCTraceSimulator( config);
+            QCTraceSimulator sim = new QCTraceSimulator(config);
             var res = TDepthOne.Run(sim).Result;
             string csvSummary = sim.ToCSV()[MetricsCountersNames.depthCounter];
             Assert.Equal(1, sim.GetMetric<TDepthOne>(MetricsNames.DepthCounter.Depth));
