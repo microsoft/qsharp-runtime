@@ -7,6 +7,7 @@
 #include <stdarg.h> // for va_list
 
 #include "CoreTypes.hpp"
+#include "qirTypes.hpp"
 
 struct QirArray;
 struct QirCallable;
@@ -90,13 +91,13 @@ extern "C"
     // ------------------------------------------------------------------------
 
     // Allocates space for a tuple requiring the given number of bytes and sets the reference count to 1.
-    QIR_SHARED_API char* quantum__rt__tuple_create(int64_t); // NOLINT
+    QIR_SHARED_API PTuple quantum__rt__tuple_create(int64_t); // NOLINT
 
     // Indicates that a new reference has been added.
-    QIR_SHARED_API void quantum__rt__tuple_reference(char*); // NOLINT
+    QIR_SHARED_API void quantum__rt__tuple_reference(PTuple); // NOLINT
 
     // Indicates that an existing reference has been removed and potentially releases the tuple.
-    QIR_SHARED_API void quantum__rt__tuple_unreference(char*); // NOLINT
+    QIR_SHARED_API void quantum__rt__tuple_unreference(PTuple); // NOLINT
 
     // ------------------------------------------------------------------------
     // Arrrays
@@ -157,8 +158,8 @@ extern "C"
 
     // Initializes the callable with the provided function table and capture tuple. The capture tuple pointer
     // should be null if there is no capture.
-    typedef void (*t_CallableEntry)(char*, char*, char*);                      // NOLINT
-    QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, char*); // NOLINT
+    typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);                      // NOLINT
+    QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, PTuple); // NOLINT
 
     // Indicates that a new reference has been added.
     QIR_SHARED_API void quantum__rt__callable_reference(QirCallable*); // NOLINT
@@ -170,7 +171,7 @@ extern "C"
     QIR_SHARED_API QirCallable* quantum__rt__callable_copy(QirCallable*); // NOLINT
 
     // Invokes the callable with the provided argument tuple and fills in the result tuple.
-    QIR_SHARED_API void quantum__rt__callable_invoke(QirCallable*, char*, char*); // NOLINT
+    QIR_SHARED_API void quantum__rt__callable_invoke(QirCallable*, PTuple, PTuple); // NOLINT
 
     // Updates the callable by applying the Adjoint functor.
     QIR_SHARED_API void quantum__rt__callable_make_adjoint(QirCallable*); // NOLINT

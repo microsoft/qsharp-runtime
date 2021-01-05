@@ -78,7 +78,7 @@ struct QirString
     Tuples are opaque to the runtime and the type of the data contained in them isn't (generally) known, thus, we use
     char* to represent the tuples QIR operates with. However, we need to manage tuples' lifetime and in case of nested
     controlled callables we also need to peek into the tuple's content. To do this we associate with each tuple's buffer
-    a header that contains the relevant data. The header immediately precedes the tuple's buffer in memeory when the
+    a header that contains the relevant data. The header immediately precedes the tuple's buffer in memory when the
     tuple is created.
 ======================================================================================================================*/
 using PTuple = char*;
