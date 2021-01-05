@@ -145,11 +145,6 @@ QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
     return th;
 }
 
-QirTupleHeader* QirTupleHeader::GetHeader(PTuple tuple)
-{
-    return reinterpret_cast<QirTupleHeader*>(tuple - sizeof(QirTupleHeader));
-}
-
 /*==============================================================================
     Implementation of QirCallable
 ==============================================================================*/
@@ -215,7 +210,6 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
 
     const size_t qubitSize = sizeof(/*Qubit*/ void*);
-    const size_t arrayPtrSize = sizeof(/*QirArrray*/ void*);
 
     TupleWithControls* outer = TupleWithControls::FromTupleHeader(tuple);
 
@@ -274,12 +268,11 @@ void QirCallable::Invoke(PTuple args, PTuple result)
     {
         // Must unpack the `args` tuple into a new tuple with flattened controls.
         QirTupleHeader* flat = FlattenControlArrays(QirTupleHeader::GetHeader(args), this->controlledDepth);
-        QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
-
         this->functionTable[this->appliedFunctor](capture, flat->AsTuple(), result);
 
-        flat->Release();
+        QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
         quantum__rt__array_unreference(controls);
+        flat->Release();
     }
 }
 

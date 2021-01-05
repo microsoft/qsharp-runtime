@@ -87,9 +87,12 @@ struct QirTupleHeader
     int refCount = 0;
     int tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer
 
+    // flexible array member, must be last in the struct
+    char data[];
+
     PTuple AsTuple()
     {
-        return reinterpret_cast<PTuple>(this) + sizeof(QirTupleHeader);
+        return data;
     }
 
     int AddRef();
@@ -97,7 +100,11 @@ struct QirTupleHeader
 
     static QirTupleHeader* Create(int size);
     static QirTupleHeader* CreateWithCopiedData(QirTupleHeader* other);
-    static QirTupleHeader* GetHeader(PTuple tuple);
+
+    static QirTupleHeader* GetHeader(PTuple tuple)
+    {
+        return reinterpret_cast<QirTupleHeader*>(tuple - offsetof(QirTupleHeader, data));
+    }
 };
 
 /*======================================================================================================================
@@ -125,7 +132,7 @@ struct TupleWithControls
 
     QirTupleHeader* GetHeader()
     {
-        return QirTupleHeader::GetHeader(reinterpret_cast<PTuple>(this));
+        return QirTupleHeader::GetHeader(this->AsTuple());
     }
 };
 static_assert(
