@@ -197,7 +197,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                     // Now we fix qubits that are not yet fixed by adjusting their start time.
                     // And adjust end time for all qubits involved.
                     foreach (QubitTimeMetrics q in qubitsMetrics) {
-                        if (ComplexTime.Compare(q.StartTime, ComplexTime.MinValue) == 0) {
+                        if (q.StartTime.IsEqualTo(ComplexTime.MinValue)) {
                             q.StartTime = maxEndTime.Subtract(q.EndTime);
                         }
                         q.EndTime = maxEndTime.AdvanceBy(primitiveOperationDuration);
@@ -224,12 +224,12 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 // Doing width reuse heuristics and width computation.
                 foreach (QubitTimeMetrics q in qubitsTraceData.Cast<QubitTimeMetrics>()) {
                     // If qubit wasn't used in any gate. We don't allocate it.
-                    if (ComplexTime.Compare(q.EndTime, ComplexTime.Zero) == 0) {
+                    if (q.EndTime.IsEqualTo(ComplexTime.Zero)) {
                         continue;
                     }
 
                     // If qubit is not fixed in time we fix it at zero.
-                    if (ComplexTime.Compare(q.StartTime, ComplexTime.MinValue) == 0) {
+                    if (q.StartTime.IsEqualTo(ComplexTime.MinValue)) {
                         q.StartTime = ComplexTime.Zero;
                     }
 

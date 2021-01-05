@@ -26,6 +26,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         // If qubit only participated in single-qubit gates StartTime is set to ComplexTime.MinValue.
         // If qubit already participated in multi-qubit gates its position is fixed on the timeline of the program.
         // For such qubits StartTime this is set to the start time of the first gate it participated in.
+        // This field is only maintained when optimizing for depth.
         internal ComplexTime StartTime { get; set; }
 
         public QubitTimeMetrics(long qubitId)

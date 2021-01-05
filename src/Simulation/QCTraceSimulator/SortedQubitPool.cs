@@ -6,7 +6,7 @@ using System.Text;
 namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
 
     /// <summary>
-    /// Either time interval or point in time on the timeline of the program.
+    /// Either length of a time interval or a point in time on the timeline of the program.
     /// </summary>
     internal struct ComplexTime
     {
@@ -42,7 +42,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// <summary>
         /// Add gate time to availability time. If gate time is zero, advance dependency time.
         /// </summary>
-        /// <param name="gateTime">Gate time to advance by. Assumed to be precise for comparison with 0.</param>
+        /// <param name="gateTime">Gate time to advance by. Assumed to be set from literals so comparison with 0 should be precise.</param>
         /// <returns>ComplexTime advanced by provided gate time</returns>
         internal ComplexTime AdvanceBy(double gateTime) {
             if (gateTime == 0.0) {
@@ -63,7 +63,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             }
             double result = DepthTime - time.DepthTime;
             if (result <= 0) {
-                // This could only happen due to insufficient floating point calculation precision.
+                // This could happen due to insufficient floating point calculation precision.
                 throw new ArgumentException("Result of ComplexTime subtraction is not positive.");
             }
             return new ComplexTime(result, 0);
@@ -79,6 +79,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
                 return result;
             }
             return a.TrailingZeroDepthGateCount.CompareTo(b.TrailingZeroDepthGateCount);
+        }
+
+        /// <summary>
+        /// Returns true if this ComplexTime is the same as the argument.
+        /// </summary>
+        internal bool IsEqualTo(ComplexTime t) {
+            return Compare(this, t) == 0;
         }
 
         /// <summary>
@@ -215,7 +222,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
                         MaxLowerBound = ComplexTime.Max(MaxLowerBound, a.Time);
                     }
                 } else {
-                    // We found the value if one argument is the sample and nother is not.
+                    // We found the value if one argument is the sample and the other is not.
                     if ((a == Sample) != (b == Sample)) {
                         MaxLowerBound = b.Time;
                         MinUpperBound = b.Time;
@@ -238,7 +245,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         private readonly VisitingComparer NodeComparer;
 
         /// <summary>
-        /// Sample which is been compared to the nodes stored in the set.
+        /// Sample which is being compared to the nodes stored in the set.
         /// Multiple comparisons are done by SortedSet to find if this Sample is present in the set.
         /// </summary>
         private readonly QubitTimeNode Sample = new QubitTimeNode(); // We reuse same object to avoid allocations.
@@ -276,12 +283,12 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// This function uses one call to SortedSet.TryGetValue() so it takes log(N) time, where N - number of nodes.
         /// </summary>
         /// <param name="requestedTime">Sample time to find</param>
-        /// <param name="getLowerBound">"true" to find maximum value less than sample</param>
+        /// <param name="getLowerBound">"true" to find maximum value &lt;= requestedTime, "false" to find minimum value &gt;= requestedTime</param>
         /// <param name="actualTime">Time found in the set</param>
-        /// <returns>"true" if sample was found in the set.</returns>
+        /// <returns>"true" if the requested bound was found in the set, "false" otherwise</returns>
         public bool FindBound(ComplexTime requestedTime, bool getLowerBound, out ComplexTime actualTime) {
             // We use the following approach:
-            // We call function TryGetValue on a sorted set. If value is found, we go with it.
+            // We call function TryGetValue on a sorted set. If value is found, we return it.
             // Otherwise TryGetValue must make conclusion that the value is absent.
             // Any comparison-based algorithm without caching must inspect both
             // maximum value less than the sample and minimum value greater than the sample.
@@ -295,10 +302,10 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             }
             if (getLowerBound) {
                 actualTime = NodeComparer.MaxLowerBound;
-                return ComplexTime.Compare(actualTime, ComplexTime.MinValue) != 0;
+                return !actualTime.IsEqualTo(ComplexTime.MinValue);
             } else {
                 actualTime = NodeComparer.MinUpperBound;
-                return ComplexTime.Compare(actualTime, ComplexTime.MaxValue) != 0;
+                return !actualTime.IsEqualTo(ComplexTime.MaxValue);
             }
         }
 
