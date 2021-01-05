@@ -12,6 +12,15 @@ namespace Microsoft.Quantum.Core{
     @Attribute()
     newtype EntryPoint = Unit;
 
+    function Length<'T> (array : 'T[]) : Int { body intrinsic; }
+
+    function RangeStart (range : Range) : Int { body intrinsic; }
+
+    function RangeStep (range : Range) : Int { body intrinsic; }
+
+    function RangeEnd (range : Range) : Int { body intrinsic; }
+
+    function RangeReverse (range : Range) : Range { body intrinsic; }
 }
 
 namespace Microsoft.Quantum.Targeting {

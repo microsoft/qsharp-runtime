@@ -4,23 +4,91 @@
 #include <memory>
 
 #include "CoreTypes.hpp"
+#include "QuantumApi_I.hpp"
 
-// The tracer does _not_ implement ISimulator interface by design to avoid virtual calls and enable as many compiler
-// optimizations (inlining, etc.) as possible.
-class CTracer
+namespace Microsoft
 {
-    // Start with no reuse of qubits.
-    long lastQubitId = -1;
-
-  public:
-    Qubit AllocateQubit();
-    void ReleaseQubit(Qubit q);
-
-    template<int N> void TraceSingleQubitOp(int32_t duration, Qubit target)
+namespace Quantum
+{
+    /*======================================================================================================================
+        TracedQubit
+    ======================================================================================================================*/
+    struct TracedQubit
     {
-        // figure out the layering, etc.
-    }
-};
+        static const long INVALID = -1;
 
-thread_local std::shared_ptr<CTracer> tracer = nullptr;
-void InitializeTracer();
+        long id = INVALID;
+
+        // Last layer the qubit was used in, `INVALID` means the qubit haven't been used yet in any operations of
+        // non-zero duration.
+        int layer = INVALID;
+    };
+
+    /*======================================================================================================================
+        The tracer implements resource estimation. See readme in this folder for details.
+    ======================================================================================================================*/
+    class CTracer : public ISimulator
+    {
+        // Start with no reuse of qubits.
+        long lastQubitId = -1;
+
+      public:
+        IQuantumGateSet* AsQuantumGateSet() override
+        {
+            return nullptr;
+        }
+        IDiagnostics* AsDiagnostics() override
+        {
+            return nullptr;
+        }
+        Qubit AllocateQubit() override
+        {
+            return reinterpret_cast<Qubit>(++lastQubitId);
+        }
+        void ReleaseQubit(Qubit qubit) override
+        {
+            // nothing for now
+        }
+        std::string QubitToString(Qubit qubit) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        Result M(Qubit target) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        void ReleaseResult(Result result) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        bool AreEqualResults(Result r1, Result r2) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        ResultValue GetResultValue(Result result) override
+        {
+            throw std::logic_error("not_implemented");
+        }
+        Result UseZero() override
+        {
+            return reinterpret_cast<Result>(0);
+        }
+        Result UseOne() override
+        {
+            return reinterpret_cast<Result>(1);
+        }
+
+        void TraceSingleQubitOp(int32_t id, int32_t duration, TracedQubit* target)
+        {
+            // figure out the layering, etc.
+        }
+    };
+
+    std::shared_ptr<CTracer> CreateTracer();
+
+} // namespace Quantum
+} // namespace Microsoft
