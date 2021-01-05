@@ -148,23 +148,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         private void RegisterPrimitiveOperationsGivenAsCircuits()
         {
-            var dllAssembly = typeof(Intrinsic.X).Assembly;
-            var localAssembly = typeof(Intrinsic.ExpFrac).Assembly;
-
             IEnumerable<Type> primitiveOperationTypes =
-                from op in dllAssembly.GetExportedTypes()
+                from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
                 select op;
-
-            if (dllAssembly.FullName != localAssembly.FullName)
-            {
-                var localPrimatives =
-                    from op in localAssembly.GetExportedTypes()
-                    where op.IsSubclassOf(typeof(AbstractCallable))
-                    select op;
-
-                primitiveOperationTypes = primitiveOperationTypes.Concat(localPrimatives);
-            }
 
             IEnumerable<Type> primitiveOperationAsCircuits =
                 from op in typeof(Circuits.X).Assembly.GetExportedTypes()
