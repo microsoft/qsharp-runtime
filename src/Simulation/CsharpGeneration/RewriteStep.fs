@@ -53,12 +53,22 @@ type Emitter() =
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
             let allSources = GetSourceFiles.Apply compilation.Namespaces 
 
-            for source in allSources |> Seq.filter context.GenerateCodeForSource do
-                let content = SimulationCode.generate source context
-                CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
-            for source in allSources |> Seq.filter (not << context.GenerateCodeForSource) do
-                let content = SimulationCode.loadedViaTestNames source context
-                if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
+            let isExe =
+                match context.assemblyConstants.TryGetValue AssemblyConstants.QsharpOutputType with
+                    | true, outputType -> outputType = AssemblyConstants.QsharpExe
+                    | _ -> false
+
+            if isExe then
+                for source in allSources do
+                    let content = SimulationCode.generate source context
+                    CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+            else
+                for source in allSources |> Seq.filter context.GenerateCodeForSource do
+                    let content = SimulationCode.generate source context
+                    CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+                for source in allSources |> Seq.filter (not << context.GenerateCodeForSource) do
+                    let content = SimulationCode.loadedViaTestNames source context
+                    if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             if not compilation.EntryPoints.IsEmpty then
                 let callable = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
