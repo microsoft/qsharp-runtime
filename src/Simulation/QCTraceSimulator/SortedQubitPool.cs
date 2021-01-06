@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
+namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
+{
 
     /// <summary>
     /// Either length of a time interval or a point in time on the timeline of the program.
@@ -26,17 +27,20 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         private long TrailingZeroDepthGateCount;
 
-        internal ComplexTime(double time) {
+        internal ComplexTime(double time)
+        {
             DepthTime = time;
             TrailingZeroDepthGateCount = 0;
         }
 
-        private ComplexTime(double depthTime, long trailingZeroDepthGateCount) {
+        private ComplexTime(double depthTime, long trailingZeroDepthGateCount)
+        {
             DepthTime = depthTime;
             TrailingZeroDepthGateCount = trailingZeroDepthGateCount;
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return $"{DepthTime}d+{TrailingZeroDepthGateCount}";
         }
         /// <summary>
@@ -44,8 +48,10 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         /// <param name="gateTime">Gate time to advance by. Assumed to be set from literals so comparison with 0 should be precise.</param>
         /// <returns>ComplexTime advanced by provided gate time</returns>
-        internal ComplexTime AdvanceBy(double gateTime) {
-            if (gateTime == 0.0) {
+        internal ComplexTime AdvanceBy(double gateTime)
+        {
+            if (gateTime == 0.0)
+            {
                 return new ComplexTime(DepthTime, TrailingZeroDepthGateCount + 1);
             }
             return new ComplexTime(DepthTime + gateTime);
@@ -57,12 +63,15 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         /// <param name="time">Time to subtract from this object.</param>
         /// <returns>Result of subtraction.</returns>
-        internal ComplexTime Subtract(ComplexTime time) {
-            if (DepthTime == time.DepthTime) {
+        internal ComplexTime Subtract(ComplexTime time)
+        {
+            if (DepthTime == time.DepthTime)
+            {
                 return new ComplexTime(0, TrailingZeroDepthGateCount - time.TrailingZeroDepthGateCount);
             }
             double result = DepthTime - time.DepthTime;
-            if (result <= 0) {
+            if (result <= 0)
+            {
                 // This could happen due to insufficient floating point calculation precision.
                 throw new ArgumentException("Result of ComplexTime subtraction is not positive.");
             }
@@ -73,9 +82,11 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// Compares two complex times. First DepthTime is compared, then TrailingZeroDepthGateCount is compared.
         /// </summary>
         /// <returns>0 when a = b, -1 when a&lt; b, and 1 when a &gt; b</returns>
-        internal static int Compare(ComplexTime a, ComplexTime b) {
+        internal static int Compare(ComplexTime a, ComplexTime b)
+        {
             int result = a.DepthTime.CompareTo(b.DepthTime);
-            if (result != 0) {
+            if (result != 0)
+            {
                 return result;
             }
             return a.TrailingZeroDepthGateCount.CompareTo(b.TrailingZeroDepthGateCount);
@@ -84,7 +95,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// <summary>
         /// Returns true if this ComplexTime is the same as the argument.
         /// </summary>
-        internal bool IsEqualTo(ComplexTime t) {
+        internal bool IsEqualTo(ComplexTime t)
+        {
             return Compare(this, t) == 0;
         }
 
@@ -92,7 +104,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// Finds smallest of the two ComplexTime arguments.
         /// </summary>
         /// <returns>Smallest of the two arguments according to comparison.</returns>
-        internal static ComplexTime Min(ComplexTime a, ComplexTime b) {
+        internal static ComplexTime Min(ComplexTime a, ComplexTime b)
+        {
             return Compare(a, b) < 0 ? a : b;
         }
 
@@ -100,7 +113,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// Finds largest of the two ComplexTime arguments.
         /// </summary>
         /// <returns>Largest of the two arguments according to comparison.</returns>
-        internal static ComplexTime Max(ComplexTime a, ComplexTime b) {
+        internal static ComplexTime Max(ComplexTime a, ComplexTime b)
+        {
             return Compare(a, b) > 0 ? a : b;
         }
 
@@ -127,7 +141,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
     /// Also supports addition (Add) and removal (Remove) of qubits identified by time. Time is <c>ComplexTime</c>.
     /// Multiple entries per time is supported. Implemented via SortedSet.
     /// </summary>
-    internal class SortedQubitPool {
+    internal class SortedQubitPool
+    {
 
         /// <summary>
         /// Auxilliary class to be placed into SortedSet, which is sorted by time.
@@ -154,16 +169,17 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             /// <summary>
             /// This is only used for Sample.
             /// </summary>
-            internal QubitTimeNode() {
-            }
+            internal QubitTimeNode() {}
 
-            internal QubitTimeNode(long qubitId, ComplexTime time) {
+            internal QubitTimeNode(long qubitId, ComplexTime time)
+            {
                 QubitId = qubitId;
                 Time = time;
                 NextNode = null;
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 return $"{QubitId} @ {Time}";
             }
         }
@@ -196,7 +212,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             /// Also sets sample object, which should not be counted because it is not an object from the set.
             /// </summary>
             /// <param name="sample">Sample object that is not considered for minimum and maximum.</param>
-            internal void ResetForComparison(QubitTimeNode sample) {
+            internal void ResetForComparison(QubitTimeNode sample)
+            {
                 MaxLowerBound = ComplexTime.MinValue;
                 MinUpperBound = ComplexTime.MaxValue;
                 Sample = sample;
@@ -206,24 +223,37 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             /// Compares Time field of two nodes. Also updates MaxLowerBound and MinUpperBound.
             /// </summary>
             /// <returns>Result of comparison of Time field of QubitTimeNode</returns>
-            public int Compare(QubitTimeNode a, QubitTimeNode b) {
+            public int Compare(QubitTimeNode a, QubitTimeNode b)
+            {
                 // Note that comparison of a and b nodes to Sample is "by reference" in this function.
                 int result = ComplexTime.Compare(a.Time, b.Time);
-                if (result > 0) {
-                    if (a == Sample && b != Sample) {
+                if (result > 0)
+                {
+                    if (a == Sample && b != Sample)
+                    {
                         MaxLowerBound = ComplexTime.Max(MaxLowerBound, b.Time);
-                    } else if (a != Sample && b == Sample) {
+                    }
+                    else if (a != Sample && b == Sample)
+                    {
                         MinUpperBound = ComplexTime.Min(MinUpperBound, a.Time);
                     }
-                } else if (result < 0) {
-                    if (a == Sample && b != Sample) {
+                }
+                else if (result < 0)
+                {
+                    if (a == Sample && b != Sample)
+                    {
                         MinUpperBound = ComplexTime.Min(MinUpperBound, b.Time);
-                    } else if (a != Sample && b == Sample) {
+                    }
+                    else if (a != Sample && b == Sample)
+                    {
                         MaxLowerBound = ComplexTime.Max(MaxLowerBound, a.Time);
                     }
-                } else {
+                }
+                else
+                {
                     // We found the value if one argument is the sample and the other is not.
-                    if ((a == Sample) != (b == Sample)) {
+                    if ((a == Sample) != (b == Sample))
+                    {
                         MaxLowerBound = b.Time;
                         MinUpperBound = b.Time;
                     }
@@ -250,7 +280,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         private readonly QubitTimeNode Sample = new QubitTimeNode(); // We reuse same object to avoid allocations.
 
-        public SortedQubitPool() {
+        public SortedQubitPool()
+        {
             NodeComparer = new VisitingComparer();
             QubitsSortedByTime = new SortedSet<QubitTimeNode>(NodeComparer);
         }
@@ -261,13 +292,16 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         /// <param name="qubitId">Id of a qubit to add to the set.</param>
         /// <param name="time">Time of the qubit.</param>
-        public void Add(long qubitId, ComplexTime time) {
+        public void Add(long qubitId, ComplexTime time)
+        {
             QubitTimeNode newNode = new QubitTimeNode(qubitId, time);
-            if (QubitsSortedByTime.Add(newNode)) {
+            if (QubitsSortedByTime.Add(newNode))
+            {
                 // New item was added to the set, we are done.
                 return;
             }
-            if (!QubitsSortedByTime.TryGetValue(newNode, out QubitTimeNode existingNode)) {
+            if (!QubitsSortedByTime.TryGetValue(newNode, out QubitTimeNode existingNode))
+            {
                 // We cannot add, but we cannot find a node with the same value. Is this a floating point glitch?
                 Debug.Assert(false, "Cannot add a value to SortedSet<QubitTimeNode> that isn't in the set.");
                 return;
@@ -286,7 +320,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// <param name="getLowerBound">"true" to find maximum value &lt;= requestedTime, "false" to find minimum value &gt;= requestedTime</param>
         /// <param name="actualTime">Time found in the set</param>
         /// <returns>"true" if the requested bound was found in the set, "false" otherwise</returns>
-        public bool FindBound(ComplexTime requestedTime, bool getLowerBound, out ComplexTime actualTime) {
+        public bool FindBound(ComplexTime requestedTime, bool getLowerBound, out ComplexTime actualTime)
+        {
             // We use the following approach:
             // We call function TryGetValue on a sorted set. If value is found, we return it.
             // Otherwise TryGetValue must make conclusion that the value is absent.
@@ -296,14 +331,18 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
             // So we just need to harvest them from VisitingComparer.
             Sample.Time = requestedTime;
             NodeComparer.ResetForComparison(Sample);
-            if (QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
+            if (QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue))
+            {
                 actualTime = foundValue.Time;
                 return true;
             }
-            if (getLowerBound) {
+            if (getLowerBound)
+            {
                 actualTime = NodeComparer.MaxLowerBound;
                 return !actualTime.IsEqualTo(ComplexTime.MinValue);
-            } else {
+            }
+            else
+            {
                 actualTime = NodeComparer.MinUpperBound;
                 return !actualTime.IsEqualTo(ComplexTime.MaxValue);
             }
@@ -314,12 +353,15 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime {
         /// </summary>
         /// <param name="time">Remove qubit with this time.</param>
         /// <returns>QubitId if qubit is found. Throws exception if it is not found.</returns>
-        public long Remove(ComplexTime time) {
+        public long Remove(ComplexTime time)
+        {
             Sample.Time = time;
-            if (!QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue)) {
+            if (!QubitsSortedByTime.TryGetValue(Sample, out QubitTimeNode foundValue))
+            {
                 throw new ApplicationException("Cannot get qubit that should be present in a qubit pool.");
             }
-            if (foundValue.NextNode == null) {
+            if (foundValue.NextNode == null)
+            {
                 // Remove only node from the tree.
                 long qubitId = foundValue.QubitId;
                 QubitsSortedByTime.Remove(Sample);

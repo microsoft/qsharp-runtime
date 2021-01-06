@@ -34,7 +34,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
             QubitId = qubitId;
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return $"{QubitId}: {StartTime} - {EndTime}";
         }
     }
