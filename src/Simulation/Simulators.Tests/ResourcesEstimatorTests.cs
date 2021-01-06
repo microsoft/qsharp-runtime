@@ -141,6 +141,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Equal(11.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
             Assert.Equal(20.0, sim.Data.Rows.Find("Width")["Sum"]);
+            // Note that in RecommendedConfig only T gates are depth 1, the rest are depth 0.
             Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Sum"]);
         }
 
