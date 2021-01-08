@@ -62,7 +62,7 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
     CHECK(ops.find(3)->second == 1);
 }
 
-TEST_CASE("Layering operations of zero duration", "[skip]")
+TEST_CASE("Layering operations of zero duration", "[tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer();
     tr->SetPreferredLayerDuration(3);

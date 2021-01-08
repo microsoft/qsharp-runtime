@@ -68,6 +68,9 @@ namespace Quantum
         // The index into the vector is treated as implicit id of the layer.
         std::vector<Layer> metricsByLayer;
 
+      private:
+        void AddOperationToLayer(OpId id, size_t layer);
+
       public:
         // -------------------------------------------------------------------------------------------------------------
         // ISimulator interface

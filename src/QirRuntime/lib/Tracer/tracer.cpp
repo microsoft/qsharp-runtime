@@ -18,12 +18,29 @@ namespace Quantum
         return tracer;
     }
 
-    void CTracer::TraceSingleQubitOp(int32_t id, int32_t opDuration, Qubit target)
+    void CTracer::AddOperationToLayer(OpId id, size_t layer)
+    {
+        auto inserted = this->metricsByLayer[layer].operations.insert({id, 1});
+        if (!inserted.second)
+        {
+            assert(inserted.first->first == id);
+            inserted.first->second += 1;
+        }
+    }
+
+    void CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
     {
         QubitState& qstate = this->qubits[reinterpret_cast<size_t>(target)];
         if (opDuration == 0)
         {
-            // TODO
+            if (qstate.layer != INVALID)
+            {
+                AddOperationToLayer(id, qstate.layer);
+            }
+            else
+            {
+                qstate.pendingZeroOps.push_back(id);
+            }
         }
         else
         {
@@ -60,18 +77,18 @@ namespace Quantum
                 layerToInsertInto = static_cast<int>(this->metricsByLayer.size()) - 1;
             }
 
-            // Add the operation to the layer.
-            auto inserted = this->metricsByLayer[layerToInsertInto].operations.insert({id, 1});
-            if (!inserted.second)
+            // Add the operation and the pending zero-duration ones into the layer.
+            AddOperationToLayer(id, layerToInsertInto);
+            for (OpId idPending : qstate.pendingZeroOps)
             {
-                assert(inserted.first->first == id);
-                inserted.first->second += 1;
+                AddOperationToLayer(idPending, layerToInsertInto);
             }
 
             // Update the qubit state.
             qstate.layer = layerToInsertInto;
-            Time layerStart = this->metricsByLayer[layerToInsertInto].startTime;
+            const Time layerStart = this->metricsByLayer[layerToInsertInto].startTime;
             qstate.lastUsedTime = max(layerStart, qstate.lastUsedTime) + opDuration;
+            qstate.pendingZeroOps.clear();
         }
     }
     void CTracer::TraceControlledSingleQubitOp(int32_t id, int32_t duration, int64_t nCtrls, Qubit* ctls, Qubit target)
