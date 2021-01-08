@@ -35,15 +35,16 @@ extern "C"
 
     void quantum__trc__single_qubit_op(int32_t id, int32_t duration, Qubit target) // NOLINT
     {
-        tracer->TraceSingleQubitOp(id, duration, reinterpret_cast<TracedQubit*>(target)); // NOLINT
+        tracer->TraceSingleQubitOp(id, duration, target);
     }
     void quantum__trc__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
         // TBD
     }
-    void quantum__trc__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* controls, Qubit* target) // NOLINT
+    void quantum__trc__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* controls, Qubit target) // NOLINT
     {
-        // TBD
+        tracer->TraceControlledSingleQubitOp(
+            id, duration, controls->count, reinterpret_cast<Qubit*>(controls->buffer), target);
     }
     void quantum__trc__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* controls, QirArray* targets) // NOLINT
     {
