@@ -18,8 +18,57 @@ namespace Quantum
         return tracer;
     }
 
-    void CTracer::AddOperationToLayer(OpId id, size_t layer)
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::CreateNewLayer
+    //------------------------------------------------------------------------------------------------------------------
+    LayerId CTracer::CreateNewLayer(Duration opDuration)
     {
+        // Create a new layer for the operation.
+        Time layerStartTime = 0;
+        if (!this->metricsByLayer.empty())
+        {
+            const Layer& lastLayer = this->metricsByLayer.back();
+            layerStartTime = lastLayer.startTime + lastLayer.duration;
+        }
+        this->metricsByLayer.push_back(Layer{max(this->preferredLayerDuration, opDuration), layerStartTime});
+        return this->metricsByLayer.size() - 1;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::FindLayerToInsertOperationInto
+    //------------------------------------------------------------------------------------------------------------------
+    LayerId CTracer::FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const
+    {
+        const QubitState& qstate = this->UseQubit(q);
+
+        LayerId layerToInsertInto = INVALID;
+        if (qstate.layer != INVALID)
+        {
+            const Layer& lastUsedIn = this->metricsByLayer[qstate.layer];
+            if (qstate.lastUsedTime + opDuration <= lastUsedIn.startTime + lastUsedIn.duration)
+            {
+                layerToInsertInto = qstate.layer;
+            }
+            else if (opDuration <= this->preferredLayerDuration && qstate.layer + 1 < this->metricsByLayer.size())
+            {
+                layerToInsertInto = qstate.layer + 1;
+            }
+        }
+        else if (opDuration <= this->preferredLayerDuration && !this->metricsByLayer.empty())
+        {
+            // the qubit hasn't been used in any of the layers yet -- add it to the first layer
+            layerToInsertInto = 0;
+        }
+
+        return layerToInsertInto;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::AddOperationToLayer
+    //------------------------------------------------------------------------------------------------------------------
+    void CTracer::AddOperationToLayer(OpId id, LayerId layer)
+    {
+        assert(layer < this->metricsByLayer.size());
         auto inserted = this->metricsByLayer[layer].operations.insert({id, 1});
         if (!inserted.second)
         {
@@ -28,14 +77,35 @@ namespace Quantum
         }
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::UpdateQubitState
+    //------------------------------------------------------------------------------------------------------------------
+    void CTracer::UpdateQubitState(Qubit q, LayerId layer, Duration opDuration)
+    {
+        QubitState& qstate = this->UseQubit(q);
+        for (OpId idPending : qstate.pendingZeroOps)
+        {
+            this->AddOperationToLayer(idPending, layer);
+        }
+
+        // Update the qubit state.
+        qstate.layer = layer;
+        const Time layerStart = this->metricsByLayer[layer].startTime;
+        qstate.lastUsedTime = max(layerStart, qstate.lastUsedTime) + opDuration;
+        qstate.pendingZeroOps.clear();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::TraceSingleQubitOp
+    //------------------------------------------------------------------------------------------------------------------
     void CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
     {
-        QubitState& qstate = this->qubits[reinterpret_cast<size_t>(target)];
         if (opDuration == 0)
         {
+            QubitState& qstate = this->UseQubit(target);
             if (qstate.layer != INVALID)
             {
-                AddOperationToLayer(id, qstate.layer);
+                this->AddOperationToLayer(id, qstate.layer);
             }
             else
             {
@@ -45,54 +115,47 @@ namespace Quantum
         else
         {
             // Figure out the layer this operation should go into.
-            int layerToInsertInto = INVALID;
-            if (qstate.layer != INVALID)
-            {
-                Layer& lastUsedIn = this->metricsByLayer[qstate.layer];
-                if (qstate.lastUsedTime + opDuration <= lastUsedIn.startTime + lastUsedIn.duration)
-                {
-                    layerToInsertInto = qstate.layer;
-                }
-                else if (opDuration <= this->preferredLayerDuration && qstate.layer + 1 < this->metricsByLayer.size())
-                {
-                    layerToInsertInto = qstate.layer + 1;
-                }
-            }
-            else if (opDuration <= this->preferredLayerDuration && !this->metricsByLayer.empty())
-            {
-                // the qubit hasn't been used in any of the layers yet -- add it to the first layer
-                layerToInsertInto = 0;
-            }
-
+            LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(target, opDuration);
             if (layerToInsertInto == INVALID)
             {
-                // Create a new layer for the operation.
-                Time layerStartTime = 0;
-                if (!this->metricsByLayer.empty())
-                {
-                    const Layer& lastLayer = this->metricsByLayer.back();
-                    layerStartTime = lastLayer.startTime + lastLayer.duration;
-                }
-                this->metricsByLayer.push_back(Layer{max(this->preferredLayerDuration, opDuration), layerStartTime});
-                layerToInsertInto = static_cast<int>(this->metricsByLayer.size()) - 1;
+                layerToInsertInto = this->CreateNewLayer(opDuration);
             }
 
             // Add the operation and the pending zero-duration ones into the layer.
-            AddOperationToLayer(id, layerToInsertInto);
-            for (OpId idPending : qstate.pendingZeroOps)
-            {
-                AddOperationToLayer(idPending, layerToInsertInto);
-            }
-
-            // Update the qubit state.
-            qstate.layer = layerToInsertInto;
-            const Time layerStart = this->metricsByLayer[layerToInsertInto].startTime;
-            qstate.lastUsedTime = max(layerStart, qstate.lastUsedTime) + opDuration;
-            qstate.pendingZeroOps.clear();
+            this->AddOperationToLayer(id, layerToInsertInto);
+            this->UpdateQubitState(target, layerToInsertInto, opDuration);
         }
     }
-    void CTracer::TraceControlledSingleQubitOp(int32_t id, int32_t duration, int64_t nCtrls, Qubit* ctls, Qubit target)
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::TraceControlledSingleQubitOp
+    //------------------------------------------------------------------------------------------------------------------
+    void CTracer::TraceControlledSingleQubitOp(OpId id, Duration opDuration, int64_t nCtrls, Qubit* ctls, Qubit target)
     {
+        // Special-casing operations of duration zero enables potentially better reuse of qubits, when we'll start
+        // optimizing for circuit width. However, tracking _the same_ pending operation across _multiple_ qubits is
+        // tricky and not worth the effort, so we don't do it.
+
+        // Figure out the layer this operation should go into.
+        LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(target, opDuration);
+        for (int64_t i = 0; i < nCtrls && layerToInsertInto != INVALID; i++)
+        {
+            layerToInsertInto = max(layerToInsertInto, this->FindLayerToInsertOperationInto(ctls[i], opDuration));
+        }
+        if (layerToInsertInto == INVALID)
+        {
+            layerToInsertInto = this->CreateNewLayer(opDuration);
+        }
+
+        // Add the operation into the layer.
+        this->AddOperationToLayer(id, layerToInsertInto);
+
+        // Update the state of the involved qubits.
+        this->UpdateQubitState(target, layerToInsertInto, opDuration);
+        for (int64_t i = 0; i < nCtrls; i++)
+        {
+            this->UpdateQubitState(ctls[i], layerToInsertInto, opDuration);
+        }
     }
 } // namespace Quantum
 } // namespace Microsoft
