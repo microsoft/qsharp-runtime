@@ -130,17 +130,38 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceControlledSingleQubitOp
     //------------------------------------------------------------------------------------------------------------------
-    void CTracer::TraceControlledSingleQubitOp(OpId id, Duration opDuration, int64_t nCtrls, Qubit* ctls, Qubit target)
+    void CTracer::TraceMultiQubitOp(
+        OpId id,
+        Duration opDuration,
+        int64_t nFirstGroup,
+        Qubit* firstGroup,
+        int64_t nSecondGroup,
+        Qubit* secondGroup)
     {
+        assert(nFirstGroup >= 0);
+        assert(nSecondGroup > 0);
+
+        // Operations that involve a single qubit can special case duration zero.
+        if (nFirstGroup == 0 && nSecondGroup == 1)
+        {
+            this->TraceSingleQubitOp(id, opDuration, secondGroup[0]);
+            return;
+        }
+
         // Special-casing operations of duration zero enables potentially better reuse of qubits, when we'll start
         // optimizing for circuit width. However, tracking _the same_ pending operation across _multiple_ qubits is
         // tricky and not worth the effort, so we don't do it.
 
         // Figure out the layer this operation should go into.
-        LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(target, opDuration);
-        for (int64_t i = 0; i < nCtrls && layerToInsertInto != INVALID; i++)
+        LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(secondGroup[0], opDuration);
+        for (int64_t i = 1; i < nSecondGroup && layerToInsertInto != INVALID; i++)
         {
-            layerToInsertInto = max(layerToInsertInto, this->FindLayerToInsertOperationInto(ctls[i], opDuration));
+            layerToInsertInto =
+                max(layerToInsertInto, this->FindLayerToInsertOperationInto(secondGroup[i], opDuration));
+        }
+        for (int64_t i = 0; i < nFirstGroup && layerToInsertInto != INVALID; i++)
+        {
+            layerToInsertInto = max(layerToInsertInto, this->FindLayerToInsertOperationInto(firstGroup[i], opDuration));
         }
         if (layerToInsertInto == INVALID)
         {
@@ -151,10 +172,13 @@ namespace Quantum
         this->AddOperationToLayer(id, layerToInsertInto);
 
         // Update the state of the involved qubits.
-        this->UpdateQubitState(target, layerToInsertInto, opDuration);
-        for (int64_t i = 0; i < nCtrls; i++)
+        for (int64_t i = 0; i < nFirstGroup; i++)
         {
-            this->UpdateQubitState(ctls[i], layerToInsertInto, opDuration);
+            this->UpdateQubitState(firstGroup[i], layerToInsertInto, opDuration);
+        }
+        for (int64_t i = 0; i < nSecondGroup; i++)
+        {
+            this->UpdateQubitState(secondGroup[i], layerToInsertInto, opDuration);
         }
     }
 } // namespace Quantum

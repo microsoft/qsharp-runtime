@@ -69,20 +69,29 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     Qubit q5 = tr->AllocateQubit();
     Qubit q6 = tr->AllocateQubit();
 
-    tr->TraceControlledSingleQubitOp(1 /*id*/, 1 /*dur*/, 1 /*nCtls*/, &q1 /*ctls*/, q2 /*target*/);
-    tr->TraceSingleQubitOp(2 /*id*/, 2 /*dur*/, q2);
+    tr->TraceMultiQubitOp(1 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q2 /*second*/);
+    tr->TraceMultiQubitOp(2 /*id*/, 2 /*dur*/, 0 /*nFirst*/, nullptr /*first*/, 1 /*nSecond*/, &q2 /*second*/);
     // q2 now is at the limit of the layer duration
 
-    tr->TraceControlledSingleQubitOp(3 /*id*/, 1 /*dur*/, 1 /*nCtls*/, &q2 /*ctls*/, q3 /*target*/);
-    // because of q2 this should have created a new layer
+    Qubit qs12[2] = {q1, q2};
+    tr->TraceMultiQubitOp(3 /*id*/, 1 /*dur*/, 0 /*nFirst*/, nullptr /*first*/, 2 /*nSecond*/, qs12 /*second*/);
+    tr->TraceMultiQubitOp(4 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/);
+    // because of q2, both ops should have been added to a new layer, which now "catches" q1, q2, q3
 
-    tr->TraceControlledSingleQubitOp(4 /*id*/, 0 /*dur*/, 1 /*nCtls*/, &q4 /*ctls*/, q5 /*target*/);
-    tr->TraceSingleQubitOp(5 /*id*/, 1 /*dur*/, q6);
-    tr->TraceControlledSingleQubitOp(6 /*id*/, 1 /*dur*/, 1 /*nCtls*/, &q1 /*ctls*/, q6 /*target*/);
+    tr->TraceMultiQubitOp(5 /*id*/, 0 /*dur*/, 1 /*nFirst*/, &q4 /*first*/, 1 /*nSecond*/, &q5 /*second*/);
+    tr->TraceSingleQubitOp(6 /*id*/, 1 /*dur*/, q6);
     // these ops should fall through into the first layer (notice no special handling of duration zero)
 
-    tr->TraceControlledSingleQubitOp(7 /*id*/, 1 /*dur*/, 1 /*nCtls*/, &q3 /*ctls*/, q4 /*target*/);
-    // because of q3 should be added into the second layer
+    tr->TraceMultiQubitOp(7 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q6 /*second*/);
+    tr->TraceMultiQubitOp(8 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q4 /*second*/);
+    // because of q1 and q3, thiese ops should be added into the second layer, which now has all but q5
+
+    tr->TraceSingleQubitOp(9, 1, q5);
+    // should fall through to the first layer
+
+    Qubit qs46[2] = {q4, q6};
+    tr->TraceMultiQubitOp(10 /*id*/, 1 /*dur*/, 3 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q5 /*second*/);
+    // because of q4, should be added into the second layer
 
     const vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 2);
@@ -91,14 +100,17 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     const auto& ops0 = layers[0].operations;
     CHECK(ops0.find(1) != ops0.end());
     CHECK(ops0.find(2) != ops0.end());
-    CHECK(ops0.find(4) != ops0.end());
     CHECK(ops0.find(5) != ops0.end());
     CHECK(ops0.find(6) != ops0.end());
+    CHECK(ops0.find(9) != ops0.end());
 
-    CHECK(layers[1].operations.size() == 2);
+    CHECK(layers[1].operations.size() == 5);
     const auto& ops1 = layers[1].operations;
     CHECK(ops1.find(3) != ops1.end());
+    CHECK(ops1.find(4) != ops1.end());
     CHECK(ops1.find(7) != ops1.end());
+    CHECK(ops1.find(8) != ops1.end());
+    CHECK(ops1.find(10) != ops1.end());
 }
 
 // TODO: add controlled and multi-qubit ops

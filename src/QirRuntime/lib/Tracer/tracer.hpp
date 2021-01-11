@@ -154,17 +154,19 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // Instead of implementing IQuantumGateSet, the tracer provides 'tracing-by-id' methods. The QIR generation
         // should translate all intrinsics to invoke these methods.
+        // The tracer doesn't differentiate between control and target qubits. However, While it could provide a single
+        // generic tracing method for and array of qubits, that would require the clients to copy control and target
+        // qubits into the same array. To avoid the copy, the tracer provides a method that takes two groups of qubits,
+        // where the first one can be empty or can be viewed as the set of controls.
         // -------------------------------------------------------------------------------------------------------------
         void TraceSingleQubitOp(OpId id, Duration duration, Qubit target);
-        void TraceControlledSingleQubitOp(OpId id, Duration duration, int64_t nCtrls, Qubit* ctls, Qubit target);
-        void TraceMultiQubitOp(OpId id, Duration duration, int64_t nTargets, Qubit* targets);
-        void TraceControlledMultiQubitOp(
+        void TraceMultiQubitOp(
             OpId id,
             Duration duration,
-            int64_t nCtrls,
-            Qubit* ctls,
-            int64_t nTargets,
-            Qubit* targets);
+            int64_t nFirstGroup,
+            Qubit* firstGroup,
+            int64_t nSecondGroup,
+            Qubit* secondGroup);
 
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.
