@@ -31,7 +31,11 @@ namespace Quantum
         // Start time of the layer.
         const Time startTime;
 
+        // Quantum operations, assigned to this layer.
         std::unordered_map<OpId, int32_t /*count of the op with this id*/> operations;
+
+        // Optional layer's name (global barriers might provide it).
+        std::string name;
 
         Layer(Duration duration, Time startTime)
             : duration(duration)
@@ -69,6 +73,10 @@ namespace Quantum
 
         // The index into the vector is treated as implicit id of the layer.
         std::vector<Layer> metricsByLayer;
+
+        // The last global barrier, injected by the user. No new operations can be added to the barrier or to any of the
+        // layer that preceeded it, even if the new operations involve completely new qubits.
+        LayerId globalBarrier = INVALID;
 
       private:
         QubitState& UseQubit(Qubit q)
@@ -167,6 +175,11 @@ namespace Quantum
             Qubit* firstGroup,
             int64_t nSecondGroup,
             Qubit* secondGroup);
+
+        // -------------------------------------------------------------------------------------------------------------
+        // Backing of the rest of the bridge methods.
+        // -------------------------------------------------------------------------------------------------------------
+        void InjectGlobalBarrier(char* name, Duration duration);
 
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.

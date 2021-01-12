@@ -51,4 +51,9 @@ extern "C"
             id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), targets->count,
             reinterpret_cast<Qubit*>(targets->buffer));
     }
+
+    void quantum__trc__inject_global_barrier(char* name, int32_t duration) // NOLINT
+    {
+        tracer->InjectGlobalBarrier(name, duration);
+    }
 }

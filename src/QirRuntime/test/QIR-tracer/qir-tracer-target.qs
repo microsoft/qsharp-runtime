@@ -197,6 +197,11 @@ namespace Microsoft.Quantum.Intrinsic {
         controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(25, 1, ctls, qb); }
     }
 
+    @TargetInstruction("inject_global_barrier")
+    operation Barrier(name : String, duration : Int) : Unit
+    {
+        body intrinsic;
+    }
 
     operation SWAP(a : Qubit, b : Qubit) : Unit 
     is Adj {

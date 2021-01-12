@@ -113,7 +113,7 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     CHECK(ops1.find(10) != ops1.end());
 }
 
-// TODO: add controlled and multi-qubit ops
+// TODO: add multi-qubit ops
 TEST_CASE("Operations with same id are counted together", "[tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer();
@@ -138,4 +138,42 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
     CHECK(ops.find(1)->second == 3);
     CHECK(ops.find(2)->second == 2);
     CHECK(ops.find(3)->second == 1);
+}
+
+TEST_CASE("Global barrier", "[tracer]")
+{
+    shared_ptr<CTracer> tr = CreateTracer();
+    tr->SetPreferredLayerDuration(1);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+
+    tr->TraceSingleQubitOp(1, 1, q1);  // L(0,1) created
+    tr->InjectGlobalBarrier("foo", 1); // creates L(1,1)
+
+    tr->TraceMultiQubitOp(2 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/);
+    // the barrier shouldn't allow this op to fall through into L(0,1), so should create L(2,1)
+
+    tr->TraceSingleQubitOp(3, 0, q1);
+    // the barrier shouldn't allow this op to fall through into L(0,1), so should create pending op
+
+    tr->TraceSingleQubitOp(4, 1, q1);
+    // should be added into L(2,1) together with the pending op `3`
+
+    const vector<Layer>& layers = tr->UseLayers();
+    REQUIRE(layers.size() == 3);
+    CHECK(layers[0].operations.size() == 1);
+    CHECK(layers[1].operations.size() == 0);
+    CHECK(layers[2].operations.size() == 3);
+
+    const auto& ops0 = layers[0].operations;
+    CHECK(ops0.find(1) != ops0.end());
+
+    CHECK(std::string("foo") == layers[1].name);
+
+    const auto& ops2 = layers[2].operations;
+    CHECK(ops2.find(2) != ops2.end());
+    CHECK(ops2.find(3) != ops2.end());
+    CHECK(ops2.find(4) != ops2.end());
 }

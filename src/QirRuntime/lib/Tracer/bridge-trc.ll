@@ -25,6 +25,7 @@ declare void @quantum__trc__single_qubit_op(i32 %id, i32 %duration, %class.QUBIT
 declare void @quantum__trc__single_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %class.QUBIT*)
 declare void @quantum__trc__multi_qubit_op(i32 %id, i32 %duration, %struct.QirArray*)
 declare void @quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %struct.QirArray*)
+declare void @quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
 
 ;===============================================================================
 ; quantum__trc namespace implementations
@@ -56,5 +57,11 @@ define void @__quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* 
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   %qs = bitcast %Array* %.qs to %struct.QirArray*
   call void @quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray* %ctls, %struct.QirArray* %qs)
+  ret void
+}
+
+define void @__quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
+{
+  call void @quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
   ret void
 }

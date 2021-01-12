@@ -31,6 +31,7 @@ namespace Quantum
             layerStartTime = lastLayer.startTime + lastLayer.duration;
         }
         this->metricsByLayer.push_back(Layer{max(this->preferredLayerDuration, opDuration), layerStartTime});
+
         return this->metricsByLayer.size() - 1;
     }
 
@@ -58,6 +59,18 @@ namespace Quantum
         {
             // the qubit hasn't been used in any of the layers yet -- add it to the first layer
             layerToInsertInto = 0;
+        }
+
+        if (layerToInsertInto != INVALID && this->globalBarrier != INVALID)
+        {
+            if (this->globalBarrier + 1 == this->metricsByLayer.size())
+            {
+                layerToInsertInto = INVALID;
+            }
+            else
+            {
+                layerToInsertInto = std::max(layerToInsertInto, this->globalBarrier + 1);
+            }
         }
 
         return layerToInsertInto;
@@ -100,31 +113,24 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     void CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
     {
-        if (opDuration == 0)
+        QubitState& qstate = this->UseQubit(target);
+        if (opDuration == 0 &&
+            (qstate.layer == INVALID || (this->globalBarrier != INVALID && qstate.layer < this->globalBarrier)))
         {
-            QubitState& qstate = this->UseQubit(target);
-            if (qstate.layer != INVALID)
-            {
-                this->AddOperationToLayer(id, qstate.layer);
-            }
-            else
-            {
-                qstate.pendingZeroOps.push_back(id);
-            }
+            qstate.pendingZeroOps.push_back(id);
+            return;
         }
-        else
-        {
-            // Figure out the layer this operation should go into.
-            LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(target, opDuration);
-            if (layerToInsertInto == INVALID)
-            {
-                layerToInsertInto = this->CreateNewLayer(opDuration);
-            }
 
-            // Add the operation and the pending zero-duration ones into the layer.
-            this->AddOperationToLayer(id, layerToInsertInto);
-            this->UpdateQubitState(target, layerToInsertInto, opDuration);
+        // Figure out the layer this operation should go into.
+        LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(target, opDuration);
+        if (layerToInsertInto == INVALID)
+        {
+            layerToInsertInto = this->CreateNewLayer(opDuration);
         }
+
+        // Add the operation and the pending zero-duration ones into the layer.
+        this->AddOperationToLayer(id, layerToInsertInto);
+        this->UpdateQubitState(target, layerToInsertInto, opDuration);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -180,6 +186,13 @@ namespace Quantum
         {
             this->UpdateQubitState(secondGroup[i], layerToInsertInto, opDuration);
         }
+    }
+
+    void CTracer::InjectGlobalBarrier(char* name, Duration duration)
+    {
+        LayerId layer = this->CreateNewLayer(duration);
+        this->metricsByLayer[layer].name = name;
+        this->globalBarrier = layer;
     }
 } // namespace Quantum
 } // namespace Microsoft

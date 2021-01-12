@@ -23,7 +23,7 @@ namespace Quantum
 } // namespace Microsoft
 
 extern "C" bool Microsoft__Quantum__Testing__Tracer__AllIntrinsics__body(); // NOLINT
-TEST_CASE("Test that we are building the new components correctly", "[qir-tracer]")
+TEST_CASE("Test that we are building the new components correctly", "[skip]")
 {
     shared_ptr<CTracer> tr = CreateTracer();
     SetSimulatorForQIR(tr.get());
