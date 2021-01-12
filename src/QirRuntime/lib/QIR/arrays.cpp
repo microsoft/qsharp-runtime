@@ -290,13 +290,13 @@ extern "C"
         return array->dimensionSizes[dim];
     }
 
-    QirArray* quantum__rt__array_copy(QirArray* array, bool force)
+    QirArray* quantum__rt__array_copy(QirArray* array, bool forceNewInstance)
     {
         if (array == nullptr)
         {
             return nullptr;
         }
-        if (force || array->userCount > 0)
+        if (forceNewInstance || array->userCount > 0)
         {
             return new QirArray(array);
         }

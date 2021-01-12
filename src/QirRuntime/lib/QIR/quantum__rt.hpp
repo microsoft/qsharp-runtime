@@ -128,7 +128,7 @@ extern "C"
     // Decreases the current user count by one, fails if the user count becomes negative.
     QIR_SHARED_API void quantum__rt__array_remove_access(QirArray*); // NOLINT
 
-    // Returns a new array which is a copy of the passed-in QirArray*.
+    // Creates a shallow copy of the array if the user count is larger than 0 or the second argument is `true`.
     QIR_SHARED_API QirArray* quantum__rt__array_copy(QirArray*, bool); // NOLINT
 
     // Returns a new array which is the concatenation of the two passed-in arrays.

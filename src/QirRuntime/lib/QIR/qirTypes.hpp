@@ -21,7 +21,7 @@ struct QirArray
 
     const bool ownsQubits = false;
     int refCount = 1;
-    int userCount = 0;
+    int userCount = 0; // used to enable copy elision, see the QIR specifications for details
 
     // NB: Release doesn't trigger destruction of the Array itself to allow for it
     // being used both on the stack and on the heap. The creator of the array
@@ -64,7 +64,7 @@ using PTuple = char*;
 struct QirTupleHeader
 {
     int32_t refCount = 0;
-    int32_t userCount = 0;
+    int32_t userCount = 0; // used to enable copy elision, see the QIR specifications for details
     int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer
 
     // flexible array member, must be last in the struct

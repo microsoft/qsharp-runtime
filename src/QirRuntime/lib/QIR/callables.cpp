@@ -64,7 +64,7 @@ extern "C"
         th->RemoveUser();
     }
 
-    PTuple quantum__rt__tuple_copy(PTuple tuple, bool force)
+    PTuple quantum__rt__tuple_copy(PTuple tuple, bool forceNewInstance)
     {
         if (tuple == nullptr)
         {
@@ -72,7 +72,7 @@ extern "C"
         }
 
         QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        if (force || th->userCount > 0)
+        if (forceNewInstance || th->userCount > 0)
         {
             return QirTupleHeader::CreateWithCopiedData(th)->AsTuple();
         }
@@ -227,7 +227,7 @@ QirCallable::QirCallable(const QirCallable& other)
 
 int QirCallable::AddRef()
 {
-    long rc = ++this->refCount;
+    int rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
 }
@@ -236,7 +236,7 @@ int QirCallable::Release()
 {
     assert(this->refCount > 0);
 
-    long rc = --this->refCount;
+    int rc = --this->refCount;
     if (rc == 0)
     {
         delete this;
