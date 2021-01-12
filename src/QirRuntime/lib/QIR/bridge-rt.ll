@@ -54,7 +54,7 @@ declare void @quantum__rt__result_unreference(%class.RESULT*)
 ;
 declare %"struct.QirArray"* @quantum__rt__qubit_allocate_array(i64)
 declare void @quantum__rt__qubit_release_array(%"struct.QirArray"*)
-declare %"struct.QirArray"* @quantum__rt__array_copy(%"struct.QirArray"*)
+declare %"struct.QirArray"* @quantum__rt__array_copy(%"struct.QirArray"*, i2 %force)
 declare %"struct.QirArray"* @quantum__rt__array_concatenate(%"struct.QirArray"*, %"struct.QirArray"*)
 declare %"struct.QirArray"* @quantum__rt__array_create_1d(i32, i64)
 declare %"struct.QirArray"* @quantum__rt__array_create_nonvariadic(i32, i32, i8*)
@@ -66,6 +66,8 @@ declare %"struct.QirArray"* @quantum__rt__array_project(%"struct.QirArray"*, i32
 declare void @quantum__rt__array_reference(%"struct.QirArray"*)
 declare %"struct.QirArray"* @quantum__rt__array_slice(%"struct.QirArray"*, i32, %"struct.QirRange"* dereferenceable(24))
 declare void @quantum__rt__array_unreference(%"struct.QirArray"*)
+declare void @quantum__rt__array_add_access(%"struct.QirArray"*)
+declare void @quantum__rt__array_remove_access(%"struct.QirArray"*)
 
 ; needed for the variadic array functions
 declare void @llvm.va_start(i8*)
@@ -77,6 +79,8 @@ declare void @llvm.va_end(i8*)
 declare i8* @quantum__rt__tuple_create(i64)
 declare void @quantum__rt__tuple_reference(i8*)
 declare void @quantum__rt__tuple_unreference(i8*)
+declare void @quantum__rt__tuple_add_user(i8*)
+declare void @quantum__rt__tuple_remove_user(i8*)
 
 declare void @quantum__rt__callable_reference(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_unreference(%"struct.QirCallable"*)
@@ -196,9 +200,9 @@ define %Array* @__quantum__rt__array_concatenate(%Array* %.head, %Array* %.tail)
   ret %Array* %.con
 }
 
-define %Array* @__quantum__rt__array_copy(%Array* %.ar) {
+define %Array* @__quantum__rt__array_copy(%Array* %.ar, i2 %force) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  %ar_copy = call %"struct.QirArray"* @quantum__rt__array_copy(%"struct.QirArray"* %ar)
+  %ar_copy = call %"struct.QirArray"* @quantum__rt__array_copy(%"struct.QirArray"* %ar, i2 %force)
   %.ar_copy = bitcast %"struct.QirArray"* %ar_copy to %Array*
   ret %Array* %.ar_copy
 }
@@ -253,6 +257,12 @@ define i64 @__quantum__rt__array_get_length(%Array* %.ar, i32 %dim) {
   ret i64 %l
 }
 
+define i64 @__quantum__rt__array_get_size_1d(%Array* %.ar) {
+  %ar = bitcast %Array* %.ar to %"struct.QirArray"*
+  %l = call i64 @quantum__rt__array_get_length(%"struct.QirArray"* %ar, i32 0)
+  ret i64 %l
+}
+
 define %Array* @__quantum__rt__array_project(%Array* %.ar, i32 %dim, i64 %index) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
   %project = call %"struct.QirArray"* @quantum__rt__array_project(%"struct.QirArray"* %ar, i32 %dim, i64 %index)
@@ -277,12 +287,28 @@ define %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 %dim, %Range %.rang
   ret %Array* %.slice
 }
 
+define %Array* @__quantum__rt__array_slice_1d(%Array* %.ar, %Range %.range) {
+  %.slice = call %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 0, %Range %.range)
+  ret %Array* %.slice
+}
+
 define void @__quantum__rt__array_unreference(%Array* %.ar) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
   call void @quantum__rt__array_unreference(%"struct.QirArray"* %ar)
   ret void
 }
 
+define void @__quantum__rt__array_add_access(%Array* %.ar) {
+  %ar = bitcast %Array* %.ar to %"struct.QirArray"*
+  call void @quantum__rt__array_add_access(%"struct.QirArray"* %ar)
+  ret void
+}
+
+define void @__quantum__rt__array_remove_access(%Array* %.ar) {
+  %ar = bitcast %Array* %.ar to %"struct.QirArray"*
+  call void @quantum__rt__array_remove_access(%"struct.QirArray"* %ar)
+  ret void
+}
 
 ;------------------------------------------------------------------------------
 ; tuples bridge
@@ -305,6 +331,17 @@ define void @__quantum__rt__tuple_unreference(%Tuple* %.th) {
   ret void
 }
 
+define void @__quantum__rt__tuple_add_user(%Tuple* %.th) {
+  %th = bitcast %Tuple* %.th to i8*
+  call void @quantum__rt__tuple_add_user(i8* %th)
+  ret void
+}
+
+define void @__quantum__rt__tuple_remove_user(%Tuple* %.th) {
+  %th = bitcast %Tuple* %.th to i8*
+  call void @quantum__rt__tuple_remove_user(i8* %th)
+  ret void
+}
 
 ;------------------------------------------------------------------------------
 ; callables bridge

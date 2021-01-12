@@ -43,6 +43,44 @@ extern "C"
         (void)th->Release();
     }
 
+    void quantum__rt__tuple_add_user(PTuple tuple)
+    {
+        if (tuple == nullptr)
+        {
+            return;
+        }
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        th->AddUser();
+    }
+
+    void quantum__rt__tuple_remove_user(PTuple tuple)
+    {
+        if (tuple == nullptr)
+        {
+            return;
+        }
+
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        th->RemoveUser();
+    }
+
+    PTuple quantum__rt__tuple_copy(PTuple tuple, bool force)
+    {
+        if (tuple == nullptr)
+        {
+            return nullptr;
+        }
+
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        if (force || th->userCount > 0)
+        {
+            return QirTupleHeader::CreateWithCopiedData(th)->AsTuple();
+        }
+
+        th->AddRef();
+        return tuple;
+    }
+
     void quantum__rt__callable_reference(QirCallable* callable)
     {
         if (callable == nullptr)
@@ -101,19 +139,34 @@ extern "C"
 ==============================================================================*/
 int QirTupleHeader::AddRef()
 {
-    assert(refCount > 0);
-    return ++refCount;
+    assert(this->refCount > 0);
+    return ++this->refCount;
 }
 
 int QirTupleHeader::Release()
 {
-    --refCount;
-    if (refCount == 0)
+    assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
+    --this->refCount;
+    if (this->refCount == 0)
     {
         char* buffer = reinterpret_cast<char*>(this);
         delete[] buffer;
     }
-    return refCount;
+    return this->refCount;
+}
+
+void QirTupleHeader::AddUser()
+{
+    ++this->userCount;
+}
+
+void QirTupleHeader::RemoveUser()
+{
+    if (this->userCount == 0)
+    {
+        quantum__rt__fail(quantum__rt__string_create("User count cannot be negative"));
+    }
+    --this->userCount;
 }
 
 QirTupleHeader* QirTupleHeader::Create(int size)
