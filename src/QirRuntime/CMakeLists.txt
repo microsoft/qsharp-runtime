@@ -57,9 +57,9 @@ endmacro(add_unit_test)
 #===============================================================================
 # compiling from IR
 #
-# CMake doesn't support IR files as sources so we compile them with custom commands,
-# which produce UTILITY libs that can only be linked in using abs paths (rather
-# than the target name):
+# CMake doesn't support LLVM IR files as sources so we compile them with custom
+# commands, which produce UTILITY libs that can only be linked in using abs paths
+# (rather than the target name):
 #   Target "qir_bridge_qis" of type UTILITY may not be linked into another
 #   target.  One may link only to INTERFACE, OBJECT, STATIC or SHARED
 #   libraries, or to executables with the ENABLE_EXPORTS property set.
