@@ -29,31 +29,33 @@ extern "C"
     {
     }
 
-    void quantum__trc__global_barrier(const char* name) // NOLINT
-    {
-    }
-
     void quantum__trc__single_qubit_op(int32_t id, int32_t duration, Qubit target) // NOLINT
     {
-        tracer->TraceSingleQubitOp(id, duration, target);
+        (void)tracer->TraceSingleQubitOp(id, duration, target);
     }
     void quantum__trc__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, Qubit target) // NOLINT
     {
-        tracer->TraceMultiQubitOp(id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), 1, &target);
+        (void)tracer->TraceMultiQubitOp(id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), 1, &target);
     }
     void quantum__trc__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
-        tracer->TraceMultiQubitOp(id, duration, 0, nullptr, targets->count, reinterpret_cast<Qubit*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(
+            id, duration, 0, nullptr, targets->count, reinterpret_cast<Qubit*>(targets->buffer));
     }
     void quantum__trc__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
-        tracer->TraceMultiQubitOp(
+        (void)tracer->TraceMultiQubitOp(
             id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), targets->count,
             reinterpret_cast<Qubit*>(targets->buffer));
     }
 
     void quantum__trc__inject_global_barrier(char* name, int32_t duration) // NOLINT
     {
-        tracer->InjectGlobalBarrier(name, duration);
+        (void)tracer->InjectGlobalBarrier(name, duration);
+    }
+
+    RESULT* quantum__trc__single_qubit_measure(int32_t id, int32_t duration, QUBIT* q) // NOLINT
+    {
+        return tracer->TraceSingleQubitMeasurement(id, duration, q);
     }
 }

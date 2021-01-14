@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include <assert.h>
+#include <sstream>
 
 #include "tracer.hpp"
 
@@ -16,6 +17,51 @@ namespace Quantum
     {
         tracer = std::make_shared<CTracer>();
         return tracer;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer's ISumulator implementation
+    //------------------------------------------------------------------------------------------------------------------
+    IQuantumGateSet* CTracer::AsQuantumGateSet()
+    {
+        return nullptr;
+    }
+    IDiagnostics* CTracer::AsDiagnostics()
+    {
+        return nullptr;
+    }
+    Qubit CTracer::AllocateQubit()
+    {
+        size_t qubit = qubits.size();
+        qubits.push_back({});
+        return reinterpret_cast<Qubit>(qubit);
+    }
+    void CTracer::ReleaseQubit(Qubit /*qubit*/)
+    {
+        // nothing for now
+    }
+    std::string CTracer::QubitToString(Qubit q)
+    {
+        size_t qubitIndex = reinterpret_cast<size_t>(q);
+        const QubitState& qstate = this->UseQubit(q);
+
+        stringstream str(qubitIndex);
+        str << " last used in layer " << qstate.layer << "(pending zero ops: " << qstate.pendingZeroOps.size() << ")";
+        return str.str();
+    }
+    void CTracer::ReleaseResult(Result /*result*/)
+    {
+        // nothing to do, we don't allocate results on measurement
+    }
+    // Although the tracer should never compare results or get their values, it still has to implement UseZero and
+    // UseOne methods as they are invoked by the QIR initialization.
+    Result CTracer::UseZero()
+    {
+        return reinterpret_cast<Result>(INVALID);
+    }
+    Result CTracer::UseOne()
+    {
+        return reinterpret_cast<Result>(INVALID);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -50,9 +96,16 @@ namespace Quantum
             {
                 layerToInsertInto = qstate.layer;
             }
-            else if (opDuration <= this->preferredLayerDuration && qstate.layer + 1 < this->metricsByLayer.size())
+            else
             {
-                layerToInsertInto = qstate.layer + 1;
+                for (LayerId candidate = qstate.layer + 1; candidate < this->metricsByLayer.size(); candidate++)
+                {
+                    if (opDuration <= this->metricsByLayer[candidate].duration)
+                    {
+                        layerToInsertInto = candidate;
+                        break;
+                    }
+                }
             }
         }
         else if (opDuration <= this->preferredLayerDuration && !this->metricsByLayer.empty())
@@ -111,14 +164,14 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceSingleQubitOp
     //------------------------------------------------------------------------------------------------------------------
-    void CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
+    LayerId CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
     {
         QubitState& qstate = this->UseQubit(target);
         if (opDuration == 0 &&
             (qstate.layer == INVALID || (this->globalBarrier != INVALID && qstate.layer < this->globalBarrier)))
         {
             qstate.pendingZeroOps.push_back(id);
-            return;
+            return INVALID;
         }
 
         // Figure out the layer this operation should go into.
@@ -131,12 +184,14 @@ namespace Quantum
         // Add the operation and the pending zero-duration ones into the layer.
         this->AddOperationToLayer(id, layerToInsertInto);
         this->UpdateQubitState(target, layerToInsertInto, opDuration);
+
+        return layerToInsertInto;
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceControlledSingleQubitOp
     //------------------------------------------------------------------------------------------------------------------
-    void CTracer::TraceMultiQubitOp(
+    LayerId CTracer::TraceMultiQubitOp(
         OpId id,
         Duration opDuration,
         int64_t nFirstGroup,
@@ -150,8 +205,7 @@ namespace Quantum
         // Operations that involve a single qubit can special case duration zero.
         if (nFirstGroup == 0 && nSecondGroup == 1)
         {
-            this->TraceSingleQubitOp(id, opDuration, secondGroup[0]);
-            return;
+            return this->TraceSingleQubitOp(id, opDuration, secondGroup[0]);
         }
 
         // Special-casing operations of duration zero enables potentially better reuse of qubits, when we'll start
@@ -186,13 +240,28 @@ namespace Quantum
         {
             this->UpdateQubitState(secondGroup[i], layerToInsertInto, opDuration);
         }
+
+        return layerToInsertInto;
     }
 
-    void CTracer::InjectGlobalBarrier(char* name, Duration duration)
+    LayerId CTracer::InjectGlobalBarrier(const char* name, Duration duration)
     {
         LayerId layer = this->CreateNewLayer(duration);
         this->metricsByLayer[layer].name = name;
         this->globalBarrier = layer;
+        return layer;
+    }
+
+    Result CTracer::TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target)
+    {
+        LayerId layerId = this->TraceSingleQubitOp(id, duration, target);
+        return reinterpret_cast<Result>(layerId);
+    }
+
+    Result CTracer::TraceMultiQubitMeasurement(OpId id, Duration duration, int64_t nTargets, Qubit* targets)
+    {
+        LayerId layerId = this->TraceMultiQubitOp(id, duration, 0, nullptr, nTargets, targets);
+        return reinterpret_cast<Result>(layerId);
     }
 } // namespace Quantum
 } // namespace Microsoft

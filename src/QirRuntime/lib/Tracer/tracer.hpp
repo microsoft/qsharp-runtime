@@ -108,28 +108,13 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // ISimulator interface
         // -------------------------------------------------------------------------------------------------------------
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            return nullptr;
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return nullptr;
-        }
-        Qubit AllocateQubit() override
-        {
-            size_t qubit = qubits.size();
-            qubits.push_back({});
-            return reinterpret_cast<Qubit>(qubit);
-        }
-        void ReleaseQubit(Qubit qubit) override
-        {
-            // nothing for now
-        }
-        std::string QubitToString(Qubit qubit) override
-        {
-            throw std::logic_error("not_implemented");
-        }
+        IQuantumGateSet* AsQuantumGateSet() override;
+        IDiagnostics* AsDiagnostics() override;
+        Qubit AllocateQubit() override;
+        void ReleaseQubit(Qubit qubit) override;
+        std::string QubitToString(Qubit qubit) override;
+        void ReleaseResult(Result result) override;
+
         Result M(Qubit target) override
         {
             throw std::logic_error("not_implemented");
@@ -138,26 +123,16 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void ReleaseResult(Result result) override
-        {
-            throw std::logic_error("not_implemented");
-        }
         bool AreEqualResults(Result r1, Result r2) override
         {
-            throw std::logic_error("not_implemented");
+            throw std::logic_error("Cannot compare results, when tracing!");
         }
         ResultValue GetResultValue(Result result) override
         {
-            throw std::logic_error("not_implemented");
+            throw std::logic_error("Result values aren't available, when tracing!");
         }
-        Result UseZero() override
-        {
-            return reinterpret_cast<Result>(0);
-        }
-        Result UseOne() override
-        {
-            return reinterpret_cast<Result>(1);
-        }
+        Result UseZero() override;
+        Result UseOne() override;
 
         // -------------------------------------------------------------------------------------------------------------
         // Instead of implementing IQuantumGateSet, the tracer provides 'tracing-by-id' methods. The QIR generation
@@ -167,8 +142,8 @@ namespace Quantum
         // qubits into the same array. To avoid the copy, the tracer provides a method that takes two groups of qubits,
         // where the first one can be empty or can be viewed as the set of controls.
         // -------------------------------------------------------------------------------------------------------------
-        void TraceSingleQubitOp(OpId id, Duration duration, Qubit target);
-        void TraceMultiQubitOp(
+        LayerId TraceSingleQubitOp(OpId id, Duration duration, Qubit target);
+        LayerId TraceMultiQubitOp(
             OpId id,
             Duration duration,
             int64_t nFirstGroup,
@@ -176,10 +151,17 @@ namespace Quantum
             int64_t nSecondGroup,
             Qubit* secondGroup);
 
+        Result TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target);
+        Result TraceMultiQubitMeasurement(OpId id, Duration duration, int64_t nTargets, Qubit* targets);
+        LayerId GetLayerIdOfSourceMeasurement(Result r) const
+        {
+            return reinterpret_cast<LayerId>(r);
+        }
+
         // -------------------------------------------------------------------------------------------------------------
         // Backing of the rest of the bridge methods.
         // -------------------------------------------------------------------------------------------------------------
-        void InjectGlobalBarrier(char* name, Duration duration);
+        LayerId InjectGlobalBarrier(const char* name, Duration duration);
 
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.

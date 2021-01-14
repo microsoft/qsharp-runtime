@@ -18,23 +18,26 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
     Qubit q2 = tr->AllocateQubit();
     Qubit q3 = tr->AllocateQubit();
 
-    tr->TraceSingleQubitOp(1, 1, q1); // L(0,3) should be created
-    tr->TraceSingleQubitOp(2, 2, q1); // add the op into L(0,3)
-    tr->TraceSingleQubitOp(3, 1, q2); // add the op into L(0,3)
-    tr->TraceSingleQubitOp(4, 3, q2); // create new layer L(3,3)
-    tr->TraceSingleQubitOp(5, 4, q2); // create new layer L(6,4)
-    tr->TraceSingleQubitOp(6, 2, q1); // add the op into L(3,3)
-    tr->TraceSingleQubitOp(7, 1, q3); // add the op into L(0,3)
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1)); // L(0,3) should be created
+    CHECK(0 == tr->TraceSingleQubitOp(2, 2, q1)); // add the op into L(0,3)
+    CHECK(0 == tr->TraceSingleQubitOp(3, 1, q2)); // add the op into L(0,3)
+    CHECK(1 == tr->TraceSingleQubitOp(4, 3, q2)); // create new layer L(3,3)
+    CHECK(2 == tr->TraceSingleQubitOp(5, 4, q2)); // long op! create new layer L(6,4)
+    CHECK(1 == tr->TraceSingleQubitOp(6, 2, q1)); // add the op into L(3,3)
+    CHECK(0 == tr->TraceSingleQubitOp(7, 1, q3)); // add the op into L(0,3)
+    CHECK(2 == tr->TraceSingleQubitOp(8, 4, q3)); // long op! but fits into existing L(6,4)
+    CHECK(3 == tr->TraceSingleQubitOp(9, 5, q1)); // long op! add the op into L(10,5)
 
     const vector<Layer>& layers = tr->UseLayers();
-    REQUIRE(layers.size() == 3);
+    REQUIRE(layers.size() == 4);
     CHECK(layers[0].startTime == 0);
     CHECK(layers[0].operations.size() == 4);
     CHECK(layers[1].startTime == 3);
     CHECK(layers[1].operations.size() == 2);
     CHECK(layers[2].startTime == 6);
-    CHECK(layers[2].operations.size() == 1);
-}
+    CHECK(layers[2].operations.size() == 2);
+    CHECK(layers[3].startTime == 10);
+    CHECK(layers[3].operations.size() == 1);}
 
 TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 {
@@ -45,12 +48,12 @@ TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
     Qubit q2 = tr->AllocateQubit();
     Qubit q3 = tr->AllocateQubit();
 
-    tr->TraceSingleQubitOp(1, 1, q1); // L(0,3) should be created
-    tr->TraceSingleQubitOp(2, 0, q1); // add the op into L(0,3)
-    tr->TraceSingleQubitOp(3, 0, q3); // pending zero op (will remain orphan)
-    tr->TraceSingleQubitOp(4, 0, q2); // pending zero op
-    tr->TraceSingleQubitOp(5, 0, q2); // another pending zero op
-    tr->TraceSingleQubitOp(6, 1, q2); // add the op into L(0,3) together with the pending ones
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1)); // L(0,3) should be created
+    CHECK(0 == tr->TraceSingleQubitOp(2, 0, q1)); // add the op into L(0,3)
+    CHECK(INVALID == tr->TraceSingleQubitOp(3, 0, q3)); // pending zero op (will remain orphan)
+    CHECK(INVALID == tr->TraceSingleQubitOp(4, 0, q2)); // pending zero op
+    CHECK(INVALID == tr->TraceSingleQubitOp(5, 0, q2)); // another pending zero op
+    CHECK(0 == tr->TraceSingleQubitOp(6, 1, q2)); // add the op into L(0,3) together with the pending ones
 
     const vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 1);
@@ -69,28 +72,28 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     Qubit q5 = tr->AllocateQubit();
     Qubit q6 = tr->AllocateQubit();
 
-    tr->TraceMultiQubitOp(1 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q2 /*second*/);
-    tr->TraceMultiQubitOp(2 /*id*/, 2 /*dur*/, 0 /*nFirst*/, nullptr /*first*/, 1 /*nSecond*/, &q2 /*second*/);
+    CHECK(0 == tr->TraceMultiQubitOp(1, 1, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q2 /*second*/));
+    CHECK(0 == tr->TraceMultiQubitOp(2, 2, 0 /*nFirst*/, nullptr /*first*/, 1 /*nSecond*/, &q2 /*second*/));
     // q2 now is at the limit of the layer duration
 
     Qubit qs12[2] = {q1, q2};
-    tr->TraceMultiQubitOp(3 /*id*/, 1 /*dur*/, 0 /*nFirst*/, nullptr /*first*/, 2 /*nSecond*/, qs12 /*second*/);
-    tr->TraceMultiQubitOp(4 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/);
+    CHECK(1 == tr->TraceMultiQubitOp(3, 1, 0 /*nFirst*/, nullptr /*first*/, 2 /*nSecond*/, qs12 /*second*/));
+    CHECK(1 == tr->TraceMultiQubitOp(4, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
     // because of q2, both ops should have been added to a new layer, which now "catches" q1, q2, q3
 
-    tr->TraceMultiQubitOp(5 /*id*/, 0 /*dur*/, 1 /*nFirst*/, &q4 /*first*/, 1 /*nSecond*/, &q5 /*second*/);
-    tr->TraceSingleQubitOp(6 /*id*/, 1 /*dur*/, q6);
+    CHECK(0 == tr->TraceMultiQubitOp(5, 0, 1 /*nFirst*/, &q4 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
+    CHECK(0 == tr->TraceSingleQubitOp(6, 1, q6));
     // these ops should fall through into the first layer (notice no special handling of duration zero)
 
-    tr->TraceMultiQubitOp(7 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q6 /*second*/);
-    tr->TraceMultiQubitOp(8 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q4 /*second*/);
+    CHECK(1 == tr->TraceMultiQubitOp(7, 1, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q6 /*second*/));
+    CHECK(1 == tr->TraceMultiQubitOp(8, 1, 1 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q4 /*second*/));
     // because of q1 and q3, thiese ops should be added into the second layer, which now has all but q5
 
-    tr->TraceSingleQubitOp(9, 1, q5);
+    CHECK(0 == tr->TraceSingleQubitOp(9, 1, q5));
     // should fall through to the first layer
 
     Qubit qs46[2] = {q4, q6};
-    tr->TraceMultiQubitOp(10 /*id*/, 1 /*dur*/, 3 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q5 /*second*/);
+    CHECK(1 == tr->TraceMultiQubitOp(10, 1, 3 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
     // because of q4, should be added into the second layer
 
     const vector<Layer>& layers = tr->UseLayers();
@@ -149,16 +152,16 @@ TEST_CASE("Global barrier", "[tracer]")
     Qubit q2 = tr->AllocateQubit();
     Qubit q3 = tr->AllocateQubit();
 
-    tr->TraceSingleQubitOp(1, 1, q1);  // L(0,1) created
-    tr->InjectGlobalBarrier("foo", 1); // creates L(1,1)
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));  // L(0,1) created
+    CHECK(1 == tr->InjectGlobalBarrier("foo", 1)); // creates L(1,1)
 
-    tr->TraceMultiQubitOp(2 /*id*/, 1 /*dur*/, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/);
+    CHECK(2 == tr->TraceMultiQubitOp(2, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
     // the barrier shouldn't allow this op to fall through into L(0,1), so should create L(2,1)
 
-    tr->TraceSingleQubitOp(3, 0, q1);
+    CHECK(INVALID == tr->TraceSingleQubitOp(3, 0, q1));
     // the barrier shouldn't allow this op to fall through into L(0,1), so should create pending op
 
-    tr->TraceSingleQubitOp(4, 1, q1);
+    CHECK(2 == tr->TraceSingleQubitOp(4, 1, q1));
     // should be added into L(2,1) together with the pending op `3`
 
     const vector<Layer>& layers = tr->UseLayers();
@@ -176,4 +179,31 @@ TEST_CASE("Global barrier", "[tracer]")
     CHECK(ops2.find(2) != ops2.end());
     CHECK(ops2.find(3) != ops2.end());
     CHECK(ops2.find(4) != ops2.end());
+}
+
+// For layering purposes, measurements behave pretty much the same as other operations
+TEST_CASE("Layering measurements", "[tracer]")
+{
+    shared_ptr<CTracer> tr = CreateTracer();
+    tr->SetPreferredLayerDuration(1);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+    Qubit q4 = tr->AllocateQubit();
+
+    CHECK(0 == tr->GetLayerIdOfSourceMeasurement(tr->TraceSingleQubitMeasurement(1, 1, q1)));
+    Qubit qs12[2] = {q1, q2};
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(tr->TraceMultiQubitMeasurement(2, 1, 2, qs12)));
+    CHECK(0 == tr->TraceSingleQubitOp(3, 1, q4));
+    CHECK(0 == tr->GetLayerIdOfSourceMeasurement(tr->TraceSingleQubitMeasurement(4, 1, q3)));
+    Qubit qs23[2] = {q2, q3};
+    CHECK(2 == tr->GetLayerIdOfSourceMeasurement(tr->TraceMultiQubitMeasurement(5, 1, 2, qs23)));
+    CHECK(1 == tr->TraceSingleQubitOp(3, 1, q4));
+
+    const vector<Layer>& layers = tr->UseLayers();
+    REQUIRE(layers.size() == 3);
+    CHECK(layers[0].operations.size() == 3);
+    CHECK(layers[1].operations.size() == 2);
+    CHECK(layers[2].operations.size() == 1);
 }
