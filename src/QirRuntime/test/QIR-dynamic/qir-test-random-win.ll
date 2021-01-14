@@ -12,19 +12,30 @@
 @PauliZ = constant i2 -2
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
 
-@Microsoft_Quantum_Testing_QIR_QuantumRandomNumberGenerator = alias i64 (), i64 ()* @Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body
+@Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator = alias i64 (), i64 ()* @Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body
+
+define void @Microsoft__Quantum__Intrinsic__H__body(%Qubit* %qb) {
+entry:
+  call void @__quantum__qis__h__body(%Qubit* %qb)
+  ret void
+}
+
+declare void @__quantum__qis__h__body(%Qubit*)
+
+define void @Microsoft__Quantum__Intrinsic__H__adj(%Qubit* %qb) {
+entry:
+  call void @__quantum__qis__h__body(%Qubit* %qb)
+  ret void
+}
 
 define i64 @Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body() #0 {
 entry:
   %randomNumber = alloca i64
   store i64 0, i64* %randomNumber
-  br label %preheader__1
-
-preheader__1:                                     ; preds = %entry
   br label %header__1
 
-header__1:                                        ; preds = %exiting__1, %preheader__1
-  %i = phi i64 [ 1, %preheader__1 ], [ %10, %exiting__1 ]
+header__1:                                        ; preds = %exiting__1, %entry
+  %i = phi i64 [ 1, %entry ], [ %10, %exiting__1 ]
   %0 = icmp sge i64 %i, 64
   %1 = icmp sle i64 %i, 64
   %2 = select i1 true, i1 %1, i1 %0
@@ -50,7 +61,6 @@ then0__1:                                         ; preds = %body__1
 continue__1:                                      ; preds = %then0__1, %body__1
   call void @__quantum__rt__qubit_release(%Qubit* %q)
   call void @__quantum__rt__result_unreference(%Result* %5)
-  call void @__quantum__rt__result_unreference(%Result* %6)
   br label %exiting__1
 
 exiting__1:                                       ; preds = %continue__1
@@ -66,8 +76,6 @@ declare %Qubit* @__quantum__rt__qubit_allocate()
 
 declare %Array* @__quantum__rt__qubit_allocate_array(i64)
 
-declare void @__quantum__qis__h__body(%Qubit*)
-
 declare %Result* @__quantum__qis__mz(%Qubit*)
 
 declare i1 @__quantum__rt__result_equal(%Result*, %Result*)
@@ -75,11 +83,5 @@ declare i1 @__quantum__rt__result_equal(%Result*, %Result*)
 declare void @__quantum__rt__qubit_release(%Qubit*)
 
 declare void @__quantum__rt__result_unreference(%Result*)
-
-define void @Microsoft__Quantum__Intrinsic__H__body(%Qubit* %qb) {
-entry:
-  call void @__quantum__qis__h__body(%Qubit* %qb)
-  ret void
-}
 
 attributes #0 = { "EntryPoint" }
