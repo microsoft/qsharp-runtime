@@ -70,7 +70,8 @@ namespace Microsoft.Azure.Quantum.Client
         /// <param name='jobId'>
         /// Id of the job.
         /// </param>
-        /// <param name='jobDefinition'>
+        /// <param name='job'>
+        /// The complete metadata of the job to submit.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -87,9 +88,9 @@ namespace Microsoft.Azure.Quantum.Client
         /// <exception cref="Microsoft.Rest.ValidationException">
         /// Thrown when a required parameter is null
         /// </exception>
-        Task<AzureOperationResponse<JobDetails>> PutWithHttpMessagesAsync(string jobId, JobDetails jobDefinition, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<AzureOperationResponse<JobDetails>> CreateWithHttpMessagesAsync(string jobId, JobDetails job, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
-        /// Delete a job.
+        /// Cancel a job.
         /// </summary>
         /// <param name='jobId'>
         /// Id of the job.
@@ -103,13 +104,10 @@ namespace Microsoft.Azure.Quantum.Client
         /// <exception cref="RestErrorException">
         /// Thrown when the operation returned an invalid status code
         /// </exception>
-        /// <exception cref="Microsoft.Rest.SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
         /// <exception cref="Microsoft.Rest.ValidationException">
         /// Thrown when a required parameter is null
         /// </exception>
-        Task<AzureOperationResponse<JobDetails>> DeleteWithHttpMessagesAsync(string jobId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<AzureOperationResponse> CancelWithHttpMessagesAsync(string jobId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// List jobs.
         /// </summary>
