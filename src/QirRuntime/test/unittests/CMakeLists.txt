@@ -4,7 +4,7 @@
 add_executable(qir-runtime-unittests
   driver.cpp
   FullstateSimulatorTests.cpp
-  QIRSupport.cpp
+  QirRuntimeTests.cpp
   ToffoliTests.cpp
 )
 

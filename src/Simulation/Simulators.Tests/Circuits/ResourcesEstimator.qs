@@ -48,6 +48,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             T(q[0]);
         }
     }
+
+    operation QubitReuseWithOptimizedDepth() : Unit
+    {
+        using (q1=Qubit()) {
+            using (q2=Qubit()) {
+                T(q2);
+                CNOT(q1, q2);
+            }
+        }
+        using (q3=Qubit()) {
+            T(q3);
+        }
+    }
+
+
     operation DepthVersusWidth () : Unit
     {
         using(q = Qubit()) {
@@ -57,4 +72,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             T(q);
         }
     }
+
+
+    operation SimultaneousUse() : Unit {
+        body (...){
+            using (register = Qubit[10]){
+                for (idx in 0..9){
+                    SomeOp(register[idx]);
+                }
+                ResetAll(register);
+            }
+        }
+    }
+
+    operation SequentialUse() : Unit {
+        body (...){
+            using (register = Qubit[10]){
+                for (idy in 0..10){
+                    for (idx in 0..9){
+                        SomeOp(register[idx]);
+                    }
+                }
+                ResetAll(register);
+            }
+        }
+    }
+
+    operation SomeOp(test : Qubit) : Unit {
+        body (...){
+            using (spareQubit = Qubit()){
+                T(test);
+                CNOT(test, spareQubit);
+            }
+        }
+    }
+
 }

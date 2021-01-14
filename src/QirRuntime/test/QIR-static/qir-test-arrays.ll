@@ -1,15 +1,12 @@
 
 %Result = type opaque
 %Range = type { i64, i64, i64 }
-%TupleHeader = type { i32, i32 }
 %String = type opaque
 %Array = type opaque
 
 @ResultZero = external global %Result*
 @ResultOne = external global %Result*
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
-
-declare %TupleHeader* @__quantum__rt__tuple_create(i64)
 
 define i64 @Microsoft__Quantum__Testing__QIR__Test_Arrays__body(%Array* %array, i64 %index, i64 %val) {
 entry:

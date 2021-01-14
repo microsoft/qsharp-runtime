@@ -10,7 +10,7 @@
 %Range = type { i64, i64, i64 }
 %Result = type opaque
 %String = type opaque
-%TupleHeader = type { i32 }
+%Tuple = type opaque
 %Pauli = type {i2}
 
 ;=======================================================================================================================
@@ -27,7 +27,7 @@
 %"struct.QirCallable" = type opaque
 %"struct.QirRange" = type { i64, i64, i64 }
 %"struct.QirString" = type opaque
-%"struct.QirTupleHeader" = type { i32 }
+; %Tuple* is mapped to i8*
 
 ;=======================================================================================================================
 ; declarations of the native APIs the bridge redirects to
@@ -74,17 +74,14 @@ declare void @llvm.va_end(i8*)
 ;------------------------------------------------------------------------------
 ; tuples and callables
 ;
-declare %"struct.QirTupleHeader"* @quantum__rt__tuple_create(i64)
-declare void @quantum__rt__tuple_reference(%"struct.QirTupleHeader"*)
-declare void @quantum__rt__tuple_unreference(%"struct.QirTupleHeader"*)
+declare i8* @quantum__rt__tuple_create(i64)
+declare void @quantum__rt__tuple_reference(i8*)
+declare void @quantum__rt__tuple_unreference(i8*)
 
 declare void @quantum__rt__callable_reference(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_unreference(%"struct.QirCallable"*)
-declare %"struct.QirCallable"* @quantum__rt__callable_create(
-  void (%"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*)**,
-  %"struct.QirTupleHeader"*)
-declare void @quantum__rt__callable_invoke(
-  %"struct.QirCallable"*, %"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*)
+declare %"struct.QirCallable"* @quantum__rt__callable_create(void (i8*, i8*, i8*)**, i8*)
+declare void @quantum__rt__callable_invoke(%"struct.QirCallable"*, i8*, i8*)
 declare %"struct.QirCallable"* @quantum__rt__callable_copy(%"struct.QirCallable"*)
 declare %"struct.QirCallable"* @quantum__rt__callable_make_adjoint(%"struct.QirCallable"*)
 declare %"struct.QirCallable"* @quantum__rt__callable_make_controlled(%"struct.QirCallable"*)
@@ -290,21 +287,21 @@ define void @__quantum__rt__array_unreference(%Array* %.ar) {
 ;------------------------------------------------------------------------------
 ; tuples bridge
 ;
-define %TupleHeader* @__quantum__rt__tuple_create(i64 %size) {
-  %th = call %"struct.QirTupleHeader"* @quantum__rt__tuple_create(i64 %size)
-  %.th = bitcast %"struct.QirTupleHeader"* %th to %TupleHeader*
-  ret %TupleHeader* %.th
+define %Tuple* @__quantum__rt__tuple_create(i64 %size) {
+  %th = call i8* @quantum__rt__tuple_create(i64 %size)
+  %.th = bitcast i8* %th to %Tuple*
+  ret %Tuple* %.th
 }
 
-define void @__quantum__rt__tuple_reference(%TupleHeader* %.th) {
-  %th = bitcast %TupleHeader* %.th to %"struct.QirTupleHeader"*
-  call void @quantum__rt__tuple_reference(%"struct.QirTupleHeader"* %th)
+define void @__quantum__rt__tuple_reference(%Tuple* %.th) {
+  %th = bitcast %Tuple* %.th to i8*
+  call void @quantum__rt__tuple_reference(i8* %th)
   ret void
 }
 
-define void @__quantum__rt__tuple_unreference(%TupleHeader* %.th) {
-  %th = bitcast %TupleHeader* %.th to %"struct.QirTupleHeader"*
-  call void @quantum__rt__tuple_unreference(%"struct.QirTupleHeader"* %th)
+define void @__quantum__rt__tuple_unreference(%Tuple* %.th) {
+  %th = bitcast %Tuple* %.th to i8*
+  call void @quantum__rt__tuple_unreference(i8* %th)
   ret void
 }
 
@@ -324,24 +321,19 @@ define void @__quantum__rt__callable_unreference(%Callable* %.clb) {
   ret void
 }
 
-define %Callable* @__quantum__rt__callable_create(
-  [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]* %.ft, %TupleHeader* %.capture) {
-  %ft = bitcast [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]* %.ft
-        to void (%"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*)**
-  %capture = bitcast %TupleHeader* %.capture to %"struct.QirTupleHeader"*
-  %clb = call %"struct.QirCallable"* @quantum__rt__callable_create(
-    void (%"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*, %"struct.QirTupleHeader"*)** %ft,
-    %"struct.QirTupleHeader"* %capture)
+define %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* %.ft, %Tuple* %.capture) {
+  %ft = bitcast [4 x void (%Tuple*, %Tuple*, %Tuple*)*]* %.ft to void (i8*, i8*, i8*)**
+  %capture = bitcast %Tuple* %.capture to i8*
+  %clb = call %"struct.QirCallable"* @quantum__rt__callable_create(void (i8*, i8*, i8*)** %ft, i8* %capture)
   %.clb = bitcast %"struct.QirCallable"* %clb to %Callable*
   ret %Callable* %.clb
 }
 
-define void @__quantum__rt__callable_invoke(%Callable* %.clb, %TupleHeader* %.args, %TupleHeader* %.res) {
+define void @__quantum__rt__callable_invoke(%Callable* %.clb, %Tuple* %.args, %Tuple* %.res) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  %args = bitcast %TupleHeader* %.args to %"struct.QirTupleHeader"*
-  %res = bitcast %TupleHeader* %.res to %"struct.QirTupleHeader"*
-  call void @quantum__rt__callable_invoke(
-    %"struct.QirCallable"* %clb, %"struct.QirTupleHeader"* %args, %"struct.QirTupleHeader"* %res)
+  %args = bitcast %Tuple* %.args to i8*
+  %res = bitcast %Tuple* %.res to i8*
+  call void @quantum__rt__callable_invoke(%"struct.QirCallable"* %clb, i8* %args, i8* %res)
   ret void
 }
 

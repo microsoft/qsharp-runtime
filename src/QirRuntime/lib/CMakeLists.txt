@@ -11,14 +11,6 @@ add_library(qdk SHARED
     $<TARGET_OBJECTS:simulators-obj>
 )
 
-if (WIN32)
-  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/qir-bridge-u.lib")
-  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/qir-bridge-qis-u.lib")
-else()
-  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libqir-bridge-u.a")
-  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libqir-bridge-qis-u.a")
-endif()
-
 target_link_libraries(qdk
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
