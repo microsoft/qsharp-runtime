@@ -420,7 +420,8 @@ namespace Microsoft.Azure.Quantum.Client
         /// <param name='jobId'>
         /// Id of the job.
         /// </param>
-        /// <param name='jobDefinition'>
+        /// <param name='job'>
+        /// The complete metadata of the job to submit.
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -443,7 +444,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<AzureOperationResponse<JobDetails>> PutWithHttpMessagesAsync(string jobId, JobDetails jobDefinition, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<AzureOperationResponse<JobDetails>> CreateWithHttpMessagesAsync(string jobId, JobDetails job, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (Client.SubscriptionId == null)
             {
@@ -461,13 +462,13 @@ namespace Microsoft.Azure.Quantum.Client
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "jobId");
             }
-            if (jobDefinition == null)
+            if (job == null)
             {
-                throw new ValidationException(ValidationRules.CannotBeNull, "jobDefinition");
+                throw new ValidationException(ValidationRules.CannotBeNull, "job");
             }
-            if (jobDefinition != null)
+            if (job != null)
             {
-                jobDefinition.Validate();
+                job.Validate();
             }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -477,9 +478,9 @@ namespace Microsoft.Azure.Quantum.Client
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("jobId", jobId);
-                tracingParameters.Add("jobDefinition", jobDefinition);
+                tracingParameters.Add("job", job);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "Put", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "Create", tracingParameters);
             }
             // Construct URL
             var _baseUrl = Client.BaseUri.AbsoluteUri;
@@ -527,9 +528,9 @@ namespace Microsoft.Azure.Quantum.Client
 
             // Serialize Request
             string _requestContent = null;
-            if(jobDefinition != null)
+            if(job != null)
             {
-                _requestContent = Rest.Serialization.SafeJsonConvert.SerializeObject(jobDefinition, Client.SerializationSettings);
+                _requestContent = Rest.Serialization.SafeJsonConvert.SerializeObject(job, Client.SerializationSettings);
                 _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
                 _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json; charset=utf-8");
             }
@@ -634,7 +635,7 @@ namespace Microsoft.Azure.Quantum.Client
         }
 
         /// <summary>
-        /// Delete a job.
+        /// Cancel a job.
         /// </summary>
         /// <param name='jobId'>
         /// Id of the job.
@@ -648,9 +649,6 @@ namespace Microsoft.Azure.Quantum.Client
         /// <exception cref="RestErrorException">
         /// Thrown when the operation returned an invalid status code
         /// </exception>
-        /// <exception cref="SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
         /// <exception cref="ValidationException">
         /// Thrown when a required parameter is null
         /// </exception>
@@ -660,7 +658,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<AzureOperationResponse<JobDetails>> DeleteWithHttpMessagesAsync(string jobId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<AzureOperationResponse> CancelWithHttpMessagesAsync(string jobId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (Client.SubscriptionId == null)
             {
@@ -687,7 +685,7 @@ namespace Microsoft.Azure.Quantum.Client
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("jobId", jobId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "Delete", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "Cancel", tracingParameters);
             }
             // Construct URL
             var _baseUrl = Client.BaseUri.AbsoluteUri;
@@ -755,7 +753,7 @@ namespace Microsoft.Azure.Quantum.Client
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 204)
+            if ((int)_statusCode != 204)
             {
                 var ex = new RestErrorException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 try
@@ -785,30 +783,12 @@ namespace Microsoft.Azure.Quantum.Client
                 throw ex;
             }
             // Create Result
-            var _result = new AzureOperationResponse<JobDetails>();
+            var _result = new AzureOperationResponse();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             if (_httpResponse.Headers.Contains("x-ms-request-id"))
             {
                 _result.RequestId = _httpResponse.Headers.GetValues("x-ms-request-id").FirstOrDefault();
-            }
-            // Deserialize Response
-            if ((int)_statusCode == 200)
-            {
-                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    _result.Body = Rest.Serialization.SafeJsonConvert.DeserializeObject<JobDetails>(_responseContent, Client.DeserializationSettings);
-                }
-                catch (JsonException ex)
-                {
-                    _httpRequest.Dispose();
-                    if (_httpResponse != null)
-                    {
-                        _httpResponse.Dispose();
-                    }
-                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
-                }
             }
             if (_shouldTrace)
             {

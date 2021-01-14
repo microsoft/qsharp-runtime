@@ -92,11 +92,12 @@ namespace Microsoft.Azure.Quantum.Client
             /// <param name='jobId'>
             /// Id of the job.
             /// </param>
-            /// <param name='jobDefinition'>
+            /// <param name='job'>
+            /// The complete metadata of the job to submit.
             /// </param>
-            public static JobDetails Put(this IJobsOperations operations, string jobId, JobDetails jobDefinition)
+            public static JobDetails Create(this IJobsOperations operations, string jobId, JobDetails job)
             {
-                return operations.PutAsync(jobId, jobDefinition).GetAwaiter().GetResult();
+                return operations.CreateAsync(jobId, job).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -108,21 +109,22 @@ namespace Microsoft.Azure.Quantum.Client
             /// <param name='jobId'>
             /// Id of the job.
             /// </param>
-            /// <param name='jobDefinition'>
+            /// <param name='job'>
+            /// The complete metadata of the job to submit.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<JobDetails> PutAsync(this IJobsOperations operations, string jobId, JobDetails jobDefinition, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<JobDetails> CreateAsync(this IJobsOperations operations, string jobId, JobDetails job, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.PutWithHttpMessagesAsync(jobId, jobDefinition, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateWithHttpMessagesAsync(jobId, job, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Delete a job.
+            /// Cancel a job.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -130,13 +132,13 @@ namespace Microsoft.Azure.Quantum.Client
             /// <param name='jobId'>
             /// Id of the job.
             /// </param>
-            public static JobDetails Delete(this IJobsOperations operations, string jobId)
+            public static void Cancel(this IJobsOperations operations, string jobId)
             {
-                return operations.DeleteAsync(jobId).GetAwaiter().GetResult();
+                operations.CancelAsync(jobId).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Delete a job.
+            /// Cancel a job.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -147,12 +149,9 @@ namespace Microsoft.Azure.Quantum.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<JobDetails> DeleteAsync(this IJobsOperations operations, string jobId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task CancelAsync(this IJobsOperations operations, string jobId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.DeleteWithHttpMessagesAsync(jobId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
+                (await operations.CancelWithHttpMessagesAsync(jobId, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
             /// <summary>
