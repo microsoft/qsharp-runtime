@@ -90,5 +90,10 @@ namespace Microsoft.Azure.Quantum.Client
         /// </summary>
         IStorageOperations Storage { get; }
 
+        /// <summary>
+        /// Gets the IQuotasOperations.
+        /// </summary>
+        IQuotasOperations Quotas { get; }
+
     }
 }
