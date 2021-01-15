@@ -79,8 +79,8 @@ declare void @llvm.va_end(i8*)
 declare i8* @quantum__rt__tuple_create(i64)
 declare void @quantum__rt__tuple_reference(i8*)
 declare void @quantum__rt__tuple_unreference(i8*)
-declare void @quantum__rt__tuple_add_user(i8*)
-declare void @quantum__rt__tuple_remove_user(i8*)
+declare void @quantum__rt__tuple_add_access(i8*)
+declare void @quantum__rt__tuple_remove_access(i8*)
 
 declare void @quantum__rt__callable_reference(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_unreference(%"struct.QirCallable"*)
@@ -331,15 +331,15 @@ define void @__quantum__rt__tuple_unreference(%Tuple* %.th) {
   ret void
 }
 
-define void @__quantum__rt__tuple_add_user(%Tuple* %.th) {
+define void @__quantum__rt__tuple_add_access(%Tuple* %.th) {
   %th = bitcast %Tuple* %.th to i8*
-  call void @quantum__rt__tuple_add_user(i8* %th)
+  call void @quantum__rt__tuple_add_access(i8* %th)
   ret void
 }
 
-define void @__quantum__rt__tuple_remove_user(%Tuple* %.th) {
+define void @__quantum__rt__tuple_remove_access(%Tuple* %.th) {
   %th = bitcast %Tuple* %.th to i8*
-  call void @quantum__rt__tuple_remove_user(i8* %th)
+  call void @quantum__rt__tuple_remove_access(i8* %th)
   ret void
 }
 
