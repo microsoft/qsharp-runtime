@@ -43,7 +43,7 @@ extern "C"
         (void)th->Release();
     }
 
-    void quantum__rt__tuple_add_user(PTuple tuple)
+    void quantum__rt__tuple_add_access(PTuple tuple)
     {
         if (tuple == nullptr)
         {
@@ -53,7 +53,7 @@ extern "C"
         th->AddUser();
     }
 
-    void quantum__rt__tuple_remove_user(PTuple tuple)
+    void quantum__rt__tuple_remove_access(PTuple tuple)
     {
         if (tuple == nullptr)
         {
