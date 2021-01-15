@@ -1,51 +1,16 @@
-# compile test ll files into a library, have to use custom commands for this
-set(CLANG_ARGS "-c")
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CLANG_ARGS
-    "${CLANG_ARGS}"
-    "-O0"
-    "-D_DEBUG"
-  )
-endif()
+# compile test ll files into a library
 
 set(TEST_FILES
   qir-test-arrays
-  qir-test-controlls
+  qir-test-functors
+  qir-test-noqsharp
   qir-test-partials
-  qir-test-range
-  qir-test-vqe
-  qir-test-shared-intrinsics
+  qir-test-qubits-results
 )
 
 foreach(file ${TEST_FILES})
-  set(INFILE "${CMAKE_CURRENT_SOURCE_DIR}/${file}.ll")
-  set(OBJFILE "${CMAKE_CURRENT_BINARY_DIR}/${file}.obj")
-
-  set(QIR_SINGLE_FILE_COMPILE_ACTION "qir_single_file_compile_action_${file}")
-  add_custom_command(OUTPUT ${QIR_SINGLE_FILE_COMPILE_ACTION}
-    COMMAND ${CMAKE_CXX_COMPILER}
-    ARGS ${CLANG_ARGS} ${INFILE} "-o" ${OBJFILE}
-    DEPENDS ${INFILE}
-    COMMENT "Compiling qir test file ${file}"
-    VERBATIM)
-
-  set(QIR_SINGLE_FILE_COMPILE "qir_single_file_compile_${file}")
-  add_custom_target(${QIR_SINGLE_FILE_COMPILE} DEPENDS ${QIR_SINGLE_FILE_COMPILE_ACTION})
-
-  if (WIN32)
-    set(QIR_TESTS_LIB  "${CMAKE_CURRENT_BINARY_DIR}/${file}.lib")
-  else()
-    set(QIR_TESTS_LIB  "${CMAKE_CURRENT_BINARY_DIR}/libqir_${file}.a")
-  endif()
-  list(APPEND QIR_TESTS_LIBS ${QIR_TESTS_LIB})
-
-  add_custom_command(OUTPUT ${QIR_TESTS_LIB}
-    COMMAND ${CMAKE_AR}
-    ARGS "rc" ${QIR_TESTS_LIB} ${OBJFILE}
-    DEPENDS ${QIR_SINGLE_FILE_COMPILE} ${INFILE}
-    COMMENT "Adding QIR tests ${file} into a lib"
-    VERBATIM)
-
+  compile_from_qir(${file} "") # don't create a target per file
+  list(APPEND QIR_TESTS_LIBS ${QIR_UTILITY_LIB})
 endforeach()
 
 add_custom_target(qir_static_test_lib DEPENDS ${QIR_TESTS_LIBS})
@@ -54,13 +19,14 @@ add_custom_target(qir_static_test_lib DEPENDS ${QIR_TESTS_LIBS})
 # The executable target for QIR tests triggers the custom actions to compile ll files
 #
 add_executable(qir-static-tests
-  qir-driver.cpp
-  qir-test-vqe.cpp)
+  qir-driver.cpp)
 
 target_link_libraries(qir-static-tests PUBLIC
   ${QIR_TESTS_LIBS}
-  qir-rt
-  qir-qis
+  ${QIR_BRIDGE_UTILITY_LIB}
+  ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  qir-rt-support
+  qir-qis-support
   simulators
 )
 

@@ -1,233 +1,91 @@
-; Copyright (c) Microsoft Corporation. All rights reserved.
-; Licensed under the MIT License.
 
 %Result = type opaque
 %Range = type { i64, i64, i64 }
-%TupleHeader = type { i32 }
-%Qubit = type opaque
-%String = type opaque
-%Array = type opaque
+%Tuple = type opaque
 %Callable = type opaque
 
 @ResultZero = external global %Result*
 @ResultOne = external global %Result*
-
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
-@Microsoft__Quantum__Intrinsic__Rz = constant [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*] [void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* @Microsoft__Quantum__Intrinsic__Rz__body__wrapper, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* @Microsoft__Quantum__Intrinsic__Rz__adj__wrapper, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null]
-@PartialApplication__2 = constant [4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*] [void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* @Lifted__PartialApplication__2__body__wrapper, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* @Lifted__PartialApplication__2__adj__wrapper, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null, void (%TupleHeader*, %TupleHeader*, %TupleHeader*)* null]
+@Microsoft__Quantum__Testing__QIR__Subtract = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Microsoft__Quantum__Testing__QIR__Subtract__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
+@PartialApplication__12 = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Lifted__PartialApplication__12__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
 
-@Microsoft_Quantum_Testing_QIR_TestPartials = alias i1 (), i1 ()* @Microsoft__Quantum__Testing__QIR__TestPartials__body
+@Microsoft__Quantum__Testing__QIR__TestPartials = alias i64 (i64, i64), i64 (i64, i64)* @Microsoft__Quantum__Testing__QIR__TestPartials__body
 
-declare void @__quantum__qis__cnot(%Qubit*, %Qubit*)
-
-declare void @__quantum__qis__h(%Qubit*)
-
-declare %Result* @__quantum__qis__mz(%Qubit*)
-
-declare void @__quantum__qis__rx(double, %Qubit*)
-
-declare void @__quantum__qis__rz(double, %Qubit*)
-
-declare void @__quantum__qis__s(%Qubit*)
-
-declare void @__quantum__qis__t(%Qubit*)
-
-declare void @__quantum__qis__x(%Qubit*)
-
-
-declare void @Microsoft__Quantum__Instructions__PhysCNOT__body(%Qubit*, %Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysH__body(%Qubit*)
-
-declare %Result* @Microsoft__Quantum__Instructions__PhysM__body(%Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysRx__body(double, %Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysRz__body(double, %Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysS__body(%Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysT__body(%Qubit*)
-
-declare void @Microsoft__Quantum__Instructions__PhysX__body(%Qubit*)
-
-
-declare void @Microsoft__Quantum__Intrinsic__Rz__adj(double, %Qubit*)
-
-declare void @Microsoft__Quantum__Intrinsic__Rz__body(double, %Qubit*)
-
-
-;define { %TupleHeader, %String* }* @Microsoft__Quantum__Core__Intrinsic__body(%String* %arg0) {
-;entry:
-;  %0 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, %String* }* getelementptr ({ %TupleHeader, %String* }, { %TupleHeader, %String* }* null, i32 1) to i64))
-;  %1 = bitcast %TupleHeader* %0 to { %TupleHeader, %String* }*
-;  %2 = getelementptr inbounds { %TupleHeader, %String* }, { %TupleHeader, %String* }* %1, i32 0, i32 1
-;  store %String* %arg0, %String** %2
-;  call void @__quantum__rt__string_reference(%String* %arg0)
-;  ret { %TupleHeader, %String* }* %1
-;}
-
-declare %TupleHeader* @__quantum__rt__tuple_create(i64)
-
-declare void @__quantum__rt__string_reference(%String*)
-
-declare i64 @Microsoft__Quantum__Core__Length__body(%Array*)
-
-declare i64 @Microsoft__Quantum__Core__RangeEnd__body(%Range)
-
-declare %Range @Microsoft__Quantum__Core__RangeReverse__body(%Range)
-
-declare i64 @Microsoft__Quantum__Core__RangeStart__body(%Range)
-
-declare i64 @Microsoft__Quantum__Core__RangeStep__body(%Range)
-
-define i1 @Microsoft__Quantum__Testing__QIR__TestPartials__body() #0 {
+define i64 @Microsoft__Quantum__Testing__QIR__TestPartials__body(i64 %x, i64 %y) #0 {
 entry:
-  %0 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, %Callable*, double }* getelementptr ({ %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* null, i32 1) to i64))
-  %1 = bitcast %TupleHeader* %0 to { %TupleHeader, %Callable*, double }*
-  %2 = getelementptr inbounds { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %1, i32 0, i32 1
-  %3 = call %Callable* @__quantum__rt__callable_create([4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]* @Microsoft__Quantum__Intrinsic__Rz, %TupleHeader* null)
-  store %Callable* %3, %Callable** %2
-  %4 = getelementptr inbounds { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %1, i32 0, i32 2
-  store double 2.500000e-01, double* %4
-  %rotate = call %Callable* @__quantum__rt__callable_create([4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]* @PartialApplication__2, %TupleHeader* %0)
-  %unrotate = call %Callable* @__quantum__rt__callable_copy(%Callable* %rotate)
-  call void @__quantum__rt__callable_make_adjoint(%Callable* %unrotate)
-  br label %preheader__1
-
-preheader__1:                                     ; preds = %entry
-  br label %header__1
-
-header__1:                                        ; preds = %exiting__1, %preheader__1
-  %i = phi i64 [ 0, %preheader__1 ], [ %18, %exiting__1 ]
-  %5 = icmp sge i64 %i, 100
-  %6 = icmp sle i64 %i, 100
-  %7 = select i1 true, i1 %6, i1 %5
-  br i1 %7, label %body__1, label %exit__1
-
-body__1:                                          ; preds = %header__1
-  %qb = call %Qubit* @__quantum__rt__qubit_allocate()
-  %8 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, %Qubit* }* getelementptr ({ %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* null, i32 1) to i64))
-  %9 = bitcast %TupleHeader* %8 to { %TupleHeader, %Qubit* }*
-  %10 = getelementptr { %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* %9, i64 0, i32 1
-  store %Qubit* %qb, %Qubit** %10
-  call void @__quantum__rt__callable_invoke(%Callable* %rotate, %TupleHeader* %8, %TupleHeader* null)
-  %11 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, %Qubit* }* getelementptr ({ %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* null, i32 1) to i64))
-  %12 = bitcast %TupleHeader* %11 to { %TupleHeader, %Qubit* }*
-  %13 = getelementptr { %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* %12, i64 0, i32 1
-  store %Qubit* %qb, %Qubit** %13
-  call void @__quantum__rt__callable_invoke(%Callable* %unrotate, %TupleHeader* %11, %TupleHeader* null)
-  %14 = call %Result* @__quantum__qis__mz(%Qubit* %qb)
-  %15 = load %Result*, %Result** @ResultZero
-  %16 = call i1 @__quantum__rt__result_equal(%Result* %14, %Result* %15)
-  %17 = xor i1 %16, true
-  br i1 %17, label %then0__1, label %continue__1
-
-then0__1:                                         ; preds = %body__1
-  call void @__quantum__rt__qubit_release(%Qubit* %qb)
-  call void @__quantum__rt__callable_unreference(%Callable* %rotate)
-  call void @__quantum__rt__callable_unreference(%Callable* %unrotate)
-  ret i1 false
-
-continue__1:                                      ; preds = %body__1
-  call void @__quantum__rt__qubit_release(%Qubit* %qb)
-  br label %exiting__1
-
-exiting__1:                                       ; preds = %continue__1
-  %18 = add i64 %i, 1
-  br label %header__1
-
-exit__1:                                          ; preds = %header__1
-  call void @__quantum__rt__callable_unreference(%Callable* %rotate)
-  call void @__quantum__rt__callable_unreference(%Callable* %unrotate)
-  ret i1 true
+  %0 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint ({ %Callable*, i64 }* getelementptr ({ %Callable*, i64 }, { %Callable*, i64 }* null, i32 1) to i64))
+  %1 = bitcast %Tuple* %0 to { %Callable*, i64 }*
+  %2 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %1, i64 0, i32 0
+  %3 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %1, i64 0, i32 1
+  %4 = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @Microsoft__Quantum__Testing__QIR__Subtract, %Tuple* null)
+  store %Callable* %4, %Callable** %2
+  store i64 %x, i64* %3
+  %subtractor = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @PartialApplication__12, %Tuple* %0)
+  %5 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint (i64* getelementptr (i64, i64* null, i32 1) to i64))
+  %6 = bitcast %Tuple* %5 to { i64 }*
+  %7 = getelementptr { i64 }, { i64 }* %6, i64 0, i32 0
+  store i64 %y, i64* %7
+  %8 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint (i64* getelementptr (i64, i64* null, i32 1) to i64))
+  call void @__quantum__rt__callable_invoke(%Callable* %subtractor, %Tuple* %5, %Tuple* %8)
+  %9 = bitcast %Tuple* %8 to { i64 }*
+  %10 = getelementptr { i64 }, { i64 }* %9, i64 0, i32 0
+  %11 = load i64, i64* %10
+  call void @__quantum__rt__callable_unreference(%Callable* %subtractor)
+  call void @__quantum__rt__tuple_unreference(%Tuple* %5)
+  call void @__quantum__rt__tuple_unreference(%Tuple* %8)
+  ret i64 %11
 }
 
-define void @Microsoft__Quantum__Intrinsic__Rz__body__wrapper(%TupleHeader* %capture-tuple, %TupleHeader* %arg-tuple, %TupleHeader* %result-tuple) {
+declare %Tuple* @__quantum__rt__tuple_create(i64)
+
+declare %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]*, %Tuple*)
+
+define void @Microsoft__Quantum__Testing__QIR__Subtract__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
 entry:
-  %0 = bitcast %TupleHeader* %arg-tuple to { %TupleHeader, double, %Qubit* }*
-  %1 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %0, i64 0, i32 1
-  %2 = load double, double* %1
-  %3 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %0, i64 0, i32 2
-  %4 = load %Qubit*, %Qubit** %3
-  call void @Microsoft__Quantum__Intrinsic__Rz__body(double %2, %Qubit* %4)
+  %0 = bitcast %Tuple* %arg-tuple to { i64, i64 }*
+  %1 = getelementptr { i64, i64 }, { i64, i64 }* %0, i64 0, i32 0
+  %2 = getelementptr { i64, i64 }, { i64, i64 }* %0, i64 0, i32 1
+  %3 = load i64, i64* %1
+  %4 = load i64, i64* %2
+  %5 = call i64 @Microsoft__Quantum__Testing__QIR__Subtract__body(i64 %3, i64 %4)
+  %6 = bitcast %Tuple* %result-tuple to { i64 }*
+  %7 = getelementptr { i64 }, { i64 }* %6, i64 0, i32 0
+  store i64 %5, i64* %7
   ret void
 }
 
-define void @Microsoft__Quantum__Intrinsic__Rz__adj__wrapper(%TupleHeader* %capture-tuple, %TupleHeader* %arg-tuple, %TupleHeader* %result-tuple) {
+define void @Lifted__PartialApplication__12__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
 entry:
-  %0 = bitcast %TupleHeader* %arg-tuple to { %TupleHeader, double, %Qubit* }*
-  %1 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %0, i64 0, i32 1
-  %2 = load double, double* %1
-  %3 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %0, i64 0, i32 2
-  %4 = load %Qubit*, %Qubit** %3
-  call void @Microsoft__Quantum__Intrinsic__Rz__adj(double %2, %Qubit* %4)
-  ret void
-}
-
-declare %Callable* @__quantum__rt__callable_create([4 x void (%TupleHeader*, %TupleHeader*, %TupleHeader*)*]*, %TupleHeader*)
-
-define void @Lifted__PartialApplication__2__body__wrapper(%TupleHeader* %capture-tuple, %TupleHeader* %arg-tuple, %TupleHeader* %result-tuple) {
-entry:
-  %0 = bitcast %TupleHeader* %capture-tuple to { %TupleHeader, %Callable*, double }*
-  %1 = bitcast %TupleHeader* %arg-tuple to { %TupleHeader, %Qubit* }*
-  %2 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, double, %Qubit* }* getelementptr ({ %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* null, i32 1) to i64))
-  %3 = bitcast %TupleHeader* %2 to { %TupleHeader, double, %Qubit* }*
-  %4 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %3, i64 0, i32 1
-  %5 = getelementptr { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %0, i64 0, i32 2
-  %6 = load double, double* %5
-  store double %6, double* %4
-  %7 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %3, i64 0, i32 2
-  %8 = getelementptr { %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* %1, i64 0, i32 1
-  %9 = load %Qubit*, %Qubit** %8
-  store %Qubit* %9, %Qubit** %7
-  %10 = getelementptr inbounds { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %0, i32 0, i32 1
+  %0 = bitcast %Tuple* %capture-tuple to { %Callable*, i64 }*
+  %1 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 1
+  %2 = load i64, i64* %1
+  %3 = bitcast %Tuple* %arg-tuple to { i64 }*
+  %4 = getelementptr { i64 }, { i64 }* %3, i64 0, i32 0
+  %5 = load i64, i64* %4
+  %6 = call %Tuple* @__quantum__rt__tuple_create(i64 mul nuw (i64 ptrtoint (i64* getelementptr (i64, i64* null, i32 1) to i64), i64 2))
+  %7 = bitcast %Tuple* %6 to { i64, i64 }*
+  %8 = getelementptr { i64, i64 }, { i64, i64 }* %7, i64 0, i32 0
+  %9 = getelementptr { i64, i64 }, { i64, i64 }* %7, i64 0, i32 1
+  store i64 %2, i64* %8
+  store i64 %5, i64* %9
+  %10 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 0
   %11 = load %Callable*, %Callable** %10
-  call void @__quantum__rt__callable_invoke(%Callable* %11, %TupleHeader* %2, %TupleHeader* %result-tuple)
-  call void @__quantum__rt__tuple_unreference(%TupleHeader* %2)
+  call void @__quantum__rt__callable_invoke(%Callable* %11, %Tuple* %6, %Tuple* %result-tuple)
+  call void @__quantum__rt__tuple_unreference(%Tuple* %6)
   ret void
 }
 
-declare void @__quantum__rt__callable_invoke(%Callable*, %TupleHeader*, %TupleHeader*)
-
-declare void @__quantum__rt__tuple_unreference(%TupleHeader*)
-
-define void @Lifted__PartialApplication__2__adj__wrapper(%TupleHeader* %capture-tuple, %TupleHeader* %arg-tuple, %TupleHeader* %result-tuple) {
-entry:
-  %0 = bitcast %TupleHeader* %capture-tuple to { %TupleHeader, %Callable*, double }*
-  %1 = bitcast %TupleHeader* %arg-tuple to { %TupleHeader, %Qubit* }*
-  %2 = call %TupleHeader* @__quantum__rt__tuple_create(i64 ptrtoint ({ %TupleHeader, double, %Qubit* }* getelementptr ({ %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* null, i32 1) to i64))
-  %3 = bitcast %TupleHeader* %2 to { %TupleHeader, double, %Qubit* }*
-  %4 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %3, i64 0, i32 1
-  %5 = getelementptr { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %0, i64 0, i32 2
-  %6 = load double, double* %5
-  store double %6, double* %4
-  %7 = getelementptr { %TupleHeader, double, %Qubit* }, { %TupleHeader, double, %Qubit* }* %3, i64 0, i32 2
-  %8 = getelementptr { %TupleHeader, %Qubit* }, { %TupleHeader, %Qubit* }* %1, i64 0, i32 1
-  %9 = load %Qubit*, %Qubit** %8
-  store %Qubit* %9, %Qubit** %7
-  %10 = getelementptr inbounds { %TupleHeader, %Callable*, double }, { %TupleHeader, %Callable*, double }* %0, i32 0, i32 1
-  %11 = load %Callable*, %Callable** %10
-  %12 = call %Callable* @__quantum__rt__callable_copy(%Callable* %11)
-  call void @__quantum__rt__callable_make_adjoint(%Callable* %12)
-  call void @__quantum__rt__callable_invoke(%Callable* %12, %TupleHeader* %2, %TupleHeader* %result-tuple)
-  call void @__quantum__rt__tuple_unreference(%TupleHeader* %2)
-  call void @__quantum__rt__callable_unreference(%Callable* %12)
-  ret void
-}
-
-declare %Callable* @__quantum__rt__callable_copy(%Callable*)
-
-declare void @__quantum__rt__callable_make_adjoint(%Callable*)
+declare void @__quantum__rt__callable_invoke(%Callable*, %Tuple*, %Tuple*)
 
 declare void @__quantum__rt__callable_unreference(%Callable*)
 
-declare %Qubit* @__quantum__rt__qubit_allocate()
+declare void @__quantum__rt__tuple_unreference(%Tuple*)
 
-declare %Array* @__quantum__rt__qubit_allocate_array(i64)
-
-declare i1 @__quantum__rt__result_equal(%Result*, %Result*)
-
-declare void @__quantum__rt__qubit_release(%Qubit*)
+define i64 @Microsoft__Quantum__Testing__QIR__Subtract__body(i64 %from, i64 %what) {
+entry:
+  %0 = sub i64 %from, %what
+  ret i64 %0
+}
 
 attributes #0 = { "EntryPoint" }

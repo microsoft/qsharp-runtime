@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Intrinsic;
     
     
-    operation MultiControlledQubitTestHelper (qubitOperation : (Qubit => Unit : Controlled, Adjoint), controls : Int, target : Qubit[]) : Unit {
+    operation MultiControlledQubitTestHelper (qubitOperation : (Qubit => Unit is Ctl + Adj), controls : Int, target : Qubit[]) : Unit {
         
         body (...) {
             
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation MultiControlledTestHelper (testOperation : (Qubit[] => Unit : Controlled, Adjoint), controlsCount : Int, targetCount : Int, target : Qubit[]) : Unit {
+    operation MultiControlledTestHelper (testOperation : (Qubit[] => Unit is Ctl + Adj), controlsCount : Int, targetCount : Int, target : Qubit[]) : Unit {
         
         body (...) {
             

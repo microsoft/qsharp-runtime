@@ -18,8 +18,6 @@ extern Microsoft::Quantum::ISimulator* g_sim;
 
 extern "C"
 {
-
-
     double quantum__qis__intAsDouble(long value)
     {
         assert(value == static_cast<int32_t>(value));
@@ -38,9 +36,6 @@ extern "C"
 
     Result quantum__qis__measure(QirArray* paulis, QirArray* qubits)
     {
-        assert(!paulis->containsQubits);
-        assert(qubits->containsQubits);
-
         const long count = qubits->count;
         assert(count == paulis->count);
 
@@ -100,5 +95,17 @@ extern "C"
     void quantum__qis__z(Qubit qubit)
     {
         g_sim->AsQuantumGateSet()->Z(qubit);
+    }
+
+    void quantum__qis__crx(QirArray* ctls, double theta, Qubit qubit)
+    {
+        g_sim->AsQuantumGateSet()->ControlledR(
+            ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), PauliId_X, qubit, theta);
+    }
+
+    void quantum__qis__crz(QirArray* ctls, double theta, Qubit qubit)
+    {
+        g_sim->AsQuantumGateSet()->ControlledR(
+            ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), PauliId_Z, qubit, theta);
     }
 }

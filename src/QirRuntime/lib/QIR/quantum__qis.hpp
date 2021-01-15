@@ -14,7 +14,6 @@
 #endif
 
 struct QirArray;
-struct QirTupleHeader;
 struct QirCallable;
 struct QirString;
 struct QirBigInt;
@@ -25,7 +24,7 @@ namespace Quantum
 {
     struct IQuantumGateSet;
 }
-}
+} // namespace Microsoft
 
 /*
     Methods from __quantum__qis namespace are specific to the target. When QIR is generated it might limit or extend
@@ -47,4 +46,6 @@ extern "C"
     QIR_SHARED_API void quantum__qis__x(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__y(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void quantum__qis__crx(QirArray*, double, QUBIT*);                 // NOLINT
+    QIR_SHARED_API void quantum__qis__crz(QirArray*, double, QUBIT*);                 // NOLINT
 }

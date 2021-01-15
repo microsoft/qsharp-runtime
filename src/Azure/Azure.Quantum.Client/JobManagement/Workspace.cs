@@ -146,7 +146,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                this.QuantumClient = new QuantumClient(new AuthorizationClientHandler(accessTokenProvider))
+                this.QuantumClient = new QuantumClient(new ClientCredentials(accessTokenProvider))
                 {
                     BaseUri = this.baseUri,
                     SubscriptionId = subscriptionId,
@@ -192,9 +192,9 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.QuantumClient.Jobs.PutAsync(
+                JobDetails jobDetails = await this.QuantumClient.Jobs.CreateAsync(
                     jobId: jobDefinition.Details.Id,
-                    jobDefinition: jobDefinition.Details,
+                    job: jobDefinition.Details,
                     cancellationToken: cancellationToken);
 
                 return new CloudJob(this, jobDetails);
@@ -217,9 +217,11 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.QuantumClient.Jobs.DeleteAsync(
+                await this.QuantumClient.Jobs.CancelAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
+
+                JobDetails jobDetails = this.QuantumClient.Jobs.Get(jobId);
 
                 return new CloudJob(this, jobDetails);
             }
