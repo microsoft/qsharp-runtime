@@ -96,6 +96,11 @@ namespace Microsoft.Azure.Quantum.Client
         public virtual IStorageOperations Storage { get; private set; }
 
         /// <summary>
+        /// Gets the IQuotasOperations.
+        /// </summary>
+        public virtual IQuotasOperations Quotas { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the QuantumClient class.
         /// </summary>
         /// <param name='httpClient'>
@@ -339,6 +344,7 @@ namespace Microsoft.Azure.Quantum.Client
             Jobs = new JobsOperations(this);
             Providers = new ProvidersOperations(this);
             Storage = new StorageOperations(this);
+            Quotas = new QuotasOperations(this);
             BaseUri = new System.Uri("https://quantum.azure.com");
             AcceptLanguage = "en-US";
             LongRunningOperationRetryTimeout = 30;
