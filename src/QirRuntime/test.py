@@ -3,7 +3,6 @@
 
 import sys, os, platform, subprocess, datetime, shutil
 import build
-
 # =============================================================================
 #  Accepts arguments:
 #    nobuild [if omitted, will attempt to build the project]
@@ -71,7 +70,7 @@ else:
       os.environ["DYLD_LIBRARY_PATH"] = old + ":" + fullstate_sim_dir + ":" + install_dir
   else:
       os.environ["DYLD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
-
+print(os.environ["LD_LIBRARY_PATH"])
 log("========= Running native tests =========")
 test_binaries = [
   "fullstate-simulator-tests",
@@ -84,5 +83,9 @@ for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
   log(test_binary)
   subprocess.run(test_binary + " ~[skip]", shell = True)
+
+print("\n")
+
+subprocess.run(os.path.join(install_dir, "qir-exe") + " 10", shell = True)
 
 print("\n")

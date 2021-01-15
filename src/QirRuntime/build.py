@@ -47,7 +47,8 @@ def do_build(root_dir, should_make, should_build, flavor):
       flavorWithDebInfo = "RelWithDebInfo"
 
   if should_make:
-    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
+    #cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
+    cmd = "cmake -G Ninja -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
     if result.returncode != 0:
