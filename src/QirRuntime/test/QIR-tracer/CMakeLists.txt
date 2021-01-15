@@ -1,5 +1,5 @@
 set(TEST_FILES
-  qir-test-intrinsics
+  tracer-intrinsics
 )
 
 foreach(file ${TEST_FILES})

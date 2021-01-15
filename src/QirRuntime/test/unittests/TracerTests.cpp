@@ -153,7 +153,7 @@ TEST_CASE("Global barrier", "[tracer]")
     Qubit q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));  // L(0,1) created
-    CHECK(1 == tr->InjectGlobalBarrier("foo", 1)); // creates L(1,1)
+    CHECK(1 == tr->InjectGlobalBarrier(42, 1)); // creates L(1,1)
 
     CHECK(2 == tr->TraceMultiQubitOp(2, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
     // the barrier shouldn't allow this op to fall through into L(0,1), so should create L(2,1)
@@ -173,7 +173,7 @@ TEST_CASE("Global barrier", "[tracer]")
     const auto& ops0 = layers[0].operations;
     CHECK(ops0.find(1) != ops0.end());
 
-    CHECK(std::string("foo") == layers[1].name);
+    CHECK(42 == layers[1].barrierId);
 
     const auto& ops2 = layers[2].operations;
     CHECK(ops2.find(2) != ops2.end());

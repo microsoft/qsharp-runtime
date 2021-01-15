@@ -49,9 +49,9 @@ extern "C"
             reinterpret_cast<Qubit*>(targets->buffer));
     }
 
-    void quantum__trc__inject_global_barrier(char* name, int32_t duration) // NOLINT
+    void quantum__trc__inject_global_barrier(int32_t id, int32_t duration) // NOLINT
     {
-        (void)tracer->InjectGlobalBarrier(name, duration);
+        (void)tracer->InjectGlobalBarrier(id, duration);
     }
 
     RESULT* quantum__trc__single_qubit_measure(int32_t id, int32_t duration, QUBIT* q) // NOLINT

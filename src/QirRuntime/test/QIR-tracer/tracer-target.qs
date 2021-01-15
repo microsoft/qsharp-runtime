@@ -31,6 +31,7 @@ namespace Microsoft.Quantum.Intrinsic {
 
     open Microsoft.Quantum.Core;
     open Microsoft.Quantum.Instructions as Phys;
+    open Microsoft.Quantum.Targeting;
 
     @Inline()
     operation X(qb : Qubit) : Unit
@@ -198,7 +199,7 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @TargetInstruction("inject_global_barrier")
-    operation Barrier(name : String, duration : Int) : Unit
+    operation Barrier(id : Int, duration : Int) : Unit
     {
         body intrinsic;
     }

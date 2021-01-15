@@ -34,8 +34,8 @@ namespace Quantum
         // Quantum operations, assigned to this layer.
         std::unordered_map<OpId, int32_t /*count of the op with this id*/> operations;
 
-        // Optional layer's name (global barriers might provide it).
-        std::string name;
+        // Optional id, if the layer represents a global barrier.
+        OpId barrierId = -1;
 
         Layer(Duration duration, Time startTime)
             : duration(duration)
@@ -161,7 +161,7 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // Backing of the rest of the bridge methods.
         // -------------------------------------------------------------------------------------------------------------
-        LayerId InjectGlobalBarrier(const char* name, Duration duration);
+        LayerId InjectGlobalBarrier(OpId id, Duration duration);
 
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.

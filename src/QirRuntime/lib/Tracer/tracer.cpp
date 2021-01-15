@@ -244,10 +244,10 @@ namespace Quantum
         return layerToInsertInto;
     }
 
-    LayerId CTracer::InjectGlobalBarrier(const char* name, Duration duration)
+    LayerId CTracer::InjectGlobalBarrier(OpId id, Duration duration)
     {
         LayerId layer = this->CreateNewLayer(duration);
-        this->metricsByLayer[layer].name = name;
+        this->metricsByLayer[layer].barrierId = id;
         this->globalBarrier = layer;
         return layer;
     }

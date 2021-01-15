@@ -25,7 +25,7 @@ declare void @quantum__trc__single_qubit_op(i32 %id, i32 %duration, %class.QUBIT
 declare void @quantum__trc__single_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %class.QUBIT*)
 declare void @quantum__trc__multi_qubit_op(i32 %id, i32 %duration, %struct.QirArray*)
 declare void @quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %struct.QirArray*)
-declare void @quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
+declare void @quantum__trc__inject_global_barrier(i32 %id, i32 %duration)
 declare %class.RESULT* @quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT* %.q)
 
 ;===============================================================================
@@ -61,9 +61,9 @@ define void @__quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* 
   ret void
 }
 
-define void @__quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
+define void @__quantum__trc__inject_global_barrier(i32 %id, i32 %duration)
 {
-  call void @quantum__trc__inject_global_barrier(i8* %name, i32 %duration)
+  call void @quantum__trc__inject_global_barrier(i32 %id, i32 %duration)
   ret void
 }
 
