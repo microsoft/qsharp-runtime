@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - AssertQubit
-    operation AssertAllZero (qubits : Qubit[]) : Unit is Adj + Ctl{
+    operation AssertAllZero (qubits : Qubit[]) : Unit is Adj + Ctl {
         body (...) {
             for qubit in qubits {
                 AssertQubit(Zero, qubit);
