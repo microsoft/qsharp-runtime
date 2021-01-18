@@ -144,12 +144,39 @@ TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(a, 1, 0, 0))) == 12);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(a, 4, 2, 3))) == 59);
 
-    QirArray* b = quantum__rt__array_copy(a);
+    QirArray* b = quantum__rt__array_copy(a, true /*force*/);
     *(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(b, 1, 2, 3))) = 42;
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(a, 1, 2, 3))) == 23);
 
     quantum__rt__array_unreference(a);
     quantum__rt__array_unreference(b);
+}
+
+TEST_CASE("Arrays: copy elision", "[qir_support]")
+{
+    QirArray* copy = quantum__rt__array_copy(nullptr, true /*force*/);
+    CHECK(copy == nullptr);
+
+    QirArray* a = quantum__rt__array_create_1d(sizeof(char), 5);
+    // the `a` array contains garbage but for this test we don't care
+
+    // no aliases for the array, copy should be elided unless enforced
+    copy = quantum__rt__array_copy(a, false /*force*/);
+    CHECK(a == copy);
+    quantum__rt__array_unreference(copy);
+
+    // single alias for the array, but copy enforced
+    copy = quantum__rt__array_copy(a, true /*force*/);
+    CHECK(a != copy);
+    quantum__rt__array_unreference(copy);
+
+    // existing aliases for the array -- cannot elide copy
+    quantum__rt__array_add_access(a);
+    copy = quantum__rt__array_copy(a, false /*force*/);
+    CHECK(a != copy);
+    quantum__rt__array_unreference(copy);
+
+    quantum__rt__array_unreference(a);
 }
 
 TEST_CASE("Arrays: empty", "[qir_support]")
@@ -167,7 +194,7 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     REQUIRE(quantum__rt__array_get_length(a, 0) == 0);
     REQUIRE(a->buffer == nullptr);
 
-    QirArray* a1 = quantum__rt__array_copy(a);
+    QirArray* a1 = quantum__rt__array_copy(a, true /*force*/);
     REQUIRE(quantum__rt__array_get_dim(a1) == 1);
     REQUIRE(quantum__rt__array_get_length(a1, 0) == 0);
     REQUIRE(a1->buffer == nullptr);
@@ -700,13 +727,14 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(qstr->str == std::string("3"));
     quantum__rt__string_unreference(qstr);
 
-    QirArray* copy = quantum__rt__array_copy(qs);
+    QirArray* copy = quantum__rt__array_copy(qs, true /*force*/);
     REQUIRE(!copy->ownsQubits);
 
     quantum__rt__qubit_release_array(qs);
     REQUIRE(!qapi->HaveQubitsInFlight());
 
-    // copy array now contains dangling pointers to qubits, but it should be still OK to release the array
+    // both arrays now contain dangling pointers to qubits, but we still must release them
+    quantum__rt__array_unreference(qs);
     quantum__rt__array_unreference(copy);
 
     SetSimulatorForQIR(nullptr);
@@ -762,7 +790,9 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
 
     // release the original resources
     quantum__rt__qubit_release_array(controlsOuter);
+    quantum__rt__array_unreference(controlsOuter);
     quantum__rt__qubit_release_array(controlsInner);
+    quantum__rt__array_unreference(controlsInner);
     quantum__rt__qubit_release(target);
 }
 
@@ -807,6 +837,8 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
 
     // release the original resources
     quantum__rt__qubit_release_array(controlsOuter);
+    quantum__rt__array_unreference(controlsOuter);
     quantum__rt__qubit_release_array(controlsInner);
+    quantum__rt__array_unreference(controlsInner);
     quantum__rt__qubit_release(target);
 }

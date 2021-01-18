@@ -43,6 +43,44 @@ extern "C"
         (void)th->Release();
     }
 
+    void quantum__rt__tuple_add_user(PTuple tuple)
+    {
+        if (tuple == nullptr)
+        {
+            return;
+        }
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        th->AddUser();
+    }
+
+    void quantum__rt__tuple_remove_user(PTuple tuple)
+    {
+        if (tuple == nullptr)
+        {
+            return;
+        }
+
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        th->RemoveUser();
+    }
+
+    PTuple quantum__rt__tuple_copy(PTuple tuple, bool forceNewInstance)
+    {
+        if (tuple == nullptr)
+        {
+            return nullptr;
+        }
+
+        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
+        if (forceNewInstance || th->userCount > 0)
+        {
+            return QirTupleHeader::CreateWithCopiedData(th)->AsTuple();
+        }
+
+        th->AddRef();
+        return tuple;
+    }
+
     void quantum__rt__callable_reference(QirCallable* callable)
     {
         if (callable == nullptr)
@@ -101,19 +139,34 @@ extern "C"
 ==============================================================================*/
 int QirTupleHeader::AddRef()
 {
-    assert(refCount > 0);
-    return ++refCount;
+    assert(this->refCount > 0);
+    return ++this->refCount;
 }
 
 int QirTupleHeader::Release()
 {
-    --refCount;
-    if (refCount == 0)
+    assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
+    --this->refCount;
+    if (this->refCount == 0)
     {
         char* buffer = reinterpret_cast<char*>(this);
         delete[] buffer;
     }
-    return refCount;
+    return this->refCount;
+}
+
+void QirTupleHeader::AddUser()
+{
+    ++this->userCount;
+}
+
+void QirTupleHeader::RemoveUser()
+{
+    if (this->userCount == 0)
+    {
+        quantum__rt__fail(quantum__rt__string_create("User count cannot be negative"));
+    }
+    --this->userCount;
 }
 
 QirTupleHeader* QirTupleHeader::Create(int size)
@@ -174,7 +227,7 @@ QirCallable::QirCallable(const QirCallable& other)
 
 int QirCallable::AddRef()
 {
-    long rc = ++this->refCount;
+    int rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
 }
@@ -183,7 +236,7 @@ int QirCallable::Release()
 {
     assert(this->refCount > 0);
 
-    long rc = --this->refCount;
+    int rc = --this->refCount;
     if (rc == 0)
     {
         delete this;

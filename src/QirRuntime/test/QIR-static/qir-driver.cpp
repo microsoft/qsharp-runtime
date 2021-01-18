@@ -51,7 +51,7 @@ To update the *.ll files to a newer version:
 // The function replaces array[index] with value, then creates a new array that consists of every other element up to
 // index (starting from index backwards) and every element from index to the end. It returns the sum of elements in this
 // new array
-extern "C" int64_t Microsoft_Quantum_Testing_QIR_Test_Arrays( // NOLINT
+extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t count,
     int64_t* array,
     int64_t index,
@@ -61,7 +61,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir]")
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
 
-    int64_t res = Microsoft_Quantum_Testing_QIR_Test_Arrays(n, values, 2, 42);
+    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
