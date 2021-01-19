@@ -279,9 +279,11 @@ namespace Microsoft.Quantum.Intrinsic {
     is Adj + Ctl {
         body (...)
         {
-            CNOT(qubit1, qubit2);
-            CNOT(qubit2, qubit1);
-            CNOT(qubit1, qubit2);
+            within {
+                CNOT(qubit1, qubit2);
+            } apply {
+                CNOT(qubit2, qubit1);
+            }
         }
         
         adjoint self;
