@@ -58,4 +58,9 @@ extern "C"
     {
         return tracer->TraceSingleQubitMeasurement(id, duration, q);
     }
+
+    RESULT* quantum__trc__multi_qubit_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
+    {
+        return tracer->TraceMultiQubitMeasurement(id, duration, qs->count, reinterpret_cast<Qubit*>(qs->buffer));
+    }
 }

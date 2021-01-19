@@ -6,22 +6,32 @@ namespace Microsoft.Quantum.Instructions {
     open Microsoft.Quantum.Targeting;
 
     @TargetInstruction("single_qubit_op")
-    operation single_qubit_op (op_id: Int, duration: Int, qb : Qubit) : Unit {
+    operation single_qubit_op(op_id: Int, duration: Int, qb : Qubit) : Unit {
         body intrinsic;
     }
 
     @TargetInstruction("multi_qubit_op")
-    operation multi_qubit_op (op_id: Int, duration: Int, qbs : Qubit[]) : Unit {
+    operation multi_qubit_op(op_id: Int, duration: Int, qbs : Qubit[]) : Unit {
         body intrinsic;
     }
 
     @TargetInstruction("single_qubit_op_ctl")
-    operation single_qubit_op_ctl (op_id: Int, duration: Int, ctl : Qubit[], qb : Qubit) : Unit {
+    operation single_qubit_op_ctl(op_id: Int, duration: Int, ctl : Qubit[], qb : Qubit) : Unit {
         body intrinsic;
     }
 
     @TargetInstruction("multi_qubit_op_ctl")
-    operation multi_qubit_op_ctl (op_id: Int, duration: Int, ctl : Qubit[], qbs : Qubit[]) : Unit {
+    operation multi_qubit_op_ctl(op_id: Int, duration: Int, ctl : Qubit[], qbs : Qubit[]) : Unit {
+        body intrinsic;
+    }
+
+    @TargetInstruction("single_qubit_measure")
+    operation single_qubit_measure(op_id: Int, duration: Int, qb : Qubit) : Result {
+        body intrinsic;
+    }
+
+    @TargetInstruction("multi_qubit_measure")
+    operation multi_qubit_measure(op_id: Int, duration: Int, qbs : Qubit[]) : Result {
         body intrinsic;
     }
 }
@@ -198,6 +208,79 @@ namespace Microsoft.Quantum.Intrinsic {
         controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(25, 1, ctls, qb); }
     }
 
+    @Inline()
+    operation Mz(qb : Qubit) : Result {
+        body  (...) { return Phys.single_qubit_measure(100, 1, qb); }
+    }
+
+    @Inline()
+    operation Mx(qb : Qubit) : Result {
+        body  (...) { return Phys.single_qubit_measure(101, 1, qb); }
+    }
+
+    @Inline()
+    operation M(qb : Qubit) : Result {
+        body  (...) { return Mz(qb); }
+    }
+
+    @Inline()
+    operation Mzz(qubits : Qubit[]) : Result {
+        body  (...) { return Phys.multi_qubit_measure(102, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mxz(qubits : Qubit[]) : Result {
+        body  (...) { return Phys.multi_qubit_measure(103, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mzx(qubits : Qubit[]) : Result {
+        body  (...) { return Phys.multi_qubit_measure(104, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mxx(qubits : Qubit[]) : Result {
+        body  (...) { return Phys.multi_qubit_measure(105, 1, qubits); }
+    }
+
+    @Inline()
+    operation Measure(paulis : Pauli[], qubits : Qubit[]) : Result {
+        body  (...)
+        {
+            mutable res = One;
+            mutable haveY = false;
+            // Measurements that involve PauliY or PauliI
+            for (i in 0..Length(paulis)-1)
+            {
+                if (paulis[i] == PauliY or paulis[i] == PauliI)
+                {
+                    set haveY = true;
+                }
+            }
+            if (haveY) { set res = Phys.multi_qubit_measure(106, 1, qubits); }
+
+            // More than two qubits (but no PauliY or PauliI)
+            elif (Length(paulis) > 2) { set res = Phys.multi_qubit_measure(107, 1, qubits); }
+
+            // Single qubit measurement -- differentiate between Mx and Mz
+            elif (Length(paulis) == 1)
+            {
+                if (paulis[0] == PauliX) { set res = Mx(qubits[0]); }
+                else { set res = Mz(qubits[0]); }
+            }
+
+            // Specialize for two-qubit measurements: Mxx, Mxz, Mzx, Mzz
+            elif (paulis[0] == PauliX and paulis[1] == PauliX) { set res = Phys.multi_qubit_measure(108, 1, qubits); }
+            elif (paulis[0] == PauliX and paulis[1] == PauliZ) { set res = Phys.multi_qubit_measure(109, 1, qubits); }
+            elif (paulis[0] == PauliZ and paulis[1] == PauliX) { set res = Phys.multi_qubit_measure(110, 1, qubits); }
+            elif (paulis[0] == PauliZ and paulis[1] == PauliZ) { set res = Phys.multi_qubit_measure(111, 1, qubits); }
+
+            //shouldn't get here
+            return res;
+        }
+    }
+
+
     @TargetInstruction("inject_global_barrier")
     operation Barrier(id : Int, duration : Int) : Unit
     {
@@ -210,12 +293,5 @@ namespace Microsoft.Quantum.Intrinsic {
         adjoint self;
     }
 
-    operation M(qb : Qubit) : Result {
-        body intrinsic;
-    }
-
-    operation Measure(bases : Pauli[], qubits : Qubit[]) : Result {
-        body intrinsic;
-    }
 
 }

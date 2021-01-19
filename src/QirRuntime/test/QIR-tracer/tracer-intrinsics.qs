@@ -73,11 +73,11 @@ namespace Microsoft.Quantum.Testing.Tracer
                 Controlled T(cc, (qs[2]));
             }
 
-            //let r0 = M(qs[0])
+            let r0 = M(qs[0]);
             //ApplyIfZero(r0, (Z, qs[0]));
 
             let qs12 = [qs[1], qs[2]];
-            //let r12 = Measure([PauliY, PauliX], qs12);
+            let r12 = Measure([PauliY, PauliX], qs12);
             //ApplyIfOne(r12, (Fixup, qs12));
         }
         return true;

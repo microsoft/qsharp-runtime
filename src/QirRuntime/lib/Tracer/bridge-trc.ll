@@ -26,7 +26,8 @@ declare void @quantum__trc__single_qubit_op_ctl(i32 %id, i32 %duration, %struct.
 declare void @quantum__trc__multi_qubit_op(i32 %id, i32 %duration, %struct.QirArray*)
 declare void @quantum__trc__multi_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %struct.QirArray*)
 declare void @quantum__trc__inject_global_barrier(i32 %id, i32 %duration)
-declare %class.RESULT* @quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT* %.q)
+declare %class.RESULT* @quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT*)
+declare %class.RESULT* @quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %struct.QirArray*)
 
 ;===============================================================================
 ; quantum__trc namespace implementations
@@ -71,6 +72,14 @@ define %Result* @__quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %Q
 {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %r = call %class.RESULT* @quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT* %q)
+  %.r = bitcast %class.RESULT* %r to %Result*
+  ret %Result* %.r
+}
+
+define %Result* @__quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %Array* %.qs)
+{
+  %qs = bitcast %Array* %.qs to %struct.QirArray*
+  %r = call %class.RESULT* @quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %struct.QirArray* %qs)
   %.r = bitcast %class.RESULT* %r to %Result*
   ret %Result* %.r
 }
