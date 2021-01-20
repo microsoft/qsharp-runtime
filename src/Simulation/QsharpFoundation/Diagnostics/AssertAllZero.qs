@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Assert that given qubits are all in $\ket{0}$ state.
     ///
     /// # Input
-    /// ## target
+    /// ## qubits
     /// Qubits that are asserted to be in $\ket{0}$ state.
     ///
     /// # See Also

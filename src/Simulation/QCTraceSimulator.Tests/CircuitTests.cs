@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.Tests
         [Fact]
         public void DistinctQubitsTests()
         {
-            QCTraceSimulator sim = new QCTraceSimulator( new QCTraceSimulatorConfiguration() { UseDistinctInputsChecker = true } );
+            QCTraceSimulator sim = new QCTraceSimulator(new QCTraceSimulatorConfiguration() { UseDistinctInputsChecker = true } );
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCapturedTest>(sim));
             Assert.Throws<DistinctInputsCheckerException>(GetTest<DisctinctQubitCaptured2Test>(sim));

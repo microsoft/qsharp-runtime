@@ -1,9 +1,10 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.13.20102604">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
 
   <Import Project="..\Common\Simulators.Test.props" />
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulators.Type1\Microsoft.Quantum.Simulators.Type1.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Type1Core\Microsoft.Quantum.Type1.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

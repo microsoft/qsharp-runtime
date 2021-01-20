@@ -71,7 +71,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Throws<MemberAccessException>(() =>
             {
-                subject.Get<Intrinsic.X>();
+                subject.Get<Diagnostics.AssertMeasurement>();
             });
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.Throws<MemberAccessException>(() =>
             {
-                subject.Get<DependsOnX>();
+                subject.Get<DependsOnAssertMeasurement>();
             });
         }
 
@@ -122,11 +122,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var subject = new TrivialSimulator();
             Assert.Equal(typeof(TrivialSimulator).Name, subject.Name);
-
-            Assert.Throws<MemberAccessException>(() =>
-            {
-                subject.Get<Intrinsic.X>();
-            });
 
             try
             {
@@ -217,19 +212,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var subject = new TrivialSimulator();
 
-            // Can't get Gen because it depends on X
+            // Can't get Gen because it depends on AssertMeasurement
             Assert.Throws<MemberAccessException>(() =>
             {
                 subject.Get<Gen<string>>();
             });
 
             // TODO: because we can't check dependencies, this
-            // is not throwing an Exception, even though Gen depends on X:
+            // is not throwing an Exception, even though Gen depends on AssertMeasurement:
             var gen1 = subject.Get<DependsOnGen>();
             Assert.NotNull(gen1);
 
             // Add an implementation of X:
-            subject.Register(typeof(Intrinsic.X), typeof(LikeX), typeof(IUnitary<Qubit>));
+            subject.Register(typeof(Diagnostics.AssertMeasurement), typeof(DummyAssertMeasurement));
             var gen2 = subject.Get<Gen<int>>();
             Assert.NotNull(gen1);
 
@@ -338,22 +333,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
         }
 
-        /// <summary>
-        /// This class is not abstract, but depends on X, which is.
+        /// <sumary>
+        /// This class has no implementation, it's just ther eto make sure
+        /// a user can register their own Operation overrides.
         /// </summary>
-        public class DependsOnX : Operation<QVoid, QVoid>, ICallable
+        public class DummyAssertMeasurement : Diagnostics.AssertMeasurement
         {
-            public DependsOnX(IOperationFactory m) : base(m)
+            public DummyAssertMeasurement(IOperationFactory m) : base(m)
             {
             }
 
-            string ICallable.FullName => "DependsOnX";
-
-            public IUnitary<Qubit> X { get; set; }
+            public override Func<(IQArray<Pauli>, IQArray<Qubit>, Result, String), QVoid> __Body__ => throw new NotImplementedException();
 
             public override void __Init__()
             {
-                this.X = this.__Factory__.Get<IUnitary<Qubit>, Intrinsic.X>();
+            }
+        }
+
+        /// <summary>
+        /// This class is not abstract, but depends on AssertMeasurement, which is.
+        /// </summary>
+        public class DependsOnAssertMeasurement : Operation<QVoid, QVoid>, ICallable
+        {
+            public DependsOnAssertMeasurement(IOperationFactory m) : base(m)
+            {
+            }
+
+            string ICallable.FullName => "DependsOnAssertMeasurement";
+
+            public IUnitary<(IQArray<Pauli>, IQArray<Qubit>, Result, String)> AssertMeasurement { get; set; }
+
+            public override void __Init__()
+            {
+                this.AssertMeasurement = this.__Factory__.Get<IUnitary<(IQArray<Pauli>, IQArray<Qubit>, Result, String)>, Diagnostics.AssertMeasurement>();
             }
 
             public override Func<QVoid, QVoid> __Body__ => throw new NotImplementedException();
@@ -438,12 +450,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             public ICallable A { get; set; }
 
-            public IUnitary<Qubit> X { get; set; }
+            public IUnitary<(IQArray<Pauli>, IQArray<Qubit>, Result, String)> AssertMeasurement { get; set; }
 
             public override void __Init__()
             {
                 this.A = this.__Factory__.Get<ICallable, A>();
-                this.X = this.__Factory__.Get<IUnitary<Qubit>, Intrinsic.X>();
+                this.AssertMeasurement = this.__Factory__.Get<IUnitary<(IQArray<Pauli>, IQArray<Qubit>, Result, String)>, Diagnostics.AssertMeasurement>();
             }
         }
 

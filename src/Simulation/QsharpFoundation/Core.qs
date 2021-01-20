@@ -61,6 +61,10 @@ namespace Microsoft.Quantum.Core {
     /// # Summary
     /// Returns the defined start value of the given range.
     ///
+    /// # Input
+    /// ## range
+    /// Input range.
+    ///
     /// # Output
     /// The defined start value of the given range.
     ///
@@ -81,7 +85,7 @@ namespace Microsoft.Quantum.Core {
     /// which is not necessarily the last element in the sequence.
     ///
     /// # Input
-    /// ## r
+    /// ## range
     /// Input range.
     ///
     /// # Output
@@ -103,7 +107,7 @@ namespace Microsoft.Quantum.Core {
     /// Returns the integer that specifies how the next value of a range is calculated.
     ///
     /// # Input
-    /// ## r
+    /// ## range
     /// Input range.
     ///
     /// # Output
@@ -121,7 +125,7 @@ namespace Microsoft.Quantum.Core {
     /// Returns a new range which is the reverse of the input range.
     ///
     /// # Input
-    /// ## r
+    /// ## range
     /// Input range.
     ///
     /// # Output
@@ -130,7 +134,7 @@ namespace Microsoft.Quantum.Core {
     /// # Remarks
     /// Note that the reverse of a range is not simply `end`..`-step`..`start`, because
     /// the actual last element of a range may not be the same as `end`.
-    function RangeReverse(r : Range) : Range {
+    function RangeReverse(range : Range) : Range {
         body intrinsic;
     }
 

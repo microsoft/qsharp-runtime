@@ -17,9 +17,9 @@ namespace Microsoft.Quantum.Intrinsic {
         "Reset is replaced by a supported implementation on all execution targets."
     )
     @EnableTestingViaName("Test.TargetDefinitions.Reset")
-    operation Reset (target : Qubit) : Unit {
-        if (M(target) == One) {
-            X(target);
+    operation Reset (qubit : Qubit) : Unit {
+        if (M(qubit) == One) {
+            X(qubit);
         }
     }
 }

@@ -1,18 +1,43 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
+  <Import Project="..\Common\AssemblyCommon.props" />
+  <Import Project="..\Common\DebugSymbols.props" />
+  <Import Project="..\Common\Simulators.Dev.props" />
 
-  <Import Project="..\Common\Simulators.Impl.props" />
+  <PropertyGroup>
+    <LanguageVersion>8.0</LanguageVersion>
+    <Nullable>enable</Nullable>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
+  </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Simulators.Impl\QCTraceSimulator\*.cs" />
-    <QSharpcompile Include="..\Simulators.Impl\QCTraceSimulator\Circuits\*.qs" />
-    <Compile Include="..\Simulators.Impl\QuantumProcessor\*.cs" />
-    <Compile Include="..\Simulators.Impl\ResourcesEstimator\*.cs" />
-    <Compile Include="..\Simulators.Impl\ToffoliSimulator\*.cs" />
+    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
+    <ProjectReference Include="..\QsharpFoundation\Microsoft.Quantum.Qsharp.Foundation.csproj" />
     <ProjectReference Include="..\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Native\win10\**\*">
+      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\Native\osx\**\*">
+      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\Native\linux\**\*">
+      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
   </ItemGroup>
 
 </Project>

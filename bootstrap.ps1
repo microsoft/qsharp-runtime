@@ -11,14 +11,6 @@ Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators")
     .\FindNuspecReferences.ps1
 Pop-Location
 
-Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type1")
-    .\FindNuspecReferences.ps1
-Pop-Location
-
-Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators.Type2")
-    .\FindNuspecReferences.ps1
-Pop-Location
-
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     Push-Location (Join-Path $PSScriptRoot "src/QirRuntime")
         .\install-prereqs.ps1

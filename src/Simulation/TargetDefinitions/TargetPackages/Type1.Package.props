@@ -15,7 +15,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
@@ -29,9 +28,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\HFromSinglyControlled.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingXX.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingYY.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingZZ.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\Measure.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />

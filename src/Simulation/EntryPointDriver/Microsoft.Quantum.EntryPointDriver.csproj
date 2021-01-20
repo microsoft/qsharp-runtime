@@ -11,14 +11,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>Microsoft</Authors>
     <Description>Entry point driver for Q# command line applications.</Description>
-    <PackageReleaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</PackageReleaseNotes>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
-    <PackageIcon>qdk-nuget-icon.png</PackageIcon>
     <PackageTags>Quantum Q# Qsharp</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

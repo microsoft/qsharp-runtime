@@ -5,7 +5,6 @@
 
   <ItemGroup>
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingXX.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingYY.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Intrinsic\IsingZZ.qs" />
@@ -22,17 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledX.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZ.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledH.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRx.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRz.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledS.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledT.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledY.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledZ.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />
@@ -40,6 +28,7 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetXWithNoReuse.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetYWithNoReuse.qs" />

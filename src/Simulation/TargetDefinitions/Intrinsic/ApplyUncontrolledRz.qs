@@ -32,6 +32,5 @@ namespace Microsoft.Quantum.Intrinsic {
     @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledRz")
     internal operation ApplyUncontrolledRz (theta : Double, qubit : Qubit) : Unit is Adj {
         body intrinsic;
-        adjoint self;
     }
 }
