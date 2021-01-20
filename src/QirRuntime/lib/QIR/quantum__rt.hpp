@@ -100,10 +100,10 @@ extern "C"
     QIR_SHARED_API void quantum__rt__tuple_unreference(PTuple); // NOLINT
 
     // Increases the current user count by one.
-    QIR_SHARED_API void quantum__rt__tuple_add_user(PTuple); // NOLINT
+    QIR_SHARED_API void quantum__rt__tuple_add_access(PTuple); // NOLINT
 
     // Decreases the current user count by one, fails if the user count becomes negative.
-    QIR_SHARED_API void quantum__rt__tuple_remove_user(PTuple); // NOLINT
+    QIR_SHARED_API void quantum__rt__tuple_remove_access(PTuple); // NOLINT
 
     // Creates a shallow copy of the tuple if the user count is larger than 0 or the second argument is `true`.
     QIR_SHARED_API PTuple quantum__rt__tuple_copy(PTuple, bool force); // NOLINT
