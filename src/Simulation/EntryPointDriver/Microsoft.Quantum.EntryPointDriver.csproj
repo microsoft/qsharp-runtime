@@ -17,7 +17,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
     <PackageIcon>qdk-nuget-icon.png</PackageIcon>
-    <PackageTags>Quantum Q# Qsharp</PackageTags>
+    <PackageTags>Quantum Q# QSharp</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 

@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <QscExe Condition="'$(QscExe)' == ''">dotnet "$(MSBuildThisFileDirectory)../tools/qsc/Microsoft.Quantum.CsharpGeneration.App.dll"</QscExe>
-    <QsharpLangVersion>0.10</QsharpLangVersion>
+    <QSharpLangVersion>0.10</QSharpLangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <QsharpCompile Include="**\*.qs" Exclude="obj\**" />
+    <QSharpCompile Include="**\*.qs" Exclude="obj\**" />
   </ItemGroup>
 </Project>
