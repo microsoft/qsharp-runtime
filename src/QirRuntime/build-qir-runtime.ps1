@@ -37,7 +37,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 
     Push-Location $qirRuntimeBuildFolder
 
-    cmake -G Ninja -DCMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
+    cmake -G Ninja -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
     cmake --build . --target install
 
     Pop-Location
@@ -52,4 +52,3 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 } else {
     Write-Host "To enable build of QIR Runtime set ENABLE_QIRRUNTIME environment variable to 'true'"
 }
-
