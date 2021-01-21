@@ -96,6 +96,11 @@ namespace Microsoft.Azure.Quantum.Client
         public virtual IStorageOperations Storage { get; private set; }
 
         /// <summary>
+        /// Gets the IQuotasOperations.
+        /// </summary>
+        public virtual IQuotasOperations Quotas { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the QuantumClient class.
         /// </summary>
         /// <param name='httpClient'>
@@ -103,7 +108,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// </param>
         /// <param name='disposeHttpClient'>
         /// True: will dispose the provided httpClient on calling QuantumClient.Dispose(). False: will not dispose provided httpClient</param>
-        internal QuantumClient(HttpClient httpClient, bool disposeHttpClient) : base(httpClient, disposeHttpClient)
+        protected QuantumClient(HttpClient httpClient, bool disposeHttpClient) : base(httpClient, disposeHttpClient)
         {
             Initialize();
         }
@@ -128,7 +133,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// <param name='handlers'>
         /// Optional. The delegating handlers to add to the http client pipeline.
         /// </param>
-        internal QuantumClient(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
+        protected QuantumClient(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
         {
             Initialize();
         }
@@ -339,7 +344,8 @@ namespace Microsoft.Azure.Quantum.Client
             Jobs = new JobsOperations(this);
             Providers = new ProvidersOperations(this);
             Storage = new StorageOperations(this);
-            BaseUri = new System.Uri("https://app-jobscheduler-prod.azurewebsites.net");
+            Quotas = new QuotasOperations(this);
+            BaseUri = new System.Uri("https://quantum.azure.com");
             AcceptLanguage = "en-US";
             LongRunningOperationRetryTimeout = 30;
             GenerateClientRequestId = true;
@@ -356,7 +362,6 @@ namespace Microsoft.Azure.Quantum.Client
                         new Iso8601TimeSpanConverter()
                     }
             };
-            SerializationSettings.Converters.Add(new TransformationJsonConverter());
             DeserializationSettings = new JsonSerializerSettings
             {
                 DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat,
@@ -370,7 +375,6 @@ namespace Microsoft.Azure.Quantum.Client
                     }
             };
             CustomInitialize();
-            DeserializationSettings.Converters.Add(new TransformationJsonConverter());
             DeserializationSettings.Converters.Add(new CloudErrorJsonConverter());
         }
     }

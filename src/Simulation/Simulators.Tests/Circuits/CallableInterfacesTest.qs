@@ -77,13 +77,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
     
     
-    operation CheckAdjoint (gate : (Qubit => Unit : Adjoint), qubit : Qubit) : Unit {
+    operation CheckAdjoint (gate : (Qubit => Unit is Adj), qubit : Qubit) : Unit {
         
         Adjoint gate(qubit);
     }
     
     
-    operation CheckControlled (gate : (Qubit => Unit : Controlled), qubit : Qubit) : Unit {
+    operation CheckControlled (gate : (Qubit => Unit is Ctl), qubit : Qubit) : Unit {
         
         
         using (ctrls = Qubit[2]) {
@@ -92,7 +92,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
     
     
-    operation CheckUnitary (gate : (Qubit => Unit : Adjoint, Controlled), qubit : Qubit) : Unit {
+    operation CheckUnitary (gate : (Qubit => Unit is Adj + Ctl), qubit : Qubit) : Unit {
         
         
         using (ctrls = Qubit[2]) {
@@ -102,7 +102,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
     
     
-    operation OneRound (plain : (Qubit => Unit), adj : (Qubit => Unit : Adjoint), ctr : (Qubit => Unit : Controlled), uni : (Qubit => Unit : Adjoint, Controlled)) : Unit {
+    operation OneRound (plain : (Qubit => Unit), adj : (Qubit => Unit is Adj), ctr : (Qubit => Unit is Ctl), uni : (Qubit => Unit is Adj + Ctl)) : Unit {
         
         
         using (qubits = Qubit[1]) {

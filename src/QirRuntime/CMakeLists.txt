@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
+
 # set the project name and version
 project(qirruntime)
 
@@ -27,7 +29,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
 set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2" "${PROJECT_SOURCE_DIR}/test")
 
+#===============================================================================
 # testing related
+#
 include(CTest)
 macro(add_unit_test target)
     add_test(
@@ -49,6 +53,71 @@ macro(add_unit_test target)
         "DYLD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${DYLD_LIBRARY_PATH}"
     )
 endmacro(add_unit_test)
+
+#===============================================================================
+# compiling from IR
+#
+# CMake doesn't support LLVM IR files as sources so we compile them with custom
+# commands, which produce UTILITY libs that can only be linked in using abs paths
+# (rather than the target name):
+#   Target "qir_bridge_qis" of type UTILITY may not be linked into another
+#   target.  One may link only to INTERFACE, OBJECT, STATIC or SHARED
+#   libraries, or to executables with the ENABLE_EXPORTS property set.
+#
+macro(compile_from_qir source_file target)
+    set(CLANG_ARGS "-c")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CLANG_ARGS
+        "${CLANG_ARGS}"
+        "-O0"
+        "-D_DEBUG"
+        )
+    endif()
+
+    set(INFILE
+        "${CMAKE_CURRENT_SOURCE_DIR}/${source_file}.ll"
+    )
+    set(OBJFILE
+        "${CMAKE_CURRENT_BINARY_DIR}/${source_file}.obj"
+    )
+
+    set(OBJFILE_COMPILE "${source_file}-compile")
+    add_custom_command(OUTPUT ${OBJFILE_COMPILE}
+        COMMAND ${CMAKE_CXX_COMPILER}
+        ARGS ${CLANG_ARGS} ${INFILE} "-o" ${OBJFILE}
+        DEPENDS ${INFILE}
+        COMMENT "Compiling ${source_file}.ll"
+        VERBATIM
+    )
+
+    add_custom_target(${source_file}_compile DEPENDS ${OBJFILE_COMPILE})
+
+    if (WIN32)
+        set(QIR_UTILITY_LIB "${CMAKE_CURRENT_BINARY_DIR}/${source_file}-u.lib" )
+    else()
+        set(QIR_UTILITY_LIB "${CMAKE_CURRENT_BINARY_DIR}/lib${source_file}-u.a")
+    endif()
+
+    add_custom_command(OUTPUT ${QIR_UTILITY_LIB}
+        COMMAND ${CMAKE_AR}
+        ARGS "rc" ${QIR_UTILITY_LIB} ${OBJFILE}
+        DEPENDS ${source_file}_compile ${INFILE}
+        COMMENT "Creating a lib from ${source_file}.ll"
+        VERBATIM
+    )
+
+    if (NOT ${target} STREQUAL "")
+      add_custom_target(${target} DEPENDS ${QIR_UTILITY_LIB})
+    endif()
+endmacro(compile_from_qir)
+
+if (WIN32)
+  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/bridge-rt-u.lib")
+  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/bridge-qis-u.lib")
+else()
+  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libbridge-rt-u.a")
+  set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libbridge-qis-u.a")
+endif()
 
 
 add_subdirectory(lib)

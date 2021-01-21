@@ -56,6 +56,7 @@ namespace Microsoft.Azure.Quantum.Client
         /// and/or download job output.
         /// </summary>
         /// <param name='blobDetails'>
+        /// The details (name and container) of the blob to store or download data.
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.

@@ -91,8 +91,8 @@ namespace Microsoft.Azure.Quantum.Exceptions
                 // Handle specific types of exceptions for additional data
                 if (ex is RestErrorException restErrorException)
                 {
-                    formattedException += $"Error Code: {restErrorException?.Body?.Code}{Environment.NewLine}" +
-                        $"Server message: {restErrorException?.Body?.Message}{Environment.NewLine}";
+                    formattedException += $"Error Code: {restErrorException?.Body?.Error?.Code}{Environment.NewLine}" +
+                        $"Server message: {restErrorException?.Body?.Error?.Message}{Environment.NewLine}";
 
                     var headers = restErrorException?.Response?.Headers;
                     if (headers != null && headers.ContainsKey("x-ms-request-id"))

@@ -137,7 +137,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
             if (configuration.UseDepthCounter)
             {
-                listeners.Add(new DepthCounter());
+                listeners.Add(new DepthCounter(optimizeDepth: configuration.OptimizeDepth));
             }
 
             if (configuration.UseWidthCounter)

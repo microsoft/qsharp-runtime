@@ -8,11 +8,21 @@ pr:
 - features/*
 - release/*
 
+schedules:
+- cron: "0 9 * * Sat"
+  displayName: 'Build for Component Governance'
+  branches:
+    include:
+    - main
+  always: true
+
 variables:
   Build.Major: 0
   Build.Minor: 14
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
+  CI: "true"
+  ENABLE_QIRRUNTIME: "true"
 
 jobs:
 - job: build

@@ -563,6 +563,7 @@ let ``Submit uses default values`` () =
                Storage:
                AAD Token:
                Base URI:
+               Location:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -582,6 +583,7 @@ let ``Submit uses default values with default target`` () =
                Storage:
                AAD Token:
                Base URI:
+               Location:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -613,6 +615,7 @@ let ``Submit allows overriding default values`` () =
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
+               Location:
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -644,6 +647,7 @@ let ``Submit allows overriding default values with default target`` () =
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
+               Location:
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -651,6 +655,98 @@ let ``Submit allows overriding default values with default target`` () =
                Verbose: True
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit does not allow to include mutually exclusive options`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--base-uri"
+        "myBaseUri"
+        "--location"
+        "myLocation"
+    ])
+    |> failsWith "Options --base-uri, --location cannot be used together."
+
+[<Fact>]
+let ``Submit allows to include --base-uri option when --location is not present`` () =
+    let given = testWithTarget "foo.target" "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--base-uri"
+        "myBaseUri"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI: myBaseUri
+               Location:
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit allows to include --location option when --base-uri is not present`` () =
+    let given = testWithTarget "foo.target" "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--location"
+        "myLocation"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI:
+               Location: myLocation
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit allows spaces for the --location option`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--verbose"
+        "--location"
+        "My Location"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.nothing
+               Storage:
+               AAD Token:
+               Base URI:
+               Location: My Location
+               Job Name:
+               Shots: 500
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit does not allow an invalid value for the --location option`` () =
+    let given = test "Returns Unit"
+    given (submitWithNothingTarget @ [
+        "--location"
+        "my!nv@lidLocation"
+    ])
+    |> failsWith "\"my!nv@lidLocation\" is an invalid value for the --location option."
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
@@ -747,6 +843,7 @@ let ``Shows help text for submit command`` () =
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
+                      --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
@@ -775,6 +872,7 @@ let ``Shows help text for submit command with default target`` () =
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
+                      --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.

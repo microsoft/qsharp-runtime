@@ -19,14 +19,14 @@ extern "C" void DebugLogPtr(char* value)
 // This VQE sample is taken from https://github.com/msr-quarc/StandaloneVQE
 // When executed in Q# it returns -1.0 with single decimal precision (the correct energy value is close to -1.3)
 extern "C" void SetupQirToRunOnFullStateSimulator();
-extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(); // NOLINT
+extern "C" int64_t Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body(); // NOLINT
 TEST_CASE("QIR: SimpleVQE with full state simulator", "[qir]")
 {
     SetupQirToRunOnFullStateSimulator();
 
-    const double expectedEV = -1.0;
-    const double ret = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
-    INFO(ret);
-    REQUIRE(std::abs(ret - expectedEV) < 0.1);
+    const int ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
+    const int ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
+    INFO(std::string("two random numbers: ") + std::to_string(ret1) + " " + std::to_string(ret2));
+    REQUIRE(ret1 != ret2);
 
 }

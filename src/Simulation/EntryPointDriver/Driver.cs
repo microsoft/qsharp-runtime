@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.CommandLine;
 using System.CommandLine.Builder;
@@ -99,11 +100,15 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(submit, StorageOption);
             AddOptionIfAvailable(submit, AadTokenOption);
             AddOptionIfAvailable(submit, BaseUriOption);
+            AddOptionIfAvailable(submit, LocationOption);
             AddOptionIfAvailable(submit, JobNameOption);
             AddOptionIfAvailable(submit, ShotsOption);
             AddOptionIfAvailable(submit, OutputOption);
             AddOptionIfAvailable(submit, DryRunOption);
             AddOptionIfAvailable(submit, VerboseOption);
+            MarkOptionsAsMutuallyExclusive(
+                submit, 
+                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() });
 
             var root = new RootCommand(entryPoint.Summary) { simulate, submit };
             foreach (var option in entryPoint.Options)
@@ -151,6 +156,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
+                Location = DefaultIfShadowed(LocationOption, azureSettings.Location),
                 JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
                 Shots = DefaultIfShadowed(ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(OutputOption, azureSettings.Output),
@@ -208,6 +214,34 @@ namespace Microsoft.Quantum.EntryPointDriver
                     $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.");
             }
         }
+
+        /// <summary>
+        /// Adds a validator to the command such that the specified options cannot be simultaneously included.
+        /// </summary>
+        /// <param name="command">The command to add the validator to.</param>
+        /// <param name="primaryAliases">The primary aliases of the options to be marked as mutually exclusive.</param>
+        private void MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases) =>
+            command.AddValidator(result =>
+            {
+                var presentAliases = new List<string>();
+                foreach (var rawAlias in primaryAliases)
+                {
+                    var option = command.Options.Where(o => o.RawAliases.Contains(rawAlias)).FirstOrDefault();
+                    var presentAlias = option?.RawAliases.Where(result.Children.Contains).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(presentAlias) &&
+                        result.Children.GetByAlias(presentAlias).Tokens.Count > 0)
+                    {
+                        presentAliases.Add(presentAlias);
+                    }
+                }
+
+                if (presentAliases.Count > 1)
+                {
+                    return $"Options {string.Join(", ", presentAliases)} cannot be used together.";
+                }
+
+                return default;
+            });
     }
 
     /// <summary>
@@ -252,6 +286,27 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
             ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
+
+        /// <summary>
+        /// The location to use with the default endpoint option.
+        /// </summary>
+        internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
+            ImmutableList.Create("--location"),
+            default,
+            "The location to use with the default endpoint.",
+            validator: result =>
+                {
+                    var location = result.Tokens.SingleOrDefault()?.Value;
+                    if (location == null)
+                    {
+                        return default;
+                    }
+
+                    var normalizedLocation = AzureSettings.NormalizeLocation(location);
+                    return Uri.CheckHostName(normalizedLocation) == UriHostNameType.Unknown ?
+                        $"\"{location}\" is an invalid value for the --location option." :
+                        default;
+                });
 
         /// <summary>
         /// The job name option.
