@@ -37,7 +37,8 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
     CHECK(layers[2].startTime == 6);
     CHECK(layers[2].operations.size() == 2);
     CHECK(layers[3].startTime == 10);
-    CHECK(layers[3].operations.size() == 1);}
+    CHECK(layers[3].operations.size() == 1);
+}
 
 TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 {
@@ -48,12 +49,12 @@ TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
     Qubit q2 = tr->AllocateQubit();
     Qubit q3 = tr->AllocateQubit();
 
-    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1)); // L(0,3) should be created
-    CHECK(0 == tr->TraceSingleQubitOp(2, 0, q1)); // add the op into L(0,3)
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));       // L(0,3) should be created
+    CHECK(0 == tr->TraceSingleQubitOp(2, 0, q1));       // add the op into L(0,3)
     CHECK(INVALID == tr->TraceSingleQubitOp(3, 0, q3)); // pending zero op (will remain orphan)
     CHECK(INVALID == tr->TraceSingleQubitOp(4, 0, q2)); // pending zero op
     CHECK(INVALID == tr->TraceSingleQubitOp(5, 0, q2)); // another pending zero op
-    CHECK(0 == tr->TraceSingleQubitOp(6, 1, q2)); // add the op into L(0,3) together with the pending ones
+    CHECK(0 == tr->TraceSingleQubitOp(6, 1, q2));       // add the op into L(0,3) together with the pending ones
 
     const vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 1);
@@ -146,39 +147,53 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
 TEST_CASE("Global barrier", "[tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(1);
+    tr->SetPreferredLayerDuration(2);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
     Qubit q3 = tr->AllocateQubit();
+    Qubit q4 = tr->AllocateQubit();
 
-    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));  // L(0,1) created
-    CHECK(1 == tr->InjectGlobalBarrier(42, 1)); // creates L(1,1)
+    CHECK(0 == tr->TraceSingleQubitOp(1, 4, q1)); // L(0,4) created
+    CHECK(0 == tr->TraceSingleQubitOp(2, 1, q4)); // added to L(0,4)
+    CHECK(1 == tr->InjectGlobalBarrier(42, 1));   // creates L(4,2)
 
-    CHECK(2 == tr->TraceMultiQubitOp(2, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
-    // the barrier shouldn't allow this op to fall through into L(0,1), so should create L(2,1)
+    CHECK(2 == tr->TraceMultiQubitOp(3, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
+    // the barrier shouldn't allow this op to fall through into L(0,4), so should create L(6,2)
 
-    CHECK(INVALID == tr->TraceSingleQubitOp(3, 0, q1));
-    // the barrier shouldn't allow this op to fall through into L(0,1), so should create pending op
+    CHECK(INVALID == tr->TraceSingleQubitOp(4, 0, q1));
+    // the barrier shouldn't allow this op to fall through into L(0,4), so should create pending op
 
-    CHECK(2 == tr->TraceSingleQubitOp(4, 1, q1));
-    // should be added into L(2,1) together with the pending op `3`
+    CHECK(2 == tr->TraceSingleQubitOp(5, 1, q1));
+    // should be added into L(6,2) together with the pending op `3`
+
+    CHECK(3 == tr->TraceSingleQubitOp(6, 3, q2));
+    // long op, with no existing wide layers to host it, so should create L(8,3)
+
+    CHECK(3 == tr->TraceSingleQubitOp(7, 3, q4));
+    // long op but can be added into L(8,3), which is post the barrier
 
     const vector<Layer>& layers = tr->UseLayers();
-    REQUIRE(layers.size() == 3);
-    CHECK(layers[0].operations.size() == 1);
+    REQUIRE(layers.size() == 4);
+    CHECK(layers[0].operations.size() == 2);
     CHECK(layers[1].operations.size() == 0);
     CHECK(layers[2].operations.size() == 3);
+    CHECK(layers[3].operations.size() == 2);
 
     const auto& ops0 = layers[0].operations;
     CHECK(ops0.find(1) != ops0.end());
+    CHECK(ops0.find(2) != ops0.end());
 
     CHECK(42 == layers[1].barrierId);
 
     const auto& ops2 = layers[2].operations;
-    CHECK(ops2.find(2) != ops2.end());
     CHECK(ops2.find(3) != ops2.end());
     CHECK(ops2.find(4) != ops2.end());
+    CHECK(ops2.find(5) != ops2.end());
+
+    const auto& ops3 = layers[3].operations;
+    CHECK(ops3.find(6) != ops3.end());
+    CHECK(ops3.find(7) != ops3.end());
 }
 
 // For layering purposes, measurements behave pretty much the same as other operations

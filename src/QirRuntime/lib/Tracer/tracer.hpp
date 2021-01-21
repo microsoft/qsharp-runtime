@@ -13,9 +13,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    using OpId = int32_t;
-    using Time = int32_t;
-    using Duration = int32_t;
+    using OpId = int;
+    using Time = int;
+    using Duration = int;
     using LayerId = size_t;
 
     constexpr LayerId INVALID = std::numeric_limits<size_t>::max();
@@ -32,7 +32,7 @@ namespace Quantum
         const Time startTime;
 
         // Quantum operations, assigned to this layer.
-        std::unordered_map<OpId, int32_t /*count of the op with this id*/> operations;
+        std::unordered_map<OpId, int /*count of the op with this id*/> operations;
 
         // Optional id, if the layer represents a global barrier.
         OpId barrierId = -1;
@@ -96,7 +96,7 @@ namespace Quantum
         LayerId FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const;
 
         // Returns the index of the created layer.
-        LayerId CreateNewLayer(Duration opDuration);
+        LayerId CreateNewLayer(Duration minRequiredDuration);
 
         // Adds operation with given id into the given layer. Assumes that duration contraints have been satisfied.
         void AddOperationToLayer(OpId id, LayerId layer);
@@ -108,28 +108,34 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // ISimulator interface
         // -------------------------------------------------------------------------------------------------------------
-        IQuantumGateSet* AsQuantumGateSet() override;
-        IDiagnostics* AsDiagnostics() override;
         Qubit AllocateQubit() override;
         void ReleaseQubit(Qubit qubit) override;
         std::string QubitToString(Qubit qubit) override;
         void ReleaseResult(Result result) override;
 
+        IQuantumGateSet* AsQuantumGateSet() override
+        {
+            throw std::logic_error("Not supported: all intrinsics must be converted to tracing operations");
+        }
+        IDiagnostics* AsDiagnostics() override
+        {
+            return nullptr;
+        }
         Result M(Qubit target) override
         {
-            throw std::logic_error("not_implemented");
+            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
         }
         Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
         {
-            throw std::logic_error("not_implemented");
+            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
         }
         bool AreEqualResults(Result r1, Result r2) override
         {
-            throw std::logic_error("Cannot compare results, when tracing!");
+            throw std::logic_error("Cannot compare results while tracing!");
         }
         ResultValue GetResultValue(Result result) override
         {
-            throw std::logic_error("Result values aren't available, when tracing!");
+            throw std::logic_error("Result values aren't available while tracing!");
         }
         Result UseZero() override;
         Result UseOne() override;
@@ -146,13 +152,13 @@ namespace Quantum
         LayerId TraceMultiQubitOp(
             OpId id,
             Duration duration,
-            int64_t nFirstGroup,
+            long nFirstGroup,
             Qubit* firstGroup,
-            int64_t nSecondGroup,
+            long nSecondGroup,
             Qubit* secondGroup);
 
         Result TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target);
-        Result TraceMultiQubitMeasurement(OpId id, Duration duration, int64_t nTargets, Qubit* targets);
+        Result TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, Qubit* targets);
         LayerId GetLayerIdOfSourceMeasurement(Result r) const
         {
             return reinterpret_cast<LayerId>(r);

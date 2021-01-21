@@ -19,7 +19,6 @@ add_library(${component_name} STATIC ${source_files})
 
 target_include_directories(${component_name} PUBLIC ${includes})
 
-MESSAGE(INFO "*** ${QIR_UTILITY_LIB}")
 target_link_libraries(${component_name}
   ${QIR_UTILITY_LIB} # absolute path to the bridge library, set by compile_from_ir
 )
