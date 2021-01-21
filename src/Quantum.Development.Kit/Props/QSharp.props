@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <QscExe Condition="'$(QscExe)' == ''">dotnet "$(MSBuildThisFileDirectory)../tools/qsc/Microsoft.Quantum.CsharpGeneration.App.dll"</QscExe>
+    <QscExe Condition="'$(QscExe)' == ''">dotnet "$(MSBuildThisFileDirectory)../tools/qsc/Microsoft.Quantum.CSharpGeneration.App.dll"</QscExe>
     <QSharpLangVersion>0.10</QSharpLangVersion>
   </PropertyGroup>
 

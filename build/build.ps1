@@ -53,7 +53,7 @@ function Build-One {
     }
 }
 
-Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
+Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
 
