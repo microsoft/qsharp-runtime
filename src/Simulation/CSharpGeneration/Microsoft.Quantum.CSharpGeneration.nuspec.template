@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>Microsoft.Quantum.CsharpGeneration</id>
+    <id>Microsoft.Quantum.CSharpGeneration</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>Microsoft</authors>
@@ -17,11 +17,11 @@
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
 
     <copyright>$copyright$</copyright>
-    <tags>Quantum Q# Qsharp</tags>
+    <tags>Quantum Q# QSharp</tags>
   </metadata>
   
   <files>
-    <file src="RewriteStep.props" target="build\Microsoft.Quantum.CsharpGeneration.props" />
+    <file src="RewriteStep.props" target="build\Microsoft.Quantum.CSharpGeneration.props" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.pdb" target="lib" />
     <file src="bin\$Configuration$\**\Microsoft.Quantum.*.xml" target="lib" />
     <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />

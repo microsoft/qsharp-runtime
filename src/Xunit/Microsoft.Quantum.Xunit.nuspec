@@ -17,7 +17,7 @@
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
 
     <copyright>$copyright$</copyright>
-    <tags>Quantum Q# Qsharp test xunit</tags>
+    <tags>Quantum Q# QSharp test xunit</tags>
 
     <dependencies>
       <dependency id="xunit" version="2.3.1" />

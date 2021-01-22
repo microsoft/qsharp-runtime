@@ -5,70 +5,70 @@
     It calls the Q# compiler (qsc.dll) to generate C# files that are then added as part of the compilation files
     of this project.
   -->
-  <Target Name="QsharpCompile"
-      Inputs="@(QsharpFiles)"
-      Outputs="$(QsharpOutDir)/$(QsharpTree).bson"
-      DependsOnTargets="QsharpPrepare"
+  <Target Name="QSharpCompile"
+      Inputs="@(QSharpFiles)"
+      Outputs="$(QSharpOutDir)/$(QSharpTree).bson"
+      DependsOnTargets="QSharpPrepare"
       BeforeTargets="CheckForDuplicateItems;CoreCompile"
       Condition="$(RunQsc)">
     <PropertyGroup>
-      <QscCommand>$(QscExe) $(QsharpDocsGen) --qst "$(QsharpTree)" --input "@(QsharpFiles,'" "')" --references "@(QsReferences,'" "')" --output "$(QsharpOutDir)"</QscCommand>
+      <QscCommand>$(QscExe) $(QSharpDocsGen) --qst "$(QSharpTree)" --input "@(QSharpFiles,'" "')" --references "@(QsReferences,'" "')" --output "$(QSharpOutDir)"</QscCommand>
     </PropertyGroup>
-    <MakeDir Directories="$(QsharpSrcOutDir)" />
-    <MakeDir Condition="$(RunQDocGen)" Directories="$(QsharpDocsOutDir)" />
-    <WriteLinesToFile File="$(QsharpOutDir)qsc-command.txt" Lines=":: files ::;@(QsharpFiles);:: qsim ::;$(QSimDll);;:: references ::;@(QsReferences);:: command ::;$(QscCommand)" Overwrite="true"/>
+    <MakeDir Directories="$(QSharpSrcOutDir)" />
+    <MakeDir Condition="$(RunQDocGen)" Directories="$(QSharpDocsOutDir)" />
+    <WriteLinesToFile File="$(QSharpOutDir)qsc-command.txt" Lines=":: files ::;@(QSharpFiles);:: qsim ::;$(QSimDll);;:: references ::;@(QsReferences);:: command ::;$(QscCommand)" Overwrite="true"/>
     <!-- Remove all existing codegen files first: -->
     <ItemGroup>
-      <QsharpCodegenFiles Include="$(QsharpSrcOutDir)**/*.*" />
+      <QSharpCodegenFiles Include="$(QSharpSrcOutDir)**/*.*" />
     </ItemGroup>
-    <Delete Files="@(QsharpCodegenFiles)" />
+    <Delete Files="@(QSharpCodegenFiles)" />
     <Exec Command="$(QscCommand)" />
     <ItemGroup>
-      <EmbeddedResource Include="$(QsharpOutDir)/$(QsharpTree).bson" LogicalName="__qsharp_data_bond_v1__.bson" Visible="false" />
-      <Compile Include="$(QsharpSrcOutDir)**/*.g.cs" Visible="false" AutoGen="true" />
+      <EmbeddedResource Include="$(QSharpOutDir)/$(QSharpTree).bson" LogicalName="__qsharp_data_bond_v1__.bson" Visible="false" />
+      <Compile Include="$(QSharpSrcOutDir)**/*.g.cs" Visible="false" AutoGen="true" />
     </ItemGroup>
   </Target>
 
   <!--
     Removes all the intermediate build outputs.
   -->
-  <Target Name="QsharpClean" 
-      DependsOnTargets="QsharpPrepare" 
+  <Target Name="QSharpClean" 
+      DependsOnTargets="QSharpPrepare" 
       BeforeTargets="Clean">
     <ItemGroup>
-      <QsharpBuiltFiles Include="$(QsharpOutDir)**/*.*" />
+      <QSharpBuiltFiles Include="$(QSharpOutDir)**/*.*" />
     </ItemGroup>
-    <Delete Files="@(QsharpBuiltFiles)" />
+    <Delete Files="@(QSharpBuiltFiles)" />
   </Target>
 
   <!--
     Helper target that sets the variables needed for Q# compilation.
   -->
-  <Target Name="QsharpPrepare" 
+  <Target Name="QSharpPrepare" 
       DependsOnTargets="ResolveAssemblyReferences" 
-      BeforeTargets="CoreCompile;QsharpClean">
+      BeforeTargets="CoreCompile;QSharpClean">
     <ItemGroup>
       <QsReferences Include="@(ReferencePath)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath), '(?i)system.|mscorlib|netstandard.library|microsoft.netcore.app')) == false" />
-      <QsharpFiles Include="@(QsharpCompile)">
+      <QSharpFiles Include="@(QSharpCompile)">
         <Visible>false</Visible>
-      </QsharpFiles>
-      <SkippedQsharpFiles Include="**/*.qs" Exclude="@(QsharpFiles);@(QsharpIgnore)">
+      </QSharpFiles>
+      <SkippedQSharpFiles Include="**/*.qs" Exclude="@(QSharpFiles);@(QSharpIgnore)">
         <Visible>false</Visible>
-      </SkippedQsharpFiles>
+      </SkippedQSharpFiles>
     </ItemGroup>
     <PropertyGroup>
-      <QsharpOutDir Condition="'$(QsharpOutDir)' == ''">$(BaseIntermediateOutputPath)qsharp</QsharpOutDir>
-      <QsharpOutDir>$([MSBuild]::Unescape('$(QsharpOutDir)').Replace('\', '/'))</QsharpOutDir>
-      <QsharpOutDir Condition="!HasTrailingSlash('$(QsharpOutDir)')">$(QsharpOutDir)/</QsharpOutDir>
-      <QsharpSrcOutDir Condition="'$(QsharpSrcOutDir)' == ''">$(QsharpOutDir)src/</QsharpSrcOutDir>
-      <QsharpFormatBackupDir Condition="'$(QsharpFormatBackupDir)' == ''">$(QsharpOutDir).backup.$([System.DateTime]::Now.ToString(`yyyyMMddhhmmss`))</QsharpFormatBackupDir>
-      <QsharpDocsOutDir Condition="'$(QsharpDocsOutDir)' == ''">$(QsharpOutDir)docs/</QsharpDocsOutDir>
-      <QsharpDocsOutDir>$([MSBuild]::Unescape('$(QsharpDocsOutDir)').Replace('\', '/'))</QsharpDocsOutDir>
-      <QsharpDocsGen Condition="$(RunQDocGen)">--doc "$(QsharpDocsOutDir)"</QsharpDocsGen>
-      <QsharpTree Condition="'$(QsharpTree)' == ''">$([System.String]::Copy('$(AssemblyName)').Replace(' ',''))</QsharpTree>
+      <QSharpOutDir Condition="'$(QSharpOutDir)' == ''">$(BaseIntermediateOutputPath)qsharp</QSharpOutDir>
+      <QSharpOutDir>$([MSBuild]::Unescape('$(QSharpOutDir)').Replace('\', '/'))</QSharpOutDir>
+      <QSharpOutDir Condition="!HasTrailingSlash('$(QSharpOutDir)')">$(QSharpOutDir)/</QSharpOutDir>
+      <QSharpSrcOutDir Condition="'$(QSharpSrcOutDir)' == ''">$(QSharpOutDir)src/</QSharpSrcOutDir>
+      <QSharpFormatBackupDir Condition="'$(QSharpFormatBackupDir)' == ''">$(QSharpOutDir).backup.$([System.DateTime]::Now.ToString(`yyyyMMddhhmmss`))</QSharpFormatBackupDir>
+      <QSharpDocsOutDir Condition="'$(QSharpDocsOutDir)' == ''">$(QSharpOutDir)docs/</QSharpDocsOutDir>
+      <QSharpDocsOutDir>$([MSBuild]::Unescape('$(QSharpDocsOutDir)').Replace('\', '/'))</QSharpDocsOutDir>
+      <QSharpDocsGen Condition="$(RunQDocGen)">--doc "$(QSharpDocsOutDir)"</QSharpDocsGen>
+      <QSharpTree Condition="'$(QSharpTree)' == ''">$([System.String]::Copy('$(AssemblyName)').Replace(' ',''))</QSharpTree>
     </PropertyGroup>
     <Warning
         Condition="'@(SkippedQbFiles)' != ''"
-        Text="Some .qs files in your project will be skipped during build: @(SkippedQsharpFiles)" />
+        Text="Some .qs files in your project will be skipped during build: @(SkippedQSharpFiles)" />
   </Target>
 </Project>

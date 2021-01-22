@@ -1,12 +1,12 @@
 ﻿<Rule
-    Name="Qsharp"
-    DisplayName="Qsharp"
+    Name="QSharp"
+    DisplayName="QSharp"
     PageTemplate="tool"
-    Description="Qsharp build items"
+    Description="QSharp build items"
     xmlns="http://schemas.microsoft.com/build/2009/properties">
 
   <Rule.DataSource>
-    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" ItemType="QsharpCompile" />
+    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" ItemType="QSharpCompile" />
   </Rule.DataSource>
 
   <Rule.Categories>
@@ -23,13 +23,13 @@
 
   <StringProperty Name="Identity" DisplayName="File Name" ReadOnly="true" Category="Misc">
     <StringProperty.DataSource>
-      <DataSource Persistence="Intrinsic" ItemType="QsharpCompile" PersistedName="Identity" />
+      <DataSource Persistence="Intrinsic" ItemType="QSharpCompile" PersistedName="Identity" />
     </StringProperty.DataSource>
   </StringProperty>
 
   <StringProperty Name="FullPath" DisplayName="Full Path" ReadOnly="true" Category="Misc">
     <StringProperty.DataSource>
-      <DataSource Persistence="Intrinsic" ItemType="QsharpCompile" PersistedName="FullPath" />
+      <DataSource Persistence="Intrinsic" ItemType="QSharpCompile" PersistedName="FullPath" />
     </StringProperty.DataSource>
   </StringProperty>
 

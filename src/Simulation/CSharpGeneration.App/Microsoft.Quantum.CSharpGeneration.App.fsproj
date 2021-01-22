@@ -3,7 +3,7 @@
   <Import Project="..\Common\DebugSymbols.props" />
   
   <PropertyGroup>
-    <AssemblyName>Microsoft.Quantum.CsharpGeneration.App</AssemblyName>
+    <AssemblyName>Microsoft.Quantum.CSharpGeneration.App</AssemblyName>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
