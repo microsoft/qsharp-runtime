@@ -88,4 +88,13 @@ namespace Microsoft.Quantum.Intrinsic
             return metadata;
         }
     }
+
+    [Obsolete("This class is deprecated and will be removed in a future release. Considering using the corresponding callable class from 'Microsoft.Quantum.Intrinsic' directly.")]
+    public class QSimM : M
+    {
+        public QSimM(IOperationFactory factory) : base(factory)
+        {
+
+        }
+    }
 }
