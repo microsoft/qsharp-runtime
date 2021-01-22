@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </remarks>
         public StackFrame[]? CallStack { get; private set; }
 
-        public SimulatorBase(IQubitManager? qubitManager = null, int? seed = null, bool onlyOverrideAbstract = false)
+        public SimulatorBase(IQubitManager? qubitManager = null, int? seed = null)
         {
             this.randomSeed = seed ?? Guid.NewGuid().GetHashCode();
             this.randomGenerator = new Lazy<System.Random>(
@@ -74,7 +74,7 @@ namespace Microsoft.Quantum.Simulation.Common
             );
             this.QubitManager = qubitManager;
 
-            this.InitBuiltinOperations(this.GetType(), onlyOverrideAbstract);
+            this.InitBuiltinOperations(this.GetType());
 
             EnableLogToConsole();
             EnableExceptionPrinting();

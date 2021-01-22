@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation
         ///  a subclass of T and registers as the override of the BaseType 
         ///  it implements.
         /// </summary>
-        public static void InitBuiltinOperations<T>(this Factory<T> factory, Type t, bool onlyOverrideAbstract = false)
+        public static void InitBuiltinOperations<T>(this Factory<T> factory, Type t)
         {
             if (t == null)
             {
@@ -48,11 +48,6 @@ namespace Microsoft.Quantum.Simulation
                 from op in overrideTypes
                 where op.IsSubclassOf(typeof(T))
                 select op;
-
-            if (onlyOverrideAbstract)
-            {
-                ops = ops.Where(o => o.BaseType.IsAbstract);
-            }
 
             foreach (var op in ops)
             {
