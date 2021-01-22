@@ -12,9 +12,16 @@
 #include "quantum__qis.hpp"
 
 #include "QuantumApi_I.hpp"
+#include "context.hpp"
 #include "qirTypes.hpp"
 
-extern Microsoft::Quantum::ISimulator* g_sim;
+namespace Microsoft
+{
+namespace Quantum
+{
+    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
+}
+} // namespace Microsoft
 
 extern "C"
 {
@@ -26,12 +33,12 @@ extern "C"
 
     void quantum__qis__cnot(Qubit control, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->ControlledX(1, &control, qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->ControlledX(1, &control, qubit);
     }
 
     void quantum__qis__h(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->H(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->H(qubit);
     }
 
     Result quantum__qis__measure(QirArray* paulis, QirArray* qubits)
@@ -48,64 +55,64 @@ extern "C"
             pauliIds.push_back(static_cast<PauliId>(*paulis->GetItemPointer(i)));
         }
 
-        return g_sim->Measure(
+        return Microsoft::Quantum::g_context->simulator->Measure(
             count, reinterpret_cast<PauliId*>(pauliIds.data()), count, reinterpret_cast<Qubit*>(qubits->buffer));
     }
 
     Result quantum__qis__mz(Qubit qubit)
     {
-        return g_sim->M(qubit);
+        return Microsoft::Quantum::g_context->simulator->M(qubit);
     }
 
     void quantum__qis__s(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->S(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->S(qubit);
     }
 
     void quantum__qis__t(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->T(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->T(qubit);
     }
 
     void quantum__qis__rx(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->R(PauliId_X, qubit, theta);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->R(PauliId_X, qubit, theta);
     }
 
     void quantum__qis__ry(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->R(PauliId_Y, qubit, theta);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->R(PauliId_Y, qubit, theta);
     }
 
     void quantum__qis__rz(double theta, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->R(PauliId_Z, qubit, theta);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->R(PauliId_Z, qubit, theta);
     }
 
     void quantum__qis__x(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->X(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->X(qubit);
     }
 
     void quantum__qis__y(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->Y(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->Y(qubit);
     }
 
     void quantum__qis__z(Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->Z(qubit);
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->Z(qubit);
     }
 
     void quantum__qis__crx(QirArray* ctls, double theta, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->ControlledR(
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->ControlledR(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), PauliId_X, qubit, theta);
     }
 
     void quantum__qis__crz(QirArray* ctls, double theta, Qubit qubit)
     {
-        g_sim->AsQuantumGateSet()->ControlledR(
+        Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->ControlledR(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), PauliId_Z, qubit, theta);
     }
 }

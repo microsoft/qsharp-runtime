@@ -19,7 +19,7 @@ struct QirArray
 
     char* buffer = nullptr;
 
-    const bool ownsQubits = false;
+    bool ownsQubits = false;
     int refCount = 1;
     int userCount = 0; // used to enable copy elision, see the QIR specifications for details
 

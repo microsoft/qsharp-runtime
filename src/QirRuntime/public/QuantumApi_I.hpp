@@ -104,7 +104,5 @@ namespace Quantum
         virtual Result UseOne() = 0;
     };
 
-    void SetSimulatorForQIR(ISimulator* sim);
-
 } // namespace Quantum
 } // namespace Microsoft
