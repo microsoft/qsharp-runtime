@@ -52,6 +52,14 @@ namespace Microsoft.Azure.Quantum
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Returns the list of quotas for a workspace.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>List of jobs</returns>
+        Task<IEnumerable<QuotaInfo>> ListQuotasAsync(
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Gets as SAS Uri for the storage account associated with the workspace.
         /// </summary>
         /// <param name="containerName">Name of the container.</param>
