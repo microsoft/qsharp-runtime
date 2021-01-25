@@ -70,7 +70,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// See remarks below for details.
     ///
     /// # Example
-    /// ```Q#
+    /// ```qsharp
     /// using (qubits = Qubit[2]) {
     ///     // Both qubits are initialized as |0〉: a=(1 + 0*i), b=(0 + 0*i)
     ///     AssertQubitIsInStateWithinTolerance((Complex(1., 0.), Complex(0., 0.)), qubits[0], 1e-5);

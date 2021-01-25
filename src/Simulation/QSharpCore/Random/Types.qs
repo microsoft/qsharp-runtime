@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.Random {
     /// # Example
     /// The following Q# code will display 0 with probability 30% and 1 with
     /// probability 70%:
-    /// ```Q#
+    /// ```qsharp
     /// let dist = CategoricalDistribution([0.3, 0.7]);
     /// Message($"Got sample: {dist::Sample()}");
     /// ```
@@ -102,7 +102,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following two distributions are identical:
-    /// ```Q#
+    /// ```qsharp
     /// let dist1 = ContinuousUniformDistribution(1.0, 2.0);
     /// let dist2 = TransformedContinuousDistribution(
     ///     PlusD(1.0, _),
