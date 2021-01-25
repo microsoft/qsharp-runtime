@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="Common.Package.props" />
+
+  <ItemGroup>
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledX.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledZ.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledH.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\HFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\Measure.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetZExplicit.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\PreparePostM.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\R.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\R1.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\R1Frac.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\RxFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SWAP.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\TFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\XFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\YFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\ZFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\SetToBasisState.qs" />
+
+    <QsharpCompile Include="..\TargetDefinitions\Decompositions\Utils.qs" />
+  </ItemGroup>
+
+</Project>

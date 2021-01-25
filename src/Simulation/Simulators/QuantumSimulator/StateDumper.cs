@@ -9,14 +9,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        private delegate bool DumpCallback(uint idx, double real, double img);
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Dump")]
-        private static extern void sim_Dump(uint id, DumpCallback callback);
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpQubits")]
-        private static extern bool sim_DumpQubits(uint id, uint cout, uint[] ids, DumpCallback callback);
-
         /// <summary>
         /// This class allows you to dump the state (wave function)
         /// of the QuantumSimulator into a callback function.

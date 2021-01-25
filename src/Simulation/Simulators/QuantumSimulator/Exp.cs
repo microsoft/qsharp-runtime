@@ -10,71 +10,42 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimExp : Quantum.Intrinsic.Exp
+        public virtual void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Exp")]
-            private static extern void Exp(uint id, uint n, Pauli[] paulis, double angle, uint[] ids);
+            this.CheckQubits(targets);
+            CheckAngle(angle);
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCExp")]
-            private static extern void MCExp(uint id, uint n, Pauli[] paulis, double angle, uint nc, uint[] ctrls, uint[] ids);
-
-            private QuantumSimulator Simulator { get; }
-
-
-            public QSimExp(QuantumSimulator m) : base(m)
+            if (paulis.Length != targets.Length)
             {
-                this.Simulator = m;
+                throw new InvalidOperationException($"Both input arrays for Exp (paulis, targets), must be of same size.");
             }
 
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __Body__ => (_args) =>
+            Exp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, targets.GetIds());
+        }
+
+        public virtual void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            Exp__Body(paulis, -angle, targets);
+        }
+
+        public virtual void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            this.CheckQubits(controls, targets);
+            CheckAngle(angle);
+
+            if (paulis.Length != targets.Length)
             {
-                var (paulis, theta, qubits) = _args;
+                throw new InvalidOperationException($"Both input arrays for Exp (paulis, qubits), must be of same size.");
+            }
 
-                Simulator.CheckQubits(qubits);
-                CheckAngle(theta);
+            SafeControlled(controls,
+                () => Exp__Body(paulis, angle, targets),
+                (count, ids) => MCExp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, count, ids, targets.GetIds()));
+        }
 
-                if (paulis.Length != qubits.Length)
-                {
-                    throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
-                }
-
-                Exp(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), theta, qubits.GetIds());
-
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Pauli>, double, IQArray<Qubit>), QVoid> __AdjointBody__ => (_args) =>
-            {
-                var (paulis, angle, qubits) = _args;
-
-                return this.__Body__.Invoke((paulis, -angle, qubits));
-            };
-
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledBody__ => (_args) =>
-            {
-                var (ctrls, (paulis, angle, qubits)) = _args;
-
-                Simulator.CheckQubits(ctrls, qubits);
-                CheckAngle(angle);
-
-                if (paulis.Length != qubits.Length)
-                {
-                    throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size.");
-                }
-
-                SafeControlled(ctrls,
-                    () => this.__Body__.Invoke((paulis, angle, qubits)),
-                    (count, ids) => MCExp(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), angle, count, ids, qubits.GetIds()));
-
-                return QVoid.Instance;
-            };
-
-            public override Func<(IQArray<Qubit>, (IQArray<Pauli>, double, IQArray<Qubit>)), QVoid> __ControlledAdjointBody__ => (_args) =>
-            {
-                var (ctrls, (paulis, angle, qubits)) = _args;
-
-                return this.__ControlledBody__.Invoke((ctrls, (paulis, -angle, qubits)));
-            };
+        public virtual void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            Exp__ControlledBody(controls, paulis, -angle, targets);
         }
     }
 }

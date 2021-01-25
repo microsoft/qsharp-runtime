@@ -398,7 +398,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Creates a new instance of the simulator with the default 
         /// <see cref="QCTraceSimulatorConfiguration"/>.
         /// </summary>
-        public QCTraceSimulator() : this( new QCTraceSimulatorConfiguration() ) { }
+        public QCTraceSimulator() : this(new QCTraceSimulatorConfiguration() ) { }
 
         /// <summary>
         /// Creates a new instance of the simulator with configuration given by 

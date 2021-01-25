@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
@@ -23,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     /// <summary>
     /// The Toffoli simulator implementation class.
     /// </summary>
-    public partial class ToffoliSimulator : SimulatorBase
+    public partial class ToffoliSimulator : SimulatorBase, IQsharpCore
     {
         /// <summary>
         /// The default number of qubits to allocate.
@@ -46,7 +47,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// There is an overhead of one byte of memory usage per allocated qubit.
         /// There is no time overhead from allocating more qubits.</param>
         public ToffoliSimulator(uint qubitCount)
-            : base(new QubitManager(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false))
+            : base(new QubitManager(qubitCapacity: qubitCount, mayExtendCapacity: false, disableBorrowing: false), null)
         {
             this.State = new bool[qubitCount];
             this.borrowedQubitStates = new Dictionary<int, Stack<bool>>();

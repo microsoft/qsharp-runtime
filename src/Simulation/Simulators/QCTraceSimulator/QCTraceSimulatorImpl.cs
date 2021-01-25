@@ -8,13 +8,14 @@ using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Common;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation
 {
     /// <summary>
     /// Internals of <see cref="QCTraceSimulator"/>. For internal use only.
     /// </summary>
-    public partial class QCTraceSimulatorImpl : SimulatorBase
+    public partial class QCTraceSimulatorImpl : SimulatorBase, IGate_Measure
     {
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
@@ -60,7 +61,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
         {
             return this.GetInstance(typeof(T)).GetType().FullName;
         }
-
 
         public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
 
@@ -148,8 +148,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         private void RegisterPrimitiveOperationsGivenAsCircuits()
         {
+            var intrinsicAssembly = 
+                (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
+                select assembly).Single();
             IEnumerable<Type> primitiveOperationTypes =
-                from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
+                from op in intrinsicAssembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
                 select op;
 
