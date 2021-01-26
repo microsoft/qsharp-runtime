@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
+namespace Microsoft.Quantum.QsCompiler.CSharpGeneration
 
 open System.Collections.Generic
 open System.Collections.Immutable

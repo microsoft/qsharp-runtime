@@ -27,13 +27,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Xunit", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generation", "generation", "{A567C185-A429-418B-AFDE-6F1785BA4A77}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.CsharpGeneration", "src\Simulation\CsharpGeneration.Tests\Tests.CsharpGeneration.fsproj", "{10D7C395-4F79-4DAF-9289-A4B8FAF6183A}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.CSharpGeneration", "src\Simulation\CSharpGeneration.Tests\Tests.CSharpGeneration.fsproj", "{10D7C395-4F79-4DAF-9289-A4B8FAF6183A}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.RoslynWrapper", "src\Simulation\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj", "{618FBF9D-4EF3-435D-9728-81C726236668}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.RoslynWrapper", "src\Simulation\RoslynWrapper.Tests\Tests.RoslynWrapper.fsproj", "{48206BD6-48DD-4442-A395-3A6594E4C9C6}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration", "src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj", "{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CSharpGeneration", "src\Simulation\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj", "{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProjects", "{09C842CB-930C-4C7D-AD5F-E30DE4A55820}"
 EndProject

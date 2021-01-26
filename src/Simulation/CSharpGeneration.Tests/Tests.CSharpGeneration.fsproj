@@ -57,8 +57,8 @@
     <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
 =======
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
->>>>>>> origin/swernli/feature/decomp:src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
+>>>>>>> origin/swernli/feature/decomp:src/Simulation/CSharpGeneration.Tests/Tests.CSharpGeneration.fsproj
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>

@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
 =======
-    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
 >>>>>>> origin/swernli/feature/decomp
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />

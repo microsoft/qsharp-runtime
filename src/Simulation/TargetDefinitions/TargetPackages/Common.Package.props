@@ -7,7 +7,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <QSharpDocsGeneration>true</QSharpDocsGeneration>
-    <CsharpGeneration>false</CsharpGeneration> <!-- we will provide our own -->
+    <CSharpGeneration>false</CSharpGeneration> <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
@@ -23,14 +23,14 @@
   <ItemGroup>
     <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
     <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
-  <Target Name="BeforeCsharpCompile">
+  <Target Name="BeforeCSharpCompile">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>

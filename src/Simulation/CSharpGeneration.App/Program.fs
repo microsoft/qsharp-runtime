@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module Microsoft.Quantum.QsCompiler.CsharpGeneration.Program
+module Microsoft.Quantum.QsCompiler.CSharpGeneration.Program
 
 open System
 open System.Collections.Generic
