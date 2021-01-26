@@ -28,8 +28,8 @@
     <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
 =======
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
 >>>>>>> origin/swernli/feature/decomp
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     /// <summary>
     /// The Toffoli simulator implementation class.
     /// </summary>
-    public partial class ToffoliSimulator : SimulatorBase, IQsharpCore
+    public partial class ToffoliSimulator : SimulatorBase, IQSharpCore
     {
         /// <summary>
         /// The default number of qubits to allocate.

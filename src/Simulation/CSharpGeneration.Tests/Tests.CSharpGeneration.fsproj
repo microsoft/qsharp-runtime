@@ -60,7 +60,7 @@
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
 >>>>>>> origin/swernli/feature/decomp:src/Simulation/CsharpGeneration.Tests/Tests.CsharpGeneration.fsproj
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>

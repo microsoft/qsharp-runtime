@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <Description>Target package interfaces for the Q# runtime.</Description>
-    <PackageTags>Quantum Q# Qsharp</PackageTags>
+    <PackageTags>Quantum Q# QSharp</PackageTags>
   </PropertyGroup>  
   
   <ItemGroup>

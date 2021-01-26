@@ -5,14 +5,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <QsharpDocsGeneration>true</QsharpDocsGeneration>
+    <QSharpDocsGeneration>true</QSharpDocsGeneration>
     <CsharpGeneration>false</CsharpGeneration> <!-- we will provide our own -->
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
   </PropertyGroup>
 
   <PropertyGroup>
     <Description>Foundation implementation for the Q# programming language.</Description>
-    <PackageTags>Quantum Q# Qsharp</PackageTags>
+    <PackageTags>Quantum Q# QSharp</PackageTags>
   </PropertyGroup>  
   
   <ItemGroup>

@@ -13,9 +13,9 @@
     <Compile Include="..\Simulators.Tests\QuantumSimulatorTests\VerifyGates.cs" />
     <Compile Include="..\Simulators.Tests\Circuits\AssertEqual.cs" />
 
-    <QsharpCompile Include="..\Simulators.Tests\Circuits\AssertEqual.qs" />
-    <QsharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
-    <QsharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\AssertEqual.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
   </ItemGroup>
 
 </Project>

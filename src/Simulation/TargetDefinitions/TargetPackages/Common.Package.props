@@ -6,14 +6,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <QsharpDocsGeneration>true</QsharpDocsGeneration>
+    <QSharpDocsGeneration>true</QSharpDocsGeneration>
     <CsharpGeneration>false</CsharpGeneration> <!-- we will provide our own -->
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageTags>Quantum Q# Qsharp</PackageTags>
+    <PackageTags>Quantum Q# QSharp</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
-    <ProjectReference Include="..\QsharpFoundation\Microsoft.Quantum.Qsharp.Foundation.csproj" />
+    <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
     <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
 

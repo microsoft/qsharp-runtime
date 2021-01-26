@@ -3,7 +3,7 @@
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IQsharpCore :
+    public interface IQSharpCore :
         IGate_Exp,
         IGate_H,
         IGate_Measure,

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
 
-  <Import Project="..\TargetDefinitions\TargetPackages\QsharpCore.Package.props" />
+  <Import Project="..\TargetDefinitions\TargetPackages\QSharpCore.Package.props" />
 
   <PropertyGroup>
 <<<<<<< HEAD:src/Simulation/QSharpCore/Microsoft.Quantum.QSharp.Core.csproj
@@ -49,5 +49,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
->>>>>>> origin/swernli/feature/decomp:src/Simulation/QsharpCore/Microsoft.Quantum.QSharp.Core.csproj
+>>>>>>> origin/swernli/feature/decomp:src/Simulation/QSharpCore/Microsoft.Quantum.QSharp.Core.csproj
 </Project>
