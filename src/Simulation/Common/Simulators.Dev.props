@@ -18,10 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-<<<<<<< HEAD
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-=======
->>>>>>> origin/swernli/feature/decomp
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
   </ItemGroup>
 

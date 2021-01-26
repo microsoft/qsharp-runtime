@@ -1,19 +1,6 @@
 ﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
 
-<<<<<<< HEAD
-  <Import Project="..\Common\AssemblyCommon.props" />
-  <Import Project="..\Common\DebugSymbols.props" />
-  <Import Project="..\Common\Simulators.Dev.props" />
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-=======
   <Import Project="..\Common\Simulators.Test.props" />
->>>>>>> origin/swernli/feature/decomp
 
   <ItemGroup>
     <Compile Remove="TestProjects\**" />
@@ -22,15 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
-    <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
-    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
-=======
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
->>>>>>> origin/swernli/feature/decomp
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj">

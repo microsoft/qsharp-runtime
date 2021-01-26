@@ -12,13 +12,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-<<<<<<< HEAD
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
-=======
     <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
->>>>>>> origin/swernli/feature/decomp
   </ItemGroup>
 
   <ItemGroup>
