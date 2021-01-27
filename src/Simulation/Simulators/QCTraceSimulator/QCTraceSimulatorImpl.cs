@@ -151,7 +151,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             var intrinsicAssembly = 
                 (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                 where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
-                select assembly).Single();
+                select assembly).First();
             IEnumerable<Type> primitiveOperationTypes =
                 from op in intrinsicAssembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
