@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following draws 10 samples from the standard normal distribution:
-    /// ```Q#
+    /// ```qsharp
     /// let samples = DrawMany((StandardNormalDistribution())::Sample, 10, ());
     /// ```
     ///
@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Random {
     /// # Example
     /// The following draws 10 samples from the normal distribution with mean
     /// 2 and standard deviation 0.1:
-    /// ```Q#
+    /// ```qsharp
     /// let samples = DrawMany(
     ///     (NormalDistribution(2.0, PowD(0.1, 2.0)))::Sample,
     ///     10, ()

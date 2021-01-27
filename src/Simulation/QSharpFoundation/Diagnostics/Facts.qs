@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # Example
     /// The following Q# snippet will fail:
-    /// ```Q#
+    /// ```qsharp
     /// Fact(false, "Expected true.");
     /// ```
     function Fact(actual : Bool, message : String) : Unit {
@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # Example
     /// The following Q# code will print "Hello, world":
-    /// ```Q#
+    /// ```qsharp
     /// Contradiction(2 == 3, "2 is not equal to 3.");
     /// Message("Hello, world.");
     /// ```

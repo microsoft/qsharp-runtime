@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Arrays {
     ///
     /// # Example
     /// The following `for` loops are equivalent:
-    /// ```Q#
+    /// ```qsharp
     /// for (idx in IndexRange(array)) { ... }
     /// for (idx in IndexRange(array)) { ... }
     /// ```
