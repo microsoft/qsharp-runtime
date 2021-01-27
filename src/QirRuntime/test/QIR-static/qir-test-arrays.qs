@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Testing.QIR
         // exercise __quantum__rt__array_get_element_ptr_1d
         set local w/= index <- val;
 
-        // exercise __quantum__rt__array_get_length
+        // exercise __quantum__rt__array_get_size
         let n = Length(local);
 
         // exercise __quantum__rt__array_slice with various ranges

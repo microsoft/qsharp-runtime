@@ -6,11 +6,19 @@
 
 @ResultZero = external global %Result*
 @ResultOne = external global %Result*
+
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
 @Microsoft__Quantum__Testing__QIR__Subtract = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Microsoft__Quantum__Testing__QIR__Subtract__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
-@PartialApplication__12 = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Lifted__PartialApplication__12__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
+@PartialApplication__42 = constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*] [void (%Tuple*, %Tuple*, %Tuple*)* @Lifted__PartialApplication__42__body__wrapper, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null, void (%Tuple*, %Tuple*, %Tuple*)* null]
+@MemoryManagement__42 = constant [2 x void (%Tuple*, i64)*] [void (%Tuple*, i64)* @MemoryManagement__42__RefCount, void (%Tuple*, i64)* @MemoryManagement__42__AliasCount]
 
 @Microsoft__Quantum__Testing__QIR__TestPartials = alias i64 (i64, i64), i64 (i64, i64)* @Microsoft__Quantum__Testing__QIR__TestPartials__body
+
+define i64 @Microsoft__Quantum__Testing__QIR__Subtract__body(i64 %from, i64 %what) {
+entry:
+  %0 = sub i64 %from, %what
+  ret i64 %0
+}
 
 define i64 @Microsoft__Quantum__Testing__QIR__TestPartials__body(i64 %x, i64 %y) #0 {
 entry:
@@ -18,10 +26,12 @@ entry:
   %1 = bitcast %Tuple* %0 to { %Callable*, i64 }*
   %2 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %1, i64 0, i32 0
   %3 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %1, i64 0, i32 1
-  %4 = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @Microsoft__Quantum__Testing__QIR__Subtract, %Tuple* null)
+  %4 = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @Microsoft__Quantum__Testing__QIR__Subtract, [2 x void (%Tuple*, i64)*]* null, %Tuple* null)
   store %Callable* %4, %Callable** %2
   store i64 %x, i64* %3
-  %subtractor = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @PartialApplication__12, %Tuple* %0)
+  %subtractor = call %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @PartialApplication__42, [2 x void (%Tuple*, i64)*]* @MemoryManagement__42, %Tuple* %0)
+  call void @__quantum__rt__callable_memory_management(i32 1, %Callable* %subtractor, i64 1)
+  call void @__quantum__rt__callable_update_alias_count(%Callable* %subtractor, i64 1)
   %5 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint (i64* getelementptr (i64, i64* null, i32 1) to i64))
   %6 = bitcast %Tuple* %5 to { i64 }*
   %7 = getelementptr { i64 }, { i64 }* %6, i64 0, i32 0
@@ -31,15 +41,16 @@ entry:
   %9 = bitcast %Tuple* %8 to { i64 }*
   %10 = getelementptr { i64 }, { i64 }* %9, i64 0, i32 0
   %11 = load i64, i64* %10
-  call void @__quantum__rt__callable_unreference(%Callable* %subtractor)
-  call void @__quantum__rt__tuple_unreference(%Tuple* %5)
-  call void @__quantum__rt__tuple_unreference(%Tuple* %8)
+  call void @__quantum__rt__callable_memory_management(i32 1, %Callable* %subtractor, i64 -1)
+  call void @__quantum__rt__callable_update_alias_count(%Callable* %subtractor, i64 -1)
+  call void @__quantum__rt__callable_memory_management(i32 0, %Callable* %subtractor, i64 -1)
+  call void @__quantum__rt__callable_update_reference_count(%Callable* %subtractor, i64 -1)
+  call void @__quantum__rt__tuple_update_reference_count(%Tuple* %5, i64 -1)
+  call void @__quantum__rt__tuple_update_reference_count(%Tuple* %8, i64 -1)
   ret i64 %11
 }
 
 declare %Tuple* @__quantum__rt__tuple_create(i64)
-
-declare %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]*, %Tuple*)
 
 define void @Microsoft__Quantum__Testing__QIR__Subtract__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
 entry:
@@ -55,7 +66,9 @@ entry:
   ret void
 }
 
-define void @Lifted__PartialApplication__12__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
+declare %Callable* @__quantum__rt__callable_create([4 x void (%Tuple*, %Tuple*, %Tuple*)*]*, [2 x void (%Tuple*, i64)*]*, %Tuple*)
+
+define void @Lifted__PartialApplication__42__body__wrapper(%Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) {
 entry:
   %0 = bitcast %Tuple* %capture-tuple to { %Callable*, i64 }*
   %1 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 1
@@ -72,20 +85,42 @@ entry:
   %10 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 0
   %11 = load %Callable*, %Callable** %10
   call void @__quantum__rt__callable_invoke(%Callable* %11, %Tuple* %6, %Tuple* %result-tuple)
-  call void @__quantum__rt__tuple_unreference(%Tuple* %6)
+  call void @__quantum__rt__tuple_update_reference_count(%Tuple* %6, i64 -1)
   ret void
 }
 
+define void @MemoryManagement__42__RefCount(%Tuple* %capture-tuple, i64 %count-change) {
+entry:
+  %0 = bitcast %Tuple* %capture-tuple to { %Callable*, i64 }*
+  %1 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 0
+  %2 = load %Callable*, %Callable** %1
+  call void @__quantum__rt__callable_memory_management(i32 0, %Callable* %2, i64 %count-change)
+  call void @__quantum__rt__callable_update_reference_count(%Callable* %2, i64 %count-change)
+  call void @__quantum__rt__tuple_update_reference_count(%Tuple* %capture-tuple, i64 %count-change)
+  ret void
+}
+
+define void @MemoryManagement__42__AliasCount(%Tuple* %capture-tuple, i64 %count-change) {
+entry:
+  %0 = bitcast %Tuple* %capture-tuple to { %Callable*, i64 }*
+  %1 = getelementptr { %Callable*, i64 }, { %Callable*, i64 }* %0, i64 0, i32 0
+  %2 = load %Callable*, %Callable** %1
+  call void @__quantum__rt__callable_memory_management(i32 1, %Callable* %2, i64 %count-change)
+  call void @__quantum__rt__callable_update_alias_count(%Callable* %2, i64 %count-change)
+  call void @__quantum__rt__tuple_update_alias_count(%Tuple* %capture-tuple, i64 %count-change)
+  ret void
+}
+
+declare void @__quantum__rt__callable_memory_management(i32, %Callable*, i64)
+
+declare void @__quantum__rt__callable_update_alias_count(%Callable*, i64)
+
 declare void @__quantum__rt__callable_invoke(%Callable*, %Tuple*, %Tuple*)
 
-declare void @__quantum__rt__callable_unreference(%Callable*)
+declare void @__quantum__rt__callable_update_reference_count(%Callable*, i64)
 
-declare void @__quantum__rt__tuple_unreference(%Tuple*)
+declare void @__quantum__rt__tuple_update_reference_count(%Tuple*, i64)
 
-define i64 @Microsoft__Quantum__Testing__QIR__Subtract__body(i64 %from, i64 %what) {
-entry:
-  %0 = sub i64 %from, %what
-  ret i64 %0
-}
+declare void @__quantum__rt__tuple_update_alias_count(%Tuple*, i64)
 
 attributes #0 = { "EntryPoint" }

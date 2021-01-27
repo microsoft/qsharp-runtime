@@ -7,8 +7,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "quantum__rt.hpp"
 #include "qirTypes.hpp"
+#include "quantum__rt.hpp"
 
 std::unordered_map<std::string, QirString*>& AllocatedStrings()
 {
@@ -67,6 +67,32 @@ extern "C"
             // TODO: amortize map cleanup across multiple iterations
             AllocatedStrings().erase(allocated);
             delete qstr;
+        }
+    }
+
+    void quantum__rt__string_update_reference_count(QirString* qstr, int32_t increment) // NOLINT
+    {
+        if (qstr == nullptr || increment == 0)
+        {
+            return;
+        }
+        else if (increment > 0)
+        {
+            assert(qstr->refCount > 0 && "Cannot resurrect released strings!");
+            qstr->refCount += increment;
+        }
+        else
+        {
+            qstr->refCount -= increment;
+            assert(qstr->refCount >= 0 && "Refcount cannot become negative!");
+            if (qstr->refCount == 0)
+            {
+                auto allocated = AllocatedStrings().find(qstr->str);
+                assert(allocated != AllocatedStrings().end());
+                // TODO: amortize map cleanup across multiple iterations
+                AllocatedStrings().erase(allocated);
+                delete qstr;
+            }
         }
     }
 
@@ -143,7 +169,7 @@ extern "C"
         oss << range.start << "..";
         if (range.step != 1)
         {
-          oss << range.step << "..";
+            oss << range.step << "..";
         }
         oss << range.end;
 

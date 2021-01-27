@@ -21,16 +21,12 @@ struct QirArray
 
     const bool ownsQubits = false;
     int refCount = 1;
-    int userCount = 0; // used to enable copy elision, see the QIR specifications for details
+    int aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
 
-    // NB: Release doesn't trigger destruction of the Array itself to allow for it
-    // being used both on the stack and on the heap. The creator of the array
-    // should delete it, if allocated from the heap.
+    // NB: Release doesn't trigger destruction of the Array itself (only of its data buffer) to allow for it being used
+    // both on the stack and on the heap. The creator of the array should delete it, if allocated from the heap.
     int AddRef();
     int Release();
-
-    void AddUser();
-    void RemoveUser();
 
     QirArray(int64_t cQubits);
     QirArray(int64_t cItems, int itemSizeInBytes, int dimCount = 1, std::vector<int64_t>&& dimSizes = {});
@@ -64,7 +60,7 @@ using PTuple = char*;
 struct QirTupleHeader
 {
     int32_t refCount = 0;
-    int32_t userCount = 0; // used to enable copy elision, see the QIR specifications for details
+    int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
     int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer
 
     // flexible array member, must be last in the struct
@@ -77,9 +73,6 @@ struct QirTupleHeader
 
     int AddRef();
     int Release();
-
-    void AddUser();
-    void RemoveUser();
 
     static QirTupleHeader* Create(int size);
     static QirTupleHeader* CreateWithCopiedData(QirTupleHeader* other);
@@ -123,28 +116,10 @@ static_assert(
     L"TupleWithControls must be tightly packed for FlattenControlArrays to be correct");
 
 /*======================================================================================================================
-    Example of creating a callable
-
-    ; Single entry of a callable
-    ; (a callable might provide entries for body, controlled, adjoint and controlled-adjoint)
-    define void @callable-body(
-        %Tuple* %capture-tuple, %Tuple* %arg-tuple, %Tuple* %result-tuple) { ... }
-
-    ; Definition of the callable that doesn't support any functors
-    @callable =
-        constant [4 x void (%Tuple*, %Tuple*, %Tuple*)*]
-        [
-            void (%Tuple*, %Tuple*, %Tuple*)* @collable-body,
-            void (%Tuple*, %Tuple*, %Tuple*)* null,
-            void (%Tuple*, %Tuple*, %Tuple*)* null,
-            void (%Tuple*, %Tuple*, %Tuple*)* null
-        ]
-
-    %3 = call %Callable* @__quantum__rt__callable_create(
-        [4 x void (%Tuple*, %Tuple*, %Tuple*)*]* @callable, %Tuple* null)
-
+    QirCallable
 ======================================================================================================================*/
 typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
+typedef void (*t_CaptureCallback)(PTuple, int64_t);
 struct QirCallable
 {
     static int constexpr Adjoint = 1;
@@ -157,10 +132,14 @@ struct QirCallable
         L"functor kind is used as index into the functionTable");
 
     int refCount = 1;
+    int aliasCount = 0;
 
     // If the callable doesn't support Adjoint or Controlled functors, the corresponding entries in the table should be
     // set to nullptr.
     t_CallableEntry functionTable[QirCallable::TableSize] = {nullptr, nullptr, nullptr, nullptr};
+
+    static int constexpr CaptureCallbacksTableSize = 2;
+    t_CaptureCallback captureCallbacks[QirCallable::CaptureCallbacksTableSize] = {nullptr, nullptr};
 
     // The callable stores the capture, it's given at creation, and passes it to the functions from the function table,
     // but the runtime doesn't have any knowledge about what the tuple actually is.
@@ -178,12 +157,16 @@ struct QirCallable
     ~QirCallable();
 
   public:
-    QirCallable(const t_CallableEntry* ftEntries, PTuple capture);
+    QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* captureCallbacks, PTuple capture);
     QirCallable(const QirCallable& other);
+    QirCallable* CloneIfShared();
 
     int AddRef();
     int Release();
+    void UpdateAliasCount(int increment);
 
     void Invoke(PTuple args, PTuple result);
     void ApplyFunctor(int functor);
+
+    void InvokeCaptureCallback(int index, int64_t parameter);
 };

@@ -35,20 +35,6 @@ int QirArray::Release()
     return rc;
 }
 
-void QirArray::AddUser()
-{
-    ++this->userCount;
-}
-
-void QirArray::RemoveUser()
-{
-    if (this->userCount == 0)
-    {
-        quantum__rt__fail(quantum__rt__string_create("User count cannot be negative"));
-    }
-    --this->userCount;
-}
-
 QirArray::QirArray(int64_t qubits_count)
     : count(qubits_count)
     , itemSizeInBytes(sizeof(void*))
@@ -251,22 +237,47 @@ extern "C"
         };
     }
 
-    void quantum__rt__array_add_access(QirArray* array)
+    // Bucketing of addre/release is non-standard so for now we'll keep the more traditional addref/release semantics
+    // in the native types. Should reconsider, if the perf of the loops becomes an issue.
+    void quantum__rt__array_update_reference_count(QirArray* array, int32_t increment)
     {
-        if (array == nullptr)
+        if (array == nullptr || increment == 0)
         {
             return;
         }
-        array->AddUser();
+        else if (increment > 0)
+        {
+            for (int i = 0; i < increment; i++)
+            {
+                array->AddRef();
+            }
+        }
+        else
+        {
+            for (int i = increment; i < 0; i++)
+            {
+                const long refCount = array->Release();
+                if (refCount == 0)
+                {
+                    delete array;
+                    assert(i == -1 && "Attempting to decrement reference count below zero!");
+                    break;
+                };
+            }
+        }
     }
 
-    void quantum__rt__array_remove_access(QirArray* array)
+    void quantum__rt__array_update_alias_count(QirArray* array, int32_t increment)
     {
-        if (array == nullptr)
+        if (array == nullptr || increment == 0)
         {
             return;
         }
-        array->RemoveUser();
+        array->aliasCount += increment;
+        if (array->aliasCount < 0)
+        {
+            quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative!"));
+        }
     }
 
     char* quantum__rt__array_get_element_ptr_1d(QirArray* array, int64_t index)
@@ -282,7 +293,7 @@ extern "C"
         return array->dimensions;
     }
 
-    int64_t quantum__rt__array_get_length(QirArray* array, int32_t dim)
+    int64_t quantum__rt__array_get_size(QirArray* array, int32_t dim)
     {
         assert(array != nullptr);
         assert(dim < array->dimensions);
@@ -296,7 +307,7 @@ extern "C"
         {
             return nullptr;
         }
-        if (forceNewInstance || array->userCount > 0)
+        if (forceNewInstance || array->aliasCount > 0)
         {
             return new QirArray(array);
         }
