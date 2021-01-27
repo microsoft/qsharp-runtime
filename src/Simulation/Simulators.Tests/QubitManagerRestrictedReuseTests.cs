@@ -84,10 +84,23 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests {
             qm.Release(q0);
             Qubit q0a = qm.Allocate();
             Assert.Equal(0, q0a.Id);
-            Qubit q3 = qm.Allocate();
-            Assert.Equal(2, q3.Id); // This should double capacity again
+            Qubit q3 = qm.Allocate(); // This should double capacity again
+            Assert.Equal(2, q3.Id);
             Assert.Equal(1, qm.FreeQubitsCount);
             Assert.Equal(3, qm.AllocatedQubitsCount);
+
+            qm.Release(q1);
+            qm.Release(q0a);
+            qm.Release(q3);
+            Assert.Equal(4, qm.FreeQubitsCount);
+            Assert.Equal(0, qm.AllocatedQubitsCount);
+
+            IQArray<Qubit> qqq = qm.Allocate(3);
+            Assert.Equal(1, qm.FreeQubitsCount);
+            Assert.Equal(3, qm.AllocatedQubitsCount);
+            qm.Release(qqq);
+            Assert.Equal(4, qm.FreeQubitsCount);
+            Assert.Equal(0, qm.AllocatedQubitsCount);
         }
 
         [Fact]

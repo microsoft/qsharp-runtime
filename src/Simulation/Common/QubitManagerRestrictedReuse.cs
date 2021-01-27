@@ -332,6 +332,12 @@ namespace Microsoft.Quantum.Simulation.Common {
             return SharedQubitStatusArray[id] == Allocated;
         }
 
+        protected void ChangeStatusToAllocated(long id) {
+            SharedQubitStatusArray[id] = Allocated;
+            AllocatedQubitsCount++;
+            FreeQubitsCount--;
+        }
+
         /// <summary>
         /// Allocates a qubit.
         /// Throws a NotEnoughQubits exception if the qubit cannot be allocated. 
@@ -346,9 +352,7 @@ namespace Microsoft.Quantum.Simulation.Common {
                 // TODO: Wording of the exception doesn't account for restricted reuse.
                 throw new NotEnoughQubits(1, this.FreeQubitsCount);
             }
-            SharedQubitStatusArray[newQubitId] = Allocated;
-            AllocatedQubitsCount++;
-            FreeQubitsCount--;
+            ChangeStatusToAllocated(newQubitId);
             return CreateQubitObject(newQubitId);
         }
 
@@ -367,14 +371,15 @@ namespace Microsoft.Quantum.Simulation.Common {
 
             QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate);
             for (int i = 0; i < numToAllocate; i++) {
-                long allocated = AllocateQubit();
-                if (allocated == None) {
+                long newQubitId = AllocateQubit();
+                if (newQubitId == None) {
                     for (int k = 0; k < i; k++) {
                         Release(result[k]);
                     }
                     throw new NotEnoughQubits(numToAllocate, this.FreeQubitsCount);
                 }
-                result.Modify(i, CreateQubitObject(allocated));
+                ChangeStatusToAllocated(newQubitId);
+                result.Modify(i, CreateQubitObject(newQubitId));
             }
 
             return result;
