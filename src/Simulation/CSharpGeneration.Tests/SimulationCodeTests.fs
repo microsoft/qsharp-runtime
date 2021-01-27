@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.CSharpGeneration.Testing
+namespace Microsoft.Quantum.CsharpGeneration.Testing
 
 open System
 open System.Collections.Immutable
@@ -17,8 +17,8 @@ open Microsoft.VisualStudio.LanguageServer.Protocol
 open Xunit
 
 open Microsoft.Quantum.QsCompiler.CompilationBuilder
-open Microsoft.Quantum.QsCompiler.CSharpGeneration
-open Microsoft.Quantum.QsCompiler.CSharpGeneration.SimulationCode
+open Microsoft.Quantum.QsCompiler.CsharpGeneration
+open Microsoft.Quantum.QsCompiler.CsharpGeneration.SimulationCode
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
 open Microsoft.Quantum.QsCompiler.SyntaxTree
 

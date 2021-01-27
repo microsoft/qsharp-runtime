@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.QsCompiler.CSharpGeneration
+namespace Microsoft.Quantum.QsCompiler.CsharpGeneration
 
 open System
 open System.Collections.Generic
 open System.IO
 open Microsoft.CodeAnalysis
 open Microsoft.Quantum.QsCompiler
-open Microsoft.Quantum.QsCompiler.CSharpGeneration
+open Microsoft.Quantum.QsCompiler.CsharpGeneration
 open Microsoft.Quantum.QsCompiler.DataTypes
 open Microsoft.Quantum.QsCompiler.Diagnostics
 open Microsoft.Quantum.QsCompiler.ReservedKeywords
