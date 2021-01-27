@@ -77,21 +77,18 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     REQUIRE(!quantum__rt__result_equal(r1, r2));
 
     // release result that has never been shared, the test QAPI will verify double release
-    quantum__rt__result_unreference(r2);
+    quantum__rt__result_update_reference_count(r2, -1);
 
     // share a result a few times
-    quantum__rt__result_reference(r1);
-    quantum__rt__result_reference(r1);
+    quantum__rt__result_update_reference_count(r1, 2);
 
     Result r3 = qapi->M(nullptr);
 
     // release shared result, the test QAPI will verify double release
-    quantum__rt__result_unreference(r1); // one release for each share
-    quantum__rt__result_unreference(r1);
-    quantum__rt__result_unreference(r1); // one release for the original allocation
+    quantum__rt__result_update_reference_count(r1, -3); // one release for shared and for the original allocation
 
     REQUIRE(qapi->HaveResultsInFlight()); // r3 should be still alive
-    quantum__rt__result_unreference(r3);
+    quantum__rt__result_update_reference_count(r3, -1);
 
     REQUIRE(!qapi->HaveResultsInFlight()); // no leaks
     SetSimulatorForQIR(nullptr);
@@ -114,9 +111,9 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(ab, 4) == 'o');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(ab, 5) == '!');
 
-    quantum__rt__array_unreference(a);
-    quantum__rt__array_unreference(b);
-    quantum__rt__array_unreference(ab);
+    quantum__rt__array_update_reference_count(a, -1);
+    quantum__rt__array_update_reference_count(b, -1);
+    quantum__rt__array_update_reference_count(ab, -1);
 }
 
 TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
@@ -148,8 +145,8 @@ TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
     *(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(b, 1, 2, 3))) = 42;
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(a, 1, 2, 3))) == 23);
 
-    quantum__rt__array_unreference(a);
-    quantum__rt__array_unreference(b);
+    quantum__rt__array_update_reference_count(a, -1);
+    quantum__rt__array_update_reference_count(b, -1);
 }
 
 TEST_CASE("Arrays: copy elision", "[qir_support]")
@@ -163,20 +160,20 @@ TEST_CASE("Arrays: copy elision", "[qir_support]")
     // no aliases for the array, copy should be elided unless enforced
     copy = quantum__rt__array_copy(a, false /*force*/);
     CHECK(a == copy);
-    quantum__rt__array_unreference(copy);
+    quantum__rt__array_update_reference_count(copy, -1);
 
     // single alias for the array, but copy enforced
     copy = quantum__rt__array_copy(a, true /*force*/);
     CHECK(a != copy);
-    quantum__rt__array_unreference(copy);
+    quantum__rt__array_update_reference_count(copy, -1);
 
     // existing aliases for the array -- cannot elide copy
     quantum__rt__array_update_alias_count(a, 1);
     copy = quantum__rt__array_copy(a, false /*force*/);
     CHECK(a != copy);
-    quantum__rt__array_unreference(copy);
+    quantum__rt__array_update_reference_count(copy, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: empty", "[qir_support]")
@@ -187,7 +184,7 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(b, 1) == 0);
     REQUIRE(quantum__rt__array_get_size(b, 2) == 3);
     REQUIRE(b->buffer == nullptr);
-    quantum__rt__array_unreference(b);
+    quantum__rt__array_update_reference_count(b, -1);
 
     QirArray* a = quantum__rt__array_create_1d(sizeof(char), 0);
     REQUIRE(quantum__rt__array_get_dim(a) == 1);
@@ -198,7 +195,7 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     REQUIRE(quantum__rt__array_get_dim(a1) == 1);
     REQUIRE(quantum__rt__array_get_size(a1, 0) == 0);
     REQUIRE(a1->buffer == nullptr);
-    quantum__rt__array_unreference(a1);
+    quantum__rt__array_update_reference_count(a1, -1);
 
     QirArray* c = quantum__rt__array_create_1d(sizeof(char), 5);
     memcpy(c->buffer, "hello", 5);
@@ -207,9 +204,9 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     QirArray* ca = quantum__rt__array_concatenate(c, a);
     REQUIRE(quantum__rt__array_get_size(ca, 0) == 5);
 
-    quantum__rt__array_unreference(a);
-    quantum__rt__array_unreference(ac);
-    quantum__rt__array_unreference(ca);
+    quantum__rt__array_update_reference_count(a, -1);
+    quantum__rt__array_update_reference_count(ac, -1);
+    quantum__rt__array_update_reference_count(ca, -1);
 }
 
 TEST_CASE("Arrays: check the slice range", "[qir_support]")
@@ -243,14 +240,14 @@ TEST_CASE("Arrays: check the slice range", "[qir_support]")
     slice = quantum__rt__array_slice(a, 0, {dim0 - 1, 1, 0});
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 0);
     REQUIRE(quantum__rt__array_get_size(slice, 1) == dim1);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     slice = quantum__rt__array_slice(a, 1, {0, -1, dim0 - 1});
     REQUIRE(quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(quantum__rt__array_get_size(slice, 1) == 0);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
@@ -264,14 +261,14 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
     slice = quantum__rt__array_slice(a, 0, {1, 2 * dim, dim});
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // if the range covers the whole array, it's effectively a copy
     slice = quantum__rt__array_slice(a, 0, {0, 1, dim - 1});
     REQUIRE(quantum__rt__array_get_size(slice, 0) == dim);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '0');
     REQUIRE(*quantum__rt__array_get_element_ptr(slice, 4) == '4');
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // disconnected slice (also check that the end of range can be above bounds as long as the generated sequence is
     // within them)
@@ -279,9 +276,9 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 2);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '0');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 1) == '4');
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
@@ -295,7 +292,7 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
     slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // reversed slices are alwayes disconnected
     slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});
@@ -303,9 +300,9 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '4');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 1) == '2');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 2) == '0');
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
@@ -343,7 +340,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 0, 0))) == 12);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 3))) == 59);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // if the range consists of a single point, the slice still has the same dimensions
     slice = quantum__rt__array_slice(a, 1, {1, 2 * dim1, dim1}); // items with second index = 1
@@ -353,7 +350,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 4);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 0, 3))) == 55);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on 0 dimension
     slice = quantum__rt__array_slice(a, 0, {1, 1, 3}); // items with first index = 1, 2 or 3
@@ -363,7 +360,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 12);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 2, 2, 3))) == 47);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on last dimension, expected result:
     // indexes                                             -- values
@@ -381,7 +378,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 2, 1))) == 10);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 1, 1))) == 18);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 58);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on sparse range in 0 dimension (also check that the end of range can be above bounds as long as the
     // generated sequence is within them)
@@ -392,7 +389,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 0);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 2, 3))) == 47);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on sparse range in the middle dimension
     slice = quantum__rt__array_slice(a, 1, {0, 2, 2}); // items with second index = 0 or 2
@@ -402,7 +399,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 0);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 1, 3))) == 59);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on sparse range in the last dimension
     // indexes                                             -- values
@@ -420,9 +417,9 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 2, 1))) == 11);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 1, 0))) == 17);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 59);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
@@ -460,7 +457,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 4);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 0, 3))) == 55);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on dim0, expect the result to look like:
     // indexes                                             -- values
@@ -474,7 +471,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(slice, 2) == dim2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 0, 0))) == 36);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 2, 2, 3))) == 23);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on last dimension, expect the result to look like:
     // indexes                                             -- values
@@ -492,7 +489,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 0, 2, 1))) == 9);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 1, 0))) == 19);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 57);
-    quantum__rt__array_unreference(slice);
+    quantum__rt__array_update_reference_count(slice, -1);
 }
 
 TEST_CASE("Arrays: project of 3D array", "[qir_support]")
@@ -532,7 +529,7 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 0, 0))) == 12);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 1, 1))) == 17);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 2, 3))) == 23);
-    quantum__rt__array_unreference(project);
+    quantum__rt__array_update_reference_count(project, -1);
 
     // project on last dimension, expected result:
     // indexes         -- values
@@ -548,9 +545,9 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 0, 0, 0))) == 2);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 1, 1, 2))) == 18);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(project, 4, 2, 2))) == 58);
-    quantum__rt__array_unreference(project);
+    quantum__rt__array_update_reference_count(project, -1);
 
-    quantum__rt__array_unreference(a);
+    quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Strings: reuse", "[qir_support]")
@@ -564,11 +561,11 @@ TEST_CASE("Strings: reuse", "[qir_support]")
     REQUIRE(a != c);
     REQUIRE(c->refCount == 1);
 
-    quantum__rt__string_unreference(a);
+    quantum__rt__string_update_reference_count(a, -1);
     REQUIRE(b->str.compare("abc") == 0);
 
-    quantum__rt__string_unreference(b);
-    quantum__rt__string_unreference(c);
+    quantum__rt__string_update_reference_count(b, -1);
+    quantum__rt__string_update_reference_count(c, -1);
 }
 
 TEST_CASE("Strings: concatenate", "[qir_support]")
@@ -583,11 +580,11 @@ TEST_CASE("Strings: concatenate", "[qir_support]")
     QirString* aa = quantum__rt__string_concatenate(a, a);
     REQUIRE(aa->str.compare("abcabc") == 0);
 
-    quantum__rt__string_unreference(a);
-    quantum__rt__string_unreference(b);
-    quantum__rt__string_unreference(abExpected);
-    quantum__rt__string_unreference(ab);
-    quantum__rt__string_unreference(aa);
+    quantum__rt__string_update_reference_count(a, -1);
+    quantum__rt__string_update_reference_count(b, -1);
+    quantum__rt__string_update_reference_count(abExpected, -1);
+    quantum__rt__string_update_reference_count(ab, -1);
+    quantum__rt__string_update_reference_count(aa, -1);
 }
 
 TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
@@ -639,7 +636,7 @@ TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
 
     for (QirString* qstr : strings)
     {
-        quantum__rt__string_unreference(qstr);
+        quantum__rt__string_update_reference_count(qstr, -1);
     }
 }
 
@@ -651,8 +648,8 @@ TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
     QirString* qstr2 = quantum__rt__range_to_string({0, 3, 42});
     REQUIRE(qstr2->str == std::string("0..3..42"));
 
-    quantum__rt__string_unreference(qstr1);
-    quantum__rt__string_unreference(qstr2);
+    quantum__rt__string_update_reference_count(qstr1, -1);
+    quantum__rt__string_update_reference_count(qstr2, -1);
 }
 
 struct QubitTestQAPI : public SimulatorStub
@@ -713,7 +710,7 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     Qubit q = quantum__rt__qubit_allocate();
     qstr = quantum__rt__qubit_to_string(q);
     REQUIRE(qstr->str == std::string("0"));
-    quantum__rt__string_unreference(qstr);
+    quantum__rt__string_update_reference_count(qstr, -1);
     quantum__rt__qubit_release(q);
     REQUIRE(!qapi->HaveQubitsInFlight());
 
@@ -725,7 +722,7 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     Qubit last = *reinterpret_cast<Qubit*>(quantum__rt__array_get_element_ptr_1d(qs, 2));
     qstr = quantum__rt__qubit_to_string(last);
     REQUIRE(qstr->str == std::string("3"));
-    quantum__rt__string_unreference(qstr);
+    quantum__rt__string_update_reference_count(qstr, -1);
 
     QirArray* copy = quantum__rt__array_copy(qs, true /*force*/);
     REQUIRE(!copy->ownsQubits);
@@ -734,8 +731,8 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(!qapi->HaveQubitsInFlight());
 
     // both arrays now contain dangling pointers to qubits, but we still must release them
-    quantum__rt__array_unreference(qs);
-    quantum__rt__array_unreference(copy);
+    quantum__rt__array_update_reference_count(qs, -1);
+    quantum__rt__array_update_reference_count(copy, -1);
 
     SetSimulatorForQIR(nullptr);
 }
@@ -784,15 +781,15 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     REQUIRE(target == *reinterpret_cast<Qubit*>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
 
     unpacked->Release();
-    quantum__rt__array_unreference(combined);
-    quantum__rt__tuple_unreference(outer);
-    quantum__rt__tuple_unreference(inner);
+    quantum__rt__array_update_reference_count(combined, -1);
+    quantum__rt__tuple_update_reference_count(outer, -1);
+    quantum__rt__tuple_update_reference_count(inner, -1);
 
     // release the original resources
     quantum__rt__qubit_release_array(controlsOuter);
-    quantum__rt__array_unreference(controlsOuter);
+    quantum__rt__array_update_reference_count(controlsOuter, -1);
     quantum__rt__qubit_release_array(controlsInner);
-    quantum__rt__array_unreference(controlsInner);
+    quantum__rt__array_update_reference_count(controlsInner, -1);
     quantum__rt__qubit_release(target);
 }
 
@@ -830,15 +827,15 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     REQUIRE(42 == *reinterpret_cast<int*>(unpackedArgs->AsTuple() + sizeof(/*Qubit*/ void*)));
 
     unpacked->Release();
-    quantum__rt__array_unreference(combined);
-    quantum__rt__tuple_unreference(outer);
-    quantum__rt__tuple_unreference(inner);
-    quantum__rt__tuple_unreference(args);
+    quantum__rt__array_update_reference_count(combined, -1);
+    quantum__rt__tuple_update_reference_count(outer, -1);
+    quantum__rt__tuple_update_reference_count(inner, -1);
+    quantum__rt__tuple_update_reference_count(args, -1);
 
     // release the original resources
     quantum__rt__qubit_release_array(controlsOuter);
-    quantum__rt__array_unreference(controlsOuter);
+    quantum__rt__array_update_reference_count(controlsOuter, -1);
     quantum__rt__qubit_release_array(controlsInner);
-    quantum__rt__array_unreference(controlsInner);
+    quantum__rt__array_update_reference_count(controlsInner, -1);
     quantum__rt__qubit_release(target);
 }

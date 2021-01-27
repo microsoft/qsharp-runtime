@@ -46,8 +46,6 @@ declare void @quantum__rt__fail(%"struct.QirString"*)
 declare %class.QUBIT* @quantum__rt__qubit_allocate()
 declare void @quantum__rt__qubit_release(%class.QUBIT*)
 declare i1 @quantum__rt__result_equal(%class.RESULT*, %class.RESULT*)
-declare void @quantum__rt__result_reference(%class.RESULT*)
-declare void @quantum__rt__result_unreference(%class.RESULT*)
 declare void @quantum__rt__result_update_reference_count(%class.RESULT* %r, i32 %c)
 
 ;------------------------------------------------------------------------------
@@ -64,9 +62,7 @@ declare i8* @quantum__rt__array_get_element_ptr_1d(%"struct.QirArray"*, i64)
 declare i8* @quantum__rt__array_get_element_ptr_nonvariadic(%Array*, i8*)
 declare i64 @quantum__rt__array_get_size(%"struct.QirArray"*, i32)
 declare %"struct.QirArray"* @quantum__rt__array_project(%"struct.QirArray"*, i32, i64)
-declare void @quantum__rt__array_reference(%"struct.QirArray"*)
 declare %"struct.QirArray"* @quantum__rt__array_slice(%"struct.QirArray"*, i32, %"struct.QirRange"* dereferenceable(24))
-declare void @quantum__rt__array_unreference(%"struct.QirArray"*)
 declare void @quantum__rt__array_update_reference_count(%"struct.QirArray"*, i32)
 declare void @quantum__rt__array_update_alias_count(%"struct.QirArray"*, i32)
 
@@ -78,13 +74,9 @@ declare void @llvm.va_end(i8*)
 ; tuples and callables
 ;
 declare i8* @quantum__rt__tuple_create(i64)
-declare void @quantum__rt__tuple_reference(i8*)
-declare void @quantum__rt__tuple_unreference(i8*)
 declare void @quantum__rt__tuple_update_reference_count(i8*, i32)
 declare void @quantum__rt__tuple_update_alias_count(i8*, i32)
 
-declare void @quantum__rt__callable_reference(%"struct.QirCallable"*)
-declare void @quantum__rt__callable_unreference(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_update_reference_count(%"struct.QirCallable"*, i32)
 declare %"struct.QirCallable"* @quantum__rt__callable_create(void (i8*, i8*, i8*)**, void (i8*, i64)**, i8*)
 declare void @quantum__rt__callable_invoke(%"struct.QirCallable"*, i8*, i8*)
@@ -98,8 +90,6 @@ declare void @quantum__rt__callable_memory_management(i32, %"struct.QirCallable"
 ; strings
 ;
 declare %"struct.QirString"* @quantum__rt__string_create(i8*)
-declare void @quantum__rt__string_reference(%"struct.QirString"*)
-declare void @quantum__rt__string_unreference(%"struct.QirString"*)
 declare void @quantum__rt__string_update_reference_count(%"struct.QirString"*, i32)
 declare %"struct.QirString"* @quantum__rt__string_concatenate(%"struct.QirString"*, %"struct.QirString"*)
 declare i1 @quantum__rt__string_equal(%"struct.QirString"*, %"struct.QirString"*)
@@ -188,18 +178,6 @@ define void @__quantum__rt__result_update_reference_count(%Result* %.r, i64 %.c)
   ret void
 }
 
-define void @__quantum__rt__result_reference(%Result* %.r) {
-  %r = bitcast %Result* %.r to %class.RESULT*
-  call void @quantum__rt__result_reference(%class.RESULT* %r)
-  ret void
-}
-
-define void @__quantum__rt__result_unreference(%Result* %.r) {
-  %r = bitcast %Result* %.r to %class.RESULT*
-  call void @quantum__rt__result_unreference(%class.RESULT* %r)
-  ret void
-}
-
 
 ; -----------------------------------------------------------------------------
 ; arrays bridge
@@ -281,12 +259,6 @@ define %Array* @__quantum__rt__array_project(%Array* %.ar, i32 %dim, i64 %index)
   ret %Array* %.project
 }
 
-define void @__quantum__rt__array_reference(%Array* %.ar) {
-  %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  call void @quantum__rt__array_reference(%"struct.QirArray"* %ar)
-  ret void
-}
-
 define %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 %dim, %Range %.range) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
   %.prange = alloca %Range
@@ -301,12 +273,6 @@ define %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 %dim, %Range %.rang
 define %Array* @__quantum__rt__array_slice_1d(%Array* %.ar, %Range %.range) {
   %.slice = call %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 0, %Range %.range)
   ret %Array* %.slice
-}
-
-define void @__quantum__rt__array_unreference(%Array* %.ar) {
-  %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  call void @quantum__rt__array_unreference(%"struct.QirArray"* %ar)
-  ret void
 }
 
 define void @__quantum__rt__array_update_reference_count(%Array* %.ar, i64 %.c) {
@@ -332,18 +298,6 @@ define %Tuple* @__quantum__rt__tuple_create(i64 %size) {
   ret %Tuple* %.th
 }
 
-define void @__quantum__rt__tuple_reference(%Tuple* %.th) {
-  %th = bitcast %Tuple* %.th to i8*
-  call void @quantum__rt__tuple_reference(i8* %th)
-  ret void
-}
-
-define void @__quantum__rt__tuple_unreference(%Tuple* %.th) {
-  %th = bitcast %Tuple* %.th to i8*
-  call void @quantum__rt__tuple_unreference(i8* %th)
-  ret void
-}
-
 define void @__quantum__rt__tuple_update_reference_count(%Tuple* %.th, i64 %.c) {
   %th = bitcast %Tuple* %.th to i8*
   %c = trunc i64 %.c to i32
@@ -361,18 +315,6 @@ define void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i64 %.c) {
 ;------------------------------------------------------------------------------
 ; callables bridge
 ;
-define void @__quantum__rt__callable_reference(%Callable* %.clb) {
-  %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  call void @quantum__rt__callable_reference(%"struct.QirCallable"* %clb)
-  ret void
-}
-
-define void @__quantum__rt__callable_unreference(%Callable* %.clb) {
-  %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  call void @quantum__rt__callable_unreference(%"struct.QirCallable"* %clb)
-  ret void
-}
-
 define void @__quantum__rt__callable_update_reference_count(%Callable* %.clb, i64 %.c) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
   %c = trunc i64 %.c to i32
@@ -443,18 +385,6 @@ define %String* @__quantum__rt__string_create(i8* %null_terminated_buffer) {
   %str = call %"struct.QirString"* @quantum__rt__string_create(i8* %null_terminated_buffer)
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str
-}
-
-define void @__quantum__rt__string_reference(%String* %.str) {
-  %str = bitcast %String* %.str to %"struct.QirString"*
-  call void @quantum__rt__string_reference(%"struct.QirString"* %str)
-  ret void
-}
-
-define void @__quantum__rt__string_unreference(%String* %.str) {
-  %str = bitcast %String* %.str to %"struct.QirString"*
-  call void @quantum__rt__string_unreference(%"struct.QirString"* %str)
-  ret void
 }
 
 define void @__quantum__rt__string_update_reference_count(%String* %.str, i64 %.c) {

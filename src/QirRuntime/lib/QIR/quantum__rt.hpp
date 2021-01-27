@@ -80,12 +80,6 @@ extern "C"
     // Returns true if the two results are the same, and false if they are different.
     QIR_SHARED_API bool quantum__rt__result_equal(RESULT*, RESULT*); // NOLINT
 
-    // Increments the reference count of a Result pointer.
-    QIR_SHARED_API void quantum__rt__result_reference(RESULT*); // NOLINT
-
-    // Decrements the reference count of a Result pointer and releases the result if appropriate.
-    QIR_SHARED_API void quantum__rt__result_unreference(RESULT*); // NOLINT
-
     // Adds the given integer value to the reference count for the result. Deallocates the result if the reference count
     // becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void quantum__rt__result_update_reference_count(RESULT*, int32_t); // NOLINT
@@ -96,12 +90,6 @@ extern "C"
 
     // Allocates space for a tuple requiring the given number of bytes and sets the reference count to 1.
     QIR_SHARED_API PTuple quantum__rt__tuple_create(int64_t); // NOLINT
-
-    // Indicates that a new reference has been added.
-    QIR_SHARED_API void quantum__rt__tuple_reference(PTuple); // NOLINT
-
-    // Indicates that an existing reference has been removed and potentially releases the tuple.
-    QIR_SHARED_API void quantum__rt__tuple_unreference(PTuple); // NOLINT
 
     // Adds the given integer value to the reference count for the tuple. Deallocates the tuple if the reference count
     // becomes 0. The behavior is undefined if the reference count becomes negative.
@@ -120,12 +108,6 @@ extern "C"
     // Creates a new 1-dimensional array. The int is the size of each element in bytes. The int64_t is the length
     // of the array. The bytes of the new array should be set to zero.
     QIR_SHARED_API QirArray* quantum__rt__array_create_1d(int32_t, int64_t); // NOLINT
-
-    // Indicates that a new reference has been added.
-    QIR_SHARED_API void quantum__rt__array_reference(QirArray*); // NOLINT
-
-    // Indicates that an existing reference has been removed and potentially releases the array.
-    QIR_SHARED_API void quantum__rt__array_unreference(QirArray*); // NOLINT
 
     // Adds the given integer value to the reference count for the array. Deallocates the array if the reference count
     // becomes 0. The behavior is undefined if the reference count becomes negative.
@@ -183,12 +165,6 @@ extern "C"
     typedef void (*t_CaptureCallback)(PTuple, int64_t);                                                     // NOLINT
     QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, t_CaptureCallback*, PTuple); // NOLINT
 
-    // Indicates that a new reference has been added.
-    QIR_SHARED_API void quantum__rt__callable_reference(QirCallable*); // NOLINT
-
-    // Indicates that an existing reference has been removed and potentially releases the callable value.
-    QIR_SHARED_API void quantum__rt__callable_unreference(QirCallable*); // NOLINT
-
     // Adds the given integer value to the reference count for the callable. Deallocates the callable if the reference
     // count becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void quantum__rt__callable_update_reference_count(QirCallable*, int32_t); // NOLINT
@@ -222,12 +198,6 @@ extern "C"
     // TODO the provided constructor doesn't match the spec!
     // QIR_SHARED_API QirString* quantum__rt__string_create(int, char*); // NOLINT
     QIR_SHARED_API QirString* quantum__rt__string_create(const char*); // NOLINT
-
-    // Indicates that a new reference has been added.
-    QIR_SHARED_API void quantum__rt__string_reference(QirString*); // NOLINT
-
-    // Indicates that an existing reference has been removed and potentially releases the string.
-    QIR_SHARED_API void quantum__rt__string_unreference(QirString*); // NOLINT
 
     // Adds the given integer value to the reference count for the string. Deallocates the string if the reference count
     // becomes 0. The behavior is undefined if the reference count becomes negative.

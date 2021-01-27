@@ -22,27 +22,6 @@ extern "C"
         return QirTupleHeader::Create(static_cast<int>(size))->AsTuple();
     }
 
-    void quantum__rt__tuple_reference(PTuple tuple)
-    {
-        if (tuple == nullptr)
-        {
-            return;
-        }
-        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        (void)th->AddRef();
-    }
-
-    void quantum__rt__tuple_unreference(PTuple tuple)
-    {
-        if (tuple == nullptr)
-        {
-            return;
-        }
-
-        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        (void)th->Release();
-    }
-
     void quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
     {
         if (tuple == nullptr || increment == 0)
@@ -97,25 +76,6 @@ extern "C"
 
         th->AddRef();
         return tuple;
-    }
-
-    void quantum__rt__callable_reference(QirCallable* callable)
-    {
-        if (callable == nullptr)
-        {
-            return;
-        }
-        (void)callable->AddRef();
-    }
-
-    void quantum__rt__callable_unreference(QirCallable* callable)
-    {
-        if (callable == nullptr)
-        {
-            return;
-        }
-        const long ref = callable->Release();
-        assert(ref >= 0);
     }
 
     void quantum__rt__callable_update_reference_count(QirCallable* callable, int32_t increment)
@@ -398,7 +358,7 @@ void QirCallable::Invoke(PTuple args, PTuple result)
         this->functionTable[this->appliedFunctor](capture, flat->AsTuple(), result);
 
         QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
-        quantum__rt__array_unreference(controls);
+        quantum__rt__array_update_reference_count(controls, -1);
         flat->Release();
     }
 }

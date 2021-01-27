@@ -48,28 +48,6 @@ extern "C"
         return CreateOrReuseAlreadyAllocated(std::string(bytes));
     }
 
-    // Indicates that a new reference has been added.
-    void quantum__rt__string_reference(QirString* qstr) // NOLINT
-    {
-        assert(qstr->refCount > 0);
-        ++qstr->refCount;
-    }
-
-    // Indicates that an existing reference has been removed and potentially releases the string.
-    void quantum__rt__string_unreference(QirString* qstr) // NOLINT
-    {
-        assert(qstr->refCount > 0);
-        const long rc = --qstr->refCount;
-        if (rc == 0)
-        {
-            auto allocated = AllocatedStrings().find(qstr->str);
-            assert(allocated != AllocatedStrings().end());
-            // TODO: amortize map cleanup across multiple iterations
-            AllocatedStrings().erase(allocated);
-            delete qstr;
-        }
-    }
-
     void quantum__rt__string_update_reference_count(QirString* qstr, int32_t increment) // NOLINT
     {
         if (qstr == nullptr || increment == 0)

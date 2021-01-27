@@ -83,56 +83,13 @@ extern "C"
         g_sim->ReleaseQubit(qubit);
     }
 
-    // Increments the reference count of a Result pointer.
-    void quantum__rt__result_reference(RESULT* r) // NOLINT
+    void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
     {
-        // If we don't have the result in our map, assume it has been allocated by a measurement with refcount = 1,
-        // and this is the first attempt to share it.
-        std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-        auto rit = trackedResults.find(r);
-        if (rit == trackedResults.end())
-        {
-            trackedResults[r] = 2;
-        }
-        else
-        {
-            rit->second += 1;
-        }
-    }
-
-    // Decrements the reference count of a Result pointer and releases the result if appropriate.
-    void quantum__rt__result_unreference(RESULT* r) // NOLINT
-    {
-        // If we don't have the result in our map, assume it has been never shared.
-        std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-        auto rit = trackedResults.find(r);
-        if (rit == trackedResults.end())
-        {
-            g_sim->ReleaseResult(r);
-        }
-        else
-        {
-            const int refcount = rit->second;
-            assert(refcount > 0);
-            if (refcount == 1)
-            {
-                trackedResults.erase(rit);
-                g_sim->ReleaseResult(r);
-            }
-            else
-            {
-                rit->second = refcount - 1;
-            }
-        }
-    }
-
-    void quantum__rt__result_update_reference_count(RESULT* r, int32_t c)
-    {
-        if (c == 0)
+        if (increment == 0)
         {
             return; // Inefficient QIR? But no harm.
         }
-        else if (c > 0)
+        else if (increment > 0)
         {
             // If we don't have the result in our map, assume it has been allocated by a measurement with refcount = 1,
             // and this is the first attempt to share it.
@@ -140,11 +97,11 @@ extern "C"
             auto rit = trackedResults.find(r);
             if (rit == trackedResults.end())
             {
-                trackedResults[r] = 1 + c;
+                trackedResults[r] = 1 + increment;
             }
             else
             {
-                rit->second += c;
+                rit->second += increment;
             }
         }
         else
@@ -154,12 +111,12 @@ extern "C"
             auto rit = trackedResults.find(r);
             if (rit == trackedResults.end())
             {
-                assert(c == -1);
+                assert(increment == -1);
                 g_sim->ReleaseResult(r);
             }
             else
             {
-                const int newRefcount = rit->second + c;
+                const int newRefcount = rit->second + increment;
                 assert(newRefcount >= 0);
                 if (newRefcount == 0)
                 {

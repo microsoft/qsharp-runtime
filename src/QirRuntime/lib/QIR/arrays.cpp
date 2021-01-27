@@ -215,28 +215,6 @@ extern "C"
         return new QirArray(count_items, itemSizeInBytes);
     }
 
-    void quantum__rt__array_reference(QirArray* array)
-    {
-        if (array == nullptr)
-        {
-            return;
-        }
-        array->AddRef();
-    }
-
-    void quantum__rt__array_unreference(QirArray* array)
-    {
-        if (array == nullptr)
-        {
-            return;
-        }
-        const long refCount = array->Release();
-        if (refCount == 0)
-        {
-            delete array;
-        };
-    }
-
     // Bucketing of addre/release is non-standard so for now we'll keep the more traditional addref/release semantics
     // in the native types. Should reconsider, if the perf of the loops becomes an issue.
     void quantum__rt__array_update_reference_count(QirArray* array, int32_t increment)
