@@ -76,7 +76,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet chooses an element at random from an array:
-    /// ```Q#
+    /// ```qsharp
     /// let (succeeded, element) = MaybeChooseElement(
     ///     data,
     ///     DiscreteUniformDistribution(0, Length(data) - 1)
@@ -106,7 +106,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet samples flips from a biased coin:
-    /// ```Q#
+    /// ```qsharp
     /// let flips = DrawMany(DrawRandomBool, 10, 0.6);
     /// ```
     operation DrawRandomBool(successProbability : Double) : Bool {

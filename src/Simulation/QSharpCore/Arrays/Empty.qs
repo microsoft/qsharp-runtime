@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Arrays {
     /// The empty array.
     ///
     /// # Example
-    /// ```Q#
+    /// ```qsharp
     /// let empty = EmptyArray<Int>();
     /// ```
     function EmptyArray<'TElement>() : 'TElement[] {
