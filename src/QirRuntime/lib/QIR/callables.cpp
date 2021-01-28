@@ -26,46 +26,43 @@ extern "C"
         return QirTupleHeader::Create(static_cast<int>(size))->AsTuple();
     }
 
-    void quantum__rt__tuple_reference(PTuple tuple)
+    void quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
     {
-        if (tuple == nullptr)
+        if (tuple == nullptr || increment == 0)
         {
             return;
         }
+
         QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        (void)th->AddRef();
+        if (increment > 0)
+        {
+            for (int i = 0; i < increment; i++)
+            {
+                (void)th->AddRef();
+            }
+        }
+        else
+        {
+            for (int i = increment; i < 0; i++)
+            {
+                (void)th->Release();
+            }
+        }
     }
 
-    void quantum__rt__tuple_unreference(PTuple tuple)
+    void quantum__rt__tuple_update_alias_count(PTuple tuple, int32_t increment)
     {
-        if (tuple == nullptr)
-        {
-            return;
-        }
-
-        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        (void)th->Release();
-    }
-
-    void quantum__rt__tuple_add_access(PTuple tuple)
-    {
-        if (tuple == nullptr)
+        if (tuple == nullptr || increment == 0)
         {
             return;
         }
         QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        th->AddUser();
-    }
+        th->aliasCount += increment;
 
-    void quantum__rt__tuple_remove_access(PTuple tuple)
-    {
-        if (tuple == nullptr)
+        if (th->aliasCount < 0)
         {
-            return;
+            quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative"));
         }
-
-        QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        th->RemoveUser();
     }
 
     PTuple quantum__rt__tuple_copy(PTuple tuple, bool forceNewInstance)
@@ -76,7 +73,7 @@ extern "C"
         }
 
         QirTupleHeader* th = QirTupleHeader::GetHeader(tuple);
-        if (forceNewInstance || th->userCount > 0)
+        if (forceNewInstance || th->aliasCount > 0)
         {
             return QirTupleHeader::CreateWithCopiedData(th)->AsTuple();
         }
@@ -85,29 +82,44 @@ extern "C"
         return tuple;
     }
 
-    void quantum__rt__callable_reference(QirCallable* callable)
+    void quantum__rt__callable_update_reference_count(QirCallable* callable, int32_t increment)
     {
-        if (callable == nullptr)
+        if (callable == nullptr || increment == 0)
         {
             return;
         }
-        (void)callable->AddRef();
+        else if (increment > 0)
+        {
+            for (int i = 0; i < increment; i++)
+            {
+                (void)callable->AddRef();
+            }
+        }
+        else
+        {
+            for (int i = increment; i < 0; i++)
+            {
+                (void)callable->Release();
+            }
+        }
     }
 
-    void quantum__rt__callable_unreference(QirCallable* callable)
+    void quantum__rt__callable_update_alias_count(QirCallable* callable, int32_t increment)
     {
-        if (callable == nullptr)
+        if (callable == nullptr || increment == 0)
         {
             return;
         }
-        const long ref = callable->Release();
-        assert(ref >= 0);
+        callable->UpdateAliasCount(increment);
     }
 
-    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, PTuple capture)
+    QirCallable* quantum__rt__callable_create(
+        t_CallableEntry* entries,
+        t_CaptureCallback* captureCallbacks,
+        PTuple capture)
     {
         assert(entries != nullptr);
-        return new QirCallable(entries, capture);
+        return new QirCallable(entries, captureCallbacks, capture);
     }
 
     void quantum__rt__callable_invoke(QirCallable* callable, PTuple args, PTuple result)
@@ -116,13 +128,17 @@ extern "C"
         callable->Invoke(args, result);
     }
 
-    QirCallable* quantum__rt__callable_copy(QirCallable* other)
+    QirCallable* quantum__rt__callable_copy(QirCallable* other, bool forceNewInstance)
     {
         if (other == nullptr)
         {
             return nullptr;
         }
-        return new QirCallable(*other);
+        if (forceNewInstance)
+        {
+            return new QirCallable(*other);
+        }
+        return other->CloneIfShared();
     }
 
     void quantum__rt__callable_make_adjoint(QirCallable* callable)
@@ -135,6 +151,11 @@ extern "C"
     {
         assert(callable != nullptr);
         callable->ApplyFunctor(QirCallable::Controlled);
+    }
+
+    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int64_t parameter)
+    {
+        callable->InvokeCaptureCallback(index, parameter);
     }
 }
 
@@ -169,20 +190,6 @@ int QirTupleHeader::Release()
     return this->refCount;
 }
 
-void QirTupleHeader::AddUser()
-{
-    ++this->userCount;
-}
-
-void QirTupleHeader::RemoveUser()
-{
-    if (this->userCount == 0)
-    {
-        quantum__rt__fail(quantum__rt__string_create("User count cannot be negative"));
-    }
-    --this->userCount;
-}
-
 QirTupleHeader* QirTupleHeader::Create(int size)
 {
     assert(size >= 0);
@@ -196,6 +203,7 @@ QirTupleHeader* QirTupleHeader::Create(int size)
     // at the beginning of the buffer place QirTupleHeader, leave the buffer uninitialized
     QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
     th->refCount = 1;
+    th->aliasCount = 0;
     th->tupleSize = size;
 
     return th;
@@ -214,6 +222,7 @@ QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
     // at the beginning of the buffer place QirTupleHeader
     QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
     th->refCount = 1;
+    th->aliasCount = 0;
     th->tupleSize = size;
 
     // copy the contents of the other tuple
@@ -230,19 +239,24 @@ QirCallable::~QirCallable()
     assert(refCount == 0);
 }
 
-QirCallable::QirCallable(const t_CallableEntry* ftEntries, PTuple capture)
+QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* callbacks, PTuple capture)
     : refCount(1)
     , capture(capture)
     , appliedFunctor(0)
     , controlledDepth(0)
 {
+    memcpy(this->functionTable, ftEntries, sizeof(this->functionTable));
+    assert(this->functionTable[0] != nullptr); // base must be always defined
+
+    if (callbacks != nullptr)
+    {
+        memcpy(this->captureCallbacks, callbacks, sizeof(this->captureCallbacks));
+    }
+
     if (g_context != nullptr && g_context->trackAllocatedObjects)
     {
         g_context->allocationsTracker->OnAllocate(this);
     }
-
-    memcpy(this->functionTable, ftEntries, QirCallable::TableSize * sizeof(void*));
-    assert(this->functionTable[0] != nullptr); // base must be always defined
 }
 
 QirCallable::QirCallable(const QirCallable& other)
@@ -251,12 +265,23 @@ QirCallable::QirCallable(const QirCallable& other)
     , appliedFunctor(other.appliedFunctor)
     , controlledDepth(other.controlledDepth)
 {
+    memcpy(this->functionTable, other.functionTable, sizeof(this->functionTable));
+    memcpy(this->captureCallbacks, other.captureCallbacks, sizeof(this->captureCallbacks));
+
     if (g_context != nullptr && g_context->trackAllocatedObjects)
     {
         g_context->allocationsTracker->OnAllocate(this);
     }
+}
 
-    memcpy(this->functionTable, other.functionTable, QirCallable::TableSize * sizeof(void*));
+QirCallable* QirCallable::CloneIfShared()
+{
+    if (this->aliasCount == 0)
+    {
+        this->AddRef();
+        return this;
+    }
+    return new QirCallable(*this);
 }
 
 int QirCallable::AddRef()
@@ -285,6 +310,15 @@ int QirCallable::Release()
         delete this;
     }
     return rc;
+}
+
+void QirCallable::UpdateAliasCount(int increment)
+{
+    this->aliasCount += increment;
+    if (this->aliasCount < 0)
+    {
+        quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative"));
+    }
 }
 
 // The function _assumes_ a particular structure of the passed in tuple (see
@@ -367,7 +401,7 @@ void QirCallable::Invoke(PTuple args, PTuple result)
         this->functionTable[this->appliedFunctor](capture, flat->AsTuple(), result);
 
         QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
-        quantum__rt__array_unreference(controls);
+        quantum__rt__array_update_reference_count(controls, -1);
         flat->Release();
     }
 }
@@ -398,5 +432,15 @@ void QirCallable::ApplyFunctor(int functor)
             quantum__rt__fail(quantum__rt__string_create("The callable doesn't provide controlled operation"));
         }
         this->controlledDepth++;
+    }
+}
+
+void QirCallable::InvokeCaptureCallback(int index, int64_t parameter)
+{
+    assert(index >= 0 && index < QirCallable::CaptureCallbacksTableSize && "Capture callback index out of range");
+
+    if (this->captureCallbacks[index] != nullptr)
+    {
+        this->captureCallbacks[index](this->capture, parameter);
     }
 }

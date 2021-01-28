@@ -60,7 +60,7 @@ then0__1:                                         ; preds = %body__1
 
 continue__1:                                      ; preds = %then0__1, %body__1
   call void @__quantum__rt__qubit_release(%Qubit* %q)
-  call void @__quantum__rt__result_unreference(%Result* %5)
+  call void @__quantum__rt__result_update_reference_count(%Result* %5, i64 -1)
   br label %exiting__1
 
 exiting__1:                                       ; preds = %continue__1
@@ -82,6 +82,6 @@ declare i1 @__quantum__rt__result_equal(%Result*, %Result*)
 
 declare void @__quantum__rt__qubit_release(%Qubit*)
 
-declare void @__quantum__rt__result_unreference(%Result*)
+declare void @__quantum__rt__result_update_reference_count(%Result*, i64)
 
 attributes #0 = { "EntryPoint" }

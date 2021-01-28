@@ -12,10 +12,9 @@
 #include "quantum__rt.hpp"
 
 #include "QuantumApi_I.hpp"
-#include "qirTypes.hpp"
 #include "SimFactory.hpp"
 #include "context.hpp"
-
+#include "qirTypes.hpp"
 
 #ifdef _WIN32
 #define EXPORTAPI extern "C" __declspec(dllexport)
@@ -28,6 +27,10 @@ EXPORTAPI void SetupQirToRunOnFullStateSimulator()
     InitializeQirContext(Microsoft::Quantum::CreateFullstateSimulator().release(), false /*trackAllocatedObjects*/);
 }
 
+// QIR specification requires the Result type to be reference counted, even though Results are created by the target and
+// qubits, created by the same target, aren't reference counted. To minimize the implementation burden on the target,
+// the runtime will track the reference counts for results. The trade-off is the performance penalty of such external
+// tracking. The design should be evaluated against real user code when we have it.
 std::unordered_map<RESULT*, int>& AllocatedResults()
 {
     static std::unordered_map<RESULT*, int> allocatedResults;
@@ -56,45 +59,50 @@ extern "C"
         Microsoft::Quantum::g_context->simulator->ReleaseQubit(qubit);
     }
 
-    // Increments the reference count of a Result pointer.
-    void quantum__rt__result_reference(RESULT* r) // NOLINT
+    void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
     {
-        // If we don't have the result in our map, assume it has been allocated by a measurement with refcount = 1,
-        // and this is the first attempt to share it.
-        std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-        auto rit = trackedResults.find(r);
-        if (rit == trackedResults.end())
+        if (increment == 0)
         {
-            trackedResults[r] = 2;
+            return; // Inefficient QIR? But no harm.
         }
-        else
+        else if (increment > 0)
         {
-            rit->second += 1;
-        }
-    }
-
-    // Decrements the reference count of a Result pointer and releases the result if appropriate.
-    void quantum__rt__result_unreference(RESULT* r) // NOLINT
-    {
-        // If we don't have the result in our map, assume it has been never shared.
-        std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-        auto rit = trackedResults.find(r);
-        if (rit == trackedResults.end())
-        {
-            Microsoft::Quantum::g_context->simulator->ReleaseResult(r);
-        }
-        else
-        {
-            const int refcount = rit->second;
-            assert(refcount > 0);
-            if (refcount == 1)
+            // If we don't have the result in our map, assume it has been allocated by a measurement with refcount = 1,
+            // and this is the first attempt to share it.
+            std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
+            auto rit = trackedResults.find(r);
+            if (rit == trackedResults.end())
             {
-                trackedResults.erase(rit);
+                trackedResults[r] = 1 + increment;
+            }
+            else
+            {
+                rit->second += increment;
+            }
+        }
+        else
+        {
+            // If we don't have the result in our map, assume it has been never shared, so it's reference count is 1.
+            std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
+            auto rit = trackedResults.find(r);
+            if (rit == trackedResults.end())
+            {
+                assert(increment == -1);
                 Microsoft::Quantum::g_context->simulator->ReleaseResult(r);
             }
             else
             {
-                rit->second = refcount - 1;
+                const int newRefcount = rit->second + increment;
+                assert(newRefcount >= 0);
+                if (newRefcount == 0)
+                {
+                    trackedResults.erase(rit);
+                    Microsoft::Quantum::g_context->simulator->ReleaseResult(r);
+                }
+                else
+                {
+                    rit->second = newRefcount;
+                }
             }
         }
     }
