@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet randomly rolls a six-sided die:
-    /// ```Q#
+    /// ```qsharp
     /// let roll = DrawRandomInt(1, 6);
     /// ```
     ///
@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet randomly draws an angle between $0$ and $2 \pi$:
-    /// ```Q#
+    /// ```qsharp
     /// let angle = DrawRandomDouble(0.0, 2.0 * PI());
     /// ```
     ///

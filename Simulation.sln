@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Sim
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "simulation", "simulation", "{34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.QSharp.Core", "src\Simulation\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj", "{A6C5BA7A-DF6F-476F-9106-95905932B810}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.QSharp.Core", "src\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj", "{A6C5BA7A-DF6F-476F-9106-95905932B810}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{34117E2A-DEDC-4274-AAA4-3C61ACF86284}"
 EndProject
@@ -27,17 +27,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Xunit", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generation", "generation", "{A567C185-A429-418B-AFDE-6F1785BA4A77}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.CsharpGeneration", "src\Simulation\CsharpGeneration.Tests\Tests.CsharpGeneration.fsproj", "{10D7C395-4F79-4DAF-9289-A4B8FAF6183A}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.CSharpGeneration", "src\Simulation\CSharpGeneration.Tests\Tests.CSharpGeneration.fsproj", "{10D7C395-4F79-4DAF-9289-A4B8FAF6183A}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.RoslynWrapper", "src\Simulation\RoslynWrapper\Microsoft.Quantum.RoslynWrapper.fsproj", "{618FBF9D-4EF3-435D-9728-81C726236668}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tests.RoslynWrapper", "src\Simulation\RoslynWrapper.Tests\Tests.RoslynWrapper.fsproj", "{48206BD6-48DD-4442-A395-3A6594E4C9C6}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CsharpGeneration", "src\Simulation\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj", "{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Microsoft.Quantum.CSharpGeneration", "src\Simulation\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj", "{B96E97F4-2DC8-45AC-ADF5-861D0D3073FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProjects", "{09C842CB-930C-4C7D-AD5F-E30DE4A55820}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QsharpExe", "src\Simulation\Simulators.Tests\TestProjects\QsharpExe\QsharpExe.csproj", "{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSharpExe", "src\Simulation\Simulators.Tests\TestProjects\QSharpExe\QSharpExe.csproj", "{2F5796A7-4AF8-4B78-928A-0A3A80752F9D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.EntryPointDriver", "src\Simulation\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj", "{944FE7EF-9220-4CC6-BB20-CE517195B922}"
 EndProject

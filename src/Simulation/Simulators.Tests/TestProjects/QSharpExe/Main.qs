@@ -1,4 +1,4 @@
-﻿namespace QsharpExe {
+﻿namespace QSharpExe {
 
     open Microsoft.Quantum.Intrinsic;
 

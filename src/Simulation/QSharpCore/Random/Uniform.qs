@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet randomly draws an angle between $0$ and $2 \pi$:
-    /// ```Q#
+    /// ```qsharp
     /// let angleDistribution = ContinuousUniformDistribution(0.0, 2.0 * PI());
     /// let angle = angleDistribution::Sample();
     /// ```
@@ -56,7 +56,7 @@ namespace Microsoft.Quantum.Random {
     ///
     /// # Example
     /// The following Q# snippet randomly rolls a six-sided die:
-    /// ```Q#
+    /// ```qsharp
     /// let dieDistribution = DiscreteUniformDistribution(1, 6);
     /// let dieRoll = dieDistribution::Sample();
     /// ```

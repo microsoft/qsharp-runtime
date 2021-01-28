@@ -5,13 +5,13 @@
     <IsPackable>false</IsPackable>
     <ExposeReferencesViaTestNames>true</ExposeReferencesViaTestNames>
     <!-- we will provide our own -->
-    <CsharpGeneration>false</CsharpGeneration>
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     </ItemGroup>
 
@@ -22,7 +22,7 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
-  <Target Name="BeforeCsharpCompile">
+  <Target Name="BeforeCSharpCompile">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>

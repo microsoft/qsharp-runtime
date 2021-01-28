@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>Tests.Microsoft.Quantum.CsharpGeneration</AssemblyName>
+    <AssemblyName>Tests.Microsoft.Quantum.CSharpGeneration</AssemblyName>
     <IsPackable>false</IsPackable>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -53,8 +53,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
-    <ProjectReference Include="..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
 

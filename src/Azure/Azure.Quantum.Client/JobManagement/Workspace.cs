@@ -281,6 +281,28 @@ namespace Microsoft.Azure.Quantum
         }
 
         /// <summary>
+        /// Lists the quotas.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// List of quotas.
+        /// </returns>
+        public async Task<IEnumerable<QuotaInfo>> ListQuotasAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var quotas = await this.QuantumClient.Quotas.ListAsync(
+                    cancellationToken: cancellationToken);
+
+                return quotas.Select(quota => new QuotaInfo(this, quota));
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "Could not list quotas");
+            }
+        }
+
+        /// <summary>
         /// Gets as SAS Uri for the linked storage account.
         /// </summary>
         /// <param name="containerName">Name of the container.</param>

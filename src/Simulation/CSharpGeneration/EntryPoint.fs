@@ -16,8 +16,8 @@ open System
 /// An entry point parameter.
 type private Parameter =
     { Name : string
-      QsharpType : ResolvedType
-      CsharpTypeName : string
+      QSharpType : ResolvedType
+      CSharpTypeName : string
       Description : string }
 
 /// The name of the generated entry point class.
@@ -50,8 +50,8 @@ let rec private parameters context doc = function
         match variable.VariableName with
         | ValidName name ->
             Seq.singleton { Name = name
-                            QsharpType = variable.Type
-                            CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
+                            QSharpType = variable.Type
+                            CSharpTypeName = SimulationCode.roslynTypeName context variable.Type
                             Description = ParameterDescription doc name }
         | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
@@ -67,7 +67,7 @@ let private optionName (paramName : string) =
 let private parameterOptionsProperty parameters =
     let optionTypeName = "System.CommandLine.Option"
     let optionsEnumerableTypeName = sprintf "System.Collections.Generic.IEnumerable<%s>" optionTypeName
-    let option { Name = name; CsharpTypeName = typeName; Description = desc } =
+    let option { Name = name; CSharpTypeName = typeName; Description = desc } =
         let createOption = ident (sprintf "%s.Options.CreateOption<%s>" driverNamespace typeName)
         let args = [optionName name; literal desc]
         invoke createOption ``(`` args ``)``

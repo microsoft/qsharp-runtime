@@ -6,21 +6,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
-    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="TestProjects\**" />
     <EmbeddedResource Remove="TestProjects\**" />
-    <QsharpCompile Remove="TestProjects\**" />
+    <QSharpCompile Remove="TestProjects\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" IsQscReference="true" />
-    <ProjectReference Include="TestProjects\QsharpExe\QsharpExe.csproj">
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj">
@@ -40,7 +40,7 @@
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QsharpExe\built\</_ExeDir>
+      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QSharpExe\built\</_ExeDir>
       <_TargetedExeDir>$(MSBuildThisFileDirectory)TestProjects\TargetedExe\built\</_TargetedExeDir>
     </PropertyGroup>
     <ItemGroup>

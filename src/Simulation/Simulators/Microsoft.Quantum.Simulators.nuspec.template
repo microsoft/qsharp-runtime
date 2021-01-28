@@ -13,7 +13,7 @@
     <description>Classical simulators of quantum computers for the Q# programming language.</description>
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
-    <tags>Quantum Q# Qsharp </tags>
+    <tags>Quantum Q# QSharp</tags>
   </metadata>
 
   <files>
