@@ -126,9 +126,11 @@ namespace Microsoft.Quantum.Simulation.Common
         protected void WriteStackTraceToLog(Exception exception, IEnumerable<StackFrame> callStack)
         {
             OnLog?.Invoke($"Unhandled exception. {exception.GetType().FullName}: {exception.Message}");
-            if (EnableStackTracePrinting) {
+            if (EnableStackTracePrinting)
+            {
                 var first = true;
-                foreach (var sf in callStack) {
+                foreach (var sf in callStack)
+                {
                     var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
                     OnLog?.Invoke(msg);
                     first = false;
