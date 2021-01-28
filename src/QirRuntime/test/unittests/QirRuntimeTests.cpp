@@ -550,6 +550,7 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     quantum__rt__array_update_reference_count(a, -1);
 }
 
+std::unordered_map<std::string, QirString*>& AllocatedStrings();
 TEST_CASE("Strings: reuse", "[qir_support]")
 {
     QirString* a = quantum__rt__string_create("abc");
@@ -566,6 +567,8 @@ TEST_CASE("Strings: reuse", "[qir_support]")
 
     quantum__rt__string_update_reference_count(b, -1);
     quantum__rt__string_update_reference_count(c, -1);
+
+    REQUIRE(AllocatedStrings().empty());
 }
 
 TEST_CASE("Strings: concatenate", "[qir_support]")
@@ -585,6 +588,8 @@ TEST_CASE("Strings: concatenate", "[qir_support]")
     quantum__rt__string_update_reference_count(abExpected, -1);
     quantum__rt__string_update_reference_count(ab, -1);
     quantum__rt__string_update_reference_count(aa, -1);
+
+    REQUIRE(AllocatedStrings().empty());
 }
 
 TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
@@ -638,6 +643,8 @@ TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
     {
         quantum__rt__string_update_reference_count(qstr, -1);
     }
+
+    REQUIRE(AllocatedStrings().empty());
 }
 
 TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
@@ -650,6 +657,8 @@ TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
 
     quantum__rt__string_update_reference_count(qstr1, -1);
     quantum__rt__string_update_reference_count(qstr2, -1);
+
+    REQUIRE(AllocatedStrings().empty());
 }
 
 struct QubitTestQAPI : public SimulatorStub

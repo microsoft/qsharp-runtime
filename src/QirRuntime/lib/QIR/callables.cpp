@@ -221,12 +221,12 @@ QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallba
     , appliedFunctor(0)
     , controlledDepth(0)
 {
-    memcpy(this->functionTable, ftEntries, QirCallable::TableSize * sizeof(void*));
+    memcpy(this->functionTable, ftEntries, sizeof(this->functionTable));
     assert(this->functionTable[0] != nullptr); // base must be always defined
 
     if (callbacks != nullptr)
     {
-        memcpy(this->captureCallbacks, callbacks, QirCallable::CaptureCallbacksTableSize * sizeof(void*));
+        memcpy(this->captureCallbacks, callbacks, sizeof(this->captureCallbacks));
     }
 }
 
@@ -236,8 +236,8 @@ QirCallable::QirCallable(const QirCallable& other)
     , appliedFunctor(other.appliedFunctor)
     , controlledDepth(other.controlledDepth)
 {
-    memcpy(this->functionTable, other.functionTable, QirCallable::TableSize * sizeof(void*));
-    memcpy(this->captureCallbacks, other.captureCallbacks, QirCallable::CaptureCallbacksTableSize * sizeof(void*));
+    memcpy(this->functionTable, other.functionTable, sizeof(this->functionTable));
+    memcpy(this->captureCallbacks, other.captureCallbacks, sizeof(this->captureCallbacks));
 }
 
 QirCallable* QirCallable::CloneIfShared()

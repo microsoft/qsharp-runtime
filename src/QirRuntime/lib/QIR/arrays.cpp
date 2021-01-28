@@ -215,7 +215,7 @@ extern "C"
         return new QirArray(count_items, itemSizeInBytes);
     }
 
-    // Bucketing of addre/release is non-standard so for now we'll keep the more traditional addref/release semantics
+    // Bucketing of addref/release is non-standard so for now we'll keep the more traditional addref/release semantics
     // in the native types. Should reconsider, if the perf of the loops becomes an issue.
     void quantum__rt__array_update_reference_count(QirArray* array, int32_t increment)
     {

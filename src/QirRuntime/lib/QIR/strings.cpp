@@ -54,23 +54,21 @@ extern "C"
         {
             return;
         }
-        else if (increment > 0)
+
+        assert(qstr->refCount > 0 && "The string has been already released!");
+        qstr->refCount += increment;
+
+        if (qstr->refCount < 0)
         {
-            assert(qstr->refCount > 0 && "Cannot resurrect released strings!");
-            qstr->refCount += increment;
+            quantum__rt__fail(quantum__rt__string_create("Attempting to decrement reference count below zero!"));
         }
-        else
+        else if (qstr->refCount == 0)
         {
-            qstr->refCount -= increment;
-            assert(qstr->refCount >= 0 && "Refcount cannot become negative!");
-            if (qstr->refCount == 0)
-            {
-                auto allocated = AllocatedStrings().find(qstr->str);
-                assert(allocated != AllocatedStrings().end());
-                // TODO: amortize map cleanup across multiple iterations
-                AllocatedStrings().erase(allocated);
-                delete qstr;
-            }
+            auto allocated = AllocatedStrings().find(qstr->str);
+            assert(allocated != AllocatedStrings().end());
+            // TODO: consider amortizing map cleanup across multiple iterations
+            AllocatedStrings().erase(allocated);
+            delete qstr;
         }
     }
 
