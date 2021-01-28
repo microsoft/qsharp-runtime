@@ -12,6 +12,7 @@
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
+#include "context.hpp"
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
 
@@ -58,6 +59,8 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir]")
 {
+    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
+
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
 
@@ -148,7 +151,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
 {
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
-    SetSimulatorForQIR(sim.get());
+    QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
     int64_t res = Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body();
     REQUIRE(res);
@@ -167,8 +170,6 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
     //     INFO(std::string("unreleased results: ") + std::to_string(id));
     //     CHECK(sim->results[id] == RELEASED);
     // }
-
-    SetSimulatorForQIR(nullptr);
 }
 
 #ifdef _WIN32
@@ -179,6 +180,8 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
 extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
 TEST_CASE("QIR: multidimensional arrays", "[qir]")
 {
+    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
+
     REQUIRE(42 + (2 + 8) / 2 == TestMultidimArrays(42, 2, 4, 8));
     REQUIRE(17 + (3 + 7) / 2 == TestMultidimArrays(17, 3, 5, 7));
 }
@@ -190,6 +193,8 @@ TEST_CASE("QIR: multidimensional arrays", "[qir]")
 extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
 TEST_CASE("QIR: Report range in a failure message", "[qir]")
 {
+    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
+
     bool failed = false;
     try
     {
@@ -207,6 +212,9 @@ TEST_CASE("QIR: Report range in a failure message", "[qir]")
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir]")
 {
+    // TODO: currently this test leaks callables. Update generated QIR and try enabling allocation tracking.
+    QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
+
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__body(42, 17);
     REQUIRE(res == 42 - 17);
 }
@@ -286,7 +294,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__body(Qubit q)                                 // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                             // NOLINT
 {
     g_ctrqapi->X(q);
 }
@@ -297,11 +305,11 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 TEST_CASE("QIR: application of nested controlled functor", "[qir]")
 {
     unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
-    SetSimulatorForQIR(qapi.get());
+    // TODO: currently this test leaks callables. Update generated QIR and try enabling allocation tracking.
+    QirContextScope qirctx(qapi.get(), false /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__TestControlled__body());
 
-    SetSimulatorForQIR(nullptr);
     g_ctrqapi = nullptr;
 }

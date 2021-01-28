@@ -8,8 +8,12 @@
 #include <string.h> // for memcpy
 #include <vector>
 
+#include "allocationsTracker.hpp"
+#include "context.hpp"
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
+
+using namespace Microsoft::Quantum;
 
 /*==============================================================================
     Implementation of quantum__rt__tuple_* and quantum__rt__callable_*
@@ -139,12 +143,22 @@ extern "C"
 ==============================================================================*/
 int QirTupleHeader::AddRef()
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAddRef(this);
+    }
+
     assert(this->refCount > 0);
     return ++this->refCount;
 }
 
 int QirTupleHeader::Release()
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnRelease(this);
+    }
+
     assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
     --this->refCount;
     if (this->refCount == 0)
@@ -174,6 +188,11 @@ QirTupleHeader* QirTupleHeader::Create(int size)
     assert(size >= 0);
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(buffer);
+    }
+
     // at the beginning of the buffer place QirTupleHeader, leave the buffer uninitialized
     QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
     th->refCount = 1;
@@ -186,6 +205,11 @@ QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
 {
     const int size = other->tupleSize;
     char* buffer = new char[sizeof(QirTupleHeader) + size];
+
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(buffer);
+    }
 
     // at the beginning of the buffer place QirTupleHeader
     QirTupleHeader* th = reinterpret_cast<QirTupleHeader*>(buffer);
@@ -212,6 +236,11 @@ QirCallable::QirCallable(const t_CallableEntry* ftEntries, PTuple capture)
     , appliedFunctor(0)
     , controlledDepth(0)
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
+
     memcpy(this->functionTable, ftEntries, QirCallable::TableSize * sizeof(void*));
     assert(this->functionTable[0] != nullptr); // base must be always defined
 }
@@ -222,11 +251,21 @@ QirCallable::QirCallable(const QirCallable& other)
     , appliedFunctor(other.appliedFunctor)
     , controlledDepth(other.controlledDepth)
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
+
     memcpy(this->functionTable, other.functionTable, QirCallable::TableSize * sizeof(void*));
 }
 
 int QirCallable::AddRef()
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAddRef(this);
+    }
+
     int rc = ++this->refCount;
     assert(rc != 1); // not allowed to resurrect!
     return rc;
@@ -234,6 +273,10 @@ int QirCallable::AddRef()
 
 int QirCallable::Release()
 {
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnRelease(this);
+    }
     assert(this->refCount > 0);
 
     int rc = --this->refCount;
