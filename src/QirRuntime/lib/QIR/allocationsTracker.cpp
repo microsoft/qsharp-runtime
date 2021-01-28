@@ -40,7 +40,7 @@ namespace Quantum
         }
         else
         {
-            if (tracked->second == 0)
+            if (tracked->second <= 0)
             {
                 quantum__rt__fail(quantum__rt__string_create("Attempting to ressurect a previously released object!"));
             }
@@ -60,7 +60,7 @@ namespace Quantum
         }
         else
         {
-            if (tracked->second == 0)
+            if (tracked->second <= 0)
             {
                 quantum__rt__fail(quantum__rt__string_create("Attempting to release a previously released object!"));
             }

@@ -62,7 +62,7 @@ namespace Quantum
             this->allocationsTracker = std::make_unique<AllocationsTracker>();
         }
     }
-    QirExecutionContext::~QirExecutionContext() {}
+    QirExecutionContext::~QirExecutionContext() = default;
 
 } // namespace Quantum
 } // namespace Microsoft

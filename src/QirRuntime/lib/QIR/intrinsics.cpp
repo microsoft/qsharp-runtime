@@ -15,14 +15,6 @@
 #include "context.hpp"
 #include "qirTypes.hpp"
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-}
-} // namespace Microsoft
-
 extern "C"
 {
     double quantum__qis__intAsDouble(long value)

@@ -28,14 +28,6 @@ EXPORTAPI void SetupQirToRunOnFullStateSimulator()
     InitializeQirContext(Microsoft::Quantum::CreateFullstateSimulator().release(), false /*trackAllocatedObjects*/);
 }
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-}
-} // namespace Microsoft
-
 std::unordered_map<RESULT*, int>& AllocatedResults()
 {
     static std::unordered_map<RESULT*, int> allocatedResults;

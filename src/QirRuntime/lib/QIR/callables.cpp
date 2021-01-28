@@ -13,14 +13,6 @@
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-}
-} // namespace Microsoft
-
 using namespace Microsoft::Quantum;
 
 /*==============================================================================

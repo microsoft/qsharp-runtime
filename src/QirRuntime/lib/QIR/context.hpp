@@ -16,13 +16,14 @@ namespace Quantum
     struct AllocationsTracker;
     struct QirExecutionContext
     {
-        ISimulator* simulator;
-        bool trackAllocatedObjects;
+        ISimulator* simulator = nullptr;
+        bool trackAllocatedObjects = false;
         std::unique_ptr<AllocationsTracker> allocationsTracker;
 
         QirExecutionContext(ISimulator* sim, bool trackAllocatedObjects);
         ~QirExecutionContext();
     };
+    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
 
     struct QirContextScope
     {

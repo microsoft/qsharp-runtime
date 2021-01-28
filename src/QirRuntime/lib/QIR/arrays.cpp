@@ -9,19 +9,11 @@
 #include <string.h> // for memcpy
 #include <vector>
 
-#include "allocationsTracker.hpp"
 #include "CoreTypes.hpp"
+#include "allocationsTracker.hpp"
 #include "context.hpp"
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
-
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-}
-} // namespace Microsoft
 
 using namespace Microsoft::Quantum;
 
@@ -76,11 +68,6 @@ QirArray::QirArray(int64_t qubits_count)
     , ownsQubits(true)
     , refCount(1)
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
-    {
-        g_context->allocationsTracker->OnAllocate(this);
-    }
-
     if (this->count > 0)
     {
         QUBIT** qbuffer = new QUBIT*[count];
@@ -95,6 +82,11 @@ QirArray::QirArray(int64_t qubits_count)
         this->buffer = nullptr;
     }
     this->dimensionSizes.push_back(this->count);
+
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
 }
 
 QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::vector<int64_t>&& dimSizes)

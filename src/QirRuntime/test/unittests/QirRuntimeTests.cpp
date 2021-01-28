@@ -883,7 +883,7 @@ TEST_CASE("Allocation tracking for arrays", "[qir_support]")
     CHECK_THROWS(ReleaseQirContext());
 
     quantum__rt__array_unreference(maybeLeaked);
-    ReleaseQirContext();
+    CHECK_NOTHROW(ReleaseQirContext());
 }
 
 TEST_CASE("Allocation tracking for tuples", "[qir_support]")
@@ -902,13 +902,13 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
     CHECK_THROWS(ReleaseQirContext());
 
     quantum__rt__tuple_unreference(maybeLeaked);
-    ReleaseQirContext();
+    CHECK_NOTHROW(ReleaseQirContext());
 }
 
-void CallableEntry(PTuple, PTuple, PTuple) {}
+static void DummyCallableEntry(PTuple, PTuple, PTuple) {}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
-    t_CallableEntry entries[4] = {CallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
 
     InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
@@ -924,5 +924,5 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
     CHECK_THROWS(ReleaseQirContext());
 
     quantum__rt__callable_unreference(maybeLeaked);
-    ReleaseQirContext();
+    CHECK_NOTHROW(ReleaseQirContext());
 }
