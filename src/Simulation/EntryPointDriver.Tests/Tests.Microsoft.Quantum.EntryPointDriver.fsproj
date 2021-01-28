@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
     <ProjectReference Include="..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
   </ItemGroup>
 

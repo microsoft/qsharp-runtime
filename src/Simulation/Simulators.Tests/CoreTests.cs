@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void BasicExecution()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath, "TestExe", "QsharpExe.dll");
+            var exe = Path.Combine(asmPath, "TestExe", "QSharpExe.dll");
 
             ProcessRunner.Run("dotnet", exe, out var _, out StringBuilder error, out int exitCode, out Exception ex);
             Assert.Null(ex);
