@@ -59,7 +59,8 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir]")
 {
-    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
+    // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed
+    QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
 
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
@@ -212,8 +213,7 @@ TEST_CASE("QIR: Report range in a failure message", "[qir]")
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir]")
 {
-    // TODO: currently this test leaks callables. Update generated QIR and try enabling allocation tracking.
-    QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
+    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__body(42, 17);
     REQUIRE(res == 42 - 17);
@@ -305,8 +305,7 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 TEST_CASE("QIR: application of nested controlled functor", "[qir]")
 {
     unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
-    // TODO: currently this test leaks callables. Update generated QIR and try enabling allocation tracking.
-    QirContextScope qirctx(qapi.get(), false /*trackAllocatedObjects*/);
+    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__TestControlled__body());
