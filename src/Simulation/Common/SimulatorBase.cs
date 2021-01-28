@@ -43,6 +43,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public abstract string Name { get; }
 
+        public bool EnableStackTracePrinting { get; set; } = true;
 
         /// <summary>
         /// If the execution finishes in failure, this method returns the call-stack of the Q# operations 
@@ -125,12 +126,13 @@ namespace Microsoft.Quantum.Simulation.Common
         protected void WriteStackTraceToLog(Exception exception, IEnumerable<StackFrame> callStack)
         {
             OnLog?.Invoke($"Unhandled exception. {exception.GetType().FullName}: {exception.Message}");
-            var first = true;
-            foreach (var sf in callStack)
-            {
-                var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
-                OnLog?.Invoke(msg);
-                first = false;
+            if (EnableStackTracePrinting) {
+                var first = true;
+                foreach (var sf in callStack) {
+                    var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
+                    OnLog?.Invoke(msg);
+                    first = false;
+                }
             }
             OnLog?.Invoke("");
         }
