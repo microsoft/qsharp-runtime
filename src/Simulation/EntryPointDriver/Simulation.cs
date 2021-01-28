@@ -3,6 +3,8 @@
 
 using System;
 using System.CommandLine.Parsing;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
@@ -31,6 +33,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             if (simulator == settings.ResourcesEstimatorName)
             {
+                // Force the explicit load of the QSharp.Core assembly so that the ResourcesEstimator
+                // can discover it dynamically at runtime and override the defined callables.
+                var coreAssemblyName = 
+                    (from aName in entryPoint.GetType().Assembly.GetReferencedAssemblies()
+                    where aName.Name == "Microsoft.Quantum.QSharp.Core"
+                    select aName).First();
+                Assembly.Load(coreAssemblyName.FullName);
+
                 var resourcesEstimator = new ResourcesEstimator();
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
                 Console.WriteLine(resourcesEstimator.ToTSV());
