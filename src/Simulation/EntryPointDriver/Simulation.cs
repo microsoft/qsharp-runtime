@@ -39,9 +39,9 @@ namespace Microsoft.Quantum.EntryPointDriver
                     (from aName in entryPoint.GetType().Assembly.GetReferencedAssemblies()
                     where aName.Name == "Microsoft.Quantum.QSharp.Core"
                     select aName).First();
-                Assembly.Load(coreAssemblyName.FullName);
+                var coreAssembly = Assembly.Load(coreAssemblyName.FullName);
 
-                var resourcesEstimator = new ResourcesEstimator();
+                var resourcesEstimator = new ResourcesEstimator(coreAssembly);
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }

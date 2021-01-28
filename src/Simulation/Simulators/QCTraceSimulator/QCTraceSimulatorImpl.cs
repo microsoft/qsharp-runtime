@@ -7,6 +7,7 @@ using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 
@@ -64,7 +65,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
 
-        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config)
+        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config, Assembly? coreAssembly = null)
         {
             configuration = Utils.DeepClone(config);
             Utils.FillDictionaryForEnumNames<PrimitiveOperationsGroups, int>(primitiveOperationsIdToNames);
@@ -107,7 +108,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             OnOperationStart += tracingCore.OnOperationStart;
             OnOperationEnd += tracingCore.OnOperationEnd;
 
-            RegisterPrimitiveOperationsGivenAsCircuits();
+            RegisterPrimitiveOperationsGivenAsCircuits(coreAssembly);
         }
 
         /// <summary>
@@ -146,16 +147,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             }
         }
 
-        private void RegisterPrimitiveOperationsGivenAsCircuits()
+        private void RegisterPrimitiveOperationsGivenAsCircuits(Assembly? coreAssembly)
         {
-            var intrinsicAssembly = 
-                (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
-                select assembly).First();
+            var intrinsicAssembly = coreAssembly;
+            if (intrinsicAssembly == null)
+            {
+                intrinsicAssembly = 
+                    (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
+                    select assembly).First();
+            }
             IEnumerable<Type> primitiveOperationTypes =
                 from op in intrinsicAssembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
                 select op;
+
+            if (primitiveOperationTypes.Count() == 0)
+            {
+                throw new Exception("Unable to load intrinsic types. The ResourcesEstimator can only be used with the default execution target.");
+            }
 
             IEnumerable<Type> primitiveOperationAsCircuits =
                 from op in typeof(Circuits.X).Assembly.GetExportedTypes()

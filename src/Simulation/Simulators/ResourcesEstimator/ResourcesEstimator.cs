@@ -5,6 +5,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
@@ -42,6 +43,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 UseDepthCounter = true,
                 UseWidthCounter = true
             };
+
+        /// <summary>
+        /// Constructor used by entry point driver to provide the assembly for core types that
+        /// need to be overriden.
+        /// </summary>
+        public ResourcesEstimator(Assembly coreAssembly) : base(RecommendedConfig(), coreAssembly)
+        {
+        }
 
         /// <summary>
         /// Parameter-less constructor. It initializes the ResourceEstimator
