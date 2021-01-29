@@ -43,6 +43,11 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public abstract string Name { get; }
 
+        /// <summary>
+        /// When exception printing is enabled, the value of this property controls stack trace printout.
+        /// When set to <c>true</c> (default), the stack trace is printed in addition to the exception message."
+        /// When set to <c>false</c>, the exception message is printed without the stack trace."
+        /// </summary>
         public bool EnableStackTracePrinting { get; set; } = true;
 
         /// <summary>
