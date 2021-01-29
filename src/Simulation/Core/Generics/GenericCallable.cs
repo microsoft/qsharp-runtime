@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Core
             _controlled = new Lazy<GenericControlled>(() => new GenericControlled(this));
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public Type OperationType { get; }
 
@@ -103,12 +103,12 @@ namespace Microsoft.Quantum.Simulation.Core
                 op = FindClosedType(I, O);
             }
 
-            var get = this.Factory.GetType()
+            var get = this.__Factory__.GetType()
                 .GetMethod("Get", new Type[0]);
 
             var result = get
                 .MakeGenericMethod(typeof(ICallable), op)
-                .Invoke(this.Factory, new object[] { })
+                .Invoke(this.__Factory__, new object[] { })
                 as ICallable;
 
             return result;
@@ -162,7 +162,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             // Get the list of Parameters of the Invoke method of the Body of the operation:
             var expectedParameters = this.OperationType
-                .GetProperty("Body").PropertyType
+                .GetProperty("__Body__").PropertyType
                 .GetMethod("Invoke").GetParameters();
 
             // Tuple in...
@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             // Tuple out...
             var expectedReturn = this.OperationType
-                .GetProperty("Body").PropertyType
+                .GetProperty("__Body__").PropertyType
                 .GetMethod("Invoke").ReturnType;
             Resolve(expectedReturn, O, typeArgs);
 

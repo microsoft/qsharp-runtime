@@ -90,7 +90,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             Assert.NotNull(data);
             var rows = data.Split('\n');
-            Assert.Equal(9, rows.Length);
+            Assert.Equal(10, rows.Length);
 
             var cols = rows[0].Split('\t');
             Assert.Equal("Metric", cols[0].Trim());
@@ -120,22 +120,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         /// <summary>
-        /// Documents that the width and depth statistics reflect independent lower
+        /// Documents that the QubitCount and Depth statistics reflect independent lower
         /// bounds for each (two T gates cannot be combined into a circuit of depth
-        /// one and width one).
+        /// one and width one). Width on the other hand is compatible with Depth.
         /// </summary>
         [Fact]
         public void DepthVersusWidthTest()
         {
-            var sim = new ResourcesEstimator();
-
+            // Operation to execute:
             // using(q = Qubit()) { T(q); } using(q = Qubit()) { T(q); } (yes, twice)
-            DepthVersusWidth.Run(sim).Wait();
-            var data = sim.Data;
 
+            // First run with width optimization
+            DataTable data = RunDepthVersusWidthTest(optimizeDepth: false);
             Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("QubitCount")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
+
+            // Now run with depth optimization
+            data = RunDepthVersusWidthTest(optimizeDepth: true);
+            Assert.Equal(2.0, data.Rows.Find("T")["Sum"]);
+            Assert.Equal(1.0, data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, data.Rows.Find("Width")["Sum"]);
             Assert.Equal(1.0, data.Rows.Find("Depth")["Sum"]);
+        }
+
+        private DataTable RunDepthVersusWidthTest(bool optimizeDepth)
+        {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = optimizeDepth;
+            var sim = new ResourcesEstimator(config);
+
+            DepthVersusWidth.Run(sim).Wait();
+            return sim.Data;
         }
 
         /// <summary>
@@ -155,7 +172,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0, data1.Rows.Find("T")["Sum"]);
             Assert.Equal(0.0, data1.Rows.Find("R")["Sum"]);
             Assert.Equal(0.0, data1.Rows.Find("Measure")["Sum"]);
-            Assert.Equal(2.0, data1.Rows.Find("Width")["Sum"]);
+            Assert.Equal(2.0, data1.Rows.Find("QubitCount")["Sum"]);
 
             Operation_2_of_2.Run(sim).Wait();
             DataTable data2 = sim.Data;
@@ -166,14 +183,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0 + 0.0, data2.Rows.Find("T")["Sum"]);
             Assert.Equal(0.0 + 1.0, data2.Rows.Find("R")["Sum"]);
             Assert.Equal(0.0 + 1.0, data2.Rows.Find("Measure")["Sum"]);
-            Assert.Equal(2.0 + 3.0, data2.Rows.Find("Width")["Sum"]);
-            Assert.Equal(System.Math.Max(2.0, 3.0), data2.Rows.Find("Width")["Max"]);
+            Assert.Equal(2.0 + 3.0, data2.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(System.Math.Max(2.0, 3.0), data2.Rows.Find("QubitCount")["Max"]);
 
             // Run again to confirm two operations isn't the limit!
             VerySimpleEstimate.Run(sim).Wait();
             DataTable data3 = sim.Data;
-            Assert.Equal(2.0 + 3.0 + 3.0, data3.Rows.Find("Width")["Sum"]);
-            Assert.Equal(3.0, data3.Rows.Find("Width")["Max"]);
+            Assert.Equal(2.0 + 3.0 + 3.0, data3.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(3.0, data3.Rows.Find("QubitCount")["Max"]);
         }
     }
 }

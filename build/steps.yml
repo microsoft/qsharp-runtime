@@ -10,12 +10,6 @@ steps:
   workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 
-- powershell: ./manifest.ps1
-  displayName: "List built assemblies"
-  workingDirectory: $(System.DefaultWorkingDirectory)/build
-  condition: succeededOrFailed()
-
-
 - powershell: ./test.ps1
   displayName: "Testing Q# runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)/build
@@ -26,6 +20,12 @@ steps:
   displayName: "Pack Q# runtime (Windows only)"
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)/build
+
+
+- pwsh: .\manifest.ps1
+  displayName: "List built packages & assemblies"
+  workingDirectory: '$(System.DefaultWorkingDirectory)/build'
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
 
 - template: steps-wrap-up.yml

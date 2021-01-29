@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
             public In(Operation<I, O> op, Func<P, I> mapper, P data)
             {
-                this.__data = new Lazy<IApplyData>(() => op?.__dataIn(mapper(data)));
+                this.__data = new Lazy<IApplyData>(() => op?.__DataIn__(mapper(data)));
             }
 
             public object Value => __data.Value.Value;
@@ -38,27 +38,27 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
 
-        public OperationPartial(Operation<I, O> op, Func<P, I> mapper) : base(op.Factory)
+        public OperationPartial(Operation<I, O> op, Func<P, I> mapper) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(mapper != null);
 
             this.BaseOp = op;
             this.Mapper = mapper;
-            this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(mapper(default(P)))?.Qubits?.ToArray());
+            this.__qubits = new Lazy<Qubit[]>(() => op?.__DataIn__(mapper(default(P)))?.Qubits?.ToArray());
         }
 
-        public OperationPartial(Operation<I, O> op, object partialTuple) : base(op.Factory)
+        public OperationPartial(Operation<I, O> op, object partialTuple) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(partialTuple != null);
 
             this.BaseOp = op;
             this.Mapper = PartialMapper.Create<P, I>(partialTuple);
-            this.__qubits = new Lazy<Qubit[]>(() => op?.__dataIn(this.Mapper(default(P)))?.Qubits?.ToArray());
+            this.__qubits = new Lazy<Qubit[]>(() => op?.__DataIn__(this.Mapper(default(P)))?.Qubits?.ToArray());
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public Operation<I, O> BaseOp { get; }
         ICallable IOperationWrapper.BaseOperation => BaseOp;
@@ -70,39 +70,39 @@ namespace Microsoft.Quantum.Simulation.Core
 
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).Variant;
 
-        public override IApplyData __dataIn(P data) => new In(this.BaseOp, this.Mapper, data);
+        public override IApplyData __DataIn__(P data) => new In(this.BaseOp, this.Mapper, data);
 
-        public override IApplyData __dataOut(O data) => this.BaseOp.__dataOut(data);
+        public override IApplyData __DataOut__(O data) => this.BaseOp.__DataOut__(data);
 
-        public override Func<P, O> Body => (a) =>
+        public override Func<P, O> __Body__ => (a) =>
         {
             var args = this.Mapper(a);
-            return this.BaseOp.Body.Invoke(args);
+            return this.BaseOp.__Body__.Invoke(args);
         };
 
-        public override Func<P, QVoid> AdjointBody => (a) =>
+        public override Func<P, QVoid> __AdjointBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
 
             var args = this.Mapper(a);
-            return op.AdjointBody.Invoke(args);
+            return op.__AdjointBody__.Invoke(args);
         };
 
-        public override Func<(IQArray<Qubit>, P), QVoid> ControlledBody => (a) =>
+        public override Func<(IQArray<Qubit>, P), QVoid> __ControlledBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
             var (ctrl, ps) = a;
-            return op.ControlledBody.Invoke((ctrl, this.Mapper(ps)));
+            return op.__ControlledBody__.Invoke((ctrl, this.Mapper(ps)));
         };
 
-        public override Func<(IQArray<Qubit>, P), QVoid> ControlledAdjointBody => (a) =>
+        public override Func<(IQArray<Qubit>, P), QVoid> __ControlledAdjointBody__ => (a) =>
         {
             Debug.Assert(typeof(O) == typeof(QVoid));
             var op = this.BaseOp;
             var (ctrl, ps) = a;
-            return op.ControlledAdjointBody.Invoke((ctrl, this.Mapper(ps)));
+            return op.__ControlledAdjointBody__.Invoke((ctrl, this.Mapper(ps)));
         };
 
         IEnumerable<Qubit> IApplyData.Qubits => __qubits.Value;

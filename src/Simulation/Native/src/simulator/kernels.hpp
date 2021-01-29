@@ -29,20 +29,17 @@ inline std::size_t make_mask(std::vector<unsigned> const& qs)
     return mask;
 }
 
-    
 template <class T, class A>
 void swap(std::vector<T, A>& wfn, unsigned q1, unsigned q2)
 {
-    if (q1 == q2)
-        return;
-    if (q1 > q2)
-        std::swap(q1, q2);
+    if (q1 == q2) return;
+    if (q1 > q2) std::swap(q1, q2);
     std::size_t offset1 = 1ull << q1;
     std::size_t offset2 = 1ull << q2;
 
-    std::size_t maskk = offset1 - 1;  // bits [0...q1-1]
-    std::size_t maskj = ((offset2 >> 1) - 1) ^ maskk;  // bits [q1...q2-2]
-    std::size_t maski = ~((offset2 >> 1) - 1);  // bits [q2-1...]
+    std::size_t maskk = offset1 - 1;                  // bits [0...q1-1]
+    std::size_t maskj = ((offset2 >> 1) - 1) ^ maskk; // bits [q1...q2-2]
+    std::size_t maski = ~((offset2 >> 1) - 1);        // bits [q2-1...]
 
 #ifndef _MSC_VER
 #pragma omp parallel for schedule(static)
@@ -70,18 +67,18 @@ void jointcollapse(std::vector<T, A>& wfn, std::vector<unsigned> const& qs, bool
 // sum up probabilities for all configuratiions where an odd number of selected bits is set
 #pragma omp parallel for schedule(static)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i++)
-        if (poppar(i & mask) != val)
-            wfn[i] = 0.;
+        if (poppar(i & mask) != val) wfn[i] = 0.;
 }
 
 template <class T, class A>
-unsigned
-getvalue(std::vector<std::complex<T>, A> const& wfn, unsigned q, double eps = 100. * std::numeric_limits<T>::epsilon())
+unsigned getvalue(
+    std::vector<std::complex<T>, A> const& wfn,
+    unsigned q,
+    double eps = 100. * std::numeric_limits<T>::epsilon())
 {
     std::size_t mask = 1ull << q;
     for (std::size_t i = 0; i < wfn.size(); ++i)
-        if (std::abs(wfn[i]) > eps)
-            return (i & mask ? 1 : 0);
+        if (std::abs(wfn[i]) > eps) return (i & mask ? 1 : 0);
     // dummy return
     return 2;
 }
@@ -109,15 +106,15 @@ void collapse(std::vector<T, A>& wfn, unsigned q, bool val, bool compact = false
         std::size_t state = (val ? mask : 0ul);
 #pragma omp parallel for schedule(static)
         for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); ++i)
-            if ((i & mask) != state)
-                wfn[i] = 0.;
+            if ((i & mask) != state) wfn[i] = 0.;
     }
 }
 
 template <class T, class A>
-bool isclassical(std::vector<std::complex<T>, A> const& wfn,
-                 std::size_t q,
-                 T eps = 100. * std::numeric_limits<T>::epsilon())
+bool isclassical(
+    std::vector<std::complex<T>, A> const& wfn,
+    std::size_t q,
+    T eps = 100. * std::numeric_limits<T>::epsilon())
 {
     std::size_t offset = 1ull << q;
     bool have0 = false;
@@ -143,8 +140,7 @@ bool isclassical(std::vector<std::complex<T>, A> const& wfn,
     }
 #endif
 
-    if (have0 && have1)
-        return false;
+    if (have0 && have1) return false;
     return true;
 }
 
@@ -158,8 +154,7 @@ double jointprobability(std::vector<T, A> const& wfn, std::vector<unsigned> cons
 // sum up probabilities for all configuratiions where an odd number of selected bits is set
 #pragma omp parallel for schedule(static) reduction(+ : prob)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i++)
-        if (poppar(i & mask) == val)
-            prob += std::norm(wfn[i]);
+        if (poppar(i & mask) == val) prob += std::norm(wfn[i]);
     return prob;
 }
 
@@ -190,8 +185,7 @@ double probability(std::vector<std::complex<T>, A> const& wfn, unsigned q)
 inline bool isDiagonal(std::vector<Gates::Basis> const& b)
 {
     for (auto x : b)
-        if (x == Gates::PauliX || x == Gates::PauliY)
-            return false;
+        if (x == Gates::PauliX || x == Gates::PauliY) return false;
     return true;
 }
 
@@ -202,26 +196,27 @@ inline ComplexType iExp(int power)
     int p = ((power % 4) + 8) % 4;
     switch (p)
     {
-        case 0:
-            return 1;
-        case 1:
-            return 1i;
-        case 2:
-            return -1;
-        case 3:
-            return -1i;
-        default:
-            assert(false);
+    case 0:
+        return 1;
+    case 1:
+        return 1i;
+    case 2:
+        return -1;
+    case 3:
+        return -1i;
+    default:
+        assert(false);
     }
     return 0;
 }
 
 template <class T, class A>
-void apply_controlled_exp(std::vector<std::complex<T>, A>& wfn,
-                          std::vector<Gates::Basis> const& b,
-                          double phi,
-                          std::vector<unsigned> const& cs,
-                          std::vector<unsigned> const& qs)
+void apply_controlled_exp(
+    std::vector<std::complex<T>, A>& wfn,
+    std::vector<Gates::Basis> const& b,
+    double phi,
+    std::vector<unsigned> const& cs,
+    std::vector<unsigned> const& qs)
 {
     assert(qs.size() > 1);
     unsigned lowest = *std::min_element(qs.begin(), qs.end());
@@ -233,15 +228,14 @@ void apply_controlled_exp(std::vector<std::complex<T>, A>& wfn,
     if (isDiagonal(b))
     {
         std::size_t mask = make_mask(qs);
-        ComplexType phase = std::exp(ComplexType(0.,-phi));
+        ComplexType phase = std::exp(ComplexType(0., -phi));
 
 #pragma omp parallel for schedule(static)
         for (std::intptr_t x = 0; x < static_cast<std::intptr_t>(wfn.size()); x++)
-            if ((x & cmask) == cmask)
-                wfn[x] *= (poppar(x & mask) ? phase : std::conj(phase));
+            if ((x & cmask) == cmask) wfn[x] *= (poppar(x & mask) ? phase : std::conj(phase));
     }
     else
-    {   // see Exp-implementation-details.txt for the explanation of the algorithm below
+    { // see Exp-implementation-details.txt for the explanation of the algorithm below
         std::size_t xy_bits = 0;
         std::size_t yz_bits = 0;
         int y_count = 0;
@@ -249,27 +243,27 @@ void apply_controlled_exp(std::vector<std::complex<T>, A>& wfn,
         {
             switch (b[i])
             {
-                case Gates::PauliX:
-                    xy_bits |= (1ull << qs[i]);
-                    break;
-                case Gates::PauliY:
-                    xy_bits |= (1ull << qs[i]);
-                    yz_bits |= (1ull << qs[i]);
-                    ++y_count;
-                    break;
-                case Gates::PauliZ:
-                    yz_bits |= (1ull << qs[i]);
-                    break;
-                case Gates::PauliI:
-                    break;
-                default:
-                    assert(false);
+            case Gates::PauliX:
+                xy_bits |= (1ull << qs[i]);
+                break;
+            case Gates::PauliY:
+                xy_bits |= (1ull << qs[i]);
+                yz_bits |= (1ull << qs[i]);
+                ++y_count;
+                break;
+            case Gates::PauliZ:
+                yz_bits |= (1ull << qs[i]);
+                break;
+            case Gates::PauliI:
+                break;
+            default:
+                assert(false);
             }
         }
 
         T alpha = std::cos(phi);
-        ComplexType beta  = std::sin(phi)*iExp(3*y_count + 1);
-        ComplexType gamma = std::sin(phi)*iExp(y_count + 1);
+        ComplexType beta = std::sin(phi) * iExp(3 * y_count + 1);
+        ComplexType gamma = std::sin(phi) * iExp(y_count + 1);
 
 #pragma omp parallel for schedule(static)
         for (std::intptr_t x = 0; x < static_cast<std::intptr_t>(wfn.size()); x++)
@@ -288,10 +282,11 @@ void apply_controlled_exp(std::vector<std::complex<T>, A>& wfn,
 }
 
 template <class T, class A>
-double jointprobability(std::vector<T, A> const& wfn,
-                        std::vector<Gates::Basis> const& b,
-                        std::vector<unsigned> const& qs,
-                        bool val = true)
+double jointprobability(
+    std::vector<T, A> const& wfn,
+    std::vector<Gates::Basis> const& b,
+    std::vector<unsigned> const& qs,
+    bool val = true)
 {
     assert(qs.size() > 1);
 
@@ -305,8 +300,7 @@ double jointprobability(std::vector<T, A> const& wfn,
         std::size_t mask = make_mask(qs);
 #pragma omp parallel for schedule(static) reduction(+ : prob)
         for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i++)
-            if (poppar(i & mask) == val)
-                prob += std::norm(wfn[i]);
+            if (poppar(i & mask) == val) prob += std::norm(wfn[i]);
     }
     else
     {
@@ -317,19 +311,19 @@ double jointprobability(std::vector<T, A> const& wfn,
         {
             switch (b[i])
             {
-                case Gates::PauliX:
-                    xy_bits |= (1ull << qs[i]);
-                    break;
-                case Gates::PauliY:
-                    xy_bits |= (1ull << qs[i]);
-                    yz_bits |= (1ull << qs[i]);
-                    ++ipow;
-                    break;
-                case Gates::PauliZ:
-                    yz_bits |= (1ull << qs[i]);
-                    break;
-                default:
-                    assert(false);
+            case Gates::PauliX:
+                xy_bits |= (1ull << qs[i]);
+                break;
+            case Gates::PauliY:
+                xy_bits |= (1ull << qs[i]);
+                yz_bits |= (1ull << qs[i]);
+                ++ipow;
+                break;
+            case Gates::PauliZ:
+                yz_bits |= (1ull << qs[i]);
+                break;
+            default:
+                assert(false);
             }
         }
 
@@ -364,27 +358,25 @@ double nrm2(std::vector<std::complex<T>, A> const& x)
     double sum = 0.;
 #pragma omp parallel for schedule(static) reduction(+ : sum)
     for (std::intptr_t i = 0; i < (std::intptr_t)x.size(); ++i)
-      sum += x[i].real() * x[i].real() + x[i].imag() * x[i].imag();
+        sum += x[i].real() * x[i].real() + x[i].imag() * x[i].imag();
     return std::sqrt(sum);
 }
-    
-    
+
 template <class T, class A>
 void normalize(std::vector<T, A>& wfn)
 {
     double scale = 1. / nrm2(wfn);
 #pragma omp parallel for schedule(static)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); ++i)
-      wfn[i] *= scale;
+        wfn[i] *= scale;
 }
 
-
-
 template <class T, class A1, class A2>
-void subsytemwavefunction_by_pivot(std::vector<T, A1> const& wfn,
-                                   std::vector<unsigned> const& qs,
-                                   std::vector<T, A2>& qubitswfn,
-                                   std::size_t pivot_position)
+void subsytemwavefunction_by_pivot(
+    std::vector<T, A1> const& wfn,
+    std::vector<unsigned> const& qs,
+    std::vector<T, A2>& qubitswfn,
+    std::size_t pivot_position)
 {
 
     const unsigned bit_size = sizeof(std::size_t) * 8;
@@ -397,8 +389,7 @@ void subsytemwavefunction_by_pivot(std::vector<T, A1> const& wfn,
     std::size_t max = 1ull << qs.size();
 
     std::vector<size_t> chunks;
-    
-#pragma omp parallel
+
     {
 #pragma omp single
         chunks = split_interval_in_chunks(max, omp_get_num_threads());
@@ -416,13 +407,14 @@ void subsytemwavefunction_by_pivot(std::vector<T, A1> const& wfn,
 }
 
 template <class T, class A1, class A2, class A3>
-bool istensorproduct(std::vector<T, A1> const& wfn,
-                     std::vector<unsigned> const& qs1,
-                     std::vector<T, A2> const& wfn1,
-                     std::vector<unsigned> const& qs2,
-                     std::vector<T, A3> const& wfn2,
-                     T phase,
-                     double tolerance)
+bool istensorproduct(
+    std::vector<T, A1> const& wfn,
+    std::vector<unsigned> const& qs1,
+    std::vector<T, A2> const& wfn1,
+    std::vector<unsigned> const& qs2,
+    std::vector<T, A3> const& wfn2,
+    T phase,
+    double tolerance)
 {
 
     const unsigned bit_size = sizeof(std::size_t) * 8;
@@ -446,7 +438,6 @@ bool istensorproduct(std::vector<T, A1> const& wfn,
     std::size_t compl_st = compl_bits.to_ullong();
 
     std::atomic<bool> go(true);
-#pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
         if (thread_id < chunks.size() - 1)
@@ -477,16 +468,16 @@ bool istensorproduct(std::vector<T, A1> const& wfn,
 // Extracts wave function for a given subset of qubits. Returns true and writes wave-function into
 // qubitswfn if given subset of qubits and its complement are in separable state.
 template <class T, class A1, class A2>
-bool subsytemwavefunction(std::vector<T, A1> const& wfn,
-                          std::vector<unsigned> const& qs,
-                          std::vector<T, A2>& qubitswfn,
-                          double tolerance)
+bool subsytemwavefunction(
+    std::vector<T, A1> const& wfn,
+    std::vector<unsigned> const& qs,
+    std::vector<T, A2>& qubitswfn,
+    double tolerance)
 {
     const unsigned bit_size = sizeof(std::size_t) * 8;
 
     assert(qubitswfn.size() == 1ull << qs.size());
     assert(tolerance > 0.0);
-
 
     // We need a sorted list of qubits:
     std::vector<unsigned> sorted(qs);
@@ -501,7 +492,8 @@ bool subsytemwavefunction(std::vector<T, A1> const& wfn,
 
     unsigned total_qubits = ilog2(wfn.size());
 
-    if (total_qubits > sorted.size()) {
+    if (total_qubits > sorted.size())
+    {
         std::vector<unsigned> qs_rest = complement(sorted, total_qubits);
         std::vector<T, A1> qubitswfn_rest(1ull << (qs_rest.size()));
         assert(qubitswfn_rest.size() * qubitswfn.size() == wfn.size());
@@ -520,10 +512,14 @@ bool subsytemwavefunction(std::vector<T, A1> const& wfn,
     }
 
     // put back to original sorting:
-    for (unsigned i = 0; i < qs.size(); ++i) {
-        if (sorted[i] != qs[i]) {
-            for (unsigned p = i + 1; p < qs.size(); ++p) {
-                if (sorted[p] == qs[i]) {
+    for (unsigned i = 0; i < qs.size(); ++i)
+    {
+        if (sorted[i] != qs[i])
+        {
+            for (unsigned p = i + 1; p < qs.size(); ++p)
+            {
+                if (sorted[p] == qs[i])
+                {
                     swap(qubitswfn, i, p);
                     std::swap(sorted[p], sorted[i]);
                     break;
@@ -534,7 +530,7 @@ bool subsytemwavefunction(std::vector<T, A1> const& wfn,
 
     return true;
 }
-}
-}
-}
-}
+} // namespace kernels
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft

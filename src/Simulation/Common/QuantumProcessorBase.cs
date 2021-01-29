@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Microsoft.Quantum.Simulation.Common
 {
@@ -179,37 +178,16 @@ namespace Microsoft.Quantum.Simulation.Common
             throw new UnsupportedOperationException();
         }
 
-        public virtual long StartConditionalStatement(IQArray<Result> measurementResults, IQArray<Result> resultsValues)
+        public virtual long StartConditionalStatement(IQArray<Result> results1, IQArray<Result> results2)
         {
-            if (measurementResults == null) { return 1; };
-            if (resultsValues == null) { return 1; };
-            Debug.Assert(measurementResults.Count == resultsValues.Count);
-            if (measurementResults.Count != resultsValues.Count) { return 1; };
-
-            int equal = 1;
-
-            for (int i = 0; i < measurementResults.Count; i++)
-            {
-                if (measurementResults[i] != resultsValues[i])
-                {
-                    equal = 0;
-                }
-            }
-
-            return equal;
+            if (results1 == null) { return results2 == null ? 1 : 0; };
+            if (results1.Count != results2?.Count) { return 0; };
+            return results1.Zip(results2, (r1, r2) => (r1, r2)).Any(pair => pair.r1 != pair.r2) ? 0 : 1;
         }
 
-        public virtual long StartConditionalStatement(Result measurementResult, Result resultValue)
+        public virtual long StartConditionalStatement(Result result1, Result result2)
         {
-
-            if (measurementResult == resultValue)
-            {
-                return 1;
-            } 
-            else
-            {
-                return 0;
-            }
+            return result1 == result2 ? 1 : 0;
         }
 
         public virtual bool RunThenClause(long statement)
@@ -234,7 +212,6 @@ namespace Microsoft.Quantum.Simulation.Common
 
         public virtual void EndConditionalStatement(long id)
         {
-
         }
 
         public virtual void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
@@ -285,19 +262,5 @@ namespace Microsoft.Quantum.Simulation.Common
         {
         }
 
-    }
-
-    /// <summary>
-    /// A class that implements exception to be thrown when Operation is not supported by a QuantumProcessor.
-    /// </summary>
-    public class UnsupportedOperationException : PlatformNotSupportedException
-    {
-        public UnsupportedOperationException(string text = "",
-                            [CallerFilePath] string file = "",
-                            [CallerMemberName] string member = "",
-                            [CallerLineNumber] int line = 0)
-            : base($"{file}::{line}::[{member}]:{text}")
-        {
-        }
     }
 }

@@ -31,8 +31,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "seed")]
         private static extern void SetSeed(uint id, UInt32 seedValue);
 
-        public uint Seed{ get; private set; }
-
         /// <summary>
         /// Creates a an instance of a quantum simulator.
         /// </summary>
@@ -43,14 +41,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
             bool throwOnReleasingQubitsNotInZeroState = true,
             UInt32? randomNumberGeneratorSeed = null,
             bool disableBorrowing = false)
-            : base(new QSimQubitManager(throwOnReleasingQubitsNotInZeroState, disableBorrowing : disableBorrowing))
+        : base(
+            new QSimQubitManager(throwOnReleasingQubitsNotInZeroState, disableBorrowing : disableBorrowing),
+            (int?)randomNumberGeneratorSeed
+        )
         {
-            Seed = (randomNumberGeneratorSeed.HasValue)
-             ? randomNumberGeneratorSeed.Value
-             : (uint)Guid.NewGuid().GetHashCode();
-
             Id = Init();
-            SetSeed(this.Id, this.Seed);
+            // Make sure that the same seed used by the built-in System.Random
+            // instance is also used by the native simulator itself.
+            SetSeed(this.Id, (uint)this.Seed);
             ((QSimQubitManager)QubitManager).Init(Id);
         }
 
@@ -201,7 +200,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 var ids = new List<uint>();
                 sim_QubitsIds(this.Id, ids.Add);
-                Debug.Assert(ids.Count == this.QubitManager.GetAllocatedQubitsCount());
+                Debug.Assert(ids.Count == this.QubitManager.AllocatedQubitsCount);
                 return ids.ToArray();
             }
         }

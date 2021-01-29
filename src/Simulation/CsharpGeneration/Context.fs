@@ -19,19 +19,19 @@ module internal DeclarationLocations =
     type TransformationState() = 
 
         member val internal CurrentSource = null with get, set
-        member val internal DeclarationLocations = new List<NonNullable<string> * (int * int)>()
+        member val internal DeclarationLocations = new List<string * Position>()
 
     type NamespaceTransformation(parent : SyntaxTreeTransformation<TransformationState>) = 
         inherit NamespaceTransformation<TransformationState>(parent)
 
         override this.OnSourceFile file = 
-            this.SharedState.CurrentSource <- file.Value
+            this.SharedState.CurrentSource <- file
             file
 
         override this.OnLocation sourceLocation = 
             match sourceLocation with 
             | Value (loc : QsLocation) when this.SharedState.CurrentSource <> null -> 
-                this.SharedState.DeclarationLocations.Add (NonNullable<string>.New this.SharedState.CurrentSource, loc.Offset) 
+                this.SharedState.DeclarationLocations.Add (this.SharedState.CurrentSource, loc.Offset)
             | _ -> ()
             sourceLocation
 
@@ -60,8 +60,8 @@ type CodegenContext = {
     allQsElements           : IEnumerable<QsNamespace>
     allUdts                 : ImmutableDictionary<QsQualifiedName,QsCustomType>
     allCallables            : ImmutableDictionary<QsQualifiedName,QsCallable>
-    declarationPositions    : ImmutableDictionary<NonNullable<string>, ImmutableSortedSet<int * int>>
-    byName                  : ImmutableDictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>
+    declarationPositions    : ImmutableDictionary<string, ImmutableSortedSet<Position>>
+    byName                  : ImmutableDictionary<string, (string * QsCallable) list>
     current                 : QsQualifiedName option
     signature               : ResolvedSignature option
     fileName                : string option
@@ -73,7 +73,7 @@ type CodegenContext = {
         let callables = GlobalCallableResolutions syntaxTree
         let positionInfos = DeclarationLocations.Accumulate syntaxTree
         let callablesByName = 
-            let result = new Dictionary<NonNullable<string>,(NonNullable<string>*QsCallable) list>()
+            let result = new Dictionary<string, (string * QsCallable) list>()
             syntaxTree |> Seq.collect (fun ns -> ns.Elements |> Seq.choose (function
             | QsCallable c -> Some (ns, c)
             | _ -> None))
@@ -104,6 +104,11 @@ type CodegenContext = {
     static member public Create (syntaxTree : ImmutableArray<QsNamespace>) = 
         CodegenContext.Create(syntaxTree, ImmutableDictionary.Empty)
 
+    member public this.ProcessorArchitecture = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ProcessorArchitecture with 
+        | true, name -> name
+        | false, _ -> null
+
     member public this.ExecutionTarget = 
         match this.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with 
         | true, name -> name
@@ -114,10 +119,15 @@ type CodegenContext = {
         | true, name -> name
         | false, _ -> null
 
-    member internal this.GenerateCodeForSource (fileName : NonNullable<string>) = 
+    member public this.ExposeReferencesViaTestNames = 
+        match this.assemblyConstants.TryGetValue AssemblyConstants.ExposeReferencesViaTestNames with 
+        | true, propVal -> propVal = "true"
+        | false, _ -> false
+
+    member internal this.GenerateCodeForSource (fileName : string) =
         let targetsQuantumProcessor = 
-            match this.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget with
+            match this.assemblyConstants.TryGetValue AssemblyConstants.ProcessorArchitecture with
             | true, target -> target = AssemblyConstants.HoneywellProcessor || target = AssemblyConstants.IonQProcessor || target = AssemblyConstants.QCIProcessor
             | _ -> false
-        not (fileName.Value.EndsWith ".dll") || targetsQuantumProcessor
+        not (fileName.EndsWith ".dll") || targetsQuantumProcessor
 

@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Core
     [DebuggerTypeProxy(typeof(GenericAdjoint.DebuggerProxy))]
     public class GenericAdjoint : GenericCallable, IApplyData, IOperationWrapper
     {
-        public GenericAdjoint(GenericCallable baseOp) : base(baseOp.Factory, null)
+        public GenericAdjoint(GenericCallable baseOp) : base(baseOp.__Factory__, null)
         {
             this.BaseOp = baseOp;
         }

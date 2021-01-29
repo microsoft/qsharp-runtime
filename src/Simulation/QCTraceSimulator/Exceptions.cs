@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
+namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 {
     /// <summary>
     /// This exception is thrown when the input to an 

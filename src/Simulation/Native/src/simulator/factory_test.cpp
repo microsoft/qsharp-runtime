@@ -8,10 +8,10 @@ using namespace Microsoft::Quantum::Simulator;
 
 int main(int argc, char** argv)
 {
-  auto& sim = psis[create()];
+    auto sim = get(create());
 
-  unsigned q=0; // qubit number
-  sim->allocateQubit(q);
+    unsigned q = 0; // qubit number
+    sim->allocateQubit(q);
 
     // produce random bits using H gates
     for (int i = 0; i < 100; i++)
@@ -19,7 +19,7 @@ int main(int argc, char** argv)
         sim->H(q);
         int result = sim->M(q);
 
-            std::cout << result << std::endl;
+        std::cout << result << std::endl;
     }
 
     sim->release(q);

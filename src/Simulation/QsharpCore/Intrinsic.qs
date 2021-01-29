@@ -4,28 +4,12 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;
+    open Microsoft.Quantum.Targeting;
 
-    /// # Summary
-    /// The random operation takes an array of doubles as input, and returns
-    /// a randomly-selected index into the array as an `Int`.
-    /// The probability of selecting a specific index is proportional to the value
-    /// of the array element at that index.
-    /// Array elements that are equal to zero are ignored and their indices are never
-    /// returned. If any array element is less than zero,
-    /// or if no array element is greater than zero, then the operation fails.
-    ///
-    /// # Input
-    /// ## probs
-    /// An array of floating-point numbers proportional to the probability of
-    /// selecting each index.
-    ///
-    /// # Output
-    /// An integer $i$ with probability $\Pr(i) = p_i / \sum_i p_i$, where $p_i$
-    /// is the $i$th element of `probs`.
+    @Deprecated("Microsoft.Quantum.Random.DrawCategorical")
     operation Random (probs : Double[]) : Int {
         body intrinsic;
-    }
-    
+    }    
     
     @Deprecated("Microsoft.Quantum.Diagnostics.AssertMeasurement")
     operation Assert (bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
@@ -674,24 +658,26 @@ namespace Microsoft.Quantum.Intrinsic {
     operation M (qubit : Qubit) : Result {
         return Measure([PauliZ], [qubit]);
     }
-    
-    
+
+
     /// # Summary
     /// Given a single qubit, measures it and ensures it is in the |0⟩ state
     /// such that it can be safely released.
     ///
     /// # Input
-    /// ## qubit
+    /// ## target
     /// The qubit whose state is to be reset to $\ket{0}$.
+    @RequiresCapability(
+        "BasicQuantumFunctionality",
+        "Reset is replaced by a supported implementation on all execution targets."
+    )
     operation Reset (target : Qubit) : Unit {
-        
-        if (M(target) == One)
-        {
+        if (M(target) == One) {
             X(target);
         }
     }
-    
-    
+
+
     /// # Summary
     /// Given an array of qubits, measure them and ensure they are in the |0⟩ state
     /// such that they can be safely released.
@@ -700,12 +686,8 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubits
     /// An array of qubits whose states are to be reset to $\ket{0}$.
     operation ResetAll (qubits : Qubit[]) : Unit {
-
         for (qubit in qubits) {
             Reset(qubit);
         }
     }
-    
 }
-
-

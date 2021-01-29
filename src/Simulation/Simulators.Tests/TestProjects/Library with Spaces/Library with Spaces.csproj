@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.11.2006.3017-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <CsharpGeneration>false</CsharpGeneration>
@@ -12,9 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj"
-                      PrivateAssets="All"
-                      IsQscReference="true" />
+    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
 
   <Target Name="BeforeCsharpCompile">

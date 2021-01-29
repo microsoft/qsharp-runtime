@@ -36,23 +36,31 @@ enum Basis
 class OneQubitGate
 {
   public:
-    OneQubitGate(unsigned q) : qubit_(q)
+    OneQubitGate(logical_qubit_id q)
+        : qubit_(q)
     {
     }
-    unsigned qubit() const
+    logical_qubit_id qubit() const
     {
         return qubit_;
     }
 
+    virtual TinyMatrix<ComplexType, 2> matrix() const
+    {
+        throw "Calling overriden function";
+    }
+
   private:
-    unsigned qubit_;
+    logical_qubit_id qubit_;
 };
 
 /// a general one qubit roitation gate, storing the qubit number and angle
 class RotationGate : public OneQubitGate
 {
   public:
-    RotationGate(double phi, unsigned q) : OneQubitGate(q), angle_(phi)
+    RotationGate(double phi, logical_qubit_id q)
+        : OneQubitGate(q)
+        , angle_(phi)
     {
     }
     double angle() const
@@ -68,7 +76,8 @@ class RotationGate : public OneQubitGate
 class X : public OneQubitGate
 {
   public:
-    X(unsigned q) : OneQubitGate(q)
+    X(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -77,7 +86,7 @@ class X : public OneQubitGate
         return "X";
     }
 
-    TinyMatrix<RealType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         RealType mat[2][2] = {{0., 1.}, {1., 0.}};
         return TinyMatrix<RealType, 2>(mat);
@@ -88,7 +97,8 @@ class X : public OneQubitGate
 class Y : public OneQubitGate
 {
   public:
-    Y(unsigned q) : OneQubitGate(q)
+    Y(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -111,7 +121,8 @@ class Y : public OneQubitGate
 class Z : public OneQubitGate
 {
   public:
-    Z(unsigned q) : OneQubitGate(q)
+    Z(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -120,10 +131,10 @@ class Z : public OneQubitGate
         return "Z";
     }
 
-    DiagMatrix<RealType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         RealType diag[2] = {1., -1.};
-        return DiagMatrix<RealType, 2>(diag);
+        return TinyMatrix<ComplexType, 2>(DiagMatrix<RealType, 2>(diag));
     }
 };
 
@@ -131,7 +142,8 @@ class Z : public OneQubitGate
 class H : public OneQubitGate
 {
   public:
-    H(unsigned q) : OneQubitGate(q)
+    H(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -140,11 +152,11 @@ class H : public OneQubitGate
         return "H";
     }
 
-    TinyMatrix<RealType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         RealType r = std::sqrt(0.5);
         RealType mat[2][2] = {{r, r}, {r, -r}};
-        return TinyMatrix<RealType, 2, 2>(mat);
+        return TinyMatrix<ComplexType, 2>(TinyMatrix<RealType, 2, 2>(mat));
     }
 };
 
@@ -152,7 +164,8 @@ class H : public OneQubitGate
 class HY : public OneQubitGate
 {
   public:
-    HY(unsigned q) : OneQubitGate(q)
+    HY(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -174,7 +187,8 @@ class HY : public OneQubitGate
 class AdjHY : public OneQubitGate
 {
   public:
-    AdjHY(unsigned q) : OneQubitGate(q)
+    AdjHY(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -196,7 +210,8 @@ class AdjHY : public OneQubitGate
 class S : public OneQubitGate
 {
   public:
-    S(unsigned q) : OneQubitGate(q)
+    S(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -205,11 +220,11 @@ class S : public OneQubitGate
         return "S";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         using val_t = ComplexType;
         val_t diag[2] = {val_t(1.), val_t(0., 1.)};
-        return DiagMatrix<val_t, 2>(diag);
+        return TinyMatrix<ComplexType, 2>(DiagMatrix<val_t, 2>(diag));
     }
 };
 
@@ -217,7 +232,8 @@ class S : public OneQubitGate
 class AdjS : public OneQubitGate
 {
   public:
-    AdjS(unsigned q) : OneQubitGate(q)
+    AdjS(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -226,11 +242,11 @@ class AdjS : public OneQubitGate
         return "AdjS";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         using val_t = ComplexType;
         val_t diag[2] = {val_t(1.), val_t(0., -1.)};
-        return DiagMatrix<val_t, 2>(diag);
+        return TinyMatrix<ComplexType, 2>(DiagMatrix<val_t, 2>(diag));
     }
 };
 
@@ -238,7 +254,8 @@ class AdjS : public OneQubitGate
 class T : public OneQubitGate
 {
   public:
-    T(unsigned q) : OneQubitGate(q)
+    T(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -247,12 +264,12 @@ class T : public OneQubitGate
         return "T";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         using val_t = ComplexType;
         RealType r = std::sqrt(0.5);
         val_t diag[2] = {val_t(1.), val_t(r, r)};
-        return DiagMatrix<val_t, 2>(diag);
+        return TinyMatrix<ComplexType, 2>(DiagMatrix<val_t, 2>(diag));
     }
 };
 
@@ -260,7 +277,8 @@ class T : public OneQubitGate
 class AdjT : public OneQubitGate
 {
   public:
-    AdjT(unsigned q) : OneQubitGate(q)
+    AdjT(logical_qubit_id q)
+        : OneQubitGate(q)
     {
     }
 
@@ -269,12 +287,12 @@ class AdjT : public OneQubitGate
         return "AdjT";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         using val_t = ComplexType;
         RealType r = std::sqrt(0.5);
         val_t diag[2] = {val_t(1.), val_t(r, -r)};
-        return DiagMatrix<val_t, 2>(diag);
+        return TinyMatrix<ComplexType, 2>(DiagMatrix<val_t, 2>(diag));
     }
 };
 
@@ -282,7 +300,8 @@ class AdjT : public OneQubitGate
 class G : public RotationGate
 {
   public:
-    G(RealType phi, unsigned q) : RotationGate(phi, q)
+    G(RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
     {
     }
 
@@ -291,12 +310,12 @@ class G : public RotationGate
         return "G";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         DiagMatrix<ComplexType, 2> d;
         ComplexType arg(0., 0.5 * angle());
         d(0, 0) = d(1, 1) = std::exp(-arg);
-        return d;
+        return TinyMatrix<ComplexType, 2>(d);
     }
 };
 
@@ -304,7 +323,8 @@ class G : public RotationGate
 class Rx : public RotationGate
 {
   public:
-    Rx(RealType phi, unsigned q) : RotationGate(phi, q)
+    Rx(RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
     {
     }
 
@@ -327,7 +347,8 @@ class Rx : public RotationGate
 class Ry : public RotationGate
 {
   public:
-    Ry(RealType phi, unsigned q) : RotationGate(phi, q)
+    Ry(RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
     {
     }
 
@@ -336,13 +357,13 @@ class Ry : public RotationGate
         return "Ry";
     }
 
-    TinyMatrix<RealType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         RealType s = std::sin(0.5 * angle());
         RealType c = std::cos(0.5 * angle());
         RealType mat[2][2] = {{c, -s}, {s, c}};
         ;
-        return TinyMatrix<RealType, 2>(mat);
+        return TinyMatrix<ComplexType, 2>(TinyMatrix<RealType, 2>(mat));
     }
 };
 
@@ -350,7 +371,8 @@ class Ry : public RotationGate
 class Rz : public RotationGate
 {
   public:
-    Rz(RealType phi, unsigned q) : RotationGate(phi, q)
+    Rz(RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
     {
     }
 
@@ -359,13 +381,13 @@ class Rz : public RotationGate
         return "Rz";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         DiagMatrix<ComplexType, 2> d;
         ComplexType arg(0., 0.5 * angle());
         d(0, 0) = std::exp(-arg);
         d(1, 1) = std::exp(arg);
-        return d;
+        return TinyMatrix<ComplexType, 2>(d);
     }
 };
 
@@ -373,7 +395,8 @@ class Rz : public RotationGate
 class R1 : public RotationGate
 {
   public:
-    R1(RealType phi, unsigned q) : RotationGate(phi, q)
+    R1(RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
     {
     }
 
@@ -382,13 +405,13 @@ class R1 : public RotationGate
         return "R1";
     }
 
-    DiagMatrix<ComplexType, 2> matrix() const
+    TinyMatrix<ComplexType, 2> matrix() const
     {
         DiagMatrix<ComplexType, 2> d;
         ComplexType arg(0., angle());
         d(0, 0) = 1.;
         d(1, 1) = std::exp(-arg);
-        return d;
+        return TinyMatrix<ComplexType, 2>(d);
     }
 };
 
@@ -396,7 +419,8 @@ class R1 : public RotationGate
 class R1Frac : public R1
 {
   public:
-    R1Frac(int k, int n, unsigned q) : R1(M_PI * static_cast<RealType>(k) / static_cast<RealType>(1 << n), q)
+    R1Frac(int k, int n, logical_qubit_id q)
+        : R1(M_PI * static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
     {
     }
 
@@ -410,7 +434,9 @@ class R1Frac : public R1
 class R : public RotationGate
 {
   public:
-    R(Basis b, RealType phi, unsigned q) : RotationGate(phi, q), b_(b)
+    R(Basis b, RealType phi, logical_qubit_id q)
+        : RotationGate(phi, q)
+        , b_(b)
     {
     }
 
@@ -423,20 +449,20 @@ class R : public RotationGate
     {
         switch (b_)
         {
-            case PauliI:
-                return G(angle(), qubit()).matrix();
-                break;
-            case PauliX:
-                return Rx(angle(), qubit()).matrix();
-                break;
-            case PauliY:
-                return Ry(angle(), qubit()).matrix();
-                break;
-            case PauliZ:
-                return Rz(angle(), qubit()).matrix();
-                break;
-            default:
-                assert(false);
+        case PauliI:
+            return G(angle(), qubit()).matrix();
+            break;
+        case PauliX:
+            return Rx(angle(), qubit()).matrix();
+            break;
+        case PauliY:
+            return Ry(angle(), qubit()).matrix();
+            break;
+        case PauliZ:
+            return Rz(angle(), qubit()).matrix();
+            break;
+        default:
+            assert(false);
         }
         // dummy return
         return TinyMatrix<ComplexType, 2>();
@@ -449,7 +475,8 @@ class R : public RotationGate
 class RFrac : public R
 {
   public:
-    RFrac(Basis b, int k, int n, unsigned q) : R(b, -2. * M_PI * static_cast<RealType>(k) / static_cast<RealType>(1 << n), q)
+    RFrac(Basis b, int k, int n, logical_qubit_id q)
+        : R(b, -2. * M_PI * static_cast<RealType>(k) / static_cast<RealType>(1ll << n), q)
     {
     }
     std::string name() const
@@ -457,7 +484,8 @@ class RFrac : public R
         return "RFrac";
     }
 };
-}
-}
-}
-}
+
+} // namespace Gates
+} // namespace SIMULATOR
+} // namespace Quantum
+} // namespace Microsoft

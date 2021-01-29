@@ -17,13 +17,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(Qubit,Qubit), QVoid> Body => (q1) =>
+            public override Func<(Qubit,Qubit), QVoid> __Body__ => (q1) =>
             {
                 Simulator.QuantumProcessor.SWAP(q1.Item1, q1.Item2);
                 return QVoid.Instance;
             };
 
-            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> ControlledBody => (args) =>
+            public override Func<(IQArray<Qubit>, (Qubit, Qubit)), QVoid> __ControlledBody__ => (args) =>
             {
                 (IQArray<Qubit> ctrls, (Qubit q1, Qubit q2) ) = args;
 

@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     ///     then it tests Controlled with different number of control qubits, also verifying that
     ///     Adjoint Controlled works.
     /// </summary>
-    operation VerifyUnitary (gate : (Qubit => Unit : Adjoint, Controlled), start : (Pauli, Result), expected : (Complex, Complex)) : Unit {
+    operation VerifyUnitary (gate : (Qubit => Unit is Adj + Ctl), start : (Pauli, Result), expected : (Complex, Complex)) : Unit {
         
         
         using (qubits = Qubit[1]) {

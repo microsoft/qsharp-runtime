@@ -10,7 +10,7 @@ Write-Host "##[info]Copy Native simulator xplat binaries"
 pushd ../src/Simulation/Native
 If (-not (Test-Path 'osx')) { mkdir 'osx' }
 If (-not (Test-Path 'linux')) { mkdir 'linux' }
-$DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build"
+$DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
 If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
 If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
 popd
@@ -45,6 +45,7 @@ function Pack-Dotnet() {
         -o $Env:NUGET_OUTDIR `
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
+        --no-build `
         @args `
         /property:Version=$Env:ASSEMBLY_VERSION `
         /property:PackageVersion=$Env:NUGET_VERSION `

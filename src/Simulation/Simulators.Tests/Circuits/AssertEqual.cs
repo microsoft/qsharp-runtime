@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
         {
             public Native(IOperationFactory m) : base(m) { }
 
-            public override Func<(__T__, __T__), QVoid> Body => (_args) =>
+            public override Func<(__T__, __T__), QVoid> __Body__ => (_args) =>
             {
                 var (expected, actual) = _args;
                 Assert.Equal(expected, actual);

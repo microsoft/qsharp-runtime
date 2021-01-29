@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
+
 project(quantum-simulator)
 cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
 
@@ -24,7 +26,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 # Configuration options (choose one to turn on)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(ENABLE_OPENMP  "Enable OpenMP Parallelization" ON)
 option(USE_SINGLE_PRECISION "Use single-precision floating point operations" OFF)
 option(HAVE_INTRINSICS "Have AVX intrinsics" OFF)
@@ -61,6 +63,8 @@ ENABLE_TESTING()
 # include directories
 add_subdirectory("src")
 
+# Copy test file depedencies
+configure_file(advantage_44_4.log advantage_44_4.log COPYONLY)
 
 # RPATH setting
 

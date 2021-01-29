@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 this.Simulator = m;
             }
 
-            public override Func<(Pauli, double, Qubit), QVoid> Body => (_args) =>
+            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => (_args) =>
             {
                 (Pauli basis, double angle, Qubit q1) = _args;
                 if (basis != Pauli.PauliI)
@@ -29,13 +29,13 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
                 return QVoid.Instance;
             };
 
-            public override Func<(Pauli, double, Qubit), QVoid> AdjointBody => (_args) =>
+            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => (_args) =>
             {
                 (Pauli basis, double angle, Qubit q1) = _args;
-                return this.Body.Invoke((basis, -angle, q1));
+                return this.__Body__.Invoke((basis, -angle, q1));
             };
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> ControlledBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (Pauli basis, double angle, Qubit q1)) = _args;
 
@@ -52,10 +52,10 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor
             };
 
 
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> ControlledAdjointBody => (_args) =>
+            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => (_args) =>
             {
                 (IQArray<Qubit> ctrls, (Pauli basis, double angle, Qubit q1)) = _args;
-                return this.ControlledBody.Invoke((ctrls, (basis, -angle, q1)));
+                return this.__ControlledBody__.Invoke((ctrls, (basis, -angle, q1)));
             };
         }
     }

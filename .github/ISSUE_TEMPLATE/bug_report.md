@@ -2,9 +2,8 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: bug
+labels: bug, needs triage
 assignees: ''
-
 ---
 
 ## Describe the bug
@@ -29,7 +28,6 @@ If applicable, add screenshots to help explain your problem.
 - IQ# Version [e.g. the output of `dotnet iqsharp --version`]
 
 - Python Version (if applicable) [e.g. the output of `python --version`]
-
 
 **Additional context**
 Add any other context about the problem here.

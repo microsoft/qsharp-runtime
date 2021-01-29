@@ -49,10 +49,10 @@ let rec private parameters context doc = function
     | QsTupleItem variable ->
         match variable.VariableName with
         | ValidName name ->
-            Seq.singleton { Name = name.Value
+            Seq.singleton { Name = name
                             QsharpType = variable.Type
                             CsharpTypeName = SimulationCode.roslynTypeName context variable.Type
-                            Description = ParameterDescription doc name.Value }
+                            Description = ParameterDescription doc name }
         | InvalidName -> Seq.empty
     | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
 
@@ -112,7 +112,9 @@ let private createArgument context entryPoint =
 
 /// A tuple of the callable's name, argument type name, and return type name.
 let private callableTypeNames context (callable : QsCallable) =
-    let callableName = sprintf "%s.%s" callable.FullName.Namespace.Value callable.FullName.Name.Value
+    let callableName =
+        SimulationCode.userDefinedName None callable.FullName.Name
+        |> sprintf "global::%s.%s" callable.FullName.Namespace
     let argTypeName = SimulationCode.roslynTypeName context callable.Signature.ArgumentType
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
@@ -171,7 +173,7 @@ let private entryPointClass context entryPoint =
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let generate context (entryPoint : QsCallable) =
     let ns =
-        ``namespace`` entryPoint.FullName.Namespace.Value
+        ``namespace`` entryPoint.FullName.Namespace
             ``{``
                 (Seq.map using SimulationCode.autoNamespaces)
                 [entryPointClass context entryPoint]

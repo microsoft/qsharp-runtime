@@ -103,10 +103,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 this.Log = new Log<string>();
             }
 
-            public override Func<string, QVoid> Body => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<string, QVoid> AdjointBody => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, string), QVoid> ControlledBody => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, string), QVoid> ControlledAdjointBody => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
+            public override Func<string, QVoid> __Body__ => (tag) => this.Log.Record(OperationFunctor.Body, tag);
+            public override Func<string, QVoid> __AdjointBody__ => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
+            public override Func<(IQArray<Qubit>, string), QVoid> __ControlledBody__ => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
+            public override Func<(IQArray<Qubit>, string), QVoid> __ControlledAdjointBody__ => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
 
             public Log<string> Log { get; }
         }
@@ -118,10 +118,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 this.Log = new Log<T>();
             }
 
-            public override Func<T, QVoid> Body => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<T, QVoid> AdjointBody => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, T), QVoid> ControlledBody => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, T), QVoid> ControlledAdjointBody => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
+            public override Func<T, QVoid> __Body__ => (tag) => this.Log.Record(OperationFunctor.Body, tag);
+            public override Func<T, QVoid> __AdjointBody__ => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
+            public override Func<(IQArray<Qubit>, T), QVoid> __ControlledBody__ => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
+            public override Func<(IQArray<Qubit>, T), QVoid> __ControlledAdjointBody__ => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
 
             public int GetNumberOfCalls(OperationFunctor functor, T tag) => this.Log.GetNumberOfCalls(functor, tag);
 
@@ -259,7 +259,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         /// </summary>
         internal static void ctrlOnReleasedCtrlQubitTest(SimulatorBase sim, Action<(IQArray<Qubit>, Qubit)> operationControlled)
         {
-            var random = new Random();
+            var random = new System.Random();
 
             ctrlTestShell(sim, operationControlled, (enabled, ctrlQs, q) =>
             {
@@ -293,7 +293,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         internal static void CheckNoQubitLeak(this SimulatorBase sim)
         {
-            Assert.True(sim.QubitManager.GetAllocatedQubitsCount() == 0);
+            Assert.True(sim.QubitManager.AllocatedQubitsCount == 0);
         }
 
         /// <summary>

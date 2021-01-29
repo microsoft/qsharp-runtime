@@ -13,6 +13,6 @@ namespace Microsoft.Quantum.Intrinsic
 
         public abstract IQArray<Qubit> Apply(long count);
 
-        public override void Init() { }
+        public override void __Init__() { }
     }
 }

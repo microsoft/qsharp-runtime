@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// For the Toffoli simulator, the implementation returns the state of the measured qubit.
             /// That is, Result.One is returned if the measured qubit is in the One state.
             /// </summary>
-            public override Func<Qubit, Result> Body => (q1) =>
+            public override Func<Qubit, Result> __Body__ => (q1) =>
             {
                 if (q1 == null) return Result.Zero;
 

@@ -19,8 +19,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
         private readonly double[] gateTimes;
-
-        private readonly Random random = new Random(DateTime.Now.Millisecond);
         protected readonly QCTraceSimulatorCoreConfiguration tCoreConfig;
 
         private Dictionary<int, string> primitiveOperationsIdToNames =
@@ -82,9 +80,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 gateTimes[i] = config.TraceGateTimes[(PrimitiveOperationsGroups)i];
             }
 
-            tCoreConfig = new QCTraceSimulatorCoreConfiguration
-            {
-                ThrowOnUnconstrainedMeasurement = configuration.ThrowOnUnconstrainedMeasurement
+            tCoreConfig = new QCTraceSimulatorCoreConfiguration {
+                ThrowOnUnconstrainedMeasurement = configuration.ThrowOnUnconstrainedMeasurement,
+                OptimizeDepth = configuration.OptimizeDepth
             };
 
             tCoreConfig.CallStackDepthLimit = config.CallStackDepthLimit; 
@@ -179,32 +177,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             }
         }
 
-        #region Helpers
-        static private (long, long) Reduce(long numerator, long denominatorPower)
-        {
-            if (numerator == 0)
-            {
-                return (0, 0);
-            }
-
-            if (numerator % 2 != 0)
-            {
-                return (numerator, denominatorPower);
-            }
-
-            long numNew = numerator;
-            long denomPowerNew = denominatorPower;
-
-            while (numNew % 2 == 0)
-            {
-                numNew /= 2;
-                denomPowerNew -= 1;
-            }
-
-            return (numNew, denomPowerNew);
-        }
-        #endregion
-
         #region Primitive operations logic 
 
         private void DoPrimitiveOperation(PrimitiveOperationsGroups operation, IQArray<Qubit> target, bool invalidateConstraints = true)
@@ -230,7 +202,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 return; // global phase case
             }
 
-            (long numNew, long denomPowerNew) = Reduce(numerator, denominatorPower);
+            (long numNew, long denomPowerNew) = CommonUtils.Reduce(numerator, denominatorPower);
             switch (denomPowerNew)
             {
                 case 3:

@@ -1,12 +1,20 @@
 name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
-trigger:
-- master
+
+trigger: none
+
+pr:
+- main
+- feature/*
+- features/*
+- release/*
 
 variables:
   Build.Major: 0
-  Build.Minor: 11
+  Build.Minor: 14
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
+  CI: "true"
+  ENABLE_QIRRUNTIME: "true"
 
 jobs:
 - job: build

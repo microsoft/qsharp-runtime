@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Core
     public class FunctionPartial<P, I, O> : Function<P, O>, ICallable<P, O>
     {
 
-        public FunctionPartial(Function<I, O> op, Func<P, I> mapper) : base(op.Factory)
+        public FunctionPartial(Function<I, O> op, Func<P, I> mapper) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(mapper != null);
@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.Mapper = mapper;
         }
 
-        public FunctionPartial(Function<I, O> op, object partialTuple) : base(op.Factory)
+        public FunctionPartial(Function<I, O> op, object partialTuple) : base(op.__Factory__)
         {
             Debug.Assert(op != null);
             Debug.Assert(partialTuple != null);
@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Core
             this.Mapper = PartialMapper.Create<P, I>(partialTuple);
         }
 
-        public override void Init() { }
+        public override void __Init__() { }
 
         public ICallable<I, O> BaseOp { get; }
 
@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Core
 
         OperationFunctor ICallable.Variant => ((ICallable)this.BaseOp).Variant;
 
-        public override Func<P, O> Body => (a) =>
+        public override Func<P, O> __Body__ => (a) =>
         {
             var args = this.Mapper(a);
             return this.BaseOp.Apply(args);

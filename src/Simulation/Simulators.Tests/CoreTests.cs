@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Microsoft.Quantum.Core;
 using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -41,6 +42,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
+        }
+
+        [Fact]
+        public void BasicExecutionTargetedExe()
+        {
+            var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var exe = Path.Combine(asmPath, "TestTargetedExe", "TargetedExe.dll");
+
+            ProcessRunner.Run("dotnet", exe, out StringBuilder output, out StringBuilder error, out int exitCode, out Exception ex);
+
+            Assert.Null(ex);
+            Assert.Equal(0, exitCode);
+            Assert.Empty(error.ToString().Trim());
+            Assert.Equal("TargetedExe", output.ToString().Trim());
         }
 
         [Fact]
@@ -80,8 +95,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 testOneBody(1, (1, q0));
                 testOneBody(1, (1, q1));
                 testOneBody(1, (1, q4));
-                testOneBody(3, (1, q5));
-                testOneBody(0, (1, q6));
+                testOneBody(1, (1, q5));
+                testOneBody(2, (1, q6));
                 testOneBody(2, (2, q2));
                 testOneBody(2, (2, q3));
                 testOneBody(1, (3, q0));
@@ -99,8 +114,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 testOneAdjoint(1, (1, q0));
                 testOneAdjoint(1, (1, q1));
                 testOneAdjoint(1, (1, q4));
-                testOneAdjoint(3, (1, q5));
-                testOneAdjoint(0, (1, q6));
+                testOneAdjoint(2, (1, q5));
+                testOneAdjoint(1, (1, q6));
                 testOneAdjoint(2, (2, q2));
                 testOneAdjoint(2, (2, q3));
                 testOneAdjoint(1, (3, q2));
@@ -116,8 +131,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 testOneCtrl(1, (1, q0));
                 testOneCtrl(1, (1, q1));
                 testOneCtrl(1, (1, q4));
-                testOneCtrl(2, (1, q5));
-                testOneCtrl(0, (1, q6));
+                testOneCtrl(1, (1, q5));
+                testOneCtrl(1, (1, q6));
                 testOneCtrl(0, (2, q0));
                 testOneCtrl(0, (2, q1));
                 testOneCtrl(2, (2, q2));
@@ -277,6 +292,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Circuits.BigIntTest.Run(s).Wait(); // Throws if it doesn't succeed
             });
         }
+
+        [Fact]
+        public void DefaultQubitIsNull() => OperationsTestHelper.RunWithMultipleSimulators(async simulator =>
+            Assert.Null(await Default<Qubit>.Run(simulator)));
+
+        [Fact]
+        public void DefaultCallableIsNull() => OperationsTestHelper.RunWithMultipleSimulators(async simulator =>
+            Assert.Null(await Default<ICallable>.Run(simulator)));
 
         [Fact]
         public void CatchFail()
