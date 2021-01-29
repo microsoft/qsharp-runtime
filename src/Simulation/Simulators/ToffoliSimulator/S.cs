@@ -9,26 +9,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class ToffoliSimulator
     {
         /// <summary>
-        /// Implementation of the S operation for the Toffoli simulator.
+        /// The implementation of the operation.
+        /// For the Toffoli simulator, the implementation throws a run-time error.
         /// </summary>
-        public class S : Quantum.Intrinsic.S
-        {
-            /// <summary>
-            /// Constructs a new operation instance.
-            /// </summary>
-            /// <param name="m">The simulator that this operation affects.</param>
-            public S(ToffoliSimulator m) : base(m)
-            {
-            }
+        public void S__Body(Qubit target) => throw new NotImplementedException();
 
-            /// <summary>
-            /// The implementation of the operation.
-            /// For the Toffoli simulator, the implementation throws a run-time error.
-            /// </summary>
-            public override Func<Qubit, QVoid> __Body__ => (q1) =>
-            {
-                throw new NotImplementedException();
-            };
-        }
+        public void S__ControlledBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
+
+        public void S__AdjointBody(Qubit target) => throw new NotImplementedException();
+
+        public void S__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
     }
 }

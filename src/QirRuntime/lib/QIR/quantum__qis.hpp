@@ -14,7 +14,6 @@
 #endif
 
 struct QirArray;
-struct QirTupleHeader;
 struct QirCallable;
 struct QirString;
 struct QirBigInt;

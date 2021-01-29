@@ -1,18 +1,17 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <ExposeReferencesViaTestNames>true</ExposeReferencesViaTestNames>
     <!-- we will provide our own -->
-    <CsharpGeneration>false</CsharpGeneration>
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
+    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +21,7 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
-  <Target Name="BeforeCsharpCompile">
+  <Target Name="BeforeCSharpCompile">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>

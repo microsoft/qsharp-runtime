@@ -20,10 +20,12 @@ param(
 $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",
-        "Microsoft.Quantum.CsharpGeneration",
+        "Microsoft.Quantum.CSharpGeneration",
         "Microsoft.Quantum.Development.Kit",
         "Microsoft.Quantum.EntryPointDriver",
         "Microsoft.Quantum.QSharp.Core",
+        "Microsoft.Quantum.Type1.Core",
+        "Microsoft.Quantum.Type2.Core",
         "Microsoft.Quantum.Runtime.Core",
         "Microsoft.Quantum.Simulators",
         "Microsoft.Quantum.Xunit"
@@ -31,12 +33,15 @@ $artifacts = @{
 
     Assemblies = @(
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
-        ".\src\Simulation\CsharpGeneration\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.CsharpGeneration.dll",
-        ".\src\Simulation\CsharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.CsharpGeneration.App.dll",
+        ".\src\Simulation\CSharpGeneration\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.CSharpGeneration.dll",
+        ".\src\Simulation\CSharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.CSharpGeneration.App.dll",
         ".\src\Simulation\RoslynWrapper\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.RoslynWrapper.dll",
         ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
-        ".\src\Simulation\QsharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
+        ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
+        ".\src\Simulation\Type1Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type1.Core.dll",
+        ".\src\Simulation\Type2Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type2.Core.dll",
+        ".\src\Simulation\QSharpFoundation\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Foundation.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulators.dll",
@@ -55,4 +60,3 @@ if ($OutputFormat -eq 'FileInfo') {
 }
     
 $artifacts | Write-Output;
-

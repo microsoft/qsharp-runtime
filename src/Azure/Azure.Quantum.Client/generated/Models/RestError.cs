@@ -10,15 +10,12 @@
 
 namespace Microsoft.Azure.Quantum.Client.Models
 {
-    using Microsoft.Rest;
-    using Microsoft.Rest.Serialization;
     using Newtonsoft.Json;
     using System.Linq;
 
     /// <summary>
-    /// An Error response.
+    /// Error information returned by the API
     /// </summary>
-    [Rest.Serialization.JsonTransformation]
     public partial class RestError
     {
         /// <summary>
@@ -32,14 +29,9 @@ namespace Microsoft.Azure.Quantum.Client.Models
         /// <summary>
         /// Initializes a new instance of the RestError class.
         /// </summary>
-        /// <param name="code">An identifier for the error. Codes are invariant
-        /// and are intended to be consumed programmatically.</param>
-        /// <param name="message">A message describing the error, intended to
-        /// be suitable for displaying in a user interface.</param>
-        public RestError(string code = default(string), string message = default(string))
+        public RestError(ErrorData error = default(ErrorData))
         {
-            Code = code;
-            Message = message;
+            Error = error;
             CustomInit();
         }
 
@@ -49,18 +41,9 @@ namespace Microsoft.Azure.Quantum.Client.Models
         partial void CustomInit();
 
         /// <summary>
-        /// Gets or sets an identifier for the error. Codes are invariant and
-        /// are intended to be consumed programmatically.
         /// </summary>
-        [JsonProperty(PropertyName = "error.code")]
-        public string Code { get; set; }
-
-        /// <summary>
-        /// Gets or sets a message describing the error, intended to be
-        /// suitable for displaying in a user interface.
-        /// </summary>
-        [JsonProperty(PropertyName = "error.message")]
-        public string Message { get; set; }
+        [JsonProperty(PropertyName = "error")]
+        public ErrorData Error { get; set; }
 
     }
 }

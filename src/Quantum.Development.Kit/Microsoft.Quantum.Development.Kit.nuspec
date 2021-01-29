@@ -17,7 +17,7 @@
     <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
 
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
-    <tags>Quantum Q# Qsharp </tags>
+    <tags>Quantum Q# QSharp</tags>
 
     <dependencies>
       <dependency id="Microsoft.Quantum.Simulators" version="$version$" />
@@ -29,7 +29,7 @@
     <file src="Props\QSharp.targets" target="build\Microsoft.Quantum.Development.Kit.targets" />
     <file src="Props\*.xaml" target="build" />
     <file src="..\..\NOTICE.txt" target="\ThirdPartyNotice.txt" />
-    <file src="..\Simulation\CsharpGeneration.App\bin\$Configuration$\netcoreapp3.1\publish\**" target="tools\qsc" exclude="**\*.pdb" />
+    <file src="..\Simulation\CSharpGeneration.App\bin\$Configuration$\netcoreapp3.1\publish\**" target="tools\qsc" exclude="**\*.pdb" />
     <file src="..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 

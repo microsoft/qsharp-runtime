@@ -17,6 +17,14 @@ namespace Microsoft.Azure.Quantum.Test
     [TestClass]
     public class WorkspaceTest
     {
+        private MockHelper httpMock;
+
+        [TestInitialize]
+        public void Init()
+        {
+            this.httpMock = new MockHelper();
+        }
+
         [TestMethod]
         public void SubmitJobTest()
         {
@@ -111,7 +119,7 @@ namespace Microsoft.Azure.Quantum.Test
             CloudJob receivedJob = workspace.CancelJob(jobId);
 
             // Validate request
-            ValidateJobRequestMessage(jobId, HttpMethod.Delete);
+            ValidateJobRequestMessage(jobId, HttpMethod.Delete, HttpMethod.Get);
 
             // Validate response
             Assert.IsNotNull(receivedJob);
@@ -147,12 +155,13 @@ namespace Microsoft.Azure.Quantum.Test
                 ProviderId = TestConstants.ProviderId,
             };
 
-            Page<JobDetails> page = new Page<JobDetails>()
+            dynamic page = new
             {
-                Items = new List<JobDetails> { jobDetails },
+                nextLink = (string)null,
+                value = new JobDetails[] { jobDetails },
             };
 
-            MockHelper.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            this.httpMock.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(page)),
             };
@@ -175,7 +184,7 @@ namespace Microsoft.Azure.Quantum.Test
                 actual: receivedJobs.Single().Details.ProviderId);
         }
 
-        private static IWorkspace GetWorkspace()
+        private IWorkspace GetWorkspace()
         {
             return new Workspace(
                 subscriptionId: TestConstants.SubscriptionId,
@@ -183,7 +192,7 @@ namespace Microsoft.Azure.Quantum.Test
                 workspaceName: TestConstants.WorkspaceName)
             {
                 // Mock jobs client (only needed for unit tests)
-                QuantumClient = new QuantumClient(MockHelper.GetHttpClientMock(), true)
+                QuantumClient = new MockHelper.MockQuantumClient(httpMock)
                 {
                     SubscriptionId = TestConstants.SubscriptionId,
                     ResourceGroupName = TestConstants.ResourceGroupName,
@@ -193,9 +202,9 @@ namespace Microsoft.Azure.Quantum.Test
             };
         }
 
-        private static void SetJobResponseMessage(string jobId)
+        private void SetJobResponseMessage(string jobId)
         {
-            MockHelper.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            this.httpMock.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(CreateJobDetails(jobId))),
             };
@@ -211,22 +220,29 @@ namespace Microsoft.Azure.Quantum.Test
                 target: "target");
         }
 
-        private static void ValidateJobRequestMessage(
+        private void ValidateJobRequestMessage(
             string jobId,
-            HttpMethod method)
+            params HttpMethod[] methods)
         {
-            var requestMessage = MockHelper.RequestMessage;
+            var requestMessages = httpMock.RequestMessages;
+            Assert.AreEqual(requestMessages.Count, methods.Length);
 
-            // Url
-            string expectedUri = $"{TestConstants.Endpoint}/v1.0/subscriptions/{TestConstants.SubscriptionId}/resourceGroups/{TestConstants.ResourceGroupName}/providers/Microsoft.Quantum/workspaces/{TestConstants.WorkspaceName}/jobs/{jobId}";
-            Assert.AreEqual(
-                expected: expectedUri.TrimEnd('/'),
-                actual: requestMessage.RequestUri.ToString());
+            for (var i = 0; i < requestMessages.Count; i++)
+            {
+                var requestMessage = requestMessages[i];
+                var method = methods[i];
 
-            // Method
-            Assert.AreEqual(
-                expected: method,
-                actual: requestMessage.Method);
+                // Url
+                string expectedUri = $"{TestConstants.Endpoint}/v1.0/subscriptions/{TestConstants.SubscriptionId}/resourceGroups/{TestConstants.ResourceGroupName}/providers/Microsoft.Quantum/workspaces/{TestConstants.WorkspaceName}/jobs/{jobId}";
+                Assert.AreEqual(
+                    expected: expectedUri.TrimEnd('/'),
+                    actual: requestMessage.RequestUri.ToString());
+
+                // Method
+                Assert.AreEqual(
+                    expected: method,
+                    actual: requestMessage.Method);
+            }
         }
     }
 }

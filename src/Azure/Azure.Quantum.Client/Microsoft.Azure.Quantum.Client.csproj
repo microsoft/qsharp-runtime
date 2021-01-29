@@ -13,7 +13,7 @@
     <PackageReleaseNotes>See: https://docs.microsoft.com/quantum/relnotes/</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
-    <PackageTags>Azure Quantum Q# Qsharp</PackageTags>
+    <PackageTags>Azure Quantum Q# QSharp</PackageTags>
     <PackageIcon>qdk-nuget-icon.png</PackageIcon>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>  
