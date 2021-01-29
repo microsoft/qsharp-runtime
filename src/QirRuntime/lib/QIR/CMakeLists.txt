@@ -22,8 +22,10 @@ endif()
 # Step 1: create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
+  "allocationsTracker.cpp"
   "arrays.cpp"
   "callables.cpp"
+  "context.cpp"
   "delegated.cpp"
   "strings.cpp"
   "utils.cpp"

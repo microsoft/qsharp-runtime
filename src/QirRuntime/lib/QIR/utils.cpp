@@ -44,7 +44,7 @@ extern "C"
     void quantum__rt__fail(QirString* msg) // NOLINT
     {
         std::string str = msg->str;
-        quantum__rt__string_unreference(msg);
+        quantum__rt__string_update_reference_count(msg, -1);
         throw std::runtime_error(str);
     }
 
