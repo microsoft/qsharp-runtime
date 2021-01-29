@@ -1,15 +1,6 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
 
-  <Import Project="..\Common\AssemblyCommon.props" />
-  <Import Project="..\Common\DebugSymbols.props" />
-  <Import Project="..\Common\Simulators.Dev.props" />
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+  <Import Project="..\Common\Simulators.Test.props" />
 
   <ItemGroup>
     <Compile Remove="TestProjects\**" />
@@ -18,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
@@ -28,16 +19,6 @@
     </ProjectReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
-  </ItemGroup>  
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-  </ItemGroup>  
-  
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
       <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QSharpExe\built\</_ExeDir>
