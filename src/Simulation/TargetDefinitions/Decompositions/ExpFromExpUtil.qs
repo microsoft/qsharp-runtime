@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the exponential of a multi-qubit Pauli operator.
@@ -23,7 +22,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// target register is to be rotated.
     /// ## qubits
     /// Register to apply the given rotation to.
-    @EnableTestingViaName("Test.TargetDefinitions.Exp")
     operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
         body (...) {
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'qubits' must have the same length"; }
