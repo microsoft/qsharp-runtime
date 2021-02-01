@@ -5,10 +5,12 @@
 #include <memory>
 #include <vector>
 
+#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
+#include "context.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
@@ -197,7 +199,7 @@ TEST_CASE("Fullstate simulator: TTSAdj=Id", "[fullstate_simulator]")
         iqa->H(q);
         iqa->T(q);
         iqa->T(q);
-        iqa->SAdjoint(q);
+        iqa->AdjointS(q);
         iqa->H(q);
         identityTTSAdj = (Result_Zero == sim->GetResultValue(sim->M(q)));
     }
@@ -218,7 +220,7 @@ TEST_CASE("Fullstate simulator: TTAdj=Id", "[fullstate_simulator]")
     {
         iqa->H(q);
         iqa->T(q);
-        iqa->TAdjoint(q);
+        iqa->AdjointT(q);
         iqa->H(q);
         identityTTadj = (Result_Zero == sim->GetResultValue(sim->M(q)));
     }
@@ -341,4 +343,14 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     {
         sim->ReleaseQubit(qs[i]);
     }
+}
+
+extern "C" void Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__body(); // NOLINT
+TEST_CASE("QIR: invoke all standard Q# gates against the fullstate simulator", "[fullstate_simulator]")
+{
+    std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
+    QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
+
+    // If the call to QIR doesn't crash, call it good.
+    Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__body();
 }
