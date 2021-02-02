@@ -28,6 +28,26 @@ entry:
   ret void
 }
 
+define void @Microsoft__Quantum__Intrinsic__H__ctl(%Array* %__controlQubits__, %Qubit* %qb) {
+entry:
+  call void @__quantum__rt__array_update_alias_count(%Array* %__controlQubits__, i64 1)
+  call void @__quantum__qis__h__ctl(%Array* %__controlQubits__, %Qubit* %qb)
+  call void @__quantum__rt__array_update_alias_count(%Array* %__controlQubits__, i64 -1)
+  ret void
+}
+
+declare void @__quantum__rt__array_update_alias_count(%Array*, i64)
+
+declare void @__quantum__qis__h__ctl(%Array*, %Qubit*)
+
+define void @Microsoft__Quantum__Intrinsic__H__ctladj(%Array* %__controlQubits__, %Qubit* %qb) {
+entry:
+  call void @__quantum__rt__array_update_alias_count(%Array* %__controlQubits__, i64 1)
+  call void @__quantum__qis__h__ctl(%Array* %__controlQubits__, %Qubit* %qb)
+  call void @__quantum__rt__array_update_alias_count(%Array* %__controlQubits__, i64 -1)
+  ret void
+}
+
 define i64 @Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body() #0 {
 entry:
   %randomNumber = alloca i64
@@ -35,41 +55,39 @@ entry:
   br label %header__1
 
 header__1:                                        ; preds = %exiting__1, %entry
-  %i = phi i64 [ 1, %entry ], [ %10, %exiting__1 ]
-  %0 = icmp sge i64 %i, 64
-  %1 = icmp sle i64 %i, 64
-  %2 = select i1 true, i1 %1, i1 %0
-  br i1 %2, label %body__1, label %exit__1
+  %i = phi i64 [ 1, %entry ], [ %8, %exiting__1 ]
+  %0 = icmp sle i64 %i, 64
+  br i1 %0, label %body__1, label %exit__1
 
 body__1:                                          ; preds = %header__1
   %q = call %Qubit* @__quantum__rt__qubit_allocate()
   call void @__quantum__qis__h__body(%Qubit* %q)
-  %3 = load i64, i64* %randomNumber
-  %4 = shl i64 %3, 1
-  store i64 %4, i64* %randomNumber
-  %5 = call %Result* @__quantum__qis__mz(%Qubit* %q)
-  %6 = load %Result*, %Result** @ResultOne
-  %7 = call i1 @__quantum__rt__result_equal(%Result* %5, %Result* %6)
-  br i1 %7, label %then0__1, label %continue__1
+  %1 = load i64, i64* %randomNumber
+  %2 = shl i64 %1, 1
+  store i64 %2, i64* %randomNumber
+  %3 = call %Result* @__quantum__qis__mz(%Qubit* %q)
+  %4 = load %Result*, %Result** @ResultOne
+  %5 = call i1 @__quantum__rt__result_equal(%Result* %3, %Result* %4)
+  br i1 %5, label %then0__1, label %continue__1
 
 then0__1:                                         ; preds = %body__1
-  %8 = load i64, i64* %randomNumber
-  %9 = add i64 %8, 1
-  store i64 %9, i64* %randomNumber
+  %6 = load i64, i64* %randomNumber
+  %7 = add i64 %6, 1
+  store i64 %7, i64* %randomNumber
   br label %continue__1
 
 continue__1:                                      ; preds = %then0__1, %body__1
   call void @__quantum__rt__qubit_release(%Qubit* %q)
-  call void @__quantum__rt__result_update_reference_count(%Result* %5, i64 -1)
+  call void @__quantum__rt__result_update_reference_count(%Result* %3, i64 -1)
   br label %exiting__1
 
 exiting__1:                                       ; preds = %continue__1
-  %10 = add i64 %i, 1
+  %8 = add i64 %i, 1
   br label %header__1
 
 exit__1:                                          ; preds = %header__1
-  %11 = load i64, i64* %randomNumber
-  ret i64 %11
+  %9 = load i64, i64* %randomNumber
+  ret i64 %9
 }
 
 declare %Qubit* @__quantum__rt__qubit_allocate()

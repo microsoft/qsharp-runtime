@@ -26,7 +26,10 @@ TEST_CASE("QIR: SimpleVQE with full state simulator", "[qir]")
 
     const int ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
     const int ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
-    INFO(std::string("two random numbers: ") + std::to_string(ret1) + " " + std::to_string(ret2));
-    REQUIRE(ret1 != ret2);
-
+    const int ret3 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
+    INFO(
+        std::string("Three random numbers: ") + std::to_string(ret1) + ", " + std::to_string(ret2) + ", " +
+        std::to_string(ret3));
+    CHECK(ret1 != ret2);
+    CHECK(ret1 != ret3);
 }

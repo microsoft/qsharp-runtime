@@ -8,7 +8,7 @@ add_executable(qir-runtime-unittests
 )
 
 target_link_libraries(qir-runtime-unittests PUBLIC
-  qir-rt
+  qir-rt-support
   simulators
 )
 
