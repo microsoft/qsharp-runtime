@@ -29,13 +29,13 @@
 %struct.QirCallable = type opaque
 %struct.QirRange = type { i64, i64, i64 }
 %struct.QirString = type opaque
-;%PauliId = type {i32}
+
+; Assumptions:
+;  %PauliId = type {i32}
 
 ;===============================================================================
 ; declarations of the native methods this bridge delegates to
 ;
-declare %class.RESULT* @quantum__qis__mz(%class.QUBIT*)
-
 declare void @quantum__qis__exp__body(%struct.QirArray*, double, %struct.QirArray*)
 declare void @quantum__qis__exp__adj(%struct.QirArray*, double, %struct.QirArray*)
 declare void @quantum__qis__exp__ctl(%struct.QirArray*, %struct.QirArray*, double, %struct.QirArray*)
@@ -280,13 +280,4 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
   ret void
 }
 
-;
-; non-standard gates
-;
-define %Result* @__quantum__qis__mz(%Qubit* %.q) {
-  %q = bitcast %Qubit* %.q to %class.QUBIT*
-  %r = call %class.RESULT* @quantum__qis__mz(%class.QUBIT* %q)
-  %.r = bitcast %class.RESULT* %r to %Result*
-  ret %Result* %.r
-}
 

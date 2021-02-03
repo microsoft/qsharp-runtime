@@ -55,9 +55,9 @@ namespace Microsoft.Quantum.Intrinsic {
         body intrinsic;
     }
 
-    // Non-standard operation. Should it exist?
-    @TargetInstruction("mz")
     operation M(qb : Qubit) : Result {
-        body intrinsic;
+        body (...) {
+            return Measure([PauliZ], [qb]);
+        }
     }
 }

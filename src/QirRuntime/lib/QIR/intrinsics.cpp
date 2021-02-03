@@ -43,12 +43,7 @@ extern "C"
 
     void quantum__qis__exp__adj(QirArray* paulis, double angle, QirArray* qubits)
     {
-        assert(paulis->count == qubits->count);
-
-        std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->Exp(
-            paulis->count, reinterpret_cast<PauliId*>(pauliIds.data()), reinterpret_cast<Qubit*>(qubits->buffer),
-            -angle);
+        quantum__qis__exp__body(paulis, -angle, qubits);
     }
 
     void quantum__qis__exp__ctl(QirArray* ctls, QirArray* paulis, double angle, QirArray* qubits)
@@ -63,12 +58,7 @@ extern "C"
 
     void quantum__qis__exp__ctladj(QirArray* ctls, QirArray* paulis, double angle, QirArray* qubits)
     {
-        assert(paulis->count == qubits->count);
-
-        std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->ControlledExp(
-            ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), paulis->count,
-            reinterpret_cast<PauliId*>(pauliIds.data()), reinterpret_cast<Qubit*>(qubits->buffer), angle);
+        quantum__qis__exp__ctl(ctls, paulis, -angle, qubits);
     }
 
     void quantum__qis__h__body(Qubit qubit)
@@ -92,11 +82,6 @@ extern "C"
             count, reinterpret_cast<PauliId*>(pauliIds.data()), count, reinterpret_cast<Qubit*>(qubits->buffer));
     }
 
-    Result quantum__qis__mz(Qubit qubit)
-    {
-        return Microsoft::Quantum::g_context->simulator->M(qubit);
-    }
-
     void quantum__qis__r__body(PauliId axis, double angle, QUBIT* qubit)
     {
         return Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->R(axis, qubit, angle);
@@ -104,8 +89,8 @@ extern "C"
 
     void quantum__qis__r__adj(PauliId axis, double angle, QUBIT* qubit)
     {
-        return Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->R(axis, qubit, -angle);
-    }
+        quantum__qis__r__body(axis, -angle, qubit);
+     }
 
     void quantum__qis__r__ctl(QirArray* ctls, PauliId axis, double angle, QUBIT* qubit)
     {
@@ -115,8 +100,7 @@ extern "C"
 
     void quantum__qis__r__ctladj(QirArray* ctls, PauliId axis, double angle, QUBIT* qubit)
     {
-        return Microsoft::Quantum::g_context->simulator->AsQuantumGateSet()->ControlledR(
-            ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), axis, qubit, angle);
+        quantum__qis__r__ctl(ctls, axis, -angle, qubit);
     }
 
     void quantum__qis__s__body(Qubit qubit)

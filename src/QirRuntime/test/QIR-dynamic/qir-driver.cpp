@@ -16,11 +16,9 @@ extern "C" void DebugLogPtr(char* value)
     std::cout << (const void*)value << std::endl;
 }
 
-// This VQE sample is taken from https://github.com/msr-quarc/StandaloneVQE
-// When executed in Q# it returns -1.0 with single decimal precision (the correct energy value is close to -1.3)
 extern "C" void SetupQirToRunOnFullStateSimulator();
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body(); // NOLINT
-TEST_CASE("QIR: SimpleVQE with full state simulator", "[qir]")
+TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
 {
     SetupQirToRunOnFullStateSimulator();
 
@@ -30,6 +28,9 @@ TEST_CASE("QIR: SimpleVQE with full state simulator", "[qir]")
     INFO(
         std::string("Three random numbers: ") + std::to_string(ret1) + ", " + std::to_string(ret2) + ", " +
         std::to_string(ret3));
+
+    // Check that the returned numbers are at least somewhat random...
     CHECK(ret1 != ret2);
     CHECK(ret1 != ret3);
+    CHECK(ret2 != ret3);
 }

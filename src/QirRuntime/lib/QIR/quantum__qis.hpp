@@ -59,7 +59,4 @@ extern "C"
     QIR_SHARED_API void quantum__qis__y__ctl(QirArray*, QUBIT*);                            // NOLINT
     QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
-
-    // other
-    QIR_SHARED_API RESULT* quantum__qis__mz(QUBIT*); // NOLINT
 }
