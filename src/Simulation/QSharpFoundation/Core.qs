@@ -20,7 +20,8 @@ namespace Microsoft.Quantum.Core {
     newtype EntryPoint = Unit;
 
     /// # Summary
-    /// Compiler-recognized attribute used to indicate that a callable should always be inlined.
+    /// Compiler-recognized attribute used during QIR emission to determine 
+    /// when callables should be inlined, if possible.
     @Attribute()
     newtype Inline = Unit;
 
