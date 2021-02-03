@@ -946,15 +946,15 @@ module SimulationCode =
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
-        let getCallableVisibility qualifiedName =
+        let getCallableAccess qualifiedName =
             match context.allCallables.TryGetValue qualifiedName with
-            | true, callable -> Some callable.Visibility
+            | true, callable -> Some callable.Access
             | false, _ -> None
 
         let getPropertyModifiers qualifiedName =
             // Use the right accessibility for the property depending on the accessibility of the callable.
             // Note: In C#, "private protected" is the intersection of protected and internal.
-            match getCallableVisibility qualifiedName |> Option.defaultValue Public with
+            match getCallableAccess qualifiedName |> Option.defaultValue Public with
             | Public -> [ ``protected`` ]
             | Internal -> [ ``private``; ``protected`` ]
 
@@ -1509,7 +1509,7 @@ module SimulationCode =
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
         let modifiers =
-            let access = classVisibility op.Visibility
+            let access = classVisibility op.Access
             if opIsIntrinsic && not isConcreteIntrinsic then
                 [ access; ``abstract``; ``partial`` ]
             else
@@ -1604,7 +1604,7 @@ module SimulationCode =
 
         let baseClassName = udtBaseClassName context qsharpType
         let baseClass     = ``simpleBase`` baseClassName
-        let modifiers     = [ classVisibility udt.Visibility ]
+        let modifiers     = [ classVisibility udt.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
         let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType
