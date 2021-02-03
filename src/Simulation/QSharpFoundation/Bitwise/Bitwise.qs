@@ -117,11 +117,11 @@ namespace Microsoft.Quantum.Bitwise {
     /// $p_i = 1$ if `paulis[i]` is `PauliX` or `PauliY`.
     ///
     /// # Remarks
-    /// The function will throw if the length of `paulis` array is greater than 63.
+    /// The function will fail if the length of `paulis` array is greater than 63.
     ///
     /// # See Also
-    /// - ZBits
-    function XBits (paulis : Pauli[]) : Int {
+    /// - Microsoft.Quantum.Bitwise.ZBits
+    function XBits(paulis : Pauli[]) : Int {
         return XOrZBits(true, paulis);
     }
 
@@ -139,11 +139,11 @@ namespace Microsoft.Quantum.Bitwise {
     /// $p_i = 1$ if `paulis[i]` is `PauliY` or `PauliZ`.
     ///
     /// # Remarks
-    /// The function will throw if the length of `paulis` array is greater than 63.
+    /// The function will fail if the length of `paulis` array is greater than 63.
     ///
     /// # See Also
-    /// - XBits
-    function ZBits (paulis : Pauli[]) : Int {
+    /// - Microsoft.Quantum.Bitwise.XBits
+    function ZBits(paulis : Pauli[]) : Int {
         return XOrZBits(false, paulis);
     }
 

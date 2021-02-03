@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Remarks
     /// See [System.Math.IEEERemainder](https://docs.microsoft.com/dotnet/api/system.math.ieeeremainder) for more details.
-    function IEEERemainder (x : Double, y : Double) : Double {
+    function IEEERemainder(x : Double, y : Double) : Double {
         body intrinsic;
     }
 
@@ -87,7 +87,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Remarks
     /// See [System.Math.Log](https://docs.microsoft.com/dotnet/api/system.math.log) for more details.
-    function Log (input : Double) : Double {
+    function Log(input : Double) : Double {
         body intrinsic;
     }
 
@@ -97,7 +97,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Remarks
     /// See [System.Math.Log10](https://docs.microsoft.com/dotnet/api/system.math.log10) for more details.
-    function Log10 (input : Double) : Double {
+    function Log10(input : Double) : Double {
         let log10 = Log(10.0);
         return Log(input) / log10;
     }
@@ -108,7 +108,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Remarks
     /// See [System.Math.Max](https://docs.microsoft.com/dotnet/api/system.math.max) for more details.
-    function MaxD (a : Double, b : Double) : Double {
+    function MaxD(a : Double, b : Double) : Double {
         return a > b ? a | b;
     }
 
