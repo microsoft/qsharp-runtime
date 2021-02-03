@@ -28,7 +28,7 @@ type Emitter() =
         member this.AssemblyConstants = upcast _AssemblyConstants
         member this.GeneratedDiagnostics = upcast _Diagnostics
         
-        member this.ImplementsPreconditionVerification = true
+        member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false
         member this.ImplementsTransformation = true
 
@@ -61,7 +61,7 @@ type Emitter() =
                 if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             if not compilation.EntryPoints.IsEmpty then
-                let callable = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
+                let callable = context.allCallables.[Seq.head compilation.EntryPoints]
                 let content = EntryPoint.generate context callable
                 CompilationLoader.GeneratedFile(callable.SourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
 
