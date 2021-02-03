@@ -16,12 +16,11 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # Remarks
     /// See the [C# ^ Operator](https://docs.microsoft.com/dotnet/csharp/language-reference/operators/xor-operator) for more details.
-    function Xor (a : Int, b : Int) : Int
-    {
-        body intrinsic;
+    function Xor (a : Int, b : Int) : Int {
+        return a ^^^ b;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the bitwise AND of two integers.
     /// This performs the same computation as the built-in `&&&` operator.
@@ -35,12 +34,11 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # Remarks
     /// See the [C# &amp; Operator](https://docs.microsoft.com/dotnet/csharp/language-reference/operators/and-operator) (binary) for more details.
-    function And (a : Int, b : Int) : Int
-    {
-        body intrinsic;
+    function And (a : Int, b : Int) : Int {
+        return a &&& b;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the bitwise OR of two integers.
     /// This performs the same computation as the built-in `|||` operator.
@@ -54,12 +52,11 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # Remarks
     /// See the [C# | Operator](https://docs.microsoft.com/dotnet/csharp/language-reference/operators/or-operator) for more details.
-    function Or (a : Int, b : Int) : Int
-    {
-        body intrinsic;
+    function Or (a : Int, b : Int) : Int {
+        return a ||| b;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the bitwise NOT of an integer.
     /// This performs the same computation as the built-in `~~~` operator.
@@ -72,12 +69,11 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # Remarks
     /// See the [C# ~ Operator](https://docs.microsoft.com/dotnet/csharp/language-reference/operators/bitwise-complement-operator) for more details.
-    function Not (a : Int) : Int
-    {
-        body intrinsic;
+    function Not (a : Int) : Int {
+        return ~~~a;
     }
-    
-    
+
+
     /// # Summary
     /// Returns the bitwise PARITY of an integer (1 if its binary representation contains odd number of ones and 0 otherwise).
     ///
@@ -86,12 +82,27 @@ namespace Microsoft.Quantum.Bitwise {
     /// let a = 248;
     /// let x = Parity(a); // x : Int = 1.
     /// ```
-    function Parity (a : Int) : Int
-    {
+    function Parity (a : Int) : Int {
         body intrinsic;
     }
-    
-    
+
+    // Common implementation for XBits and ZBits.
+    internal function XOrZBits(x : Bool, paulis : Pauli[]) : Int {
+        if Length(paulis) > 63 {
+            fail $"Cannot represent an array of length {Length(paulis)} as an integer; at most 63 Pauli operators can be represented.";
+        }
+
+        let p = x ? PauliX | PauliZ;
+        mutable result = 0;
+        for pauli in paulis[Length(paulis) - 1..-1..0] {
+            if pauli == p or pauli == PauliY {
+                set result |||= 1;
+            }
+            set result <<<= 1;
+        }
+        return result;
+    }
+
     /// # Summary
     /// Returns an integer representing the X bits of an array
     /// of Pauli operators.
@@ -110,9 +121,8 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # See Also
     /// - ZBits
-    function XBits (paulis : Pauli[]) : Int
-    {
-        body intrinsic;
+    function XBits (paulis : Pauli[]) : Int {
+        return XOrZBits(true, paulis);
     }
 
     /// # Summary
@@ -133,11 +143,8 @@ namespace Microsoft.Quantum.Bitwise {
     ///
     /// # See Also
     /// - XBits
-    function ZBits (paulis : Pauli[]) : Int
-    {
-        body intrinsic;
+    function ZBits (paulis : Pauli[]) : Int {
+        return XOrZBits(false, paulis);
     }
-    
+
 }
-
-

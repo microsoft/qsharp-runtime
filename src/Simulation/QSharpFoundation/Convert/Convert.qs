@@ -9,7 +9,7 @@
 /// If there are several versions of the function for Bool, Int and Double types, the corresponding
 /// functions have suffix B,I and D.
 namespace Microsoft.Quantum.Convert {
-    
+
     /// # Summary
     /// Converts a given integer to an equivalent double-precision
     /// floating-point number.
@@ -19,8 +19,8 @@ namespace Microsoft.Quantum.Convert {
     function IntAsDouble(a : Int) : Double {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given integer to an equivalent big integer.
     ///
@@ -29,8 +29,8 @@ namespace Microsoft.Quantum.Convert {
     function IntAsBigInt(a : Int) : BigInt {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given big integer to an equivalent integer, if possible.
     /// The function returns a pair of the resulting integer and a Boolean flag
@@ -40,19 +40,18 @@ namespace Microsoft.Quantum.Convert {
     function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given big integer to an array of Booleans.
     /// The 0 element of the array is the least significant bit of the big integer.
     /// # Remarks
     /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
-    function BigIntAsBoolArray(a : BigInt) : Bool[]
-    {
+    function BigIntAsBoolArray(a : BigInt) : Bool[] {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given array of Booleans to an equivalent big integer.
     /// The 0 element of the array is the least significant bit of the big integer.
@@ -61,48 +60,47 @@ namespace Microsoft.Quantum.Convert {
     function BoolArrayAsBigInt(a : Bool[]) : BigInt {
         body intrinsic;
     }
-     
+
     /// # Summary
     /// Converts a given boolean value to an equivalent string representation.
     ///
     /// # Remarks
     /// See [C# Convert.ToString](https://docs.microsoft.com/dotnet/api/system.convert.tostring?view=netframework-4.7.1#System_Convert_ToString_System_Boolean_) for more details.
     function BoolAsString(a : Bool) : String {
-        body intrinsic;
+        return $"{a}";
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given double-precision floating-point number to an equivalent string representation.
     ///
     /// # Remarks
     /// See [C# Convert.ToString](https://docs.microsoft.com/dotnet/api/system.convert.tostring?view=netframework-4.7.1#System_Convert_ToString_System_Double_) for more details.
     function DoubleAsString(a : Double) : String {
-        body intrinsic;
+        return $"{a}";
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given double-precision floating-point number to an equivalent string representation,
     /// using the given format.
     ///
     /// # Remarks
     /// See [C# Double.ToString](https://docs.microsoft.com/dotnet/api/system.double.tostring?view=netframework-4.7.1#System_Double_ToString_System_String_) for more details.
-    function DoubleAsStringWithFormat(a : Double, fmt : String) : String
-    {
+    function DoubleAsStringWithFormat(a : Double, fmt : String) : String {
         body intrinsic;
     }
-    
-    
+
+
     /// # Summary
     /// Converts a given integer number to an equivalent string representation.
     ///
     /// # Remarks
     /// See [C# Convert.ToString](https://docs.microsoft.com/dotnet/api/system.convert.tostring?view=netframework-4.7.1#System_Convert_ToString_System_Int64_) for more details.
     function IntAsString(a : Int) : String {
-        body intrinsic;
+        return $"{a}";
     }
-    
+
     /// # Summary
     /// Converts a given integer number to an equivalent string representation,
     /// using the given format.
@@ -112,7 +110,7 @@ namespace Microsoft.Quantum.Convert {
     function IntAsStringWithFormat(a : Int, fmt : String) : String {
         body intrinsic;
     }
-    
+
     /// # Summary
     /// Encodes a multi-qubit Pauli operator represented as an array of
     /// single-qubit Pauli operators into an integer.
@@ -140,6 +138,6 @@ namespace Microsoft.Quantum.Convert {
     function PauliArrayAsInt(paulis : Pauli[]) : Int {
         body intrinsic;
     }
-    
+
 }
 

@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Abs](https://docs.microsoft.com/dotnet/api/system.math.abs) for more details.
     function AbsD (a : Double) : Double {
-        body intrinsic;
+        return a < 0.0 ? -a | a;
     }
 
     /// # Summary
@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Abs](https://docs.microsoft.com/dotnet/api/system.math.abs) for more details.
     function AbsI (a : Int) : Int {
-        body intrinsic;
+        return a < 0 ? -a | a;
     }
 
     /// # Summary
@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Numerics.BigInteger.Abs](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.abs) for more details.
     function AbsL (a : BigInt) : BigInt {
-        body intrinsic;
+        return a < 0L ? -a | a;
     }
 
     /// # Summary
@@ -98,7 +98,8 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Log10](https://docs.microsoft.com/dotnet/api/system.math.log10) for more details.
     function Log10 (input : Double) : Double {
-        body intrinsic;
+        let log10 = Log(10.0);
+        return Log(input) / log10;
     }
 
 
@@ -108,7 +109,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Max](https://docs.microsoft.com/dotnet/api/system.math.max) for more details.
     function MaxD (a : Double, b : Double) : Double {
-        body intrinsic;
+        return a > b ? a | b;
     }
 
 
@@ -118,7 +119,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Max](https://docs.microsoft.com/dotnet/api/system.math.max) for more details.
     function MaxI (a : Int, b : Int) : Int {
-        body intrinsic;
+        return a > b ? a | b;
     }
 
 
@@ -128,7 +129,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Numerics.BigInteger.Max](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.max) for more details.
     function MaxL (a : BigInt, b : BigInt) : BigInt {
-        body intrinsic;
+        return a > b ? a | b;
     }
 
 
@@ -138,7 +139,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Min](https://docs.microsoft.com/dotnet/api/system.math.min) for more details.
     function MinD (a : Double, b : Double) : Double {
-        body intrinsic;
+        return a < b ? a | b;
     }
 
 
@@ -148,7 +149,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Min](https://docs.microsoft.com/dotnet/api/system.math.min) for more details.
     function MinI (a : Int, b : Int) : Int {
-        body intrinsic;
+        return a < b ? a | b;
     }
 
 
@@ -158,7 +159,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Numerics.BigInteger.Min](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.min) for more details.
     function MinL(a : BigInt, b : BigInt) : BigInt {
-        body intrinsic;
+        return a < b ? a | b;
     }
 
 
@@ -196,7 +197,9 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
     function SignD (a : Double) : Int {
-        body intrinsic;
+        if   (a < 0.0) { return -1; }
+        elif (a > 0.0) { return +1; }
+        else           { return  0; }
     }
 
 
@@ -206,7 +209,9 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
     function SignI (a : Int) : Int {
-        body intrinsic;
+        if   (a < 0) { return -1; }
+        elif (a > 0) { return +1; }
+        else         { return  0; }
     }
 
 
@@ -216,7 +221,9 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
     function SignL (a : BigInt) : Int {
-        body intrinsic;
+        if   (a < 0L) { return -1; }
+        elif (a > 0L) { return +1; }
+        else          { return  0; }
     }
 
     /// # Summary
