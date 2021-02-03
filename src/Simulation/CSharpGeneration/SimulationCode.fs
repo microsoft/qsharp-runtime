@@ -1439,7 +1439,7 @@ module SimulationCode =
                 (constructors @ properties @ methods)
             ``}``
 
-    let private classVisibility = function
+    let private classAccess = function
         | Public -> ``public``
         | Internal -> ``internal``
 
@@ -1509,7 +1509,7 @@ module SimulationCode =
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
         let modifiers =
-            let access = classVisibility op.Access
+            let access = classAccess op.Access
             if opIsIntrinsic && not isConcreteIntrinsic then
                 [ access; ``abstract``; ``partial`` ]
             else
@@ -1604,7 +1604,7 @@ module SimulationCode =
 
         let baseClassName = udtBaseClassName context qsharpType
         let baseClass     = ``simpleBase`` baseClassName
-        let modifiers     = [ classVisibility udt.Access ]
+        let modifiers     = [ classAccess udt.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
         let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType
