@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Math;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     function AbsDIsCorrect() : Unit {
@@ -20,19 +21,19 @@ namespace Microsoft.Quantum.Tests {
 
     @Test("QuantumSimulator")
     function AbsLIsCorrect() : Unit {
-        EqualityFactI(AbsL(-123L), 123L, "AbsL was incorrect for negative numbers.");
-        EqualityFactI(AbsL(123L), 123L, "AbsL was incorrect for positive numbers.");
-        EqualityFactI(AbsL(0L), 0L, "AbsL was incorrect for zero.");
+        EqualityFactL(AbsL(-123L), 123L, "AbsL was incorrect for negative numbers.");
+        EqualityFactL(AbsL(123L), 123L, "AbsL was incorrect for positive numbers.");
+        EqualityFactL(AbsL(0L), 0L, "AbsL was incorrect for zero.");
     }
 
     @Test("QuantumSimulator")
     function Log10IsCorrect() : Unit {
-        EqualityWithinToleranceFact(Log10(0.456), -0.341035157335565, "Log10(0.456) was incorrect.");
-        EqualityWithinToleranceFact(Log10(1.0), 0.0, "Log10(1.0) was incorrect.");
-        EqualityWithinToleranceFact(Log10(1.23), 0.0899051114393979, "Log10(1.23) was incorrect.");
-        EqualityWithinToleranceFact(Log10(10.0), 1.0, "Log10(10.0) was incorrect.");
-        EqualityWithinToleranceFact(Log10(100.0), 2.0, "Log10(100.0) was incorrect.");
-        EqualityWithinToleranceFact(Log10(123.456), 2.09151220162777, "Log10(123.456) was incorrect.");
+        EqualityWithinToleranceFact(Log10(0.456), -0.341035157335565, 1e-7, "Log10(0.456) was incorrect.");
+        EqualityWithinToleranceFact(Log10(1.0), 0.0, 1e-7, "Log10(1.0) was incorrect.");
+        EqualityWithinToleranceFact(Log10(1.23), 0.0899051114393979, 1e-7, "Log10(1.23) was incorrect.");
+        EqualityWithinToleranceFact(Log10(10.0), 1.0, 1e-7, "Log10(10.0) was incorrect.");
+        EqualityWithinToleranceFact(Log10(100.0), 2.0, 1e-7, "Log10(100.0) was incorrect.");
+        EqualityWithinToleranceFact(Log10(123.456), 2.09151220162777, 1e-7, "Log10(123.456) was incorrect.");
     }
 
     @Test("QuantumSimulator")
@@ -42,7 +43,7 @@ namespace Microsoft.Quantum.Tests {
 
     @Test("QuantumSimulator")
     function MaxIIsCorrect() : Unit {
-        EqualityFactD(MaxI(-1, 2), 2, "MaxI was incorrect.");
+        EqualityFactI(MaxI(-1, 2), 2, "MaxI was incorrect.");
     }
 
 }

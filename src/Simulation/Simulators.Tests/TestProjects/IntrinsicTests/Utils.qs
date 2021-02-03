@@ -16,6 +16,12 @@ namespace Microsoft.Quantum.Tests {
         }
     }
 
+    internal function EqualityFactL(actual : BigInt, expected : BigInt, message : String) : Unit {
+        if (actual != expected) {
+            FormattedFailure(actual, expected, message);
+        }
+    }
+
     internal function EqualityFactS(actual : String, expected : String, message : String) : Unit {
         if (actual != expected) {
             FormattedFailure(actual, expected, message);
@@ -28,10 +34,10 @@ namespace Microsoft.Quantum.Tests {
         }
     }
 
-    internal function EqualityWithinToleranceFact(actual : Double, expected : Double, tolerance : Double) : Unit {
+    internal function EqualityWithinToleranceFact(actual : Double, expected : Double, tolerance : Double, message : String) : Unit {
         let delta = actual - expected;
         if (delta > tolerance or delta < -tolerance) {
-            FormattedFailure(actual, expected, "Values were not equal within tolerance.");
+            FormattedFailure(actual, expected, message);
         }
     }
 

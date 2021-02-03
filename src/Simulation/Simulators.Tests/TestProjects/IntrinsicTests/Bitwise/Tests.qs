@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Bitwise;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     function XorIsCorrect() : Unit {

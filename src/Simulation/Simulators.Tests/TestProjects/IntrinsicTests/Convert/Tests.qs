@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Tests {
     open Microsoft.Quantum.Convert;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     function DoubleAsStringIsCorrect() : Unit {
