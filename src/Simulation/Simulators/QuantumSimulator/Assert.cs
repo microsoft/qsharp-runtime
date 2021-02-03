@@ -14,9 +14,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
     {
         public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "JointEnsembleProbability")]
-            private static extern double JointEnsembleProbability(uint id, uint n, Pauli[] b, uint[] q);
-
             private QuantumSimulator Simulator { get; }
 
             public QSimAssert(QuantumSimulator m) : base(m)

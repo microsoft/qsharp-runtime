@@ -8,12 +8,13 @@ using Microsoft.Quantum.Simulation.Common;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : SimulatorBase, IDisposable
+    public partial class QuantumSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IDisposable
     {
         public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime.dll";
 
@@ -213,7 +214,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
             else
             {
-                uint count = (uint)ctrls.Length;                
+                uint count = (uint)ctrls.Length;
                 controlledAction(count, ctrls.GetIds());
             }
         }

@@ -52,10 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
     <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
-    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>

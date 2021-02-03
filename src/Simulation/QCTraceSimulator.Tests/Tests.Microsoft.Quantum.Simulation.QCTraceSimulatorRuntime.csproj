@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.210122233-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk/0.15.210222819-alpha">
 
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\Simulators.Dev.props" />
@@ -13,6 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
     <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

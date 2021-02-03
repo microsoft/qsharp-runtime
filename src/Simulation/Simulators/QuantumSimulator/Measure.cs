@@ -9,36 +9,20 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public class QSimMeasure : Intrinsic.Measure
+        public virtual Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Measure")]
-            private static extern uint Measure(uint id, uint n, Pauli[] b, uint[] ids);
-
-            private QuantumSimulator Simulator { get; }
-
-
-            public QSimMeasure(QuantumSimulator m) : base(m)
+            this.CheckQubits(targets);
+            if (paulis.Length != targets.Length)
             {
-                this.Simulator = m;
+                throw new InvalidOperationException($"Both input arrays for Measure (paulis, targets), must be of same size");
             }
-
-            public override Func<(IQArray<Pauli>, IQArray<Qubit>), Result> __Body__ => (_args) =>
+            if (targets.Length == 1)
             {
-                var (paulis, qubits) = _args;
-
-                Simulator.CheckQubits(qubits);
-                if (paulis.Length != qubits.Length)
-                {
-                    throw new InvalidOperationException($"Both input arrays for {this.GetType().Name} (paulis,qubits), must be of same size");
-                }
-                if (qubits.Length == 1)
-                {
-                    // When we are operating on a single qubit we will collapse the state, so mark
-                    // that qubit as measured.
-                    qubits[0].IsMeasured = true;
-                }
-                return Measure(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds()).ToResult();
-            };
+                // When we are operating on a single qubit we will collapse the state, so mark
+                // that qubit as measured.
+                targets[0].IsMeasured = true;
+            }
+            return Measure(this.Id, (uint)paulis.Length, paulis.ToArray(), targets.GetIds()).ToResult();
         }
     }
 }

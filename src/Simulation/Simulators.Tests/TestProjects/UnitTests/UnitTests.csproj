@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.210122233-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk/0.15.210222819-alpha">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
-    <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />

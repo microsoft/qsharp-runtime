@@ -15,12 +15,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             readonly bool throwOnReleasingQubitsNotInZeroState;
 
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "allocateQubit")]
-            private static extern void AllocateOne(uint id, uint qubit_id);
-
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "release")]
-            private static extern bool ReleaseOne(uint id, uint qubit_id);
-
             public uint SimulatorId { get; private set; }
 
             public QSimQubitManager(bool throwOnReleasingQubitsNotInZeroState = true, long qubitCapacity = 32, bool mayExtendCapacity = true, bool disableBorrowing = false)

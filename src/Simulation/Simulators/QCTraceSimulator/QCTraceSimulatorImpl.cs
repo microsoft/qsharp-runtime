@@ -7,14 +7,16 @@ using Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime;
 using Microsoft.Quantum.Simulation.Core;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Quantum.Simulation.Common;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementation
 {
     /// <summary>
     /// Internals of <see cref="QCTraceSimulator"/>. For internal use only.
     /// </summary>
-    public partial class QCTraceSimulatorImpl : SimulatorBase
+    public partial class QCTraceSimulatorImpl : SimulatorBase, IGate_Measure
     {
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
@@ -61,10 +63,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             return this.GetInstance(typeof(T)).GetType().FullName;
         }
 
-
         public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
 
-        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config)
+        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config, Assembly? coreAssembly = null)
         {
             configuration = Utils.DeepClone(config);
             Utils.FillDictionaryForEnumNames<PrimitiveOperationsGroups, int>(primitiveOperationsIdToNames);
@@ -107,7 +108,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             OnOperationStart += tracingCore.OnOperationStart;
             OnOperationEnd += tracingCore.OnOperationEnd;
 
-            RegisterPrimitiveOperationsGivenAsCircuits();
+            RegisterPrimitiveOperationsGivenAsCircuits(coreAssembly);
         }
 
         /// <summary>
@@ -146,12 +147,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             }
         }
 
-        private void RegisterPrimitiveOperationsGivenAsCircuits()
+        private void RegisterPrimitiveOperationsGivenAsCircuits(Assembly? coreAssembly)
         {
+            var intrinsicAssembly = coreAssembly;
+            if (intrinsicAssembly == null)
+            {
+                intrinsicAssembly = 
+                    (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
+                    select assembly).First();
+            }
             IEnumerable<Type> primitiveOperationTypes =
-                from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
+                from op in intrinsicAssembly.GetExportedTypes()
                 where op.IsSubclassOf(typeof(AbstractCallable))
                 select op;
+
+            if (primitiveOperationTypes.Count() == 0)
+            {
+                throw new Exception("Unable to load intrinsic types. The ResourcesEstimator can only be used with the default execution target.");
+            }
 
             IEnumerable<Type> primitiveOperationAsCircuits =
                 from op in typeof(Circuits.X).Assembly.GetExportedTypes()

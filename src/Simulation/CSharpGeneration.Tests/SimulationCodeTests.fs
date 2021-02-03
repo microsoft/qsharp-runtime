@@ -1710,7 +1710,7 @@ namespace N1
 
     let testOneSpecialization pick (_,op) expected =
         let context = createTestContext op
-        let actual  = op |> pick |> buildSpecialization context |> Option.map (fst >> formatSyntaxTree)
+        let actual  = op |> pick |> buildSpecialization context op |> Option.map (fst >> formatSyntaxTree)
         Assert.Equal(expected |> Option.map clearFormatting, actual |> Option.map clearFormatting)
 
     [<Fact>]
@@ -2315,7 +2315,7 @@ namespace N1
     [<Fact>]
     let ``is abstract`` () =
         let testOne (_,op) expected =
-            let actual = op |> isAbstract
+            let actual = op |> isIntrinsic
             Assert.Equal(expected, actual)
 
         true  |> testOne emptyOperation

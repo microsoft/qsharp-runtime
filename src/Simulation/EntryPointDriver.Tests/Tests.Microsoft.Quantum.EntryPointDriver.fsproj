@@ -31,6 +31,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
     <ProjectReference Include="..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,14 +6,14 @@ labels: enhancement, needs triage
 assignees: ''
 ---
 
-** Please describe what you would like the feature to accomplish.**
-A clear and concise description of what you want to accomplish and why.
+**Please describe what you would like the feature to accomplish.**  
+A clear and concise description of what you want to accomplish and why.  
 
-** Describe the solution you'd like **
-A clear and concise description of what you want to happen.
+**Describe the solution you'd like**  
+A clear and concise description of what you want to happen.  
 
-** Describe alternatives you've considered **
-A clear and concise description of any alternative solutions or features you've considered.
+**Describe alternatives you've considered**  
+A clear and concise description of any alternative solutions or features you've considered.  
 
-** Additional context **
-Add any other context or screenshots about the feature request here.
+**Additional context**  
+Add any other context or screenshots about the feature request here.  

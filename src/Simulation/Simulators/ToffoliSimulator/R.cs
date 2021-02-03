@@ -9,78 +9,53 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class ToffoliSimulator
     {
         /// <summary>
-        /// Implementation of the R operation for the Toffoli simulator.
+        /// The implementation of the operation.
+        /// For the Toffoli simulator, the implementation flips the target qubit
+        /// if the rotation is effectively an X gate.
         /// </summary>
-        public class R : Intrinsic.R
+        public void R__Body(Pauli pauli, double angle, Qubit target)
         {
-            private ToffoliSimulator simulator { get; }
+            if (target == null) return;
 
-            /// <summary>
-            /// Constructs a new operation instance.
-            /// </summary>
-            /// <param name="m">The simulator that this operation affects.</param>
-            public R(ToffoliSimulator m) : base(m)
+            this.CheckQubit(target, "target");
+
+            var (isX, safe) = CheckRotation(pauli, angle / 2.0);
+            if (isX)
             {
-                simulator = m;
+                this.DoX(target);
             }
-
-            /// <summary>
-            /// The implementation of the operation.
-            /// For the Toffoli simulator, the implementation flips the target qubit
-            /// if the rotation is effectively an X gate.
-            /// </summary>
-            public override Func<(Pauli, double, Qubit), QVoid> __Body__ => (_args) =>
-            {
-                var (basis, angle, q1) = _args;
-
-                if (q1 == null) return QVoid.Instance;
-
-                simulator.CheckQubit(q1, "q1");
-
-                var (isX, safe) = CheckRotation(basis, angle / 2.0);
-                if (isX)
-                {
-                    simulator.DoX(q1);
-                }
-
-                return QVoid.Instance;
-            };
-
-            /// <summary>
-            /// The implementation of the adjoint specialization of the operation.
-            /// For the Toffoli simulator *only*, this operation is self-adjoint.
-            /// </summary>
-            public override Func<(Pauli, double, Qubit), QVoid> __AdjointBody__ => __Body__;
-
-            /// <summary>
-            /// The implementation of the controlled specialization of the operation.
-            /// For the Toffoli simulator, the implementation flips the target qubit
-            /// if the rotation is effectively an X gate and all of the control qubits
-            /// are in the One state.
-            /// </summary>
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledBody__ => (_args) =>
-            {
-                var (ctrls, (basis, angle, q1)) = _args;
-
-                if (q1 == null) return QVoid.Instance;
-
-                simulator.CheckControlQubits(ctrls, q1);
-
-                var (isX, safe) = CheckRotation(basis, angle / 2.0);
-                if (!safe)
-                {
-                    throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
-                }
-                // We never need to do anything since only the identity is safe to control
-
-                return QVoid.Instance;
-            };
-
-            /// <summary>
-            /// The implementation of the controlled adjoint specialization of the operation.
-            /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
-            /// </summary>
-            public override Func<(IQArray<Qubit>, (Pauli, double, Qubit)), QVoid> __ControlledAdjointBody__ => __ControlledBody__;
         }
+
+        /// <summary>
+        /// The implementation of the adjoint specialization of the operation.
+        /// For the Toffoli simulator *only*, this operation is self-adjoint.
+        /// </summary>
+        public void R__AdjointBody(Pauli pauli, double angle, Qubit target) => R__Body(pauli, angle, target);
+
+        /// <summary>
+        /// The implementation of the controlled specialization of the operation.
+        /// For the Toffoli simulator, the implementation flips the target qubit
+        /// if the rotation is effectively an X gate and all of the control qubits
+        /// are in the One state.
+        /// </summary>
+        public void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        {
+            if (target == null) return;
+
+            this.CheckControlQubits(controls, target);
+
+            var (isX, safe) = CheckRotation(pauli, angle / 2.0);
+            if (!safe)
+            {
+                throw new InvalidOperationException($"The Toffoli simulator can only perform controlled rotations of multiples of 2*pi.");
+            }
+            // We never need to do anything since only the identity is safe to control
+        }
+
+        /// <summary>
+        /// The implementation of the controlled adjoint specialization of the operation.
+        /// For the Toffoli simulator *only*, the controlled specialization is self-adjoint.
+        /// </summary>
+        public void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target) => R__ControlledBody(controls, pauli, angle, target);
     }
 }

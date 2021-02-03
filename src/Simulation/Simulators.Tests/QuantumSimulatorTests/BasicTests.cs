@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
-using Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
@@ -60,7 +59,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 var x = sim.Get<Intrinsic.X>();
                 var measure = sim.Get<Intrinsic.M>();
-                var set = sim.Get<SetQubit>();
+                var set = sim.Get<Measurement.SetToBasisState>();
 
                 var ctrlX = x.__ControlledBody__.AsAction();
                 OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>
@@ -220,9 +219,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             TestCallable(gate.Controlled.Partial(nullTarget), target);
             TestCallable(gate.Controlled.Partial(nullCtrl), ctrls[0]);
 
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeTarget, target)));
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls1, target)));
-            Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls2, target)));
+            // Some decompositions actually allow for duplications in controls, so these tests
+            // should be skipped for those packages.
+            if (OperationsTestHelper.ShouldPerformQubitUniquenessTest)
+            {
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeTarget, target)));
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls1, target)));
+                Assert.Throws<NotDistinctQubits>(() => gate.Controlled.Apply((dupeCtrls2, target)));
+            }
         }
 
         private static void TestUnitary(IUnitary<Qubit> gate, IQArray<Qubit> ctrls, IQArray<Qubit> target)
@@ -238,8 +242,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var mapper = new Func<Qubit, IQArray<Qubit>>(q => new QArray<Qubit>(q, targets[1], targets[2]));
             var dupTargets = new QArray<Qubit>(targets[0], targets[1], targets[0]);
 
-            Assert.Throws<ArgumentNullException>(() => gate.Apply(null));
-            Assert.Throws<NotDistinctQubits>(() => gate.Apply(dupTargets));
+            if (OperationsTestHelper.ShouldPerformQubitUniquenessTest)
+            {
+                Assert.Throws<NotDistinctQubits>(() => gate.Apply(dupTargets));
+            }
             TestCallable(gate.Partial(mapper), targets[0]);
         }
 
@@ -280,22 +286,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestSimpleGateCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            // Single Qubit gates:
             {
-
-                // Single Qubit gates:
+                var gateTypes = new Type[]
                 {
-                    var gateTypes = new Type[]
-                    {
-                        typeof(Intrinsic.H),
-                        typeof(Intrinsic.S),
-                        typeof(Intrinsic.T),
-                        typeof(Intrinsic.X),
-                        typeof(Intrinsic.Y),
-                        typeof(Intrinsic.Z)
-                    };
+                    typeof(Intrinsic.H),
+                    typeof(Intrinsic.S),
+                    typeof(Intrinsic.T),
+                    typeof(Intrinsic.X),
+                    typeof(Intrinsic.Y),
+                    typeof(Intrinsic.Z)
+                };
 
-                    foreach (var t in gateTypes)
+                foreach (var t in gateTypes)
+                {
+                    using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
                     {
                         var gate = qsim.Get<IUnitary<Qubit>>(t);
                         TestOne(qsim, gate, TestUnitary);
@@ -324,7 +329,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 // Exp
                 {
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, Double, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), 1.0, qubits));
+                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, Double, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1.0, qubits));
                     var gate = qsim.Get<Intrinsic.Exp>();
                     var p = gate.Partial(mapper);
                     TestOne(qsim, p, TestMultiUnitary);
@@ -332,7 +337,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 // ExpFrac
                 {
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), 1, 2, qubits));
+                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1, 2, qubits));
                     var gate = qsim.Get<Intrinsic.ExpFrac>();
                     var p = gate.Partial(mapper);
                     TestOne(qsim, p, TestMultiUnitary);
@@ -357,6 +362,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     var gate = qsim.Get<Intrinsic.Measure>();
                     var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits));
                     var p = gate.Partial(mapper);
+
+                    // On systems that decompose joint measurement a qubit can actually be duplictated in
+                    // the targets, so skip the duplicate qubit check.
                     TestOne(qsim, p, (g, ctrls, t) => TestMultiCallable<Result>(p, t));
                 }
             }
