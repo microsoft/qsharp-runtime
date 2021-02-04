@@ -11,8 +11,22 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the absolute value of a double-precision floating-point number.
     ///
-    /// # Remarks
-    /// See [System.Math.Abs](https://docs.microsoft.com/dotnet/api/system.math.abs) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose absolute value is to be returned.
+    ///
+    /// # Output
+    /// The absolute value of `a`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// Message($"{AbsD(3.14)}");   // 3.14
+    /// Message($"{AbsD(-2.71)}");  // 2.71
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.AbsI
+    /// - Microsoft.Quantum.Math.AbsL
     function AbsD (a : Double) : Double {
         return a < 0.0 ? -a | a;
     }
@@ -20,17 +34,45 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the absolute value of an integer.
     ///
-    /// # Remarks
-    /// See [System.Math.Abs](https://docs.microsoft.com/dotnet/api/system.math.abs) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose absolute value is to be returned.
+    ///
+    /// # Output
+    /// The absolute value of `a`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// Message($"{AbsD(314)}");   // 314
+    /// Message($"{AbsD(-271)}");  // 271
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.AbsD
+    /// - Microsoft.Quantum.Math.AbsL
     function AbsI (a : Int) : Int {
         return a < 0 ? -a | a;
     }
 
     /// # Summary
-    /// Returns the absolute value of a big integer.
+    /// Returns the absolute value of an integer.
     ///
-    /// # Remarks
-    /// See [System.Numerics.BigInteger.Abs](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.abs) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose absolute value is to be returned.
+    ///
+    /// # Output
+    /// The absolute value of `a`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// Message($"{AbsD(314L)}");   // 314L
+    /// Message($"{AbsD(-271L)}");  // 271L
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.AbsD
+    /// - Microsoft.Quantum.Math.AbsI
     function AbsL (a : BigInt) : BigInt {
         return a < 0L ? -a | a;
     }
@@ -104,8 +146,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Math.Max](https://docs.microsoft.com/dotnet/api/system.math.max) for more details.
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The larger of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let max = MaxD(3.14, 2.71);  // 3.14
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MaxI
+    /// - Microsoft.Quantum.MaxL
     function MaxD(a : Double, b : Double) : Double {
         return a > b ? a | b;
     }
@@ -114,9 +171,24 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Math.Max](https://docs.microsoft.com/dotnet/api/system.math.max) for more details.
-    function MaxI (a : Int, b : Int) : Int {
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The larger of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let max = MaxD(314, 271);  // 314
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MaxD
+    /// - Microsoft.Quantum.MaxL
+    function MaxI(a : Int, b : Int) : Int {
         return a > b ? a | b;
     }
 
@@ -124,8 +196,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the larger of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Numerics.BigInteger.Max](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.max) for more details.
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The larger of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let max = MaxD(314L, 271L);  // 314L
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MaxD
+    /// - Microsoft.Quantum.MaxI
     function MaxL (a : BigInt, b : BigInt) : BigInt {
         return a > b ? a | b;
     }
@@ -134,8 +221,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Math.Min](https://docs.microsoft.com/dotnet/api/system.math.min) for more details.
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The smaller of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let min = MinD(3.14, 2.71);  // 2.71
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MinI
+    /// - Microsoft.Quantum.MinL
     function MinD (a : Double, b : Double) : Double {
         return a < b ? a | b;
     }
@@ -144,8 +246,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Math.Min](https://docs.microsoft.com/dotnet/api/system.math.min) for more details.
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The smaller of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let min = MinD(314, 271);  // 271
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MinD
+    /// - Microsoft.Quantum.MinL
     function MinI (a : Int, b : Int) : Int {
         return a < b ? a | b;
     }
@@ -154,8 +271,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns the smaller of two specified numbers.
     ///
-    /// # Remarks
-    /// See [System.Numerics.BigInteger.Min](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.min) for more details.
+    /// # Input
+    /// ## a
+    /// The first number to be compared.
+    /// ## b
+    /// The second number to be compared.
+    ///
+    /// # Output
+    /// The smaller of `a` and `b`.
+    ///
+    /// # Example
+    /// ```qsharp
+    /// let min = MinD(314L, 271L);  // 271L
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.MinD
+    /// - Microsoft.Quantum.MinI
     function MinL(a : BigInt, b : BigInt) : BigInt {
         return a < b ? a | b;
     }
@@ -164,8 +296,27 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Performs modular division on a number raised to the power of another number.
     ///
+    /// # Input
+    /// ## value
+    /// The value to be raised to the given exponent.
+    /// ## exponent
+    /// The exponent to which `value` is to be raised.
+    /// ## modulus
+    /// The modulus with respect to which `value ^ exponent` is to be computed.
+    ///
+    /// # Output
+    /// The result of `(value ^ exponent) % modulus`.
+    ///
     /// # Remarks
-    /// See [System.Numerics.BigInteger.ModPow](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.modpow) for more details.
+    /// The implementation of this function takes the modulus at each step,
+    /// making it much more efficient than `(value ^ exponent) % modulus` for
+    /// large values of `value` and `exponent`.
+    ///
+    /// # Example
+    /// The following snippet computs $11^31415 \bmod 13$:
+    /// ```qsharp
+    /// let result = ModPowL(11, 31415, 13);  // 6
+    /// ```
     function ModPowL(value : BigInt, exponent : BigInt, modulus : BigInt) : BigInt {
         // We implement our own binary exponentiation algorithm here so that
         // we can take the modulus at every step, avoiding any large
@@ -202,8 +353,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns an integer that indicates the sign of a number.
     ///
-    /// # Remarks
-    /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose sign is to be returned.
+    ///
+    /// # Output
+    /// The sign of `a` represented as an integer, as shown in the following
+    /// table:
+    ///
+    /// |Return value  |Meaning                  |
+    /// |--------------|-------------------------|
+    /// | -1           |`a` is less than zero    |
+    /// | 0            |`a` is equal to zero     |
+    /// | +1           |`a` is greater than zero |
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.SignI
+    /// - Microsoft.Quantum.Math.SignL
     function SignD (a : Double) : Int {
         if   (a < 0.0) { return -1; }
         elif (a > 0.0) { return +1; }
@@ -214,8 +380,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns an integer that indicates the sign of a number.
     ///
-    /// # Remarks
-    /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose sign is to be returned.
+    ///
+    /// # Output
+    /// The sign of `a` represented as an integer, as shown in the following
+    /// table:
+    ///
+    /// |Return value  |Meaning                  |
+    /// |--------------|-------------------------|
+    /// | -1           |`a` is less than zero    |
+    /// | 0            |`a` is equal to zero     |
+    /// | +1           |`a` is greater than zero |
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.SignD
+    /// - Microsoft.Quantum.Math.SignL
     function SignI (a : Int) : Int {
         if   (a < 0) { return -1; }
         elif (a > 0) { return +1; }
@@ -226,8 +407,23 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Returns an integer that indicates the sign of a number.
     ///
-    /// # Remarks
-    /// See [System.Math.Sign](https://docs.microsoft.com/dotnet/api/system.math.sign) for more details.
+    /// # Input
+    /// ## a
+    /// The number whose sign is to be returned.
+    ///
+    /// # Output
+    /// The sign of `a` represented as an integer, as shown in the following
+    /// table:
+    ///
+    /// |Return value  |Meaning                  |
+    /// |--------------|-------------------------|
+    /// | -1           |`a` is less than zero    |
+    /// | 0            |`a` is equal to zero     |
+    /// | +1           |`a` is greater than zero |
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.SignD
+    /// - Microsoft.Quantum.Math.SignI
     function SignL (a : BigInt) : Int {
         if   (a < 0L) { return -1; }
         elif (a > 0L) { return +1; }
