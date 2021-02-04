@@ -52,7 +52,7 @@ To update the *.ll files to a newer version:
 // The function replaces array[index] with value, then creates a new array that consists of every other element up to
 // index (starting from index backwards) and every element from index to the end. It returns the sum of elements in this
 // new array
-extern "C" void Microsoft__Quantum__Experimental__RunRBExperiment__body();
+extern "C" void Microsoft__Quantum__Experimental__RunRBExperiment__body(); // NOLINT
 TEST_CASE("QIR: Run RB experiment", "[qir]")
 {
     // Create a full state simulator and link it to the QIR context scope

@@ -73,10 +73,7 @@ else:
 print(os.environ["LD_LIBRARY_PATH"])
 log("========= Running native tests =========")
 test_binaries = [
-  "fullstate-simulator-tests",
-  "qir-runtime-unittests",
-  "qir-static-tests",
-  "qir-dynamic-tests"
+  "qir-example"
 ]
 
 for name in test_binaries:
