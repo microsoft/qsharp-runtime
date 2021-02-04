@@ -74,6 +74,7 @@ else:
 
 log("========= Running native tests =========")
 test_binaries = [
+  "fullstate-simulator-tests",
   "qir-runtime-unittests",
   "qir-static-tests",
   "qir-dynamic-tests"
