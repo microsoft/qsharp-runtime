@@ -27,7 +27,10 @@ namespace Microsoft.Quantum.Tests {
 
     @Test("QuantumSimulator")
     function XBitsIsCorrect() : Unit {
-        EqualityFactI(XBits([PauliX, PauliY, PauliZ, PauliI]), 12, "XBits was incorrect.");
+        // We expect this to be 3, 3 = 0011₂. In little endian representation,
+        // we start with the 1s digit, so we get that 3 is what we get from
+        // [1, 1, 0, 0]
+        EqualityFactI(XBits([PauliX, PauliY, PauliZ, PauliI]), 3, "XBits was incorrect.");
     }
 
     @Test("QuantumSimulator")
