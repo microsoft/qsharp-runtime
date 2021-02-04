@@ -20,6 +20,12 @@ namespace Microsoft.Quantum.Core {
     newtype EntryPoint = Unit;
 
     /// # Summary
+    /// Compiler-recognized attribute used during QIR emission to determine 
+    /// when callables should be inlined, if possible.
+    @Attribute()
+    newtype Inline = Unit;
+
+    /// # Summary
     /// Compiler-recognized attribute used to mark a type or callable as deprecated.
     /// 
     /// # Named Items
