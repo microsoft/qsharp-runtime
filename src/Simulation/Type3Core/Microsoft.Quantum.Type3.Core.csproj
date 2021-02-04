@@ -3,7 +3,7 @@
   <Import Project="..\TargetDefinitions\TargetPackages\Type3.Package.props" />
 
   <PropertyGroup>
-    <Description>Type2 Targeting support for the Q# programming language.</Description>
+    <Description>Type3 Targeting support for the Q# programming language.</Description>
     <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
   
