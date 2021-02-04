@@ -79,7 +79,7 @@ namespace Quantum
         }
 
         const QUANTUM_SIMULATOR handle;
-        unsigned simulatorId;
+        unsigned simulatorId = -1;
         unsigned nextQubitId = 0; // the QuantumSimulator expects contiguous ids, starting from 0
 
         unsigned GetQubitId(Qubit qubit) const
@@ -285,13 +285,13 @@ namespace Quantum
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
-        void SAdjoint(Qubit q) override
+        void AdjointS(Qubit q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(LoadProc(this->handle, "AdjS"));
             op(this->simulatorId, GetQubitId(q));
         }
 
-        void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(LoadProc(this->handle, "MCAdjS"));
@@ -313,13 +313,13 @@ namespace Quantum
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
-        void TAdjoint(Qubit q) override
+        void AdjointT(Qubit q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(LoadProc(this->handle, "AdjT"));
             op(this->simulatorId, GetQubitId(q));
         }
 
-        void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(LoadProc(this->handle, "MCAdjT"));

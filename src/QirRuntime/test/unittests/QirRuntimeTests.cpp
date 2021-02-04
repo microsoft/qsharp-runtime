@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "qirTypes.hpp"
+#include "quantum__qis.hpp"
 #include "quantum__rt.hpp"
 
 #include "BitStates.hpp"
@@ -980,4 +981,100 @@ TEST_CASE("Tuples: copy elision", "[qir_support]")
     quantum__rt__tuple_update_reference_count(self, -1);
     quantum__rt__tuple_update_reference_count(other1, -1);
     quantum__rt__tuple_update_reference_count(other2, -1);
+}
+
+// Adjoints for R and Exp are implemented by qis, so let's check they at least do the angle invertion in adjoints.
+struct AdjointsTestSimulator : public SimulatorStub
+{
+    int lastId = -1;
+    double rotationAngle = 0.0;
+    double exponentAngle = 0.0;
+
+    Qubit AllocateQubit() override
+    {
+        return reinterpret_cast<Qubit>(++this->lastId);
+    }
+    void ReleaseQubit(Qubit qubit) override {}
+    Result UseZero() override
+    {
+        return reinterpret_cast<Result>(0);
+    }
+    Result UseOne() override
+    {
+        return reinterpret_cast<Result>(1);
+    }
+
+    void R(PauliId, Qubit, double theta) override
+    {
+        this->rotationAngle += theta;
+    }
+    void Exp(long count, PauliId* paulis, Qubit*, double theta) override
+    {
+        this->exponentAngle += theta;
+
+        // check that paulis were unpacked correctly (this assumes that the tests always invoke with the same axes)
+        REQUIRE(count == 2);
+        CHECK(paulis[0] == PauliId_Z);
+        CHECK(paulis[1] == PauliId_Y);
+    }
+    void ControlledR(long, Qubit*, PauliId, Qubit, double theta) override
+    {
+        this->rotationAngle += theta;
+    }
+    void ControlledExp(long, Qubit*, long count, PauliId* paulis, Qubit*, double theta) override
+    {
+        this->exponentAngle += theta;
+
+        // check that paulis were unpacked correctly (this assumes that the tests always invoke with the same axes)
+        REQUIRE(count == 2);
+        CHECK(paulis[0] == PauliId_Z);
+        CHECK(paulis[1] == PauliId_Y);
+    }
+};
+TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
+{
+    std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
+    QirContextScope qirctx(qapi.get());
+
+    const double angle = 0.42;
+
+    Qubit target = quantum__rt__qubit_allocate();
+    QirArray* ctrls = quantum__rt__qubit_allocate_array(2);
+
+    quantum__qis__r__body(PauliId_Y, angle, target);
+    quantum__qis__r__adj(PauliId_Y, angle, target);
+    quantum__qis__r__ctl(ctrls, PauliId_X, angle, target);
+    quantum__qis__r__ctladj(ctrls, PauliId_X, angle, target);
+
+    quantum__rt__qubit_release_array(ctrls);
+    quantum__rt__array_update_reference_count(ctrls, -1);
+    quantum__rt__qubit_release(target);
+
+    REQUIRE(qapi->rotationAngle == Approx(0).epsilon(0.0001));
+}
+
+TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
+{
+    std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
+    QirContextScope qirctx(qapi.get());
+
+    const double angle = 0.42;
+
+    QirArray* targets = quantum__rt__qubit_allocate_array(2);
+    QirArray* ctrls = quantum__rt__qubit_allocate_array(2);
+    QirArray* axes = quantum__rt__array_create_1d(1 /*element size*/, 2 /*count*/);
+    axes->buffer[0] = 2;
+    axes->buffer[1] = 3;
+
+    quantum__qis__exp__body(axes, angle, targets);
+    quantum__qis__exp__adj(axes, angle, targets);
+    quantum__qis__exp__ctl(ctrls, axes, angle, targets);
+    quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
+
+    quantum__rt__qubit_release_array(ctrls);
+    quantum__rt__array_update_reference_count(ctrls, -1);
+    quantum__rt__qubit_release_array(targets);
+    quantum__rt__array_update_reference_count(targets, -1);
+
+    REQUIRE(qapi->exponentAngle == Approx(0).epsilon(0.0001));
 }

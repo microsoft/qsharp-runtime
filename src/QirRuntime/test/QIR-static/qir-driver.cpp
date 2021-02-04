@@ -56,7 +56,8 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t count,
     int64_t* array,
     int64_t index,
-    int64_t val);
+    int64_t val,
+    bool dummy);
 TEST_CASE("QIR: Using 1D arrays", "[qir]")
 {
     // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed
@@ -65,7 +66,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir]")
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42);
+    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42, false);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
@@ -114,9 +115,11 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result M(Qubit qubit) override
+    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        const int id = GetQubitId(qubit);
+        assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
+
+        const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->results.push_back(this->qubits[id]);
         return reinterpret_cast<Result>(this->results.size() - 1);
@@ -209,6 +212,7 @@ TEST_CASE("QIR: Report range in a failure message", "[qir]")
     REQUIRE(failed);
 }
 
+#if 0 // TODO: Q# compiler crashes generating QIR for TestPartials
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir]")
@@ -218,6 +222,7 @@ TEST_CASE("QIR: Partial application of a callable", "[qir]")
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__body(42, 17);
     REQUIRE(res == 42 - 17);
 }
+#endif
 
 // The Microsoft__Quantum__Testing__QIR__TestControlled__body tests needs proper semantics of X and M, and nothing else.
 // The validation is done inside the test and it would return an error code in case of failure.
@@ -267,9 +272,11 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result M(Qubit qubit) override
+    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        const int id = GetQubitId(qubit);
+        assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
+
+        const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
         return reinterpret_cast<Result>(this->qubits[id]);
     }
