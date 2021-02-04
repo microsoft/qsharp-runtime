@@ -237,19 +237,19 @@ namespace Quantum
         {
             throw std::logic_error("operation_not_supported");
         }
-        void SAdjoint(Qubit target) override
+        void AdjointS(Qubit target) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void TAdjoint(Qubit target) override
+        void AdjointT(Qubit target) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("operation_not_supported");
         }

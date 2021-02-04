@@ -3,14 +3,11 @@
 
 namespace Microsoft.Quantum.Testing.QIR
 {
-    open Microsoft.Quantum.Intrinsic;
-
     function Subtract(from : Int, what : Int) : Int
     {
         return from - what;
     }
 
-    @EntryPoint()
     function TestPartials(x : Int, y : Int) : Int
     {
         let subtractor = Subtract(x, _);
