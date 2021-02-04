@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Intrinsic {
             }
             else {
                 within {
-                    Controlled CNOT(ctls, (qubit1, qubit2));
+                    CNOT(qubit1, qubit2);
                 }
                 apply {
                     Controlled CNOT(ctls, (qubit2, qubit1));
