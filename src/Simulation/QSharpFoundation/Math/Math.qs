@@ -324,8 +324,8 @@ namespace Microsoft.Quantum.Math {
         mutable result = 1L;
         mutable runningExponent = exponent;
         mutable runningValue = value;
-        while runningExponent > 0 {
-            if (runningExponent &&& 1) {
+        while runningExponent > 0L {
+            if (runningExponent &&& 1L) == 1L {
                 set result = (result * runningValue) % modulus;
             }
 
@@ -477,14 +477,14 @@ namespace Microsoft.Quantum.Math {
 
     internal function ExtendedTruncation(value : Double) : (Int, Double, Bool) {
         let truncated = Truncate(value);
-        return (truncated, truncated - value, value >= 0);
+        return (truncated, Microsoft.Quantum.Convert.IntAsDouble(truncated) - value, value >= 0.0);
     }
 
     /// # Summary
     /// Returns the smallest integer greater than or equal to the specified number.
     ///
     /// # Input
-    /// ## a
+    /// ## value
     /// The value whose ceiling is to be returned.
     ///
     /// # Output
@@ -510,7 +510,7 @@ namespace Microsoft.Quantum.Math {
     /// Returns the smallest integer greater than or equal to the specified number.
     ///
     /// # Input
-    /// ## a
+    /// ## value
     /// The value whose floor is to be returned.
     ///
     /// # Output
@@ -523,7 +523,7 @@ namespace Microsoft.Quantum.Math {
     /// Message($"{Floor(-3.1)}");  // -4.0
     /// Message($"{Floor(-3.7)}");  // -4.0
     /// ```
-    function Floor(a : Double) : Int {
+    function Floor(value : Double) : Int {
         let (truncated, remainder, isPositive) = ExtendedTruncation(value);
         if AbsD(remainder) <= 1e-15 {
             return truncated;
@@ -559,7 +559,4 @@ namespace Microsoft.Quantum.Math {
         }
     }
 
-
 }
-
-
