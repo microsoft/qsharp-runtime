@@ -409,6 +409,7 @@ module SimulationCode =
             | NamedItem (ex, acc)           -> buildNamedItem ex acc
             | ArrayItem (a, i)              -> buildArrayItem a i
             | ValueArray elems              -> buildValueArray ex.ResolvedType elems
+            | SizedArray (value, size)      -> buildSizedArray value size
             | NewArray (t, expr)            -> buildNewArray t expr
             | AdjointApplication op         -> (buildExpression op)   <|.|> (``ident`` "Adjoint")
             | ControlledApplication op      -> (buildExpression op)   <|.|> (``ident`` "Controlled")
@@ -590,6 +591,9 @@ module SimulationCode =
             | Some arrayType -> ``new`` arrayType ``(`` (elems |> Seq.map captureExpression |> Seq.toList) ``)``
 // TODO: diagnostics.
             | _ -> failwith ""
+
+        and buildSizedArray value size =
+            ident "QArray" <.> (ident "Repeat", [ buildExpression value; buildExpression size ])
 
         and buildNewArray b count =
             let arrayType = (ArrayType b |> QArrayType).Value

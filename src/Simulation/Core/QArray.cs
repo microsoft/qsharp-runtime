@@ -517,6 +517,10 @@ namespace Microsoft.Quantum.Simulation.Core
             arg;
     }
 
+    public static class QArray
+    {
+        public static QArray<T> Repeat<T>(T element, long count) => throw new NotImplementedException();
+    }
 
     /// <summary>
     /// This JsonConverter converts instances of IQArray['T] as QArray['T]
@@ -557,4 +561,3 @@ namespace Microsoft.Quantum.Simulation.Core
                 objectType.GetGenericTypeDefinition() == typeof(QArray<>);
     }
 }
-
