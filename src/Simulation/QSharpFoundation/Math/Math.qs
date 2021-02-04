@@ -36,15 +36,6 @@ namespace Microsoft.Quantum.Math {
     }
 
     /// # Summary
-    /// Returns the smallest integer greater than or equal to the specified number.
-    ///
-    /// # Remarks
-    /// See [System.Math.Ceiling](https://docs.microsoft.com/dotnet/api/system.math.ceiling) for more details.
-    function Ceiling (value : Double) : Int {
-        body intrinsic;
-    }
-
-    /// # Summary
     /// Divides one BigInteger value by another, returns the result and the remainder as a tuple.
     ///
     /// # Remarks
@@ -54,23 +45,21 @@ namespace Microsoft.Quantum.Math {
     }
 
     /// # Summary
-    /// Returns $e$ raised to the specified power.
+    /// Returns the natural logarithmic base raised to a specified power.
+    ///
+    /// # Input
+    /// ## a
+    /// The power to which $e$ should be raised.
+    ///
+    /// # Output
+    /// The natural logarithmic base raised to the power `a`, $e^a$.
     ///
     /// # Remarks
-    /// See [System.Math.Exp](https://docs.microsoft.com/dotnet/api/system.math.exp) for more details.
+    /// Note that on some execution targets, this function may be implemented
+    /// by a limited-precision algorithm.
     function ExpD (a : Double) : Double {
-        body intrinsic;
+        return E() ^ a;
     }
-
-    /// # Summary
-    /// Returns the largest integer less than or equal to the specified number.
-    ///
-    /// # Remarks
-    /// See [System.Math.Floor](https://docs.microsoft.com/dotnet/api/system.math.floor) for more details.
-    function Floor (value : Double) : Int {
-        body intrinsic;
-    }
-
 
     /// # Summary
     /// Returns the remainder resulting from the division of a specified number by another specified number.
@@ -93,10 +82,19 @@ namespace Microsoft.Quantum.Math {
 
 
     /// # Summary
-    /// Returns the base 10 logarithm of a specified number.
+    /// Returns the base-10 logarithm of a specified number.
+    ///
+    /// # Input
+    /// ## input
+    /// The non-negative number whose base-10 logarithm is to be computed.
+    ///
+    /// # Output
+    /// The base-10 logarithm of `input`, such that `PowD(10.0, Log10(input))`
+    /// is approximately the same as `input`.
     ///
     /// # Remarks
-    /// See [System.Math.Log10](https://docs.microsoft.com/dotnet/api/system.math.log10) for more details.
+    /// Note that on some execution targets, this function may be implemented
+    /// by a limited-precision algorithm.
     function Log10(input : Double) : Double {
         let log10 = Log(10.0);
         return Log(input) / log10;
@@ -168,27 +166,37 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Remarks
     /// See [System.Numerics.BigInteger.ModPow](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.modpow) for more details.
-    function ModPowL(value : BigInt, exponent : BigInt, modulus: BigInt) : BigInt {
-        body intrinsic;
+    function ModPowL(value : BigInt, exponent : BigInt, modulus : BigInt) : BigInt {
+        // We implement our own binary exponentiation algorithm here so that
+        // we can take the modulus at every step, avoiding any large
+        // intermediate values.
+        mutable result = 1L;
+        mutable runningExponent = exponent;
+        mutable runningValue = value;
+        while runningExponent > 0 {
+            if (runningExponent &&& 1) {
+                set result = (result * runningValue) % modulus;
+            }
+
+            set runningValue *= runningValue;
+            set runningExponent >>>= 1;
+        }
+        return result;
     }
 
     /// # Summary
     /// Returns the number x raised to the power y.
     ///
-    /// # Remarks
-    /// See [System.Math.Pow](https://docs.microsoft.com/dotnet/api/system.math.pow) for more details.
-    function PowD (x : Double, y : Double) : Double {
-        body intrinsic;
-    }
-
-
-    /// # Summary
-    /// Rounds a value to the nearest integer.
+    /// # Input
+    /// ## x
+    /// The base to be raised to the given power.
+    /// ## y
+    /// The power to which the base is to be raised.
     ///
-    /// # Remarks
-    /// See [System.Math.Round](https://docs.microsoft.com/dotnet/api/system.math.round) for more details.
-    function Round (a : Double) : Int {
-        body intrinsic;
+    /// # Output
+    /// The base `x` raised to the power `y`; i.e.: `x ^ y`.
+    function PowD(x : Double, y : Double) : Double {
+        return x ^ y;
     }
 
     /// # Summary
@@ -235,14 +243,126 @@ namespace Microsoft.Quantum.Math {
         body intrinsic;
     }
 
+    // Design notes:
+    // In order to minimize the number of intrinsic functions needed in
+    // runtime interfaces, we want to express Ceiling, Floor, Round, and
+    // Truncate all in terms of a single intrinsic, Truncate. The differences
+    // between the behavior for each can be replicated by using the output
+    // of Truncate, the difference between the input and Truncate, and the
+    // sign of the input:
+    //
+    // | Input | Truncate | Ceiling | Floor | Round |
+    // |-------|----------|---------|-------|-------|
+    // |   3.1 |      3.0 |     4.0 |   3.0 |   3.0 |
+    // |   3.7 |      3.0 |     4.0 |   3.0 |   4.0 |
+    // |  -3.1 |     -3.0 |    -3.0 |  -4.0 |  -3.0 |
+    // |  -3.7 |     -3.0 |    -3.0 |  -4.0 |  -4.0 |
+
     /// # Summary
-    /// Calculates the integral part of a number.
+    /// Returns the integral part of a number.
     ///
-    /// # Remarks
-    /// See [System.Math.Truncate](https://docs.microsoft.com/dotnet/api/system.math.truncate) for more details.
-    function Truncate (a : Double) : Int {
+    /// # Input
+    /// ## a
+    /// The value whose truncation is to be returned.
+    ///
+    /// # Output
+    /// The truncation of the input.
+    ///
+    /// # Example
+    /// ```
+    /// Message($"{Truncate(3.1)}");   //  3.0
+    /// Message($"{Truncate(3.7)}");   //  3.0
+    /// Message($"{Truncate(-3.1)}");  // -3.0
+    /// Message($"{Truncate(-3.7)}");  // -3.0
+    /// ```
+    function Truncate(a : Double) : Int {
         body intrinsic;
     }
+
+    internal function ExtendedTruncation(value : Double) : (Int, Double, Bool) {
+        let truncated = Truncate(value);
+        return (truncated, truncated - value, value >= 0);
+    }
+
+    /// # Summary
+    /// Returns the smallest integer greater than or equal to the specified number.
+    ///
+    /// # Input
+    /// ## a
+    /// The value whose ceiling is to be returned.
+    ///
+    /// # Output
+    /// The ceiling of the input.
+    ///
+    /// # Example
+    /// ```
+    /// Message($"{Ceiling(3.1)}");   //  4.0
+    /// Message($"{Ceiling(3.7)}");   //  4.0
+    /// Message($"{Ceiling(-3.1)}");  // -3.0
+    /// Message($"{Ceiling(-3.7)}");  // -3.0
+    /// ```
+    function Ceiling(value : Double) : Int {
+        let (truncated, remainder, isPositive) = ExtendedTruncation(value);
+        if AbsD(remainder) <= 1e-15 {
+            return truncated;
+        } else {
+            return isPositive ? truncated + 1 | truncated;
+        }
+    }
+
+    /// # Summary
+    /// Returns the smallest integer greater than or equal to the specified number.
+    ///
+    /// # Input
+    /// ## a
+    /// The value whose floor is to be returned.
+    ///
+    /// # Output
+    /// The floor of the input.
+    ///
+    /// # Example
+    /// ```
+    /// Message($"{Floor(3.1)}");   //  3.0
+    /// Message($"{Floor(3.7)}");   //  3.0
+    /// Message($"{Floor(-3.1)}");  // -4.0
+    /// Message($"{Floor(-3.7)}");  // -4.0
+    /// ```
+    function Floor(a : Double) : Int {
+        let (truncated, remainder, isPositive) = ExtendedTruncation(value);
+        if AbsD(remainder) <= 1e-15 {
+            return truncated;
+        } else {
+            return isPositive ? truncated + 1 | truncated;
+        }
+    }
+
+    /// # Summary
+    /// Returns the nearest integer to the specified number.
+    ///
+    /// # Input
+    /// ## a
+    /// The value to be rounded.
+    ///
+    /// # Output
+    /// The nearest integer to the input.
+    ///
+    /// # Example
+    /// ```
+    /// Message($"{Round(3.1)}");   //  3.0
+    /// Message($"{Round(3.7)}");   //  4.0
+    /// Message($"{Round(-3.1)}");  // -3.0
+    /// Message($"{Round(-3.7)}");  // -4.0
+    /// ```
+    function Round(value : Double) : Int {
+        let (truncated, remainder, isPositive) = ExtendedTruncation(value);
+        if AbsD(remainder) <= 1e-15 {
+            return truncated;
+        } else {
+            let abs = AbsD(remainder);
+            return truncated + (abs <= 0.5 ? 0 | (isPositive ? 1 | -1));
+        }
+    }
+
 
 }
 
