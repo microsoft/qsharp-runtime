@@ -31,7 +31,8 @@ namespace Microsoft.Quantum.Math {
     /// # See Also
     /// - Microsoft.Quantum.Math.E
     function PI() : Double {
-        return 3.14159265358979323846;
+        // return 3.14159265358979323846;
+        body intrinsic;
     }
 
 }
