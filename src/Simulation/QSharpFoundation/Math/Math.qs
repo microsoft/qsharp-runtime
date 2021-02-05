@@ -449,10 +449,10 @@ namespace Microsoft.Quantum.Math {
     //
     // | Input | Truncate | Ceiling | Floor | Round |
     // |-------|----------|---------|-------|-------|
-    // |   3.1 |      3.0 |     4.0 |   3.0 |   3.0 |
-    // |   3.7 |      3.0 |     4.0 |   3.0 |   4.0 |
-    // |  -3.1 |     -3.0 |    -3.0 |  -4.0 |  -3.0 |
-    // |  -3.7 |     -3.0 |    -3.0 |  -4.0 |  -4.0 |
+    // |   3.1 |        3 |       4 |     3 |     3 |
+    // |   3.7 |        3 |       4 |     3 |     4 |
+    // |  -3.1 |       -3 |      -3 |    -4 |    -3 |
+    // |  -3.7 |       -3 |      -3 |    -4 |    -4 |
 
     /// # Summary
     /// Returns the integral part of a number.
@@ -466,10 +466,10 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```
-    /// Message($"{Truncate(3.1)}");   //  3.0
-    /// Message($"{Truncate(3.7)}");   //  3.0
-    /// Message($"{Truncate(-3.1)}");  // -3.0
-    /// Message($"{Truncate(-3.7)}");  // -3.0
+    /// Message($"{Truncate(3.1)}");   //  3
+    /// Message($"{Truncate(3.7)}");   //  3
+    /// Message($"{Truncate(-3.1)}");  // -3
+    /// Message($"{Truncate(-3.7)}");  // -3
     /// ```
     ///
     /// # See Also
@@ -498,10 +498,10 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```
-    /// Message($"{Ceiling(3.1)}");   //  4.0
-    /// Message($"{Ceiling(3.7)}");   //  4.0
-    /// Message($"{Ceiling(-3.1)}");  // -3.0
-    /// Message($"{Ceiling(-3.7)}");  // -3.0
+    /// Message($"{Ceiling(3.1)}");   //  4
+    /// Message($"{Ceiling(3.7)}");   //  4
+    /// Message($"{Ceiling(-3.1)}");  // -3
+    /// Message($"{Ceiling(-3.7)}");  // -3
     /// ```
     function Ceiling(value : Double) : Int {
         let (truncated, remainder, isPositive) = ExtendedTruncation(value);
@@ -524,10 +524,10 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```
-    /// Message($"{Floor(3.1)}");   //  3.0
-    /// Message($"{Floor(3.7)}");   //  3.0
-    /// Message($"{Floor(-3.1)}");  // -4.0
-    /// Message($"{Floor(-3.7)}");  // -4.0
+    /// Message($"{Floor(3.1)}");   //  3
+    /// Message($"{Floor(3.7)}");   //  3
+    /// Message($"{Floor(-3.1)}");  // -4
+    /// Message($"{Floor(-3.7)}");  // -4
     /// ```
     function Floor(value : Double) : Int {
         let (truncated, remainder, isPositive) = ExtendedTruncation(value);
@@ -550,10 +550,10 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```
-    /// Message($"{Round(3.1)}");   //  3.0
-    /// Message($"{Round(3.7)}");   //  4.0
-    /// Message($"{Round(-3.1)}");  // -3.0
-    /// Message($"{Round(-3.7)}");  // -4.0
+    /// Message($"{Round(3.1)}");   //  3
+    /// Message($"{Round(3.7)}");   //  4
+    /// Message($"{Round(-3.1)}");  // -3
+    /// Message($"{Round(-3.7)}");  // -4
     /// ```
     function Round(value : Double) : Int {
         let (truncated, remainder, isPositive) = ExtendedTruncation(value);

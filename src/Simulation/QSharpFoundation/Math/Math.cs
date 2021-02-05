@@ -7,33 +7,6 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Math
 {
-    public partial class AbsD
-    {
-        public class Native : AbsD
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, double> __Body__ => System.Math.Abs;
-        }
-    }
-
-    public partial class AbsI
-    {
-        public class Native : AbsI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<long, long> __Body__ => System.Math.Abs;
-        }
-    }
-
-    public partial class AbsL
-    {
-        public class Native : AbsL
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<BigInteger, BigInteger> __Body__ => BigInteger.Abs;
-        }
-    }
-
     public partial class ArcCos
     {
         public class Native : ArcCos
@@ -71,15 +44,6 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class Ceiling
-    {
-        public class Native : Ceiling
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, long> __Body__ => (arg) => System.Convert.ToInt64(System.Math.Ceiling(arg));
-        }
-    }
-
     public partial class Cos
     {
         public class Native : Cos
@@ -114,15 +78,6 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class E
-    {
-        public class Native : E
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<QVoid, double> __Body__ => (arg) => System.Math.E;
-        }
-    }
-
     public partial class ExpD
     {
         public class Native : ExpD
@@ -131,16 +86,6 @@ namespace Microsoft.Quantum.Math
             public override Func<double, double> __Body__ => System.Math.Exp;
         }
     }
-
-    public partial class Floor
-    {
-        public class Native : Floor
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, long> __Body__ => (arg) => System.Convert.ToInt64(System.Math.Floor(arg));
-        }
-    }
-
     public partial class IEEERemainder
     {
         public class Native : IEEERemainder
@@ -168,60 +113,6 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class MaxD
-    {
-        public class Native : MaxD
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(double, double), double> __Body__ => (args) => System.Math.Max(args.Item1, args.Item2);
-        }
-    }
-
-    public partial class MaxI
-    {
-        public class Native : MaxI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(long, long), long> __Body__ => (args) => System.Math.Max(args.Item1, args.Item2);
-        }
-    }
-
-    public partial class MaxL
-    {
-        public class Native : MaxL
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(BigInteger, BigInteger), BigInteger> __Body__ => (args) => BigInteger.Max(args.Item1, args.Item2);
-        }
-    }
-
-    public partial class MinD
-    {
-        public class Native : MinD
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(double, double), double> __Body__ => (args) => System.Math.Min(args.Item1, args.Item2);
-        }
-    }
-
-    public partial class MinI
-    {
-        public class Native : MinI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(long, long), long> __Body__ => (args) => System.Math.Min(args.Item1, args.Item2);
-        }
-    }
-
-    public partial class MinL
-    {
-        public class Native : MinL
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(BigInteger, BigInteger), BigInteger> __Body__ => (args) => BigInteger.Min(args.Item1, args.Item2);
-        }
-    }
-
     public partial class ModPowL
     {
         public class Native : ModPowL
@@ -230,67 +121,12 @@ namespace Microsoft.Quantum.Math
             public override Func<(BigInteger, BigInteger, BigInteger), BigInteger> __Body__ => (args) => BigInteger.ModPow(args.Item1, args.Item2, args.Item3);
         }
     }
-
-    public partial class PI : Function<QVoid, Double>
-    {
-        public class Native : PI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<QVoid, double> __Body__ => (arg) => System.Math.PI;
-        }
-    }
-
-    public partial class PowD
-    {
-        public class Native : PowD
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<(double, double), double> __Body__ => (arg) => System.Math.Pow(arg.Item1, arg.Item2);
-        }
-    }
-
-    public partial class Round
-    {
-        public class Native : Round
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, long> __Body__ => (arg) => System.Convert.ToInt64(System.Math.Round(arg));
-        }
-    }
-
     public partial class Sin
     {
         public class Native : Sin
         {
             public Native(IOperationFactory m) : base(m) { }
             public override Func<double, double> __Body__ => (theta) => System.Math.Sin(theta);
-        }
-    }
-
-    public partial class SignD
-    {
-        public class Native : SignD
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, long> __Body__ => (arg) => System.Math.Sign(arg);
-        }
-    }
-
-    public partial class SignI
-    {
-        public class Native : SignI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<long, long> __Body__ => (arg) => System.Math.Sign(arg);
-        }
-    }
-
-    public partial class SignL
-    {
-        public class Native : SignL
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<BigInteger, long> __Body__ => (arg) => arg.Sign;
         }
     }
 
@@ -330,13 +166,5 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class Truncate
-    {
-        public class Native : Truncate
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<double, long> __Body__ => (arg) => System.Convert.ToInt64(System.Math.Truncate(arg));
-        }
-    }
 }
 
