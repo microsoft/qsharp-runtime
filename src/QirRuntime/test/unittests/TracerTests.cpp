@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 #include "catch.hpp"
 
 #include "CoreTypes.hpp"
@@ -11,8 +15,7 @@ using namespace Microsoft::Quantum;
 
 TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(3);
+    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -42,8 +45,7 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
 
 TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(3);
+    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -63,8 +65,7 @@ TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 
 TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(3);
+    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -120,8 +121,7 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
 // TODO: add multi-qubit ops
 TEST_CASE("Operations with same id are counted together", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(3);
+    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -146,8 +146,7 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
 
 TEST_CASE("Global barrier", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(2);
+    shared_ptr<CTracer> tr = CreateTracer(2 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -199,8 +198,7 @@ TEST_CASE("Global barrier", "[tracer]")
 // For layering purposes, measurements behave pretty much the same as other operations
 TEST_CASE("Layering measurements", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer();
-    tr->SetPreferredLayerDuration(1);
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -221,4 +219,87 @@ TEST_CASE("Layering measurements", "[tracer]")
     CHECK(layers[0].operations.size() == 3);
     CHECK(layers[1].operations.size() == 2);
     CHECK(layers[2].operations.size() == 1);
+}
+
+TEST_CASE("Output: to string", "[tracer]")
+{
+    std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+
+    Qubit q1 = tr->AllocateQubit();
+    tr->TraceSingleQubitOp(3, 1, q1);
+    tr->TraceSingleQubitOp(5, 1, q1);
+    tr->InjectGlobalBarrier(4, 2);
+    tr->TraceSingleQubitOp(3, 4, q1);
+    tr->TraceSingleQubitOp(2, 1, q1);
+
+    {
+        std::stringstream out;
+        tr->PrintLayerMetrics(out, ",", true /*printZeroMetrics*/);
+        std::string metrics = out.str();
+
+        std::stringstream expected;
+        expected << "layer_id,name,Y,Z,5" << std::endl;
+        expected << "0,,0,1,0" << std::endl;
+        expected << "1,,0,0,1" << std::endl;
+        expected << "2,b,0,0,0" << std::endl;
+        expected << "4,,0,1,0" << std::endl;
+        expected << "8,,1,0,0" << std::endl;
+
+        INFO(metrics);
+        CHECK(metrics == expected.str());
+    }
+
+    {
+        std::stringstream out;
+        tr->PrintLayerMetrics(out, ",", false /*printZeroMetrics*/);
+        std::string metrics = out.str();
+
+        std::stringstream expected;
+        expected << "layer_id,name,Y,Z,5" << std::endl;
+        expected << "0,,,1," << std::endl;
+        expected << "1,,,,1" << std::endl;
+        expected << "2,b,,," << std::endl;
+        expected << "4,,,1," << std::endl;
+        expected << "8,,1,," << std::endl;
+
+        INFO(metrics);
+        CHECK(metrics == expected.str());
+    }
+}
+
+TEST_CASE("Output: to file", "[tracer]")
+{
+    std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+
+    Qubit q1 = tr->AllocateQubit();
+    tr->TraceSingleQubitOp(3, 1, q1);
+    tr->TraceSingleQubitOp(5, 1, q1);
+    tr->InjectGlobalBarrier(4, 2);
+    tr->TraceSingleQubitOp(3, 4, q1);
+    tr->TraceSingleQubitOp(2, 1, q1);
+
+    const std::string fileName = "tracer-test.txt";
+    std::ofstream out;
+    out.open(fileName);
+    tr->PrintLayerMetrics(out, "\t", false /*printZeroMetrics*/);
+    out.close();
+
+    std::ifstream in(fileName);
+    string line;
+    REQUIRE(in.is_open());
+    std::string metrics(std::istreambuf_iterator<char>{in}, {});
+    in.close();
+
+    std::stringstream expected;
+    expected << "layer_id\tname\tY\tZ\t5" << std::endl;
+    expected << "0\t\t\t1\t" << std::endl;
+    expected << "1\t\t\t\t1" << std::endl;
+    expected << "2\tb\t\t\t" << std::endl;
+    expected << "4\t\t\t1\t" << std::endl;
+    expected << "8\t\t1\t\t" << std::endl;
+
+    INFO(metrics);
+    CHECK(metrics == expected.str());
 }

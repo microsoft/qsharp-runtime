@@ -114,11 +114,12 @@ endmacro(compile_from_qir)
 if (WIN32)
   set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/bridge-rt-u.lib")
   set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/bridge-qis-u.lib")
+  set(QIR_BRIDGE_TRACER_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/Tracer/bridge-trc-u.lib")
 else()
   set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libbridge-rt-u.a")
   set(QIR_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libbridge-qis-u.a")
+  set(QIR_BRIDGE_TRACER_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/Tracer/libbridge-trc-u.a")
 endif()
-
 
 add_subdirectory(lib)
 add_subdirectory(test)

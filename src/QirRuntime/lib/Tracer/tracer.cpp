@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
+#include <set>
 #include <sstream>
 
 #include "tracer.hpp"
@@ -13,9 +14,14 @@ namespace Microsoft
 namespace Quantum
 {
     thread_local std::shared_ptr<CTracer> tracer = nullptr;
-    std::shared_ptr<CTracer> CreateTracer()
+    std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration)
     {
-        tracer = std::make_shared<CTracer>();
+        tracer = std::make_shared<CTracer>(preferredLayerDuration);
+        return tracer;
+    }
+    std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration, const std::unordered_map<OpId, std::string>& opNames)
+    {
+        tracer = std::make_shared<CTracer>(preferredLayerDuration, opNames);
         return tracer;
     }
 
@@ -151,6 +157,8 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     LayerId CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
     {
+        this->seenOps.insert(id);
+
         QubitState& qstate = this->UseQubit(target);
         if (opDuration == 0 &&
             (qstate.layer == INVALID || (this->globalBarrier != INVALID && qstate.layer < this->globalBarrier)))
@@ -186,6 +194,8 @@ namespace Quantum
     {
         assert(nFirstGroup >= 0);
         assert(nSecondGroup > 0);
+
+        this->seenOps.insert(id);
 
         // Operations that involve a single qubit can special case duration zero.
         if (nFirstGroup == 0 && nSecondGroup == 1)
@@ -247,6 +257,49 @@ namespace Quantum
     {
         LayerId layerId = this->TraceMultiQubitOp(id, duration, 0, nullptr, nTargets, targets);
         return reinterpret_cast<Result>(layerId);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CTracer::PrintLayerMetrics
+    //------------------------------------------------------------------------------------------------------------------
+    static std::string GetOperationName(OpId opId, const std::unordered_map<OpId, std::string>& opNames)
+    {
+        if (opId < 0)
+        {
+            return "";
+        }
+
+        auto nameIt = opNames.find(opId);
+        return nameIt == opNames.end() ? std::to_string(opId) : nameIt->second;
+    }
+    void CTracer::PrintLayerMetrics(std::ostream& out, const std::string& separator, bool printZeroMetrics) const
+    {
+        // Sort the operations by id so the output is deterministic.
+        std::set<OpId> seenOpsOrederedById(this->seenOps.begin(), this->seenOps.end());
+
+        // header row
+        out << "layer_id" << separator << "name";
+        for (OpId opId : seenOpsOrederedById)
+        {
+            out << separator << GetOperationName(opId, this->opNames);
+        }
+        out << std::endl;
+
+        // data rows
+        const std::string zeroString = printZeroMetrics ? "0" : "";
+        for (const Layer& layer : this->metricsByLayer)
+        {
+            out << layer.startTime;
+            out << separator << GetOperationName(layer.barrierId, this->opNames);
+
+            for (OpId opId : seenOpsOrederedById)
+            {
+                auto foundInLayer = layer.operations.find(opId);
+                out << separator
+                    << ((foundInLayer == layer.operations.end()) ? zeroString : std::to_string(foundInLayer->second));
+            }
+            out << std::endl;
+        }
     }
 } // namespace Quantum
 } // namespace Microsoft

@@ -3,7 +3,9 @@
 
 #include <limits>
 #include <memory>
+#include <ostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "CoreTypes.hpp"
@@ -69,7 +71,7 @@ namespace Quantum
         std::vector<QubitState> qubits;
 
         // The preferred duration of a layer.
-        int preferredLayerDuration = 0;
+        const int preferredLayerDuration = 0;
 
         // The index into the vector is treated as implicit id of the layer.
         std::vector<Layer> metricsByLayer;
@@ -77,6 +79,13 @@ namespace Quantum
         // The last global barrier, injected by the user. No new operations can be added to the barrier or to any of the
         // layer that preceeded it, even if the new operations involve completely new qubits.
         LayerId globalBarrier = INVALID;
+
+        // Mapping of operation ids to user-chosen names, for operations that user didn't name, the output will use
+        // operation ids.
+        std::unordered_map<OpId, std::string> opNames;
+
+        // Operations we've seen so far (to be able to trim output to include only these)
+        std::unordered_set<OpId> seenOps;
 
       private:
         QubitState& UseQubit(Qubit q)
@@ -105,6 +114,17 @@ namespace Quantum
         void UpdateQubitState(Qubit q, LayerId layer, Duration opDuration);
 
       public:
+        explicit CTracer(int preferredLayerDuration)
+            : preferredLayerDuration(preferredLayerDuration)
+        {
+        }
+
+        CTracer(int preferredLayerDuration, const std::unordered_map<OpId, std::string>& opNames)
+            : preferredLayerDuration(preferredLayerDuration)
+            , opNames(opNames)
+        {
+        }
+
         // -------------------------------------------------------------------------------------------------------------
         // ISimulator interface
         // -------------------------------------------------------------------------------------------------------------
@@ -172,20 +192,20 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.
         // -------------------------------------------------------------------------------------------------------------
-        void SetPreferredLayerDuration(int dur)
-        {
-            this->preferredLayerDuration = dur;
-        }
-
         // Temporary method for initial testing
         // TODO: replace with a safer accessor
         const std::vector<Layer>& UseLayers()
         {
             return this->metricsByLayer;
         }
+
+        void PrintLayerMetrics(std::ostream& out, const std::string& separator, bool printZeroMetrics) const;
     };
 
-    std::shared_ptr<CTracer> CreateTracer();
+    std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
+    std::shared_ptr<CTracer> CreateTracer(
+        int preferredLayerDuration,
+        const std::unordered_map<OpId, std::string>& opNames);
 
 } // namespace Quantum
 } // namespace Microsoft
