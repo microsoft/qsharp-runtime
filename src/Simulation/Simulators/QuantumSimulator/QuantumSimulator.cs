@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IDisposable
+    public partial class QuantumSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
     {
         public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime.dll";
 
