@@ -1,7 +1,9 @@
-﻿namespace Tets.Samples {
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
-    open Microsoft.Quantum.Canon;
-    open Microsoft.Quantum.Measurement;
+namespace Microsoft.Quantum.Testing.QIR
+{
+
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
@@ -9,7 +11,7 @@
         
         using (q = Qubit()) {
             H(q);
-            return MResetZ(q);
+            return M(q);
         }
     }
 }

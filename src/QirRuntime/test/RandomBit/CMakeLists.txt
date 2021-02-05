@@ -7,6 +7,7 @@ set(RANDOM_BIT_FILES
 #  qir-test-qsharp
 #  qir-test-partials
 #  qir-test-qubits-results
+  qir-random-bit
 )
 
 foreach(file ${RANDOM_BIT_FILES})
