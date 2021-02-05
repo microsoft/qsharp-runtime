@@ -175,6 +175,15 @@ namespace Microsoft.Quantum.Math
         }
     }
 
+    public partial class Truncate
+    {
+        public class Native : Truncate
+        {
+            public Native(IOperationFactory m) : base(m) { }
+            public override Func<double, long> __Body__ => (arg) => System.Convert.ToInt64(System.Math.Truncate(arg));
+        }
+    }
+
 
 }
 

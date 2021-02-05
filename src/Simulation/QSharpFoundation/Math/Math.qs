@@ -534,7 +534,7 @@ namespace Microsoft.Quantum.Math {
         if AbsD(remainder) <= 1e-15 {
             return truncated;
         } else {
-            return isPositive ? truncated + 1 | truncated;
+            return isPositive ? truncated | truncated - 1;
         }
     }
 
