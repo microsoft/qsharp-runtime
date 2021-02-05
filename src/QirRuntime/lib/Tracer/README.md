@@ -6,7 +6,7 @@ The purpose of the Resource Tracer is to provide efficient and flexible way to e
 
 In addition to the standard QIR runtime functions, the quantum program will have to:
 
-1. convert _all_ used intrinsic operations into one of the supported by the tracer _trc_ operations (see the list below);
+1. convert _all_ used intrinsic operations into one of the _trc_ operations supported by the tracer (see the list below);
 1. (_optional_) provide callbacks for handling of conditional branches on a measurement (if not provided, the estimates
  would cover only one branch of the execution);
 1. (_optional_) provide a C++ header file with names of the gates (for user friendly output);
@@ -37,17 +37,17 @@ ___WIP___
 | `void __quantum__trc__multi_qubit_op(i32 %id, i32 %duration, %Array* %qs)` | Function for counting operations that involve multiple qubits.|
 | `void __quantum__trc__single_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Qubit* %q)` | Function for counting controlled operations with single target qubit. |
 | `void __quantum__trc__multi_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Array* %qs)` | Function for counting controlled operations with multiple target qubits. |
-| `%Result* @__quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a sigle qubit. The user might assign different operation id, depending on the basis of the measurement. |
-| `%Result* @__quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user might assign different operation id, depending on the basis of the measurement for each qubit.|
+| `%Result* @__quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user might assign different operation ids for different measurement bases. |
+| `%Result* @__quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user might assign different operation ids for different measurement bases. |
 | `void __quantum__trc__swap(%Qubit* %q1, %Qubit* %q2)` | See [Special handling of SWAP](#special-handling-of-swap) for details. |
 
-_Note on operation ids_: The client is responsible for using opeartion ids in a consistent manner. Operations with the
+_Note on operation ids_: The client is responsible for using operation ids in a consistent manner. Operations with the
  same id will be counted by the tracer as the _same_ operation, even accross invocations with different number of target
  qubits or when different functors are applied.
 
 ## Native backing of the extension methods ##
 
-The Resource Tracer will reuse qir-rt library as much as possible while extending it with the entry points specified above.
+The Resource Tracer will reuse qir-rt library as much as possible while extending it with the callbacks specified above.
 
 __Conditionals on measurements__: The Resource Tracer will execute LLVM IR's branching structures "as is", depending on
  the values of the corresponding variables at runtime. To enable estimation of branches that depend on a measurement
@@ -66,7 +66,7 @@ __Caching__ (lower priority): It might be a huge perf win if the Resource Tracer
 _Definition_: ___Time___ is an integer-valued function on all quantum operations in a program (gates, measurements,
  qubits allocation/release). For each gate there is start and end times. For each qubit, there are times when the qubit
  is allocated and released. Start time of a gate cannot be less than allocation time of any of the qubits the gate uses.
- If two gates or measurements use the same qubit, one of the gates must have start time greater of equal than the end
+ If two gates or measurements use the same qubit, one of the gates must have start time greater than or equal to the end
  time of the other.
 
 A sequentially executed quantum program can be assigned a trivial time function, when all quantum operations have
@@ -104,9 +104,9 @@ As the tracer is executing a sequential quantum program, it will compute a time 
 1. The first encountered operation of __non-zero__ duration N is added into layer L(0, max(P,N)). The value
  for _conditional barrier_ is set to 0.
 1. When conditional callback is encountered, the layer L(t,N) of the measurement that produced the result the conditional
- is on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope the barrier
- is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen before or in the same
- layer as the measurement, even if they don't involve the measured qubits.)
+ is dependent on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope the
+ barrier is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen before or in
+ the same layer as the measurement, even if they don't involve the measured qubits.)
 1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is a single-qubit _op_ of
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
  Starting at L(k, Nk) and scanning backwards to L(conditional barrier, Nb) find the _first_ layer that contains an
