@@ -281,3 +281,15 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
 }
 
 
+;===============================================================================
+; quantum.qis math functions
+;
+
+; LLVM intrinsics:
+; https://llvm.org/docs/LangRef.html
+declare double @llvm.sqrt.f64(double %.val)
+
+define double @__quantum__qis__sqrt__body(double %.val) {
+  %value = call double @llvm.sqrt.f64(double %.val)
+  ret double %value
+}
