@@ -79,9 +79,9 @@ namespace Microsoft.Quantum.Tests {
 
     @Test("QuantumSimulator")
     function ModPowL() : Unit {
-        EqualityFactL(PowModL(117L, 391L, 119L), 110L, "ModPowL(117L, 391L, 119L) was incorrect.");
-        EqualityFactL(PowModL(117L, 5792L, 119L), 18L, "ModPowL(117L, 5792L, 119L) was incorrect.");
-        EqualityFactL(PowModL(8675309L, 5792L, 2345678L), 1936199L, "ModPowL(8675309L, 5792L, 2345678L) was incorrect.");
+        EqualityFactL(ModPowL(117L, 391L, 119L), 110L, "ModPowL(117L, 391L, 119L) was incorrect.");
+        EqualityFactL(ModPowL(117L, 5792L, 119L), 18L, "ModPowL(117L, 5792L, 119L) was incorrect.");
+        EqualityFactL(ModPowL(8675309L, 5792L, 2345678L), 1936199L, "ModPowL(8675309L, 5792L, 2345678L) was incorrect.");
     }
 
 }
