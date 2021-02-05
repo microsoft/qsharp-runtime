@@ -20,6 +20,34 @@ namespace Microsoft.Quantum.Convert {
         body intrinsic;
     }
 
+    /// # Summary
+    /// Converts a floating-point number to an integer by
+    /// returning the truncation to its integral part.
+    ///
+    /// # Input
+    /// ## a
+    /// The value whose truncation is to be returned.
+    ///
+    /// # Output
+    /// The truncation of the input.
+    ///
+    /// # Example
+    /// ```
+    /// Message($"{Truncate(3.1)}");   //  3.0
+    /// Message($"{Truncate(3.7)}");   //  3.0
+    /// Message($"{Truncate(-3.1)}");  // -3.0
+    /// Message($"{Truncate(-3.7)}");  // -3.0
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.Truncate
+    /// - Microsoft.Quantum.Math.Ceiling
+    /// - Microsoft.Quantum.Math.Floor
+    /// - Microsoft.Quantum.Math.Round
+    function DoubleAsInt(a : Double) : Int {
+        body intrinsic;
+    }
+
 
     /// # Summary
     /// Converts a given integer to an equivalent big integer.

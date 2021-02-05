@@ -471,6 +471,12 @@ namespace Microsoft.Quantum.Math {
     /// Message($"{Truncate(-3.1)}");  // -3.0
     /// Message($"{Truncate(-3.7)}");  // -3.0
     /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Convert.DoubleAsInt
+    /// - Microsoft.Quantum.Math.Ceiling
+    /// - Microsoft.Quantum.Math.Floor
+    /// - Microsoft.Quantum.Math.Round
     function Truncate(a : Double) : Int {
         body intrinsic;
     }
