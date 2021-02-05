@@ -48,37 +48,37 @@ namespace Microsoft.Quantum.Tests {
 
     @Test("QuantumSimulator")
     function CeilingIsCorrect() : Unit {
-        EqualityWithinToleranceFact(Ceiling(3.1), 4.0, 1e-7, "Ceiling(3.1) was incorrect.");
-        EqualityWithinToleranceFact(Ceiling(3.7), 4.0, 1e-7, "Ceiling(3.7) was incorrect.");
-        EqualityWithinToleranceFact(Ceiling(-3.1), -3.0, 1e-7, "Ceiling(-3.1) was incorrect.");
-        EqualityWithinToleranceFact(Ceiling(-3.7), -3.0, 1e-7, "Ceiling(-3.7) was incorrect.");
+        EqualityFactI(Ceiling(3.1), 4, "Ceiling(3.1) was incorrect.");
+        EqualityFactI(Ceiling(3.7), 4, "Ceiling(3.7) was incorrect.");
+        EqualityFactI(Ceiling(-3.1), -3, "Ceiling(-3.1) was incorrect.");
+        EqualityFactI(Ceiling(-3.7), -3, "Ceiling(-3.7) was incorrect.");
     }
 
     @Test("QuantumSimulator")
     function FloorIsCorrect() : Unit {
-        EqualityWithinToleranceFact(Floor(3.1), 3.0, 1e-7, "Floor(3.1) was incorrect.");
-        EqualityWithinToleranceFact(Floor(3.7), 3.0, 1e-7, "Floor(3.7) was incorrect.");
-        EqualityWithinToleranceFact(Floor(-3.1), -4.0, 1e-7, "Floor(-3.1) was incorrect.");
-        EqualityWithinToleranceFact(Floor(-3.7), -4.0, 1e-7, "Floor(-3.7) was incorrect.");
+        EqualityFactI(Floor(3.1), 3, "Floor(3.1) was incorrect.");
+        EqualityFactI(Floor(3.7), 3, "Floor(3.7) was incorrect.");
+        EqualityFactI(Floor(-3.1), -4, "Floor(-3.1) was incorrect.");
+        EqualityFactI(Floor(-3.7), -4, "Floor(-3.7) was incorrect.");
     }
 
     @Test("QuantumSimulator")
     function RoundIsCorrect() : Unit {
-        EqualityWithinToleranceFact(Round(3.1), 3.0, 1e-7, "Round(3.1) was incorrect.");
-        EqualityWithinToleranceFact(Round(3.7), 4.0, 1e-7, "Round(3.7) was incorrect.");
-        EqualityWithinToleranceFact(Round(-3.1), -3.0, 1e-7, "Round(-3.1) was incorrect.");
-        EqualityWithinToleranceFact(Round(-3.7), -4.0, 1e-7, "Round(-3.7) was incorrect.");
+        EqualityFactI(Round(3.1), 3, "Round(3.1) was incorrect.");
+        EqualityFactI(Round(3.7), 4, "Round(3.7) was incorrect.");
+        EqualityFactI(Round(-3.1), -3, "Round(-3.1) was incorrect.");
+        EqualityFactI(Round(-3.7), -4, "Round(-3.7) was incorrect.");
     }
 
     @Test("QuantumSimulator")
     function PowDIsCorrect() : Unit {
-        EqualityWithinToleranceFact(PowD(2.1234, 3.4567), 13.7380892872214, 1e-7, "PowD(2.1234, 3.4567) was incorrect.");
+        EqualityWithinToleranceFact(PowD(2.1234, 3.4567), 13.5036405192181, 1e-7, "PowD(2.1234, 3.4567) was incorrect.");
         EqualityWithinToleranceFact(PowD(0.4567, 9.10111213), 0.000798479316935851, 1e-8, "PowD(0.4567, 9.10111213) was incorrect.");
         EqualityWithinToleranceFact(PowD(13.14151617, -1.98765), 0.00597756523034148, 1e-8, "PowD(13.14151617, -1.98765) was incorrect.");
     }
 
     @Test("QuantumSimulator")
-    function ModPowL() : Unit {
+    function ModPowLIsCorrect() : Unit {
         EqualityFactL(ModPowL(117L, 391L, 119L), 110L, "ModPowL(117L, 391L, 119L) was incorrect.");
         EqualityFactL(ModPowL(117L, 5792L, 119L), 18L, "ModPowL(117L, 5792L, 119L) was incorrect.");
         EqualityFactL(ModPowL(8675309L, 5792L, 2345678L), 1936199L, "ModPowL(8675309L, 5792L, 2345678L) was incorrect.");
