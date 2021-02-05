@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
-#include <cmath>
 
 #include "CoreTypes.hpp"
 #include "QuantumApi_I.hpp"
@@ -319,20 +318,4 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir]")
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__TestControlled__body());
 
     g_ctrqapi = nullptr;
-}
-
-
-
-
-extern "C" double __quantum__qis__sqrt__body(double);   // NOLINT
-
-TEST_CASE("QIR: math", "[qir.math][qir.math.sqrt]")
-{
-    REQUIRE(2.0     == __quantum__qis__sqrt__body((double)4.0));
-    REQUIRE(3.0     == __quantum__qis__sqrt__body((double)9.0));
-    REQUIRE(10.0    == __quantum__qis__sqrt__body((double)100.0));
-
-    REQUIRE( isnan(__quantum__qis__sqrt__body((double)-5.0)) );     // (double)NAN == sqrt((double)-5.0)
-    REQUIRE( isnan(__quantum__qis__sqrt__body(nan(""))) );          // (double)NAN == sqrt((double)<quiet NAN>)
-    REQUIRE( isinf(__quantum__qis__sqrt__body((double)INFINITY)) ); // +-infinity  == sqrt((double) +infinity)
 }
