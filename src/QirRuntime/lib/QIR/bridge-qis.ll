@@ -287,7 +287,6 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
 
 ; LLVM intrinsics (https://llvm.org/docs/LangRef.html):
 declare double      @llvm.sqrt.f64(double %.val)
-;declare double      @llvm.ceil.f64(double %Val)
 
 ; Native implementations:
 declare i1          @quantum__qis__isnan__body(double %d)
@@ -319,10 +318,3 @@ define double @__quantum__qis__sqrt__body(double %d) {      ; https://en.cpprefe
   %result = call double @llvm.sqrt.f64(double %d)           
   ret double %result
 }
-
-;define i64 @__quantum__qis__ceiling__body(double %d) {
-;  %doubleResult = call double @llvm.ceil.f64(double %d)
-;  %result = call i64 @quantum__qis__doubleasint__body(double $doubleResult)  ; Should be the same as DoubleAsInt in https://github.com/microsoft/qsharp-runtime/pull/497/files
-;  ret i64 %result
-;}
-

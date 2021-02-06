@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Testing.QIR
             let res1 = TestControlled();
             let res2 = TestPartials(17, 42);
             let res3 = Test_Qubit_Result_Management();
-            let res4 = TestSqrt();
+            let res4 = SqrtTest();
         }
 
         return sum;

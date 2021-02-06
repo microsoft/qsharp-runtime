@@ -59,4 +59,9 @@ extern "C"
     QIR_SHARED_API void quantum__qis__y__ctl(QirArray*, QUBIT*);                            // NOLINT
     QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
+
+    QIR_SHARED_API bool        quantum__qis__isnan__body(double d);                         // NOLINT
+    QIR_SHARED_API double      quantum__qis__infinity__body();                              // NOLINT
+    QIR_SHARED_API bool        quantum__qis__isinf__body(double d);                         // NOLINT
+
 }

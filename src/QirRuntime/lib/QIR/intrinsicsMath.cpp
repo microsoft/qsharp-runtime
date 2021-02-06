@@ -1,15 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #include <cmath>
+#include "quantum__qis.hpp"
 
 extern "C"
 {
-
-// Declarations:
-bool        quantum__qis__isnan__body(double d);
-double      quantum__qis__inf__body();
-bool        quantum__qis__isinf__body(double d);
 
 // Implementations:
 bool quantum__qis__isnan__body(double d)

@@ -5,22 +5,27 @@ namespace Microsoft.Quantum.Intrinsic {
 
     open Microsoft.Quantum.Targeting;
 
+    @Inline()
     function NAN() : Double {
         body intrinsic;
     }
 
+    @Inline()
     function IsNan(d: Double) : Bool {
         body intrinsic;
     }
 
+    @Inline()
     function INFINITY() : Double {
         body intrinsic;
     }
 
+    @Inline()
     function IsInf(d: Double) : Bool {
         body intrinsic;
     }
 
+    @Inline()
     function Sqrt(d : Double) : Double {
         body intrinsic;
     }

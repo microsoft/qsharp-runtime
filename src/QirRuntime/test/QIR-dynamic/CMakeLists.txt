@@ -36,7 +36,6 @@ add_executable(qir-dynamic-tests
 target_link_libraries(qir-dynamic-tests PUBLIC
   ${QIR_TESTS_LIBS}
   qdk
-  qir-qis-support
 )
 
 target_include_directories(qir-dynamic-tests PUBLIC
