@@ -166,15 +166,6 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class PI : Function<QVoid, Double>
-    {
-        public class Native : PI
-        {
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<QVoid, double> __Body__ => (arg) => System.Math.PI;
-        }
-    }
-
     public partial class Truncate
     {
         public class Native : Truncate
