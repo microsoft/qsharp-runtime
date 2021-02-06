@@ -95,13 +95,13 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     // should fall through to the first layer
 
     Qubit qs46[2] = {q4, q6};
-    CHECK(1 == tr->TraceMultiQubitOp(10, 1, 3 /*nFirst*/, &q3 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
-    // because of q4, should be added into the second layer
+    CHECK(1 == tr->TraceMultiQubitOp(10, 1, 2 /*nFirst*/, qs46 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
+    // because of the controls, should be added into the second layer
 
     const vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 2);
 
-    REQUIRE(layers[0].operations.size() == 5);
+    CHECK(layers[0].operations.size() == 5);
     const auto& ops0 = layers[0].operations;
     CHECK(ops0.find(1) != ops0.end());
     CHECK(ops0.find(2) != ops0.end());

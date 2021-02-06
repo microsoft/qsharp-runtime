@@ -17,7 +17,7 @@ using namespace Microsoft::Quantum;
 namespace TracerUser
 {
 
-TEST_CASE("Test that we are building the new components correctly", "[qir-tracer]")
+TEST_CASE("Invoke each operator from Q# core once", "[qir-tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, g_operationNames);
     QirContextScope qirctx(tr.get(), false /*trackAllocatedObjects*/);

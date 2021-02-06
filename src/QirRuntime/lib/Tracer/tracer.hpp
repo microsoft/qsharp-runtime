@@ -60,6 +60,9 @@ namespace Quantum
         Time lastUsedTime = 0;
 
         std::vector<OpId> pendingZeroOps;
+
+        // For now assume that only one kind of frame can be tracked.
+        bool isFrameOpen = false;
     };
 
     /*==================================================================================================================
@@ -67,10 +70,10 @@ namespace Quantum
     ==================================================================================================================*/
     class CTracer : public ISimulator
     {
-        // Start with no reuse of qubits.
+        // For now the tracer assumes no reuse of qubits.
         std::vector<QubitState> qubits;
 
-        // The preferred duration of a layer.
+        // The preferred duration of a layer. An operation with longer duration will make the containing layer longer.
         const int preferredLayerDuration = 0;
 
         // The index into the vector is treated as implicit id of the layer.
@@ -84,7 +87,7 @@ namespace Quantum
         // operation ids.
         std::unordered_map<OpId, std::string> opNames;
 
-        // Operations we've seen so far (to be able to trim output to include only these)
+        // Operations we've seen so far (to be able to trim output to include only those that were encounted).
         std::unordered_set<OpId> seenOps;
 
       private:
