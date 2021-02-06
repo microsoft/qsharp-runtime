@@ -70,6 +70,7 @@ add_dependencies(qir-rt ${bridge_rt_target})
 #
 set(qis_sup_source_files
   "intrinsics.cpp"
+  "intrinsicsMath.cpp"
 )
 
 add_library(qir-qis-support ${qis_sup_source_files})

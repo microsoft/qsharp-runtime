@@ -3,6 +3,8 @@
 
 namespace Microsoft.Quantum.Testing.QIR
 {
+    open Microsoft.Quantum.Testing.QIR.Math;
+
     @EntryPoint()
     operation Test_Arrays(array : Int[], index : Int, val : Int, dummy : Bool) : Int
     {
@@ -33,9 +35,9 @@ namespace Microsoft.Quantum.Testing.QIR
         if (dummy)
         {
             let res1 = TestControlled();
-            //Q# compiler crashes if both TestControlled and TestPartials are enabled
-            //let res2 = TestPartials(17, 42);
+            let res2 = TestPartials(17, 42);
             let res3 = Test_Qubit_Result_Management();
+            let res4 = TestSqrt();
         }
 
         return sum;

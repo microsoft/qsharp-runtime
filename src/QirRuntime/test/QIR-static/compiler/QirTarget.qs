@@ -5,6 +5,26 @@ namespace Microsoft.Quantum.Intrinsic {
 
     open Microsoft.Quantum.Targeting;
 
+    function NAN() : Double {
+        body intrinsic;
+    }
+
+    function IsNan(d: Double) : Bool {
+        body intrinsic;
+    }
+
+    function INFINITY() : Double {
+        body intrinsic;
+    }
+
+    function IsInf(d: Double) : Bool {
+        body intrinsic;
+    }
+
+    function Sqrt(d : Double) : Double {
+        body intrinsic;
+    }
+
     operation X(qb : Qubit) : Unit
     is Adj + Ctl {
         body intrinsic;

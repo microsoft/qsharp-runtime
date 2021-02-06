@@ -1,3 +1,4 @@
+//
 namespace Microsoft.Quantum.Testing.QIR
 {
     open Microsoft.Quantum.Intrinsic;
