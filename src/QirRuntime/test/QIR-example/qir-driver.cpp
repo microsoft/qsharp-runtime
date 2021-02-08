@@ -49,9 +49,8 @@ To update the *.ll files to a newer version:
 - the generated file name.ll will be placed into `s` folder
 */
 
-// The function replaces array[index] with value, then creates a new array that consists of every other element up to
-// index (starting from index backwards) and every element from index to the end. It returns the sum of elements in this
-// new array
+// The function runs a VQE algorithm with hard-coded values for the hamiltonian terms and input state.
+// The result should be the ground state energy of Hydrogen, approx. -1.13.
 extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(); // NOLINT
 TEST_CASE("QIR: Run RB experiment", "[qir]")
 {
