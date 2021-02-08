@@ -5290,7 +5290,7 @@ condContinue__1:                                  ; preds = %condFalse__1, %cond
 
 define { i64, double, i1 }* @Microsoft__Quantum__Math____QsRef0__ExtendedTruncation____body(double %value) {
 entry:
-  %truncated = fptrunc double %value to i64
+  %truncated = fptosi double %value to i64
   %0 = call %Tuple* @__quantum__rt__tuple_create(i64 ptrtoint ({ i64, double, i1 }* getelementptr ({ i64, double, i1 }, { i64, double, i1 }* null, i32 1) to i64))
   %1 = bitcast %Tuple* %0 to { i64, double, i1 }*
   %2 = getelementptr { i64, double, i1 }, { i64, double, i1 }* %1, i64 0, i32 0
