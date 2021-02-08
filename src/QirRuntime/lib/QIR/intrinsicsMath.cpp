@@ -23,4 +23,9 @@ bool quantum__qis__isinf__body(double d)
     return std::isinf(d);           // https://en.cppreference.com/w/cpp/numeric/math/isinf
 }
 
+double quantum__qis__arctan2__body(double y, double x)
+{
+    return std::atan2(y, x);        // https://en.cppreference.com/w/cpp/numeric/math/atan2
+}
+
 }   // extern "C"

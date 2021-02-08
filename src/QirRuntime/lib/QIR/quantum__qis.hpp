@@ -63,5 +63,6 @@ extern "C"
     QIR_SHARED_API bool        quantum__qis__isnan__body(double d);                         // NOLINT
     QIR_SHARED_API double      quantum__qis__infinity__body();                              // NOLINT
     QIR_SHARED_API bool        quantum__qis__isinf__body(double d);                         // NOLINT
+    QIR_SHARED_API double      quantum__qis__arctan2__body(double y, double x);             // NOLINT
 
 }
