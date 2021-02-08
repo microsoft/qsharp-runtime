@@ -519,7 +519,8 @@ namespace Microsoft.Quantum.Simulation.Core
 
     public static class QArray
     {
-        public static QArray<T> Repeat<T>(T element, long count) => throw new NotImplementedException();
+        public static QArray<T> Repeat<T>(T element, long count) =>
+            new QArray<T>(Enumerable.Repeat(element, Convert.ToInt32(count)));
     }
 
     /// <summary>

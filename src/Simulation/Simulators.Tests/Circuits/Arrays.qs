@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
-{
+namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
-    
-    operation MapF<'T, 'U> (mapper : ('T -> 'U), source : 'T[]) : 'U[] {
-        
+
+    operation MapF<'T, 'U>(mapper : ('T -> 'U), source : 'T[]) : 'U[] {
         mutable result = new 'U[Length(source)];
         
         for (i in 0 .. Length(source) - 1) {
@@ -17,10 +15,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits
         
         return result;
     }
-    
 
-    operation LengthTest () : Unit
-    {
+    operation LengthTest() : Unit {
         let a1 = [One, Zero];
         let a2 = [Zero, Zero, Zero];
 
