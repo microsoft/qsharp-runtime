@@ -29,8 +29,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    function SizedArray() : Unit {
+    function CreateArrayWithPositiveSize() : Unit {
         let xs = [true, size = 3];
         AssertEqual([true, true, true], xs);
+    }
+
+    @Test("QuantumSimulator")
+    function CreateArrayWithZeroSize() : Unit {
+        let xs = [true, size = 0];
+        AssertEqual(0, Length(xs));
+    }
+
+    function CreateArrayWithNegativeSize() : Bool[] {
+        return [true, size = -1];
+    }
+
+    @Test("QuantumSimulator")
+    function CreateArrayWithSizeExpression() : Unit {
+        let n = 2;
+        let xs = [7, size = n + 1];
+        AssertEqual([7, 7, 7], xs);
+    }
+
+    @Test("QuantumSimulator")
+    function CreateArrayWithValueExpression() : Unit {
+        let x = "foo";
+        let xs = [x + "bar", size = 3];
+        AssertEqual(["foobar", "foobar", "foobar"], xs);
     }
 }
