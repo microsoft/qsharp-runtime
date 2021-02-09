@@ -9,21 +9,29 @@
 namespace Microsoft.Quantum.Math {
 
     /// # Summary
-    /// Returns the natural logarithmic base $e$.
+    /// Returns the natural logarithmic base to double-precision.
     ///
-    /// # Remarks
-    /// See [System.Math.E](https://docs.microsoft.com/dotnet/api/system.math.e) for more details.
-    function E () : Double {
-        body intrinsic;
+    /// # Output
+    /// A double-precision approximation of the natural logarithic base,
+    /// $e \approx 2.7182818284590452354$.
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.PI
+    function E() : Double {
+        return 2.7182818284590452354;
     }
 
     /// # Summary
-    /// Represents the ratio of the circumference of a circle to its diameter, specified by the constant, π.
+    /// Represents the ratio of the circumference of a circle to its diameter.
     ///
-    /// # Remarks
-    /// See [System.Math.PI](https://docs.microsoft.com/dotnet/api/system.math.pi) for more details.
-    function PI () : Double {
-        body intrinsic;
+    /// # Ouptut
+    /// A double-precision approximation of the the circumference of a circle
+    /// to its diameter, $\pi \approx 3.14159265358979323846$.
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Math.E
+    function PI() : Double {
+        return 3.14159265358979323846;
     }
 
 }
