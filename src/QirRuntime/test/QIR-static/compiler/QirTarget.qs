@@ -102,3 +102,57 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 }
+
+// Handling of conditionals
+namespace Microsoft.Quantum.Canon
+{
+    operation NoOp<'T> (input : 'T) : Unit is Adj + Ctl {}
+}
+
+namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions
+{
+    operation ApplyIfZero<'T> (result : Result, (op : ('T => Unit), target : 'T)) : Unit {
+        body intrinsic;
+    }
+    operation ApplyIfZeroA<'T> (result : Result, (op : ('T => Unit is Adj), target : 'T)) : Unit is Adj {
+        body intrinsic;
+    }
+    operation ApplyIfZeroC<'T> (result : Result, (op : ('T => Unit is Ctl), target : 'T)) : Unit is Ctl {
+        body intrinsic;
+    }
+    operation ApplyIfZeroCA<'T> (result : Result, (op : ('T => Unit is Adj + Ctl), target : 'T)) : Unit is Adj + Ctl {
+        body intrinsic;
+    }
+    operation ApplyIfOne<'T> (result : Result, (op : ('T => Unit), target : 'T)) : Unit {
+        body intrinsic;
+    }
+    operation ApplyIfOneA<'T> (result : Result, (op : ('T => Unit is Adj), target : 'T)) : Unit is Adj {
+        body intrinsic;
+    }
+    operation ApplyIfOneC<'T> (result : Result, (op : ('T => Unit is Ctl), target : 'T)) : Unit is Ctl {
+        body intrinsic;
+    }
+    operation ApplyIfOneCA<'T> (result : Result, (op : ('T => Unit is Adj + Ctl), target : 'T)) : Unit is Adj + Ctl {
+        body intrinsic;
+    }
+    operation ApplyIfElseR<'T, 'U> (
+        result : Result, 
+        (zeroOp : ('T => Unit), zeroInput : 'T), (oneOp : ('U => Unit), oneInput : 'U)) : Unit {
+        body intrinsic;
+    }
+    operation ApplyIfElseRA<'T, 'U> (
+        result : Result, 
+        (zeroOp : ('T => Unit is Adj), zeroInput : 'T), (oneOp : ('U => Unit is Adj), oneInput : 'U)) : Unit is Adj {
+        body intrinsic;
+    }
+    operation ApplyIfElseRC<'T, 'U> (
+        result : Result, 
+        (zeroOp : ('T => Unit is Ctl), zeroInput : 'T), (oneOp : ('U => Unit is Ctl), oneInput : 'U)) : Unit is Ctl {
+        body intrinsic;
+    }
+    operation ApplyIfElseRCA<'T, 'U> (
+        result : Result, 
+        (zeroOp : ('T => Unit is Adj + Ctl), zeroInput : 'T), (oneOp : ('U => Unit is Adj + Ctl), oneInput : 'U)) : Unit is Adj + Ctl {
+        body intrinsic;
+    }
+}
