@@ -37,7 +37,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 
     Push-Location $qirRuntimeBuildFolder
 
-    cmake -G Ninja -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
+    cmake -G Ninja -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" $PSScriptRoot
     cmake --build . --target install
 
     Pop-Location
