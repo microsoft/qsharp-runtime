@@ -31,7 +31,9 @@ for file in os.listdir(root_dir):
   if ext == ".qs":
     files_to_process = files_to_process + " " + file
 
-command = (qsc + " build --qir s --build-exe --input " + files_to_process + " --proj " + output_file)
+# Compile as a lib so all functions are retained and don't have to workaround the current limitations of
+# @EntryPoint attribute.
+command = (qsc + " build --qir s --input " + files_to_process + " --proj " + output_file)
 log("Executing: " + command)
 subprocess.run(command, shell = True)
 

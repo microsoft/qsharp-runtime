@@ -5,19 +5,9 @@ namespace Microsoft.Quantum.Testing.Tracer
 {
     open Microsoft.Quantum.Intrinsic;
 
-    operation Fixup(qs : Qubit[]) : Unit
+    operation TestCoreIntrinsics() : Unit
     {
-        for (i in 0..Length(qs)-1)
-        {
-            X(qs[i]);
-        }
-    }
-
-    @EntryPoint()
-    operation AllIntrinsics() : Bool
-    {
-        mutable res = false;
-        using (qs = Qubit[3])
+        use qs = Qubit[3]
         {
             X(qs[0]);
             Y(qs[0]);
@@ -45,7 +35,7 @@ namespace Microsoft.Quantum.Testing.Tracer
             Adjoint S(qs[1]);
             Adjoint T(qs[2]);
 
-            using (c = Qubit())
+            use c = Qubit()
             {
                 Controlled X([c], (qs[0]));
                 Controlled Y([c], (qs[0]));
@@ -59,7 +49,7 @@ namespace Microsoft.Quantum.Testing.Tracer
                 Controlled T([c], (qs[2]));
             }
 
-            using (cc = Qubit[2])
+            use cc = Qubit[2]
             {
                 Controlled X(cc, (qs[0]));
                 Controlled Y(cc, (qs[0]));
@@ -72,14 +62,6 @@ namespace Microsoft.Quantum.Testing.Tracer
                 Controlled S(cc, (qs[1]));
                 Controlled T(cc, (qs[2]));
             }
-
-            let r0 = M(qs[0]);
-            //ApplyIfZero(r0, (Z, qs[0]));
-
-            let qs12 = [qs[1], qs[2]];
-            let r12 = Measure([PauliY, PauliX], qs12);
-            //ApplyIfOne(r12, (Fixup, qs12));
         }
-        return true;
     }
 }

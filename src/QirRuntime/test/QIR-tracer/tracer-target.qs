@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Instructions {
         body intrinsic;
     }
 
-    @TargetInstruction("multi_qubit_measure")
+    @TargetInstruction("joint_measure")
     operation multi_qubit_measure(op_id: Int, duration: Int, qbs : Qubit[]) : Result {
         body intrinsic;
     }
@@ -250,7 +250,7 @@ namespace Microsoft.Quantum.Intrinsic {
             mutable res = One;
             mutable haveY = false;
             // Measurements that involve PauliY or PauliI
-            for (i in 0..Length(paulis)-1)
+            for i in 0..Length(paulis)-1
             {
                 if (paulis[i] == PauliY or paulis[i] == PauliI)
                 {
@@ -287,11 +287,11 @@ namespace Microsoft.Quantum.Intrinsic {
         body intrinsic;
     }
 
-    operation SWAP(a : Qubit, b : Qubit) : Unit 
-    is Adj {
-        body intrinsic;
-        adjoint self;
-    }
+    // operation SWAP(a : Qubit, b : Qubit) : Unit 
+    // is Adj {
+    //     body intrinsic;
+    //     adjoint self;
+    // }
 
 
 }

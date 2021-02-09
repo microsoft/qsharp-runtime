@@ -6,7 +6,7 @@ The purpose of the Resource Tracer is to provide efficient and flexible way to e
 
 In addition to the standard QIR runtime functions, the quantum program will have to:
 
-1. convert _all_ used intrinsic operations into one of the _trc_ operations supported by the tracer (see the list below);
+1. convert _all_ used intrinsic operations into one of the _qis_ operations supported by the tracer (see the list below);
 1. (_optional_) provide callbacks for handling of conditional branches on a measurement (if not provided, the estimates
  would cover only one branch of the execution);
 1. (_optional_) provide callbacks for start/end of quantum operations (if not provided, all operations will be treated
@@ -20,29 +20,29 @@ The last provisions
 
 The Resource Tracer will consist of:
 
-1. the bridge for the `__quantum__trc__*` extension methods;
+1. the bridge for the `__quantum__qis__*` extension methods;
 2. the native implementation to back the extensions;
 3. the logic for partitioning gates into layers;
 4. the logic for frame tracking;
 5. output of the collected statistics;
 6. (_lower priority_) the scheduling component to optimize depth and/or width of the circuit.
 
-## List of `__quantum__trc__*` methods ##
+## List of `__quantum__qis__*` methods ##
 
 ___WIP___
 
 | Signature                                             | Description                                                  |
 | :---------------------------------------------------- | :----------------------------------------------------------- |
-| `void __quantum__trc__inject_global_barrier(i32 %id, i32 %duration)` | Function to insert a global barrier. It will be inserted into QIR based on a user defined intrinsic. See [Layering](#layering) section for details. |
-| `void __quantum__trc__on_operation_start(i64 %id)`    | Function to identify the start of a quantum module. The argument is a unique _id_ of the module. The tracer will have an option to treat module boundaries as barriers between layers and (_lower priority_) and option to cache estimates for a module, executed multiple times. The call to the function will be inserted into QIR by the Q# compiler when Tracer is specified as the compilation target. |
-| `void __quantum__trc__on_operation_end(i64 %id)`      | Function to identify the end of a quantum module. The argument is a unique _id_ of the module and must match the _id_ supplied on start of the module. The call to the function will be inserted into QIR by the Q# compiler when Tracer is specified as the compilation target. |
-| `void __quantum__trc__single_qubit_op(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting operations that involve a single qubit. The first argument is the id of the operation, as assigned by the client. Multiple intrinsics can be assigned the same id, in which case they will be counted together. The second argument is duration to be assigned to the particular invocation of the operation. |
-| `void __quantum__trc__multi_qubit_op(i32 %id, i32 %duration, %Array* %qs)` | Function for counting operations that involve multiple qubits.|
-| `void __quantum__trc__single_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Qubit* %q)` | Function for counting controlled operations with single target qubit. |
-| `void __quantum__trc__multi_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Array* %qs)` | Function for counting controlled operations with multiple target qubits. |
-| `%Result* @__quantum__trc__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user might assign different operation ids for different measurement bases. |
-| `%Result* @__quantum__trc__multi_qubit_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user might assign different operation ids for different measurement bases. |
-| `void __quantum__trc__swap(%Qubit* %q1, %Qubit* %q2)` | See [Special handling of SWAP](#special-handling-of-swap) for details. |
+| `void __quantum__qis__inject_global_barrier(i32 %id, i32 %duration)` | Function to insert a global barrier. It will be inserted into QIR based on a user defined intrinsic. See [Layering](#layering) section for details. |
+| `void __quantum__qis__on_operation_start(i64 %id)`    | Function to identify the start of a quantum module. The argument is a unique _id_ of the module. The tracer will have an option to treat module boundaries as barriers between layers and (_lower priority_) and option to cache estimates for a module, executed multiple times. The call to the function will be inserted into QIR by the Q# compiler when Tracer is specified as the compilation target. |
+| `void __quantum__qis__on_operation_end(i64 %id)`      | Function to identify the end of a quantum module. The argument is a unique _id_ of the module and must match the _id_ supplied on start of the module. The call to the function will be inserted into QIR by the Q# compiler when Tracer is specified as the compilation target. |
+| `void __quantum__qis__single_qubit_op(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting operations that involve a single qubit. The first argument is the id of the operation, as assigned by the client. Multiple intrinsics can be assigned the same id, in which case they will be counted together. The second argument is duration to be assigned to the particular invocation of the operation. |
+| `void __quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %Array* %qs)` | Function for counting operations that involve multiple qubits.|
+| `void __quantum__qis__single_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Qubit* %q)` | Function for counting controlled operations with single target qubit. |
+| `void __quantum__qis__multi_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Array* %qs)` | Function for counting controlled operations with multiple target qubits. |
+| `%Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user might assign different operation ids for different measurement bases. |
+| `%Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user might assign different operation ids for different measurement bases. |
+| `void __quantum__qis__swap(%Qubit* %q1, %Qubit* %q2)` | See [Special handling of SWAP](#special-handling-of-swap) for details. |
 
 _Note on operation ids_: The client is responsible for using operation ids in a consistent manner. Operations with the
  same id will be counted by the tracer as the _same_ operation, even accross invocations with different number of target
@@ -55,7 +55,7 @@ The Resource Tracer will reuse qir-rt library as much as possible while extendin
 __Conditionals on measurements__: The Resource Tracer will execute LLVM IR's branching structures "as is", depending on
  the values of the corresponding variables at runtime. To enable estimation of branches that depend on a measurement
  result, the source Q# program will have to be authored in such a way that the Q# compiler will translate the
- conditionals into `__quantum__trc__apply_if*` calls. The tracer will add operations from _both branches_ into the
+ conditionals into `__quantum__qis__apply_if*` calls. The tracer will add operations from _both branches_ into the
  layers it creates to compute the upper bound estimate.
 
 Nested conditionals, conditional measurements and conditional tracked operations will _not_ be supported.
@@ -92,7 +92,7 @@ _Definition_: A ___global barrier___ is any operation that acts on _all_ current
  for the clients to inject global barriers equivalent to an identity operator. This will allow the clients to enforce a
  particular layering structure (because no later operation can sink below the barrier).
 
-The global barriers will be implemented as calls to `__quantum__trc__global_barrier` function. No additional support from
+The global barriers will be implemented as calls to `__quantum__qis__global_barrier` function. No additional support from
  the compiler should be needed, as the user can define their own intrinsic to represent the barrier and map it to the above
  runtime function via targets.qs file. The user can choose duration of a barrier which would affect start time of the
  following layers but no operations will be added to a barrier, independent of its width.
@@ -168,8 +168,10 @@ The tracer will have options to output the estimates into command line or into a
 - Zero counts for any of the statistics _might_ be replaced with empty string.
 - The global barrier layer lists the name and no statistics.
 
-__TBD__: specify the header that maps operation ids to gate names
+The map of operation ids to names can be passed to the tracer's constructor as `std::unordered_map<OpId, std::string>`.
+ The mapping can be partial, ids will be used in the ouput for unnamed operations.
 
 ## Depth vs width optimizations ##
 
 TBD but lower priority.
+

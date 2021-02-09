@@ -26,4 +26,5 @@ extern const std::unordered_map<Microsoft::Quantum::OpId, std::string> g_operati
 } // namespace TracerUser
 
 // Available function in generated QIR
-extern "C" bool Microsoft__Quantum__Testing__Tracer__AllIntrinsics__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__Tracer__TestCoreIntrinsics__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__Tracer__TestMeasurements__body(bool compare); // NOLINT
