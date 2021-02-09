@@ -292,6 +292,7 @@ declare i1          @quantum__qis__isnan__body(double %d)
 declare double      @quantum__qis__infinity__body()
 declare i1          @quantum__qis__isinf__body(double %d)
 declare double      @quantum__qis__arctan2__body(double %y, double %x)
+declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 
 ; API for the user code:
 define double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
@@ -335,4 +336,9 @@ define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: func
                                                                     ; https://en.cppreference.com/w/cpp/numeric/math/atan2
   %result = call double @quantum__qis__arctan2__body(double %y, double %x)
   ret double %result
+}
+
+define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {  ; operation DrawRandomInt (min : Int, max : Int) : Int      https://docs.microsoft.com/en-us/qsharp/api/qsharp/microsoft.quantum.random.drawrandomint
+  %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
+  ret i64 %result
 }

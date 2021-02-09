@@ -40,6 +40,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res5 = LogTest();
             let res6 = ArcTan2Test();
             let res7 = PauliToStringTest();
+            let res8 = DrawRandomIntTest(0, 1);
         }
         return sum;
     }

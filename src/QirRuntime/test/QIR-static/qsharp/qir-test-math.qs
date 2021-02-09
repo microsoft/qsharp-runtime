@@ -60,5 +60,9 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    operation DrawRandomIntTest(min : Int, max : Int) : Int {
+        return DrawRandomInt(min, max);
+    }
+
 }
 
