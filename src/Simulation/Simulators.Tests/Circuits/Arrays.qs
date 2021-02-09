@@ -7,7 +7,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     operation MapF<'T, 'U>(mapper : ('T -> 'U), source : 'T[]) : 'U[] {
         mutable result = new 'U[Length(source)];
-        
         for (i in 0 .. Length(source) - 1) {
             let m = mapper(source[i]);
             set result = result w/ i <- m;
