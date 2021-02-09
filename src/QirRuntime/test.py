@@ -79,10 +79,11 @@ test_binaries = [
 for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
   log(test_binary)
+  print(test_binary)
   subprocess.run(test_binary + " ~[skip]", shell = True)
 
 print("\n")
 
-subprocess.run(os.path.join(install_dir, "qir-exe") + " 10", shell = True)
-
+# subprocess.run(os.path.join(install_dir, "qir-example"), shell = True)
+print(os.environ["LD_LIBRARY_PATH"])
 print("\n")
