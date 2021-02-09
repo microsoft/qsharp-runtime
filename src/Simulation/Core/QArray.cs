@@ -232,8 +232,8 @@ namespace Microsoft.Quantum.Simulation.Core
         }
 
         /// <summary>
-        /// Creates an array of size given by capacity and default-initializes 
-        /// array elements. Uses C# keyword <code>default</code> to initialize array elements. 
+        /// Creates an array of size given by capacity and initializes each array element to the default value it has in
+        /// Q#.
         /// </summary>
         public static QArray<T> Create(long capacity) => new QArray<T>
         {
@@ -517,8 +517,14 @@ namespace Microsoft.Quantum.Simulation.Core
             arg;
     }
 
+    /// <summary>
+    /// Contains static methods for creating <see cref="QArray"/>s.
+    /// </summary>
     public static class QArray
     {
+        /// <summary>
+        /// Creates an array that contains <paramref name="element"/> repeated <paramref name="count"/> times.
+        /// </summary>
         public static QArray<T> Repeat<T>(T element, long count) =>
             new QArray<T>(Enumerable.Repeat(element, Convert.ToInt32(count)));
     }
