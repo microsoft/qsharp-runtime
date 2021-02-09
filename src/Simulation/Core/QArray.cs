@@ -133,18 +133,27 @@ namespace Microsoft.Quantum.Simulation.Core
 
             public void RemoveReference() => refCount--;
 
-            public void Extend(long newLength)
+            public void Extend(long newLength) =>
+                Extend(Default.OfType<T>(), Convert.ToInt32(newLength - Length));
+
+            /// <summary>
+            /// Extends the length of the array by adding <paramref name="count"/> occurrences of
+            /// <paramref name="value"/>.
+            /// </summary>
+            internal void Extend(T value, long count)
             {
-                var newLengthInt = Convert.ToInt32(newLength);
+                var intCount = Convert.ToInt32(count);
+                var total = Convert.ToInt32(Length) + intCount;
                 if (storage is null)
                 {
-                    storage = new List<T>(newLengthInt);
+                    storage = new List<T>(total);
                 }
-                else if (storage.Capacity < newLengthInt)
+                else if (storage.Capacity < total)
                 {
-                    storage.Capacity = newLengthInt;
+                    storage.Capacity = total;
                 }
-                storage.AddRange(Enumerable.Repeat(Default.OfType<T>(), newLengthInt - storage.Count));
+
+                storage.AddRange(Enumerable.Repeat(value, intCount));
             }
         }
 
@@ -240,6 +249,16 @@ namespace Microsoft.Quantum.Simulation.Core
             storage = new QArrayInner(capacity),
             Length = capacity
         };
+
+        /// <summary>
+        /// Creates an array that contains <paramref name="value"/> repeated <paramref name="count"/> times.
+        /// </summary>
+        internal static QArray<T> Repeat(T value, long count)
+        {
+            var array = new QArray<T> { Length = count };
+            array.storage.Extend(value, count);
+            return array;
+        }
 
         /// <summary>
         /// Creates a copy of this array.
@@ -523,10 +542,9 @@ namespace Microsoft.Quantum.Simulation.Core
     public static class QArray
     {
         /// <summary>
-        /// Creates an array that contains <paramref name="element"/> repeated <paramref name="count"/> times.
+        /// Creates an array that contains <paramref name="value"/> repeated <paramref name="count"/> times.
         /// </summary>
-        public static QArray<T> Repeat<T>(T element, long count) =>
-            new QArray<T>(Enumerable.Repeat(element, Convert.ToInt32(count)));
+        public static QArray<T> Repeat<T>(T value, long count) => QArray<T>.Repeat(value, count);
     }
 
     /// <summary>
