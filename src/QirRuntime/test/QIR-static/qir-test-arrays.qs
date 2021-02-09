@@ -4,6 +4,7 @@
 namespace Microsoft.Quantum.Testing.QIR
 {
     open Microsoft.Quantum.Testing.QIR.Math;
+    open Microsoft.Quantum.Testing.QIR.Str;
 
     @EntryPoint()
     operation Test_Arrays(array : Int[], index : Int, val : Int, dummy : Bool) : Int
@@ -42,6 +43,7 @@ namespace Microsoft.Quantum.Testing.QIR
             let res4 = SqrtTest();
             let res5 = LogTest();
             let res6 = ArcTan2Test();
+            let res7 = PauliToStringTest();
         }
 
         return sum;

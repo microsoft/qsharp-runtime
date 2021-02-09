@@ -13,7 +13,7 @@
 %Range = type { i64, i64, i64 }
 %Result = type opaque
 %String = type opaque
-%Pauli = type {i2}
+%Pauli = type i2
 
 ;=======================================================================================================================
 ; Native types
@@ -29,9 +29,7 @@
 %struct.QirCallable = type opaque
 %struct.QirRange = type { i64, i64, i64 }
 %struct.QirString = type opaque
-
-; Assumptions:
-;  %PauliId = type {i32}
+%PauliId = type i32
 
 ;===============================================================================
 ; declarations of the native methods this bridge delegates to
@@ -139,53 +137,53 @@ define %Result* @__quantum__qis__measure__body(%Array* %.paulis, %Array* %.qubit
   ret %Result* %.r
 }
 
-define void @__quantum__qis__r__body(i2 %.pauli, double %theta, %Qubit* %.q) {
+define void @__quantum__qis__r__body(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
-  %pauli = zext i2 %.pauli to i32
-  call void @quantum__qis__r__body(i32 %pauli, double %theta, %class.QUBIT* %q)
+  %pauli = zext %Pauli %.pauli to %PauliId
+  call void @quantum__qis__r__body(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__adj(i2 %.pauli, double %theta, %Qubit* %.q) {
+define void @__quantum__qis__r__adj(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
-  %pauli = zext i2 %.pauli to i32
-  call void @quantum__qis__r__adj(i32 %pauli, double %theta, %class.QUBIT* %q)
+  %pauli = zext %Pauli %.pauli to %PauliId
+  call void @quantum__qis__r__adj(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__ctl(%Array* %.ctls, {i2, double, %Qubit*}* %.args) {
+define void @__quantum__qis__r__ctl(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
-  %.ppauli = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 0
-  %.pauli = load i2, i2* %.ppauli
-  %pauli = zext i2 %.pauli to i32
+  %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
+  %.pauli = load %Pauli, %Pauli* %.ppauli
+  %pauli = zext %Pauli %.pauli to %PauliId
 
-  %.ptheta = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 1
+  %.ptheta = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 1
   %theta = load double, double* %.ptheta
 
-  %.pq = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 2
+  %.pq = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 2
   %.q = load %Qubit*, %Qubit** %.pq
   %q = bitcast %Qubit* %.q to %class.QUBIT*
 
-  call void @quantum__qis__r__ctl(%struct.QirArray* %ctls, i32 %pauli, double %theta, %class.QUBIT* %q)
+  call void @quantum__qis__r__ctl(%struct.QirArray* %ctls, %PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__ctladj(%Array* %.ctls, {i2, double, %Qubit*}* %.args) {
+define void @__quantum__qis__r__ctladj(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
-  %.ppauli = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 0
-  %.pauli = load i2, i2* %.ppauli
-  %pauli = zext i2 %.pauli to i32
+  %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
+  %.pauli = load %Pauli, %Pauli* %.ppauli
+  %pauli = zext %Pauli %.pauli to %PauliId
 
-  %.ptheta = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 1
+  %.ptheta = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 1
   %theta = load double, double* %.ptheta
 
-  %.pq = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 2
+  %.pq = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 2
   %.q = load %Qubit*, %Qubit** %.pq
   %q = bitcast %Qubit* %.q to %class.QUBIT*
 
-  call void @quantum__qis__r__ctladj(%struct.QirArray* %ctls, i32 %pauli, double %theta, %class.QUBIT* %q)
+  call void @quantum__qis__r__ctladj(%struct.QirArray* %ctls, %PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
