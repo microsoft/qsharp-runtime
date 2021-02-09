@@ -7,21 +7,11 @@ namespace Microsoft.Quantum.Testing.QIR.Str {
 
     function PauliToStringTest() : Int {
 
-        mutable pauli   = PauliI;
-        mutable str     = $"Pauli value: {pauli}";
-        if "Pauli value: PauliI" != str      { return 1; }     // The return value indicates which test case has failed.
-
-        set pauli       = PauliX;
-        set str         = $"{pauli}";
-        if "PauliX" != str     { return 2; }
-
-        set pauli       = PauliY;
-        set str         = $"{pauli}";
-        if "PauliY" != str     { return 3; }
-
-        set pauli       = PauliZ;
-        set str         = $"{pauli}";
-        if "PauliZ" != str     { return 4; }
+        if "Pauli value: PauliI" != 
+            $"Pauli value: {PauliI}"   { return 1; }     // The return value indicates which test case has failed.
+        if "PauliX" != $"{PauliX}"     { return 2; }
+        if "PauliY" != $"{PauliY}"     { return 3; }
+        if "PauliZ" != $"{PauliZ}"     { return 4; }
 
         return 0;
     }
