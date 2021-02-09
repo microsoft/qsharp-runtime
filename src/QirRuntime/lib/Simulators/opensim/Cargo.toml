@@ -1,7 +1,10 @@
 [package]
-name = "rust_example"
+name = "opensim_static"
 version = "0.1.0"
 
 [lib]
-name = "rust_example"
+name = "opensim_static"
 crate-type = ["staticlib"]
+
+[dependencies]
+opensim_runtime = { path = "../../../../Simulation/OpenSystems/runtime" }
