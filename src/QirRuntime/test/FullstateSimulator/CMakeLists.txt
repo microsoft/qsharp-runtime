@@ -6,8 +6,10 @@ add_executable(fullstate-simulator-tests
 
 target_link_libraries(fullstate-simulator-tests PUBLIC
   ${QIR_UTILITY_LIB} # created by compile_from_qir
-  qir-rt
-  qir-qis
+  ${QIR_BRIDGE_UTILITY_LIB}
+  ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  qir-rt-support
+  qir-qis-support
   simulators
 )
 
