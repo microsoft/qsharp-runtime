@@ -327,7 +327,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         [Fact]
         public void CreateArrayWithNegativeSize() =>
-            // TODO: More specific exception type.
             Assert.ThrowsAny<Exception>(() =>
                 OperationsTestHelper.RunWithMultipleSimulators(simulator =>
                     Circuits.CreateArrayWithNegativeSize.Run(simulator).Wait()));
