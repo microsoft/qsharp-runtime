@@ -57,7 +57,7 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t* array,
     int64_t index,
     int64_t val,
-    bool dummy);
+    bool compilerDecoy);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
     // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed

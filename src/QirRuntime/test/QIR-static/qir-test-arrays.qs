@@ -7,7 +7,7 @@ namespace Microsoft.Quantum.Testing.QIR
     open Microsoft.Quantum.Testing.QIR.Str;
 
     @EntryPoint()
-    operation Test_Arrays(array : Int[], index : Int, val : Int, dummy : Bool) : Int
+    operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int
     {
         // exercise __quantum__rt__array_copy
         mutable local = array;
@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Testing.QIR
         }
 
         // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
-        if (dummy)
+        if (compilerDecoy)
         {
             let res1 = TestControlled();
             let res2 = TestPartials(17, 42);
