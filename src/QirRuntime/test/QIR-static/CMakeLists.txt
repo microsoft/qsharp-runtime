@@ -20,7 +20,10 @@ add_custom_target(qir_static_test_lib DEPENDS ${QIR_TESTS_LIBS})
 # The executable target for QIR tests triggers the custom actions to compile ll files
 #
 add_executable(qir-static-tests
-  qir-driver.cpp)
+  qir-driver.cpp
+  qir-test-math.cpp
+  qir-test-strings.cpp
+)
 
 target_link_libraries(qir-static-tests PUBLIC
   ${QIR_TESTS_LIBS}

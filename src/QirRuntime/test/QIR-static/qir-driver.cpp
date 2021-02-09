@@ -57,8 +57,8 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t* array,
     int64_t index,
     int64_t val,
-    bool dummy);
-TEST_CASE("QIR: Using 1D arrays", "[qir]")
+    bool compilerDecoy);
+TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
     // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed
     QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
@@ -152,7 +152,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 };
-TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
+TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][qir.result]")
 {
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
@@ -182,7 +182,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
 // that is written to the original array at [1,1,1] and then retrieved from [1,1].
 // Thus, all three dimensions must be at least 2.
 extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
-TEST_CASE("QIR: multidimensional arrays", "[qir]")
+TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
@@ -195,7 +195,7 @@ TEST_CASE("QIR: multidimensional arrays", "[qir]")
 
 // Manually authored QIR to test dumping range [0..2..6] into string and then raising a failure with it
 extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
-TEST_CASE("QIR: Report range in a failure message", "[qir]")
+TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
@@ -215,7 +215,7 @@ TEST_CASE("QIR: Report range in a failure message", "[qir]")
 #if 0 // TODO: Q# compiler crashes generating QIR for TestPartials
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
-TEST_CASE("QIR: Partial application of a callable", "[qir]")
+TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
@@ -309,7 +309,7 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }
-TEST_CASE("QIR: application of nested controlled functor", "[qir]")
+TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {
     unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);

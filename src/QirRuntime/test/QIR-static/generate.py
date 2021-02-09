@@ -39,7 +39,7 @@ else:
       output_file = file_name
 
 command = (qsc + " build --qir s --build-exe --input " + files_to_process +
-           " compiler\\qircore.qs compiler\\qirtarget.qs --proj " + output_file)
+           " compiler\\qircore.qs compiler\\qirtarget.qs compiler\\Constants.qs --proj " + output_file)
 log("Executing: " + command)
 subprocess.run(command, shell = True)
 

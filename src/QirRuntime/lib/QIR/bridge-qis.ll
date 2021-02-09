@@ -13,7 +13,7 @@
 %Range = type { i64, i64, i64 }
 %Result = type opaque
 %String = type opaque
-%Pauli = type {i2}
+%Pauli = type i2
 
 ;=======================================================================================================================
 ; Native types
@@ -29,9 +29,7 @@
 %struct.QirCallable = type opaque
 %struct.QirRange = type { i64, i64, i64 }
 %struct.QirString = type opaque
-
-; Assumptions:
-;  %PauliId = type {i32}
+%PauliId = type i32
 
 ;===============================================================================
 ; declarations of the native methods this bridge delegates to
@@ -139,53 +137,53 @@ define %Result* @__quantum__qis__measure__body(%Array* %.paulis, %Array* %.qubit
   ret %Result* %.r
 }
 
-define void @__quantum__qis__r__body(i2 %.pauli, double %theta, %Qubit* %.q) {
+define void @__quantum__qis__r__body(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
-  %pauli = zext i2 %.pauli to i32
-  call void @quantum__qis__r__body(i32 %pauli, double %theta, %class.QUBIT* %q)
+  %pauli = zext %Pauli %.pauli to %PauliId
+  call void @quantum__qis__r__body(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__adj(i2 %.pauli, double %theta, %Qubit* %.q) {
+define void @__quantum__qis__r__adj(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
-  %pauli = zext i2 %.pauli to i32
-  call void @quantum__qis__r__adj(i32 %pauli, double %theta, %class.QUBIT* %q)
+  %pauli = zext %Pauli %.pauli to %PauliId
+  call void @quantum__qis__r__adj(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__ctl(%Array* %.ctls, {i2, double, %Qubit*}* %.args) {
+define void @__quantum__qis__r__ctl(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
-  %.ppauli = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 0
-  %.pauli = load i2, i2* %.ppauli
-  %pauli = zext i2 %.pauli to i32
+  %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
+  %.pauli = load %Pauli, %Pauli* %.ppauli
+  %pauli = zext %Pauli %.pauli to %PauliId
 
-  %.ptheta = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 1
+  %.ptheta = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 1
   %theta = load double, double* %.ptheta
 
-  %.pq = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 2
+  %.pq = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 2
   %.q = load %Qubit*, %Qubit** %.pq
   %q = bitcast %Qubit* %.q to %class.QUBIT*
 
-  call void @quantum__qis__r__ctl(%struct.QirArray* %ctls, i32 %pauli, double %theta, %class.QUBIT* %q)
+  call void @quantum__qis__r__ctl(%struct.QirArray* %ctls, %PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__ctladj(%Array* %.ctls, {i2, double, %Qubit*}* %.args) {
+define void @__quantum__qis__r__ctladj(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
-  %.ppauli = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 0
-  %.pauli = load i2, i2* %.ppauli
-  %pauli = zext i2 %.pauli to i32
+  %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
+  %.pauli = load %Pauli, %Pauli* %.ppauli
+  %pauli = zext %Pauli %.pauli to %PauliId
 
-  %.ptheta = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 1
+  %.ptheta = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 1
   %theta = load double, double* %.ptheta
 
-  %.pq = getelementptr inbounds {i2, double, %Qubit*}, {i2, double, %Qubit*}* %.args, i32 0, i32 2
+  %.pq = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 2
   %.q = load %Qubit*, %Qubit** %.pq
   %q = bitcast %Qubit* %.q to %class.QUBIT*
 
-  call void @quantum__qis__r__ctladj(%struct.QirArray* %ctls, i32 %pauli, double %theta, %class.QUBIT* %q)
+  call void @quantum__qis__r__ctladj(%struct.QirArray* %ctls, %PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
@@ -281,3 +279,60 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
 }
 
 
+;===============================================================================
+; quantum.qis math functions
+;
+
+; LLVM intrinsics (https://llvm.org/docs/LangRef.html):
+declare double      @llvm.sqrt.f64(double %.val)
+declare double      @llvm.log.f64(double %Val)
+
+; Native implementations:
+declare i1          @quantum__qis__isnan__body(double %d)
+declare double      @quantum__qis__infinity__body()
+declare i1          @quantum__qis__isinf__body(double %d)
+declare double      @quantum__qis__arctan2__body(double %y, double %x)
+
+; API for the user code:
+define double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
+  %result = call double @llvm.sqrt.f64(double -1.0)         ; sqrt(<negative>) -> NaN   
+  ret double %result
+}
+
+define i1 @__quantum__qis__isnan__body(double %d) {         ; http://www.cplusplus.com/reference/cmath/isnan/
+  %result = call i1 @quantum__qis__isnan__body(double %d)
+  ret i1 %result
+}
+
+define double @__quantum__qis__infinity__body() {           ; https://en.cppreference.com/w/c/numeric/math/INFINITY
+  %result = call double @quantum__qis__infinity__body()
+  ret double %result
+}
+
+define i1 @__quantum__qis__isinf__body(double %d) {         ; https://en.cppreference.com/w/cpp/numeric/math/isinf
+  %result = call i1 @quantum__qis__isinf__body(double %d)   
+  ret i1 %result
+}
+
+define double @__quantum__qis__sqrt__body(double %d) {      ; https://en.cppreference.com/w/cpp/numeric/math/sqrt
+  %result = call double @llvm.sqrt.f64(double %d)           
+  ret double %result
+}
+
+define double @__quantum__qis__log__body(double %d) {       ; https://en.cppreference.com/w/cpp/numeric/math/log
+  %result = call double @llvm.log.f64(double %d)           
+  ret double %result
+}
+
+define i1 @__quantum__qis__isnegativeinfinity__body(double %d) {    ; Q#: function IsNegativeInfinity(d : Double) : Bool
+                                                                    ; https://en.cppreference.com/w/cpp/numeric/math/log    https://llvm.org/docs/LangRef.html#llvm-log-intrinsic
+  %negInf = call double @llvm.log.f64(double 0.0)                   ; ln(0) -> (-infinity)
+  %result = fcmp oeq double %negInf, %d                             ; %result = (%negInf == %d)
+  ret i1 %result
+}
+
+define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: function ArcTan2 (y : Double, x : Double) : Double
+                                                                    ; https://en.cppreference.com/w/cpp/numeric/math/atan2
+  %result = call double @quantum__qis__arctan2__body(double %y, double %x)
+  ret double %result
+}
