@@ -4,7 +4,7 @@
 
 #include "CoreTypes.hpp"
 
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #ifdef _WIN32

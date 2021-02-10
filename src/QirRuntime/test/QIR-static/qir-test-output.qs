@@ -5,8 +5,7 @@ namespace Microsoft.Quantum.Testing.QIR.Out {
 
     open Microsoft.Quantum.Intrinsic;
 
-    function MessageTest(msg: String) : Unit
-    {
+    function MessageTest(msg: String) : Unit {
         Message( msg );
     }
 

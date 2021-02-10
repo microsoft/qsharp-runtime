@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Testing.QIR {
@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res5 = LogTest();
             let res6 = ArcTan2Test();
             let res7 = PauliToStringTest();
-            let res8 = DrawRandomIntTest(0, 1);
+            let res8 = TestDrawRandomInt(0, 1);
             MessageTest("Test");
         }
         return sum;

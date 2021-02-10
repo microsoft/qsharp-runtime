@@ -10,7 +10,7 @@
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__body();           // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__body();            // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__body();        // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__DrawRandomIntTest__body(int64_t min, int64_t max);  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(int64_t min, int64_t max);  // NOLINT
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
 {
@@ -43,7 +43,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     while(--times)
     {
         const int64_t randomNumber = 
-            Microsoft__Quantum__Testing__QIR__Math__DrawRandomIntTest__body(minimum, maximum);
+            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(minimum, maximum);
         REQUIRE(minimum <= randomNumber);
         REQUIRE(randomNumber <= maximum);
 
@@ -62,12 +62,12 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
 
     // Make sure the exception std::invalid_argument is thrown if min > max:
-    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__DrawRandomIntTest__body(10, 5), 
+    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5), 
                       std::invalid_argument);
     // Check the exception string:
     try
     {
-        (void)Microsoft__Quantum__Testing__QIR__Math__DrawRandomIntTest__body(10, 5);
+        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5);
     }
     catch(std::invalid_argument const & exc)
     {
