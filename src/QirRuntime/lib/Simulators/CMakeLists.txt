@@ -23,14 +23,14 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Corrosion)
 
-corrosion_import_crate(MANIFEST_PATH opensim/Cargo.toml)
+corrosion_import_crate(MANIFEST_PATH ../../../Simulation/OpenSystems/runtime/Cargo.toml)
 
 #===============================================================================
 # Produce static lib for users to link directly to
 
 add_library(${component_name} STATIC ${source_files})
 target_include_directories(${component_name} PUBLIC ${includes})
-target_link_libraries(${component_name} ${CMAKE_DL_LIBS} PUBLIC opensim_static)
+target_link_libraries(${component_name} ${CMAKE_DL_LIBS} PUBLIC opensim)
 
 #===============================================================================
 # Produce object lib we'll use to create a shared lib (so/dll) later on
