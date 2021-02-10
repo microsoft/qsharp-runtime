@@ -7,18 +7,38 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 Write-Host "##[info]Copy Native simulator xplat binaries"
-pushd ../src/Simulation/Native
-If (-not (Test-Path 'osx')) { mkdir 'osx' }
-If (-not (Test-Path 'linux')) { mkdir 'linux' }
-$DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
-If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
-If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
+pushd (Join-Path $PSScriptRoot ../src/Simulation/Native)
+    If (-not (Test-Path 'osx')) { mkdir 'osx' }
+    If (-not (Test-Path 'linux')) { mkdir 'linux' }
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
 popd
+
+Write-Host "##[info]Copy open systems simulator xplat binaries"
+Push-Location (Join-Path $PSScriptRoot ../src/Simulation/OpenSystems/runtime)
+    If (-not (Test-Path 'osx')) { mkdir 'osx' }
+    If (-not (Test-Path 'linux')) { mkdir 'linux' }
+    If (-not (Test-Path 'win10')) { mkdir 'win10' }
+    $Configuration = $Env:BUILD_CONFIGURATION.ToLowerInvariant();
+    $DROP = (Join-Path "$Env:DROP_NATIVE" "src" "Simulation" "OpenSystems" "runtime" "target" $Configuration);
+    $DROP | Write-Host
+    Get-ChildItem -recurse "$DROP/*.dll"
+    if (Test-Path "$DROP/libopensim.dylib") {
+        Copy-Item "$DROP/libopensim.dylib" "osx/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    }
+    if (Test-Path "$DROP/libopensim.so") {
+        Copy-Item "$DROP/libopensim.so" "linux/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    }
+    if (Test-Path "$DROP/opensim.dll") {
+        Copy-Item "$DROP/opensim.dll"  "win10/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    }
+Pop-Location
 
 
 function Pack-One() {
     Param($project, $option1 = "", $option2 = "", $option3 = "")
-    nuget pack $project `
+    nuget pack (Join-Path $PSScriptRoot $project) `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $Env:NUGET_VERSION `
@@ -41,7 +61,7 @@ function Pack-Dotnet() {
     }  else {
         $args = @();
     }
-    dotnet pack $project `
+    dotnet pack (Join-Path $PSScriptRoot $project) `
         -o $Env:NUGET_OUTDIR `
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
