@@ -27,10 +27,11 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
-        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="lasterr")]
-        private static extern string _LastError();
 
         public const string DLL_NAME = "Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll";
+
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="lasterr")]
+        private static extern string _LastError();
 
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_name")]
@@ -41,9 +42,8 @@ namespace Microsoft.Quantum.Experimental
             get
             {
                 // TODO: Add get_name to c_api and uncomment this.
-                // LogCall("get_name");
-                // return _GetName();
-                return "OpenSystemsSimulator";
+                LogCall("get_name");
+                return _GetName();;
             }
         }
 
@@ -64,8 +64,6 @@ namespace Microsoft.Quantum.Experimental
             LogCall("init");
             CheckCall(_Destroy(simId));
         }
-
-        
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="dump_to_console")]
         private static extern void _DumpToConsole(uint simId);
@@ -109,10 +107,7 @@ namespace Microsoft.Quantum.Experimental
         //     }
         // }
 
-        // FIXME: all of the following actually return an error code that needs to be checked, not void!
-        //        To fix, write a new method that checks the error code that results, calls last_err if
-        //        needed, and turns that error message into an exception.
-
+        
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="h")]
         private static extern Int64 _H(ulong simId, uint idx);
 
@@ -131,79 +126,79 @@ namespace Microsoft.Quantum.Experimental
             CheckCall(_X(simId, (uint)q.Id));
         }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="y")]
-        // private static extern void _Y(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="y")]
+        private static extern Int64 _Y(ulong simId, uint idx);
 
-        // public static void Y(Qubit q)
-        // {
-        //     LogCall("y");
-        //     _Y((uint)q.Id);
-        // }
+        public static void Y(ulong simId, Qubit q)
+        {
+            LogCall("y");
+            CheckCall(_Y(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="z")]
-        // private static extern void _Z(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="z")]
+        private static extern Int64 _Z(ulong simId, uint idx);
 
-        // public static void Z(Qubit q)
-        // {
-        //     LogCall("z");
-        //     _Z((uint)q.Id);
-        // }
+        public static void Z(ulong simId, Qubit q)
+        {
+            LogCall("z");
+            CheckCall(_Z(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="s")]
-        // private static extern void _S(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="s")]
+        private static extern Int64 _S(ulong simId, uint idx);
 
-        // public static void S(Qubit q)
-        // {
-        //     LogCall("s");
-        //     _S((uint)q.Id);
-        // }
+        public static void S(ulong simId, Qubit q)
+        {
+            LogCall("s");
+            CheckCall(_S(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="s_adj")]
-        // private static extern void _SAdj(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="s_adj")]
+        private static extern Int64 _SAdj(ulong simId, uint idx);
 
-        // public static void SAdj(Qubit q)
-        // {
-        //     LogCall("s_adj");
-        //     _SAdj((uint)q.Id);
-        // }
+        public static void SAdj(ulong simId, Qubit q)
+        {
+            LogCall("s");
+            CheckCall(_SAdj(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="t")]
-        // private static extern void _T(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="t")]
+        private static extern Int64 _T(ulong simId, uint idx);
 
-        // public static void T(Qubit q)
-        // {
-        //     LogCall("t");
-        //     _T((uint)q.Id);
-        // }
+        public static void T(ulong simId, Qubit q)
+        {
+            LogCall("t");
+            CheckCall(_T(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="t_adj")]
-        // private static extern void _TAdj(uint idx);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="t_adj")]
+        private static extern Int64 _TAdj(ulong simId, uint idx);
 
-        // public static void TAdj(Qubit q)
-        // {
-        //     LogCall("t_adj");
-        //     _TAdj((uint)q.Id);
-        // }
+        public static void TAdj(ulong simId, Qubit q)
+        {
+            LogCall("t_adj");
+            CheckCall(_TAdj(simId, (uint)q.Id));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
-        // private static extern void _CNOT(uint idxControl, uint idxTarget);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
+        private static extern Int64 _CNOT(ulong simId, uint idxControl, uint idxTarget);
 
-        // public static void CNOT(Qubit control, Qubit target)
-        // {
-        //     LogCall("cnot");
-        //     _CNOT((uint)control.Id, (uint)target.Id);
-        // }
+        public static void CNOT(ulong simId, Qubit control, Qubit target)
+        {
+            LogCall("cnot");
+            CheckCall(_CNOT(simId, (uint)control.Id, (uint)target.Id));
+        }
 
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="m")]
-        // private static extern void _M(uint idx, out uint result);
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="m")]
+        private static extern Int64 _M(ulong simId, uint idx, out uint result);
 
-        // public static Result M(Qubit q)
-        // {
-        //     LogCall("m");
-        //     _M((uint)q.Id, out var result);
-        //     return result == 1 ? Result.One : Result.Zero;
-        // }
+        public static Result M(ulong simId, Qubit q)
+        {
+            LogCall("m");
+            CheckCall(_M(simId, (uint)q.Id, out var result));
+            return result == 1 ? Result.One : Result.Zero;
+        }
 
     }
 }
