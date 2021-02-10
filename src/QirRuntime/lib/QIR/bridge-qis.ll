@@ -60,6 +60,8 @@ declare void @quantum__qis__y__ctl(%struct.QirArray*, %class.QUBIT*)
 declare void @quantum__qis__z__body(%class.QUBIT*)
 declare void @quantum__qis__z__ctl(%struct.QirArray*, %class.QUBIT*)
 
+declare void @quantum__qis__message__body(%"struct.QirString"* %str)
+
 ;===============================================================================
 ; quantum.qis namespace implementations
 ;
@@ -278,6 +280,14 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
   ret void
 }
 
+
+;===============================================================================
+;
+define void @__quantum__qis__message__body(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  call void @quantum__qis__message__body(%"struct.QirString"* %str)
+  ret void
+}
 
 ;===============================================================================
 ; quantum.qis math functions
