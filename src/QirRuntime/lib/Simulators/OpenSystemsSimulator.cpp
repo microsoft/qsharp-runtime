@@ -40,8 +40,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    // FIXME: support public IDiagnostics
-    class OpenSystemSimulator : public ISimulator, public IQuantumGateSet
+    // FIXME: support methods from public IDiagnostics; they currently
+    //        just throw.
+    class OpenSystemSimulator : public ISimulator, public IQuantumGateSet, public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(size_t /*simulator id*/, size_t /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -103,6 +104,30 @@ namespace Quantum
         IQuantumGateSet* AsQuantumGateSet() override
         {
             return this;
+        }
+        IDiagnostics* AsDiagnostics() override
+        {
+            return this;
+        }
+
+        void GetState(TGetStateCallback callback) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+        bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* failureMessage) override
+        {
+            throw std::logic_error("operation_not_supported");
+        }
+
+        bool AssertProbability(
+            long numTargets,
+            PauliId bases[],
+            Qubit targets[],
+            double probabilityOfZero,
+            double precision,
+            const char* failureMessage) override
+        {
+            throw std::logic_error("operation_not_supported");
         }
 
         virtual std::string QubitToString(Qubit q) override
@@ -264,5 +289,10 @@ namespace Quantum
             throw std::logic_error("not yet implemented");
         }
     };
+
+    std::unique_ptr<ISimulator> CreateOpenSystemsSimulator()
+    {
+        return std::make_unique<OpenSystemSimulator>();
+    }
 } // namespace Quantum
 } // namespace Microsoft

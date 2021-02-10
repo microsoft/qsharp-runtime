@@ -1,13 +1,15 @@
 add_subdirectory(QIR)
 add_subdirectory(Simulators)
 
-
 #===============================================================================
 # Produce the qdk dynamic library
 #
 add_library(qdk SHARED
     $<TARGET_OBJECTS:qir-rt-support-obj>
     $<TARGET_OBJECTS:qir-qis-support-obj>
+    # NB: The following line includes all obj files from simulators, but does
+    #     not include Rust dependencies. To get that, we need the opensim lib
+    #     as well, built from corrosion in the Simulators subdirectory, above.
     $<TARGET_OBJECTS:simulators-obj>
 )
 
@@ -15,6 +17,7 @@ target_link_libraries(qdk
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
   ${CMAKE_DL_LIBS}
+  opensim
 )
 
 set_property(TARGET qdk PROPERTY POSITION_INDEPENDENT_CODE ON)

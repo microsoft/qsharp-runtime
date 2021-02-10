@@ -15,5 +15,7 @@ namespace Quantum
     // Full State Simulator
     std::unique_ptr<ISimulator> CreateFullstateSimulator();
 
+    std::unique_ptr<ISimulator> CreateOpenSystemsSimulator();
+
 } // namespace Quantum
 } // namespace Microsoft
