@@ -56,4 +56,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         let xs = [x + "bar", size = 3];
         AssertEqual(["foobar", "foobar", "foobar"], xs);
     }
+
+    @Test("QuantumSimulator")
+    function SizedArrayShouldIncrementArrayItemRefCount() : Unit {
+        mutable item = [1];
+        let items = [item, size = 1];
+        set item w/= 0 <- 2;
+
+        AssertEqual([2], item);
+        AssertEqual([[1]], items);
+    }
+
+    @Test("QuantumSimulator")
+    function ArrayOfArraysShouldHaveCorrectReferenceCounts() : Unit {
+        mutable items = [[1], size = 2];
+        set items w/= 0 <- items[0] w/ 0 <- 2;
+
+        AssertEqual([[2], [1]], items);
+    }
 }
