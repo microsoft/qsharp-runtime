@@ -29,6 +29,10 @@ TEST_CASE("QIR: Math.ArcTan2", "[qir.math][qir.Math.ArcTan2]")
 
 TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 {
+    // Commented out until https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r573978601
+    // is resolved.
+
+    /*
     // Range of the generated random numbers:
     constexpr int64_t   minimum = -1024;
     constexpr int64_t   maximum =  1023;
@@ -60,6 +64,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
         REQUIRE((genAverage - 300) < counter);  // The random number has been generated >  700 times (of expected 1000).
         REQUIRE(counter < (genAverage + 300));  // The random number has been generated < 1300 times (of expected 1000).
     }
+    */
 
     // Make sure the exception std::invalid_argument is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5), 
@@ -75,4 +80,3 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
 
 }
-
