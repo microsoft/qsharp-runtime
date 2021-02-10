@@ -7,8 +7,6 @@ use lazy_static::lazy_static;
 use std::sync::Mutex;
 use std::collections::HashMap;
 
-const DEFAULT_CAPACITY: usize = 1;
-
 struct CApiState {
     register_state: State,
     noise_model: NoiseModel
@@ -50,6 +48,28 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(sim_id: usize, idxs: &[usize], channel_
 }
 
 // C API FUNCTIONS //
+
+#[no_mangle]
+pub extern fn get_name() -> *const c_char {
+    // There's a whole dance we have to do in order to allow the memory
+    // allocated for a string to be deallocated on the .NET side.
+
+    let serialized = CString::new("open_sim").unwrap().into_raw();
+    std::mem::forget(serialized);
+    serialized
+}
+
+#[no_mangle]
+pub extern fn lasterr() -> *const c_char {
+    match &*LAST_ERROR.lock().unwrap() {
+        None => ptr::null(),
+        Some(msg) => {
+            let wrapped_msg = CString::new(msg.as_str()).unwrap().into_raw();
+            std::mem::forget(wrapped_msg);
+            wrapped_msg
+        }
+    }
+}
 
 #[no_mangle]
 pub extern fn init(initial_capacity: usize) -> usize {
@@ -145,19 +165,6 @@ pub extern fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
             Err(format!("No simulator with id {} exists.", sim_id).to_string())
         }
     })
-}
-
-
-#[no_mangle]
-pub extern fn lasterr() -> *const c_char {
-    match &*LAST_ERROR.lock().unwrap() {
-        None => ptr::null(),
-        Some(msg) => {
-            let wrapped_msg = CString::new(msg.as_str()).unwrap().into_raw();
-            std::mem::forget(wrapped_msg);
-            wrapped_msg
-        }
-    }
 }
 
 #[no_mangle]
