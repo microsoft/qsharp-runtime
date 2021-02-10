@@ -2,10 +2,6 @@
 
   <Import Project="..\Common\Simulators.Test.props" />
 
-  <PropertyGroup>
-    <QscVerbosity>detailed</QscVerbosity>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="TestProjects\**" />
     <EmbeddedResource Remove="TestProjects\**" />
