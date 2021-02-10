@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
 using System.Reflection;
@@ -57,18 +60,18 @@ namespace Microsoft.Quantum.Experimental
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="destroy")]
-        private static extern Int64 _Destroy(uint simId);
+        private static extern Int64 _Destroy(ulong simId);
 
-        public static void Destroy(uint simId)
+        public static void Destroy(ulong simId)
         {
             LogCall("init");
             CheckCall(_Destroy(simId));
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="dump_to_console")]
-        private static extern void _DumpToConsole(uint simId);
+        private static extern void _DumpToConsole(ulong simId);
 
-        public static void DumpToConsole(uint simId)
+        public static void DumpToConsole(ulong simId)
         {
             LogCall("dump_to_console");
             _DumpToConsole(simId);
