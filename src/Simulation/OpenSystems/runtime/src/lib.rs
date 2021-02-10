@@ -4,6 +4,7 @@ extern crate ndarray;
 extern crate derive_more;
 extern crate serde;
 
+pub mod c_api;
 mod utils;
 mod common_matrices;
 mod states;

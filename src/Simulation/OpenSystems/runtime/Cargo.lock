@@ -152,12 +152,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "opensim_runtime"
+name = "opensim"
 version = "0.1.0"
 dependencies = [
  "derive_more",
  "getrandom",
  "itertools",
+ "lazy_static",
  "ndarray",
  "num-complex",
  "num-traits",

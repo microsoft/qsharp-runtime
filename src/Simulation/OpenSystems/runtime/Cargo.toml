@@ -1,5 +1,5 @@
 [package]
-name = "opensim_runtime"
+name = "opensim"
 version = "0.1.0"
 authors = ["Christopher Granade <cgranade@cgranade.com>"]
 edition = "2018"
@@ -26,6 +26,7 @@ itertools = "0.9.0"
 rand = "0.7.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+lazy_static = "1.4.0"
 
 # See https://github.com/rust-random/rand/issues/990
 # and https://docs.rs/getrandom/0.1.15/getrandom/index.html#support-for-webassembly-and-asmjs
@@ -38,9 +39,6 @@ getrandom = { version = "0.1.15", features = ["wasm-bindgen"] }
 web-sys = { version = "0.3.4",  features = ['console'], optional = true }
 
 [lib]
-name = "opensim_runtime"
+name = "opensim"
 path = "src/lib.rs"
-# Build a Rust library from this crate. That can't be used directly except
-# by other Rust crates, but allows us to retarget the runtime here as different
-# kinds of libraries with thin wrappers later.
-crate-type = ["rlib"]
+crate-type = ["rlib", "staticlib", "cdylib"]

@@ -30,6 +30,10 @@ extern "C"
     i64 t_adj(size_t sim_id, size_t idx);
     i64 cnot(size_t sim_id, size_t idx_control, size_t idx_target);
     i64 m(size_t sim_id, size_t idx, size_t* result_out);
+    const char* lasterr();
+    const char* get_noise_model(size_t sim_id);
+    i64 set_noise_model(size_t sim_id, const char* new_model);
+    const char* get_current_state(size_t sim_id);
 }
 
 namespace Microsoft

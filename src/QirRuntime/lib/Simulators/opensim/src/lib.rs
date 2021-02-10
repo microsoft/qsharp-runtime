@@ -1,2 +1,4 @@
+extern crate opensim;
+// extern crate lazy_static;
 
-mod c_api;
+use opensim::c_api;
