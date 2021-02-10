@@ -6,11 +6,14 @@ $ErrorActionPreference = 'Stop'
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
+$RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..");
+$DropNative = "$Env:DROP_NATIVE" -eq "" ? $RepoRoot : $Env:DROP_NATIVE;
+
 Write-Host "##[info]Copy Native simulator xplat binaries"
 pushd (Join-Path $PSScriptRoot ../src/Simulation/Native)
     If (-not (Test-Path 'osx')) { mkdir 'osx' }
     If (-not (Test-Path 'linux')) { mkdir 'linux' }
-    $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
+    $DROP = "$DropNative/src/Simulation/Native/build/drop"
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
 popd
@@ -20,10 +23,10 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/OpenSystems/runtime)
     If (-not (Test-Path 'osx')) { mkdir 'osx' }
     If (-not (Test-Path 'linux')) { mkdir 'linux' }
     If (-not (Test-Path 'win10')) { mkdir 'win10' }
-    $Configuration = $Env:BUILD_CONFIGURATION.ToLowerInvariant();
-    $DROP = (Join-Path "$Env:DROP_NATIVE" "src" "Simulation" "OpenSystems" "runtime" "target" $Configuration);
-    $DROP | Write-Host
-    Get-ChildItem -recurse "$DROP/*.dll"
+    $DROP = Join-Path `
+                "$DropNative" "src" "Simulation" "OpenSystems" `
+                "runtime" "target" `
+                $Env:BUILD_CONFIGURATION.ToLowerInvariant();
     if (Test-Path "$DROP/libopensim.dylib") {
         Copy-Item "$DROP/libopensim.dylib" "osx/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
     }
