@@ -60,4 +60,5 @@ TEST_CASE("QIR: Run RB experiment", "[qir]")
     QirContextScope qirctx(qapi.get());
 
     double res = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
+    REQUIRE(res == 0.0);
 }

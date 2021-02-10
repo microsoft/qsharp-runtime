@@ -28,8 +28,10 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
 #elif __APPLE__
     return ::dlopen("libMicrosoft.Quantum.Simulator.Runtime.dylib", RTLD_LAZY);
 #else
-    return ::dlopen("libMicrosoft.Quantum.Simulator.Runtime.so", RTLD_LAZY);
-    std::cout << dlerror();
+    auto h = ::dlopen("libMicrosoft.Quantum.Simulator.Runtime.so", RTLD_LAZY);
+    std::cout << "**" << h;
+    // std::cout << dlerror();
+    return h;
 #endif
 }
 
@@ -117,10 +119,10 @@ namespace Quantum
         CFullstateSimulator()
             : handle(LoadQuantumSimulator())
         {
-            std::cout << this->handle;
+            std::cout << "***" << this->handle;
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(LoadProc(this->handle, "init"));
-
+            std::cout << "***" << (void *) initSimulatorInstance;
             this->simulatorId = initSimulatorInstance();
         }
         ~CFullstateSimulator()
