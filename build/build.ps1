@@ -16,6 +16,15 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }
 
+if ($Env:ENABLE_OPENSIM -ne "false") {
+    $openSimulator = (Join-Path $PSScriptRoot "../src/Simulation/OpenSystems")
+    & "$openSimulator/build-open-simulator.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping build of native simulator because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+}
 
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
