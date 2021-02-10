@@ -1,4 +1,6 @@
+& (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
+
 Push-Location (Join-Path $PSScriptRoot runtime)
-    # TODO: Set debug/release flag.
-    cargo build
+    $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
+    cargo build @releaseFlag;
 Pop-Location
