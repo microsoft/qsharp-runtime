@@ -30,7 +30,8 @@ namespace Microsoft.Quantum.Experimental
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="lasterr")]
         private static extern string _LastError();
 
-        public const string DLL_NAME = "Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll";
+        public const string DLL_NAME = "Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll";
+
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_name")]
         private static extern string _GetName();
