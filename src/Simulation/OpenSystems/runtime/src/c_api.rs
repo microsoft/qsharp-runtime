@@ -81,7 +81,9 @@ pub extern fn destroy(sim_id: usize) -> i64 {
 }
 
 #[no_mangle]
-pub extern fn dump_to_console() -> () {}
+pub extern fn dump_to_console(sim_id: usize) -> () {
+    // FIXME: implement this
+}
 
 #[no_mangle]
 pub extern fn x(sim_id: usize, idx: usize) -> i64 {

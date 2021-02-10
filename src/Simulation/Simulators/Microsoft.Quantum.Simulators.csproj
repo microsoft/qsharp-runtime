@@ -38,6 +38,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
+    <None Include="..\OpenSystems\runtime\target\*.dll">
+      <Link>runtimes\win-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\OpenSystems\runtime\target\*.dylib">
+      <Link>runtimes\osx-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\OpenSystems\runtime\target\*.so">
+      <Link>runtimes\linux-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
   </ItemGroup>
 
 </Project>
