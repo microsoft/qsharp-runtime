@@ -60,15 +60,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     @Test("QuantumSimulator")
     function SizedArrayShouldIncrementArrayItemRefCount() : Unit {
         mutable item = [1];
-        let items = [item, size = 1];
+        let items = [item, size = 2];
         set item w/= 0 <- 2;
 
         AssertEqual([2], item);
-        AssertEqual([[1]], items);
+        AssertEqual([[1], [1]], items);
     }
 
     @Test("QuantumSimulator")
-    function ArrayOfArraysShouldHaveCorrectReferenceCounts() : Unit {
+    function ArrayOfArraysShouldCopyOnUpdate() : Unit {
         mutable items = [[1], size = 2];
         set items w/= 0 <- items[0] w/ 0 <- 2;
 

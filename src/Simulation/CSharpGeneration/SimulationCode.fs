@@ -593,7 +593,7 @@ module SimulationCode =
             | _ -> failwith ""
 
         and buildSizedArray value size =
-            ident "QArray" <.> (ident "Repeat", [ buildExpression value; buildExpression size ])
+            ident "QArray" <.> (ident "Repeat", [ captureExpression value; buildExpression size ])
 
         and buildNewArray b count =
             let arrayType = (ArrayType b |> QArrayType).Value
