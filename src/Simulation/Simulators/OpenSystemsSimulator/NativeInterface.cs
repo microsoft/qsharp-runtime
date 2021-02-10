@@ -77,38 +77,33 @@ namespace Microsoft.Quantum.Experimental
             _DumpToConsole(simId);
         }
 
-        // TODO: Copy datamodel and uncomment.
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_current_state")]
-        // private static extern string _GetCurrentState();
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_current_state")]
+        private static extern string _GetCurrentState(ulong simId);
 
-        // public static State CurrentState
-        // {
-        //     get
-        //     {
-        //         LogCall("get_current_state");
-        //         return JsonSerializer.Deserialize<State>(_GetCurrentState());
-        //     }
-        // }
+        public static State GetCurrentState(ulong simId)
+        {
+            LogCall("get_current_state");
+            return JsonSerializer.Deserialize<State>(_GetCurrentState(simId));
+        }
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_noise_model")]
-        // private static extern string _GetNoiseModel();
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_noise_model")]
+        private static extern string _GetNoiseModel(ulong simId);
 
-        // [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="set_noise_model")]
-        // private static extern void _SetNoiseModel(string noiseModel);
 
-        // public static NoiseModel NoiseModel
-        // {
-        //     get
-        //     {
-        //         LogCall("get_noise_model");
-        //         return JsonSerializer.Deserialize<NoiseModel>(_GetNoiseModel());
-        //     }
-        //     set
-        //     {
-        //         LogCall("set_noise_model");
-        //         _SetNoiseModel(JsonSerializer.Serialize(value));
-        //     }
-        // }
+        public static NoiseModel GetNoiseModel(ulong simId)
+        {
+            LogCall("get_noise_model");
+            return JsonSerializer.Deserialize<NoiseModel>(_GetNoiseModel(simId));
+        }
+
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="set_noise_model")]
+        private static extern Int64 _SetNoiseModel(ulong simId, string noiseModel);
+
+        public static void SetNoiseModel(ulong simId, NoiseModel noiseModel)
+        {
+            LogCall("set_noise_model");
+            CheckCall(_SetNoiseModel(simId, JsonSerializer.Serialize(noiseModel)));
+        }
 
         
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="h")]

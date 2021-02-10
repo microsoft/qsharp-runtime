@@ -16,8 +16,24 @@ namespace Microsoft.Quantum.Experimental
 {
     public partial class OpenSystemsSimulator : SimulatorBase, IType1Core, IDisposable
     {
-        public override string Name => NativeInterface.Name;
         private readonly ulong Id;
+
+        public override string Name => NativeInterface.Name;
+        public NoiseModel NoiseModel
+        {
+            get
+            {
+                return NativeInterface.GetNoiseModel(Id);
+            }
+
+            set
+            {
+                NativeInterface.SetNoiseModel(Id, value);
+            }
+        }
+
+        public State CurrentState => NativeInterface.GetCurrentState(this.Id);
+
 
         public OpenSystemsSimulator(uint capacity = 3)
         {

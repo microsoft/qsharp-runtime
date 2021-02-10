@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
+    <PackageReference Include="NumSharp" Version="0.20.5" />
   </ItemGroup>
 
   <ItemGroup>
