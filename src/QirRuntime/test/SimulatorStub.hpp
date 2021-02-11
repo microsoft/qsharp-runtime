@@ -100,19 +100,19 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void SAdjoint(Qubit target) override
+        void AdjointS(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void TAdjoint(Qubit target) override
+        void AdjointT(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }

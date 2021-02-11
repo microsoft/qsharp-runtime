@@ -135,7 +135,10 @@ extern "C"
             return quantum__rt__string_create("PauliY");
         case PauliId_Z:
             return quantum__rt__string_create("PauliZ");
+        default:
+            break;
         }
+        return quantum__rt__string_create("<Unexpected Pauli Value>");
     }
 
     // Returns a string representation of the range.

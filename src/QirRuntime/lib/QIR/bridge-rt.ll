@@ -11,7 +11,7 @@
 %Result = type opaque
 %String = type opaque
 %Tuple = type opaque
-%Pauli = type {i2}
+%Pauli = type i2
 
 ;=======================================================================================================================
 ; Native types
@@ -27,6 +27,7 @@
 %"struct.QirCallable" = type opaque
 %"struct.QirRange" = type { i64, i64, i64 }
 %"struct.QirString" = type opaque
+%PauliId = type i32
 ; %Tuple* is mapped to i8*
 
 ;=======================================================================================================================
@@ -97,7 +98,7 @@ declare %"struct.QirString"* @quantum__rt__int_to_string(i64)
 declare %"struct.QirString"* @quantum__rt__double_to_string(double)
 declare %"struct.QirString"* @quantum__rt__bool_to_string(i1)
 declare %"struct.QirString"* @quantum__rt__result_to_string(%class.RESULT*)
-declare %"struct.QirString"* @quantum__rt__pauli_to_string(i32)
+declare %"struct.QirString"* @quantum__rt__pauli_to_string(%PauliId)
 declare %"struct.QirString"* @quantum__rt__qubit_to_string(%class.QUBIT*)
 declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* dereferenceable(24) %range)
 
@@ -378,10 +379,9 @@ define void @__quantum__rt__callable_memory_management(i32 %index, %Callable* %.
 ; strings bridge
 ;
 ; NYI:
-;define %String* @__quantum__rt__pauli_to_string(%Pauli) ; need to check that the type is lowered correctly
 ;define %String* @__quantum__rt__bigint_to_string(%BigInt*)
 
-define %String* @__quantum__rt__string_create(i8* %null_terminated_buffer) {
+define %String* @__quantum__rt__string_create(i32 %ignoredStrLength, i8* %null_terminated_buffer) {
   %str = call %"struct.QirString"* @quantum__rt__string_create(i8* %null_terminated_buffer)
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str
@@ -435,6 +435,13 @@ define %String* @__quantum__rt__result_to_string(%Result* %.r) {
   ret %String* %.str
 }
 
+define %String* @__quantum__rt__pauli_to_string(%Pauli %.pauli) {
+  %pauli = zext %Pauli %.pauli to %PauliId
+  %str = call %"struct.QirString"* @quantum__rt__pauli_to_string(%PauliId %pauli)
+  %.str = bitcast %"struct.QirString"* %str to %String*
+  ret %String* %.str
+}
+
 define %String* @__quantum__rt__qubit_to_string(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %"class.QUBIT"*
   %str = call %"struct.QirString"* @quantum__rt__qubit_to_string(%"class.QUBIT"* %q)
@@ -450,7 +457,6 @@ define %String* @__quantum__rt__range_to_string(%Range %.range) {
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str
 }
-
 
 ;------------------------------------------------------------------------------
 ; bigints bridge

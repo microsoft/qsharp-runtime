@@ -56,8 +56,9 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
     int64_t count,
     int64_t* array,
     int64_t index,
-    int64_t val);
-TEST_CASE("QIR: Using 1D arrays", "[qir]")
+    int64_t val,
+    bool compilerDecoy);
+TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
     // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed
     QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
@@ -65,7 +66,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir]")
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42);
+    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42, false);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
@@ -114,9 +115,11 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result M(Qubit qubit) override
+    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        const int id = GetQubitId(qubit);
+        assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
+
+        const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->results.push_back(this->qubits[id]);
         return reinterpret_cast<Result>(this->results.size() - 1);
@@ -149,7 +152,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 };
-TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
+TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][qir.result]")
 {
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
@@ -179,7 +182,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir]")
 // that is written to the original array at [1,1,1] and then retrieved from [1,1].
 // Thus, all three dimensions must be at least 2.
 extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
-TEST_CASE("QIR: multidimensional arrays", "[qir]")
+TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
@@ -192,7 +195,7 @@ TEST_CASE("QIR: multidimensional arrays", "[qir]")
 
 // Manually authored QIR to test dumping range [0..2..6] into string and then raising a failure with it
 extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
-TEST_CASE("QIR: Report range in a failure message", "[qir]")
+TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
@@ -209,15 +212,17 @@ TEST_CASE("QIR: Report range in a failure message", "[qir]")
     REQUIRE(failed);
 }
 
+#if 0 // TODO: Q# compiler crashes generating QIR for TestPartials
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
-TEST_CASE("QIR: Partial application of a callable", "[qir]")
+TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 {
     QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__body(42, 17);
     REQUIRE(res == 42 - 17);
 }
+#endif
 
 // The Microsoft__Quantum__Testing__QIR__TestControlled__body tests needs proper semantics of X and M, and nothing else.
 // The validation is done inside the test and it would return an error code in case of failure.
@@ -267,9 +272,11 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result M(Qubit qubit) override
+    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        const int id = GetQubitId(qubit);
+        assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
+
+        const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
         return reinterpret_cast<Result>(this->qubits[id]);
     }
@@ -302,7 +309,7 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }
-TEST_CASE("QIR: application of nested controlled functor", "[qir]")
+TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {
     unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);

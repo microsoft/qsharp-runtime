@@ -1,8 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 namespace Microsoft.Quantum.Testing.QIR
 {
     open Microsoft.Quantum.Intrinsic;
 
-    @EntryPoint()
     operation Test_Qubit_Result_Management() : Bool
     {
         // exercise __quantum__rt__qubit_allocate_array

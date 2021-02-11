@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Arrays {
     /// let empty = EmptyArray<Int>();
     /// ```
     function EmptyArray<'TElement>() : 'TElement[] {
-        body intrinsic;
+        return new 'TElement[0];
     }
 
 }

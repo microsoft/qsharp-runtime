@@ -3,8 +3,11 @@
 
 namespace Microsoft.Quantum.Testing.QIR
 {
+    open Microsoft.Quantum.Testing.QIR.Math;
+    open Microsoft.Quantum.Testing.QIR.Str;
+
     @EntryPoint()
-    operation Test_Arrays(array : Int[], index : Int, val : Int) : Int
+    operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int
     {
         // exercise __quantum__rt__array_copy
         mutable local = array;
@@ -29,6 +32,21 @@ namespace Microsoft.Quantum.Testing.QIR
             set sum += result[i];
         }
 
+        // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
+        if (compilerDecoy)
+        {
+            let res1 = TestControlled();
+            let res2 = TestPartials(17, 42);
+            let res3 = Test_Qubit_Result_Management();
+
+            // Math tests:
+            let res4 = SqrtTest();
+            let res5 = LogTest();
+            let res6 = ArcTan2Test();
+            let res7 = PauliToStringTest();
+        }
+
         return sum;
     }
+
 }

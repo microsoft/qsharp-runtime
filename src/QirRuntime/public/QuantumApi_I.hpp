@@ -39,10 +39,10 @@ namespace Quantum
             double theta) = 0;
 
         // Adjoint operations
-        virtual void SAdjoint(Qubit target) = 0;
-        virtual void TAdjoint(Qubit target) = 0;
-        virtual void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) = 0;
-        virtual void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) = 0;
+        virtual void AdjointS(Qubit target) = 0;
+        virtual void AdjointT(Qubit target) = 0;
+        virtual void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) = 0;
+        virtual void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) = 0;
     };
 
     struct IDiagnostics

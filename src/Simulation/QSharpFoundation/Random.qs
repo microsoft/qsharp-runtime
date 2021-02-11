@@ -21,6 +21,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// is the $i$th element of `probs`.
     @Deprecated("Microsoft.Quantum.Random.DrawCategorical")
     operation Random (probs : Double[]) : Int {
-        body intrinsic;
+        return Microsoft.Quantum.Random.DrawCategorical(probs);
     }
 }

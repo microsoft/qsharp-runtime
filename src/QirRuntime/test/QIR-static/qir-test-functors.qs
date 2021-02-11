@@ -3,8 +3,6 @@
 // support multi-controlled X.
 namespace Microsoft.Quantum.Intrinsic
 {
-    open Microsoft.Quantum.Instructions;
-
     @Inline()
     operation K(q : Qubit) : Unit
     is Adj+Ctl {
@@ -34,7 +32,6 @@ namespace Microsoft.Quantum.Testing.QIR
         }
     }
 
-    @EntryPoint()
     operation TestControlled () : Int
     {
         let qop = Qop(_, 1);
