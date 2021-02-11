@@ -53,7 +53,7 @@ To update the *.ll files to a newer version:
 // The result should be the ground state energy of Hydrogen, approx. -1.13.
 // The Q# source code can be found in msr-quarc/StandaloneVQE on the branch guenp/non-standalone.
 extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(); // NOLINT
-TEST_CASE("QIR: Run RB experiment", "[qir]")
+TEST_CASE("QIR: Run QIR example", "[qir]")
 {
     // Create a full state simulator and link it to the QIR context scope
     unique_ptr<ISimulator> qapi = CreateFullstateSimulator();

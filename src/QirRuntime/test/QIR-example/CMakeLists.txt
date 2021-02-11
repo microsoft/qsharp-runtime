@@ -1,7 +1,7 @@
 # compile test ll files into a library
 
 set(TEST_FILES
-  qir-example
+  qir-example-vqe
 )
 
 foreach(file ${TEST_FILES})
