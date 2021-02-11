@@ -142,18 +142,10 @@ namespace Microsoft.Quantum.Simulation.Core
             /// </summary>
             internal void Extend(T value, long count)
             {
-                var intCount = Convert.ToInt32(count);
-                var total = Convert.ToInt32(Length) + intCount;
-                if (storage is null)
-                {
-                    storage = new List<T>(total);
-                }
-                else if (storage.Capacity < total)
-                {
-                    storage.Capacity = total;
-                }
-
-                storage.AddRange(Enumerable.Repeat(value, intCount));
+                var total = Convert.ToInt32(Length + count);
+                storage ??= new List<T>(total);
+                storage.Capacity = Math.Max(storage.Capacity, total);
+                storage.AddRange(Enumerable.Repeat(value, Convert.ToInt32(count)));
             }
         }
 
