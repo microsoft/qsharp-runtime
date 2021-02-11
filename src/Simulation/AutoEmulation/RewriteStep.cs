@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             // collect all callables that have an emulation attribute
             var globals = compilation.Namespaces
                                      .GlobalCallableResolutions()
-                                     .Where(p => p.Value.SourceFile.EndsWith(".qs"))
+                                     .Where(p => p.Value.Source.CodeFile.EndsWith(".qs"))
                                      .Where(p => p.Value.Attributes.Any(HasEmulationAttribute));
 
             if (!globals.Any())
