@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
@@ -14,6 +13,18 @@ using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
+    public static class Extensions
+    {
+        /// <summary>
+        ///     This method is a wrapper to let the tests keep using a one Type parameter
+        ///     method to fetch for Gates.
+        /// </summary>
+        public static T Get<T>(this SimulatorBase sim) where T : AbstractCallable
+        {
+            return sim.Get<T, T>();
+        }
+    }
+
     public class Log<T>
     {
         public Dictionary<string, int> _log = new Dictionary<string, int>();
@@ -88,75 +99,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
-    static class OperationsTestHelper
+    static partial class OperationsTestHelper
     {
-        public static TraceImpl<T> GetTracer<T>(this SimulatorBase s)
-        {
-            return s.Get<GenericCallable>(typeof(Tests.Circuits.Generics.Trace<>)).FindCallable(typeof(T), typeof(QVoid)) as TraceImpl<T>;
-        }
-
-
-        public class TracerImpl : Tests.Circuits.ClosedType.Trace
-        {
-            public TracerImpl(IOperationFactory m) : base(m)
-            {
-                this.Log = new Log<string>();
-            }
-
-            public override Func<string, QVoid> __Body__ => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<string, QVoid> __AdjointBody__ => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, string), QVoid> __ControlledBody__ => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, string), QVoid> __ControlledAdjointBody__ => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
-
-            public Log<string> Log { get; }
-        }
-
-        public class TraceImpl<T> : Tests.Circuits.Generics.Trace<T>
-        {
-            public TraceImpl(IOperationFactory m) : base(m)
-            {
-                this.Log = new Log<T>();
-            }
-
-            public override Func<T, QVoid> __Body__ => (tag) => this.Log.Record(OperationFunctor.Body, tag);
-            public override Func<T, QVoid> __AdjointBody__ => (tag) => this.Log.Record(OperationFunctor.Adjoint, tag);
-            public override Func<(IQArray<Qubit>, T), QVoid> __ControlledBody__ => (args) => this.Log.Record(OperationFunctor.Controlled, args.Item2);
-            public override Func<(IQArray<Qubit>, T), QVoid> __ControlledAdjointBody__ => (args) => this.Log.Record(OperationFunctor.ControlledAdjoint, args.Item2);
-
-            public int GetNumberOfCalls(OperationFunctor functor, T tag) => this.Log.GetNumberOfCalls(functor, tag);
-
-            public Log<T> Log { get; }
-        }
-
-        private static void InitSimulator(SimulatorBase sim)
-        {
-            sim.InitBuiltinOperations(typeof(OperationsTestHelper));
-            sim.Register(typeof(Tests.Circuits.Generics.Trace<>), typeof(TraceImpl<>), typeof(IUnitary));
-
-            // For Toffoli, replace H with I.
-            if (sim is ToffoliSimulator)
-            {
-                sim.Register(typeof(Intrinsic.H), typeof(Intrinsic.I), typeof(IUnitary));
-            }
-        }
-
-        public static void RunWithMultipleSimulators(Action<SimulatorBase> test)
-        {
-            var simulators = new SimulatorBase[] { new QuantumSimulator(), new ToffoliSimulator() };
-
-            foreach (var s in simulators)
-            {
-                InitSimulator(s);
-
-                test(s);
-
-                if (s is IDisposable sim)
-                {
-                    sim.Dispose();
-                }
-            }
-        }
-
         /// <summary>
         /// A shell for simple Apply tests.
         /// </summary>
@@ -189,13 +133,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         /// <summary>
         /// A shell for simple Controlled tests. It calls the controlled operation with 0..4 control qubits
-        /// set to all possible combination of 1 & 0.
+        /// set to all possible combination of 1 and 0.
         /// </summary>
         internal static void ctrlTestShell(SimulatorBase sim, Action<(IQArray<Qubit>, Qubit)> operationControlled, Action<bool, IQArray<Qubit>, Qubit> test)
         {
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
-            var set = sim.Get<SetQubit>();
+            var set = sim.Get<Measurement.SetToBasisState>();
 
             // Number of control bits to use
             for (int n = 0; n < 4; n++)

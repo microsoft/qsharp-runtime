@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="Common.Package.props" />
+
+  <ItemGroup>
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Exp.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\H.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Measure.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\R.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\S.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\T.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CCNOT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFrac.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\M.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetX.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetY.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZ.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1Frac.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\Reset.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\Rx.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\Ry.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\Rz.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\SetToBasisState.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\SWAP.qs" />
+  </ItemGroup>
+
+</Project>

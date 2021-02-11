@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     operation AssertUnitaryHelper (stateIds : Int[], unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit[] => Unit), qubits : Qubit[]) : Unit {
         
         let expectedState = ApplyMatrix(unitaryMatrix, StateById(stateIds));
-        _flipToBasis(stateIds, qubits);
+        FlipToBasis(stateIds, qubits);
         unitaryOp(qubits);
         AssertState(expectedState, qubits);
         ResetAll(qubits);
@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation AssertUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit[] => Unit : Adjoint), qubits : Qubit[]) : Unit {
+    operation AssertUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit[] => Unit is Adj), qubits : Qubit[]) : Unit {
         
         
         if (Length(unitaryMatrix!) != 2 ^ Length(qubits)) {

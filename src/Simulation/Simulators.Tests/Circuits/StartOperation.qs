@@ -9,9 +9,9 @@ namespace Microsoft.Quantum.Tests.StartOperation {
     
     newtype Qubits = Qubit[];
     
-    newtype UDT1 = ((Int, Qubit, (Qubit, Qubit), Result) => Unit : Adjoint, Controlled);
+    newtype UDT1 = ((Int, Qubit, (Qubit, Qubit), Result) => Unit is Adj + Ctl);
     
-    newtype UDT2 = (Qubit => Unit : Adjoint, Controlled);
+    newtype UDT2 = (Qubit => Unit is Adj + Ctl);
     
     newtype UDT3 = ((Int, Qubit) => Int);
     
@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Tests.StartOperation {
     }
     
     
-    operation AllVariants<'T> (gate : ('T => Unit : Adjoint, Controlled), i : 'T, ctrls : Qubits) : Unit {
+    operation AllVariants<'T> (gate : ('T => Unit is Adj + Ctl), i : 'T, ctrls : Qubits) : Unit {
         
         body (...) {
             gate(i);
@@ -91,7 +91,7 @@ namespace Microsoft.Quantum.Tests.StartOperation {
     
     // This is needed to fix the bug that the parser is reporting incorrectly the type of UDTs:
     
-    function UDT1asUnitary (u : UDT1) : ((Int, Qubit, (Qubit, Qubit), Result) => Unit : Adjoint, Controlled) {
+    function UDT1asUnitary (u : UDT1) : ((Int, Qubit, (Qubit, Qubit), Result) => Unit is Adj + Ctl) {
         
         return u!;
     }

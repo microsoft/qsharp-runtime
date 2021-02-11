@@ -16,9 +16,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private static Pauli[] PAULI_Z = new Pauli[] { Pauli.PauliZ };
         
-            [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "JointEnsembleProbability")]
-            private static extern double JointEnsembleProbability(uint id, uint n, Pauli[] b, uint[] q);
-
             public QSimQubit(int id, uint simulatorId) : base(id)
             {
                 this.SimulatorId = simulatorId;

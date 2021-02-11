@@ -25,17 +25,17 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     
     newtype Plain1 = ((Qubit, Qubit) => Unit);
     
-    newtype Adj1 = ((Qubit, Qubit) => Unit : Adjoint);
+    newtype Adj1 = ((Qubit, Qubit) => Unit is Adj);
     
     newtype Adj2 = Adj1;
     
-    newtype Ctrl1 = ((Qubit, Qubit) => Unit : Controlled);
+    newtype Ctrl1 = ((Qubit, Qubit) => Unit is Ctl);
     
-    newtype U1 = ((Qubit, Qubit, Qubit[]) => Unit : Adjoint, Controlled);
+    newtype U1 = ((Qubit, Qubit, Qubit[]) => Unit is Adj + Ctl);
     
     newtype U2 = U1;
     
-    newtype U3 = (Qubit => Unit : Adjoint, Controlled);
+    newtype U3 = (Qubit => Unit is Adj + Ctl);
     
     
     operation BPlain1 (available : Int, q1 : Qubit, action : ((Qubit, Qubit) => Unit)) : Unit {
@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     }
     
     
-    operation BAdj1 (available : Int, (q1 : Qubit, q2 : Qubit, qs : Qubit[]), action : ((Qubit, Qubit) => Unit : Adjoint)) : Unit {
+    operation BAdj1 (available : Int, (q1 : Qubit, q2 : Qubit, qs : Qubit[]), action : ((Qubit, Qubit) => Unit is Adj)) : Unit {
         
         body (...) {
             
@@ -90,7 +90,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     }
     
     
-    operation BCtrl1 (available : Int, qs : Qs, action : ((Qubit, Qubit) => Unit : Controlled)) : Unit {
+    operation BCtrl1 (available : Int, qs : Qs, action : ((Qubit, Qubit) => Unit is Ctl)) : Unit {
         
         body (...) {
             
@@ -120,7 +120,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     }
     
     
-    operation BU1 (available : Int, qs : Qubit[], action : ((Qubit, Qubit, Qubit[]) => Unit : Adjoint, Controlled)) : Unit {
+    operation BU1 (available : Int, qs : Qubit[], action : ((Qubit, Qubit, Qubit[]) => Unit is Adj + Ctl)) : Unit {
         
         body (...) {
             
@@ -137,7 +137,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     }
     
     
-    operation BGen<'T> (available : Int, arg : 'T, action : ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled)) : Unit {
+    operation BGen<'T> (available : Int, arg : 'T, action : ((Qubit, Qubit, 'T) => Unit is Adj + Ctl)) : Unit {
         
         body (...) {
             
@@ -178,7 +178,7 @@ namespace Microsoft.Quantum.Tests.CoreOperations {
     }
     
     
-    operation TestAllVariants<'T> (available : Int, args : 'T, action : ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled), B : ((Int, 'T, ((Qubit, Qubit, 'T) => Unit : Adjoint, Controlled)) => Unit : Adjoint, Controlled)) : Unit {
+    operation TestAllVariants<'T> (available : Int, args : 'T, action : ((Qubit, Qubit, 'T) => Unit is Adj + Ctl), B : ((Int, 'T, ((Qubit, Qubit, 'T) => Unit is Adj + Ctl)) => Unit is Adj + Ctl)) : Unit {
         
         
         using (ctrls = Qubit[2]) {

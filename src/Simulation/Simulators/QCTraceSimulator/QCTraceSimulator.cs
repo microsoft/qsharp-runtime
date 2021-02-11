@@ -10,6 +10,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Groups of primitive operations counted by <see cref="QCTraceSimulator"/>.
@@ -398,13 +399,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// Creates a new instance of the simulator with the default 
         /// <see cref="QCTraceSimulatorConfiguration"/>.
         /// </summary>
-        public QCTraceSimulator() : this( new QCTraceSimulatorConfiguration() ) { }
+        public QCTraceSimulator() : this(new QCTraceSimulatorConfiguration() ) { }
 
         /// <summary>
         /// Creates a new instance of the simulator with configuration given by 
         /// the <paramref name="config"/> parameter.
         /// </summary>
-        public QCTraceSimulator(QCTraceSimulatorConfiguration config) : base(config) { }
+        public QCTraceSimulator(QCTraceSimulatorConfiguration config, Assembly? coreAssembly = null) : 
+            base(config, coreAssembly) { }
 
         /// <summary>
         /// Array of the names of all of the metrics collected by this instance of the simulator.

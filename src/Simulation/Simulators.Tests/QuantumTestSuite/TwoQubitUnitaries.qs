@@ -7,7 +7,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Intrinsic;
     
     
-    operation TwoQubitUnitaryTestHelper (matrix : RowMajorMatrix, unitary : (Qubit[] => Unit : Adjoint)) : Unit {
+    operation TwoQubitUnitaryTestHelper (matrix : RowMajorMatrix, unitary : (Qubit[] => Unit is Adj)) : Unit {
         let totalQubits = MaxQubitsToAllocateForTwoQubitTests();
         
         using (qubits = Qubit[totalQubits]) {            
@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation ControlledTestHelper (qubitOperation : (Qubit => Unit : Controlled, Adjoint), target : Qubit[]) : Unit {
+    operation ControlledTestHelper (qubitOperation : (Qubit => Unit is Ctl + Adj), target : Qubit[]) : Unit {
         
         body (...) {
             

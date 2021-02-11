@@ -1,27 +1,25 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.13.2011.802-alpha">
-
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.2101126940">
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
   <Import Project="..\Common\Simulators.Dev.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <IncludeQsharpCorePackages>false</IncludeQsharpCorePackages>
-    <CsharpGeneration>false</CsharpGeneration><!-- we will provide our own -->
-  </PropertyGroup>
-
-  <PropertyGroup>
     <LanguageVersion>8.0</LanguageVersion>
     <Nullable>enable</Nullable>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
   </PropertyGroup>
-
 
   <ItemGroup>
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsharpGeneration\Microsoft.Quantum.CsharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
+    <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
+    <ProjectReference Include="..\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
   </ItemGroup>
 
   <ItemGroup>

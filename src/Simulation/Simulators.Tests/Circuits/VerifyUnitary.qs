@@ -6,7 +6,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Diagnostics;
-    open Microsoft.Quantum.Simulation.TestSuite;
+    open Microsoft.Quantum.Measurement;
     
     
     /// <summary>
@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     ///     then it tests Controlled with different number of control qubits, also verifying that
     ///     Adjoint Controlled works.
     /// </summary>
-    operation VerifyUnitary (gate : (Qubit => Unit : Adjoint, Controlled), start : (Pauli, Result), expected : (Complex, Complex)) : Unit {
+    operation VerifyUnitary (gate : (Qubit => Unit is Adj + Ctl), start : (Pauli, Result), expected : (Complex, Complex)) : Unit {
         
         
         using (qubits = Qubit[1]) {
@@ -28,14 +28,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             let q1 = qubits[0];
             let (a, b) = expected;
             let (p, r) = start;
-            SetQubit(r, q1);
+            SetToBasisState(r, q1);
             
             if (p == PauliX) {
                 H(q1);
             }
             
             // Make sure we start in correct state.
-            Assert([p], [q1], r, $"Qubit in invalid state.");
+            AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
             
             // Apply the gate, make sure it's in the right state
             gate(q1);
@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             
             // Apply Adjoint, back to Zero:
             Adjoint gate(q1);
-            Assert([p], [q1], r, $"Qubit in invalid state.");
+            AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
             
             // When no control qubits, it should be equivalent to just calling the gate:
             Controlled gate(new Qubit[0], q1);
@@ -51,7 +51,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             
             // Apply Adjoint, back to Zero:
             Controlled (Adjoint gate)(new Qubit[0], q1);
-            Assert([p], [q1], r, $"Qubit in invalid state.");
+            AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
             
             // Now test control... We'll have 3 control qubits.
             // We will run the test with 1..3 controls at a time.
@@ -62,18 +62,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
                 for (i in 0 .. ctrlsCount - 1) {
                     
                     // We're starting fresh
-                    Assert([p], [q1], r, $"Qubit in invalid state.");
+                    AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
                     
                     // Get a subset for control and initialize them to zero:
                     let c = ctrls[0 .. i];
                     
                     for (j in 0 .. i) {
-                        SetQubit(Zero, c[j]);
+                        SetToBasisState(Zero, c[j]);
                     }
                     
                     // Noop when ctrls are all zero.
                     Controlled gate(c, q1);
-                    Assert([p], [q1], r, $"Qubit in invalid state.");
+                    AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
                     
                     // turn on each of the controls one by one
                     for (j in 1 .. Length(c)) {
@@ -85,7 +85,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
                             AssertQubitIsInStateWithinTolerance(expected, q1, tolerance);
                         }
                         else {
-                            Assert([p], [q1], r, $"Qubit in invalid state.");
+                            AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
                         }
                         
                         Adjoint Controlled gate(c, q1);
@@ -96,8 +96,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             }
             
             // We're back where we started.
-            Assert([p], [q1], r, $"Qubit in invalid state.");
-            SetQubit(r, q1);
+            AssertMeasurement([p], [q1], r, $"Qubit in invalid state.");
+            SetToBasisState(r, q1);
             ResetAll(qubits);
         }
     }

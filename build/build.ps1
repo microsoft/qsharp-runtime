@@ -24,7 +24,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
         $script:all_ok = $False
     }
 } else {
-    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
+    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
 }
 
 
@@ -45,7 +45,7 @@ function Build-One {
         -v $Env:BUILD_VERBOSITY  `
         @args `
         /property:Version=$Env:ASSEMBLY_VERSION `
-        /property:QsharpDocsOutputPath=$Env:DOCS_OUTDIR;
+        /property:QSharpDocsOutputPath=$Env:DOCS_OUTDIR;
 
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to build $project."
@@ -53,7 +53,7 @@ function Build-One {
     }
 }
 
-Build-One 'publish' '../src/Simulation/CsharpGeneration.App'
+Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
 

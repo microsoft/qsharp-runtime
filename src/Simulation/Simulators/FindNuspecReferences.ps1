@@ -7,7 +7,7 @@
 # This is problematic because we currently don't want to create a package for every dll.
 #
 # On the other hand, when creating a package using nuget pack, nuget does not
-# identifies PackageReferences defined in the csproj, so all the dependencies
+# identify PackageReferences defined in the csproj, so all the dependencies
 # are not listed and the package doesn't work.
 #
 # We don't want to hardcode the list of dependencies on the .nuspec, as they can
@@ -97,7 +97,7 @@ function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
 
 # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
 Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
-Add-NuGetDependencyFromCsprojToNuspec "../Simulators/Microsoft.Quantum.Simulators.csproj"
+Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.csproj"
 
 # Save into .nuspec file:
 $nuspec.package.metadata.AppendChild($dep)

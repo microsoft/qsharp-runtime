@@ -67,7 +67,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private QuantumSimulator Simulator { get; }
 
-
             public QsimDumpMachine(QuantumSimulator m) : base(m)
             {
                 this.Simulator = m;
@@ -84,7 +83,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
         {
             private QuantumSimulator Simulator { get; }
-
 
             public QSimDumpRegister(QuantumSimulator m) : base(m)
             {

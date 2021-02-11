@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.ClosedType {
     }
     
     
-    operation TraceGate (gate : (Qubit => Unit : Adjoint, Controlled), tag : String, qubit : Qubit) : Unit {
+    operation TraceGate (gate : (Qubit => Unit is Adj + Ctl), tag : String, qubit : Qubit) : Unit {
         
         body (...) {
             Trace(tag);
@@ -118,7 +118,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.ClosedType {
     }
     
     
-    operation Repeat (callback : (Qubit => Unit : Adjoint, Controlled), bodyCount : Int, adjointCount : Int, controlledCount : Int, source : Qubit) : Unit {
+    operation Repeat (callback : (Qubit => Unit is Adj + Ctl), bodyCount : Int, adjointCount : Int, controlledCount : Int, source : Qubit) : Unit {
         
         body (...) {
             

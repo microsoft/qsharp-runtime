@@ -57,7 +57,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
         }
 
-
         /// <summary>
         /// Verifies that the statistics configured in the ResourcesEstimator
         /// matches what the Results method expects.
@@ -118,6 +117,47 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(3.0, data.Rows.Find("Width")["Sum"]);
             Assert.Equal(2.0, data.Rows.Find("Depth")["Sum"]);
         }
+
+        [Fact]
+        public void QubitReuseWithOptimizedDepthTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            QubitReuseWithOptimizedDepth.Run(sim).Wait();
+
+            Assert.Equal(2.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
+        [Fact]
+        public void QubitReuseSimultaneousTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            SimultaneousUse.Run(sim).Wait();
+
+            Assert.Equal(11.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(20.0, sim.Data.Rows.Find("Width")["Sum"]);
+            // Note that in RecommendedConfig only T gates are depth 1, the rest are depth 0.
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
+        [Fact]
+        public void QubitReuseSequentialTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            SequentialUse.Run(sim).Wait();
+
+            Assert.Equal(11.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(20.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(11.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
 
         /// <summary>
         /// Documents that the QubitCount and Depth statistics reflect independent lower

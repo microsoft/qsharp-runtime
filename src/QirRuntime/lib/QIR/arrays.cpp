@@ -9,38 +9,39 @@
 #include <string.h> // for memcpy
 #include <vector>
 
-#include "quantum__rt.hpp"
-#include "qirTypes.hpp"
-
 #include "CoreTypes.hpp"
+#include "allocationsTracker.hpp"
+#include "context.hpp"
+#include "qirTypes.hpp"
+#include "quantum__rt.hpp"
 
-long QirArray::AddRef()
+using namespace Microsoft::Quantum;
+
+int QirArray::AddRef()
 {
-    assert(!this->containsQubits);
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAddRef(this);
+    }
 
-    int rc = ++this->refCount;
-    assert(rc != 1); // not allowed to resurrect!
-    return rc;
+    assert(this->refCount != 0 && "Cannot resurrect released array!");
+    return ++this->refCount;
 }
 
 // NB: Release doesn't trigger destruction of the QirArray itself to allow for it
 // being used both on the stack and on the heap. The creator of the array
 // should delete it, if allocated from the heap.
-long QirArray::Release()
+int QirArray::Release()
 {
-    assert(this->refCount > 0);
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnRelease(this);
+    }
 
-    const long rc = --this->refCount;
+    assert(this->refCount != 0 && "Cannot release already released array!");
+    const int rc = --this->refCount;
     if (rc == 0)
     {
-        if (this->containsQubits)
-        {
-            QUBIT** qubits = reinterpret_cast<QUBIT**>(this->buffer);
-            for (long i = 0; i < this->count; i++)
-            {
-                quantum__rt__qubit_release(qubits[i]);
-            }
-        }
         delete[] this->buffer;
         this->buffer = nullptr;
     }
@@ -50,7 +51,7 @@ long QirArray::Release()
 QirArray::QirArray(int64_t qubits_count)
     : count(qubits_count)
     , itemSizeInBytes(sizeof(void*))
-    , containsQubits(true)
+    , ownsQubits(true)
     , refCount(1)
 {
     if (this->count > 0)
@@ -67,6 +68,11 @@ QirArray::QirArray(int64_t qubits_count)
         this->buffer = nullptr;
     }
     this->dimensionSizes.push_back(this->count);
+
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
 }
 
 QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::vector<int64_t>&& dimSizes)
@@ -74,10 +80,16 @@ QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::
     , itemSizeInBytes(item_size_bytes)
     , dimensions(dimCount)
     , dimensionSizes(std::move(dimSizes))
-    , containsQubits(false)
+    , ownsQubits(false)
     , refCount(1)
 {
     assert(dimCount > 0);
+
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
+
     if (dimCount == 1)
     {
         assert(this->dimensionSizes.empty() || this->dimensionSizes[0] == this->count);
@@ -104,10 +116,13 @@ QirArray::QirArray(const QirArray* other)
     , itemSizeInBytes(other->itemSizeInBytes)
     , dimensions(other->dimensions)
     , dimensionSizes(other->dimensionSizes)
-    , containsQubits(other->containsQubits)
+    , ownsQubits(false)
     , refCount(1)
 {
-    assert(!this->containsQubits);
+    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    {
+        g_context->allocationsTracker->OnAllocate(this);
+    }
 
     const int64_t size = this->count * this->itemSizeInBytes;
     if (this->count > 0)
@@ -133,18 +148,9 @@ char* QirArray::GetItemPointer(int64_t index)
     return &this->buffer[index * this->itemSizeInBytes];
 }
 
-QUBIT* QirArray::GetQubit(int64_t index)
-{
-    assert(this->containsQubits);
-    assert(index < this->count);
-
-    QUBIT** qubits = reinterpret_cast<QUBIT**>(this->buffer);
-    return qubits[index];
-}
-
 void QirArray::Append(const QirArray* other)
 {
-    assert(!this->containsQubits && !other->containsQubits);
+    assert(!this->ownsQubits); // cannot take ownership of the appended qubits, as they might be owned by somebody else
     assert(this->itemSizeInBytes == other->itemSizeInBytes);
     assert(this->dimensions == 1 && other->dimensions == 1);
 
@@ -198,15 +204,8 @@ static int64_t RunCount(const std::vector<int64_t>& dimensionSizes, int dimensio
 }
 
 /*==============================================================================
-    We don't expect the clients to create many arrays so we'll start with
-    allocating the QirArray objects on the heap. If later it proves being a problem,
-    can add some kind of QirArray Manager that will store QirArrays in a more efficient
-    maner.
-
-    Re null handling: because the quantum__rt__* methods aren't expected to be
-    invoked directly by the clients, we assume that qir generation ensures null safety.
+    Implementation of quantum__rt__* methods for arrays
 ==============================================================================*/
-
 extern "C"
 {
     QirArray* quantum__rt__qubit_allocate_array(int64_t count)
@@ -216,12 +215,22 @@ extern "C"
 
     void quantum__rt__qubit_release_array(QirArray* qa)
     {
-        assert(qa != nullptr);
-        assert(qa->containsQubits);
+        if (qa == nullptr)
+        {
+            return;
+        }
 
-        long refCount = qa->Release();
-        assert(refCount == 0);
-        delete qa;
+        assert(qa->ownsQubits);
+        if (qa->ownsQubits)
+        {
+            QUBIT** qubits = reinterpret_cast<QUBIT**>(qa->buffer);
+            for (long i = 0; i < qa->count; i++)
+            {
+                quantum__rt__qubit_release(qubits[i]);
+            }
+
+            qa->ownsQubits = false;
+        }
     }
 
     QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)
@@ -230,21 +239,47 @@ extern "C"
         return new QirArray(count_items, itemSizeInBytes);
     }
 
-    void quantum__rt__array_reference(QirArray* array)
+    // Bucketing of addref/release is non-standard so for now we'll keep the more traditional addref/release semantics
+    // in the native types. Should reconsider, if the perf of the loops becomes an issue.
+    void quantum__rt__array_update_reference_count(QirArray* array, int32_t increment)
     {
-        assert(array != nullptr);
-        array->AddRef();
+        if (array == nullptr || increment == 0)
+        {
+            return;
+        }
+        else if (increment > 0)
+        {
+            for (int i = 0; i < increment; i++)
+            {
+                array->AddRef();
+            }
+        }
+        else
+        {
+            for (int i = increment; i < 0; i++)
+            {
+                const long refCount = array->Release();
+                if (refCount == 0)
+                {
+                    delete array;
+                    assert(i == -1 && "Attempting to decrement reference count below zero!");
+                    break;
+                };
+            }
+        }
     }
 
-    void quantum__rt__array_unreference(QirArray* array)
+    void quantum__rt__array_update_alias_count(QirArray* array, int32_t increment)
     {
-        assert(array != nullptr);
-
-        const long refCount = array->Release();
-        if (refCount == 0)
+        if (array == nullptr || increment == 0)
         {
-            delete array;
-        };
+            return;
+        }
+        array->aliasCount += increment;
+        if (array->aliasCount < 0)
+        {
+            quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative!"));
+        }
     }
 
     char* quantum__rt__array_get_element_ptr_1d(QirArray* array, int64_t index)
@@ -254,13 +289,13 @@ extern "C"
     }
 
     // Returns the number of dimensions in the array.
-    int32_t quantum__rt__array_get_dim(QirArray* array) // NOLINT
+    int32_t quantum__rt__array_get_dim(QirArray* array)
     {
         assert(array != nullptr);
         return array->dimensions;
     }
 
-    int64_t quantum__rt__array_get_length(QirArray* array, int32_t dim)
+    int64_t quantum__rt__array_get_size(QirArray* array, int32_t dim)
     {
         assert(array != nullptr);
         assert(dim < array->dimensions);
@@ -268,10 +303,18 @@ extern "C"
         return array->dimensionSizes[dim];
     }
 
-    QirArray* quantum__rt__array_copy(QirArray* array)
+    QirArray* quantum__rt__array_copy(QirArray* array, bool forceNewInstance)
     {
-        assert(array != nullptr);
-        return new QirArray(array);
+        if (array == nullptr)
+        {
+            return nullptr;
+        }
+        if (forceNewInstance || array->aliasCount > 0)
+        {
+            return new QirArray(array);
+        }
+        (void)array->AddRef();
+        return array;
     }
 
     QirArray* quantum__rt__array_concatenate(QirArray* head, QirArray* tail)
@@ -436,7 +479,7 @@ extern "C"
         // When range covers the whole dimension, can return a copy of the array without doing any math.
         if (range.step == 1 && range.start == 0 && range.end == array->dimensionSizes[dim])
         {
-            return quantum__rt__array_copy(array);
+            return quantum__rt__array_copy(array, true /*force*/);
         }
 
         // Create slice array of appropriate size.
@@ -445,7 +488,6 @@ extern "C"
         const int64_t sliceItemsCount =
             std::accumulate(sliceDims.begin(), sliceDims.end(), 1, std::multiplies<int64_t>());
         QirArray* slice = new QirArray(sliceItemsCount, itemSizeInBytes, dimensions, std::move(sliceDims));
-
         const int64_t singleIndexRunCount = RunCount(array->dimensionSizes, dim);
         const int64_t rowCount = singleIndexRunCount * array->dimensionSizes[dim];
 

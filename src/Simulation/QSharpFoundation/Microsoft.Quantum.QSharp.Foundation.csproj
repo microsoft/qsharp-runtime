@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.2101126940">
+
+  <Import Project="..\Common\AssemblyCommon.props" />
+  <Import Project="..\Common\DebugSymbols.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <QSharpDocsGeneration>true</QSharpDocsGeneration>
+    <CSharpGeneration>false</CSharpGeneration> <!-- we will provide our own -->
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Foundation implementation for the Q# programming language.</Description>
+    <PackageTags>Quantum Q# QSharp</PackageTags>
+  </PropertyGroup>  
+  
+  <ItemGroup>
+    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="BeforeCSharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>  
+
+</Project>

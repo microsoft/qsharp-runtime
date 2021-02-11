@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
 
         for (stateId in 0 .. maxId) {
             let expectedState = ApplyMatrix(unitaryMatrix, StateIdToVector(stateId));
-            _flipToBasis([stateId], [qubit]);
+            FlipToBasis([stateId], [qubit]);
             unitaryOp(qubit);
             let alpha = Microsoft.Quantum.Math.Complex((expectedState![0])!);
             let beta = Microsoft.Quantum.Math.Complex((expectedState![1])!);
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation AssertQubitUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit => Unit : Adjoint)) : Unit {
+    operation AssertQubitUnitaryWithAdjoint (unitaryMatrix : RowMajorMatrix, unitaryOp : (Qubit => Unit is Adj)) : Unit {
         
         if (Length(unitaryMatrix!) != 2) {
             fail $"qubit unitary matrix must have two rows";

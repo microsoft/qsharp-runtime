@@ -6,7 +6,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     open Microsoft.Quantum.Diagnostics;
     
     
-    operation ControlledQubitOperationTester (actual : (Qubit => Unit : Controlled, Adjoint), expected : (Qubit => Unit : Controlled, Adjoint), numberOfQubits : Int) : Unit {
+    operation ControlledQubitOperationTester (actual : (Qubit => Unit is Ctl + Adj), expected : (Qubit => Unit is Ctl + Adj), numberOfQubits : Int) : Unit {
         
         Message($"Testing operation: {actual} against {expected}");
         
@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Simulation.TestSuite {
     }
     
     
-    operation ControlledOperationTester (actual : (Qubit[] => Unit : Controlled, Adjoint), expected : (Qubit[] => Unit : Controlled, Adjoint), numberOfQubits : Int, numberOfControls : Int) : Unit {
+    operation ControlledOperationTester (actual : (Qubit[] => Unit is Ctl + Adj), expected : (Qubit[] => Unit is Ctl + Adj), numberOfQubits : Int, numberOfControls : Int) : Unit {
         
         Message($"Testing operation: {actual} against {expected}");
         
