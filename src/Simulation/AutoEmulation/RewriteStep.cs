@@ -46,11 +46,12 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             // we do not change the Q# syntax tree
             transformed = compilation;
 
+            // global callables
+            var globalCallables = compilation.Namespaces.GlobalCallableResolutions();
+
             // collect all callables that have an emulation attribute
-            var globals = compilation.Namespaces
-                                     .GlobalCallableResolutions()
-                                     .Where(p => p.Value.Source.CodeFile.EndsWith(".qs"))
-                                     .Where(p => p.Value.Attributes.Any(HasEmulationAttribute));
+            var globals = globalCallables.Where(p => p.Value.Source.CodeFile.EndsWith(".qs"))
+                                         .Where(p => p.Value.Attributes.Any(HasEmulationAttribute));
 
             if (!globals.Any())
             {
@@ -70,7 +71,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
                     Message = "AutoEmulation: cannot determine output path for generated C# code",
                     Stage = IRewriteStep.Stage.Transformation
                 });
-                return true;
+                return false;
             }
 
             diagnostics.Add(new IRewriteStep.Diagnostic {
@@ -83,9 +84,57 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             var context = CodegenContext.Create(compilation, AssemblyConstants);
 
             var generator = new CodeGenerator(context);
-            foreach (var (key, value) in globals)
+            foreach (var (key, callable) in globals)
             {
-                generator.AddCallable(key, value, value.Attributes.Where(HasEmulationAttribute).Select(GetEmulationAttributeArguments));
+                var attributeArguments = callable.Attributes.Where(HasEmulationAttribute).Select(GetEmulationAttributeArguments);
+                foreach (var (alternativeOperation, _) in attributeArguments)
+                {
+                    var period = alternativeOperation.LastIndexOf('.');
+                    if (period == -1)
+                    {
+                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                            Severity = DiagnosticSeverity.Error,
+                            Message = $"AutoEmulation: name of alternative operation in {key.Namespace}.{key.Name} must be completely specified (including namespace)",
+                            Stage = IRewriteStep.Stage.Transformation
+                        });
+                        return false;
+                    }
+
+                    var qualifiedName = new QsQualifiedName(alternativeOperation.Substring(0, period), alternativeOperation.Substring(period + 1));
+                    if (!globalCallables.TryGetValue(qualifiedName, out var alternativeCallable))
+                    {
+                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                            Severity = DiagnosticSeverity.Error,
+                            Message = $"AutoEmulation: cannot find alternative operation `{alternativeOperation}`",
+                            Stage = IRewriteStep.Stage.Transformation
+                        });
+                        return false;
+                    }
+
+                    var callableSignature = callable.Signature;
+                    var alternativeSignature = alternativeCallable.Signature;
+
+                    if (!callable.Signature.Equals(alternativeCallable.Signature))
+                    {
+                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                            Severity = DiagnosticSeverity.Error,
+                            Message = $"AutoEmulation: signature of `{alternativeOperation}` does not match the one of {key.Namespace}.{key.Name}",
+                            Stage = IRewriteStep.Stage.Transformation
+                        });
+                        return false;
+                    }
+
+                    if (!GetSpecializationKinds(callable).IsSubsetOf(GetSpecializationKinds(alternativeCallable)))
+                    {
+                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                            Severity = DiagnosticSeverity.Error,
+                            Message = $"AutoEmulation: specializations of `{alternativeOperation}` must be a superset of specializations of {key.Namespace}.{key.Name}",
+                            Stage = IRewriteStep.Stage.Transformation
+                        });
+                        return false;
+                    }
+                }
+                generator.AddCallable(key, callable, attributeArguments);
             }
             generator.WriteTo(writer);
 
@@ -112,6 +161,9 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
                     },
                 _ => throw new Exception("Unexpected argument")
             };
+
+        private static ISet<QsSpecializationKind> GetSpecializationKinds(QsCallable callable) =>
+            callable.Specializations.Select(spec => spec.Kind).OrderBy(kind => kind).ToHashSet();
 
         private List<IRewriteStep.Diagnostic> diagnostics = new List<IRewriteStep.Diagnostic>();
     }

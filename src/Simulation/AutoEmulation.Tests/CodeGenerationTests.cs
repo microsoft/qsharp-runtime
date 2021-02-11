@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using Microsoft.Quantum.QsCompiler.AutoEmulation;
 using Microsoft.Quantum.QsCompiler.CompilationBuilder;
-using Xunit;
-using System.Linq;
-using System.Collections.Immutable;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
+using Microsoft.Quantum.QsCompiler.SyntaxTree;
+using Xunit;
 
 namespace Microsoft.Quantum.AutoEmulation.Testing
 {
@@ -20,19 +21,24 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             TestOneSuccessfulFile("SuccessCA");
         }
 
+        [Fact]
+        public void CanFailForVariousReasons()
+        {
+            TestOneFailingFile("FailAlternativeDoesNotExist");
+            TestOneFailingFile("FailDifferentSignatures");
+            TestOneFailingFile("FailDifferentSpecializationKinds");
+            TestOneFailingFile("FailNoNamespace");
+        }
+
         private void TestOneSuccessfulFile(string fileName)
         {
             var step = new RewriteStep();
             var path = CreateNewTemporaryPath();
             step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
 
-            var mgr = new CompilationUnitManager();
-            var files = CreateFileManager("Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
-            mgr.AddOrUpdateSourceFilesAsync(files).Wait();
-            var compilation = mgr.Build().BuiltCompilation;
+            var compilation = CreateCompilation("Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
 
             Assert.True(step.Transformation(compilation, out var transformed));
-            Assert.Single(step.GeneratedDiagnostics);
             var generatedFileName = Path.Combine(path, "__AutoEmulation__.g.cs");
             Assert.True(File.Exists(generatedFileName));
 
@@ -42,6 +48,27 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             Assert.Equal(File.ReadAllText(Path.Combine("TestFiles", $"{fileName}.cs_")), File.ReadAllText(generatedFileName));
 
             Directory.Delete(path, true);
+        }
+
+        private void TestOneFailingFile(string fileName)
+        {
+            var step = new RewriteStep();
+            var path = CreateNewTemporaryPath();
+            step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
+
+            var compilation = CreateCompilation("Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
+
+            Assert.False(step.Transformation(compilation, out var transformed));
+            Assert.Equal(2, step.GeneratedDiagnostics.Count());
+            Assert.Equal(CodeAnalysis.DiagnosticSeverity.Error, step.GeneratedDiagnostics.Last().Severity);
+        }
+
+        private QsCompilation CreateCompilation(params string[] fileNames)
+        {
+            var mgr = new CompilationUnitManager();
+            var files = CreateFileManager(fileNames);
+            mgr.AddOrUpdateSourceFilesAsync(files).Wait();
+            return mgr.Build().BuiltCompilation;
         }
 
         private ImmutableHashSet<FileContentManager> CreateFileManager(params string[] fileNames) =>
