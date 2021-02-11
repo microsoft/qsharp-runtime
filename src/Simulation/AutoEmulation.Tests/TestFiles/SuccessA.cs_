@@ -1,0 +1,69 @@
+using System;
+using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Simulation.Simulators;
+
+namespace AutoEmulationTests
+{
+    public partial class Success
+    {
+        public class Native : Success
+        {
+            public Native(Microsoft.Quantum.Simulation.Core.IOperationFactory m): base(m)
+            {
+                sim0 = ((m) as ToffoliSimulator);
+            }
+
+            public override void __Init__()
+            {
+                base.__Init__();
+                if ((sim0) != (null))
+                {
+                    alternative0 = (__Factory__.Get<AutoEmulationTests.SuccessClassical>(typeof(AutoEmulationTests.SuccessClassical)));
+                }
+            }
+
+            public override Func<QVoid, QVoid> __Body__
+            {
+                get
+                {
+                    return args =>
+                    {
+                        if ((sim0) != (null))
+                        {
+                            return alternative0.__Body__(args);
+                        }
+                        else
+                        {
+                            return base.__Body__(args);
+                        }
+                    }
+
+                    ;
+                }
+            }
+
+            public override Func<QVoid, QVoid> __AdjointBody__
+            {
+                get
+                {
+                    return args =>
+                    {
+                        if ((sim0) != (null))
+                        {
+                            return alternative0.__AdjointBody__(args);
+                        }
+                        else
+                        {
+                            return base.__AdjointBody__(args);
+                        }
+                    }
+
+                    ;
+                }
+            }
+
+            private AutoEmulationTests.SuccessClassical alternative0 = null;
+            private ToffoliSimulator sim0 = null;
+        }
+    }
+}
