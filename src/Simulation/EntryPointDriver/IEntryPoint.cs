@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.EntryPointDriver
@@ -16,9 +17,7 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// Contains entry point properties needed by the command-line interface and allows the entry point to use
     /// command-line arguments. The implementation of this interface is code-generated.
     /// </remarks>
-    /// <typeparam name="TIn">The entry point's argument type.</typeparam>
-    /// <typeparam name="TOut">The entry point's return type.</typeparam>
-    public interface IEntryPoint<TIn, TOut>
+    public interface IEntryPoint
     {
         /// <summary>
         /// The summary from the entry point's documentation comment.
@@ -41,9 +40,21 @@ namespace Microsoft.Quantum.EntryPointDriver
         string DefaultExecutionTarget { get; }
 
         /// <summary>
-        /// Additional information about the entry point.
+        /// Submits the entry point to Azure Quantum.
         /// </summary>
-        EntryPointInfo<TIn, TOut> Info { get; }
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="settings">The submission settings.</param>
+        /// <returns>The exit code.</returns>
+        Task<int> Submit(ParseResult parseResult, AzureSettings settings);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="settings">The driver settings.</param>
+        /// <param name="simulator">The simulator to use.</param>
+        /// <returns>The exit code.</returns>
+        Task<int> Simulate(ParseResult parseResult, DriverSettings settings, string simulator);
 
         /// <summary>
         /// Creates an instance of the default simulator if it is a custom simulator.
@@ -53,12 +64,5 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Thrown if the default simulator is not a custom simulator.
         /// </exception>
         IOperationFactory CreateDefaultCustomSimulator();
-
-        /// <summary>
-        /// Creates the argument to the entry point based on the command-line parsing result.
-        /// </summary>
-        /// <param name="parseResult">The command-line parsing result.</param>
-        /// <returns>The argument to the entry point.</returns>
-        TIn CreateArgument(ParseResult parseResult);
     }
 }

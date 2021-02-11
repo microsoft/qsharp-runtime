@@ -13,18 +13,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Simulation.Core;
-using static Microsoft.Quantum.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
-    /// The entry point driver is the entry point for the C# application that executes the Q# entry point.
+    /// The entry point driver is the entry point for the C# application that executes Q# entry points.
     /// </summary>
-    /// <typeparam name="TCallable">The entry point's callable type.</typeparam>
-    /// <typeparam name="TIn">The entry point's argument type.</typeparam>
-    /// <typeparam name="TOut">The entry point's return type.</typeparam>
-    public sealed class Driver<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
+    public sealed class Driver
     {
         /// <summary>
         /// The driver settings.
@@ -34,7 +29,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The entry point.
         /// </summary>
-        private readonly IEntryPoint<TIn, TOut> entryPoint;
+        private readonly IEntryPoint entryPoint;
 
         /// <summary>
         /// The simulator option.
@@ -51,7 +46,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoint">The entry point.</param>
-        public Driver(DriverSettings settings, IEntryPoint<TIn, TOut> entryPoint)
+        public Driver(DriverSettings settings, IEntryPoint entryPoint)
         {
             this.settings = settings;
             this.entryPoint = entryPoint;
@@ -137,17 +132,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        private async Task<int> Simulate(ParseResult parseResult, string simulator) =>
-            await Simulation<TCallable, TIn, TOut>.Simulate(
-                settings, entryPoint, parseResult, DefaultIfShadowed(SimulatorOption, simulator));
+        private Task<int> Simulate(ParseResult parseResult, string simulator) =>
+            this.entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="azureSettings">The Azure submission settings.</param>
-        private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
-            await Azure.Submit(entryPoint, parseResult, new AzureSettings
+        private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
+            this.entryPoint.Submit(parseResult, new AzureSettings
             {
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
@@ -242,13 +236,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
                 return default;
             });
-    }
-
-    /// <summary>
-    /// Static members for <see cref="Driver{TCallable,TIn,TOut}"/>.
-    /// </summary>
-    internal static class Driver
-    {
+    
         // TODO: Define the aliases as constants.
 
         /// <summary>
