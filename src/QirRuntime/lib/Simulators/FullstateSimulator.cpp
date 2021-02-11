@@ -22,6 +22,8 @@ typedef HMODULE QUANTUM_SIMULATOR;
 typedef void* QUANTUM_SIMULATOR;
 #endif
 
+namespace
+{
 #ifdef _WIN32
 const char* FULLSTATESIMULATORLIB = "Microsoft.Quantum.Simulator.Runtime.dll";
 #elif __APPLE__
@@ -32,13 +34,24 @@ const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
 
 QUANTUM_SIMULATOR LoadQuantumSimulator()
 {
+    QUANTUM_SIMULATOR handle = 0;
 #ifdef _WIN32
-    return ::LoadLibraryA(FULLSTATESIMULATORLIB);
-#elif __APPLE__
-    return ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
+    handle = ::LoadLibraryA(FULLSTATESIMULATORLIB);
+    if (handle == NULL)
+    {
+        throw std::runtime_error(
+            std::string("Failed to load ") + FULLSTATESIMULATORLIB + 
+            " (error code: " + std::to_string(GetLastError()) + ")");
+    }
 #else
-    return ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
+    handle = ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
+    if (handle == nullptr)
+    {
+        throw std::runtime_error(
+            std::string("Failed to load ") + FULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+    }
 #endif
+    return handle;
 }
 
 bool UnloadQuantumSimulator(QUANTUM_SIMULATOR handle)
@@ -58,6 +71,7 @@ void* LoadProc(QUANTUM_SIMULATOR handle, const char* procName)
     return ::dlsym(handle, procName);
 #endif
 }
+} // namespace
 
 namespace Microsoft
 {
@@ -135,10 +149,6 @@ namespace Quantum
         CFullstateSimulator()
             : handle(LoadQuantumSimulator())
         {
-            if (handle == 0)
-            {
-                throw std::runtime_error(std::string("Failed to load ") + FULLSTATESIMULATORLIB);
-            }
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
