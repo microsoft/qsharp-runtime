@@ -381,7 +381,7 @@ define void @__quantum__rt__callable_memory_management(i32 %index, %Callable* %.
 ; NYI:
 ;define %String* @__quantum__rt__bigint_to_string(%BigInt*)
 
-define %String* @__quantum__rt__string_create(i32 %ignoredStrLength, i8* %null_terminated_buffer) {
+define %String* @__quantum__rt__string_create(i32 %length_ignored, i8* %null_terminated_buffer) {
   %str = call %"struct.QirString"* @quantum__rt__string_create(i8* %null_terminated_buffer)
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str

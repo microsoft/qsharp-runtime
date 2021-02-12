@@ -70,7 +70,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
-extern "C" bool Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body(); // NOLINT
 struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     // no intelligent reuse, we just want to check that QIR releases all qubits
@@ -157,8 +157,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body();
-    REQUIRE(res);
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body());
 
     // check that all qubits have been released
     for (size_t id = 0; id < sim->qubits.size(); id++)
@@ -300,7 +299,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
-extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
 extern "C" void __quantum__qis__k__body(Qubit q)                             // NOLINT
 {
     g_ctrqapi->X(q);
@@ -315,7 +314,7 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__TestControlled__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestControlled__body());
 
     g_ctrqapi = nullptr;
 }
