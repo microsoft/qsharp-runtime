@@ -13,13 +13,13 @@ extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(QirStri
 // https://stackoverflow.com/a/5419388/6362941
 struct CoutRedirector
 {
-    CoutRedirector( std::streambuf * newBuffer ) 
-        : old( std::cout.rdbuf( newBuffer ) )      // Redirect std::cout to new_buffer.
+    CoutRedirector(std::streambuf * newBuffer) 
+        : old(std::cout.rdbuf(newBuffer))      // Redirect std::cout to new_buffer.
     {}
 
     ~CoutRedirector() 
     {
-        REQUIRE_NOTHROW( std::cout.rdbuf( old ) );     // Redirect std::cout back to stdout.
+        REQUIRE_NOTHROW(std::cout.rdbuf(old));     // Redirect std::cout back to stdout.
     }
 
 private:

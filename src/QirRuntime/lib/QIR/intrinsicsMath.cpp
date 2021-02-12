@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "quantum__qis.hpp"
 #include "quantum__qis_internal.hpp"
+#include "quantum__rt.hpp"
 
 extern "C"
 {
@@ -37,7 +38,7 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)
     {
-        throw std::invalid_argument( excStrDrawRandomInt );
+        quantum__rt__fail(quantum__rt__string_create(excStrDrawRandomInt));
     }
 
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution

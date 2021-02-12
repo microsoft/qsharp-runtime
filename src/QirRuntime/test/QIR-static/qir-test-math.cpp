@@ -66,15 +66,16 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
     */
 
-    // Make sure the exception std::invalid_argument is thrown if min > max:
+    // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5), 
-                      std::invalid_argument);
+                      std::runtime_error);
+
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5);
     }
-    catch(std::invalid_argument const & exc)
+    catch(std::runtime_error const & exc)
     {
         REQUIRE(0 == strcmp(exc.what(), excStrDrawRandomInt));
     }
