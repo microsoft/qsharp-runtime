@@ -105,7 +105,17 @@ namespace Microsoft.Quantum.Experimental
             CheckCall(_SetNoiseModel(simId, JsonSerializer.Serialize(noiseModel)));
         }
 
-        
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="ideal_noise_model")]
+        private static extern string _IdealNoiseModel();
+
+
+        public static NoiseModel IdealNoiseModel()
+        {
+            LogCall("ideal_noise_model");
+            return JsonSerializer.Deserialize<NoiseModel>(_IdealNoiseModel());
+        }
+
+
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="h")]
         private static extern Int64 _H(ulong simId, uint idx);
 

@@ -54,5 +54,7 @@ namespace Microsoft.Quantum.Experimental
 
         [JsonPropertyName("z_meas")]
         public Instrument? ZMeas { get; set; }
+
+        public static NoiseModel Ideal => NativeInterface.IdealNoiseModel();
     }
 }

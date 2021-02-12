@@ -183,6 +183,18 @@ pub extern fn get_noise_model(sim_id: usize) -> *const c_char {
     }
 }
 
+/// Returns a JSON serialization of the ideal noise model (i.e.: a noise model
+/// that agrees with closed-system simulation).
+#[no_mangle]
+pub extern fn ideal_noise_model() -> *const c_char {
+    let serialized = CString::new(
+        serde_json::to_string(&NoiseModel::ideal()).unwrap().as_str()
+    ).unwrap().into_raw();
+    std::mem::forget(serialized);
+    serialized
+}
+
+
 #[no_mangle]
 pub extern fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
     if new_model.is_null() {
