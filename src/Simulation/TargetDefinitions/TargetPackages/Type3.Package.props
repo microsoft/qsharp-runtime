@@ -30,9 +30,6 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\HFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingXX.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingYY.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Decompositions\IsingZZ.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\Measure.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />

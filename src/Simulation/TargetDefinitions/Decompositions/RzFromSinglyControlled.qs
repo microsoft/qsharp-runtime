@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies a rotation about the $z$-axis by a given angle.
@@ -28,7 +27,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliZ, theta, qubit);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.Rz")
     operation Rz (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         body (...) {
             ApplyUncontrolledRz(theta, qubit);
