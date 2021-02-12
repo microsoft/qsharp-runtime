@@ -14,7 +14,10 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Experimental
 {
-    public partial class OpenSystemsSimulator : SimulatorBase, IType1Core, IDisposable
+    // NB: This class should not implement IQSharpCore, but does so temporarily
+    //     to make the simulator available to IQ# (note that the I in IQSharpCore
+    //     refers to interfaces, and not to IQ# itself...)
+    public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore
     {
         private readonly ulong Id;
 
@@ -34,110 +37,192 @@ namespace Microsoft.Quantum.Experimental
 
         public State CurrentState => NativeInterface.GetCurrentState(this.Id);
 
+        public class OpenSystemsQubitManager : QubitManager
+        {
+            private readonly OpenSystemsSimulator Parent;
+            public OpenSystemsQubitManager(OpenSystemsSimulator parent, uint capacity)
+                : base(capacity)
+            {
+                this.Parent = parent;
+            }
+
+            protected override void Release(Qubit qubit, bool wasUsedOnlyForBorrowing)
+            {
+                if (qubit != null && qubit.IsMeasured)
+                {
+                    // Try to reset measured qubits.
+                    // TODO: There are better ways to do this; increment on the
+                    //       design and make it customizable.
+                    // FIXME: In particular, this implementation uses a lot of
+                    //        extraneous measurements.
+                    if (this.Parent.Measure__Body(new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(qubit)) == Result.One)
+                    {
+                        this.Parent.X__Body(qubit);
+                    }
+                }
+                base.Release(qubit, wasUsedOnlyForBorrowing);
+            }
+        }
 
         public OpenSystemsSimulator(uint capacity = 3) : base(new QubitManager((long)capacity))
         {
             this.Id = NativeInterface.Init(capacity);
         }
 
-        public void ApplyControlledX__Body(Qubit control, Qubit target)
+        public void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
-            NativeInterface.CNOT(this.Id, control, target);
-        }
-
-        public void ApplyControlledZ__Body(Qubit control, Qubit target)
-        {
-            // FIXME: Make this a new Type4, with CZ applied by decompositions.
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledH__Body(Qubit target)
+        public void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void H__Body(Qubit target)
         {
             NativeInterface.H(this.Id, target);
         }
 
-        public void ApplyUncontrolledRx__AdjointBody(double angle, Qubit target)
+        public void H__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            // FIXME: Rotations are not yet supported.
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledRx__Body(double angle, Qubit target)
+        public Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
-            // FIXME: Rotations are not yet supported.
+            if (targets is { Count: 1 } && paulis is { Count: 1 } && paulis.Single() == Pauli.PauliZ)
+            {
+                return NativeInterface.M(this.Id, targets.Single());
+            }
+            else
+            {
+                // FIXME: Pass multiqubit and non-Z cases to decompositions.
+                throw new NotImplementedException();
+            }
+        }
+
+        public void R__Body(Pauli pauli, double angle, Qubit target)
+        {
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledRy__AdjointBody(double angle, Qubit target)
+        public void R__AdjointBody(Pauli pauli, double angle, Qubit target)
         {
-            // FIXME: Rotations are not yet supported.
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledRy__Body(double angle, Qubit target)
+        public void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            // FIXME: Rotations are not yet supported.
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledRz__AdjointBody(double angle, Qubit target)
+        public void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            // FIXME: Rotations are not yet supported.
             throw new NotImplementedException();
         }
 
-        public void ApplyUncontrolledRz__Body(double angle, Qubit target)
-        {
-            // FIXME: Rotations are not yet supported.
-            throw new NotImplementedException();
-        }
-
-        public void ApplyUncontrolledS__AdjointBody(Qubit target)
-        {
-            NativeInterface.SAdj(this.Id, target);
-        }
-
-        public void ApplyUncontrolledS__Body(Qubit target)
+        public void S__Body(Qubit target)
         {
             NativeInterface.S(this.Id, target);
         }
 
-        public void ApplyUncontrolledT__AdjointBody(Qubit target)
+        public void S__AdjointBody(Qubit target)
         {
-            NativeInterface.TAdj(this.Id, target);
+            NativeInterface.SAdj(this.Id, target);
         }
 
-        public void ApplyUncontrolledT__Body(Qubit target)
+        public void S__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void S__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void T__Body(Qubit target)
         {
             NativeInterface.T(this.Id, target);
         }
 
-        public void ApplyUncontrolledX__Body(Qubit target)
+        public void T__AdjointBody(Qubit target)
+        {
+            NativeInterface.TAdj(this.Id, target);
+        }
+
+        public void T__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void T__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void X__Body(Qubit target)
         {
             NativeInterface.X(this.Id, target);
         }
 
-        public void ApplyUncontrolledY__Body(Qubit target)
+        public void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        {
+            // TODO: pass off to decompositions for more than one control.
+            if (controls is { Count: 1 })
+            {
+                NativeInterface.CNOT(this.Id, controls[0], target);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void Y__Body(Qubit target)
         {
             NativeInterface.Y(this.Id, target);
         }
 
-        public void ApplyUncontrolledZ__Body(Qubit target)
+        public void Y__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Z__Body(Qubit target)
         {
             NativeInterface.Z(this.Id, target);
+        }
+
+        public void Z__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()
         {
             NativeInterface.Destroy(this.Id);
         }
-
-        public Result M__Body(Qubit target) =>
-            NativeInterface.M(this.Id, target);
-
-        public void Reset__Body(Qubit target)
-        {
-            throw new NotImplementedException();
-        }
+        // public void Reset__Body(Qubit target)
+        // {
+        //     // The open systems simulator doesn't have a reset operation, so simulate
+        //     // it via an M followed by a conditional X.
+        //     var res = M__Body(target);
+        //     if (res == Result.One)
+        //     {
+        //         ApplyUncontrolledX__Body(target);
+        //     }
+        // }
     }
 }
