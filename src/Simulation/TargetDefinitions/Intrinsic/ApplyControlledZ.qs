@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the controlled-Z (CZ) gate to a pair of qubits.
@@ -28,7 +27,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled Z([control], target);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.ApplyControlledZ")
     internal operation ApplyControlledZ (control : Qubit, target : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;

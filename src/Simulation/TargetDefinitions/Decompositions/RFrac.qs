@@ -4,7 +4,6 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies a rotation about the given Pauli axis by an angle specified
@@ -39,7 +38,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// // PI() is a Q# function that returns an approximation of π.
     /// R(pauli, -PI() * IntAsDouble(numerator) / IntAsDouble(2 ^ (power - 1)), qubit);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.RFrac")
     operation RFrac (pauli : Pauli, numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
         // Note that power must be converted to a double and used with 2.0 instead of 2 to allow for
         // negative exponents that result in a fractional denominator.

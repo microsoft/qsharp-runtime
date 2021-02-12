@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the π/8 gate to a single qubit.
@@ -19,7 +18,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    @EnableTestingViaName("Test.TargetDefinitions.T")
     operation T (qubit : Qubit) : Unit is Adj + Ctl {
         body (...) {
             ApplyUncontrolledT(qubit);
