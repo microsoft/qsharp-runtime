@@ -102,7 +102,20 @@ namespace Microsoft.Quantum.Experimental
         public static void SetNoiseModel(ulong simId, NoiseModel noiseModel)
         {
             LogCall("set_noise_model");
-            CheckCall(_SetNoiseModel(simId, JsonSerializer.Serialize(noiseModel)));
+            string? jsonData = null;
+            try
+            {
+                jsonData = JsonSerializer.Serialize(noiseModel);
+                CheckCall(_SetNoiseModel(simId, jsonData));
+            }
+            catch (NotSupportedException ex)
+            {
+                throw new ArgumentException("Could not serialize noise model to JSON, as no suitable serializer was found.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not set noise model from JSON:\n{jsonData}", ex);
+            }
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="ideal_noise_model")]
