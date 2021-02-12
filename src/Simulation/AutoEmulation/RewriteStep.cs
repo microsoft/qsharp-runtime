@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
                     var callableSignature = callable.Signature;
                     var alternativeSignature = alternativeCallable.Signature;
 
-                    if (!callable.Signature.Equals(alternativeCallable.Signature))
+                    if (!callableSignature.ArgumentType.Equals(alternativeSignature.ArgumentType) || !callableSignature.ReturnType.Equals(alternativeSignature.ReturnType))
                     {
                         diagnostics.Add(new IRewriteStep.Diagnostic {
                             Severity = DiagnosticSeverity.Error,
