@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -180,7 +180,11 @@ namespace Microsoft.Quantum.Experimental
         public void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             // TODO: pass off to decompositions for more than one control.
-            if (controls is { Count: 1 })
+            if (controls is { Count: 0 })
+            {
+                X__Body(target);
+            }
+            else if (controls is { Count: 1 })
             {
                 NativeInterface.CNOT(this.Id, controls[0], target);
             }
@@ -207,7 +211,19 @@ namespace Microsoft.Quantum.Experimental
 
         public void Z__ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            // TODO: pass off to decompositions for more than one control.
+            if (controls is { Count: 0 })
+            {
+                Z__Body(target);
+            }
+            else if (controls is { Count: 1 })
+            {
+                Get<ApplyCZUsingCNOT, ApplyCZUsingCNOT>().__Body__((controls[0], target));
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void Dispose()
