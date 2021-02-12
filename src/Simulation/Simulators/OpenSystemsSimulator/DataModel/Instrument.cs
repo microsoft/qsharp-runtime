@@ -15,6 +15,7 @@ namespace Microsoft.Quantum.Experimental
 {
     public class Instrument
     {
+        [JsonPropertyName("effects")]
         public IList<Channel> Effects { get; set; } = new List<Channel>();
 
         public override string ToString() =>
