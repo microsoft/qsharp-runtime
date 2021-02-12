@@ -1,12 +1,8 @@
 # compile test ll files into a library
 
 set(TEST_FILES
-#  qir-test-arrays
-#  qir-test-functors
   qir-test-noqsharp
-  qir-test-qsharp
-#  qir-test-partials
-#  qir-test-qubits-results
+  qir-gen
 )
 
 foreach(file ${TEST_FILES})
