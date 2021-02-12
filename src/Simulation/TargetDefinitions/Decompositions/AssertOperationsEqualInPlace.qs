@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Diagnostics {
     internal operation IterateThroughCartesianPower (length : Int, value : Int, op : (Int[] => Unit)) : Unit {
         mutable bounds = new Int[length];
 
-        for (i in 0 .. length - 1)
+        for i in 0 .. length - 1
         {
             set bounds = bounds w/ i <- value;
         }
@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Diagnostics {
             //computes the next element in the Cartesian product
             set arr = arr w/ 0 <- arr[0] + 1;
 
-            for (i in 0 .. Length(arr) - 2)
+            for i in 0 .. Length(arr) - 2
             {
                 if (arr[i] == bounds[i])
                 {
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Diagnostics {
             fail "qubits and stateIds must have the same length";
         }
             
-        for (i in 0 .. Length(qubits) - 1)
+        for i in 0 .. Length(qubits) - 1
         {
             let id = basis[i];
             let qubit = qubits[i];
@@ -120,7 +120,7 @@ namespace Microsoft.Quantum.Diagnostics {
     internal operation AssertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
         let tolerance = 1e-5;
 
-        using (qubits = Qubit[Length(basis)]) {
+        use qubits = Qubit[Length(basis)] {
             AssertAllZeroWithinTolerance(qubits, tolerance);
             FlipToBasis(basis, qubits);
             givenU(qubits);

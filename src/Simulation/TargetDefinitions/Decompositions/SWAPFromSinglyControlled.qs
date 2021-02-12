@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the SWAP gate to a pair of qubits.
@@ -33,7 +32,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// CNOT(qubit2, qubit1);
     /// CNOT(qubit1, qubit2);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.SWAP")
     operation SWAP (qubit1 : Qubit, qubit2 : Qubit) : Unit is Adj + Ctl {
         body (...) {
             ApplyUncontrolledSWAP(qubit1, qubit2);
