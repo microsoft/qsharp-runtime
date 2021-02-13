@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #include <cassert>
@@ -34,10 +34,13 @@ namespace Quantum
         qubits.emplace_back(QubitState{});
         return reinterpret_cast<Qubit>(qubit);
     }
+
     void CTracer::ReleaseQubit(Qubit /*qubit*/)
     {
         // nothing for now
     }
+
+    // TODO: what would be meaningful information we could printout for a qubit?
     std::string CTracer::QubitToString(Qubit q)
     {
         size_t qubitIndex = reinterpret_cast<size_t>(q);
@@ -47,16 +50,19 @@ namespace Quantum
         str << " last used in layer " << qstate.layer << "(pending zero ops: " << qstate.pendingZeroOps.size() << ")";
         return str.str();
     }
+
     void CTracer::ReleaseResult(Result /*result*/)
     {
-        // nothing to do, we don't allocate results on measurement
+        // nothing to do, we don't allocate results on measurement [yet]
     }
+
     // Although the tracer should never compare results or get their values, it still has to implement UseZero and
     // UseOne methods as they are invoked by the QIR initialization.
     Result CTracer::UseZero()
     {
         return reinterpret_cast<Result>(INVALID);
     }
+
     Result CTracer::UseOne()
     {
         return reinterpret_cast<Result>(INVALID);
@@ -195,17 +201,15 @@ namespace Quantum
         assert(nFirstGroup >= 0);
         assert(nSecondGroup > 0);
 
-        this->seenOps.insert(id);
-
-        // Operations that involve a single qubit can special case duration zero.
-        if (nFirstGroup == 0 && nSecondGroup == 1)
+        // Special-casing operations of duration zero enables potentially better reuse of qubits, when we'll start
+        // optimizing for circuit width. However, tracking _the same_ pending operation across _multiple_ qubits is
+        // tricky and not worth the effort, so we only do single qubit case.
+        if (opDuration == 0 && nFirstGroup == 0 && nSecondGroup == 1)
         {
             return this->TraceSingleQubitOp(id, opDuration, secondGroup[0]);
         }
 
-        // Special-casing operations of duration zero enables potentially better reuse of qubits, when we'll start
-        // optimizing for circuit width. However, tracking _the same_ pending operation across _multiple_ qubits is
-        // tricky and not worth the effort, so we don't do it.
+        this->seenOps.insert(id);
 
         // Figure out the layer this operation should go into.
         LayerId layerToInsertInto = this->FindLayerToInsertOperationInto(secondGroup[0], opDuration);
@@ -275,11 +279,11 @@ namespace Quantum
     void CTracer::PrintLayerMetrics(std::ostream& out, const std::string& separator, bool printZeroMetrics) const
     {
         // Sort the operations by id so the output is deterministic.
-        std::set<OpId> seenOpsOrederedById(this->seenOps.begin(), this->seenOps.end());
+        std::set<OpId> seenOpsOrderedById(this->seenOps.begin(), this->seenOps.end());
 
         // header row
         out << "layer_id" << separator << "name";
-        for (OpId opId : seenOpsOrederedById)
+        for (OpId opId : seenOpsOrderedById)
         {
             out << separator << GetOperationName(opId, this->opNames);
         }
@@ -292,7 +296,7 @@ namespace Quantum
             out << layer.startTime;
             out << separator << GetOperationName(layer.barrierId, this->opNames);
 
-            for (OpId opId : seenOpsOrederedById)
+            for (OpId opId : seenOpsOrderedById)
             {
                 auto foundInLayer = layer.operations.find(opId);
                 out << separator

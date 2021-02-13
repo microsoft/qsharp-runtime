@@ -1,7 +1,7 @@
-// Copyright (c) // NOLINT{} Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 
 #include "CoreTypes.hpp"
 #include "qirTypes.hpp"
