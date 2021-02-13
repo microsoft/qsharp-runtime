@@ -28,4 +28,8 @@ namespace Microsoft.Quantum.Intrinsic {
         body intrinsic;
     }
 
+    operation DrawRandomInt(min : Int, max : Int) : Int {
+        body intrinsic;
+    }
+
 }
