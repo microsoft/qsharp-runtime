@@ -6,16 +6,31 @@
 #include "qirTypes.hpp"
 #include "quantum__qis.hpp"
 
-namespace
+// Forward declarations:
+static std::ostream& GetQOstream();
+
+// Public API:
+extern "C"
 {
-    std::ostream * currOStream = &std::cout;
-
-    std::ostream& GetQOstream()
+    void quantum__qis__message__body(QirString* qstr)   // NOLINT
     {
-        return *currOStream;
+        GetQOstream() << qstr->str << std::endl;
     }
+}   // extern "C"
 
-} // namespace
+
+// Internal API:
+static  std::ostream * currOStream = &std::cout;    // Log to std::cout by default.
+
+static  std::ostream& GetQOstream()
+{
+    return *currOStream;
+}
+
+
+// For test purposes only:
+namespace Quantum { namespace Qis { namespace Internal  // Replace with `namespace Quantum::Qis::Internal` after migration to C++17.
+{
 
 std::ostream& SetQOstream(std::ostream & newOStream)
 {
@@ -24,10 +39,5 @@ std::ostream& SetQOstream(std::ostream & newOStream)
     return oldOStream;
 }
 
-extern "C"
-{
-    void quantum__qis__message__body(QirString* qstr)   // NOLINT
-    {
-        GetQOstream() << qstr->str << std::endl;
-    }
-}   // extern "C"
+}}} // namespace Quantum::Qis::Internal
+
