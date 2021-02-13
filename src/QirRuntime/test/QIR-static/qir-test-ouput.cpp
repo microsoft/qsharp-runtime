@@ -6,43 +6,47 @@
 #include "catch.hpp"
 
 #include "qirTypes.hpp"
+#include "quantum__qis_internal.hpp"
 
 extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(QirString*);        // NOLINT
 
 
 // https://stackoverflow.com/a/5419388/6362941
-struct CoutRedirector
+// https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574170031
+// https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574194191
+struct QOstreamRedirector
 {
-    CoutRedirector(std::streambuf * newBuffer) 
-        : old(std::cout.rdbuf(newBuffer))      // Redirect std::cout to new_buffer.
+    QOstreamRedirector(std::ostream & newOstream)
+        : old(SetQOstream(newOstream))
     {}
 
-    ~CoutRedirector() 
+    ~QOstreamRedirector()
     {
-        REQUIRE_NOTHROW(std::cout.rdbuf(old));     // Redirect std::cout back to stdout.
+        SetQOstream(old);
     }
 
 private:
-    std::streambuf * old;
+    std::ostream& old;
 };
 
 
 TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
 {
-    std::string testStr1 = "Test String 1";
-    std::string testStr2 = "Test String 2";
-    std::stringstream coutBuffer;
+    const std::string       testStr1 = "Test String 1";
+    const std::string       testStr2 = "Test String 2";
+
+    std::ostringstream      outStrStream;
 
     {
-        CoutRedirector coutRedirector(coutBuffer.rdbuf());  // Redirect std::cout to coutBuffer.
+        QOstreamRedirector qOStreamRedirector(outStrStream);
 
-        // Print something to std::cout:
+        // Log something:
         QirString qstr{std::string(testStr1)};
         Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
         qstr.str = testStr2;
         Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
 
-    } // Recover std::cout.
+    } // Recover the output stream.
 
-    REQUIRE(coutBuffer.str() == (testStr1 + "\n" + testStr2 + "\n"));
+    REQUIRE(outStrStream.str() == (testStr1 + "\n" + testStr2 + "\n"));
 }

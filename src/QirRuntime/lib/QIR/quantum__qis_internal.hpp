@@ -16,3 +16,5 @@ extern "C"
 {
     QIR_SHARED_API extern char const excStrDrawRandomInt[]; // = "Invalid Argument: minimum > maximum for DrawRandomInt()";
 }
+
+QIR_SHARED_API extern std::ostream& SetQOstream(std::ostream & newOStream);
