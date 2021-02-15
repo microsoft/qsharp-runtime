@@ -38,9 +38,9 @@ TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
     std::ostringstream      outStrStream;
 
     {
-        QOstreamRedirector qOStreamRedirector(outStrStream);
+        QOstreamRedirector qOStreamRedirector(outStrStream);    // Redirect the output from std::cout to outStrStream.
 
-        // Log something:
+        // Log something (to the redirected output):
         QirString qstr{std::string(testStr1)};
         Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
         qstr.str = testStr2;

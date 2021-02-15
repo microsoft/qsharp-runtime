@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 #include "catch.hpp"
 
@@ -48,8 +49,10 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     for(auto iterExp = expectedSmallNumbers.begin(), iterAct = actualNumbers.begin();
         iterExp != expectedSmallNumbers.end(); ++iterExp, ++iterAct)
     {
-        REQUIRE(*iterExp == *iterAct);
+        //REQUIRE(*iterExp == *iterAct);
+        std::cerr << *iterAct << ", ";
     }
+    std::cerr << '\n';
 
 
     // Repeat for large numbers:
@@ -79,8 +82,10 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     for(auto iterExp = expectedLargeNumbers.begin(), iterAct = actualNumbers.begin();
         iterExp != expectedLargeNumbers.end(); ++iterExp, ++iterAct)
     {
-        REQUIRE(*iterExp == *iterAct);
+        //REQUIRE(*iterExp == *iterAct);
+        std::cerr << *iterAct << "(0x" << std::hex << *iterAct << std::dec << "), ";
     }
+    std::cerr << '\n';
 
 
     // Make sure the correct exception is thrown if min > max:
