@@ -22,52 +22,121 @@ namespace Microsoft.Quantum.EntryPointDriver
     public sealed class Driver
     {
         /// <summary>
+        /// The subscription option.
+        /// </summary>
+        private static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
+            ImmutableList.Create("--subscription"), "The subscription ID.");
+
+        /// <summary>
+        /// The resource group option.
+        /// </summary>
+        private static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
+            ImmutableList.Create("--resource-group"), "The resource group name.");
+
+        /// <summary>
+        /// The workspace option.
+        /// </summary>
+        private static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
+            ImmutableList.Create("--workspace"), "The workspace name.");
+
+        /// <summary>
+        /// The storage option.
+        /// </summary>
+        private static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
+            ImmutableList.Create("--storage"), default, "The storage account connection string.");
+
+        /// <summary>
+        /// The AAD token option.
+        /// </summary>
+        private static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
+            ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
+
+        /// <summary>
+        /// The base URI option.
+        /// </summary>
+        private static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
+            ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
+
+        /// <summary>
+        /// The location to use with the default endpoint option.
+        /// </summary>
+        private static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
+            ImmutableList.Create("--location"),
+            default,
+            "The location to use with the default endpoint.",
+            validator: result =>
+            {
+                var location = result.Tokens.SingleOrDefault()?.Value;
+                if (location == null)
+                {
+                    return default;
+                }
+
+                var normalizedLocation = AzureSettings.NormalizeLocation(location);
+                return Uri.CheckHostName(normalizedLocation) == UriHostNameType.Unknown ?
+                    $"\"{location}\" is an invalid value for the --location option." :
+                    default;
+            });
+
+        /// <summary>
+        /// The job name option.
+        /// </summary>
+        private static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
+            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
+
+        /// <summary>
+        /// The shots option.
+        /// </summary>
+        private static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
+            ImmutableList.Create("--shots"),
+            500,
+            "The number of times the program is executed on the target machine.",
+            validator: result =>
+                int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
+                    ? "The number of shots must be a positive number."
+                    : default);
+
+        /// <summary>
+        /// The output option.
+        /// </summary>
+        private static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
+            ImmutableList.Create("--output"),
+            OutputFormat.FriendlyUri,
+            "The information to show in the output after the job is submitted.");
+
+        /// <summary>
+        /// The dry run option.
+        /// </summary>
+        private static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
+            ImmutableList.Create("--dry-run"),
+            false,
+            "Validate the program and options, but do not submit to Azure Quantum.");
+
+        /// <summary>
+        /// The verbose option.
+        /// </summary>
+        private static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
+            ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
+
+        /// <summary>
         /// The driver settings.
         /// </summary>
         private readonly DriverSettings settings;
 
         /// <summary>
-        /// The entry point.
+        /// All the registered entry points of the program.
         /// </summary>
-        private readonly IEntryPoint entryPoint;
-
-        /// <summary>
-        /// The simulator option.
-        /// </summary>
-        private OptionInfo<string> SimulatorOption { get; }
-
-        /// <summary>
-        /// The target option.
-        /// </summary>
-        private OptionInfo<string?> TargetOption { get; }
+        private readonly IEnumerable<IEntryPoint> entryPoints;
 
         /// <summary>
         /// Creates a new driver for the entry point.
         /// </summary>
         /// <param name="settings">The driver settings.</param>
-        /// <param name="entryPoint">The entry point.</param>
-        public Driver(DriverSettings settings, IEntryPoint entryPoint)
+        /// <param name="entryPoints">The entry points.</param>
+        public Driver(DriverSettings settings, IEnumerable<IEntryPoint> entryPoints)
         {
             this.settings = settings;
-            this.entryPoint = entryPoint;
-
-            SimulatorOption = new OptionInfo<string>(
-                settings.SimulatorOptionAliases,
-                entryPoint.DefaultSimulatorName,
-                "The name of the simulator to use.",
-                suggestions: new[]
-                {
-                    settings.QuantumSimulatorName,
-                    settings.ToffoliSimulatorName,
-                    settings.ResourcesEstimatorName,
-                    entryPoint.DefaultSimulatorName
-                });
-
-            var targetAliases = ImmutableList.Create("--target");
-            const string targetDescription = "The target device ID.";
-            TargetOption = string.IsNullOrWhiteSpace(entryPoint.DefaultExecutionTarget)
-                ? new OptionInfo<string?>(targetAliases, targetDescription)
-                : new OptionInfo<string?>(targetAliases, entryPoint.DefaultExecutionTarget, targetDescription);
+            this.entryPoints = entryPoints;
         }
 
         /// <summary>
@@ -77,46 +146,18 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         public async Task<int> Run(string[] args)
         {
-            var simulate = new Command("simulate", "(default) Run the program using a local simulator.")
-            {
-                Handler = CommandHandler.Create<ParseResult, string>(Simulate)
-            };
-            AddOptionIfAvailable(simulate, SimulatorOption);
+            var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand);
+            var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand);
 
-            var submit = new Command("submit", "Submit the program to Azure Quantum.")
-            {
-                IsHidden = true,
-                Handler = CommandHandler.Create<ParseResult, AzureSettings>(Submit)
-            };
-            AddOptionIfAvailable(submit, SubscriptionOption);
-            AddOptionIfAvailable(submit, ResourceGroupOption);
-            AddOptionIfAvailable(submit, WorkspaceOption);
-            AddOptionIfAvailable(submit, TargetOption);
-            AddOptionIfAvailable(submit, StorageOption);
-            AddOptionIfAvailable(submit, AadTokenOption);
-            AddOptionIfAvailable(submit, BaseUriOption);
-            AddOptionIfAvailable(submit, LocationOption);
-            AddOptionIfAvailable(submit, JobNameOption);
-            AddOptionIfAvailable(submit, ShotsOption);
-            AddOptionIfAvailable(submit, OutputOption);
-            AddOptionIfAvailable(submit, DryRunOption);
-            AddOptionIfAvailable(submit, VerboseOption);
-            MarkOptionsAsMutuallyExclusive(
-                submit, 
-                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() });
+            var simulate = CreateSimulateCommand(simulateSubCommands);
+            var submit = CreateSubmitCommand(submitSubCommands);
 
-            var root = new RootCommand(entryPoint.Summary) { simulate, submit };
-            foreach (var option in entryPoint.Options)
+            var root = new RootCommand(/*entryPoint.Summary*/) { simulate, submit };
+            if (this.entryPoints.Count() == 1)
             {
-                root.AddGlobalOption(option);
+                SetSubCommandAsDefault(root, simulate);
+                root.Description = this.entryPoints.First().Summary;
             }
-
-            // Set the simulate command as the default.
-            foreach (var option in simulate.Options)
-            {
-                root.AddOption(option);
-            }
-            root.Handler = simulate.Handler;
 
             Console.OutputEncoding = Encoding.UTF8;
             return await new CommandLineBuilder(root)
@@ -127,56 +168,49 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
-        /// Simulates the entry point.
+        /// Displays a message to the console using the given color and text writer.
         /// </summary>
-        /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="simulator">The simulator to use.</param>
-        /// <returns>The exit code.</returns>
-        private Task<int> Simulate(ParseResult parseResult, string simulator) =>
-            this.entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(SimulatorOption, simulator));
+        /// <param name="color">The text color.</param>
+        /// <param name="writer">The text writer for the console output stream.</param>
+        /// <param name="message">The message to display.</param>
+        internal static void DisplayWithColor(ConsoleColor color, TextWriter writer, string message)
+        {
+            var originalForeground = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            writer.WriteLine(message);
+            Console.ForegroundColor = originalForeground;
+        }
 
-        /// <summary>
-        /// Submits the entry point to Azure Quantum.
-        /// </summary>
-        /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="azureSettings">The Azure submission settings.</param>
-        private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings) =>
-            this.entryPoint.Submit(parseResult, new AzureSettings
+        private static void SetSubCommandAsDefault(Command root, Command subCommand)
+        {
+            root.Handler = subCommand.Handler;
+            foreach (var option in subCommand.Options)
             {
-                Subscription = azureSettings.Subscription,
-                ResourceGroup = azureSettings.ResourceGroup,
-                Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(TargetOption, azureSettings.Target),
-                Storage = DefaultIfShadowed(StorageOption, azureSettings.Storage),
-                AadToken = DefaultIfShadowed(AadTokenOption, azureSettings.AadToken),
-                BaseUri = DefaultIfShadowed(BaseUriOption, azureSettings.BaseUri),
-                Location = DefaultIfShadowed(LocationOption, azureSettings.Location),
-                JobName = DefaultIfShadowed(JobNameOption, azureSettings.JobName),
-                Shots = DefaultIfShadowed(ShotsOption, azureSettings.Shots),
-                Output = DefaultIfShadowed(OutputOption, azureSettings.Output),
-                DryRun = DefaultIfShadowed(DryRunOption, azureSettings.DryRun),
-                Verbose = DefaultIfShadowed(VerboseOption, azureSettings.Verbose)
-            });
+                root.AddOption(option);
+            }
+        }
 
         /// <summary>
-        /// Returns true if the alias is not already used by an entry point option.
+        /// Returns true if the alias is not already used by an existing option.
         /// </summary>
         /// <param name="alias">The alias to check.</param>
+        /// <param name="existingOptions">Existing options to check against.</param>
         /// <returns>True if the alias is available for use by the driver.</returns>
-        private bool IsAliasAvailable(string alias) =>
-            !entryPoint.Options.SelectMany(option => option.RawAliases).Contains(alias);
+        private static bool IsAliasAvailable(string alias, IEnumerable<Option> existingOptions) =>
+            !existingOptions.SelectMany(option => option.RawAliases).Contains(alias);
 
         /// <summary>
-        /// Returns the default value and displays a warning if the primary (first) alias is shadowed by an entry point
-        /// option, and returns the original value otherwise.
+        /// Returns the default value and displays a warning if the primary (first) alias is
+        /// shadowed by one of the given entry point's options, and returns the original value otherwise.
         /// </summary>
         /// <typeparam name="T">The type of the option values.</typeparam>
+        /// <param name="entryPoint">The entry point whose options are checked against.</param>
         /// <param name="option">The option.</param>
         /// <param name="value">The value of the option given on the command line.</param>
         /// <returns>The default value or the original value.</returns>
-        private T DefaultIfShadowed<T>(OptionInfo<T> option, T value)
+        private static T DefaultIfShadowed<T>(IEntryPoint entryPoint, OptionInfo<T> option, T value)
         {
-            if (IsAliasAvailable(option.Aliases.First()))
+            if (IsAliasAvailable(option.Aliases.First(), entryPoint.Options))
             {
                 return value;
             }
@@ -196,11 +230,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="command">The command to add the option to.</param>
         /// <param name="option">The option to add.</param>
         /// <typeparam name="T">The type of the option's argument.</typeparam>
-        private void AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
+        private static void AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
-            if (IsAliasAvailable(option.Aliases.First()))
+            if (IsAliasAvailable(option.Aliases.First(), command.Options))
             {
-                command.AddOption(option.Create(option.Aliases.Where(IsAliasAvailable)));
+                command.AddOption(option.Create(option.Aliases.Where(alias => IsAliasAvailable(alias, command.Options))));
             }
             else if (option.Required)
             {
@@ -214,7 +248,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="command">The command to add the validator to.</param>
         /// <param name="primaryAliases">The primary aliases of the options to be marked as mutually exclusive.</param>
-        private void MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases) =>
+        private static void MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases) =>
             command.AddValidator(result =>
             {
                 var presentAliases = new List<string>();
@@ -236,139 +270,178 @@ namespace Microsoft.Quantum.EntryPointDriver
 
                 return default;
             });
-    
-        // TODO: Define the aliases as constants.
 
-        /// <summary>
-        /// The subscription option.
-        /// </summary>
-        internal static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
-            ImmutableList.Create("--subscription"), "The subscription ID.");
-
-        /// <summary>
-        /// The resource group option.
-        /// </summary>
-        internal static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
-            ImmutableList.Create("--resource-group"), "The resource group name.");
-
-        /// <summary>
-        /// The workspace option.
-        /// </summary>
-        internal static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
-            ImmutableList.Create("--workspace"), "The workspace name.");
-
-        /// <summary>
-        /// The storage option.
-        /// </summary>
-        internal static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
-            ImmutableList.Create("--storage"), default, "The storage account connection string.");
-
-        /// <summary>
-        /// The AAD token option.
-        /// </summary>
-        internal static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
-            ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
-
-        /// <summary>
-        /// The base URI option.
-        /// </summary>
-        internal static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
-            ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
-
-        /// <summary>
-        /// The location to use with the default endpoint option.
-        /// </summary>
-        internal static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
-            ImmutableList.Create("--location"),
-            default,
-            "The location to use with the default endpoint.",
-            validator: result =>
+        private static Command CreateSimulateCommand(IEnumerable<Command> entryPointCommands)
+        {
+            var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
+            if (entryPointCommands.Count() == 1)
+            {
+                var epCommand = entryPointCommands.First();
+                simulate.AddCommand(epCommand);
+                SetSubCommandAsDefault(simulate, epCommand);
+            }
+            else
+            {
+                foreach (var epCommand in entryPointCommands)
                 {
-                    var location = result.Tokens.SingleOrDefault()?.Value;
-                    if (location == null)
-                    {
-                        return default;
-                    }
+                    simulate.AddCommand(epCommand);
+                }
+            }
 
-                    var normalizedLocation = AzureSettings.NormalizeLocation(location);
-                    return Uri.CheckHostName(normalizedLocation) == UriHostNameType.Unknown ?
-                        $"\"{location}\" is an invalid value for the --location option." :
-                        default;
+            return simulate;
+        }
+
+        private static Command CreateSubmitCommand(IEnumerable<Command> entryPointCommands)
+        {
+            var submit = new Command("submit", "Submit the program to Azure Quantum.")
+            {
+                IsHidden = true,
+            };
+            if (entryPointCommands.Count() == 1)
+            {
+                var epCommand = entryPointCommands.First();
+                submit.AddCommand(epCommand);
+                SetSubCommandAsDefault(submit, epCommand);
+            }
+            else
+            {
+                foreach (var epCommand in entryPointCommands)
+                {
+                    submit.AddCommand(epCommand);
+                }
+            }
+
+            return submit;
+        }
+
+        private static Func<ParseResult, TArg, Task<int>> MakeHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
+        {
+            return (ParseResult parseResult, TArg arg) => handle(parseResult, arg, entryPoint);
+        }
+
+        private Command CreateSimulateEntryPointCommand(IEntryPoint entryPoint)
+        {
+            var command = new Command(entryPoint.Name, entryPoint.Summary)
+            {
+                Handler = CommandHandler.Create(MakeHandle<string>(Simulate, entryPoint))
+            };
+            foreach (var option in entryPoint.Options)
+            {
+                command.AddOption(option);
+            }
+
+            AddOptionIfAvailable(command, this.BuildSimulatorOption(entryPoint));
+
+            return command;
+        }
+
+        private Command CreateSubmitEntryPointCommand(IEntryPoint entryPoint)
+        {
+            var command = new Command(entryPoint.Name, entryPoint.Summary)
+            {
+                Handler = CommandHandler.Create(MakeHandle<AzureSettings>(Submit, entryPoint))
+            };
+            foreach (var option in entryPoint.Options)
+            {
+                command.AddOption(option);
+            }
+
+            AddOptionIfAvailable(command, SubscriptionOption);
+            AddOptionIfAvailable(command, ResourceGroupOption);
+            AddOptionIfAvailable(command, WorkspaceOption);
+            AddOptionIfAvailable(command, this.BuildTargetOption(entryPoint));
+            AddOptionIfAvailable(command, StorageOption);
+            AddOptionIfAvailable(command, AadTokenOption);
+            AddOptionIfAvailable(command, BaseUriOption);
+            AddOptionIfAvailable(command, LocationOption);
+            AddOptionIfAvailable(command, JobNameOption);
+            AddOptionIfAvailable(command, ShotsOption);
+            AddOptionIfAvailable(command, OutputOption);
+            AddOptionIfAvailable(command, DryRunOption);
+            AddOptionIfAvailable(command, VerboseOption);
+            MarkOptionsAsMutuallyExclusive(
+                command,
+                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() });
+
+            return command;
+        }
+
+        private OptionInfo<string> BuildSimulatorOption(IEntryPoint entryPoint) =>
+            new OptionInfo<string>(
+                this.settings.SimulatorOptionAliases,
+                entryPoint.DefaultSimulatorName,
+                "The name of the simulator to use.",
+                suggestions: new[]
+                {
+                    this.settings.QuantumSimulatorName,
+                    this.settings.ToffoliSimulatorName,
+                    this.settings.ResourcesEstimatorName,
+                    entryPoint.DefaultSimulatorName
                 });
 
-        /// <summary>
-        /// The job name option.
-        /// </summary>
-        internal static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
-
-        /// <summary>
-        /// The shots option.
-        /// </summary>
-        internal static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
-            ImmutableList.Create("--shots"),
-            500,
-            "The number of times the program is executed on the target machine.",
-            validator: result =>
-                int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
-                    ? "The number of shots must be a positive number."
-                    : default);
-
-        /// <summary>
-        /// The output option.
-        /// </summary>
-        internal static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
-            ImmutableList.Create("--output"),
-            OutputFormat.FriendlyUri,
-            "The information to show in the output after the job is submitted.");
-
-        /// <summary>
-        /// The dry run option.
-        /// </summary>
-        internal static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
-            ImmutableList.Create("--dry-run"),
-            false,
-            "Validate the program and options, but do not submit to Azure Quantum.");
-
-        /// <summary>
-        /// The verbose option.
-        /// </summary>
-        internal static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
-            ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
-
-        /// <summary>
-        /// Displays a message to the console using the given color and text writer.
-        /// </summary>
-        /// <param name="color">The text color.</param>
-        /// <param name="writer">The text writer for the console output stream.</param>
-        /// <param name="message">The message to display.</param>
-        internal static void DisplayWithColor(ConsoleColor color, TextWriter writer, string message)
+        private OptionInfo<string?> BuildTargetOption(IEntryPoint entryPoint)
         {
-            var originalForeground = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            writer.WriteLine(message);
-            Console.ForegroundColor = originalForeground;
+            var targetAliases = ImmutableList.Create("--target");
+            const string targetDescription = "The target device ID.";
+            return string.IsNullOrWhiteSpace(entryPoint.DefaultExecutionTarget)
+                ? new OptionInfo<string?>(targetAliases, targetDescription)
+                : new OptionInfo<string?>(targetAliases, entryPoint.DefaultExecutionTarget, targetDescription);
+        }
+
+        /// <summary>
+        /// Simulates the entry point.
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="simulator">The simulator to use.</param>
+        /// <param name="entryPoint">The entry point to simulate.</param>
+        /// <returns>The exit code.</returns>
+        private Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
+            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, BuildSimulatorOption(entryPoint), simulator));
+
+        /// <summary>
+        /// Submits the entry point to Azure Quantum.
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="azureSettings">The Azure submission settings.</param>
+        /// <param name="entryPoint">The entry point to submit.</param>
+        private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
+            entryPoint.Submit(parseResult, new AzureSettings
+            {
+                Subscription = azureSettings.Subscription,
+                ResourceGroup = azureSettings.ResourceGroup,
+                Workspace = azureSettings.Workspace,
+                Target = DefaultIfShadowed(entryPoint, BuildTargetOption(entryPoint), azureSettings.Target),
+                Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
+                AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
+                BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
+                Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
+                JobName = DefaultIfShadowed(entryPoint, JobNameOption, azureSettings.JobName),
+                Shots = DefaultIfShadowed(entryPoint, ShotsOption, azureSettings.Shots),
+                Output = DefaultIfShadowed(entryPoint, OutputOption, azureSettings.Output),
+                DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
+                Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
+            });
+        
+        /// <summary>
+        /// A modification of the command-line <see cref="HelpBuilder"/> class.
+        /// </summary>
+        private sealed class QsHelpBuilder : HelpBuilder
+        {
+            /// <summary>
+            /// Creates a new help builder using the given console.
+            /// </summary>
+            /// <param name="console">The console to use.</param>
+            internal QsHelpBuilder(IConsole console) : base(console)
+            {
+            }
+
+            protected override string ArgumentDescriptor(IArgument argument)
+            {
+                // Hide long argument descriptors.
+                var descriptor = base.ArgumentDescriptor(argument);
+                return descriptor.Length > 30 ? argument.Name : descriptor;
+            }
         }
     }
 
-    /// <summary>
-    /// A modification of the command-line <see cref="HelpBuilder"/> class.
-    /// </summary>
-    internal sealed class QsHelpBuilder : HelpBuilder
-    {
-        /// <summary>
-        /// Creates a new help builder using the given console.
-        /// </summary>
-        /// <param name="console">The console to use.</param>
-        internal QsHelpBuilder(IConsole console) : base(console)
-        {
-        }
-
-        protected override string ArgumentDescriptor(IArgument argument)
-        {
-            // Hide long argument descriptors.
-            var descriptor = base.ArgumentDescriptor(argument);
-            return descriptor.Length > 30 ? argument.Name : descriptor;
-        }
-    }
 }
