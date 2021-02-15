@@ -86,14 +86,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     for(auto iterExp = expectedSmallNumbers.begin(), iterAct = actualNumbers.begin();
         iterExp != expectedSmallNumbers.end(); ++iterExp, ++iterAct)
     {
-        //REQUIRE(*iterExp == *iterAct);
-        std::cerr << *iterAct << ", ";
-    }
-    std::cerr << '\n';
-    for(auto iterExp = expectedSmallNumbers.begin(), iterAct = actualNumbers.begin();
-        iterExp != expectedSmallNumbers.end(); ++iterExp, ++iterAct)
-    {
-        CHECK(*iterExp == *iterAct);
+        REQUIRE(*iterExp == *iterAct);
     }
 
 
@@ -110,14 +103,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     for(auto iterExp = expectedLargeNumbers.begin(), iterAct = actualNumbers.begin();
         iterExp != expectedLargeNumbers.end(); ++iterExp, ++iterAct)
     {
-        //REQUIRE(*iterExp == *iterAct);
-        std::cerr << *iterAct << "(0x" << std::hex << *iterAct << std::dec << "), ";
-    }
-    std::cerr << '\n';
-    for(auto iterExp = expectedLargeNumbers.begin(), iterAct = actualNumbers.begin();
-        iterExp != expectedLargeNumbers.end(); ++iterExp, ++iterAct)
-    {
-        CHECK(*iterExp == *iterAct);
+        REQUIRE(*iterExp == *iterAct);
     }
 
 
