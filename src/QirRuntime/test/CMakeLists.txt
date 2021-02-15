@@ -1,1 +1,1 @@
-add_subdirectory(QIR-example)
+add_subdirectory(QIR-exe)

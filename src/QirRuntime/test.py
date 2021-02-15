@@ -70,10 +70,9 @@ else:
       os.environ["DYLD_LIBRARY_PATH"] = old + ":" + fullstate_sim_dir + ":" + install_dir
   else:
       os.environ["DYLD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
-print(os.environ["LD_LIBRARY_PATH"])
 log("========= Running native tests =========")
 test_binaries = [
-  "qir-example"
+  "vqe-with-params3"
 ]
 
 for name in test_binaries:
@@ -85,5 +84,5 @@ for name in test_binaries:
 print("\n")
 
 # subprocess.run(os.path.join(install_dir, "qir-example"), shell = True)
-print(os.environ["LD_LIBRARY_PATH"])
+#print(os.environ["LD_LIBRARY_PATH"])
 print("\n")

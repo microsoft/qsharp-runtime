@@ -9,7 +9,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 set(TEST_FILES
-  vqe-with-params
+  VariationalQuantumEigensolver
   vqe-with-params2
 )
 

@@ -1,8 +1,18 @@
-#include <iostream>
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
+#include <assert.h>
+#include <bitset>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <unordered_set>
+
+#include "CoreTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
+#include "context.hpp"
 #include "qirTypes.hpp"
 #include "quantum__rt.hpp"
 
@@ -26,23 +36,13 @@ int main(int argc, char* argv[]) noexcept
 {
     try
     {
-        if (argc != 2)
-        {
-            // argv[0] should contain the program name
-            std::cout << "usage: " << argv[0] << " <number of iterations>\n";
-            return 1;
-        }
-
         unique_ptr<ISimulator> qapi = CreateFullstateSimulator();
-        SetSimulatorForQIR(qapi.get());
+        QirContextScope qirctx(qapi.get());
 
         const long iters = atol(argv[1]);
 
-        for (long i = 0; i < iters; i++)
-        {
-            const double ret = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
-            std::cout << ret << std::endl;
-        }
+        const double ret = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
+        std::cout << ret << std::endl;
     }
     catch (const std::exception& e)
     {
