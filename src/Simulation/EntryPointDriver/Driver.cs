@@ -181,6 +181,11 @@ namespace Microsoft.Quantum.EntryPointDriver
             Console.ForegroundColor = originalForeground;
         }
 
+        /// <summary>
+        /// Copies the handle and options from the given sub command to the given command.
+        /// </summary>
+        /// <param name="root">The command whose handle and options will be set.</param>
+        /// <param name="subCommand">The sub command that will be copied from.</param>
         private static void SetSubCommandAsDefault(Command root, Command subCommand)
         {
             root.Handler = subCommand.Handler;
@@ -271,6 +276,11 @@ namespace Microsoft.Quantum.EntryPointDriver
                 return default;
             });
 
+        /// <summary>
+        /// Creates the simulate command.
+        /// </summary>
+        /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
+        /// <returns>The created simulate command.</returns>
         private static Command CreateSimulateCommand(IEnumerable<Command> entryPointCommands)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
@@ -291,6 +301,11 @@ namespace Microsoft.Quantum.EntryPointDriver
             return simulate;
         }
 
+        /// <summary>
+        /// Creates the Azure submit command.
+        /// </summary>
+        /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
+        /// <returns>The created submit command.</returns>
         private static Command CreateSubmitCommand(IEnumerable<Command> entryPointCommands)
         {
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
@@ -314,32 +329,49 @@ namespace Microsoft.Quantum.EntryPointDriver
             return submit;
         }
 
-        private static Func<ParseResult, TArg, Task<int>> MakeHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
+        /// <summary>
+        /// Creates a wrapper for a command handle that is specific to an entry point.
+        /// </summary>
+        /// <typeparam name="TArg">The input argument type to the handle.</typeparam>
+        /// <param name="handle">The handle.</param>
+        /// <param name="entryPoint">The entry point this handle is specific to.</param>
+        /// <returns>The handle wrapper for the given handle.</returns>
+        private static Func<ParseResult, TArg, Task<int>> CreateHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
         {
             return (ParseResult parseResult, TArg arg) => handle(parseResult, arg, entryPoint);
         }
 
+        /// <summary>
+        /// Creates a sub command specific to the given entry point for the simulate command.
+        /// </summary>
+        /// <param name="entryPoint">The entry point to make a command for.</param>
+        /// <returns>The command corresponding to the given entry point.</returns>
         private Command CreateSimulateEntryPointCommand(IEntryPoint entryPoint)
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(MakeHandle<string>(Simulate, entryPoint))
+                Handler = CommandHandler.Create(CreateHandle<string>(Simulate, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
                 command.AddOption(option);
             }
 
-            AddOptionIfAvailable(command, this.BuildSimulatorOption(entryPoint));
+            AddOptionIfAvailable(command, this.CreateSimulatorOption(entryPoint));
 
             return command;
         }
 
+        /// <summary>
+        /// Creates a sub command specific to the given entry point for the submit command.
+        /// </summary>
+        /// <param name="entryPoint">The entry point to make a command for.</param>
+        /// <returns>The command corresponding to the given entry point.</returns>
         private Command CreateSubmitEntryPointCommand(IEntryPoint entryPoint)
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(MakeHandle<AzureSettings>(Submit, entryPoint))
+                Handler = CommandHandler.Create(CreateHandle<AzureSettings>(Submit, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -349,7 +381,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             AddOptionIfAvailable(command, SubscriptionOption);
             AddOptionIfAvailable(command, ResourceGroupOption);
             AddOptionIfAvailable(command, WorkspaceOption);
-            AddOptionIfAvailable(command, this.BuildTargetOption(entryPoint));
+            AddOptionIfAvailable(command, this.CreateTargetOption(entryPoint));
             AddOptionIfAvailable(command, StorageOption);
             AddOptionIfAvailable(command, AadTokenOption);
             AddOptionIfAvailable(command, BaseUriOption);
@@ -366,7 +398,12 @@ namespace Microsoft.Quantum.EntryPointDriver
             return command;
         }
 
-        private OptionInfo<string> BuildSimulatorOption(IEntryPoint entryPoint) =>
+        /// <summary>
+        /// Creates the simulation option for the simulate command with the given entry point.
+        /// </summary>
+        /// <param name="entryPoint">The entry point.</param>
+        /// <returns>The OptionInfor for the simulator option.</returns>
+        private OptionInfo<string> CreateSimulatorOption(IEntryPoint entryPoint) =>
             new OptionInfo<string>(
                 this.settings.SimulatorOptionAliases,
                 entryPoint.DefaultSimulatorName,
@@ -379,7 +416,12 @@ namespace Microsoft.Quantum.EntryPointDriver
                     entryPoint.DefaultSimulatorName
                 });
 
-        private OptionInfo<string?> BuildTargetOption(IEntryPoint entryPoint)
+        /// <summary>
+        /// Creates the target option for the Azure submit command with the given entry point.
+        /// </summary>
+        /// <param name="entryPoint">The entry point.</param>
+        /// <returns>The OptionInfo for the --target option.</returns>
+        private OptionInfo<string?> CreateTargetOption(IEntryPoint entryPoint)
         {
             var targetAliases = ImmutableList.Create("--target");
             const string targetDescription = "The target device ID.";
@@ -396,7 +438,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="entryPoint">The entry point to simulate.</param>
         /// <returns>The exit code.</returns>
         private Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
-            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, BuildSimulatorOption(entryPoint), simulator));
+            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, CreateSimulatorOption(entryPoint), simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -404,13 +446,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="azureSettings">The Azure submission settings.</param>
         /// <param name="entryPoint">The entry point to submit.</param>
+        /// <returns>The exit code.</returns>
         private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
             entryPoint.Submit(parseResult, new AzureSettings
             {
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(entryPoint, BuildTargetOption(entryPoint), azureSettings.Target),
+                Target = DefaultIfShadowed(entryPoint, CreateTargetOption(entryPoint), azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
