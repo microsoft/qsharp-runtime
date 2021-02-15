@@ -23,7 +23,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
         Write-Host "On Windows build QIR Runtime using Clang"
         $env:CC = "C:\Program Files\LLVM\bin\clang.exe"
         $env:CXX = "C:\Program Files\LLVM\bin\clang++.exe"
-        $env:RC = "C:\Program Files\LLVM\bin\clang++.exe"
+        $env:RC = "C:\Program Files\LLVM\bin\llvm-rc.exe"
         $llvmExtras = (Join-Path $PSScriptRoot "externals/LLVM")
         $env:PATH += ";$llvmExtras"
     } else {
