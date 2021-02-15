@@ -72,7 +72,7 @@ else:
       os.environ["DYLD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
 log("========= Running native tests =========")
 test_binaries = [
-  "vqe-with-params3"
+  "qir-exe"
 ]
 
 for name in test_binaries:
