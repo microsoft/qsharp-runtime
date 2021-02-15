@@ -34,19 +34,20 @@ using namespace std;
 using namespace Microsoft::Quantum;
 int main(int argc, char* argv[]) noexcept
 {
+    std::cout << "Start running VQE." << std::endl;
     try
     {
         unique_ptr<ISimulator> qapi = CreateFullstateSimulator();
         QirContextScope qirctx(qapi.get());
 
-        const long iters = atol(argv[1]);
-
         const double ret = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
+        std::cout << "\nDone running VQE." << std::endl;
         std::cout << ret << std::endl;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Failed to run VQE: " << e.what() << std::endl;
+        std::cerr << "\nFailed to run VQE: " << std::endl;
+        std::cerr << e.what() << std::endl;
         return 2;
     }
 
