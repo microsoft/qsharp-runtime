@@ -26,4 +26,3 @@ CheckOptions:
     value:  'CamelCase'
   - key:    readability-identifier-naming.NamespaceCase
     value:  'CamelCase'
-

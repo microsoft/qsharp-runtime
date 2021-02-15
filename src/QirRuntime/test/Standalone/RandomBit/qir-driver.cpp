@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include <iostream>
+#include "../Shared/CLI11.hpp"
 
 // Can manually add calls to DebugLog in the ll files for debugging.
 extern "C" void DebugLog(int64_t value)
@@ -14,11 +15,14 @@ extern "C" void DebugLogPtr(char* value)
 }
 
 extern "C" void SetupQirToRunOnFullStateSimulator();
-//extern "C" int64_t Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body(); // NOLINT
+extern "C" bool Microsoft__Quantum__Testing__QIR__RandomBit__body(); // NOLINT
+
 int main(int argc, char *argv[])
 {
     std::cout << "QIR Driver" << std::endl;
     SetupQirToRunOnFullStateSimulator();
-
+    
+    bool bit = Microsoft__Quantum__Testing__QIR__RandomBit__body();
+    std::cout << bit << std::endl;
     return 0;
 }

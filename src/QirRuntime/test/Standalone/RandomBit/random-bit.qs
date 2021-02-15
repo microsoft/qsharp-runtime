@@ -3,15 +3,15 @@
 
 namespace Microsoft.Quantum.Testing.QIR
 {
-
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
-    operation RandomBit() : Result {
-        
+    operation RandomBit() : Bool {
         using (q = Qubit()) {
             H(q);
-            return M(q);
+            let r = M(q);
         }
+
+        return true;
     }
 }

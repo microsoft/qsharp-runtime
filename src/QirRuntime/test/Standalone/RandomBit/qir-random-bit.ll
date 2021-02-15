@@ -1,9 +1,8 @@
 
 %Result = type opaque
 %Range = type { i64, i64, i64 }
-%Array = type opaque
 %Qubit = type opaque
-%class.RESULT = type opaque
+%Array = type opaque
 
 @ResultZero = external global %Result*
 @ResultOne = external global %Result*
@@ -13,19 +12,23 @@
 @PauliZ = constant i2 -2
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
 
-define %Result* @Microsoft__Quantum__Intrinsic__Measure__body(%Array* %bases, %Array* %qubits) {
+@Microsoft__Quantum__Testing__QIR__RandomBit = alias i1 (), i1 ()* @Microsoft__Quantum__Testing__QIR__RandomBit__body
+
+define i1 @Microsoft__Quantum__Testing__QIR__RandomBit__body() #0 {
 entry:
-  call void @__quantum__rt__array_update_alias_count(%Array* %bases, i64 1)
-  call void @__quantum__rt__array_update_alias_count(%Array* %qubits, i64 1)
-  %0 = call %Result* @__quantum__qis__measure__body(%Array* %bases, %Array* %qubits)
-  call void @__quantum__rt__array_update_alias_count(%Array* %bases, i64 -1)
-  call void @__quantum__rt__array_update_alias_count(%Array* %qubits, i64 -1)
-  ret %Result* %0
+  %q = call %Qubit* @__quantum__rt__qubit_allocate()
+  call void @__quantum__qis__h__body(%Qubit* %q)
+  %r = call %Result* @Microsoft__Quantum__Intrinsic__M__body(%Qubit* %q)
+  call void @__quantum__rt__qubit_release(%Qubit* %q)
+  call void @__quantum__rt__result_update_reference_count(%Result* %r, i64 -1)
+  ret i1 true
 }
 
-declare void @__quantum__rt__array_update_alias_count(%Array*, i64)
+declare %Qubit* @__quantum__rt__qubit_allocate()
 
-declare %Result* @__quantum__qis__measure__body(%Array*, %Array*)
+declare %Array* @__quantum__rt__qubit_allocate_array(i64)
+
+declare void @__quantum__qis__h__body(%Qubit*)
 
 define %Result* @Microsoft__Quantum__Intrinsic__M__body(%Qubit* %qb) {
 entry:
@@ -48,9 +51,17 @@ entry:
   ret %Result* %5
 }
 
+declare void @__quantum__rt__qubit_release(%Qubit*)
+
+declare void @__quantum__rt__result_update_reference_count(%Result*, i64)
+
 declare %Array* @__quantum__rt__array_create_1d(i32, i64)
 
 declare i8* @__quantum__rt__array_get_element_ptr_1d(%Array*, i64)
+
+declare void @__quantum__rt__array_update_alias_count(%Array*, i64)
+
+declare %Result* @__quantum__qis__measure__body(%Array*, %Array*)
 
 declare void @__quantum__rt__array_update_reference_count(%Array*, i64)
 
@@ -59,8 +70,6 @@ entry:
   call void @__quantum__qis__h__body(%Qubit* %qb)
   ret void
 }
-
-declare void @__quantum__qis__h__body(%Qubit*)
 
 define void @Microsoft__Quantum__Intrinsic__H__adj(%Qubit* %qb) {
 entry:
@@ -86,26 +95,14 @@ entry:
   ret void
 }
 
-define %Result* @Microsoft__Quantum__Testing__QIR__RandomBit__body() {
+define %Result* @Microsoft__Quantum__Intrinsic__Measure__body(%Array* %bases, %Array* %qubits) {
 entry:
-  %q = call %Qubit* @__quantum__rt__qubit_allocate()
-  call void @__quantum__qis__h__body(%Qubit* %q)
-  %0 = call %Result* @Microsoft__Quantum__Intrinsic__M__body(%Qubit* %q)
-  call void @__quantum__rt__qubit_release(%Qubit* %q)
+  call void @__quantum__rt__array_update_alias_count(%Array* %bases, i64 1)
+  call void @__quantum__rt__array_update_alias_count(%Array* %qubits, i64 1)
+  %0 = call %Result* @__quantum__qis__measure__body(%Array* %bases, %Array* %qubits)
+  call void @__quantum__rt__array_update_alias_count(%Array* %bases, i64 -1)
+  call void @__quantum__rt__array_update_alias_count(%Array* %qubits, i64 -1)
   ret %Result* %0
-}
-
-declare %Qubit* @__quantum__rt__qubit_allocate()
-
-declare %Array* @__quantum__rt__qubit_allocate_array(i64)
-
-declare void @__quantum__rt__qubit_release(%Qubit*)
-
-define %class.RESULT* @Microsoft__Quantum__Testing__QIR__RandomBit() #0 {
-entry:
-  %0 = call %Result* @Microsoft__Quantum__Testing__QIR__RandomBit__body()
-  %1 = bitcast %Result* %0 to %class.RESULT*
-  ret %class.RESULT* %1
 }
 
 attributes #0 = { "EntryPoint" }
