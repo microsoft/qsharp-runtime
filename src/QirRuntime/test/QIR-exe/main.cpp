@@ -35,7 +35,6 @@ int main(int argc, char* argv[]) noexcept
             std::cout << "usage: " << argv[0] << " <number of iterations> <theta1> <theta2> <theta3> <number of samples>\n";
             return 1;
         }
-        std::cout << "***Starting VQE example***";
 
         // Create a full state simulator and link it to the QIR context scope
         unique_ptr<ISimulator> qapi = CreateFullstateSimulator();
@@ -46,6 +45,12 @@ int main(int argc, char* argv[]) noexcept
         const double theta2 = -0.001;
         const double theta3 = 0.001;
         const int nsamples = 1;
+
+        std::cout << "*** Starting VQE example with " << iters << " iterations***\n";
+        std::cout << "*** theta1 = " << theta1 << "\n";
+        std::cout << "*** theta2 = " << theta2 << "\n";
+        std::cout << "*** theta3 = " << theta3 << "\n";
+        std::cout << "*** nsamples = " << nsamples << "\n";
 
         for (long i = 0; i < iters; i++)
         {
