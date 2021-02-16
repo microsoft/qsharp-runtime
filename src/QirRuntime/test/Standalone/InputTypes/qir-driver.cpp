@@ -15,7 +15,13 @@ extern "C" void DebugLogPtr(char* value)
 }
 
 extern "C" void SetupQirToRunOnFullStateSimulator();
-extern "C" bool Microsoft__Quantum__Testing__QIR__InputTypes__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__InputTypes__body( // NOLINT
+    int64_t anInt,
+    double_t aDouble,
+    bool aBool,
+    char* aString,
+    int64_t anArrayLength,
+    int64_t* anArray);
 
 int main(int argc, char *argv[])
 {
@@ -64,7 +70,8 @@ int main(int argc, char *argv[])
 
         // Start simulation.
         SetupQirToRunOnFullStateSimulator();
-        Microsoft__Quantum__Testing__QIR__InputTypes__body();
+        // TODO: Get this from command line.
+        Microsoft__Quantum__Testing__QIR__InputTypes__body(0, 0.0, false, NULL, 0, NULL);
         simulatorOutputStream->flush();
         (*operationOutputStream) << "OPERATION OUTPUT:\n";
         operationOutputStream->flush();

@@ -6,7 +6,7 @@ namespace Microsoft.Quantum.Testing.QIR
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
-    operation InputTypes() : Unit {
+    operation InputTypes(anInt : Int, aDouble : Double, aBool : Bool, aString : String, anArray : Int[]) : Unit {
         
     }
 }
