@@ -52,13 +52,18 @@ To update the *.ll files to a newer version:
 // The function runs a VQE algorithm with hard-coded values for the hamiltonian terms and input state.
 // The result should be the ground state energy of Hydrogen, approx. -1.13.
 // The Q# source code can be found in msr-quarc/StandaloneVQE on the branch guenp/non-standalone.
-extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(); // NOLINT
+extern "C" double Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(double theta1, double theta2, double theta3, int nSamples); // NOLINT
 TEST_CASE("QIR: Run QIR example", "[qir]")
 {
     // Create a full state simulator and link it to the QIR context scope
     unique_ptr<ISimulator> qapi = CreateFullstateSimulator();
     QirContextScope qirctx(qapi.get());
 
-    double res = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body();
+    const double theta1 = 0.001;
+    const double theta2 = -0.001;
+    const double theta3 = 0.001;
+    const int nsamples = 1;
+
+    double res = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(theta1, theta2, theta3, nsamples);
     REQUIRE(res == 0.0);
 }

@@ -72,9 +72,7 @@ else:
       os.environ["DYLD_LIBRARY_PATH"] = fullstate_sim_dir + ":" + install_dir
 print(os.environ["LD_LIBRARY_PATH"])
 log("========= Running native tests =========")
-test_binaries = [
-  "qir-example"
-]
+test_binaries = []
 
 for name in test_binaries:
   test_binary = os.path.join(install_dir, name + exe_ext)
@@ -84,6 +82,8 @@ for name in test_binaries:
 
 print("\n")
 
-# subprocess.run(os.path.join(install_dir, "qir-example"), shell = True)
-print(os.environ["LD_LIBRARY_PATH"])
+cmd = os.path.join(install_dir, "qir-exe") + " 0.001 -0.001 0.001 10"
+subprocess.run(cmd, shell = True)
+
+print(cmd)
 print("\n")
