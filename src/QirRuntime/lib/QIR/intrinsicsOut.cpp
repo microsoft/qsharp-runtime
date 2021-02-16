@@ -32,7 +32,7 @@ static  std::ostream& GetQOstream()
 namespace Quantum { namespace Qis { namespace Internal  // Replace with `namespace Quantum::Qis::Internal` after migration to C++17.
 {
 
-std::ostream& SetQOstream(std::ostream & newOStream)
+std::ostream& SetOutputStream(std::ostream & newOStream)
 {
     std::ostream& oldOStream = *currOStream;
     currOStream = &newOStream;

@@ -348,8 +348,9 @@ define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: func
   ret double %result
 }
 
+
 ; operation DrawRandomInt (min : Int, max : Int) : Int      
-; https://docs.microsoft.com/en-us/qsharp/api/qsharp/microsoft.quantum.random.drawrandomint
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.random.drawrandomint
 define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {  
   %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
   ret i64 %result

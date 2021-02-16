@@ -17,12 +17,12 @@ extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(QirStri
 struct QOstreamRedirector
 {
     QOstreamRedirector(std::ostream & newOstream)
-        : old(Quantum::Qis::Internal::SetQOstream(newOstream))
+        : old(Quantum::Qis::Internal::SetOutputStream(newOstream))
     {}
 
     ~QOstreamRedirector()
     {
-        Quantum::Qis::Internal::SetQOstream(old);
+        Quantum::Qis::Internal::SetOutputStream(old);
     }
 
 private:

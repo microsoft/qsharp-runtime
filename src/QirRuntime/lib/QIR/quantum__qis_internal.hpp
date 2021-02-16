@@ -17,6 +17,6 @@ namespace Quantum { namespace Qis { namespace Internal  // Replace with `namespa
 {
     QIR_SHARED_API extern char const excStrDrawRandomInt[]; // = "Invalid Argument: minimum > maximum for DrawRandomInt()";
 
-    QIR_SHARED_API extern std::ostream& SetQOstream(std::ostream & newOStream);
+    QIR_SHARED_API extern std::ostream& SetOutputStream(std::ostream & newOStream);
     QIR_SHARED_API void UseRandomSeed(bool random);         
 }}} // namespace Quantum::Qis::Internal
