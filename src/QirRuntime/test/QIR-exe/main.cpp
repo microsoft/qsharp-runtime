@@ -41,21 +41,21 @@ int main(int argc, char* argv[]) noexcept
         QirContextScope qirctx(qapi.get());
 
         const long iters = atol(argv[1]);
-        const double theta1 = 0.001;
-        const double theta2 = -0.001;
-        const double theta3 = 0.001;
-        const int nsamples = 1;
+        const double theta1 = stod(argv[2]);
+        const double theta2 = stod(argv[3]);
+        const double theta3 = stod(argv[4]);
+        const int nsamples = atoi(argv[5]);
 
-        std::cout << "*** Starting VQE example with " << iters << " iterations***\n";
-        std::cout << "*** theta1 = " << theta1 << "\n";
-        std::cout << "*** theta2 = " << theta2 << "\n";
-        std::cout << "*** theta3 = " << theta3 << "\n";
-        std::cout << "*** nsamples = " << nsamples << "\n";
+        std::cout << "*** Starting VQE example with " << iters << " iterations***" << std::endl;
+        std::cout << "*** theta1 = " << theta1 << std::endl;
+        std::cout << "*** theta2 = " << theta2 << std::endl;
+        std::cout << "*** theta3 = " << theta3 << std::endl;
+        std::cout << "*** nsamples = " << nsamples << std::endl;
 
         for (long i = 0; i < iters; i++)
         {
             const double ret = Microsoft__Quantum__Samples__Chemistry__SimpleVQE__GetEnergyHydrogenVQE__body(theta1, theta2, theta3, nsamples);
-            std::cout << ret << std::endl;
+            std::cout << "*** Result " << i << ": " << ret << std::endl;
         }
     }
     catch (const std::exception& e)

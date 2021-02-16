@@ -82,8 +82,39 @@ for name in test_binaries:
 
 print("\n")
 
-cmd = os.path.join(install_dir, "qir-exe") + " 0.001 -0.001 0.001 10"
-subprocess.run(cmd, shell = True)
+from scipy.optimize import minimize
 
-print(cmd)
-print("\n")
+def run_program(var_params, num_samples) -> float:
+    # run parameterized quantum program for VQE algorithm
+    theta1, theta2, theta3 = var_params
+    cmd = os.path.join(install_dir, "qir-exe") + f" 1 {theta1} {theta2} {theta3} {num_samples}"
+    result = subprocess.run(cmd, shell = True, capture_output=True)
+    idx = str(result.stdout).find("Result 0: ")
+    value = float(result.stdout[idx+3:-2])
+    print(var_params, value)
+    return value
+ 
+def VQE(initial_var_params, num_samples):
+    """ Run VQE Optimization to find the optimal energy and the associated variational parameters """
+    print(f"Starting VQE algorithm: {initial_var_params}, {num_samples}")
+ 
+    opt_result = minimize(run_program,
+                          initial_var_params,
+                          args=(num_samples,),
+                          method="COBYLA",
+                          tol=0.000001,
+                          options={'disp': True, 'maxiter': 200,'rhobeg' : 0.05})
+ 
+    return opt_result
+
+# Initial variational parameters
+var_params = [0.001, -0.001, 0.001]
+
+# Run VQE and print the results of the optimization process
+# A large number of samples is selected for higher accuracy
+opt_result = VQE(var_params, num_samples=100)
+print(opt_result)
+
+# Print difference with exact FCI value known for this bond length
+fci_value = -1.1372704220924401
+print("Difference with exact FCI value :: ", abs(opt_result.fun - fci_value))
