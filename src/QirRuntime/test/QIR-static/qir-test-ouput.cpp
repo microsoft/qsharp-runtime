@@ -8,24 +8,24 @@
 #include "qirTypes.hpp"
 #include "quantum__qis_internal.hpp"
 
-extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(QirString*);        // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(void*); // NOLINT
 
 
 // https://stackoverflow.com/a/5419388/6362941
 // https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574170031
 // https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574194191
-struct QOstreamRedirector
+struct OstreamRedirectorScoped
 {
-    QOstreamRedirector(std::ostream & newOstream)
+    OstreamRedirectorScoped(std::ostream& newOstream)
         : old(Quantum::Qis::Internal::SetOutputStream(newOstream))
     {}
 
-    ~QOstreamRedirector()
+    ~OstreamRedirectorScoped()
     {
         Quantum::Qis::Internal::SetOutputStream(old);
     }
 
-private:
+  private:
     std::ostream& old;
 };
 
@@ -38,7 +38,7 @@ TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
     std::ostringstream      outStrStream;
 
     {
-        QOstreamRedirector qOStreamRedirector(outStrStream);    // Redirect the output from std::cout to outStrStream.
+        OstreamRedirectorScoped qOStreamRedirector(outStrStream);    // Redirect the output from std::cout to outStrStream.
 
         // Log something (to the redirected output):
         QirString qstr{std::string(testStr1)};

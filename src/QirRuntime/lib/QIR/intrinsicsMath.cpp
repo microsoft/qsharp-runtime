@@ -9,9 +9,10 @@
 #include "quantum__rt.hpp"
 
 // Forward declarations:
-namespace   // Visible in this translation unit only.
+namespace // Visible in this translation unit only.
 {
-    extern thread_local bool seedIsRandom;
+extern thread_local bool randomizeSeed;
+extern int64_t lastGeneratedRndNum;
 }
 
 // Implementation:
@@ -48,29 +49,40 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
     // https://en.cppreference.com/w/cpp/numeric/random
-    thread_local static std::mt19937_64 gen(seedIsRandom
+    thread_local static std::mt19937_64 gen(randomizeSeed
                                                 ? std::random_device()() :  // Default
                                                 0);                         // For test purposes only.
 
-    return std::uniform_int_distribution<int64_t>(minimum, maximum)(gen);
+    lastGeneratedRndNum = std::uniform_int_distribution<int64_t>(minimum, maximum)(gen);
+    return lastGeneratedRndNum;
 }
 
-}   // extern "C"
+} // extern "C"
 
-namespace   // Visible in this translation unit only.
+namespace // Visible in this translation unit only.
 {
-    thread_local bool seedIsRandom = true;
+thread_local bool randomizeSeed = true;
+int64_t lastGeneratedRndNum = 0;
 }
 
 // For test purposes only:
-namespace Quantum { namespace Qis { namespace Internal 
+namespace Quantum
 {
-
-char const excStrDrawRandomInt[] = "Invalid Argument: minimum > maximum for DrawRandomInt()";
-
-void UseRandomSeed(bool random)
+namespace Qis
 {
-    seedIsRandom = random;
-}
+    namespace Internal
+    {
+        char const excStrDrawRandomInt[] = "Invalid Argument: minimum > maximum for DrawRandomInt()";
 
-}}} // namespace Quantum::Qis::Internal
+        void RandomizeSeed(bool randomize)
+        {
+            randomizeSeed = randomize;
+        }
+
+        int64_t GetLastGeneratedRandomNumber()
+        {
+            return lastGeneratedRndNum;
+        }
+    } // namespace Internal
+} // namespace Qis
+} // namespace Quantum
