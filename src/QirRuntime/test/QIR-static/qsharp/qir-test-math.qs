@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;        // E()
     open Microsoft.Quantum.Random;
+    open Microsoft.Quantum.Convert;     // DoubleAsString()
 
     function SqrtTest() : Int {
         if  2.0 != Sqrt(  4.0)          { return 1; }           // The return value indicates which test case has failed.
@@ -63,6 +64,37 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
 
     operation TestDrawRandomInt(min : Int, max : Int) : Int {
         return DrawRandomInt(min, max);
+    }
+
+    function Close(expected : Double, actual : Double) : Bool {
+        let neighbourhood = 0.0000001;  // On x86-64 + Win the error is in 16th digit after the decimal point. 
+                                        // E.g. enstead of 0.0 there can be 0.00000000000000012.
+                                        // Thus 0.0000001 should be more than enough.
+
+        return ((expected - neighbourhood) < actual) and (actual < (expected + neighbourhood));
+    }
+
+    function SinTest() : Int {
+
+        // function Sin (theta : Double) : Double
+
+        if not Close(0.0, Sin(0.0))                 { return  1; }    // The return value indicates which test case has failed.
+        if not Close(0.5, Sin(PI()/6.0))            { return  2; }
+        if not Close(1.0, Sin(PI()/2.0))            { return  3; }
+        if not Close(0.5, Sin(5.0*PI()/6.0))        { return  4; }
+        if not Close(0.0, Sin(PI()))                { return  5; }
+
+        if not Close(-0.5, Sin(-5.0*PI()/6.0))      { return  6; }
+        if not Close(-1.0, Sin(-PI()/2.0))          { return  7; }
+        if not Close(-0.5, Sin(-PI()/6.0))          { return  8; }
+
+        if not Close(Sqrt(2.0)/2.0, Sin(PI()/4.0))  { return  9; }
+                                                                                              
+        if NAN() != Sin(NAN())                      { return 10; }
+        if NAN() != Sin(INFINITY())                 { return 11; }
+        if NAN() != Sin(-INFINITY())                { return 11; }
+
+        return 0;
     }
 
 }

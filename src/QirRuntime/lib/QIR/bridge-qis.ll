@@ -296,6 +296,7 @@ define void @__quantum__qis__message__body(%String* %.str) {
 ; LLVM intrinsics (https://llvm.org/docs/LangRef.html):
 declare double      @llvm.sqrt.f64(double %.val)
 declare double      @llvm.log.f64(double %Val)
+declare double      @llvm.sin.f64(double %Val)
 
 ; Native implementations:
 declare i1          @quantum__qis__isnan__body(double %d)
@@ -346,6 +347,13 @@ define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: func
                                                                     ; https://en.cppreference.com/w/cpp/numeric/math/atan2
   %result = call double @quantum__qis__arctan2__body(double %y, double %x)
   ret double %result
+}
+
+; function Sin (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.sin
+define double @__quantum__qis__sin__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/sin    
+    %result = call double @llvm.sin.f64(double %theta)          ; https://llvm.org/docs/LangRef.html#llvm-sin-intrinsic
+    ret double %result
 }
 
 
