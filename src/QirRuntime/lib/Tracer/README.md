@@ -58,28 +58,30 @@ As the tracer is executing a sequential quantum program, it will compute a time 
  using the _conceptual_ algorithm, described below (aka "tetris algorithm"). The actual implementation of layering might
  be done differently, as long as the resulting layering is the same as if running the conceptual algorithm.
 
-_Definition_: A ___barrier___ is ??
+_Definition_: A ___barrier___ is a layer that no more operations can be added into.
 
-The global barriers will be implemented as calls to `__quantum__qis__global_barrier` function. No additional support from
- the compiler should be needed, as the user can define their own intrinsic to represent the barrier and map it to the
- above runtime function via targets.qs file. The user can choose duration of a barrier which would affect start time of
- the following layers but no operations will be added to a barrier, independent of its width.
+A user will be able to inject global barriers by calling `__quantum__qis__global_barrier` function. The user can choose
+ duration of a barrier which would affect start time of the following layers but no operations will be added to a barrier,
+ independent of its width.
 
-1. The tracer will have a setting for preferred layer duration: P.
+__The conceptual algorithm__:
+
+1. The tracer must be set the preferred layer duration: P.
 1. The first encountered operation of __non-zero__ duration N is added into layer L(0, max(P,N)). The value
- for _conditional barrier_ is set to 0.
+ of _conditional barrier_ variable on the tracer is set to 0.
 1. When conditional callback is encountered, the layer L(t,N) of the measurement that produced the result the conditional
- is dependent on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope the
- barrier is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen before or in
- the same layer as the measurement, even if they don't involve the measured qubits.)
+ is dependent on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope
+ _conditional barrier_ is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen
+ before or in the same layer as the measurement, even if they don't involve the measured qubits.)
+ TODO: is it OK for later operations to be added to the layers with ops _inside_ conditional branches?
 1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is a single-qubit _op_ of
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
- Starting at L(k, Nk) and scanning backwards to L(conditional barrier, Nb) find the _first_ layer that contains an
+ Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the _first_ layer that contains an
  operation that acts on the qubit of _op_. Add _op_ into this layer. If no such layer is found, add _op_ to the list of
  pending operations on the qubit. At the end of the program commit all pending operations of duration zero into a new
  layer.
 1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is _op_ of duration _N > 0_
- or it involves more than one qubit. Starting at L(k, Nk) and scanning backwards to L(conditional barrier, Nb) find the
+ or it involves more than one qubit. Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the
  _last_ layer L(t, Nt) such that Qubits(t, Nt) don't contain any of the _op_'s qubits and find the _first_ layer L(w, Nw)
  such that Qubits(w, Nw) contains some of _op_'s qubits but Nw + N <= P. Add _op_ into one of the two layer with later
  time. If neither such layers is found, add _op_ into a new layer L(k+1, max(P, N)). Add the pending operations of all

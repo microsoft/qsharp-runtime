@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Core{
+namespace Microsoft.Quantum.Core {
 
     @Attribute()
     newtype Attribute = Unit;
