@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Testing.QIR
-{
+namespace Microsoft.Quantum.Testing.QIR {
+    open Microsoft.Quantum.Testing.QIR.Math;
+    open Microsoft.Quantum.Testing.QIR.Str;
+
     @EntryPoint()
-    operation Test_Arrays(array : Int[], index : Int, val : Int, dummy : Bool) : Int
-    {
+    operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int {
         // exercise __quantum__rt__array_copy
         mutable local = array;
 
@@ -24,21 +25,22 @@ namespace Microsoft.Quantum.Testing.QIR
 
         // return a value that is likely to be correct only if the above operations did what was expected
         mutable sum = 0;
-        for (i in 0..Length(result)-1)
-        {
+        for i in 0..Length(result)-1 {
             set sum += result[i];
         }
 
         // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
-        if (dummy)
-        {
+        if (compilerDecoy) {
             let res1 = TestControlled();
-            //Q# compiler crashes if both TestControlled and TestPartials are enabled
-            //let res2 = TestPartials(17, 42);
-            let res3 = Test_Qubit_Result_Management();
-        }
+            let res2 = TestPartials(17, 42);
+            TestQubitResultManagement();
 
+            // Math tests:
+            let res4 = SqrtTest();
+            let res5 = LogTest();
+            let res6 = ArcTan2Test();
+            let res7 = PauliToStringTest();
+        }
         return sum;
     }
-
 }

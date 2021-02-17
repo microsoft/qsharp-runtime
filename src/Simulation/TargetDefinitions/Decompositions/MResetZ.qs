@@ -3,7 +3,6 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Targeting;
 
     /// # Summary
@@ -26,7 +25,6 @@ namespace Microsoft.Quantum.Measurement {
         "BasicQuantumFunctionality",
         "MResetZ is replaced by a supported implementation on all execution targets."
     )
-    @EnableTestingViaName("Test.TargetDefinitions.MResetZ")
     operation MResetZ (target : Qubit) : Result {
         let result = M(target);
 

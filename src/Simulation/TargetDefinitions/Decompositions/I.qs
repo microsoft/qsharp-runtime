@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Performs the identity operation (no-op) on a single qubit.
@@ -10,7 +9,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// This is a no-op. It is provided for completeness and because
     /// sometimes it is useful to call the identity in an algorithm or to pass it as a parameter.
-    @EnableTestingViaName("Test.TargetDefinitions.I")
     operation I (target : Qubit) : Unit is Adj + Ctl {
         body (...) { }
         adjoint self;

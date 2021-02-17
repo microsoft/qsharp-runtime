@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies a rotation about the given Pauli axis.
@@ -26,7 +25,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// When called with `pauli = PauliI`, this operation applies
     /// a *global phase*. This phase can be significant
     /// when used with the `Controlled` functor.
-    @EnableTestingViaName("Test.TargetDefinitions.R")
     operation R (pauli : Pauli, theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         if (pauli == PauliX) {
             Rx(theta, qubit);
