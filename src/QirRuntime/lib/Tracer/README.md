@@ -64,7 +64,7 @@ A user will be able to inject global barriers by calling `__quantum__qis__global
  duration of a barrier which would affect start time of the following layers but no operations will be added to a barrier,
  independent of its width.
 
-__The conceptual algorithm__:
+#### The conceptual algorithm ####
 
 1. The tracer must be set the preferred layer duration: P.
 1. The first encountered operation of __non-zero__ duration N is added into layer L(0, max(P,N)). The value
@@ -78,14 +78,23 @@ __The conceptual algorithm__:
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
  Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the _first_ layer that contains an
  operation that acts on the qubit of _op_. Add _op_ into this layer. If no such layer is found, add _op_ to the list of
- pending operations on the qubit. At the end of the program commit all pending operations of duration zero into a new
- layer.
+ pending operations on the qubit. At the end of the program still pending operations are ignored.
 1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is _op_ of duration _N > 0_
  or it involves more than one qubit. Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the
  _last_ layer L(t, Nt) such that Qubits(t, Nt) don't contain any of the _op_'s qubits and find the _first_ layer L(w, Nw)
  such that Qubits(w, Nw) contains some of _op_'s qubits but Nw + N <= P. Add _op_ into one of the two layer with later
  time. If neither such layers is found, add _op_ into a new layer L(k+1, max(P, N)). Add the pending operations of all
  involved qubits into the same layer and clear the pending lists.
+
+#### Example of layering ####
+
+The diagram below shows an example of how a sequential program, represented by the left circuit, would be layered by the
+ algorithm above. The gates in light gray are of duration zero, the preferrred layer duration is 1, and the barrier,
+ represented by a vertical squiggle, is set to have duration 0.
+
+![layering example](layering_example.png?raw=true "Layering example diagram")
+
+Notice, that gate 9 is dropped because it cannot cross the barrier to be added into L(2,1).
 
 ## Special handling of SWAP ##
 
