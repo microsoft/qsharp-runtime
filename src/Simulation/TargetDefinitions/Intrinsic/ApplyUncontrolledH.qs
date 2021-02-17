@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the Hadamard transformation to a single qubit. Note that the Controlled 
@@ -21,7 +20,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    @EnableTestingViaName("Test.TargetDefinitions.ApplyUncontrolledH")
     internal operation ApplyUncontrolledH (qubit : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;

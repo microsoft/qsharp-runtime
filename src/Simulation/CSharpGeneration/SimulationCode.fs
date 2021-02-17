@@ -946,16 +946,16 @@ module SimulationCode =
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
-        let getCallableAccessModifier qualifiedName =
+        let getCallableAccess qualifiedName =
             match context.allCallables.TryGetValue qualifiedName with
-            | true, callable -> Some callable.Modifiers.Access
+            | true, callable -> Some callable.Access
             | false, _ -> None
 
         let getPropertyModifiers qualifiedName =
             // Use the right accessibility for the property depending on the accessibility of the callable.
             // Note: In C#, "private protected" is the intersection of protected and internal.
-            match getCallableAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
-            | DefaultAccess -> [ ``protected`` ]
+            match getCallableAccess qualifiedName |> Option.defaultValue Public with
+            | Public -> [ ``protected`` ]
             | Internal -> [ ``private``; ``protected`` ]
 
         let buildOne qualifiedName =
@@ -1439,8 +1439,8 @@ module SimulationCode =
                 (constructors @ properties @ methods)
             ``}``
 
-    let private classAccessModifier = function
-        | DefaultAccess -> ``public``
+    let private classAccess = function
+        | Public -> ``public``
         | Internal -> ``internal``
 
     // Builds the .NET class for the given operation.
@@ -1509,7 +1509,7 @@ module SimulationCode =
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
         let modifiers =
-            let access = classAccessModifier op.Modifiers.Access
+            let access = classAccess op.Access
             if opIsIntrinsic && not isConcreteIntrinsic then
                 [ access; ``abstract``; ``partial`` ]
             else
@@ -1604,7 +1604,7 @@ module SimulationCode =
 
         let baseClassName = udtBaseClassName context qsharpType
         let baseClass     = ``simpleBase`` baseClassName
-        let modifiers     = [ classAccessModifier udt.Modifiers.Access ]
+        let modifiers     = [ classAccess udt.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
         let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType

@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Performs a joint measurement of one or more qubits in the
@@ -39,7 +38,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
-    @EnableTestingViaName("Test.TargetDefinitions.Measure")
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
         body intrinsic;
     }

@@ -2,11 +2,12 @@
 # Licensed under the MIT License.
 
 import sys, os, platform, subprocess, datetime, shutil
-import build
+import build, generateqir
 
 # =============================================================================
 #  Accepts arguments:
 #    nobuild [if omitted, will attempt to build the project]
+#    noqirgen [if omitted, will attempt to generate qir from Q# projects]
 #    debug/release
 #
 #  For example: "test.py nobuild debug"
@@ -24,6 +25,7 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 # parameters
 flavor = "Debug"
 nobuild = False
+noqirgen = False
 for arg in sys.argv:
   arg = arg.lower()
   if arg == "test.py":
@@ -34,8 +36,17 @@ for arg in sys.argv:
     flavor = "Release"
   elif arg == "nobuild":
     nobuild = True
+    noqirgen = True
+  elif arg == "noqirgen":
+    noqirgen = True
   else:
     log("unrecognized argument: " + arg)
+    sys.exit()
+
+if not noqirgen:
+  if generateqir.do_generate_all(root_dir) != 0:
+    log("build failed to generate QIR => won't execute the tests")
+    log("to execute the tests from the last successful build run `test.py nobuild`")
     sys.exit()
 
 if not nobuild:

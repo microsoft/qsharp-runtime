@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
   
@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.14.2012122063-beta" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.15.210222819-alpha" />
   </ItemGroup>
 
   <ItemGroup>
