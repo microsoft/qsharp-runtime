@@ -2,6 +2,15 @@
 # Licensed under the MIT License.
 
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+    Write-Host "##[info]Compile Q# Projects into QIR"
+    $qirStaticPath = Join-Path $PSScriptRoot test QIR-static qsharp
+    dotnet build $qirStaticPath
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
+        return
+    }
+    Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination (Split-Path $qirStaticPath -Parent)
+
     Write-Host "##[info]Build QIR Runtime"
     $oldCC = $env:CC
     $oldCXX = $env:CXX
