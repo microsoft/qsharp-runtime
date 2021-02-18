@@ -12,6 +12,7 @@ use num_traits::{ Zero, One };
 
 use crate::utils::*;
 
+/// Returns a copy of the single-qubit identity matrix.
 pub fn i() -> Array2<C64> {
     array![
         [ONE_C, ZERO_C],
@@ -19,6 +20,7 @@ pub fn i() -> Array2<C64> {
     ]
 }
 
+/// Returns a copy of the Pauli 𝑋 operator.
 pub fn x() -> Array2<C64> {
     array![
         [ZERO_C, ONE_C],
@@ -26,6 +28,7 @@ pub fn x() -> Array2<C64> {
     ]
 }
 
+/// Returns a copy of the Pauli 𝑌 operator.
 pub fn y() -> Array2<C64> {
     array![
         [ZERO_C, I_C],
@@ -33,6 +36,7 @@ pub fn y() -> Array2<C64> {
     ]
 }
 
+/// Returns a copy of the Pauli 𝑍 operator.
 pub fn z() -> Array2<C64> {
     array![
         [ONE_C, ZERO_C],
@@ -40,6 +44,7 @@ pub fn z() -> Array2<C64> {
     ]
 }
 
+/// Returns a copy of the single-qubit Hadamard transformation.
 pub fn h() -> Array2<C64> {
     array![
         [ONE_C, ONE_C],
@@ -142,6 +147,21 @@ mod tests {
     #[test]
     fn x_is_self_adjoint() {
         assert!(is_self_adjoint(x()));
+    }
+
+    #[test]
+    fn y_is_self_adjoint() {
+        assert!(is_self_adjoint(y()));
+    }
+
+    #[test]
+    fn z_is_self_adjoint() {
+        assert!(is_self_adjoint(z()));
+    }
+
+    #[test]
+    fn cnot_is_self_adjoint() {
+        assert!(is_self_adjoint(cnot()));
     }
 
     #[test]
