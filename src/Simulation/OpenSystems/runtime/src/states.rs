@@ -2,20 +2,16 @@
 // Licensed under the MIT License.
 
 use crate::common_matrices;
-use crate::linalg::extend_one_to_n;
 use core::fmt::Display;
 use num_traits::One;
 use crate::states::StateData::Mixed;
 use crate::states::StateData::Pure;
 use crate::QubitSized;
-use crate::ONE_C;
 use crate::linalg::Trace;
-use ndarray::Array;
 use crate::C64;
 use ndarray::{ Array1, Array2 };
-use derive_more::{Display};
 use std::convert::TryInto;
-use crate::linalg::{ HasDagger, Tensor };
+use crate::linalg::{ Tensor };
 use serde::{ Serialize, Deserialize };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -72,19 +68,6 @@ impl State {
             data: Mixed(common_matrices::elementary_matrix((0, 0), (new_dim, new_dim)))
         }
     }
-
-    // TODO: deprecate this in favor of relying on the measurement probabilities
-    //       returned by an instrument.
-    pub fn ideal_z_meas_pr(&self, idx_qubit: usize) -> f64 {
-        match &self.data {
-            Pure(psi) => todo!(),
-            Mixed(rho) => {
-                let meas_op = extend_one_to_n(&common_matrices::z(), idx_qubit, self.n_qubits);
-                let expectation: C64 = rho.dot(&meas_op).trace();
-                (1.0 + expectation.re) / 2.0
-            }
-        }
-    }
 }
 
 impl Trace for &State {
@@ -98,14 +81,17 @@ impl Trace for &State {
     }
 }
 
-// impl DensityOperator {
-//     fn new(n_qubits: usize) -> Self {
-//         let dim = 2usize.pow(n_qubits.try_into().unwrap());
-//         let mut data = Array::zeros((dim, dim));
-//         data[(0, 0)] = ONE_C;
-//         DensityOperator {
-//             n_qubits: n_qubits,
-//             data: data
-//         }
-//     }
-// }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trace_pure_is_one() {
+        let pure = State {
+            n_qubits: 1usize,
+            data: Pure(common_matrices::elementary_vec(0, 2))
+        };
+        assert_eq!(pure.trace(), C64::one());
+    }
+}
