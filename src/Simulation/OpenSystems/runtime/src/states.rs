@@ -1,5 +1,7 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
-use crate::Z;
+use crate::common_matrices;
 use crate::linalg::extend_one_to_n;
 use core::fmt::Display;
 use num_traits::One;
@@ -87,7 +89,7 @@ impl State {
         match &self.data {
             Pure(psi) => todo!(),
             Mixed(rho) => {
-                let meas_op = extend_one_to_n(&Z(), idx_qubit, self.n_qubits);
+                let meas_op = extend_one_to_n(&common_matrices::z(), idx_qubit, self.n_qubits);
                 let expectation: C64 = rho.dot(&meas_op).trace();
                 (1.0 + expectation.re) / 2.0
             }

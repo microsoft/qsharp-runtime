@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 use core::ops::Range;
 use num_traits::Zero;
 use ndarray::{ Array, Array1, Array2 };
@@ -7,6 +10,11 @@ use std::cmp;
 use crate::{ C64, log_message };
 
 pub trait HasDagger {
+    /// Returns the hermitian conjugate (colloquially, the dagger) of a
+    /// borrowed reference as a new copy.
+    ///
+    /// For most types implementing this trait, the hermitian conjugate
+    /// is represented by the conjugate transpose.
     fn dag(self: &Self) -> Self;
 }
 

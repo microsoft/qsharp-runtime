@@ -1,6 +1,8 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 use num_traits::Num;
 use num_complex::Complex;
-use std::fmt::Write;
 
 pub type C64 = Complex<f64>;
 

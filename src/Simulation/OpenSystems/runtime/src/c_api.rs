@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;

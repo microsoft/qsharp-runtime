@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 #[macro_use(array)]
 
 extern crate ndarray;
@@ -12,8 +15,6 @@ mod linalg;
 mod channels;
 mod noise_model;
 mod instrument;
-use num_complex::Complex;
-use ndarray::{ Array1 };
 
 pub use crate::channels::depolarizing_channel;
 pub use crate::noise_model::NoiseModel;

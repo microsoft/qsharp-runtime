@@ -1,6 +1,6 @@
 use num_traits::{ Zero, One };
 use crate::C64;
-use crate::common_matrices::{ I, X, Y, Z, H, T, CNOT, S };
+use crate::common_matrices;
 use crate::states::StateData::Mixed;
 use crate::states::State;
 use crate::channels::Channel;
@@ -30,11 +30,11 @@ impl NoiseModel {
     pub fn ideal() -> NoiseModel {
         let i = Channel {
             n_qubits: 1,
-            data: Unitary(I())
+            data: Unitary(common_matrices::i())
         };
         let z = Channel {
             n_qubits: 1,
-            data: Unitary(Z())
+            data: Unitary(common_matrices::z())
         };
         let z_meas = Instrument {
             effects: vec![
@@ -61,41 +61,41 @@ impl NoiseModel {
         NoiseModel {
             initial_state: State {
                 n_qubits: 1,
-                data: Mixed((I() + Z()) / 2.0)
+                data: Mixed((common_matrices::i() + common_matrices::z()) / 2.0)
             },
             i: i,
             x: Channel {
                 n_qubits: 1,
-                data: Unitary(X())
+                data: Unitary(common_matrices::x())
             },
             y: Channel {
                 n_qubits: 1,
-                data: Unitary(Y())
+                data: Unitary(common_matrices::y())
             },
             z: z,
             h: Channel {
                 n_qubits: 1,
-                data: Unitary(H())
+                data: Unitary(common_matrices::h())
             },
             t: Channel {
                 n_qubits: 1,
-                data: Unitary(T())
+                data: Unitary(common_matrices::t())
             },
             t_adj: Channel {
                 n_qubits: 1,
-                data: Unitary(T().dag())
+                data: Unitary(common_matrices::t().dag())
             },
             s: Channel {
                 n_qubits: 1,
-                data: Unitary(S())
+                data: Unitary(common_matrices::s())
             },
             s_adj: Channel {
                 n_qubits: 1,
-                data: Unitary(S().dag())
+                data: Unitary(common_matrices::s().dag())
             },
             cnot: Channel {
                 n_qubits: 2,
-                data: Unitary(CNOT())
+                data: Unitary(common_matrices::cnot())
             },
             z_meas: z_meas
         }
