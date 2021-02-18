@@ -4,18 +4,18 @@
 #include "catch.hpp"
 
 #include <algorithm>
+#include <cstring> // for memcpy
 #include <memory>
-#include <string.h> // for memcpy
 #include <unordered_map>
 #include <vector>
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 #include "quantum__qis.hpp"
 #include "quantum__rt.hpp"
 
 #include "BitStates.hpp"
+#include "QirContext.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
 
 using namespace Microsoft::Quantum;
 

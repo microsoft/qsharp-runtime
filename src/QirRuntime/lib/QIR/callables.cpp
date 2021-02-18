@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
+#include <cstring> // for memcpy
 #include <limits>
 #include <memory>
 #include <stdexcept>
-#include <string.h> // for memcpy
 #include <vector>
 
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "allocationsTracker.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
 #include "quantum__rt.hpp"
 
 using namespace Microsoft::Quantum;
