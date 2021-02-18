@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
