@@ -4,7 +4,7 @@
 
 #include "CoreTypes.hpp"
 
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #ifdef _WIN32
@@ -60,9 +60,13 @@ extern "C"
     QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
+    QIR_SHARED_API void quantum__qis__message__body(QirString* qstr);                       // NOLINT
+
+    // Q# Math:
     QIR_SHARED_API bool        quantum__qis__isnan__body(double d);                         // NOLINT
     QIR_SHARED_API double      quantum__qis__infinity__body();                              // NOLINT
     QIR_SHARED_API bool        quantum__qis__isinf__body(double d);                         // NOLINT
     QIR_SHARED_API double      quantum__qis__arctan2__body(double y, double x);             // NOLINT
+    QIR_SHARED_API int64_t     quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum);     // NOLINT
 
 }

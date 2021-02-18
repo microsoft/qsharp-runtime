@@ -5,6 +5,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
 
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;        // E()
+    open Microsoft.Quantum.Random;
 
     function SqrtTest() : Int {
         if  2.0 != Sqrt(  4.0)          { return 1; }           // The return value indicates which test case has failed.
@@ -58,6 +59,10 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         // and https://en.cppreference.com/w/cpp/numeric/math/atan2 .
         
         return 0;
+    }
+
+    operation TestDrawRandomInt(min : Int, max : Int) : Int {
+        return DrawRandomInt(min, max);
     }
 
 }
