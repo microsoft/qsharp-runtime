@@ -3,8 +3,8 @@
 
 use core::f64::consts::FRAC_1_SQRT_2;
 use crate::utils::*;
-use ndarray::Array2;
-use crate::linalg::HasDagger;
+use ndarray::{ Array, Array1, Array2 };
+use num_traits::{ Zero, One };
 
 pub fn i() -> Array2<C64> {
     array![
@@ -64,9 +64,23 @@ pub fn cnot() -> Array2<C64> {
     ]
 }
 
+
+pub fn elementary_vec<T: Zero + One>(idx: usize, n: usize) -> Array1<T> {
+    Array::from_shape_fn(n, |i| if i == idx {T::one()} else {T::zero()})
+}
+
+pub fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (usize, usize)) -> Array2<T> {
+    Array::from_shape_fn((n, m), |(i, j)| if i == idx0 && j == idx1 {
+        T::one()
+    } else {
+        T::zero()
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::linalg::HasDagger;
 
     fn is_self_adjoint(arr: Array2<C64>) -> bool {
         arr == arr.dag()
@@ -97,5 +111,23 @@ mod tests {
     #[test]
     fn t_squares_to_s() {
         assert!(are_equal_to_precision(t().dot(&t()), s()));
+    }
+
+    #[test]
+    fn elementary_vec_is_correct() {
+        assert_eq!(elementary_vec::<i64>(2, 4), array![0i64, 0i64, 1i64, 0i64])
+    }
+
+    #[test]
+    fn elementary_matrix_is_correct() {
+        assert_eq!(
+            elementary_matrix::<i64>((1, 3), (4, 5)),
+            array![
+                [0i64, 0i64, 0i64, 0i64, 0i64],
+                [0i64, 0i64, 0i64, 1i64, 0i64],
+                [0i64, 0i64, 0i64, 0i64, 0i64],
+                [0i64, 0i64, 0i64, 0i64, 0i64]
+            ]
+        )
     }
 }

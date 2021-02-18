@@ -5,7 +5,6 @@ use crate::common_matrices;
 use crate::linalg::extend_one_to_n;
 use core::fmt::Display;
 use num_traits::One;
-use num_traits::Zero;
 use crate::states::StateData::Mixed;
 use crate::states::StateData::Pure;
 use crate::QubitSized;
@@ -51,17 +50,8 @@ impl Display for StateData {
     }
 }
 
-fn elementary_vec<T: Zero + One>(idx: usize, n: usize) -> Array1<T> {
-    Array::from_shape_fn(n, |i| if i == idx {T::one()} else {T::zero()})
-}
 
-fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (usize, usize)) -> Array2<T> {
-    Array::from_shape_fn((n, m), |(i, j)| if i == idx0 && j == idx1 {
-        T::one()
-    } else {
-        T::zero()
-    })
-}
+
 
 impl State {
     pub fn extend(self: &Self, n_qubits: usize) -> State {
@@ -69,8 +59,8 @@ impl State {
         State {
             n_qubits: self.n_qubits + n_qubits,
             data: match &self.data {
-                Pure(psi) => Pure(psi.tensor(&elementary_vec(0, new_dim))),
-                Mixed(rho) => Mixed(rho.tensor(&elementary_matrix((0, 0), (new_dim, new_dim))))
+                Pure(psi) => Pure(psi.tensor(&common_matrices::elementary_vec(0, new_dim))),
+                Mixed(rho) => Mixed(rho.tensor(&common_matrices::elementary_matrix((0, 0), (new_dim, new_dim))))
             }
         }
     }
@@ -79,7 +69,7 @@ impl State {
         let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
         State {
             n_qubits: n_qubits,
-            data: Mixed(elementary_matrix((0, 0), (new_dim, new_dim)))
+            data: Mixed(common_matrices::elementary_matrix((0, 0), (new_dim, new_dim)))
         }
     }
 
