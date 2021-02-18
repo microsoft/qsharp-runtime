@@ -44,11 +44,11 @@ Notice, that gate 9 is dropped because it cannot cross the barrier to be added i
 
 ### Definitions ###
 
-___Time___ is an integer-valued function on all quantum operations in a program (gates, measurements,
- qubits allocation/release). For each gate there are start and end times. For each qubit, there are times when the qubit
- is allocated and released. Start time of a gate cannot be less than allocation time of any of the qubits the gate uses.
- If two gates or measurements use the same qubit, one of the gates must have start time greater than or equal to the end
- time of the other.
+Each quantum operation in a program can be assigned an integer value,  which we'll call its ___start time___. Some
+ operations might have non-zero duration, so they will also have ___end time___. For each qubit, there are also times
+ when the qubit is allocated and released. Start time of a gate cannot be less than allocation time of any of the qubits
+ the gate is using. If two gates or measurements use the same qubit, one of the gates must have start time greater than
+ or equal to the end time of the other. We'll call a particular assignment of times across a program its ___time function___.
 
 A sequentially executed quantum program can be assigned a trivial time function, when all quantum operations have
  duration of 1 and unique start times, ordered to match the flow of the program. Layering compresses the timeline by
@@ -66,14 +66,14 @@ A sequential program can be trivially layered such that each layer contains exac
  zero time to execute, those gates can be added to a layer even if they act on the same qubit another gate in this layer
  is acting on and have to be executed sequentially within the layer.
 
-_Definition_: A ___barrier___ is a layer that no operations can be added into.
-
-
 ### The Resource Tracer's Layering Algorithm ###
 
 As the tracer is executing a sequential quantum program, it will compute a time function and corresponding layering
  using the _conceptual_ algorithm, described below (aka "tetris algorithm"). The actual implementation of layering might
  be done differently, as long as the resulting layering is the same as if running the conceptual algorithm.
+
+A ___barrier___ is a layer that acts as if it was containing all currently allocated qubits and no operation can be added
+ into it.
 
 A user can inject _barriers_ by calling `__quantum__qis__global_barrier` function. The user can choose duration of
  a barrier which would affect start time of the following layers but no operations will be added to a barrier,

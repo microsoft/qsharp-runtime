@@ -14,16 +14,3 @@ namespace TracerUser
 const std::unordered_map<Microsoft::Quantum::OpId, std::string> g_operationNames = {
     {0, "X"}, {1, "CX"}, {2, "MCX"}, {3, "Y"}, {4, "CY"}, {5, "MCY"} /*etc.*/};
 }
-
-namespace Microsoft
-{
-namespace Quantum
-{
-
-    std::unique_ptr<ISimulator> CreateFullstateSimulator()
-    {
-        throw std::logic_error("Tracer should not instantiate full state simulator");
-    }
-
-} // namespace Quantum
-} // namespace Microsoft

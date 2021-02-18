@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "CoreTypes.hpp"
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 #include "tracer.hpp"
 
 namespace Microsoft
