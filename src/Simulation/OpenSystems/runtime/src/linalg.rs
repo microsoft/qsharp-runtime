@@ -7,7 +7,8 @@ use ndarray::{ Array, Array1, Array2 };
 use std::ops::Mul;
 use std::convert::TryInto;
 use std::cmp;
-use crate::{ C64, log_message };
+
+use crate::{ C64, log_message, nq_eye };
 
 pub trait HasDagger {
     /// Returns the hermitian conjugate (colloquially, the dagger) of a
@@ -84,9 +85,6 @@ impl <T: Clone + Zero> Trace for &Array2<T> {
     }
 }
 
-fn nq_eye(nq: usize) -> Array2<C64> {
-    Array2::eye(2usize.pow(nq.try_into().unwrap()))
-}
 
 // FIXME: weaken data to be a view so that to_owned isn't needed.
 // FIXME: modify to Result<..., String> so that errors can propagate to the C API.

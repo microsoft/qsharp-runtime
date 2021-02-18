@@ -1,10 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+//! Definitions for commonly used vectors and matrices, such as the Pauli
+//! matrices, common Clifford operators, and elementary matrices.
+
 use core::f64::consts::FRAC_1_SQRT_2;
-use crate::utils::*;
+use std::convert::TryInto;
+
 use ndarray::{ Array, Array1, Array2 };
 use num_traits::{ Zero, One };
+
+use crate::utils::*;
 
 pub fn i() -> Array2<C64> {
     array![
@@ -64,7 +70,21 @@ pub fn cnot() -> Array2<C64> {
     ]
 }
 
-
+/// Returns an elementary vector; that is, a vector with a one at a given
+/// index and zeros everywhere else.
+///
+/// # Examples
+/// The following are equivalent:
+/// ```
+/// # #[macro_use] extern crate ndarray;
+/// # use opensim::elementary_vec;
+/// let vec = elementary_vec::<i64>(2, 4);
+/// ```
+/// and:
+/// ```
+/// # #[macro_use] extern crate ndarray;
+/// let vec = array![0i64, 0i64, 1i64, 0i64];
+/// ```
 pub fn elementary_vec<T: Zero + One>(idx: usize, n: usize) -> Array1<T> {
     Array::from_shape_fn(n, |i| if i == idx {T::one()} else {T::zero()})
 }
@@ -75,6 +95,26 @@ pub fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (u
     } else {
         T::zero()
     })
+}
+
+/// Returns an identity matrix that acts on state vectors of registers of
+/// qubits with a given size.
+/// 
+/// # Example
+/// The following snippet defines a two-qubit identity matrix:
+/// ```
+/// # #[macro_use] extern crate ndarray;
+/// # use opensim::nq_eye;
+/// let eye = nq_eye(2usize);
+/// assert_eq!(eye, array![
+///     [Complex::new(1f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64)],
+///     [Complex::new(0f64, 0f64), Complex::new(1f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64)],
+///     [Complex::new(0f64, 0f64), Complex::new(0f64, 0f64), Complex::new(1f64, 0f64), Complex::new(0f64, 0f64)],
+///     [Complex::new(0f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64), Complex::new(1f64, 0f64)],
+/// ]);
+/// ```
+pub fn nq_eye(nq: usize) -> Array2<C64> {
+    Array2::eye(2usize.pow(nq.try_into().unwrap()))
 }
 
 #[cfg(test)]
