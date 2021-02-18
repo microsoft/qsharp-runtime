@@ -8,7 +8,8 @@ The purpose of the Resource Tracer is to provide efficient and flexible way to e
 To run against the tracer, the quantum program should comply with the
  [QIR specifications](https://github.com/microsoft/qsharp-language/tree/main/Specifications/QIR) as well as:
 
-1. convert _each_ used intrinsic operation into one of the _qis_ operations supported by the tracer (see the list below);
+1. convert _each_ used intrinsic operation into one of the Quantum Instruction Set (_qis_) operations supported by the
+ tracer (see the last section of this readme);
 1. (_optional_) provide callbacks for handling of conditional branches on a measurement (if not provided, the estimates
  would cover only one branch of the execution);
 1. (_optional_) provide callbacks for start/end of quantum operations (if not provided, all operations will be treated
@@ -16,8 +17,6 @@ To run against the tracer, the quantum program should comply with the
 1. (_optional_) provide callbacks for global barriers;
 1. (_optional_) provide description of mapping for frame tracking;
 1. (_optional_) provide names of operations for output (in the form of `tracer-config.hpp|cpp` files).
-
-The last provisions  
 
 The Resource Tracer will consist of:
 
