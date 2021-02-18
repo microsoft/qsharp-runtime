@@ -11,8 +11,8 @@
 
 namespace TracerUser
 {
-const std::unordered_map<OpId, std::string> g_operationNames = {{0, "X"}, {1, "CX"}, {2, "MCX"},
-                                                                {3, "Y"}, {4, "CY"}, {5, "MCY"} /*etc.*/};
+const std::unordered_map<Microsoft::Quantum::OpId, std::string> g_operationNames = {
+    {0, "X"}, {1, "CX"}, {2, "MCX"}, {3, "Y"}, {4, "CY"}, {5, "MCY"} /*etc.*/};
 }
 
 namespace Microsoft

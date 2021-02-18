@@ -8,20 +8,10 @@
 #include <string>
 #include <unordered_map>
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    using OpId = int;
-    using Time = int;
-    using Duration = int;
-    using LayerId = size_t;
-}
-}
+#include "TracerTypes.hpp"
 
 namespace TracerUser
 {
-using OpId = int;
 extern const std::unordered_map<Microsoft::Quantum::OpId, std::string> g_operationNames;
 } // namespace TracerUser
 

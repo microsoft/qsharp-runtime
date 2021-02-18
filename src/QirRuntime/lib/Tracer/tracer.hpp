@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+#pragma once
 
-#include <limits>
 #include <memory>
 #include <ostream>
 #include <unordered_map>
@@ -9,29 +9,23 @@
 #include <vector>
 
 #include "CoreTypes.hpp"
+#include "TracerTypes.hpp"
 #include "QuantumApi_I.hpp"
 
 namespace Microsoft
 {
 namespace Quantum
 {
-    using OpId = int;
-    using Time = int;
-    using Duration = int;
-    using LayerId = size_t;
-
-    constexpr LayerId INVALID = std::numeric_limits<size_t>::max();
-
     /*==================================================================================================================
         Layer
     ==================================================================================================================*/
     struct Layer
     {
-        // Width of the layer on the time axis.
-        const Duration duration;
-
         // Start time of the layer.
         const Time startTime;
+
+        // Width of the layer on the time axis.
+        const Duration duration;
 
         // Quantum operations, assigned to this layer.
         std::unordered_map<OpId, int /*count of the op with this id*/> operations;
@@ -39,9 +33,9 @@ namespace Quantum
         // Optional id, if the layer represents a global barrier.
         OpId barrierId = -1;
 
-        Layer(Duration duration, Time startTime)
-            : duration(duration)
-            , startTime(startTime)
+        Layer(Time startTime, Duration duration)
+            : startTime(startTime)
+            , duration(duration)
         {
         }
     };
@@ -55,14 +49,12 @@ namespace Quantum
         // operations of non-zero duration.
         LayerId layer = INVALID;
 
-        // For layers with duration greater than one, multiple operations might fit on the same qubit, if the operations
-        // are short. `lastUsedTime` is the end time of the last operation, the qubit participated it.
+        // `lastUsedTime` stores the end time of the last operation, the qubit participated in. It might not match the
+        // end time of a layer, if the duration of the last operation is less than duration of the layer. Tracking this
+        // time allows us to possibly fit multiple short operations on the same qubit into a single layer.
         Time lastUsedTime = 0;
 
-        std::vector<OpId> pendingZeroOps;
-
-        // For now assume that only one kind of frame can be tracked.
-        bool isFrameOpen = false;
+        std::vector<OpId> pendingZeroDurationOps;
     };
 
     /*==================================================================================================================

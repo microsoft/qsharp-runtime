@@ -26,8 +26,83 @@ namespace Microsoft.Quantum.Instructions {
     operation joint_measure(op_id: Int, duration: Int, qbs : Qubit[]) : Result {
         body intrinsic;
     }
+
+    // Operations, used in Hadamard frame tracking
+    @Inline()
+    operation Tz(qb : Qubit) : Unit
+    is Adj + Ctl {
+        body  (...) { single_qubit_op(11, 1, qb); }
+        adjoint (...) { single_qubit_op(11, 1, qb); }
+        controlled (ctls, ...) { single_qubit_op_ctl(12, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { single_qubit_op_ctl(12, 1, ctls, qb); }
+    }
+
+    @Inline()
+    operation Tx(qb : Qubit) : Unit
+    is Adj + Ctl {
+        body  (...) { single_qubit_op(13, 1, qb); }
+        adjoint (...) { single_qubit_op(13, 1, qb); }
+        controlled (ctls, ...) { single_qubit_op_ctl(14, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { single_qubit_op_ctl(14, 1, ctls, qb); }
+    }
+
+    
+    @Inline()
+    operation Sz(qb : Qubit) : Unit
+    is Adj + Ctl {
+        body  (...) { single_qubit_op(15, 1, qb); }
+        adjoint (...) { single_qubit_op(15, 1, qb); }
+        controlled (ctls, ...) { single_qubit_op_ctl(16, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { single_qubit_op_ctl(16, 1, ctls, qb); }
+    }
+
+    @Inline()
+    operation Sx(qb : Qubit) : Unit
+    is Adj + Ctl {
+        body  (...) { single_qubit_op(17, 1, qb); }
+        adjoint (...) { single_qubit_op(17, 1, qb); }
+        controlled (ctls, ...) { single_qubit_op_ctl(18, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { single_qubit_op_ctl(18, 1, ctls, qb); }
+    }
+
+    @Inline()
+    operation Mz(qb : Qubit) : Result {
+        body  (...) { return single_qubit_measure(100, 1, qb); }
+    }
+
+    @Inline()
+    operation Mx(qb : Qubit) : Result {
+        body  (...) { return single_qubit_measure(101, 1, qb); }
+    }
+
+    @Inline()
+    operation Mzz(qubits : Qubit[]) : Result {
+        body  (...) { return joint_measure(102, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mxz(qubits : Qubit[]) : Result {
+        body  (...) { return joint_measure(103, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mzx(qubits : Qubit[]) : Result {
+        body  (...) { return joint_measure(104, 1, qubits); }
+    }
+
+    @Inline()
+    operation Mxx(qubits : Qubit[]) : Result {
+        body  (...) { return joint_measure(105, 1, qubits); }
+    }
 }
 
+namespace Microsoft.Quantum.Tracer {
+
+    @TargetInstruction("inject_global_barrier")
+    operation Barrier(id : Int, duration : Int) : Unit {
+        body intrinsic;
+    }
+}
 
 namespace Microsoft.Quantum.Intrinsic {
 
@@ -84,57 +159,21 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @Inline()
-    operation Tz(qb : Qubit) : Unit
-    is Adj + Ctl {
-        body  (...) { Phys.single_qubit_op(11, 1, qb); }
-        adjoint (...) { Phys.single_qubit_op(11, 1, qb); }
-        controlled (ctls, ...) { Phys.single_qubit_op_ctl(12, 1, ctls, qb); }
-        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(12, 1, ctls, qb); }
-    }
-
-    @Inline()
-    operation Tx(qb : Qubit) : Unit
-    is Adj + Ctl {
-        body  (...) { Phys.single_qubit_op(13, 1, qb); }
-        adjoint (...) { Phys.single_qubit_op(13, 1, qb); }
-        controlled (ctls, ...) { Phys.single_qubit_op_ctl(14, 1, ctls, qb); }
-        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(14, 1, ctls, qb); }
-    }
-
-    @Inline()
     operation T(qb : Qubit) : Unit
     is Adj + Ctl {
-        body  (...) { Tz(qb); }
-        adjoint (...) { Adjoint Tz(qb); }
-        controlled (ctls, ...) { Controlled Tz(ctls, qb); }
-        controlled adjoint (ctls, ...) { Controlled Adjoint Tz(ctls, qb); }
-    }
-
-    @Inline()
-    operation Sz(qb : Qubit) : Unit
-    is Adj + Ctl {
-        body  (...) { Phys.single_qubit_op(15, 1, qb); }
-        adjoint (...) { Phys.single_qubit_op(15, 1, qb); }
-        controlled (ctls, ...) { Phys.single_qubit_op_ctl(16, 1, ctls, qb); }
-        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(16, 1, ctls, qb); }
-    }
-
-    @Inline()
-    operation Sx(qb : Qubit) : Unit
-    is Adj + Ctl {
-        body  (...) { Phys.single_qubit_op(17, 1, qb); }
-        adjoint (...) { Phys.single_qubit_op(17, 1, qb); }
-        controlled (ctls, ...) { Phys.single_qubit_op_ctl(18, 1, ctls, qb); }
-        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(18, 1, ctls, qb); }
+        body  (...) { Phys.Tz(qb); }
+        adjoint (...) { Adjoint Phys.Tz(qb); }
+        controlled (ctls, ...) { Controlled Phys.Tz(ctls, qb); }
+        controlled adjoint (ctls, ...) { Controlled Adjoint Phys.Tz(ctls, qb); }
     }
 
     @Inline()
     operation S(qb : Qubit) : Unit
     is Adj + Ctl {
-        body  (...) { Sz(qb); }
-        adjoint (...) { Adjoint Sz(qb); }
-        controlled (ctls, ...) { Controlled Sz(ctls, qb); }
-        controlled adjoint (ctls, ...) { Controlled Adjoint Sz(ctls, qb); }
+        body  (...) { Phys.Sz(qb); }
+        adjoint (...) { Adjoint Phys.Sz(qb); }
+        controlled (ctls, ...) { Controlled Phys.Sz(ctls, qb); }
+        controlled adjoint (ctls, ...) { Controlled Adjoint Phys.Sz(ctls, qb); }
     }
 
     @Inline()
@@ -165,38 +204,8 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @Inline()
-    operation Mz(qb : Qubit) : Result {
-        body  (...) { return Phys.single_qubit_measure(100, 1, qb); }
-    }
-
-    @Inline()
-    operation Mx(qb : Qubit) : Result {
-        body  (...) { return Phys.single_qubit_measure(101, 1, qb); }
-    }
-
-    @Inline()
     operation M(qb : Qubit) : Result {
-        body  (...) { return Mz(qb); }
-    }
-
-    @Inline()
-    operation Mzz(qubits : Qubit[]) : Result {
-        body  (...) { return Phys.joint_measure(102, 1, qubits); }
-    }
-
-    @Inline()
-    operation Mxz(qubits : Qubit[]) : Result {
-        body  (...) { return Phys.joint_measure(103, 1, qubits); }
-    }
-
-    @Inline()
-    operation Mzx(qubits : Qubit[]) : Result {
-        body  (...) { return Phys.joint_measure(104, 1, qubits); }
-    }
-
-    @Inline()
-    operation Mxx(qubits : Qubit[]) : Result {
-        body  (...) { return Phys.joint_measure(105, 1, qubits); }
+        body  (...) { return Phyz.Mz(qb); }
     }
 
     @Inline()
@@ -222,20 +231,14 @@ namespace Microsoft.Quantum.Intrinsic {
             }
 
             // Specialize for two-qubit measurements: Mxx, Mxz, Mzx, Mzz
-            elif paulis[0] == PauliX and paulis[1] == PauliX { set res = Phys.joint_measure(108, 1, qubits); }
-            elif paulis[0] == PauliX and paulis[1] == PauliZ { set res = Phys.joint_measure(109, 1, qubits); }
-            elif paulis[0] == PauliZ and paulis[1] == PauliX { set res = Phys.joint_measure(110, 1, qubits); }
-            elif paulis[0] == PauliZ and paulis[1] == PauliZ { set res = Phys.joint_measure(111, 1, qubits); }
+            elif paulis[0] == PauliX and paulis[1] == PauliX { set res = Phys.Mxx(qubits); }
+            elif paulis[0] == PauliX and paulis[1] == PauliZ { set res = Phys.Mxz(qubits); }
+            elif paulis[0] == PauliZ and paulis[1] == PauliX { set res = Phys.Mzx(qubits); }
+            elif paulis[0] == PauliZ and paulis[1] == PauliZ { set res = Phys.Mzz(qubits); }
 
             //shouldn't get here
             return res;
         }
-    }
-
-
-    @TargetInstruction("inject_global_barrier")
-    operation Barrier(id : Int, duration : Int) : Unit {
-        body intrinsic;
     }
 
     // operation SWAP(a : Qubit, b : Qubit) : Unit 

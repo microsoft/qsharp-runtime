@@ -30,7 +30,22 @@ The Resource Tracer will consist of:
 
 ## Layering ##
 
-_Definition_: ___Time___ is an integer-valued function on all quantum operations in a program (gates, measurements,
+One of the goals of the tracer is to compute which of the quantum operations can be executed in parallel. Further in
+ this section we provide the defintions of used concepts and the description of how we group the operations into
+ _layers_, however, we hope that the following example of layering is intuitively clear.
+
+### Example of layering ###
+
+The diagram below shows an example of how a sequential program, represented by the left circuit, could be layered. The gates in light gray are of duration zero, the preferrred layer duration is 1, and the barrier,
+ represented by a vertical squiggle, is set to have duration 0.
+
+![layering example](layering_example.png?raw=true "Layering example diagram")
+
+Notice, that gate 9 is dropped because it cannot cross the barrier to be added into L(2,1).
+
+### Definitions ###
+
+___Time___ is an integer-valued function on all quantum operations in a program (gates, measurements,
  qubits allocation/release). For each gate there are start and end times. For each qubit, there are times when the qubit
  is allocated and released. Start time of a gate cannot be less than allocation time of any of the qubits the gate uses.
  If two gates or measurements use the same qubit, one of the gates must have start time greater than or equal to the end
@@ -41,7 +56,7 @@ A sequentially executed quantum program can be assigned a trivial time function,
  assuming that some operations might be executed simultaneously while allowing for different operations to have various
  durations.
 
-_Definition_: Provided a valid _time_ function for the program a ___layer of duration N at time T, denoted as L(T,N),___
+Provided a valid _time_ function for the program a ___layer of duration N at time T, denoted as L(T,N),___
  is a subset of operations in the program such that all of these operations have start time greater or equal _T_ and
  finish time less than _T + N_. The program is ___layered___ if all gates in it are partitioned into layers, that don't
  overlap in time. The union of all qubits that are involved in operations of a given layer, will be denoted _Qubits(T,N)_.
@@ -52,49 +67,53 @@ A sequential program can be trivially layered such that each layer contains exac
  zero time to execute, those gates can be added to a layer even if they act on the same qubit another gate in this layer
  is acting on and have to be executed sequentially within the layer.
 
+_Definition_: A ___barrier___ is a layer that no operations can be added into.
+
+
 ### The Resource Tracer's Layering Algorithm ###
 
 As the tracer is executing a sequential quantum program, it will compute a time function and corresponding layering
  using the _conceptual_ algorithm, described below (aka "tetris algorithm"). The actual implementation of layering might
  be done differently, as long as the resulting layering is the same as if running the conceptual algorithm.
 
-_Definition_: A ___barrier___ is a layer that no more operations can be added into.
+A user can inject _barriers_ by calling `__quantum__qis__global_barrier` function. The user can choose duration of
+ a barrier which would affect start time of the following layers but no operations will be added to a barrier,
+ independent of its duration.
 
-A user will be able to inject global barriers by calling `__quantum__qis__global_barrier` function. The user can choose
- duration of a barrier which would affect start time of the following layers but no operations will be added to a barrier,
- independent of its width.
+__Conditional execution on measurement results__: The Tracer will execute LLVM IR's branching structures "as is",
+ depending on the values of the corresponding variables at runtime. To enable estimation of branches that depend on a
+ measurement result, the source Q# program will have to be authored in such a way that the Q# compiler will translate the
+ conditionals into corresponding callbacks to the tracer. The tracer will add operations from _both branches_ into the
+ layers it creates to compute the upper bound estimate.
+
+Conditionals, measurements and operations, that open frames, inside conditional callbacks are _not_ supported.
+
+__Caching__ (lower priority): It might be a huge perf win if the Resource Tracer could cache statistics for repeated
+ computations. The Tracer will have an option to cache layering results per quantum module if the boundaries of modules
+ are treated as barriers.
 
 #### The conceptual algorithm ####
 
-1. The tracer must be set the preferred layer duration: P.
-1. The first encountered operation of __non-zero__ duration N is added into layer L(0, max(P,N)). The value
+Note: The tracer assumes that the preferred layer duration is _P_.
+
+1. The first encountered operation of __non-zero__ duration _N_ is added into layer _L(0, max(P,N))_. The value
  of _conditional barrier_ variable on the tracer is set to 0.
-1. When conditional callback is encountered, the layer L(t,N) of the measurement that produced the result the conditional
+1. When conditional callback is encountered, the layer _L(t,N)_ of the measurement that produced the result the conditional
  is dependent on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope
  _conditional barrier_ is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen
  before or in the same layer as the measurement, even if they don't involve the measured qubits.)
  TODO: is it OK for later operations to be added to the layers with ops _inside_ conditional branches?
-1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is a single-qubit _op_ of
+1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is a single-qubit _op_ of
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
- Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the _first_ layer that contains an
+ Starting at _L(k, Nk)_ and scanning backwards to _L(conditional barrier, Nb)_ find the _first_ layer that contains an
  operation that acts on the qubit of _op_. Add _op_ into this layer. If no such layer is found, add _op_ to the list of
  pending operations on the qubit. At the end of the program still pending operations are ignored.
-1. Suppose, there are already layers L(0,N0), ... , L(k,Nk) and the operation being executed is _op_ of duration _N > 0_
- or it involves more than one qubit. Starting at L(k, Nk) and scanning backwards to L(_conditional barrier_, Nb) find the
- _last_ layer L(t, Nt) such that Qubits(t, Nt) don't contain any of the _op_'s qubits and find the _first_ layer L(w, Nw)
- such that Qubits(w, Nw) contains some of _op_'s qubits but Nw + N <= P. Add _op_ into one of the two layer with later
- time. If neither such layers is found, add _op_ into a new layer L(k+1, max(P, N)). Add the pending operations of all
- involved qubits into the same layer and clear the pending lists.
-
-#### Example of layering ####
-
-The diagram below shows an example of how a sequential program, represented by the left circuit, would be layered by the
- algorithm above. The gates in light gray are of duration zero, the preferrred layer duration is 1, and the barrier,
- represented by a vertical squiggle, is set to have duration 0.
-
-![layering example](layering_example.png?raw=true "Layering example diagram")
-
-Notice, that gate 9 is dropped because it cannot cross the barrier to be added into L(2,1).
+1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is _op_ of duration _N > 0_
+ or it involves more than one qubit. Starting at _L(k, Nk)_ and scanning backwards to _L(conditional barrier, Nb)_ find
+ the _last_ layer _L(t, Nt)_ such that _Qubits(t, Nt)_ don't contain any of the _op_'s qubits and find the _first_ layer
+ _L(w, Nw)_ such that Qubits(w, Nw) contains some of _op_'s qubits but Nw + N <= P. Add _op_ into one of the two layer
+ with later time. If neither such layers is found, add _op_ into a new layer _L(k+Nk, max(P, N))_. Add the pending
+ operations of all involved qubits into the same layer and clear the pending lists.
 
 ## Special handling of SWAP ##
 
@@ -104,7 +123,7 @@ The tracer will provide a way to handle SWAP as, effectively, renaming of the in
 ## Frame tracking ##
 
 A user might want to count differently operations that are applied in a different state. For example, if Hadamard gate
- is applied to a qubit and then Rz and Mx gates, a user might want to count the sequence as if Rz as Mz were executed.
+ is applied to a qubit and then Rz gate, a user might want to count it as if Rz were executed instead.
  The frame is closed when the state of the qubit is reset (in Hadamard's case, another Hadamard operator is applied to
  the qubit). The user will be able to register the required frame tracking with the tracer via a C++ registration
  callback.
@@ -172,15 +191,3 @@ _Note on mapping Q# intrinsics to the methods above_: Q# compiler will support T
  this project (`tracer-target.qs` specifies the mapping).
 
 The Resource Tracer will reuse qir-rt library while implementing the qis methods specified above.
-
-__Conditionals on measurements__: The Resource Tracer will execute LLVM IR's branching structures "as is", depending on
- the values of the corresponding variables at runtime. To enable estimation of branches that depend on a measurement
- result, the source Q# program will have to be authored in such a way that the Q# compiler will translate the
- conditionals into `__quantum__qis__apply_if*` calls. The tracer will add operations from _both branches_ into the
- layers it creates to compute the upper bound estimate.
-
-Nested conditionals, conditional measurements and conditional tracked operations will _not_ be supported.
-
-__Caching__ (lower priority): It might be a huge perf win if the Resource Tracer could cache statistics for repeated
- computations. The Tracer will have an option to cache layering results per quantum module if the boundaries of modules
- are treated as layering barriers.

@@ -47,7 +47,7 @@ namespace Quantum
         const QubitState& qstate = this->UseQubit(q);
 
         stringstream str(std::to_string(qubitIndex));
-        str << " last used in layer " << qstate.layer << "(pending zero ops: " << qstate.pendingZeroOps.size() << ")";
+        str << " last used in layer " << qstate.layer << "(pending zero ops: " << qstate.pendingZeroDurationOps.size() << ")";
         return str.str();
     }
 
@@ -81,7 +81,7 @@ namespace Quantum
             layerStartTime = lastLayer.startTime + lastLayer.duration;
         }
         this->metricsByLayer.emplace_back(
-            Layer{max(this->preferredLayerDuration, minRequiredDuration), layerStartTime});
+            Layer {layerStartTime, max(this->preferredLayerDuration, minRequiredDuration)});
 
         return this->metricsByLayer.size() - 1;
     }
@@ -146,7 +146,7 @@ namespace Quantum
     void CTracer::UpdateQubitState(Qubit q, LayerId layer, Duration opDuration)
     {
         QubitState& qstate = this->UseQubit(q);
-        for (OpId idPending : qstate.pendingZeroOps)
+        for (OpId idPending : qstate.pendingZeroDurationOps)
         {
             this->AddOperationToLayer(idPending, layer);
         }
@@ -155,7 +155,7 @@ namespace Quantum
         qstate.layer = layer;
         const Time layerStart = this->metricsByLayer[layer].startTime;
         qstate.lastUsedTime = max(layerStart, qstate.lastUsedTime) + opDuration;
-        qstate.pendingZeroOps.clear();
+        qstate.pendingZeroDurationOps.clear();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ namespace Quantum
         if (opDuration == 0 &&
             (qstate.layer == INVALID || (this->globalBarrier != INVALID && qstate.layer < this->globalBarrier)))
         {
-            qstate.pendingZeroOps.push_back(id);
+            qstate.pendingZeroDurationOps.push_back(id);
             return INVALID;
         }
 

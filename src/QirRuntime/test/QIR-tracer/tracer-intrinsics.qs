@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Testing.Tracer {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Tracer;
 
     operation TestCoreIntrinsics() : Unit {
         use qs = Qubit[3];
@@ -19,7 +20,7 @@ namespace Microsoft.Quantum.Testing.Tracer {
         S(qs[1]);
         T(qs[2]);
 
-        Barrier(42, 1);
+        Barrier(42, 0);
 
         Adjoint X(qs[0]);
         Adjoint Y(qs[0]);
