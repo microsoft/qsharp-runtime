@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 #include "quantum__qis.hpp"
 
 // Forward declarations:

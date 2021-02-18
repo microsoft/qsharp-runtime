@@ -6,14 +6,14 @@
     To support the dispatch over the qir-bridge, the clients must register their
     Microsoft::Quantum::ISimulator* first.
 =============================================================================*/
-#include <assert.h>
+#include <cassert>
 #include <vector>
 
 #include "quantum__qis.hpp"
 
 #include "QuantumApi_I.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 
 // Pauli consts are {i2} in QIR, likely stored as {i8} in arrays, but we are using the standard C++ enum type based on
 // {i32} so cannot pass through the buffer and have to allocate a new one instead and copy.

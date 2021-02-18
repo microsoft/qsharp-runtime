@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 #include <stdexcept>
 #include <memory>
 #include <unordered_set>
@@ -9,7 +9,7 @@
 
 #include "quantum__rt.hpp"
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 
 std::unordered_set<char*>& UseMemoryTracker()
 {

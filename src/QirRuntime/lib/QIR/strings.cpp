@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
 std::unordered_map<std::string, QirString*>& AllocatedStrings()

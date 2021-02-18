@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 
-#include "context.hpp"
+#include "QirContext.hpp"
 
 #include "CoreTypes.hpp"
 #include "QuantumApi_I.hpp"
