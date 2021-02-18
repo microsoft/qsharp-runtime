@@ -1,9 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Testing.QIR.Math;
     open Microsoft.Quantum.Testing.QIR.Str;
+    open Microsoft.Quantum.Testing.QIR.Out;
 
     @EntryPoint()
     operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int {
@@ -40,6 +41,8 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res5 = LogTest();
             let res6 = ArcTan2Test();
             let res7 = PauliToStringTest();
+            let res8 = TestDrawRandomInt(0, 1);
+            MessageTest("Test");
         }
         return sum;
     }
