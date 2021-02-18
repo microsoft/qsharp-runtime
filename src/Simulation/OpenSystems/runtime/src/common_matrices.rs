@@ -105,6 +105,7 @@ pub fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (u
 /// ```
 /// # #[macro_use] extern crate ndarray;
 /// # use opensim::nq_eye;
+/// use num_complex::Complex;
 /// let eye = nq_eye(2usize);
 /// assert_eq!(eye, array![
 ///     [Complex::new(1f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64), Complex::new(0f64, 0f64)],
