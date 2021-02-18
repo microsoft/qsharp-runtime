@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 #include <bitset>
 #include <iostream>
 #include <memory>
@@ -12,8 +12,8 @@
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file

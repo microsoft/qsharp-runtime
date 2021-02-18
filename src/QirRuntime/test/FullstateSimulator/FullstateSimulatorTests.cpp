@@ -10,7 +10,7 @@
 
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
-#include "context.hpp"
+#include "QirContext.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;

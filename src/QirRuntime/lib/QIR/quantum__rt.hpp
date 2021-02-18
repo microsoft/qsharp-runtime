@@ -7,7 +7,7 @@
 #include <stdarg.h> // for va_list
 
 #include "CoreTypes.hpp"
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 
 struct QirArray;
 struct QirCallable;
