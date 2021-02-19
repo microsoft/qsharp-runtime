@@ -5,7 +5,10 @@
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
+    <OpenSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/OpenSystems/runtime/target/$(Configuration.ToLowerInvariant())))</OpenSimBuildPath>
   </PropertyGroup>
+
+  <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
 
   <PropertyGroup Condition="'$(QsimDll)' == ''">
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
@@ -28,7 +31,26 @@
       <Visible>false</Visible>
     </None>
   </ItemGroup>
+
+  <!-- Copy the experimental open systems simulator from src/Simulation/Native build to where we can see and use it. -->
   
+  <PropertyGroup Condition="'$(OpenSimDll)' == ''">
+    <OpenSimDllMac>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/libopensim.dylib))</OpenSimDllMac>
+    <OpenSimDllLinux>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/libopensim.so))</OpenSimDllLinux>
+    <OpenSimDllWindows>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/opensim.dll))</OpenSimDllWindows>
+    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(OpenSimDllMac)</OpenSimDll>
+    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(OpenSimDllLinux)</OpenSimDll>
+    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(OpenSimDllWindows)</OpenSimDll>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(OpenSimDll)" >
+      <Link>Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
   <Target Name="BeforeCSharpCompile">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />

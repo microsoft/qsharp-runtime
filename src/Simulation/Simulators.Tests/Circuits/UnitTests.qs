@@ -5,21 +5,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
-
+    
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
     @Test("ResourcesEstimator")
-    @Test("QuantumSimulator")
     operation QSharpUnitTest() : Unit {
-      Message("Worked!");
-    }
-
+		Message("Worked!");
+	}
+        
+    @Test("QuantumSimulator")
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.TrivialSimulator")
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.ModifiedTrivialSimulator")
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.UnitTests.TrivialSimulator")
     operation ArbitraryUnitTestTarget() : Unit {
-      Message("Worked!");
-    }
-
+		Message("Worked!");
+	}
+    
 }
 
