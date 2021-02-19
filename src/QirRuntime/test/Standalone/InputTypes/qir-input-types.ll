@@ -1,7 +1,6 @@
 
 %Result = type opaque
 %Range = type { i64, i64, i64 }
-%String = type opaque
 %Array = type opaque
 
 @ResultZero = external global %Result*
@@ -12,7 +11,7 @@
 @PauliZ = constant i2 -2
 @EmptyRange = internal constant %Range { i64 0, i64 1, i64 -1 }
 
-define void @Microsoft__Quantum__Testing__QIR__InputTypes__body(i64 %anInt, double %aDouble, i1 %aBool, %String* %aString, %Array* %anArray) {
+define void @Microsoft__Quantum__Testing__QIR__InputTypes__body(i64 %anInt, double %aDouble, %Array* %anArray) {
 entry:
   call void @__quantum__rt__array_update_alias_count(%Array* %anArray, i64 1)
   call void @__quantum__rt__array_update_alias_count(%Array* %anArray, i64 -1)
@@ -21,7 +20,7 @@ entry:
 
 declare void @__quantum__rt__array_update_alias_count(%Array*, i64)
 
-define void @Microsoft__Quantum__Testing__QIR__InputTypes(i64 %anInt, double %aDouble, i1 %aBool, %String* %aString, i64 %anArray__count, i64* %anArray) #0 {
+define void @Microsoft__Quantum__Testing__QIR__InputTypes(i64 %anInt, double %aDouble, i64 %anArray__count, i64* %anArray) #0 {
 entry:
   %0 = call %Array* @__quantum__rt__array_create_1d(i32 8, i64 %anArray__count)
   %1 = icmp sgt i64 %anArray__count, 0
@@ -34,7 +33,7 @@ copy:                                             ; preds = %entry
   br label %next
 
 next:                                             ; preds = %copy, %entry
-  call void @Microsoft__Quantum__Testing__QIR__InputTypes__body(i64 %anInt, double %aDouble, i1 %aBool, %String* %aString, %Array* %0)
+  call void @Microsoft__Quantum__Testing__QIR__InputTypes__body(i64 %anInt, double %aDouble, %Array* %0)
   ret void
 }
 

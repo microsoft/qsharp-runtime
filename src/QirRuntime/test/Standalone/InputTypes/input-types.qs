@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
-    operation InputTypes(anInt : Int, aDouble : Double, aBool : Bool, aString : String, anArray : Int[]) : Unit {
-        
+    operation InputTypes(anInt : Int, aDouble : Double, anArray : Int[]) : Unit {
+        // TODO: Add messages with the values of the arguments.
     }
 }

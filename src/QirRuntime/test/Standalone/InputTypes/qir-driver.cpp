@@ -18,15 +18,13 @@ extern "C" void SetupQirToRunOnFullStateSimulator();
 extern "C" void Microsoft__Quantum__Testing__QIR__InputTypes__body( // NOLINT
     int64_t anInt,
     double_t aDouble,
-    bool aBool,
-    char* aString,
     int64_t anArrayLength,
     int64_t* anArray);
 
 int main(int argc, char *argv[])
 {
     try{
-        CLI::App app("Random Bit");
+        CLI::App app("Input Types");
 
         // Add the --simulator-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
@@ -42,6 +40,50 @@ int main(int argc, char *argv[])
             operationOutputFile,
             "File to write the output of the Q# operation to");
 
+        // Add the options that correspond to the parameters that the QIR entry-point needs.
+        // Option for a Q# Int type.
+        int64_t anInt = 0;
+        CLI::Option *anIntOpt = app.add_option(
+            "--anint",
+            anInt,
+            "An integer");
+
+        anIntOpt->required();
+
+        // Option for a Q# Double type.
+        double_t aDouble = 0.0;
+        CLI::Option *aDoubleOpt = app.add_option(
+            "--adouble",
+            aDouble,
+            "A double");
+
+        aDoubleOpt->required();
+
+        // Option for a Q# Bool type.
+        bool aBool = false;
+        CLI::Option *aBoolOpt = app.add_option(
+            "--abool",
+            aBool,
+            "A bool");
+
+        aBoolOpt->required();
+
+        // TODO: Add option for Q# Pauli type.
+        // TODO: Add option for Q# Result type.
+        // TODO: Add option for Q# String type.
+
+        // Option for a Q# Array<Int> type.
+        std::vector<int64_t> anIntegerArray;
+        CLI::Option *anIntegerArrayOpt = app.add_option(
+            "--anintegerarray",
+            anIntegerArray,
+            "An integer array");
+
+        anIntegerArrayOpt->required();
+
+        // TODO: Add option for Q# Tuple<T> type.
+
+        // With all the options added, parse arguments from the command line.
         CLI11_PARSE(app, argc, argv);
 
         // Redirect the simulator output from std::cout if the --simulator-output option is present.
@@ -68,10 +110,21 @@ int main(int argc, char *argv[])
             operationOutputStream = &operationOutputFileStream;
         }
 
+        // TODO: Remove this after the Message Q# function is integrated into the QIR runtime.
+        (*simulatorOutputStream) << anInt << std::endl;
+        (*simulatorOutputStream) << aDouble << std::endl;
+        (*simulatorOutputStream) << aBool << std::endl;
+        for (int64_t n : anIntegerArray) {
+            (*simulatorOutputStream) << n << " ";
+        }
+
+        (*simulatorOutputStream) << std::endl;
+
         // Start simulation.
+        // TODO: Use the pattern suggested by Irina.
         SetupQirToRunOnFullStateSimulator();
-        // TODO: Get this from command line.
-        Microsoft__Quantum__Testing__QIR__InputTypes__body(0, 0.0, false, NULL, 0, NULL);
+        // TODO: Pass the parsed arguments to the entry-point operation.
+        Microsoft__Quantum__Testing__QIR__InputTypes__body(anInt, aDouble, 0, nullptr);
         simulatorOutputStream->flush();
         (*operationOutputStream) << "OPERATION OUTPUT:\n";
         operationOutputStream->flush();
