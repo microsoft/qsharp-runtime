@@ -8,7 +8,7 @@ use std::ops::Mul;
 use std::convert::TryInto;
 use std::cmp;
 
-use crate::{ C64, log_message, nq_eye };
+use crate::{ C64, nq_eye };
 
 pub trait HasDagger {
     /// Returns the hermitian conjugate (colloquially, the dagger) of a

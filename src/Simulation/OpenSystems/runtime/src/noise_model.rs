@@ -101,3 +101,14 @@ impl NoiseModel {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn can_serialize_noise_model() {
+        let noise_model = NoiseModel::ideal();
+        let _json = serde_json::to_string(&noise_model);
+    }
+}
