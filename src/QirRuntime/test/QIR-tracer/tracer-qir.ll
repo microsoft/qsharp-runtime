@@ -895,7 +895,7 @@ entry:
   %23 = bitcast i8* %22 to %Qubit**
   %qb__9 = load %Qubit*, %Qubit** %23
   call void @__quantum__qis__single_qubit_op(i64 11, i64 1, %Qubit* %qb__9)
-  call void @__quantum__qis__inject_global_barrier(i64 42, i64 1)
+  call void @__quantum__qis__inject_barrier(i64 42, i64 1)
   %24 = call i8* @__quantum__rt__array_get_element_ptr_1d(%Array* %qs, i64 0)
   %25 = bitcast i8* %24 to %Qubit**
   %qb__11 = load %Qubit*, %Qubit** %25
@@ -1181,7 +1181,7 @@ declare %Qubit* @__quantum__rt__qubit_allocate()
 
 declare %Array* @__quantum__rt__qubit_allocate_array(i64)
 
-declare void @__quantum__qis__inject_global_barrier(i64, i64)
+declare void @__quantum__qis__inject_barrier(i64, i64)
 
 declare void @__quantum__rt__qubit_release(%Qubit*)
 

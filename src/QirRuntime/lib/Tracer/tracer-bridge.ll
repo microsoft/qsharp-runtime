@@ -25,7 +25,7 @@ declare void @quantum__qis__single_qubit_op(i32 %id, i32 %duration, %class.QUBIT
 declare void @quantum__qis__single_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %class.QUBIT*)
 declare void @quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %struct.QirArray*)
 declare void @quantum__qis__multi_qubit_op_ctl(i32 %id, i32 %duration, %struct.QirArray*, %struct.QirArray*)
-declare void @quantum__qis__inject_global_barrier(i32 %id, i32 %duration)
+declare void @quantum__qis__inject_barrier(i32 %id, i32 %duration)
 declare %class.RESULT* @quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT*)
 declare %class.RESULT* @quantum__qis__joint_measure(i32 %id, i32 %duration, %struct.QirArray*)
 
@@ -62,9 +62,9 @@ define void @__quantum__qis__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* 
   ret void
 }
 
-define void @__quantum__qis__inject_global_barrier(i32 %id, i32 %duration)
+define void @__quantum__qis__inject_barrier(i32 %id, i32 %duration)
 {
-  call void @quantum__qis__inject_global_barrier(i32 %id, i32 %duration)
+  call void @quantum__qis__inject_barrier(i32 %id, i32 %duration)
   ret void
 }
 

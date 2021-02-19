@@ -85,7 +85,11 @@ __Conditional execution on measurement results__: The Tracer will execute LLVM I
  conditionals into corresponding callbacks to the tracer. The tracer will add operations from _both branches_ into the
  layers it creates to compute the upper bound estimate.
 
-Conditionals, measurements and operations, that open frames, inside conditional callbacks are _not_ supported.
+The following operations are _not_ supported inside conditional callbacks and would cause a runtime failure:
+
+- nested conditional callbacks;
+- measurements;
+- opening and closing operations of tracked frames (if tracking is set up).
 
 __Caching__ (lower priority): It might be a huge perf win if the Resource Tracer could cache statistics for repeated
  computations. The Tracer will have an option to cache layering results per quantum module if the boundaries of modules
@@ -95,24 +99,33 @@ __Caching__ (lower priority): It might be a huge perf win if the Resource Tracer
 
 Note: The tracer assumes that the preferred layer duration is _P_.
 
-1. The first encountered operation of __non-zero__ duration _N_ is added into layer _L(0, max(P,N))_. The value
- of _conditional barrier_ variable on the tracer is set to 0.
-1. When conditional callback is encountered, the layer _L(t,N)_ of the measurement that produced the result the conditional
- is dependent on, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional scope
+1. The first encountered operation of duration _N_, where either _N > 0_ or the operation involves multiple qubits, is
+ added into layer _L(0, max(P,N))_. The value of _conditional barrier_ variable on the tracer is set to 0.
+1. When conditional callback is encountered, the layer _L(t,N)_ of the measurement that produced the result used in the
+ conditional callback, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional callback
  _conditional barrier_ is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen
  before or in the same layer as the measurement, even if they don't involve the measured qubits.)
- TODO: is it OK for later operations to be added to the layers with ops _inside_ conditional branches?
 1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is a single-qubit _op_ of
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
- Starting at _L(k, Nk)_ and scanning backwards to _L(conditional barrier, Nb)_ find the _first_ layer that contains an
- operation that acts on the qubit of _op_. Add _op_ into this layer. If no such layer is found, add _op_ to the list of
- pending operations on the qubit. At the end of the program still pending operations are ignored.
+
+    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional barrier, Nb)_ until find a layer _L(t,Nt)_
+     such that _Q(t,Nt)_ contains the qubit of _op_.
+    - Add _op_ into this layer.
+    - If no such layer is found, add _op_ to the list of pending operations on the qubit.
+    - At the end of the program still pending operations will be ignored.
+
 1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is _op_ of duration _N > 0_
- or it involves more than one qubit. Starting at _L(k, Nk)_ and scanning backwards to _L(conditional barrier, Nb)_ find
- the _last_ layer _L(t, Nt)_ such that _Qubits(t, Nt)_ don't contain any of the _op_'s qubits and find the _first_ layer
- _L(w, Nw)_ such that Qubits(w, Nw) contains some of _op_'s qubits but Nw + N <= P. Add _op_ into one of the two layer
- with later time. If neither such layers is found, add _op_ into a new layer _L(k+Nk, max(P, N))_. Add the pending
- operations of all involved qubits into the same layer and clear the pending lists.
+ or it involves more than one qubit.
+
+    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional barrier,Nb)_ until find a layer _L(w,Nw)_
+     such that _Qubits(w,Nw)_ contain some of _op_'s qubits.
+    - If _L(w,Nw)_ is found and _op_ can be added into it without increasing the layer's duration, add _op_ into
+     _L(w,Nw)_, otherwise set _w = conditional barrier_.
+    - If _op_ hasn't been added to a layer, scan from [boundaries included] _L(w,Nw)_ to _L(k,Nk)_ until find
+     a layer _L(t,Nt)_ such that _Qubits(t, Nt)_ don't contain any of the _op_'s qubits and _N <= Nt_.
+    - If _L(t,Nt)_ is found, add _op_ into this layer.
+    - If _op_ hasn't been added to a layer, add _op_ into a new layer _L(k+Nk, max(P, N))_.
+    - Add the pending operations of all involved qubits into the same layer and clear the pending lists.
 
 ## Special handling of SWAP ##
 
@@ -145,21 +158,30 @@ __TBD__: C++ definitions of the structure above + the interface to register fram
 The tracer will have options to output the estimates into command line or into a file, specified by the user. In both
  cases the output will be in the same format:
 
-- Tab separated, where:
+- column separator is configurable (the regex expressions below use comma as separator)
+- the first column specifies the time _t_ of a layer _L(t, n)_ or of a barrier
+- the second column contains the optional name of the layer or the barrier
+- the remaining columns contain counts per operation in the layer (all zeros in case of a barrier)
 
-  - the first column specifies the time _t_ of a layer _L(t, n)_
-  - the second column contains an optional name of the layer, that corresponds to a global barrier
-  - the remaining columns contain counts per operation in the layer
-
-- The first row is a header row: `layer_id\tname(\t[a-zA-Z]+)*`, where specific operation names are listed, such as
- CNOT, Mz, etc., if provided by the user (if not provided, the header row will list operation ids).
-- All following rows contain statistics per layer: `[0-9]+\t[a-zA-Z]*(\t([0-9]*))*`.
+- The first row is a header row: `layer_id,name(,[0-9a-zA-Z]+)*`. The fragment `(,[0-9a-zA-Z]+)*` lists operation
+ names or their ids if the names weren't provided by the user.
+- The following rows contain statistics per layer: `[0-9]+,[a-zA-Z]*(,([0-9]*))*`.
 - The rows are sorted in order of increasing layer time.
-- Zero counts for any of the statistics _might_ be replaced with empty string.
-- The global barrier layer lists the name and no statistics.
+- Zero counts for the statistics _can_ be replaced with empty string.
 
 The map of operation ids to names can be passed to the tracer's constructor as `std::unordered_map<OpId, std::string>`.
  The mapping can be partial, ids will be used in the ouput for unnamed operations.
+
+Example of valid output:
+
+```csv
+layer_id,name,Y,Z,5
+0,,0,1,0
+1,,0,0,1
+2,b,0,0,0
+4,,0,1,0
+8,,1,0,0
+```
 
 ## Depth vs width optimizations ##
 
@@ -169,15 +191,15 @@ TBD but lower priority.
 
 | Signature                                             | Description                                                  |
 | :---------------------------------------------------- | :----------------------------------------------------------- |
-| `void __quantum__qis__inject_global_barrier(i32 %id, i32 %duration)` | Function to insert a global barrier between layers. The first argument is the id of the barrier and the second item specifies the duration of the barrier. See [Layering](#layering) section for details. |
+| `void __quantum__qis__inject_barrier(i32 %id, i32 %duration)` | Function to insert a barrier. The first argument is the id of the barrier that can be used to map it to a user-friendly name in the output and the second argument specifies the duration of the barrier. See [Layering](#layering) section for details. |
 | `void __quantum__qis__on_module_start(i64 %id)`    | Function to identify the start of a quantum module. The argument is a unique _id_ of the module. The tracer will have an option to treat module boundaries as barriers between layers and (_lower priority_) option to cache estimates for a module, executed multiple times. For example, a call to the function might be inserted into QIR, generated by the Q# compiler, immediately before the body code of a Q# `operation`. |
 | `void __quantum__qis__on_module_end(i64 %id)`      | Function to identify the end of a quantum module. The argument is a unique _id_ of the module and must match the _id_ supplied on start of the module. For example, a call to the function might be inserted into QIR, generated by the Q# compiler, immediately after the body code of a Q# `operation`. |
 | `void __quantum__qis__single_qubit_op(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting operations that involve a single qubit. The first argument is the id of the operation. Multiple intrinsics can be assigned the same id, in which case they will be counted together. The second argument is duration to be assigned to the particular invocation of the operation. |
 | `void __quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %Array* %qs)` | Function for counting operations that involve multiple qubits.|
-| `void __quantum__qis__single_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Qubit* %q)` | Function for counting controlled operations with single target qubit. |
-| `void __quantum__qis__multi_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Array* %qs)` | Function for counting controlled operations with multiple target qubits. |
-| `%Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user might assign different operation ids for different measurement bases. |
-| `%Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user might assign different operation ids for different measurement bases. |
+| `void __quantum__qis__single_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Qubit* %q)` | Function for counting controlled operations with single target qubit and `%ctls` array of controls. |
+| `void __quantum__qis__multi_qubit_op__ctl(i32 %id, i32 %duration, %Array* %ctls, %Array* %qs)` | Function for counting controlled operations with multiple target qubits and `%ctls` array of controls. |
+| `%Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user can assign different operation ids for different measurement bases. |
+| `%Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user can assign different operation ids for different measurement bases. |
 | `void __quantum__qis__swap(%Qubit* %q1, %Qubit* %q2)` | See [Special handling of SWAP](#special-handling-of-swap) for details. |
 | TODO: handling of conditionals on measurement results | |
 

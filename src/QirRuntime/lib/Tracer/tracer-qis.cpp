@@ -49,7 +49,7 @@ extern "C"
             reinterpret_cast<Qubit*>(targets->buffer));
     }
 
-    void quantum__qis__inject_global_barrier(int32_t id, int32_t duration) // NOLINT
+    void quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
     {
         (void)tracer->InjectGlobalBarrier(id, duration);
     }
