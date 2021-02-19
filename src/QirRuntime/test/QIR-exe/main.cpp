@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) noexcept
         const double theta3 = stod(argv[4]);
         const int nsamples = atoi(argv[5]);
 
+        // TODO: move this stdout printing to Q# using Message 
         std::cout << "*** Starting VQE example with " << iters << " iterations***" << std::endl;
         std::cout << "*** theta1 = " << theta1 << std::endl;
         std::cout << "*** theta2 = " << theta2 << std::endl;
