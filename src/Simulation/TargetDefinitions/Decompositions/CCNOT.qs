@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the doubly controlled–NOT (CCNOT) gate to three qubits.
@@ -20,7 +19,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled X([control1, control2], target);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.CCNOT")
     operation CCNOT (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Controlled X([control1, control2], target);

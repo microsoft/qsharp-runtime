@@ -1,31 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-/*=============================================================================
-    QIR assumes a single global execution context.
-    To support the dispatch over the qir-bridge, the clients must implement
-    Microsoft::Quantum::IQuantumGateSet* g_qapi;
-=============================================================================*/
-#include <assert.h>
+#include <cassert>
 #include <unordered_map>
 
 #include "quantum__rt.hpp"
 
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 
-#ifdef _WIN32
-#define EXPORTAPI extern "C" __declspec(dllexport)
-#else
-#define EXPORTAPI extern "C"
-#endif
-EXPORTAPI void SetupQirToRunOnFullStateSimulator()
-{
-    // Leak the simulator, because the QIR only creates one and it will exist for the duration of the session
-    InitializeQirContext(Microsoft::Quantum::CreateFullstateSimulator().release(), false /*trackAllocatedObjects*/);
-}
+/*=============================================================================
+    Note: QIR assumes a single global execution context!
+=============================================================================*/
 
 // QIR specification requires the Result type to be reference counted, even though Results are created by the target and
 // qubits, created by the same target, aren't reference counted. To minimize the implementation burden on the target,

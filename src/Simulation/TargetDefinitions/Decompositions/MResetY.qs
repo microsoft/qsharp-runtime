@@ -3,7 +3,6 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Targeting;
 
     /// # Summary
@@ -26,7 +25,6 @@ namespace Microsoft.Quantum.Measurement {
         "BasicQuantumFunctionality",
         "MResetY is replaced by a supported implementation on all execution targets."
     )
-    @EnableTestingViaName("Test.TargetDefinitions.MResetY")
     operation MResetY (target : Qubit) : Result {
         let result = Measure([PauliY], [target]);
 

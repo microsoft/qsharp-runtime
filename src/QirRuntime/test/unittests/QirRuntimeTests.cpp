@@ -4,18 +4,18 @@
 #include "catch.hpp"
 
 #include <algorithm>
+#include <cstring> // for memcpy
 #include <memory>
-#include <string.h> // for memcpy
 #include <unordered_map>
 #include <vector>
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 #include "quantum__qis.hpp"
 #include "quantum__rt.hpp"
 
 #include "BitStates.hpp"
+#include "QirContext.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
 
 using namespace Microsoft::Quantum;
 
@@ -912,10 +912,10 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
     CHECK_NOTHROW(ReleaseQirContext());
 }
 
-static void DummyCallableEntry(PTuple, PTuple, PTuple) {}
+static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
@@ -940,7 +940,7 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 TEST_CASE("Callables: copy elision", "[qir_support]")
 {
     QirContextScope qirctx(nullptr, true);
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirCallable* original =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);

@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
@@ -14,7 +12,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IDisposable
+    public partial class QuantumSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
     {
         public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime.dll";
 

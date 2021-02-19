@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
-    @EnableTestingViaName("Test.TargetDefinitions.ExpUtil")
     internal operation ExpUtil (paulis : Pauli[], theta : Double, qubits : Qubit[], rotation : ((Pauli, Qubit) => Unit is Adj + Ctl)) : Unit is Ctl {
         if (Length(paulis) != Length(qubits)) { fail "Arrays 'paulis' and 'qubits' must have the same length"; }
         if (Length(paulis) == 1) {
@@ -28,7 +26,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
         else { // Length(paulis) > 2 
             within {
-                for (i in 0 .. Length(paulis) - 1) {
+                for i in 0 .. Length(paulis) - 1 {
                     MapPauli(qubits[i], PauliZ, paulis[i]);
                 }
             }

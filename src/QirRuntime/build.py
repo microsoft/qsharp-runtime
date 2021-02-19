@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import sys, os, platform, subprocess, datetime
+import sys, os, platform, subprocess, datetime, shutil
+import generateqir
 
 # =============================================================================
 #  The script will create [root]\build\[OS]\[Debug|Release] folder for the output.
@@ -67,6 +68,7 @@ if __name__ == '__main__':
   flavor = "Debug"
   should_make = True
   should_build = True
+  noqirgen = False
 
   for arg in sys.argv:
     arg = arg.lower()
@@ -80,9 +82,17 @@ if __name__ == '__main__':
       should_make = False
     elif arg == "make":
       should_build = False
+    elif arg == "noqirgen":
+      noqirgen = True
     else:
       log("unrecognized argument: " + arg)
       sys.exit()
   
   root_dir = os.path.dirname(os.path.abspath(__file__))
+
+  if not noqirgen:
+    if generateqir.do_generate_all(root_dir) != 0:
+      log("Aborting build due to failures in QIR generation")
+      sys.exit()
+
   do_build(root_dir, should_make, should_build, flavor)
