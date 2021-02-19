@@ -19,7 +19,6 @@ namespace Microsoft.Quantum.Tests.UnitTests {
 
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation UnitTest1 () : Unit {
     }
     
