@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.15.210222838-alpha">
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.210222838-alpha">
 
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\DebugSymbols.props" />
@@ -44,18 +44,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\OpenSystems\runtime\target\**\*.dll">
-      <Link>runtimes\win-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+    <None Include="..\OpenSystems\win10\**\*">
+      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\OpenSystems\runtime\target\**\*.dylib">
-      <Link>runtimes\osx-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+    <None Include="..\OpenSystems\osx\**\*">
+      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\OpenSystems\runtime\target\**\*.so">
-      <Link>runtimes\linux-x64\native\Microsoft.Quantum.Experimental.OpenSystemsSimulator.Native.dll</Link>
+    <None Include="..\OpenSystems\linux\**\*">
+      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
