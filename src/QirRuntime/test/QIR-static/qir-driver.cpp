@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <cassert>
 #include <bitset>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_set>
 
 #include "CoreTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "QirContext.hpp"
-#include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
@@ -223,8 +223,8 @@ TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 }
 #endif
 
-// The Microsoft__Quantum__Testing__QIR__TestControlled__body tests needs proper semantics of X and M, and nothing else.
-// The validation is done inside the test and it would return an error code in case of failure.
+// The Microsoft__Quantum__Testing__QIR__TestFunctors__body tests needs proper semantics of X and M, and nothing else.
+// The validation is done inside the test and it would throw in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
@@ -299,13 +299,18 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
-extern "C" void Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__body(Qubit q)                             // NOLINT
+static int g_cKCalls = 0;
+static int g_cKCallsControlled = 0;
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__body();       // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body(); // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                              // NOLINT
 {
+    g_cKCalls++;
     g_ctrqapi->X(q);
 }
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
+    g_cKCallsControlled++;
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
@@ -314,7 +319,82 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestControlled__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__body());
+
+    const int cKCalls = g_cKCalls;
+    const int cKCallsControlled = g_cKCallsControlled;
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body());
+    CHECK(g_cKCalls - cKCalls == 3);
+    CHECK(g_cKCallsControlled - cKCallsControlled == 5);
 
     g_ctrqapi = nullptr;
+}
+
+// TestConditionalOnResult() is authored in a way that the expected path through the function only applies X operator
+// for the chosen sequence of measurement results, and all other paths apply Y. Thus, the correct execution must get the
+// expected maximum number of X and ControlledX callback.
+struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
+{
+    int cX = 0;
+    int ccX = 0;
+    vector<ResultValue> mockMeasurements;
+
+    explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
+        : mockMeasurements(results)
+    {
+    }
+
+    Qubit AllocateQubit() override
+    {
+        return nullptr;
+    }
+    void ReleaseQubit(Qubit qubit) override {}
+
+    void X(Qubit) override
+    {
+        this->cX++;
+    }
+    void ControlledX(long numControls, Qubit controls[], Qubit qubit) override
+    {
+        this->ccX++;
+    }
+    void Y(Qubit) override {}
+
+    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+    {
+        static int callNumber = -1;
+        callNumber++;
+        assert(callNumber < this->mockMeasurements.size() && "ConditionalsTestSimulator isn't set up correctly");
+
+        return (this->mockMeasurements[callNumber] == Result_Zero) ? UseZero() : UseOne();
+    }
+
+    bool AreEqualResults(Result r1, Result r2) override
+    {
+        // those are bogus pointers but it's ok to compare them _as pointers_
+        return (r1 == r2);
+    }
+
+    void ReleaseResult(Result result) override {} // the results aren't allocated by this test simulator
+
+    Result UseZero() override
+    {
+        return reinterpret_cast<Result>(0);
+    }
+
+    Result UseOne() override
+    {
+        return reinterpret_cast<Result>(1);
+    }
+};
+extern "C" void Microsoft__Quantum__Testing__QIR__TestConditionalOnResult__body(); // NOLINT
+TEST_CASE("QIR: conditionals on measurement results", "[qir][qir.conditionals]")
+{
+    unique_ptr<ConditionalsTestSimulator> qapi =
+        make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
+    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestConditionalOnResult__body());
+    CHECK(qapi->cX == 14);
+    CHECK(qapi->ccX == 9);
 }

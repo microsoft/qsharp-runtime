@@ -60,7 +60,7 @@ extern "C"
     QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
-    QIR_SHARED_API void quantum__qis__message__body(QirString* qstr);                       // NOLINT
+    QIR_SHARED_API void quantum__qis__message__body(QirString* qstr); // NOLINT
 
     // Q# Math:
     QIR_SHARED_API bool        quantum__qis__isnan__body(double d);                         // NOLINT
@@ -75,5 +75,35 @@ extern "C"
 
     QIR_SHARED_API double      quantum__qis__ieeeremainder__body(double x, double y);       // NOLINT
     QIR_SHARED_API int64_t     quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum);     // NOLINT
+    QIR_SHARED_API bool quantum__qis__isnan__body(double d);                                    // NOLINT
+    QIR_SHARED_API double quantum__qis__infinity__body();                                       // NOLINT
+    QIR_SHARED_API bool quantum__qis__isinf__body(double d);                                    // NOLINT
+    QIR_SHARED_API double quantum__qis__arctan2__body(double y, double x);                      // NOLINT
+    QIR_SHARED_API int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum); // NOLINT
 
+    // Q# ApplyIf:
+    QIR_SHARED_API void unexpected_conditional();                                                      // NOLINT
+    QIR_SHARED_API void quantum__qis__applyifelseintrinsic__body(RESULT*, QirCallable*, QirCallable*); // NOLINT
+    QIR_SHARED_API void quantum__qis__applyconditionallyintrinsicca__body(                             // NOLINT
+        QirArray*,
+        QirArray*,
+        QirCallable*,
+        QirCallable*);
+    QIR_SHARED_API void quantum__qis__applyconditionallyintrinsicca__adj( // NOLINT
+        QirArray*,
+        QirArray*,
+        QirCallable*,
+        QirCallable*);
+    QIR_SHARED_API void quantum__qis__applyconditionallyintrinsicca__ctl( // NOLINT
+        QirArray*,
+        QirArray*,
+        QirArray*,
+        QirCallable*,
+        QirCallable*);
+    QIR_SHARED_API void quantum__qis__applyconditionallyintrinsicca__ctladj( // NOLINT
+        QirArray*,
+        QirArray*,
+        QirArray*,
+        QirCallable*,
+        QirCallable*);
 }

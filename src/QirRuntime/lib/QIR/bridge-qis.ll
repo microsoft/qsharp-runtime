@@ -60,7 +60,7 @@ declare void @quantum__qis__y__ctl(%struct.QirArray*, %class.QUBIT*)
 declare void @quantum__qis__z__body(%class.QUBIT*)
 declare void @quantum__qis__z__ctl(%struct.QirArray*, %class.QUBIT*)
 
-declare void @quantum__qis__message__body(%"struct.QirString"* %str)
+declare void @quantum__qis__message__body(%struct.QirString* %str)
 
 ;===============================================================================
 ; quantum.qis namespace implementations
@@ -284,8 +284,8 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
 ;===============================================================================
 ;
 define void @__quantum__qis__message__body(%String* %.str) {
-  %str = bitcast %String* %.str to %"struct.QirString"*
-  call void @quantum__qis__message__body(%"struct.QirString"* %str)
+  %str = bitcast %String* %.str to %struct.QirString*
+  call void @quantum__qis__message__body(%struct.QirString* %str)
   ret void
 }
 
@@ -437,3 +437,186 @@ define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {
   %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
   ret i64 %result
 }
+
+;===============================================================================
+; quantum.qis conditional functions
+;
+declare void @unexpected_conditional()
+declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsicca__body(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsicca__adj(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsicca__ctl(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsicca__ctladj(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+
+; applyif
+define void @__quantum__qis__applyifelseintrinsic__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  %r = bitcast %Result* %.r to %class.RESULT*
+  %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
+  %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
+  call void @quantum__qis__applyifelseintrinsic__body(
+    %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+  ret void
+}
+
+define void @__quantum__qis__applyifelseintrinsica__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsica__adj(%Result, %Callable*, %Callable*) {
+  call void @unexpected_conditional()
+  ret void
+}
+
+define void @__quantum__qis__applyifelseintrinsicc__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicc__ctl(%Array*, %Result, %Callable*, %Callable*) {
+  call void @unexpected_conditional()
+  ret void
+}
+
+define void @__quantum__qis__applyifelseintrinsicca__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__ctl(%Array*, %Result, %Callable*, %Callable*) {
+  call void @unexpected_conditional()
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__adj(%Result, %Callable*, %Callable*) {
+  call void @unexpected_conditional()
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__ctladj(%Array*, %Result, %Callable*, %Callable*) {
+  call void @unexpected_conditional()
+  ret void
+}
+
+; applyconditionally
+define void @__quantum__qis__applyconditionallyintrinsicca__body(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+
+  %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
+  %rs2 = bitcast %Array* %.rs2 to %struct.QirArray*
+  %clb_on_equal = bitcast %Callable* %.clb_on_equal to %struct.QirCallable*
+  %clb_on_different = bitcast %Callable* %.clb_on_different to %struct.QirCallable*
+  call void @quantum__qis__applyconditionallyintrinsicca__body(
+    %struct.QirArray* %rs1, %struct.QirArray* %rs2,
+    %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
+  ret void
+}
+define void @__quantum__qis__applyconditionallyintrinsicca__ctl(
+  %Array* %.ctls, { %Array*, %Array*, %Callable*, %Callable* }* %.args) {
+
+  %.prs1 = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 0
+  %.rs1 = load %Array*, %Array** %.prs1
+
+  %.prs2 = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 1
+  %.rs2 = load %Array*, %Array** %.prs2
+
+  %.pclb_on_equal = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 2
+  %.clb_on_equal = load %Callable*, %Callable** %.pclb_on_equal
+
+  %.pclb_on_different = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 3
+  %.clb_on_different = load %Callable*, %Callable** %.pclb_on_different
+
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
+  %rs2 = bitcast %Array* %.rs2 to %struct.QirArray*
+  %clb_on_equal = bitcast %Callable* %.clb_on_equal to %struct.QirCallable*
+  %clb_on_different = bitcast %Callable* %.clb_on_different to %struct.QirCallable*
+  call void @quantum__qis__applyconditionallyintrinsicca__ctl(
+    %struct.QirArray* %ctls,
+    %struct.QirArray* %rs1, %struct.QirArray* %rs2,
+    %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
+  ret void
+}
+define void @__quantum__qis__applyconditionallyintrinsicca__adj(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+
+  %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
+  %rs2 = bitcast %Array* %.rs2 to %struct.QirArray*
+  %clb_on_equal = bitcast %Callable* %.clb_on_equal to %struct.QirCallable*
+  %clb_on_different = bitcast %Callable* %.clb_on_different to %struct.QirCallable*
+  call void @quantum__qis__applyconditionallyintrinsicca__adj(
+    %struct.QirArray* %rs1, %struct.QirArray* %rs2,
+    %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
+  ret void
+}
+define void @__quantum__qis__applyconditionallyintrinsicca__ctladj(
+  %Array* %.ctls, { %Array*, %Array*, %Callable*, %Callable* }* %.args) {
+
+  %.prs1 = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 0
+  %.rs1 = load %Array*, %Array** %.prs1
+
+  %.prs2 = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 1
+  %.rs2 = load %Array*, %Array** %.prs2
+
+  %.pclb_on_equal = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 2
+  %.clb_on_equal = load %Callable*, %Callable** %.pclb_on_equal
+
+  %.pclb_on_different = getelementptr inbounds
+    {%Array*, %Array*, %Callable*, %Callable*}, {%Array*, %Array*, %Callable*, %Callable*}* %.args, i32 0, i32 3
+  %.clb_on_different = load %Callable*, %Callable** %.pclb_on_different
+
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
+  %rs2 = bitcast %Array* %.rs2 to %struct.QirArray*
+  %clb_on_equal = bitcast %Callable* %.clb_on_equal to %struct.QirCallable*
+  %clb_on_different = bitcast %Callable* %.clb_on_different to %struct.QirCallable*
+  call void @quantum__qis__applyconditionallyintrinsicca__ctladj(
+    %struct.QirArray* %ctls,
+    %struct.QirArray* %rs1, %struct.QirArray* %rs2,
+    %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
+  ret void
+}
+
+define void @__quantum__qis__applyconditionallyintrinsic__body(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+  call void @__quantum__qis__applyconditionallyintrinsicca__body(
+    %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different)
+  ret void
+}
+
+define void @__quantum__qis__applyconditionallyintrinsica__body(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+  call void @__quantum__qis__applyconditionallyintrinsicca__body(
+    %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different)
+  ret void
+}
+define void @__quantum__qis__applyconditionallyintrinsica__adj(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+  call void @__quantum__qis__applyconditionallyintrinsicca__adj(
+    %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different)
+  ret void
+}
+
+define void @__quantum__qis__applyconditionallyintrinsicc__body(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+  call void @__quantum__qis__applyconditionallyintrinsicca__body(
+    %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different)
+  ret void
+}
+define void @__quantum__qis__applyconditionallyintrinsicc__ctl(
+  %Array* %.ctls, { %Array*, %Array*, %Callable*, %Callable* }* %.args) {
+  call void @__quantum__qis__applyconditionallyintrinsicca__ctl(
+    %Array* %.ctls, { %Array*, %Array*, %Callable*, %Callable* }* %.args)
+  ret void
+}
+
