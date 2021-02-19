@@ -43,6 +43,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res7 = PauliToStringTest();
             let res8 = TestDrawRandomInt(0, 1);
             let res9 = SinTest();
+            let res10 = CosTest();
             MessageTest("Test");
         }
         return sum;

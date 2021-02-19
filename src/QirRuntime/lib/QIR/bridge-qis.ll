@@ -297,6 +297,7 @@ define void @__quantum__qis__message__body(%String* %.str) {
 declare double      @llvm.sqrt.f64(double %.val)
 declare double      @llvm.log.f64(double %Val)
 declare double      @llvm.sin.f64(double %Val)
+declare double      @llvm.cos.f64(double %Val)
 
 ; Native implementations:
 declare i1          @quantum__qis__isnan__body(double %d)
@@ -351,8 +352,15 @@ define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: func
 
 ; function Sin (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.sin
-define double @__quantum__qis__sin__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/sin    
+define double @__quantum__qis__sin__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/sin
     %result = call double @llvm.sin.f64(double %theta)          ; https://llvm.org/docs/LangRef.html#llvm-sin-intrinsic
+    ret double %result
+}
+
+; function Cos (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.cos
+define double @__quantum__qis__cos__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/cos
+    %result = call double @llvm.cos.f64(double %theta)          ; https://llvm.org/docs/LangRef.html#llvm-cos-intrinsic
     ret double %result
 }
 

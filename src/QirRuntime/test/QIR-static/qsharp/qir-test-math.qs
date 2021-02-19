@@ -97,5 +97,27 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    function CosTest() : Int {
+
+        // function Cos (theta : Double) : Double
+
+        if not Close( 1.0, Cos(0.0))                { return  1; }    // The return value indicates which test case has failed.
+        if not Close( 0.5, Cos(PI()/3.0))           { return  2; }
+        if not Close( 0.0, Cos(PI()/2.0))           { return  3; }
+        if not Close(-0.5, Cos(2.0*PI()/3.0))       { return  4; }
+        if not Close(-1.0, Cos(PI()))               { return  5; }
+
+        if not Close(-0.5, Cos(-2.0*PI()/3.0))      { return  6; }
+        if not Close( 0.0, Cos(-PI()/2.0))          { return  7; }
+        if not Close( 0.5, Cos(-PI()/3.0))          { return  8; }
+
+        if not Close(Sqrt(2.0)/2.0, Cos(PI()/4.0))  { return  9; }
+                                                                                              
+        if NAN() != Cos(NAN())                      { return 10; }
+        if NAN() != Cos(INFINITY())                 { return 11; }
+        if NAN() != Cos(-INFINITY())                { return 11; }
+
+        return 0;
+    }
 }
 
