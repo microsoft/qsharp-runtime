@@ -6,7 +6,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    // TODO: Disabled until we have a noise model for Rz.
+    // @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation TestTeleport() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();
