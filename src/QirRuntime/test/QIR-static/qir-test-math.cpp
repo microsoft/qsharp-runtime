@@ -13,6 +13,7 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__body();    
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__body();                               // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__body();                                   // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__body();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__body();                                   // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(int64_t min, int64_t max); // NOLINT
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
@@ -38,6 +39,11 @@ TEST_CASE("QIR: Math.Sin", "[qir.math][qir.Math.Sin]")
 TEST_CASE("QIR: Math.Cos", "[qir.math][qir.Math.Cos]")
 {
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__CosTest__body());
+}
+
+TEST_CASE("QIR: Math.Tan", "[qir.math][qir.Math.Tan]")
+{
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanTest__body());
 }
 
 

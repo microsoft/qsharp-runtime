@@ -364,6 +364,15 @@ define double @__quantum__qis__cos__body(double %theta) {       ; https://en.cpp
     ret double %result
 }
 
+; function Tan (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.tan
+define double @__quantum__qis__tan__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/tan
+    %sin = call double @llvm.sin.f64(double %theta)
+    %cos = call double @llvm.cos.f64(double %theta)
+    %result = fdiv double %sin, %cos                            ; tg(x) = sin(x) / cos(x)
+    ret double %result
+}
+
 
 ; operation DrawRandomInt (min : Int, max : Int) : Int      
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.random.drawrandomint

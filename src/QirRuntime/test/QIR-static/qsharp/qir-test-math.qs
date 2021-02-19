@@ -119,5 +119,30 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
 
         return 0;
     }
+
+    function TanTest() : Int {
+        // function Tan (theta : Double) : Double
+        if not Close( 0.0, Tan(0.0))                            { return  1; }    // The return value indicates which test case has failed.
+        if not Close( 0.5/(Sqrt(3.0)/2.0), Tan( PI()/6.0))      { return  2; }  // tg(Pi/6) = sin(Pi/6) / cos(Pi/6) = (1/2) / (sqrt(3)/2)
+        if not Close( 1.0, Tan( PI()/4.0))                      { return  3; }
+        if not Close( (Sqrt(3.0)/2.0)/0.5, Tan( PI()/3.0))      { return  4; }
+        // https://en.cppreference.com/w/cpp/numeric/math/tan
+        // The function has mathematical poles at Pi(1/2 + n); however no common floating-point representation 
+        // is able to represent Pi/2 exactly, thus there is no value of the argument for which a pole error occurs.
+        if not Close(-1.0, Tan(3.0*PI()/4.0))                   { return  5; }
+        if not Close( 0.0, Tan(PI()))                           { return  6; }
+
+        if not Close(-0.5/(Sqrt(3.0)/2.0), Tan(-PI()/6.0))      { return  7; }
+        if not Close(-1.0, Tan(-PI()/4.0))                      { return  8; }
+        if not Close(-(Sqrt(3.0)/2.0)/0.5, Tan(-PI()/3.0))      { return  9; }
+        if not Close( 1.0, Tan(-3.0*PI()/4.0))                  { return 10; }
+
+        if NAN() != Tan(NAN())                                  { return 11; }
+        if NAN() != Tan(INFINITY())                             { return 12; }
+        if NAN() != Tan(-INFINITY())                            { return 13; }
+
+        return 0;
+    }
+
 }
 

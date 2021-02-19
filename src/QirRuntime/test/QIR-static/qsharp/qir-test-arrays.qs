@@ -44,6 +44,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res8 = TestDrawRandomInt(0, 1);
             let res9 = SinTest();
             let res10 = CosTest();
+            let res11 = TanTest();
             MessageTest("Test");
         }
         return sum;
