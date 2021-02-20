@@ -100,16 +100,16 @@ __Caching__ (lower priority): It might be a huge perf win if the Resource Tracer
 Note: The tracer assumes that the preferred layer duration is _P_.
 
 1. The first encountered operation of duration _N_, where either _N > 0_ or the operation involves multiple qubits, is
- added into layer _L(0, max(P,N))_. The value of _conditional barrier_ variable on the tracer is set to 0.
+ added into layer _L(0, max(P,N))_. The value of _conditional fence_ variable on the tracer is set to 0.
 1. When conditional callback is encountered, the layer _L(t,N)_ of the measurement that produced the result used in the
- conditional callback, is looked up and the _conditional barrier_ is set to _t + N_. At the end of the conditional callback
- _conditional barrier_ is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen
+ conditional callback, is looked up and the _conditional fence_ is set to _t + N_. At the end of the conditional callback
+ _conditional fence_ is reset to 0. (Effectively, no operations, conditioned on the result of a measurement, can happen
  before or in the same layer as the measurement, even if they don't involve the measured qubits.)
 1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is a single-qubit _op_ of
  duration __0__ (controlled and multi-qubit operations of duration 0 are treated the same as non-zero operations).
 
-    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional barrier, Nb)_ until find a layer _L(t,Nt)_
-     such that _Q(t,Nt)_ contains the qubit of _op_.
+    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional fence,Nf)_ until find a layer _L(t,Nt)_
+     such that _Qubits(t,Nt)_ contains the qubit of _op_.
     - Add _op_ into this layer.
     - If no such layer is found, add _op_ to the list of pending operations on the qubit.
     - At the end of the program still pending operations will be ignored.
@@ -117,15 +117,15 @@ Note: The tracer assumes that the preferred layer duration is _P_.
 1. Suppose, there are already layers _L(0,N0), ... , L(k,Nk)_ and the operation being executed is _op_ of duration _N > 0_
  or it involves more than one qubit.
 
-    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional barrier,Nb)_ until find a layer _L(w,Nw)_
+    - Scan from [boundaries included] _L(k,Nk)_ to _L(conditional fence,Nf)_ until find a layer _L(w,Nw)_
      such that _Qubits(w,Nw)_ contain some of _op_'s qubits.
     - If _L(w,Nw)_ is found and _op_ can be added into it without increasing the layer's duration, add _op_ into
-     _L(w,Nw)_, otherwise set _w = conditional barrier_.
+     _L(w,Nw)_, otherwise set _L(w,Nw) = L(conditional fence,Nf)_.
     - If _op_ hasn't been added to a layer, scan from [boundaries included] _L(w,Nw)_ to _L(k,Nk)_ until find
-     a layer _L(t,Nt)_ such that _Qubits(t, Nt)_ don't contain any of the _op_'s qubits and _N <= Nt_.
+     a layer _L(t,Nt)_ such that _N <= Nt_ (notice, that this layer cannot contain any qubits from _op_).
     - If _L(t,Nt)_ is found, add _op_ into this layer.
     - If _op_ hasn't been added to a layer, add _op_ into a new layer _L(k+Nk, max(P, N))_.
-    - Add the pending operations of all involved qubits into the same layer and clear the pending lists.
+    - Add the pending operations of all _op_'s qubits into the same layer and clear the pending lists of these qubits.
 
 ## Special handling of SWAP ##
 
