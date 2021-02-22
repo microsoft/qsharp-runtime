@@ -144,5 +144,56 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    function SinhTest() : Int {
+
+        // function Sinh (theta : Double) : Double
+
+        let xValues = [ -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5,
+                         5.0,  4.5,  4.0,  3.5,  3.0,  2.5,  2.0,  1.5,  1.0,  0.5, 0.0 ];
+        for x in xValues {
+            if not Close( (ExpD(x) - ExpD(-x)) / 2.0, Sinh(x)) { return 1; }    // The return value indicates which test case has failed.
+        }
+
+        if NAN()        != Sinh(NAN())                      { return 2; }
+        if INFINITY()   != Sinh(INFINITY())                 { return 3; }
+        if -INFINITY()  != Sinh(-INFINITY())                { return 4; }
+
+        return 0;
+    }
+
+    function CoshTest() : Int {
+
+        // function Cosh (theta : Double) : Double
+
+        let xValues = [ -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5,
+                         5.0,  4.5,  4.0,  3.5,  3.0,  2.5,  2.0,  1.5,  1.0,  0.5, 0.0 ];
+        for x in xValues {
+            if not Close( (ExpD(x) + ExpD(-x)) / 2.0, Cosh(x)) { return 1; }    // The return value indicates which test case has failed.
+        }
+
+        if NAN()        != Cosh(NAN())                      { return 2; }
+        if INFINITY()   != Cosh(INFINITY())                 { return 3; }
+        if INFINITY()   != Cosh(-INFINITY())                { return 4; }
+
+        return 0;
+    }
+
+    function TanhTest() : Int {
+
+        // function Tanh (theta : Double) : Double
+
+        let xValues = [ -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5,
+                         5.0,  4.5,  4.0,  3.5,  3.0,  2.5,  2.0,  1.5,  1.0,  0.5, 0.0 ];
+        for x in xValues {
+            if not Close( Sinh(x) / Cosh(x), Tanh(x))       { return 1; }    // The return value indicates which test case has failed.
+        }
+
+        if NAN() != Tanh(NAN())         { return 2; }
+        if  1.0  != Tanh(INFINITY())    { return 3; }
+        if -1.0  != Tanh(-INFINITY())   { return 4; }
+
+        return 0;
+    }
+
 }
 
