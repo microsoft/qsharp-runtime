@@ -115,22 +115,34 @@ namespace Microsoft.Quantum.Experimental
 
         public void R__Body(Pauli pauli, double angle, Qubit target)
         {
-            throw new NotImplementedException();
+            if (pauli == Pauli.PauliI)
+            {
+                // Don't apply global phases on uncontrolled operations.
+                return;
+            }
+            throw new NotImplementedException("Arbitrary rotation with noise is not yet supported.");
         }
 
         public void R__AdjointBody(Pauli pauli, double angle, Qubit target)
         {
-            throw new NotImplementedException();
+            R__Body(pauli, -angle, target);
         }
 
         public void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            throw new NotImplementedException();
+            if (controls is { Count: 0 })
+            {
+                R__Body(pauli, angle, target);
+            }
+            else
+            {
+                throw new NotImplementedException("Arbitrary controlled rotation with noise is not yet supported.");
+            }
         }
 
         public void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            throw new NotImplementedException();
+            R__ControlledBody(controls, pauli, -angle, target);
         }
 
         public void S__Body(Qubit target)
