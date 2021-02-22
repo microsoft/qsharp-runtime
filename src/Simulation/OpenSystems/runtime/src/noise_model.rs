@@ -10,7 +10,7 @@ use crate::linalg::HasDagger;
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct NoiseModel {
     pub initial_state: State,
     pub i: Channel,

@@ -38,6 +38,9 @@ getrandom = { version = "0.1.15", features = ["wasm-bindgen"] }
 # We only need web-sys when compiling with the web-sys-log feature.
 web-sys = { version = "0.3.4",  features = ['console'], optional = true }
 
+[dev-dependencies]
+assert-json-diff = "2.0.1"
+
 [lib]
 name = "opensim"
 path = "src/lib.rs"

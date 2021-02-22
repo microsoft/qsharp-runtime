@@ -12,7 +12,7 @@ use serde::{ Serialize, Deserialize };
 use crate::utils::log_message;
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Instrument {
     pub effects: Vec<Channel>
 }
