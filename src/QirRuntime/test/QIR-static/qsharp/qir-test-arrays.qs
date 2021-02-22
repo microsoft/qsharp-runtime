@@ -48,6 +48,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res12 = SinhTest();
             let res13 = CoshTest();
             let res14 = TanhTest();
+            let res15 = IeeeRemainderTest();
             MessageTest("Test");
         }
         return sum;
