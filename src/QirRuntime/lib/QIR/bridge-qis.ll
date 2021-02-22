@@ -306,6 +306,7 @@ declare i1          @quantum__qis__isinf__body(double %d)
 declare double      @quantum__qis__arctan2__body(double %y, double %x)
 declare double      @quantum__qis__sinh__body(double %theta)
 declare double      @quantum__qis__cosh__body(double %theta)
+declare double      @quantum__qis__ieeeremainder__body(double %y, double %x)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 
 ; API for the user code:
@@ -396,6 +397,12 @@ define double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cpp
     %cos = call double @__quantum__qis__cosh__body(double %theta)
     %result = fdiv double %sin, %cos                            ; tanh(x) = sinh(x) / cosh(x)
     ret double %result
+}
+
+; function IEEERemainder(x : Double, y : Double) : Double
+define double @__quantum__qis__ieeeremainder__body(double %x, double %y) {
+  %result = call double @quantum__qis__ieeeremainder__body(double %x, double %y)
+  ret double %result
 }
 
 

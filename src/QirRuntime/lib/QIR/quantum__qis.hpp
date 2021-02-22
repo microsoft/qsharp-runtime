@@ -69,6 +69,7 @@ extern "C"
     QIR_SHARED_API double      quantum__qis__arctan2__body(double y, double x);             // NOLINT
     QIR_SHARED_API double      quantum__qis__sinh__body(double theta);                      // NOLINT
     QIR_SHARED_API double      quantum__qis__cosh__body(double theta);                      // NOLINT
+    QIR_SHARED_API double      quantum__qis__ieeeremainder__body(double x, double y);       // NOLINT
     QIR_SHARED_API int64_t     quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum);     // NOLINT
 
 }

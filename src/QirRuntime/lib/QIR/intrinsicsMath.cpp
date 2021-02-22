@@ -50,6 +50,11 @@ double quantum__qis__cosh__body(double theta)
     return std::cosh(theta);
 }
 
+double quantum__qis__ieeeremainder__body(double x, double y)
+{
+    return std::remainder(x, y);    // https://en.cppreference.com/w/cpp/numeric/math/remainder
+}
+
 int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)
