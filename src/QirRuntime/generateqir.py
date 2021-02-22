@@ -33,6 +33,7 @@ def do_generate_qir(test_dir):
 def do_generate_all(root_dir):
   test_projects = [
     os.path.join(root_dir, "test", "QIR-static"),
+    os.path.join(root_dir, "samples", "StandaloneSupportedInputs")
     # add other test folders here
   ]
 

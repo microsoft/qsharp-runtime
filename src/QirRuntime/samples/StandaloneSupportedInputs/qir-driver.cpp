@@ -1,30 +1,26 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #include <iostream>
-#include "../Shared/CLI11.hpp"
+#include "CLI11.hpp"
+#include "CoreTypes.hpp"
+#include "QuantumApi_I.hpp"
+#include "SimFactory.hpp"
+#include "SimulatorStub.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
+#include "quantum__rt.hpp"
 
-// Can manually add calls to DebugLog in the ll files for debugging.
-extern "C" void DebugLog(int64_t value)
-{
-    std::cout << value << std::endl;
-}
-extern "C" void DebugLogPtr(char* value)
-{
-    std::cout << (const void*)value << std::endl;
-}
+using namespace Microsoft::Quantum;
 
-extern "C" void SetupQirToRunOnFullStateSimulator();
-extern "C" void Microsoft__Quantum__Testing__QIR__InputTypes__body( // NOLINT
+extern "C" void Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body( // NOLINT
     int64_t anInt,
-    double_t aDouble,
-    int64_t anArrayLength,
-    int64_t* anArray);
+    double aDouble);
 
 int main(int argc, char *argv[])
 {
     try{
-        CLI::App app("Input Types");
+        CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
         // Add the --simulator-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
@@ -90,43 +86,33 @@ int main(int argc, char *argv[])
         std::ostream* simulatorOutputStream = &std::cout;
         std::filebuf simulatorOutputFileBuffer;
         if (!simulatorOutputFileOpt->empty()){
-            std::cout << "Simulator Output File: " << simulatorOutputFile << std::endl;
             simulatorOutputFileBuffer.open(simulatorOutputFile, std::ios::out);
             std::ostream simulatorOutputFileStream(&simulatorOutputFileBuffer);
             // TODO: Call into the QIR runtime API to redirect the output of the simulator.
             simulatorOutputStream = &simulatorOutputFileStream;
         }
 
-        // TODO: This is for testing purposes only.
-        (*simulatorOutputStream) << "SIMULATOR OUTPUT:\nSample Output\n";
-
         // Redirect the Q# opertion output from std::cout if the --operation-output option is present.
         std::ostream* operationOutputStream = &std::cout;
         std::filebuf operationOutputFileBuffer;
         if (!operationOutputFileOpt->empty()){
-            std::cout << "Operation Output File: " << operationOutputFile << std::endl;
             operationOutputFileBuffer.open(operationOutputFile, std::ios::out);
             std::ostream operationOutputFileStream(&operationOutputFileBuffer);
             operationOutputStream = &operationOutputFileStream;
         }
 
         // TODO: Remove this after the Message Q# function is integrated into the QIR runtime.
-        (*simulatorOutputStream) << anInt << std::endl;
-        (*simulatorOutputStream) << aDouble << std::endl;
-        (*simulatorOutputStream) << aBool << std::endl;
-        for (int64_t n : anIntegerArray) {
-            (*simulatorOutputStream) << n << " ";
-        }
-
-        (*simulatorOutputStream) << std::endl;
+        (*operationOutputStream) << "SIMULATOR OUTPUT\n----------------" << std::endl;
 
         // Start simulation.
-        // TODO: Use the pattern suggested by Irina.
-        SetupQirToRunOnFullStateSimulator();
-        // TODO: Pass the parsed arguments to the entry-point operation.
-        Microsoft__Quantum__Testing__QIR__InputTypes__body(anInt, aDouble, 0, nullptr);
+        std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
+        QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+        Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body(anInt, aDouble);
         simulatorOutputStream->flush();
-        (*operationOutputStream) << "OPERATION OUTPUT:\n";
+
+        // This is for visualization purposes only and should not be part of the generated C++ code.
+        // N.B. For examples on how other return values are shown, look at other samples.
+        (*operationOutputStream) << "\nOPERATION OUTPUT\n----------------" << std::endl;
         operationOutputStream->flush();
 
         // Close opened file buffers;
@@ -138,8 +124,7 @@ int main(int argc, char *argv[])
             operationOutputFileBuffer.close();
         }
     } catch(...) {
+        std::cout << "An unexpected failure occurred." << std::endl;
         return 1;
     }
-
-    return 0;
 }
