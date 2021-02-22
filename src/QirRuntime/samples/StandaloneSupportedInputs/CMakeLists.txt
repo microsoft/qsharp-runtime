@@ -1,25 +1,16 @@
-# compile test ll files into a library
+#=======================================================================================================================
+# This is a reference make file on how to build a QIR-based standalone executable.
+#=======================================================================================================================
 
-set(TEST_FILES
-  qir-entrypoint-supported-inputs
-)
-
-foreach(file ${TEST_FILES})
-  compile_from_qir(${file} "") # don't create a target per file
-  list(APPEND QIR_TESTS_LIBS ${QIR_UTILITY_LIB})
-endforeach()
-
-add_custom_target(qir_entrypoint_supported_inputs_lib DEPENDS ${QIR_TESTS_LIBS})
-
-#==============================================================================
-# The executable target for QIR tests triggers the custom actions to compile ll files
-#
-add_executable(qir-entrypoint-supported-inputs
+add_executable(qir-entrypoint-supported-inputs-exe
   qir-driver.cpp
 )
 
-target_link_libraries(qir-entrypoint-supported-inputs PUBLIC
-  ${QIR_TESTS_LIBS}
+# This is where the generated QIR file is specified.
+compile_from_qir(qir-entrypoint-supported-inputs qir_entry_point_supported_inputs_target)
+
+target_link_libraries(qir-entrypoint-supported-inputs-exe PUBLIC
+  ${QIR_UTILITY_LIB} # created by compile_from_qir
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
   qir-rt-support
@@ -27,12 +18,12 @@ target_link_libraries(qir-entrypoint-supported-inputs PUBLIC
   simulators
 )
 
-target_include_directories(qir-entrypoint-supported-inputs PUBLIC
-  "${test_includes}"
+target_include_directories(qir-entrypoint-supported-inputs-exe PUBLIC
   "${standalone_includes}"
   "${public_includes}"
   "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
-add_dependencies(qir-entrypoint-supported-inputs qir_entrypoint_supported_inputs_lib)
 
-install(TARGETS qir-entrypoint-supported-inputs RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_dependencies(qir-entrypoint-supported-inputs-exe qir_entry_point_supported_inputs_target)
+
+install(TARGETS qir-entrypoint-supported-inputs-exe RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")

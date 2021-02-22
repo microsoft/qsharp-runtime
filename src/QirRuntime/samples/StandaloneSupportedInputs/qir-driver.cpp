@@ -3,13 +3,9 @@
 
 #include <iostream>
 #include "CLI11.hpp"
-#include "CoreTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
-#include "SimulatorStub.hpp"
 #include "QirContext.hpp"
-#include "QirTypes.hpp"
-#include "quantum__rt.hpp"
 
 using namespace Microsoft::Quantum;
 
