@@ -51,6 +51,7 @@ compile_from_qir(bridge-qis ${bridge_qis_target})
 set(qis_sup_source_files
   "intrinsics.cpp"
   "intrinsicsMath.cpp"
+  intrinsicsOut.cpp
 )
 
 add_library(qir-qis-support ${qis_sup_source_files})

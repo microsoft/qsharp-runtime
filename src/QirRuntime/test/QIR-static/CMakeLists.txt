@@ -19,6 +19,7 @@ add_executable(qir-static-tests
   qir-driver.cpp
   qir-test-math.cpp
   qir-test-strings.cpp
+  qir-test-ouput.cpp
 )
 
 target_link_libraries(qir-static-tests PUBLIC
