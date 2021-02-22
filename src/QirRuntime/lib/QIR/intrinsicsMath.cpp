@@ -40,6 +40,16 @@ double quantum__qis__arctan2__body(double y, double x)
     return std::atan2(y, x);        // https://en.cppreference.com/w/cpp/numeric/math/atan2
 }
 
+double quantum__qis__sinh__body(double theta)
+{
+    return std::sinh(theta);
+}
+
+double quantum__qis__cosh__body(double theta)
+{
+    return std::cosh(theta);
+}
+
 int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)

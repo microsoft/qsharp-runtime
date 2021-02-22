@@ -304,6 +304,8 @@ declare i1          @quantum__qis__isnan__body(double %d)
 declare double      @quantum__qis__infinity__body()
 declare i1          @quantum__qis__isinf__body(double %d)
 declare double      @quantum__qis__arctan2__body(double %y, double %x)
+declare double      @quantum__qis__sinh__body(double %theta)
+declare double      @quantum__qis__cosh__body(double %theta)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 
 ; API for the user code:
@@ -370,6 +372,29 @@ define double @__quantum__qis__tan__body(double %theta) {       ; https://en.cpp
     %sin = call double @llvm.sin.f64(double %theta)
     %cos = call double @llvm.cos.f64(double %theta)
     %result = fdiv double %sin, %cos                            ; tg(x) = sin(x) / cos(x)
+    ret double %result
+}
+
+; function Sinh (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.sinh
+define double @__quantum__qis__sinh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/sinh
+    %result = call double @quantum__qis__sinh__body(double %theta)
+    ret double %result
+}
+
+; function Cosh (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.cosh
+define double @__quantum__qis__cosh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/cosh
+    %result = call double @quantum__qis__cosh__body(double %theta)
+    ret double %result
+}
+
+; function Tanh (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.tanh
+define double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/tanh
+    %sin = call double @__quantum__qis__sinh__body(double %theta)
+    %cos = call double @__quantum__qis__cosh__body(double %theta)
+    %result = fdiv double %sin, %cos                            ; tanh(x) = sinh(x) / cosh(x)
     ret double %result
 }
 
