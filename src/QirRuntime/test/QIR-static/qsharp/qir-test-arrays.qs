@@ -42,6 +42,16 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res6 = ArcTan2Test();
             let res7 = PauliToStringTest();
             let res8 = TestDrawRandomInt(0, 1);
+            let res9 = SinTest();
+            let res10 = CosTest();
+            let res11 = TanTest();
+            let res12 = SinhTest();
+            let res13 = CoshTest();
+            let res14 = TanhTest();
+            let res15 = IeeeRemainderTest();
+            let res16 = ArcSinTest();
+            let res17 = ArcCosTest();
+            let res18 = ArcTanTest();
             MessageTest("Test");
         }
         return sum;
