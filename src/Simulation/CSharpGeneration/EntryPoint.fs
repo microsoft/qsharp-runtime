@@ -21,7 +21,7 @@ type private Parameter =
       Description : string }
 
 /// The name of the generated entry point class.
-let entryPointClassName = "__QsEntryPoint__"
+//let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
 let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
@@ -119,6 +119,10 @@ let private callableTypeNames context (callable : QsCallable) =
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
 
+let private entryPointClassName (entryPoint : QsCallable) =
+    let prefix = "__QsEntryPoint__"
+    (entryPoint.FullName.Namespace, prefix +  entryPoint.FullName.Name)
+
 let private submitMethod context entryPoint =
     let callableName, _, _ = callableTypeNames context entryPoint
     //let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
@@ -170,16 +174,35 @@ let private simulateMethod context entryPoint =
         (Some (``=>`` (simulationType <.> (ident "Simulate", args))))
 
 /// The main method for the standalone executable.
-//let private mainMethod context entryPoint =
-//    let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
-//    let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
-//    let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-//    let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
-//    let commandLineArgsName = "args"
-//    arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
-//        ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
-//        [``private``; ``static``; async]
-//        (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
+let private mainMethod context (entryPoints : seq<QsCallable>) =
+    //let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
+    //let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
+    //let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
+
+    let entryPointArrayMembers =
+        [
+            for ep in entryPoints do
+                let ns, name = entryPointClassName ep
+                ``new`` (``type`` (ns + "." + name)) ``(`` [] ``)``
+        ]
+
+    let entryPointArray =
+        ``new array`` (Some (driverNamespace + ".IEntryPoint")) entryPointArrayMembers
+
+    let driver = ``new`` (``type`` (driverNamespace + ".Driver")) ``(`` [driverSettings; entryPointArray] ``)``
+    let commandLineArgsName = "args"
+    arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
+        ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
+        [``private``; ``static``; async]
+        (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
+
+let mainClass context (entryPoints : seq<QsCallable>) =
+    ``class`` "__QsEntryPoint__" ``<<`` [] ``>>``
+        ``:`` None ``,`` []
+        [``internal``]
+        ``{``
+            [mainMethod context entryPoints]
+        ``}``
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
@@ -221,7 +244,7 @@ let private entryPointClass context (entryPoint : QsCallable) =
     ]
     //let baseName = sprintf "%s.IEntryPoint<%s, %s>" driverNamespace argTypeName returnTypeName
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
-    ``class`` (entryPointClassName +  entryPoint.FullName.Name) ``<<`` [] ``>>``
+    ``class`` (entryPointClassName entryPoint |> snd) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
@@ -236,10 +259,19 @@ let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
         ``}``
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generateEntryPointSource context (entryPoints : seq<QsCallable>) (generateMain : bool) =
+let generateEntryPointSource context (entryPoints : seq<QsCallable>) (generatedMain : ClassDeclarationSyntax option) =
     //let tempEntryPoint = Seq.head entryPoints
 
     let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
+
+    let namespaces =
+        let ns, eps = Seq.head entryPointNamespaces
+        let firstNS =
+            match generatedMain with
+            | Some main -> (entryPointNamespace context ns eps).AddMembers(main)
+            | None -> entryPointNamespace context ns eps
+            :> MemberDeclarationSyntax 
+        firstNS :: [for ns, eps in Seq.tail entryPointNamespaces -> entryPointNamespace context ns eps]
 
     //let ns =
     //    ``namespace`` tempEntryPoint.FullName.Namespace
@@ -248,6 +280,6 @@ let generateEntryPointSource context (entryPoints : seq<QsCallable>) (generateMa
     //            [entryPointClass context tempEntryPoint]
     //        ``}``
     // ToDo: look into including the autoNamespaces only once per file
-    ``compilation unit`` [] [] [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps]
+    ``compilation unit`` [] [] namespaces
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
