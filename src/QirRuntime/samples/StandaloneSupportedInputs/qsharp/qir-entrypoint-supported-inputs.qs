@@ -5,7 +5,7 @@
 
     
     @EntryPoint()
-    operation ExerciseSupportedInputs (anInt : Int, aDouble : Double) : Unit {
+    operation ExerciseInputs (anInt : Int, aDouble : Double) : Unit {
         Message("Exercise Supported Inputs");
         Message($"anInt: {anInt}");
         Message($"anDouble: {aDouble}");

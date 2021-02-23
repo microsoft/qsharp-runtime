@@ -9,7 +9,7 @@
 
 using namespace Microsoft::Quantum;
 
-extern "C" void Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body( // NOLINT
+extern "C" void Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // NOLINT
     int64_t anInt,
     double aDouble);
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
         // Start simulation.
         std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
         QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
-        Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body(anInt, aDouble);
+        Quantum__StandaloneSupportedInputs__ExerciseInputs__body(anInt, aDouble);
         simulatorOutputStream->flush();
 
         // This is for visualization purposes only and should not be part of the generated C++ code.

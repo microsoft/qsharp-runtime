@@ -14,9 +14,9 @@
 @1 = internal constant [8 x i8] c"anInt: \00"
 @2 = internal constant [11 x i8] c"anDouble: \00"
 
-@Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs = alias void (i64, double), void (i64, double)* @Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body
+@Quantum__StandaloneSupportedInputs__ExerciseInputs = alias void (i64, double), void (i64, double)* @Quantum__StandaloneSupportedInputs__ExerciseInputs__body
 
-define void @Quantum__StandaloneSupportedInputs__ExerciseSupportedInputs__body(i64 %anInt, double %aDouble) #0 {
+define void @Quantum__StandaloneSupportedInputs__ExerciseInputs__body(i64 %anInt, double %aDouble) #0 {
 entry:
   %msg = call %String* @__quantum__rt__string_create(i32 25, i8* getelementptr inbounds ([26 x i8], [26 x i8]* @0, i32 0, i32 0))
   call void @__quantum__qis__message__body(%String* %msg)
