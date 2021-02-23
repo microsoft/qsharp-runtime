@@ -5,7 +5,6 @@
 // The core types will be exposed in the C-interfaces for interop, thus no
 // namespaces or scoped enums can be used to define them.
 
-
 /*==============================================================================
   Qubit & Result
 
@@ -36,5 +35,3 @@ enum PauliId : int32_t
     PauliId_Z = 2,
     PauliId_Y = 3,
 };
-
-
