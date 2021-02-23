@@ -65,9 +65,7 @@ extern "C"
     void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
         QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        PTuple argsTuple = quantum__rt__tuple_create(0);
-        quantum__rt__callable_invoke(clbApply, argsTuple /*args*/, nullptr /*result*/);
-        quantum__rt__tuple_update_reference_count(argsTuple, -1);
+        ApplyWithFunctor(false /*C*/, false /*A*/, nullptr, clbApply);
     }
 
     void quantum__qis__applyconditionallyintrinsicca__body(

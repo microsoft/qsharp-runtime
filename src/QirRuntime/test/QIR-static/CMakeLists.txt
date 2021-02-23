@@ -17,6 +17,7 @@ add_custom_target(qir_static_test_lib DEPENDS ${QIR_TESTS_LIBS})
 #
 add_executable(qir-static-tests
   qir-driver.cpp
+  qir-test-conditionals.cpp
   qir-test-math.cpp
   qir-test-strings.cpp
   qir-test-ouput.cpp

@@ -4,7 +4,6 @@
 #pragma once
 
 #include <memory>
-#include "CoreTypes.hpp"
 
 namespace Microsoft
 {
