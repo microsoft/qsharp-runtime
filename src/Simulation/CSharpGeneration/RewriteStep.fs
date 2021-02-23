@@ -61,9 +61,18 @@ type Emitter() =
                 if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
 
             if not compilation.EntryPoints.IsEmpty then
-                let callable = context.allCallables.[Seq.head compilation.EntryPoints]
-                let content = EntryPoint.generate context callable
-                CompilationLoader.GeneratedFile(callable.SourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
+                let entryPointSources =
+                    compilation.EntryPoints
+                    |> Seq.map (fun ep -> context.allCallables.[ep])
+                    |> Seq.groupBy (fun ep -> ep.SourceFile)
+
+                let (sourceFile, callables) = Seq.head entryPointSources
+                let content = EntryPoint.generateEntryPointSource context callables true
+                CompilationLoader.GeneratedFile(sourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
+
+                for (sourceFile, callables) in Seq.tail entryPointSources do
+                    let content = EntryPoint.generateEntryPointSource context callables false
+                    CompilationLoader.GeneratedFile(sourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
 
             transformed <- compilation
             true
