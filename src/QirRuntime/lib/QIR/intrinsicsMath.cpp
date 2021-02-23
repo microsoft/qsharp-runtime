@@ -50,6 +50,21 @@ double quantum__qis__cosh__body(double theta)
     return std::cosh(theta);
 }
 
+double quantum__qis__arcsin__body(double theta)
+{
+    return std::asin(theta);        // https://en.cppreference.com/w/cpp/numeric/math/asin
+}
+
+double quantum__qis__arccos__body(double theta)
+{
+    return std::acos(theta);        // https://en.cppreference.com/w/cpp/numeric/math/acos
+}
+
+double quantum__qis__arctan__body(double theta)
+{
+    return std::atan(theta);        // https://en.cppreference.com/w/cpp/numeric/math/atan
+}
+
 double quantum__qis__ieeeremainder__body(double x, double y)
 {
     return std::remainder(x, y);    // https://en.cppreference.com/w/cpp/numeric/math/remainder

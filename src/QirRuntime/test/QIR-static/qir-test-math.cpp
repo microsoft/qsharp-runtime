@@ -14,6 +14,9 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__body();
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__body();                                   // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__body();                                   // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__body();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__body();                                // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__body();                                // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__body();                                // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__body();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__body();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__body();                                  // NOLINT
@@ -48,6 +51,21 @@ TEST_CASE("QIR: Math.Cos", "[qir.math][qir.Math.Cos]")
 TEST_CASE("QIR: Math.Tan", "[qir.math][qir.Math.Tan]")
 {
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanTest__body());
+}
+
+TEST_CASE("QIR: Math.ArcSin", "[qir.math][qir.Math.ArcSin]")
+{
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__body());
+}
+
+TEST_CASE("QIR: Math.ArcCos", "[qir.math][qir.Math.ArcCos]")
+{
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__body());
+}
+
+TEST_CASE("QIR: Math.ArcTan", "[qir.math][qir.Math.ArcTan]")
+{
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__body());
 }
 
 TEST_CASE("QIR: Math.Sinh", "[qir.math][qir.Math.Sinh]")

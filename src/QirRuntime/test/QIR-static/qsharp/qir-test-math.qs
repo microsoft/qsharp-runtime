@@ -144,6 +144,84 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    function ArcSinTest() : Int {
+
+        // function ArcSin (theta : Double) : Double
+
+        if not Close(0.0, ArcSin(0.0))                  { return  1; }    // The return value indicates which test case has failed.
+
+        if not Close(PI()/6.0, ArcSin(0.5))             { return  2; }
+        if not Close(PI()/2.0, ArcSin(1.0))             { return  3; }
+
+        if not Close(-PI()/6.0, ArcSin(-0.5))           { return  4; }
+        if not Close(-PI()/2.0, ArcSin(-1.0))           { return  5; }
+
+        if not Close(PI()/4.0, ArcSin(Sqrt(2.0)/2.0))   { return  6; }
+
+        if NAN() != ArcSin(NAN())                       { return  7; }
+        if NAN() != ArcSin(1.1)                         { return  8; }
+        if NAN() != ArcSin(-1.1)                        { return  9; }
+
+        mutable testVal = -1.0;
+        while testVal <= 1.0 {
+            if not Close(testVal, Sin(ArcSin(testVal))) { return 10; }
+            set testVal = testVal + 0.1;
+        }
+
+        return 0;
+    }
+
+    function ArcCosTest() : Int {
+
+        // function ArcCos (theta : Double) : Double
+
+        if not Close( 0.0, ArcCos(1.0))                 { return  1; }    // The return value indicates which test case has failed.
+        if not Close( PI()/3.0, ArcCos(0.5))            { return  2; }
+        if not Close( PI()/2.0, ArcCos(0.0))            { return  3; }
+        if not Close(2.0*PI()/3.0, ArcCos(-0.5))        { return  4; }
+        if not Close(PI(), ArcCos(-1.0))                { return  5; }
+
+        if not Close(PI()/4.0, ArcCos(Sqrt(2.0)/2.0))   { return  6; }
+
+        if NAN() != ArcCos(NAN())                       { return  7; }
+        if NAN() != ArcCos(1.1)                         { return  8; }
+        if NAN() != ArcCos(-1.1)                        { return  9; }
+
+        mutable testVal = -1.0;
+        while testVal <= 1.0 {
+            if not Close(testVal, Cos(ArcCos(testVal))) { return 10; }
+            set testVal = testVal + 0.1;
+        }
+
+        return 0;
+    }
+
+    function ArcTanTest() : Int {
+
+        // function ArcTan (theta : Double) : Double
+
+        if not Close( 0.0, ArcTan(0.0))                     { return  1; }  // The return value indicates which test case has failed.
+        if not Close( PI()/6.0, ArcTan(1.0/Sqrt(3.0)))      { return  2; }  // tg(Pi/6) = sin(Pi/6) / cos(Pi/6) = (1/2) / (sqrt(3)/2) = 1/sqrt(3)
+        if not Close( PI()/4.0, ArcTan(1.0))                { return  3; }
+        if not Close( PI()/3.0, ArcTan(Sqrt(3.0)))          { return  4; }
+
+        if not Close(-PI()/6.0, ArcTan(-1.0/Sqrt(3.0)))     { return  5; }
+        if not Close(-PI()/4.0, ArcTan(-1.0))               { return  6; }
+        if not Close(-PI()/3.0, ArcTan(-Sqrt(3.0)))         { return  7; }
+
+        if NAN() != ArcTan(NAN())                           { return  8; }
+        if not Close( PI()/2.0, ArcTan( INFINITY()))        { return  9; }
+        if not Close(-PI()/2.0, ArcTan(-INFINITY()))        { return 10; }
+
+        mutable testVal = -10.0;
+        while testVal <= 10.0 {
+            if not Close(testVal, Tan(ArcTan(testVal)))     { return 11; }
+            set testVal = testVal + 0.1;
+        }
+
+        return 0;
+    }
+
     function SinhTest() : Int {
 
         // function Sinh (theta : Double) : Double

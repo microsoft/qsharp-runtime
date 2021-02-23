@@ -306,6 +306,9 @@ declare i1          @quantum__qis__isinf__body(double %d)
 declare double      @quantum__qis__arctan2__body(double %y, double %x)
 declare double      @quantum__qis__sinh__body(double %theta)
 declare double      @quantum__qis__cosh__body(double %theta)
+declare double      @quantum__qis__arcsin__body(double %theta)
+declare double      @quantum__qis__arccos__body(double %theta)
+declare double      @quantum__qis__arctan__body(double %theta)
 declare double      @quantum__qis__ieeeremainder__body(double %y, double %x)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 
@@ -398,6 +401,28 @@ define double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cpp
     %result = fdiv double %sin, %cos                            ; tanh(x) = sinh(x) / cosh(x)
     ret double %result
 }
+
+; function ArcSin (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arcsin
+define double @__quantum__qis__arcsin__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/asin
+    %result = call double @quantum__qis__arcsin__body(double %theta)
+    ret double %result
+}
+
+; function ArcCos (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arccos
+define double @__quantum__qis__arccos__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/acos
+    %result = call double @quantum__qis__arccos__body(double %theta)
+    ret double %result
+}
+
+; function ArcTan (theta : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arctan
+define double @__quantum__qis__arctan__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/atan
+    %result = call double @quantum__qis__arctan__body(double %theta)
+    ret double %result
+}
+
 
 ; function IEEERemainder(x : Double, y : Double) : Double
 define double @__quantum__qis__ieeeremainder__body(double %x, double %y) {
