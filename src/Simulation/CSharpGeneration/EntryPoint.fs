@@ -195,12 +195,19 @@ let private mainMethod context (entryPoints : seq<QsCallable>) =
         [``private``; ``static``; async]
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
-let mainClass context (entryPoints : seq<QsCallable>) =
-    ``class`` "__QsEntryPoint__" ``<<`` [] ``>>``
+let private mainClass context (entryPoints : seq<QsCallable>) =
+    ``class`` entryPointClassName ``<<`` [] ``>>``
         ``:`` None ``,`` []
         [``internal``]
         ``{``
             [mainMethod context entryPoints]
+        ``}``
+
+let mainNamespace context (entryPoints : seq<QsCallable>) =
+    ``namespace`` entryPointClassName
+        ``{``
+            (Seq.map using SimulationCode.autoNamespaces)
+            [mainClass context entryPoints]
         ``}``
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
@@ -256,21 +263,28 @@ let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
             (Seq.map using SimulationCode.autoNamespaces)
             [for ep in entryPoints -> entryPointClass context ep]
         ``}``
+        :> MemberDeclarationSyntax
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generateEntryPointSource context (entryPoints : seq<QsCallable>) (generatedMain : ClassDeclarationSyntax option) =
+let generateEntryPointSource context (entryPoints : seq<QsCallable>) (mainNamespace : NamespaceDeclarationSyntax option) =
     //let tempEntryPoint = Seq.head entryPoints
 
     let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
 
+    let epNamespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps]
+
     let namespaces =
-        let ns, eps = Seq.head entryPointNamespaces
-        let firstNS =
-            match generatedMain with
-            | Some main -> (entryPointNamespace context ns eps).AddMembers(main)
-            | None -> entryPointNamespace context ns eps
-            :> MemberDeclarationSyntax 
-        firstNS :: [for ns, eps in Seq.tail entryPointNamespaces -> entryPointNamespace context ns eps]
+        match mainNamespace with
+        | Some mainNamespace -> (mainNamespace :> MemberDeclarationSyntax) :: epNamespaces
+        | None -> epNamespaces
+
+        //let ns, eps = Seq.head entryPointNamespaces
+        //let firstNS =
+        //    match mainNamespace with
+        //    | Some mainNS -> (entryPointNamespace context ns eps).AddMembers(mainNS)
+        //    | None -> entryPointNamespace context ns eps
+        //    :> MemberDeclarationSyntax 
+        //firstNS :: [for ns, eps in Seq.tail entryPointNamespaces -> entryPointNamespace context ns eps]
 
     //let ns =
     //    ``namespace`` tempEntryPoint.FullName.Namespace

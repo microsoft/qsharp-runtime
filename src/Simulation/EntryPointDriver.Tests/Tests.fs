@@ -71,10 +71,10 @@ let private compileQSharp source =
 let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoints = seq { for ep in compilation.EntryPoints -> context.allCallables.[ep] }
-    let main = EntryPoint.mainClass context entryPoints
+    let mainNS = EntryPoint.mainNamespace context entryPoints
     [
         SimulationCode.generate testFile context
-        EntryPoint.generateEntryPointSource context entryPoints (Some main)
+        EntryPoint.generateEntryPointSource context entryPoints (Some mainNS)
     ]
 
 /// The full path to a referenced assembly given its short name.
@@ -129,7 +129,7 @@ let private testAssembly testName constants =
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
 /// code.
 let private run (assembly : Assembly) (args : string[]) =
-    let entryPoint = assembly.GetType (sprintf "%s.%s" testNamespace EntryPoint.entryPointClassName)
+    let entryPoint = assembly.GetType (sprintf "%s.%s" EntryPoint.entryPointClassName EntryPoint.entryPointClassName)
     let main = entryPoint.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out

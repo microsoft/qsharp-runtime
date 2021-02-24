@@ -66,7 +66,7 @@ type Emitter() =
                     compilation.EntryPoints
                     |> Seq.map (fun ep -> context.allCallables.[ep])
 
-                let main = EntryPoint.mainClass context entryPointCallables
+                let main = EntryPoint.mainNamespace context entryPointCallables
 
                 let entryPointSources =
                     entryPointCallables
