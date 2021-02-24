@@ -83,7 +83,17 @@ namespace Microsoft.Quantum.Bitwise {
     /// let x = Parity(a); // x : Int = 1.
     /// ```
     function Parity (a : Int) : Int {
-        body intrinsic;
+        mutable tmpParam = a;
+        mutable result = false;
+        while tmpParam != 0 {
+            // Clear (to `0`) the least significant `1` (not to confuse with the least significant bit). E.g.
+            // x          : 1101 0100
+            // x-1        : 1101 0011
+            // x &&& (x-1): 1101 0000     The least significant `1` has been cleared.
+            set tmpParam = tmpParam &&& (tmpParam - 1);
+            set result = not result;
+        }
+        return (result ? 1 | 0);
     }
 
     // Common implementation for XBits and ZBits.
