@@ -21,6 +21,7 @@ add_executable(qir-static-tests
   qir-test-math.cpp
   qir-test-strings.cpp
   qir-test-ouput.cpp
+  qir-test-other.cpp
 )
 
 target_link_libraries(qir-static-tests PUBLIC
