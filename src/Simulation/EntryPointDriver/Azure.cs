@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> Submit<TIn, TOut>(
             IEntryPoint entryPoint, EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
         {
-            /**/
+            /*/
             
             Console.WriteLine("Submit");
             Console.WriteLine($"EntryPoint: {entryPoint.Name}");

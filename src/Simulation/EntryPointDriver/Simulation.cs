@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> Simulate(
             IEntryPoint entryPoint, TIn input, DriverSettings settings, string simulator)
         {
-            /**/
+            /*/
 
             Console.WriteLine("Simulate");
             Console.WriteLine($"EntryPoint: {entryPoint.Name}");
