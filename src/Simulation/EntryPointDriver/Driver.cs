@@ -417,7 +417,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         private OptionInfo<string> CreateSimulatorOption(IEntryPoint entryPoint) =>
             new OptionInfo<string>(
                 this.settings.SimulatorOptionAliases,
-                "QuantumSimulator",
+                entryPoint.DefaultSimulatorName,
                 "The name of the simulator to use.",
                 suggestions: new[]
                 {
