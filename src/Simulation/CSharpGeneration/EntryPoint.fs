@@ -21,7 +21,7 @@ type private Parameter =
       Description : string }
 
 /// The name of the generated entry point class.
-//let entryPointClassName = "__QsEntryPoint__"
+let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
 let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
@@ -119,9 +119,8 @@ let private callableTypeNames context (callable : QsCallable) =
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
 
-let private entryPointClassName (entryPoint : QsCallable) =
-    let prefix = "__QsEntryPoint__"
-    (entryPoint.FullName.Namespace, prefix +  entryPoint.FullName.Name)
+let private generateEntryPointClassName (entryPoint : QsCallable) =
+    (entryPoint.FullName.Namespace, entryPointClassName +  entryPoint.FullName.Name)
 
 let private submitMethod context entryPoint =
     let callableName, _, _ = callableTypeNames context entryPoint
@@ -182,7 +181,7 @@ let private mainMethod context (entryPoints : seq<QsCallable>) =
     let entryPointArrayMembers =
         [
             for ep in entryPoints do
-                let ns, name = entryPointClassName ep
+                let ns, name = generateEntryPointClassName ep
                 ``new`` (``type`` (ns + "." + name)) ``(`` [] ``)``
         ]
 
@@ -244,7 +243,7 @@ let private entryPointClass context (entryPoint : QsCallable) =
     ]
     //let baseName = sprintf "%s.IEntryPoint<%s, %s>" driverNamespace argTypeName returnTypeName
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
-    ``class`` (entryPointClassName entryPoint |> snd) ``<<`` [] ``>>``
+    ``class`` (generateEntryPointClassName entryPoint |> snd) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``

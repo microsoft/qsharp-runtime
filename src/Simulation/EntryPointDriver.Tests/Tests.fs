@@ -70,10 +70,11 @@ let private compileQSharp source =
 /// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
 let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
-    let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
+    let entryPoints = seq { for ep in compilation.EntryPoints -> context.allCallables.[ep] }
+    let main = EntryPoint.mainClass context entryPoints
     [
         SimulationCode.generate testFile context
-        EntryPoint.generate context entryPoint
+        EntryPoint.generateEntryPointSource context entryPoints (Some main)
     ]
 
 /// The full path to a referenced assembly given its short name.
