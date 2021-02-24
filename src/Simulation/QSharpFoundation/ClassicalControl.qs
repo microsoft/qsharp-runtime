@@ -29,20 +29,36 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     }
 
     operation ApplyIfElseIntrinsicA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit is Adj {
-        body intrinsic;
-        adjoint intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        adjoint (...) {
+            ApplyIfElseIntrinsic(measurementResult, Adjoint onResultZeroOp, Adjoint onResultOneOp);
+        }
     }
 
     operation ApplyIfElseIntrinsicC(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit is Ctl {
-        body intrinsic;
-        controlled intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        controlled (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled onResultZeroOp(ctls, _), Controlled onResultOneOp(ctls, _));
+        }
     }
 
     operation ApplyIfElseIntrinsicCA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
-        body intrinsic;
-        adjoint intrinsic;
-        controlled intrinsic;
-        controlled adjoint intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        adjoint (...) {
+            ApplyIfElseIntrinsic(measurementResult, Adjoint onResultZeroOp, Adjoint onResultOneOp);
+        }
+        controlled (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled onResultZeroOp(ctls, _), Controlled onResultOneOp(ctls, _));
+        }
+        controlled adjoint (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled Adjoint onResultZeroOp(ctls, _), Controlled Adjoint onResultOneOp(ctls, _));
+        }
     }
 
 
@@ -52,20 +68,36 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     }
 
     operation ApplyConditionallyIntrinsicA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit is Adj {
-        body intrinsic;
-        adjoint intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        adjoint (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Adjoint onEqualOp, Adjoint onNonEqualOp);
+        }
     }
 
     operation ApplyConditionallyIntrinsicC(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit is Ctl {
-        body intrinsic;
-        controlled intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        controlled (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled onEqualOp(ctls, _), Controlled onNonEqualOp(ctls, _));
+        }
     }
 
     operation ApplyConditionallyIntrinsicCA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
-        body intrinsic;
-        adjoint intrinsic;
-        controlled intrinsic;
-        controlled adjoint intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        adjoint (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Adjoint onEqualOp, Adjoint onNonEqualOp);
+        }
+        controlled (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled onEqualOp(ctls, _), Controlled onNonEqualOp(ctls, _));
+        }
+        controlled adjoint (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled Adjoint onEqualOp(ctls, _), Controlled Adjoint onNonEqualOp(ctls, _));
+        }
     }
 
 
