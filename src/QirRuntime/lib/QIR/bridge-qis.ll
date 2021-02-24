@@ -441,8 +441,13 @@ define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {
 ;===============================================================================
 ; quantum.qis conditional functions
 ;
-declare void @unexpected_conditional()
-declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyifelseintrinsicca__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyifelseintrinsicca__adj(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyifelseintrinsicca__ctl(
+  %struct.QirArray*, %class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyifelseintrinsicca__ctladj(
+  %struct.QirArray*, %class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+
 declare void @quantum__qis__applyconditionallyintrinsicca__body(
   %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
 declare void @quantum__qis__applyconditionallyintrinsicca__adj(
@@ -453,51 +458,102 @@ declare void @quantum__qis__applyconditionallyintrinsicca__ctladj(
   %struct.QirArray*, %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
 
 ; applyif
-define void @__quantum__qis__applyifelseintrinsic__body(
+
+define void @__quantum__qis__applyifelseintrinsicca__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+
   %r = bitcast %Result* %.r to %class.RESULT*
   %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
   %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
-  call void @quantum__qis__applyifelseintrinsic__body(
+  call void @quantum__qis__applyifelseintrinsicca__body(
     %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__ctl(%Array* %.ctls, { %Result*, %Callable*, %Callable* }* %.args) {
+  %.pr = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 0
+  %.r = load %Result*, %Result** %.pr
+
+  %.pclb_on_zero = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 1
+  %.clb_on_zero = load %Callable*, %Callable** %.pclb_on_zero
+
+  %.pclb_on_one = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 2
+  %.clb_on_one = load %Callable*, %Callable** %.pclb_on_one
+
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  %r = bitcast %Result* %.r to %class.RESULT*
+  %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
+  %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
+  call void @quantum__qis__applyifelseintrinsicca__ctl(
+    %struct.QirArray* %ctls, %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__adj(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+
+  %r = bitcast %Result* %.r to %class.RESULT*
+  %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
+  %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
+  call void @quantum__qis__applyifelseintrinsicca__adj(
+    %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+  ret void
+}
+define void @__quantum__qis__applyifelseintrinsicca__ctladj(
+  %Array* %.ctls, { %Result*, %Callable*, %Callable* }* %.args) {
+
+  %.pr = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 0
+  %.r = load %Result*, %Result** %.pr
+
+  %.pclb_on_zero = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 1
+  %.clb_on_zero = load %Callable*, %Callable** %.pclb_on_zero
+
+  %.pclb_on_one = getelementptr inbounds
+    {%Result*, %Callable*, %Callable*}, {%Result*, %Callable*, %Callable*}* %.args, i32 0, i32 2
+  %.clb_on_one = load %Callable*, %Callable** %.pclb_on_one
+
+  %ctls = bitcast %Array* %.ctls to %struct.QirArray*
+  %r = bitcast %Result* %.r to %class.RESULT*
+  %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
+  %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
+  call void @quantum__qis__applyifelseintrinsicca__ctladj(
+    %struct.QirArray* %ctls, %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+
+  ret void
+}
+
+define void @__quantum__qis__applyifelseintrinsic__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  call void @__quantum__qis__applyifelseintrinsicca__body(
+    %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
   ret void
 }
 
 define void @__quantum__qis__applyifelseintrinsica__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
-  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
+  call void @__quantum__qis__applyifelseintrinsicca__body(
+    %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
   ret void
 }
-define void @__quantum__qis__applyifelseintrinsica__adj(%Result, %Callable*, %Callable*) {
-  call void @unexpected_conditional()
+define void @__quantum__qis__applyifelseintrinsica__adj(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+  call void @__quantum__qis__applyifelseintrinsicca__adj(
+    %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
   ret void
 }
 
 define void @__quantum__qis__applyifelseintrinsicc__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
-  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
+  call void @__quantum__qis__applyifelseintrinsicca__body(
+    %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
   ret void
 }
-define void @__quantum__qis__applyifelseintrinsicc__ctl(%Array*, %Result, %Callable*, %Callable*) {
-  call void @unexpected_conditional()
-  ret void
-}
-
-define void @__quantum__qis__applyifelseintrinsicca__body(
-  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
-  call void @__quantum__qis__applyifelseintrinsic__body(%Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one)
-  ret void
-}
-define void @__quantum__qis__applyifelseintrinsicca__ctl(%Array*, %Result, %Callable*, %Callable*) {
-  call void @unexpected_conditional()
-  ret void
-}
-define void @__quantum__qis__applyifelseintrinsicca__adj(%Result, %Callable*, %Callable*) {
-  call void @unexpected_conditional()
-  ret void
-}
-define void @__quantum__qis__applyifelseintrinsicca__ctladj(%Array*, %Result, %Callable*, %Callable*) {
-  call void @unexpected_conditional()
+define void @__quantum__qis__applyifelseintrinsicc__ctl(%Array* %.ctls, { %Result*, %Callable*, %Callable* }* %.args) {
+  call void @__quantum__qis__applyifelseintrinsicca__ctl(%Array* %.ctls, { %Result*, %Callable*, %Callable* }* %.args)
   ret void
 }
 

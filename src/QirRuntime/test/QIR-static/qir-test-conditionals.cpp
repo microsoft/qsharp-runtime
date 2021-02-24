@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "catch.hpp"
@@ -20,8 +21,10 @@ using namespace Microsoft::Quantum;
 // expected maximum number of X and ControlledX callbacks.
 struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
-    int cX = 0;
-    int ccX = 0;
+    int nGateCallback = 0;
+    vector<int> xCallbacks;
+    vector<int> cxCallbacks;
+    vector<int> otherCallbacks;
 
     vector<ResultValue> mockMeasurements;
     int nextMeasureResult = 0;
@@ -29,6 +32,29 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
         : mockMeasurements(results)
     {
+    }
+
+    std::string GetHistory()
+    {
+        std::stringstream out;
+        out << "X: ";
+        for (int i : this->xCallbacks)
+        {
+            out << i << ",";
+        }
+
+        out << std::endl << "CX: ";
+        for (int i : this->cxCallbacks)
+        {
+            out << i << ",";
+        }
+
+        out << std::endl << "Other: ";
+        for (int i : this->otherCallbacks)
+        {
+            out << i << ",";
+        }
+        return out.str();
     }
 
     Qubit AllocateQubit() override
@@ -39,21 +65,34 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void X(Qubit) override
     {
-        this->cX++;
+        this->xCallbacks.push_back(this->nGateCallback);
+        this->nGateCallback++;
     }
     void ControlledX(long numControls, Qubit controls[], Qubit qubit) override
     {
-        this->ccX++;
+        this->cxCallbacks.push_back(this->nGateCallback);
+        this->nGateCallback++;
     }
-    void Y(Qubit) override {}
+    void Y(Qubit) override
+    {
+        this->otherCallbacks.push_back(this->nGateCallback);
+        this->nGateCallback++;
+    }
+    void ControlledY(long numControls, Qubit controls[], Qubit qubit) override
+    {
+        this->otherCallbacks.push_back(this->nGateCallback);
+        this->nGateCallback++;
+    }
 
     Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        assert(this->nextMeasureResult < this->mockMeasurements.size()
-            && "ConditionalsTestSimulator isn't set up correctly");
+        assert(
+            this->nextMeasureResult < this->mockMeasurements.size() &&
+            "ConditionalsTestSimulator isn't set up correctly");
 
-        return (this->mockMeasurements[this->nextMeasureResult] == Result_Zero) ? UseZero() : UseOne();
+        Result r = (this->mockMeasurements[this->nextMeasureResult] == Result_Zero) ? UseZero() : UseOne();
         this->nextMeasureResult++;
+        return r;
     }
 
     bool AreEqualResults(Result r1, Result r2) override
@@ -83,20 +122,26 @@ TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__body());
-    CHECK(qapi->cX == 8);
-    CHECK(qapi->ccX == 0);
+
+    INFO(qapi->GetHistory());
+    CHECK(qapi->xCallbacks.size() == 8);
+    CHECK(qapi->cxCallbacks.size() == 0);
+    CHECK(qapi->otherCallbacks.size() == 0);
 }
 
 extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body(); // NOLINT
-TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals][skip]")
+TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body());
-    CHECK(qapi->cX == 5);
-    CHECK(qapi->ccX == 7);
+
+    INFO(qapi->GetHistory());
+    CHECK(qapi->xCallbacks.size() == 5);
+    CHECK(qapi->cxCallbacks.size() == 7);
+    CHECK(qapi->otherCallbacks.size() == 0);
 }
 
 extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body(); // NOLINT
@@ -107,6 +152,9 @@ TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body());
-    CHECK(qapi->cX == 4);
-    CHECK(qapi->ccX == 2);
+
+    INFO(qapi->GetHistory());
+    CHECK(qapi->xCallbacks.size() == 4);
+    CHECK(qapi->cxCallbacks.size() == 2);
+    CHECK(qapi->otherCallbacks.size() == 0);
 }

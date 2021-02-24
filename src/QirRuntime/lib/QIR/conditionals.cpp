@@ -56,16 +56,36 @@ static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
 
 extern "C"
 {
-    void unexpected_conditional()
-    {
-        throw std::logic_error(
-            "This conditional callback should have been lowered to a corresponding __body call in QIR");
-    }
-
-    void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
+    void quantum__qis__applyifelseintrinsicca__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
         QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
         ApplyWithFunctor(false /*C*/, false /*A*/, nullptr, clbApply);
+    }
+
+    void quantum__qis__applyifelseintrinsicca__adj(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
+    {
+        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
+        ApplyWithFunctor(false /*C*/, true /*A*/, nullptr, clbApply);
+    }
+
+    void quantum__qis__applyifelseintrinsicca__ctl(
+        QirArray* ctls,
+        RESULT* r,
+        QirCallable* clbOnZero,
+        QirCallable* clbOnOne)
+    {
+        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
+        ApplyWithFunctor(true /*C*/, false /*A*/, ctls, clbApply);
+    }
+
+    void quantum__qis__applyifelseintrinsicca__ctladj(
+        QirArray* ctls,
+        RESULT* r,
+        QirCallable* clbOnZero,
+        QirCallable* clbOnOne)
+    {
+        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
+        ApplyWithFunctor(true /*C*/, true /*A*/, ctls, clbApply);
     }
 
     void quantum__qis__applyconditionallyintrinsicca__body(

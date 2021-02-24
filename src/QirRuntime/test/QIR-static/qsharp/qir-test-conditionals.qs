@@ -8,9 +8,9 @@ namespace Microsoft.Quantum.Testing.QIR {
         use q1 = Qubit();
         use q2 = Qubit();
 
-        let r1 = M(q1);
+        let r1 = M(q1); // expected: r1 = Zero
         X(q2);
-        let r2 = M(q2);
+        let r2 = M(q2); // expected: r2 = One
 
         ApplyIfElseR(r1, (X, q1), (Y, q1));
         ApplyIfElseR(r2, (Y, q1), (X, q1));
