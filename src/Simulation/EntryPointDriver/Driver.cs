@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -336,9 +337,19 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="handle">The handle.</param>
         /// <param name="entryPoint">The entry point this handle is specific to.</param>
         /// <returns>The handle wrapper for the given handle.</returns>
-        private static Func<ParseResult, TArg, Task<int>> CreateHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
+        //private Func<ParseResult, TArg, Task<int>> CreateHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
+        //{
+        //    return (ParseResult parseResult, TArg arg) => handle(parseResult, arg, entryPoint);
+        //}
+
+        private Func<ParseResult, string, Task<int>> CreateSimulateHandle(Func<ParseResult, string, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
         {
-            return (ParseResult parseResult, TArg arg) => handle(parseResult, arg, entryPoint);
+            return (ParseResult parseResult, string simulator) => handle(parseResult, simulator, entryPoint);
+        }
+
+        private Func<ParseResult, AzureSettings, Task<int>> CreateSubmitHandle(Func<ParseResult, AzureSettings, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
+        {
+            return (ParseResult parseResult, AzureSettings settings) => handle(parseResult, settings, entryPoint);
         }
 
         /// <summary>
@@ -350,7 +361,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(CreateHandle<string>(Simulate, entryPoint))
+                Handler = CommandHandler.Create(CreateSimulateHandle(Simulate, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -371,7 +382,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(CreateHandle<AzureSettings>(Submit, entryPoint))
+                Handler = CommandHandler.Create(CreateSubmitHandle(Submit, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -406,7 +417,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         private OptionInfo<string> CreateSimulatorOption(IEntryPoint entryPoint) =>
             new OptionInfo<string>(
                 this.settings.SimulatorOptionAliases,
-                entryPoint.DefaultSimulatorName,
+                "QuantumSimulator",
                 "The name of the simulator to use.",
                 suggestions: new[]
                 {
@@ -437,8 +448,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="simulator">The simulator to use.</param>
         /// <param name="entryPoint">The entry point to simulate.</param>
         /// <returns>The exit code.</returns>
-        private Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
-            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, CreateSimulatorOption(entryPoint), simulator));
+        private async Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
+            await entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, CreateSimulatorOption(entryPoint), simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -447,8 +458,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="azureSettings">The Azure submission settings.</param>
         /// <param name="entryPoint">The entry point to submit.</param>
         /// <returns>The exit code.</returns>
-        private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
-            entryPoint.Submit(parseResult, new AzureSettings
+        private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
+            await entryPoint.Submit(parseResult, new AzureSettings
             {
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
