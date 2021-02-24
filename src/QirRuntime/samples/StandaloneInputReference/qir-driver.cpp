@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <iostream>
 #include "CLI11.hpp"
+#include "QirContext.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
-#include "QirContext.hpp"
+#include <iostream>
 
 using namespace Microsoft::Quantum;
 
@@ -13,50 +13,38 @@ extern "C" void Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // NOL
     int64_t anInt,
     double aDouble);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    try{
+    try
+    {
         CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
         // Add the --simulator-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
         std::string simulatorOutputFile;
-        CLI::Option *simulatorOutputFileOpt = app.add_option(
-            "-s,--simulator-output",
-            simulatorOutputFile,
-            "File to write the output of the simulator to");
+        CLI::Option* simulatorOutputFileOpt = app.add_option(
+            "-s,--simulator-output", simulatorOutputFile, "File to write the output of the simulator to");
 
         std::string operationOutputFile;
-        CLI::Option *operationOutputFileOpt = app.add_option(
-            "-o,--operation-output",
-            operationOutputFile,
-            "File to write the output of the Q# operation to");
+        CLI::Option* operationOutputFileOpt = app.add_option(
+            "-o,--operation-output", operationOutputFile, "File to write the output of the Q# operation to");
 
         // Add the options that correspond to the parameters that the QIR entry-point needs.
         // Option for a Q# Int type.
         int64_t anInt = 0;
-        CLI::Option *anIntOpt = app.add_option(
-            "--anint",
-            anInt,
-            "An integer");
+        CLI::Option* anIntOpt = app.add_option("--anint", anInt, "An integer");
 
         anIntOpt->required();
 
         // Option for a Q# Double type.
         double_t aDouble = 0.0;
-        CLI::Option *aDoubleOpt = app.add_option(
-            "--adouble",
-            aDouble,
-            "A double");
+        CLI::Option* aDoubleOpt = app.add_option("--adouble", aDouble, "A double");
 
         aDoubleOpt->required();
 
         // Option for a Q# Bool type.
         bool aBool = false;
-        CLI::Option *aBoolOpt = app.add_option(
-            "--abool",
-            aBool,
-            "A bool");
+        CLI::Option* aBoolOpt = app.add_option("--abool", aBool, "A bool");
 
         aBoolOpt->required();
 
@@ -66,10 +54,7 @@ int main(int argc, char *argv[])
 
         // Option for a Q# Array<Int> type.
         std::vector<int64_t> anIntegerArray;
-        CLI::Option *anIntegerArrayOpt = app.add_option(
-            "--anintegerarray",
-            anIntegerArray,
-            "An integer array");
+        CLI::Option* anIntegerArrayOpt = app.add_option("--anintegerarray", anIntegerArray, "An integer array");
 
         anIntegerArrayOpt->required();
 
@@ -81,7 +66,8 @@ int main(int argc, char *argv[])
         // Redirect the simulator output from std::cout if the --simulator-output option is present.
         std::ostream* simulatorOutputStream = &std::cout;
         std::filebuf simulatorOutputFileBuffer;
-        if (!simulatorOutputFileOpt->empty()){
+        if (!simulatorOutputFileOpt->empty())
+        {
             simulatorOutputFileBuffer.open(simulatorOutputFile, std::ios::out);
             std::ostream simulatorOutputFileStream(&simulatorOutputFileBuffer);
             // TODO: Call into the QIR runtime API to redirect the output of the simulator.
@@ -91,7 +77,8 @@ int main(int argc, char *argv[])
         // Redirect the Q# opertion output from std::cout if the --operation-output option is present.
         std::ostream* operationOutputStream = &std::cout;
         std::filebuf operationOutputFileBuffer;
-        if (!operationOutputFileOpt->empty()){
+        if (!operationOutputFileOpt->empty())
+        {
             operationOutputFileBuffer.open(operationOutputFile, std::ios::out);
             std::ostream operationOutputFileStream(&operationOutputFileBuffer);
             operationOutputStream = &operationOutputFileStream;
@@ -112,14 +99,18 @@ int main(int argc, char *argv[])
         operationOutputStream->flush();
 
         // Close opened file buffers;
-        if (!simulatorOutputFileOpt->empty()){
+        if (!simulatorOutputFileOpt->empty())
+        {
             simulatorOutputFileBuffer.close();
         }
 
-        if (!operationOutputFileOpt->empty()){
+        if (!operationOutputFileOpt->empty())
+        {
             operationOutputFileBuffer.close();
         }
-    } catch(...) {
+    }
+    catch (...)
+    {
         std::cout << "An unexpected failure occurred." << std::endl;
         return 1;
     }

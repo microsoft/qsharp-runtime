@@ -1,3 +1,2 @@
-Checks: 
-  '-*,bugprone-*'
-WarningsAsErrors: '*'
+InheritParentConfig: true
+HeaderFilterRegex: ''
