@@ -1,9 +1,15 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.15.2102129370-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk/0.15.2102129527-alpha">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <QirGeneration>True</QirGeneration>
+    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" /> 
+  </ItemGroup>
 
 </Project>
