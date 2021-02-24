@@ -5,7 +5,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <CSharpGeneration>false</CSharpGeneration>
     <QirGeneration>True</QirGeneration>
-    <ExecutionTarget>honeywell.qpu</ExecutionTarget>
   </PropertyGroup>
 
 </Project>

@@ -57,8 +57,8 @@ namespace Microsoft.Quantum.Testing.QIR {
 
             // Conditionals:
             TestApplyIf();
+            TestApplyIfWithFunctors();
             TestApplyConditionally();
-            TestConditionalRewrite();
         }
         return sum;
     }

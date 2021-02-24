@@ -24,7 +24,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     int ccX = 0;
 
     vector<ResultValue> mockMeasurements;
-    int nMeasure = -1;
+    int nextMeasureResult = 0;
 
     explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
         : mockMeasurements(results)
@@ -49,10 +49,11 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
     {
-        this->nMeasure++;
-        assert(this->nMeasure < this->mockMeasurements.size() && "ConditionalsTestSimulator isn't set up correctly");
+        assert(this->nextMeasureResult < this->mockMeasurements.size()
+            && "ConditionalsTestSimulator isn't set up correctly");
 
-        return (this->mockMeasurements[this->nMeasure] == Result_Zero) ? UseZero() : UseOne();
+        return (this->mockMeasurements[this->nextMeasureResult] == Result_Zero) ? UseZero() : UseOne();
+        this->nextMeasureResult++;
     }
 
     bool AreEqualResults(Result r1, Result r2) override
@@ -82,7 +83,19 @@ TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__body());
-    CHECK(qapi->cX == 10);
+    CHECK(qapi->cX == 8);
+    CHECK(qapi->ccX == 0);
+}
+
+extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body(); // NOLINT
+TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals][skip]")
+{
+    unique_ptr<ConditionalsTestSimulator> qapi =
+        make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
+    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body());
+    CHECK(qapi->cX == 5);
     CHECK(qapi->ccX == 7);
 }
 
@@ -96,16 +109,4 @@ TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body());
     CHECK(qapi->cX == 4);
     CHECK(qapi->ccX == 2);
-}
-
-extern "C" void Microsoft__Quantum__Testing__QIR__TestConditionalRewrite__body(); // NOLINT
-TEST_CASE("QIR: conditionals on measurement results", "[qir][qir.conditionals]")
-{
-    unique_ptr<ConditionalsTestSimulator> qapi =
-        make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
-
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestConditionalRewrite__body());
-    CHECK(qapi->cX == 1);
-    CHECK(qapi->ccX == 1);
 }
