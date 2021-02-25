@@ -491,7 +491,7 @@ namespace Microsoft.Quantum.Simulation.Common
 
         #region Branching based on measurement
 
-        class ApplyIfElse : ApplyIfElseIntrinsic
+        public class ApplyIfElse : ApplyIfElseIntrinsic
         {
             protected readonly SimulatorBase sim;
             public ApplyIfElse(SimulatorBase m) : base(m) =>
@@ -505,7 +505,7 @@ namespace Microsoft.Quantum.Simulation.Common
             };
         }
 
-        class ApplyConditionally : ApplyConditionallyIntrinsic
+        public class ApplyConditionally : ApplyConditionallyIntrinsic
         {
             protected readonly SimulatorBase sim;
             public ApplyConditionally(SimulatorBase m) : base(m) =>
