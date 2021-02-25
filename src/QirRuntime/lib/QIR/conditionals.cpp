@@ -9,30 +9,10 @@
 #include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
-static void ApplyWithFunctor(bool isControlled, bool isAdjoint, QirArray* ctls, QirCallable* clb)
+static void Apply(QirCallable* clb)
 {
-    auto tupleSize = isControlled ? sizeof(void*) : 0;
-    PTuple argsTuple = quantum__rt__tuple_create(tupleSize);
-
-    QirCallable* clbFunc =
-        (isAdjoint || isControlled) ? quantum__rt__callable_copy(clb, true /*force new instance*/) : clb;
-
-    if (isAdjoint)
-    {
-        quantum__rt__callable_make_adjoint(clbFunc);
-    }
-    if (isControlled)
-    {
-        quantum__rt__callable_make_controlled(clbFunc);
-        *reinterpret_cast<QirArray**>(argsTuple) = ctls;
-    }
-
-    quantum__rt__callable_invoke(clbFunc, argsTuple /*args*/, nullptr /*result*/);
-
-    if (clb != clbFunc)
-    {
-        quantum__rt__callable_update_reference_count(clbFunc, -1);
-    }
+    PTuple argsTuple = quantum__rt__tuple_create(0);
+    quantum__rt__callable_invoke(clb, argsTuple /*args*/, nullptr /*result*/);
     quantum__rt__tuple_update_reference_count(argsTuple, -1);
 }
 
@@ -56,77 +36,19 @@ static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
 
 extern "C"
 {
-    void quantum__qis__applyifelseintrinsicca__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
+    void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
         QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        ApplyWithFunctor(false /*C*/, false /*A*/, nullptr, clbApply);
+        Apply(clbApply);
     }
 
-    void quantum__qis__applyifelseintrinsicca__adj(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
-    {
-        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        ApplyWithFunctor(false /*C*/, true /*A*/, nullptr, clbApply);
-    }
-
-    void quantum__qis__applyifelseintrinsicca__ctl(
-        QirArray* ctls,
-        RESULT* r,
-        QirCallable* clbOnZero,
-        QirCallable* clbOnOne)
-    {
-        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        ApplyWithFunctor(true /*C*/, false /*A*/, ctls, clbApply);
-    }
-
-    void quantum__qis__applyifelseintrinsicca__ctladj(
-        QirArray* ctls,
-        RESULT* r,
-        QirCallable* clbOnZero,
-        QirCallable* clbOnOne)
-    {
-        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        ApplyWithFunctor(true /*C*/, true /*A*/, ctls, clbApply);
-    }
-
-    void quantum__qis__applyconditionallyintrinsicca__body(
+    void quantum__qis__applyconditionallyintrinsic__body(
         QirArray* rs1,
         QirArray* rs2,
         QirCallable* clbOnAllEqual,
         QirCallable* clbOnSomeDifferent)
     {
         QirCallable* clbApply = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
-        ApplyWithFunctor(false /*C*/, false /*A*/, nullptr, clbApply);
-    }
-
-    void quantum__qis__applyconditionallyintrinsicca__adj(
-        QirArray* rs1,
-        QirArray* rs2,
-        QirCallable* clbOnAllEqual,
-        QirCallable* clbOnSomeDifferent)
-    {
-        QirCallable* clbApply = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
-        ApplyWithFunctor(false /*C*/, true /*A*/, nullptr, clbApply);
-    }
-
-    void quantum__qis__applyconditionallyintrinsicca__ctl(
-        QirArray* ctls,
-        QirArray* rs1,
-        QirArray* rs2,
-        QirCallable* clbOnAllEqual,
-        QirCallable* clbOnSomeDifferent)
-    {
-        QirCallable* clbApply = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
-        ApplyWithFunctor(true /*C*/, false /*A*/, ctls, clbApply);
-    }
-
-    void quantum__qis__applyconditionallyintrinsicca__ctladj(
-        QirArray* ctls,
-        QirArray* rs1,
-        QirArray* rs2,
-        QirCallable* clbOnAllEqual,
-        QirCallable* clbOnSomeDifferent)
-    {
-        QirCallable* clbApply = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
-        ApplyWithFunctor(true /*C*/, true /*A*/, ctls, clbApply);
+        Apply(clbApply);
     }
 }
