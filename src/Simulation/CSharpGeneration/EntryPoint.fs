@@ -198,7 +198,7 @@ let mainNamespace (entryPoints : seq<QsCallable>) =
 
     ``namespace`` entryPointClassName
         ``{``
-            (Seq.map using SimulationCode.autoNamespaces)
+            []
             [mainClass]
         ``}``
 
@@ -245,7 +245,7 @@ let private entryPointClass context (entryPoint : QsCallable) =
 let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
     ``namespace`` name
         ``{``
-            (Seq.map using SimulationCode.autoNamespaces)
+            []
             [for ep in entryPoints -> entryPointClass context ep]
         ``}``
         :> MemberDeclarationSyntax
@@ -260,7 +260,6 @@ let generateEntryPointSource context (entryPoints : seq<QsCallable>) (mainNamesp
         match mainNamespace with
         | Some mainNamespace -> (mainNamespace :> MemberDeclarationSyntax) :: epNamespaces
         | None -> epNamespaces
-    // ToDo: look into including the autoNamespaces only once per file
-    ``compilation unit`` [] [] namespaces
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) namespaces
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
