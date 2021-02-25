@@ -192,7 +192,7 @@ let private testWithTarget defaultTarget =
     |> testWithConstants
 
 /// Standard command-line arguments for the "submit" command without specifying a target.
-let private submitWithoutTarget = 
+let private submitWithoutTarget =
     [ "submit"
       "--subscription"
       "mySubscription"
@@ -421,7 +421,7 @@ let ``Accepts one-tuple`` () =
     let given = test "Accepts one-tuple"
     given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
 
-[<Fact>]    
+[<Fact>]
 let ``Accepts two-tuple`` () =
     let given = test "Accepts two-tuple"
     given ["-x"; "7"; "-y"; "8"; "-z"; "9"] |> yields "7 8 9"
@@ -452,7 +452,7 @@ let ``Shadows --simulator`` () =
     |> yields (sprintf "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
                         %s"
                        AssemblyConstants.ResourcesEstimator)
-    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
+    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails
     given ["-s"; "foo"] |> fails
 
 [<Fact>]
@@ -834,9 +834,12 @@ let ``Shows help text for submit command`` () =
     let message =
         name
         |> sprintf "Usage:
-                      %s submit [options]
+                      %s submit [options] [command]
 
                     Options:
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
@@ -850,10 +853,10 @@ let ``Shows help text for submit command`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
-                      -n <n> (REQUIRED)                                   A number.
-                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-                      --my-cool-bool (REQUIRED)                           A neat bit.
-                      -?, -h, --help                                      Show help and usage information"
+                      -?, -h, --help                                      Show help and usage information
+
+                      Commands:
+                        EntryPointTest.Help    This test checks that the entry point documentation appears correctly in the command line help message."
     let given = test "Help"
     given ["submit"; "--help"] |> yields message
 
@@ -863,9 +866,12 @@ let ``Shows help text for submit command with default target`` () =
     let message =
         name
         |> sprintf "Usage:
-                      %s submit [options]
+                      %s submit [options] [command]
 
                     Options:
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
@@ -879,9 +885,9 @@ let ``Shows help text for submit command with default target`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
-                      -n <n> (REQUIRED)                                   A number.
-                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-                      --my-cool-bool (REQUIRED)                           A neat bit.
-                      -?, -h, --help                                      Show help and usage information"
+                      -?, -h, --help                                      Show help and usage information
+
+                      Commands:
+                        EntryPointTest.Help    This test checks that the entry point documentation appears correctly in the command line help message."
     let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message
