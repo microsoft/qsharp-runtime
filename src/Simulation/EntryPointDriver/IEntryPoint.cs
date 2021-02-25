@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         Task<int> Submit(ParseResult parseResult, AzureSettings settings);
 
         /// <summary>
-        /// 
+        /// Simulates the entry point.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The driver settings.</param>

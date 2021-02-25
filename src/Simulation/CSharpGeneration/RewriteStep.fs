@@ -28,7 +28,7 @@ type Emitter() =
         member this.AssemblyConstants = upcast _AssemblyConstants
         member this.GeneratedDiagnostics = upcast _Diagnostics
         
-        member this.ImplementsPreconditionVerification = false
+        member this.ImplementsPreconditionVerification = true
         member this.ImplementsPostconditionVerification = false
         member this.ImplementsTransformation = true
 
@@ -66,7 +66,7 @@ type Emitter() =
                     compilation.EntryPoints
                     |> Seq.map (fun ep -> context.allCallables.[ep])
 
-                let main = EntryPoint.mainNamespace context entryPointCallables
+                let main = EntryPoint.mainNamespace entryPointCallables
 
                 let entryPointSources =
                     entryPointCallables

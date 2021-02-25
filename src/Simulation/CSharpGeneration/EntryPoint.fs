@@ -124,9 +124,6 @@ let private generateEntryPointClassName (entryPoint : QsCallable) =
 
 let private submitMethod context entryPoint =
     let callableName, _, _ = callableTypeNames context entryPoint
-    //let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
-    //let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-    //let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
     let args =
@@ -149,8 +146,6 @@ let private submitMethod context entryPoint =
 let private simulateMethod context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let simulationType = generic (driverNamespace + ".Simulation") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
-    //let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-    //let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
     let simulatorParamName = "simulator"
@@ -173,10 +168,7 @@ let private simulateMethod context entryPoint =
         (Some (``=>`` (simulationType <.> (ident "Simulate", args))))
 
 /// The main method for the standalone executable.
-let private mainMethod context (entryPoints : seq<QsCallable>) =
-    //let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
-    //let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
-    //let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
+let private mainMethod (entryPoints : seq<QsCallable>) =
 
     let entryPointArrayMembers =
         [
@@ -195,24 +187,23 @@ let private mainMethod context (entryPoints : seq<QsCallable>) =
         [``private``; ``static``; async]
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
-let private mainClass context (entryPoints : seq<QsCallable>) =
-    ``class`` entryPointClassName ``<<`` [] ``>>``
-        ``:`` None ``,`` []
-        [``internal``]
-        ``{``
-            [mainMethod context entryPoints]
-        ``}``
+let mainNamespace (entryPoints : seq<QsCallable>) =
+    let mainClass =
+        ``class`` entryPointClassName ``<<`` [] ``>>``
+            ``:`` None ``,`` []
+            [``internal``]
+            ``{``
+                [mainMethod entryPoints]
+            ``}``
 
-let mainNamespace context (entryPoints : seq<QsCallable>) =
     ``namespace`` entryPointClassName
         ``{``
             (Seq.map using SimulationCode.autoNamespaces)
-            [mainClass context entryPoints]
+            [mainClass]
         ``}``
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
-    //let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
     let nameProperty =
         entryPoint.FullName.ToString()
@@ -232,23 +223,17 @@ let private entryPointClass context (entryPoint : QsCallable) =
         |> (fun (_, value) -> if value = null then "" else value)
         |> literal
         |> property "DefaultExecutionTarget" "string"
-    //let infoProperty =
-    //    property "Info" (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
-    //                    (ident callableName <|.|> ident "Info")
     let members : MemberDeclarationSyntax list = [
         nameProperty
         summaryProperty
         parameterOptionsProperty parameters
         defaultSimulatorNameProperty
         defaultExecutionTargetProperty
-        //infoProperty
         customSimulatorFactory defaultSimulator
         createArgument context entryPoint
         submitMethod context entryPoint
         simulateMethod context entryPoint
-        //mainMethod context entryPoint
     ]
-    //let baseName = sprintf "%s.IEntryPoint<%s, %s>" driverNamespace argTypeName returnTypeName
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
     ``class`` (generateEntryPointClassName entryPoint |> snd) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
@@ -267,8 +252,6 @@ let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
 let generateEntryPointSource context (entryPoints : seq<QsCallable>) (mainNamespace : NamespaceDeclarationSyntax option) =
-    //let tempEntryPoint = Seq.head entryPoints
-
     let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
 
     let epNamespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps]
@@ -277,21 +260,6 @@ let generateEntryPointSource context (entryPoints : seq<QsCallable>) (mainNamesp
         match mainNamespace with
         | Some mainNamespace -> (mainNamespace :> MemberDeclarationSyntax) :: epNamespaces
         | None -> epNamespaces
-
-        //let ns, eps = Seq.head entryPointNamespaces
-        //let firstNS =
-        //    match mainNamespace with
-        //    | Some mainNS -> (entryPointNamespace context ns eps).AddMembers(mainNS)
-        //    | None -> entryPointNamespace context ns eps
-        //    :> MemberDeclarationSyntax 
-        //firstNS :: [for ns, eps in Seq.tail entryPointNamespaces -> entryPointNamespace context ns eps]
-
-    //let ns =
-    //    ``namespace`` tempEntryPoint.FullName.Namespace
-    //        ``{``
-    //            (Seq.map using SimulationCode.autoNamespaces)
-    //            [entryPointClass context tempEntryPoint]
-    //        ``}``
     // ToDo: look into including the autoNamespaces only once per file
     ``compilation unit`` [] [] namespaces
     |> ``with leading comments`` SimulationCode.autogenComment
