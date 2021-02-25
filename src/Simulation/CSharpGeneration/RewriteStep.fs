@@ -70,14 +70,14 @@ type Emitter() =
 
                 let entryPointSources =
                     entryPointCallables
-                    |> Seq.groupBy (fun ep -> ep.SourceFile)
+                    |> Seq.groupBy (fun ep -> ep.Source.CodeFile)
 
                 let (sourceFile, callables) = Seq.head entryPointSources
-                let content = EntryPoint.generateEntryPointSource context callables (Some main)
+                let content = EntryPoint.generateSource context callables (Some main)
                 CompilationLoader.GeneratedFile(sourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
 
                 for (sourceFile, callables) in Seq.tail entryPointSources do
-                    let content = EntryPoint.generateEntryPointSource context callables None
+                    let content = EntryPoint.generateSource context callables None
                     CompilationLoader.GeneratedFile(sourceFile, dir, ".EntryPoint.g.cs", content) |> ignore
 
             transformed <- compilation

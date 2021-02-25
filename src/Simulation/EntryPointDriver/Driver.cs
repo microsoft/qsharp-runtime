@@ -126,7 +126,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// All the registered entry points of the program.
         /// </summary>
-        private readonly IEnumerable<IEntryPoint> entryPoints;
+        private readonly IReadOnlyCollection<IEntryPoint> entryPoints;
 
         /// <summary>
         /// Creates a new driver for the entry point.
@@ -136,7 +136,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public Driver(DriverSettings settings, IEnumerable<IEntryPoint> entryPoints)
         {
             this.settings = settings;
-            this.entryPoints = entryPoints;
+            this.entryPoints = entryPoints.ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -149,13 +149,13 @@ namespace Microsoft.Quantum.EntryPointDriver
             var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand);
             var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand);
 
-            var (simulate, simulateValids) = CreateSimulateCommand(simulateSubCommands);
-            var (submit, submitValids) = CreateSubmitCommand(submitSubCommands);
+            var (simulate, simulateValidators) = CreateSimulateCommand(simulateSubCommands);
+            var (submit, _) = CreateSubmitCommand(submitSubCommands);
 
             var root = new RootCommand() { simulate, submit };
             if (this.entryPoints.Count() == 1)
             {
-                SetSubCommandAsDefault(root, simulate, simulateValids);
+                SetSubCommandAsDefault(root, simulate, simulateValidators);
                 root.Description = this.entryPoints.First().Summary;
             }
 
@@ -243,8 +243,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The list of validators added to the command during this function.</returns>
         private static IEnumerable<ValidateSymbol<CommandResult>> AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
-            var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
-
             if (IsAliasAvailable(option.Aliases.First(), command.Options))
             {
                 command.AddOption(option.Create(option.Aliases.Where(alias => IsAliasAvailable(alias, command.Options))));
@@ -255,10 +253,10 @@ namespace Microsoft.Quantum.EntryPointDriver
                     $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.";
 
                 command.AddValidator(validator);
-                validators =  new[] { validator };
+                return new[] { validator };
             }
 
-            return validators;
+            return Enumerable.Empty<ValidateSymbol<CommandResult>>();
         }
 
         /// <summary>
@@ -269,8 +267,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The list of validators added to the command during this function.</returns>
         private static IEnumerable<ValidateSymbol<CommandResult>> MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases)
         {
-            var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
-
             ValidateSymbol<CommandResult> validator = result =>
             {
                 var presentAliases = new List<string>();
@@ -305,15 +301,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateCommand(
             IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
         {
-            var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
-
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             if (entryPointCommands.Count() == 1)
             {
-                var (epCommand, valids) = entryPointCommands.First();
+                var (epCommand, validators) = entryPointCommands.First();
                 simulate.AddCommand(epCommand);
-                SetSubCommandAsDefault(simulate, epCommand, valids);
-                validators = valids;
+                SetSubCommandAsDefault(simulate, epCommand, validators);
+                return (simulate, validators);
             }
             else
             {
@@ -321,9 +315,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 {
                     simulate.AddCommand(epCommand);
                 }
+                return (simulate, Enumerable.Empty<ValidateSymbol<CommandResult>>());
             }
-
-            return (simulate, validators);
         }
 
         /// <summary>
@@ -333,18 +326,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>Tuple with the created submit command and the validators for that command.</returns>
         private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSubmitCommand(IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
         {
-            var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
-
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
                 IsHidden = true,
             };
             if (entryPointCommands.Count() == 1)
             {
-                var (epCommand, valids) = entryPointCommands.First();
+                var (epCommand, validators) = entryPointCommands.First();
                 submit.AddCommand(epCommand);
-                SetSubCommandAsDefault(submit, epCommand, valids);
-                validators = valids;
+                SetSubCommandAsDefault(submit, epCommand, validators);
+                return (submit, validators);
             }
             else
             {
@@ -352,9 +343,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 {
                     submit.AddCommand(epCommand);
                 }
+                return (submit, Enumerable.Empty<ValidateSymbol<CommandResult>>());
             }
-
-            return (submit, validators);
         }
 
         /// <summary>
@@ -398,22 +388,23 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
-            validators = validators.Concat(AddOptionIfAvailable(command, SubscriptionOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, ResourceGroupOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, WorkspaceOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, this.CreateTargetOption(entryPoint)));
-            validators = validators.Concat(AddOptionIfAvailable(command, StorageOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, AadTokenOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, BaseUriOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, LocationOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, JobNameOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, ShotsOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, OutputOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, DryRunOption));
-            validators = validators.Concat(AddOptionIfAvailable(command, VerboseOption));
-            validators = validators.Concat(MarkOptionsAsMutuallyExclusive(
-                command,
-                new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
+            validators = validators
+                .Concat(AddOptionIfAvailable(command, SubscriptionOption))
+                .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
+                .Concat(AddOptionIfAvailable(command, WorkspaceOption))
+                .Concat(AddOptionIfAvailable(command, this.CreateTargetOption(entryPoint)))
+                .Concat(AddOptionIfAvailable(command, StorageOption))
+                .Concat(AddOptionIfAvailable(command, AadTokenOption))
+                .Concat(AddOptionIfAvailable(command, BaseUriOption))
+                .Concat(AddOptionIfAvailable(command, LocationOption))
+                .Concat(AddOptionIfAvailable(command, JobNameOption))
+                .Concat(AddOptionIfAvailable(command, ShotsOption))
+                .Concat(AddOptionIfAvailable(command, OutputOption))
+                .Concat(AddOptionIfAvailable(command, DryRunOption))
+                .Concat(AddOptionIfAvailable(command, VerboseOption))
+                .Concat(MarkOptionsAsMutuallyExclusive(
+                    command,
+                    new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
 
             return (command, validators);
         }
@@ -457,8 +448,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="simulator">The simulator to use.</param>
         /// <param name="entryPoint">The entry point to simulate.</param>
         /// <returns>The exit code.</returns>
-        private async Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
-            await entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, this.CreateSimulatorOption(entryPoint), simulator));
+        private Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
+            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, this.CreateSimulatorOption(entryPoint), simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -467,8 +458,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="azureSettings">The Azure submission settings.</param>
         /// <param name="entryPoint">The entry point to submit.</param>
         /// <returns>The exit code.</returns>
-        private async Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
-            await entryPoint.Submit(parseResult, new AzureSettings
+        private Task<int> Submit(ParseResult parseResult, AzureSettings azureSettings, IEntryPoint entryPoint) =>
+            entryPoint.Submit(parseResult, new AzureSettings
             {
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
@@ -506,5 +497,4 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
     }
-
 }

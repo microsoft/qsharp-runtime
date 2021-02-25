@@ -368,7 +368,6 @@ namespace EntryPointTest {
 // --- Multiple entry points
 
 namespace EntryPointTest {
-    
     @EntryPoint()
     operation  MultipleEntryPoints1() : String {
         return "Hello from Entry Point 1!";

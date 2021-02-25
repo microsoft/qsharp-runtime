@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.EntryPointDriver
     public interface IEntryPoint
     {
         /// <summary>
-        /// The name of the entry point operation.
+        /// The name of the entry point.
         /// </summary>
         string Name { get; }
 

@@ -119,9 +119,11 @@ let private callableTypeNames context (callable : QsCallable) =
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
 
+/// Generates the class name for an entry point class.
 let private generateEntryPointClassName (entryPoint : QsCallable) =
-    (entryPoint.FullName.Namespace, entryPointClassName +  entryPoint.FullName.Name)
+    { Namespace = entryPoint.FullName.Namespace; Name = entryPointClassName + entryPoint.FullName.Name }
 
+/// Generates the Submit method for an entry point class.
 let private submitMethod context entryPoint =
     let callableName, _, _ = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
@@ -143,6 +145,7 @@ let private submitMethod context entryPoint =
         [``public``]
         (Some (``=>`` (ident (driverNamespace + ".Azure") <.> (ident "Submit", args))))
 
+/// Generates the Simulate method for an entry point class.
 let private simulateMethod context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let simulationType = generic (driverNamespace + ".Simulation") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
@@ -173,8 +176,8 @@ let private mainMethod (entryPoints : seq<QsCallable>) =
     let entryPointArrayMembers =
         [
             for ep in entryPoints do
-                let ns, name = generateEntryPointClassName ep
-                ``new`` (``type`` (ns + "." + name)) ``(`` [] ``)``
+                let name = generateEntryPointClassName ep
+                ``new`` (``type`` (name.ToString())) ``(`` [] ``)``
         ]
 
     let entryPointArray =
@@ -187,6 +190,7 @@ let private mainMethod (entryPoints : seq<QsCallable>) =
         [``private``; ``static``; async]
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
+/// Generates a namespace for the main function
 let mainNamespace (entryPoints : seq<QsCallable>) =
     let mainClass =
         ``class`` entryPointClassName ``<<`` [] ``>>``
@@ -235,13 +239,14 @@ let private entryPointClass context (entryPoint : QsCallable) =
         simulateMethod context entryPoint
     ]
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
-    ``class`` (generateEntryPointClassName entryPoint |> snd) ``<<`` [] ``>>``
+    ``class`` ((generateEntryPointClassName entryPoint).Name) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
             members
         ``}``
 
+/// Generates a namespace for a set of entry points that share the namespace
 let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
     ``namespace`` name
         ``{``
@@ -251,7 +256,7 @@ let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
         :> MemberDeclarationSyntax
 
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generateEntryPointSource context (entryPoints : seq<QsCallable>) (mainNamespace : NamespaceDeclarationSyntax option) =
+let generateSource context (entryPoints : seq<QsCallable>) (mainNamespace : NamespaceDeclarationSyntax option) =
     let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
 
     let epNamespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps]

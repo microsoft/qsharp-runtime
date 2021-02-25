@@ -74,7 +74,7 @@ let private generateCSharp constants (compilation : QsCompilation) =
     let mainNS = EntryPoint.mainNamespace entryPoints
     [
         SimulationCode.generate testFile context
-        EntryPoint.generateEntryPointSource context entryPoints (Some mainNS)
+        EntryPoint.generateSource context entryPoints (Some mainNS)
     ]
 
 /// The full path to a referenced assembly given its short name.
