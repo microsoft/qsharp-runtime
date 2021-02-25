@@ -28,20 +28,11 @@ type Emitter() =
         member this.AssemblyConstants = upcast _AssemblyConstants
         member this.GeneratedDiagnostics = upcast _Diagnostics
         
-        member this.ImplementsPreconditionVerification = true
+        member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false
         member this.ImplementsTransformation = true
 
-        member this.PreconditionVerification compilation =
-            if compilation.EntryPoints.Length > 1 then
-                _Diagnostics <- IRewriteStep.Diagnostic
-                    (Message = DiagnosticItem.Message (ErrorCode.MultipleEntryPoints, []),
-                     Severity = DiagnosticSeverity.Error,
-                     Stage = IRewriteStep.Stage.PreconditionVerification) :: _Diagnostics
-                false
-            else
-                true
-
+        member this.PreconditionVerification compilation = NotImplementedException() |> raise
         member this.PostconditionVerification _ = NotImplementedException() |> raise
         
         member this.Transformation (compilation, transformed) = 
