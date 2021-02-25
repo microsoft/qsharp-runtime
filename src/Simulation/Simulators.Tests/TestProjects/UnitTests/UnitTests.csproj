@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
+<Project Sdk="Microsoft.Quantum.Sdk/0.15.2102129527-alpha">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -15,9 +15,6 @@
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />
     <ProjectReference Include="..\Library with Spaces\Library with Spaces.csproj" />
-    <ProjectReference Include="..\HoneywellExe\HoneywellExe.csproj" />
-    <ProjectReference Include="..\IonQExe\IonQExe.csproj" />
-    <ProjectReference Include="..\QCIExe\QCIExe.csproj" />
   </ItemGroup>
 
   <ItemGroup>

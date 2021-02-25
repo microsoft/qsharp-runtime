@@ -32,14 +32,14 @@ namespace Microsoft.Quantum.Random {
         // There are nicer ways of doing this, but they require the full
         // standard library to be available.
         mutable sum = 0.0;
-        for (prob in probs) {
+        for prob in probs {
             Fact(prob >= 0.0, "Probabilities must be positive.");
             set sum += prob;
         }
 
         let variate = DrawRandomDouble(0.0, sum);
         mutable acc = 0.0;
-        for (idx in 0..Length(probs) - 1) {
+        for idx in 0..Length(probs) - 1 {
             set acc += probs[idx];
             if (variate <= acc) {
                 return idx;

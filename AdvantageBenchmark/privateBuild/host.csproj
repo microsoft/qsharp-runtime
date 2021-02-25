@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.14.2012122063-beta">
+<Project Sdk="Microsoft.Quantum.Sdk/0.15.2101126940">
   <!-- Add project references to Simulator and other required packages: -->
   <Import Project="..\..\src\Simulation\Common\Simulators.Dev.props" />
 

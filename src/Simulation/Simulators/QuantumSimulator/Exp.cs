@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators

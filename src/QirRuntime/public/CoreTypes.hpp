@@ -1,8 +1,9 @@
 #pragma once
 
+#include <cstdint>
+
 // The core types will be exposed in the C-interfaces for interop, thus no
 // namespaces or scoped enums can be used to define them.
-
 
 /*==============================================================================
   Qubit & Result
@@ -27,12 +28,10 @@ enum ResultValue
 /*==============================================================================
   PauliId matrices
 ==============================================================================*/
-enum PauliId
+enum PauliId : int32_t
 {
     PauliId_I = 0,
     PauliId_X = 1,
     PauliId_Z = 2,
     PauliId_Y = 3,
 };
-
-

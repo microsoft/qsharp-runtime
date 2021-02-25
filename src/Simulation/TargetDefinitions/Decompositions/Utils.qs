@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
-    @EnableTestingViaName("Test.TargetDefinitions.SpreadZ")
     internal operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
             CNOT(to[0], from);
@@ -16,7 +14,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhase")
     internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
         body (...) {}
         controlled (controls, (...)) {
@@ -30,7 +27,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.ApplyGlobalPhaseFracWithR1Frac")
     internal operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
         body (...) {}
         controlled (ctrls, ...) {
@@ -43,7 +39,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.MapPauli")
     internal operation MapPauli (qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
         if (from == to) {
         }
@@ -73,13 +68,12 @@ namespace Microsoft.Quantum.Intrinsic {
 
     /// Given a multiply-controlled operation that requires k controls 
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
-    @EnableTestingViaName("Test.TargetDefinitions.ApplyWithLessControlsA")
     internal operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {
         let numControls = Length(controls);
         let numControlPairs = numControls / 2;
-        using (temps = Qubit[numControlPairs]) {
+        use temps = Qubit[numControlPairs] {
             within {
-                for (numPair in 0 .. numControlPairs - 1) { // constant depth
+                for numPair in 0 .. numControlPairs - 1 { // constant depth
                     PhaseCCX(controls[2*numPair], controls[2*numPair + 1], temps[numPair]);
                 }
             }
@@ -90,7 +84,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.PhaseCCX")
     internal operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         // https://arxiv.org/pdf/1210.0974.pdf#page=2
         H(target);
@@ -106,7 +99,6 @@ namespace Microsoft.Quantum.Intrinsic {
         H(target);
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.ReducedDyadicFraction")
     internal function ReducedDyadicFraction (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
         if (numerator == 0) { return (0,0); }
         mutable num = numerator;
@@ -118,7 +110,6 @@ namespace Microsoft.Quantum.Intrinsic {
         return (num,denPow);
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.ReducedDyadicFractionPeriodic")
     internal function ReducedDyadicFractionPeriodic (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
         let (k,n) = ReducedDyadicFraction(numerator,denominatorPowerOfTwo); // k is odd, or (k,n) are both 0
         let period = 2*2^n; // \pi k / 2^n is 2\pi periodic, therefore k is 2 * 2^n periodic
@@ -129,30 +120,28 @@ namespace Microsoft.Quantum.Intrinsic {
 
     // TODO(swernli): Consider removing this in favor of pulling Microsoft.Quantum.Arrays.Subarray
     // into the runtime.
-    @EnableTestingViaName("Test.TargetDefinitions.Subarray")
     internal function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
         let nSliced = Length(indices);
         mutable sliced = new 'T[nSliced];
 
-        for (idx in 0 .. nSliced - 1) {
+        for idx in 0 .. nSliced - 1 {
             set sliced w/= idx <- array[indices[idx]];
         }
 
         return sliced;
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.IndicesOfNonIdentity")
     internal function IndicesOfNonIdentity (paulies : Pauli[]) : Int[] {
         mutable nonIdPauliCount = 0;
 
-        for (i in 0 .. Length(paulies) - 1) {
+        for i in 0 .. Length(paulies) - 1 {
             if (paulies[i] != PauliI) { set nonIdPauliCount += 1; }
         }
         
         mutable indices = new Int[nonIdPauliCount];
         mutable index = 0;
         
-        for (i in 0 .. Length(paulies) - 1) {
+        for i in 0 .. Length(paulies) - 1 {
             if (paulies[i] != PauliI) {
                 set indices w/= index <- i;
                 set index = index + 1;
@@ -162,7 +151,6 @@ namespace Microsoft.Quantum.Intrinsic {
         return indices;
     }
 
-    @EnableTestingViaName("Test.TargetDefinitions.RemovePauliI")
     internal function RemovePauliI (paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
         let indices = IndicesOfNonIdentity(paulis);
         let newPaulis = Subarray(indices, paulis);

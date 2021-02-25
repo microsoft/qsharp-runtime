@@ -4,7 +4,6 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Convert;
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies the exponential of a multi-qubit Pauli operator
@@ -29,7 +28,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// the qubit register is to be rotated.
     /// ## qubits
     /// Register to apply the given rotation to.
-    @EnableTestingViaName("Test.TargetDefinitions.ExpFrac")
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {
         body (...) {
             if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'target' must have the same length"; }
