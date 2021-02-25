@@ -891,3 +891,11 @@ let ``Shows help text for submit command with default target`` () =
                         EntryPointTest.Help    This test checks that the entry point documentation appears correctly in the command line help message."
     let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message
+
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
+let ``Supports multiple entry points`` () =
+    let given = test "Multiple entry points"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> yields "Hello from Entry Point 1!"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> yields "Hello from Entry Point 2!"
+    given ["simulate"] |> fails
+    given [] |> fails

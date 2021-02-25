@@ -360,3 +360,22 @@ namespace EntryPointTest {
     @EntryPoint()
     operation Help(n : Int, pauli : Pauli, myCoolBool : Bool) : Unit { }
 }
+
+//
+// Multiple Entry Points
+//
+
+// --- Multiple entry points
+
+namespace EntryPointTest {
+    
+    @EntryPoint()
+    operation  MultipleEntryPoints1() : String {
+        return "Hello from Entry Point 1!";
+    }
+
+    @EntryPoint()
+    operation  MultipleEntryPoints2() : String {
+        return "Hello from Entry Point 2!";
+    }
+}
