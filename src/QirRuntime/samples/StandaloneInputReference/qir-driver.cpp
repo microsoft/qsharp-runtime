@@ -19,15 +19,15 @@ int main(int argc, char* argv[])
     {
         CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
-        // Add the --simulator-output and --operation-output options.
+        // Add the --simulation-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
         std::string simulatorOutputFile;
         CLI::Option* simulatorOutputFileOpt = app.add_option(
-            "-s,--simulator-output", simulatorOutputFile, "File to write the output of the simulator to");
+            "-s,--simulation-output", simulatorOutputFile, "File where the output produced during the simulation is written");
 
         std::string operationOutputFile;
         CLI::Option* operationOutputFileOpt = app.add_option(
-            "-o,--operation-output", operationOutputFile, "File to write the output of the Q# operation to");
+            "-o,--operation-output", operationOutputFile, "File where the output of the Q# operation is written");
 
         // Add the options that correspond to the parameters that the QIR entry-point needs.
         // Option for a Q# Int type.
