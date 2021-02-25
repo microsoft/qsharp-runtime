@@ -75,9 +75,13 @@ namespace Microsoft.Quantum.Bitwise {
 
 
     /// # Summary
-    /// Returns the bitwise PARITY of an integer
-    /// (1 if its [two's complement](https://en.wikipedia.org/wiki/Signed_number_representations#Two's_complement)
-    /// representation contains odd number of ones and 0 otherwise).
+    /// Returns the bitwise PARITY of an integer.
+    ///
+    /// # Description
+    /// This function returns the bitwise parity of the 
+    /// [two's complement](https://en.wikipedia.org/wiki/Signed_number_representations#Two's_complement)
+    /// representation of its input, returning `1` if that representation
+    /// contains an odd number of ones, and returning `0` otherwise.
     ///
     /// # Example
     /// ```qsharp
@@ -88,10 +92,10 @@ namespace Microsoft.Quantum.Bitwise {
         mutable v = a;
         // http://graphics.stanford.edu/~seander/bithacks.html#ParityMultiply
         // XOR the bits in every 2-bit pair, save the result in the least significant bit (LSB) of the pair:
-        set v = v ^^^ (v >>> 1);    // bit[0] = bit[0] ^ bit[1]; bit[2] = bit[2] ^ bit[3]; ..
+        set v ^^^= (v >>> 1);    // bit[0] = bit[0] ^ bit[1]; bit[2] = bit[2] ^ bit[3]; ..
         // Now only the even bits contain the information.
         // XOR the even bits in every 4-bit nibble, save the result in the LSB of the nibble:
-        set v = v ^^^ (v >>> 2);    // bit[0] = bit[0] ^ bit[2]; bit[4] = bit[4] ^ bit[6]; ..
+        set v ^^^= (v >>> 2);    // bit[0] = bit[0] ^ bit[2]; bit[4] = bit[4] ^ bit[6]; ..
         // Now only the LSB of each nibble contains the information.
         set v =
             (v &&& 0x1111111111111111)      // In every 4-bit nibble clear (to '0') all the bits except the LSB.
@@ -105,7 +109,8 @@ namespace Microsoft.Quantum.Bitwise {
             //   0x11111111
             // 0x1111111
             //-----------------
-            //         4          The value in the most significant 4-bit nibble is equal to the number of 1s in (A). The LSB is 0.
+            //         4          The value in the most significant 4-bit nibble is equal to the number of 1s in (A), 
+            //                    modulo 16. The LSB is 0.
         return (v >>> 60) &&& 1;    // Return the LSB of the most significant 4-bit nibble.
     }
 
