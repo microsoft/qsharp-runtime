@@ -13,8 +13,10 @@ target_link_libraries(qir-tracer-tests PUBLIC
   ${QIR_UTILITY_LIB} # set by compile_from_qir
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_TRACER_UTILITY_LIB}
+  ${QIR_BRIDGE_QIS_UTILITY_LIB}
   tracer
   qir-rt-support
+  qir-qis-support
 )
 
 target_include_directories(qir-tracer-tests PUBLIC
