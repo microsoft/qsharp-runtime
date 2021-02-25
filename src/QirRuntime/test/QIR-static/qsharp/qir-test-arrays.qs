@@ -32,7 +32,8 @@ namespace Microsoft.Quantum.Testing.QIR {
 
         // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
         if (compilerDecoy) {
-            let res1 = TestControlled();
+            let res1_1 = TestFunctors();
+            let res1_2 = TestFunctorsNoArgs();
             let res2 = TestPartials(17, 42);
             TestQubitResultManagement();
 
@@ -53,6 +54,11 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res17 = ArcCosTest();
             let res18 = ArcTanTest();
             MessageTest("Test");
+
+            // Conditionals:
+            TestApplyIf();
+            TestApplyIfWithFunctors();
+            TestApplyConditionally();
         }
         return sum;
     }

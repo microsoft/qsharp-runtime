@@ -60,7 +60,7 @@ declare void @quantum__qis__y__ctl(%struct.QirArray*, %class.QUBIT*)
 declare void @quantum__qis__z__body(%class.QUBIT*)
 declare void @quantum__qis__z__ctl(%struct.QirArray*, %class.QUBIT*)
 
-declare void @quantum__qis__message__body(%"struct.QirString"* %str)
+declare void @quantum__qis__message__body(%struct.QirString* %str)
 
 ;===============================================================================
 ; quantum.qis namespace implementations
@@ -284,8 +284,8 @@ define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
 ;===============================================================================
 ;
 define void @__quantum__qis__message__body(%String* %.str) {
-  %str = bitcast %String* %.str to %"struct.QirString"*
-  call void @quantum__qis__message__body(%"struct.QirString"* %str)
+  %str = bitcast %String* %.str to %struct.QirString*
+  call void @quantum__qis__message__body(%struct.QirString* %str)
   ret void
 }
 
@@ -437,3 +437,35 @@ define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {
   %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
   ret i64 %result
 }
+
+;===============================================================================
+; quantum.qis conditional functions
+;
+declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsic__body(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+
+define void @__quantum__qis__applyifelseintrinsic__body(
+  %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
+
+  %r = bitcast %Result* %.r to %class.RESULT*
+  %clb_on_zero = bitcast %Callable* %.clb_on_zero to %struct.QirCallable*
+  %clb_on_one = bitcast %Callable* %.clb_on_one to %struct.QirCallable*
+  call void @quantum__qis__applyifelseintrinsic__body(
+    %class.RESULT* %r, %struct.QirCallable* %clb_on_zero, %struct.QirCallable* %clb_on_one)
+  ret void
+}
+
+define void @__quantum__qis__applyconditionallyintrinsic__body(
+  %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
+
+  %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
+  %rs2 = bitcast %Array* %.rs2 to %struct.QirArray*
+  %clb_on_equal = bitcast %Callable* %.clb_on_equal to %struct.QirCallable*
+  %clb_on_different = bitcast %Callable* %.clb_on_different to %struct.QirCallable*
+  call void @quantum__qis__applyconditionallyintrinsic__body(
+    %struct.QirArray* %rs1, %struct.QirArray* %rs2,
+    %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
+  ret void
+}
+
