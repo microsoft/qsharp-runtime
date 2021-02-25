@@ -31,21 +31,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> Submit<TIn, TOut>(
             IEntryPoint entryPoint, EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
         {
-            /*/
-            
-            Console.WriteLine("Submit");
-            Console.WriteLine($"EntryPoint: {entryPoint.Name}");
-            Console.WriteLine($"Arguments: {input}");
-            Console.WriteLine("With Azure Settings:");
-            foreach (var prop in typeof(AzureSettings).GetProperties())
-            {
-                Console.WriteLine($"\t{prop.Name}: {prop.GetValue(settings)}");
-            }
-
-            return 0;
-
-            /*/
-
             if (settings.Verbose)
             {
                 Console.WriteLine(settings);
@@ -63,9 +48,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             return settings.DryRun
                 ? Validate(machine, info, input)
                 : await SubmitJob(machine, info, input, settings);
-
-            /**/
-
         }
 
         /// <summary>

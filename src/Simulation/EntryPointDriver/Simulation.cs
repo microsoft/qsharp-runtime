@@ -30,15 +30,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> Simulate(
             IEntryPoint entryPoint, TIn input, DriverSettings settings, string simulator)
         {
-            /*/
-
-            Console.WriteLine("Simulate");
-            Console.WriteLine($"EntryPoint: {entryPoint.Name}");
-            Console.WriteLine($"Arguments: {input}");
-            Console.WriteLine($"On Simulator: {simulator}");
-
-            /*/
-
             if (simulator == settings.ResourcesEstimatorName)
             {
                 // Force the explicit load of the QSharp.Core assembly so that the ResourcesEstimator
@@ -68,8 +59,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 }
                 await RunSimulator(input, createSimulator);
             }
-
-            /**/
 
             return 0;
         }

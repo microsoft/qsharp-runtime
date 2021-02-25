@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Circuits;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -187,6 +186,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="root">The command whose handle and options will be set.</param>
         /// <param name="subCommand">The sub command that will be copied from.</param>
+        /// <param name="validators">The validators associated with the sub command.</param>
         private static void SetSubCommandAsDefault(Command root, Command subCommand, IEnumerable<ValidateSymbol<CommandResult>> validators)
         {
             root.Handler = subCommand.Handler;
@@ -237,9 +237,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Adds the option to the command using only the aliases that are available, and only if the primary (first)
         /// alias is available. If a required option is not available, the command is disabled.
         /// </summary>
+        /// <typeparam name="T">The type of the option's argument.</typeparam>
         /// <param name="command">The command to add the option to.</param>
         /// <param name="option">The option to add.</param>
-        /// <typeparam name="T">The type of the option's argument.</typeparam>
+        /// <returns>The list of validators added to the command during this function.</returns>
         private static IEnumerable<ValidateSymbol<CommandResult>> AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
@@ -265,6 +266,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="command">The command to add the validator to.</param>
         /// <param name="primaryAliases">The primary aliases of the options to be marked as mutually exclusive.</param>
+        /// <returns>The list of validators added to the command during this function.</returns>
         private static IEnumerable<ValidateSymbol<CommandResult>> MarkOptionsAsMutuallyExclusive(Command command, string[] primaryAliases)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
@@ -299,8 +301,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates the simulate command.
         /// </summary>
         /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>The created simulate command.</returns>
-        private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateCommand(IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
+        /// <returns>Tuple with the created simulate command and the validators for that command.</returns>
+        private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateCommand(
+            IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
 
@@ -327,7 +330,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates the Azure submit command.
         /// </summary>
         /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>The created submit command.</returns>
+        /// <returns>Tuple with the created submit command and the validators for that command.</returns>
         private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSubmitCommand(IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
@@ -355,39 +358,17 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
-        /// Creates a wrapper for a command handle that is specific to an entry point.
-        /// </summary>
-        /// <typeparam name="TArg">The input argument type to the handle.</typeparam>
-        /// <param name="handle">The handle.</param>
-        /// <param name="entryPoint">The entry point this handle is specific to.</param>
-        /// <returns>The handle wrapper for the given handle.</returns>
-        //private Func<ParseResult, TArg, Task<int>> CreateHandle<TArg>(Func<ParseResult, TArg, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
-        //{
-        //    return (ParseResult parseResult, TArg arg) => handle(parseResult, arg, entryPoint);
-        //}
-
-        private Func<ParseResult, string, Task<int>> CreateSimulateHandle(Func<ParseResult, string, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
-        {
-            return (ParseResult parseResult, string simulator) => handle(parseResult, simulator, entryPoint);
-        }
-
-        private Func<ParseResult, AzureSettings, Task<int>> CreateSubmitHandle(Func<ParseResult, AzureSettings, IEntryPoint, Task<int>> handle, IEntryPoint entryPoint)
-        {
-            return (ParseResult parseResult, AzureSettings settings) => handle(parseResult, settings, entryPoint);
-        }
-
-        /// <summary>
         /// Creates a sub command specific to the given entry point for the simulate command.
         /// </summary>
         /// <param name="entryPoint">The entry point to make a command for.</param>
-        /// <returns>The command corresponding to the given entry point.</returns>
+        /// <returns>Tuple with the command corresponding to the given entry point and the validators for that command.</returns>
         private (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateEntryPointCommand(IEntryPoint entryPoint)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
 
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(CreateSimulateHandle(Simulate, entryPoint))
+                Handler = CommandHandler.Create((ParseResult parseResult, string simulator) => this.Simulate(parseResult, simulator, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -403,14 +384,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a sub command specific to the given entry point for the submit command.
         /// </summary>
         /// <param name="entryPoint">The entry point to make a command for.</param>
-        /// <returns>The command corresponding to the given entry point.</returns>
+        /// <returns>Tuple with the command corresponding to the given entry point and the validators for that command.</returns>
         private (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSubmitEntryPointCommand(IEntryPoint entryPoint)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
 
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create(CreateSubmitHandle(Submit, entryPoint))
+                Handler = CommandHandler.Create((ParseResult parseResult, AzureSettings settings) => this.Submit(parseResult, settings, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -477,7 +458,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="entryPoint">The entry point to simulate.</param>
         /// <returns>The exit code.</returns>
         private async Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
-            await entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, CreateSimulatorOption(entryPoint), simulator));
+            await entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, this.CreateSimulatorOption(entryPoint), simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -492,7 +473,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(entryPoint, CreateTargetOption(entryPoint), azureSettings.Target),
+                Target = DefaultIfShadowed(entryPoint, this.CreateTargetOption(entryPoint), azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
