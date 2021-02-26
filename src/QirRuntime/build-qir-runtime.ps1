@@ -12,6 +12,16 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination (Split-Path $qirStaticPath -Parent)
     # Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
     Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination $Env:DROPS_DIR
+    
+    $qirTargetedPath = Join-Path $PSScriptRoot test QIR-static qsharp-targeted
+    dotnet build $qirTargetedPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirTargetedPath' into QIR."
+        return
+    }
+    Copy-Item -Path (Join-Path $qirTargetedPath qir *.ll) -Destination (Split-Path $qirTargetedPath -Parent)
+    # Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
+    Copy-Item -Path (Join-Path $qirTargetedPath qir *.ll) -Destination $Env:DROPS_DIR
 
     Write-Host "##[info]Build QIR Runtime"
     $oldCC = $env:CC

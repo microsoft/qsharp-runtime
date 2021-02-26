@@ -56,11 +56,6 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res18 = ArcTanTest();
             let res19 = ParityTest();
             MessageTest("Test");
-
-            // Conditionals:
-            TestApplyIf();
-            TestApplyIfWithFunctors();
-            TestApplyConditionally();
         }
         return sum;
     }

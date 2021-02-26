@@ -3,6 +3,7 @@
 set(TEST_FILES
   qir-test-noqsharp
   qir-gen
+  qir-targeted
 )
 
 foreach(file ${TEST_FILES})

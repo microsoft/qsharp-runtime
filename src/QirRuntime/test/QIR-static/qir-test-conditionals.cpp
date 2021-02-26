@@ -154,7 +154,7 @@ TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body());
 
     INFO(qapi->GetHistory());
-    CHECK(qapi->xCallbacks.size() == 4);
-    CHECK(qapi->cxCallbacks.size() == 2);
+    CHECK(qapi->xCallbacks.size() == 2);
+    CHECK(qapi->cxCallbacks.size() == 0);
     CHECK(qapi->otherCallbacks.size() == 0);
 }
