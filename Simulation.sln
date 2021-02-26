@@ -63,7 +63,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IonQExe", "src\Simulation\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QCIExe", "src\Simulation\Simulators.Tests\TestProjects\QCIExe\QCIExe.csproj", "{C015FF41-9A51-4AF0-AEFC-2547D596B10A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TargetedExe", "src\Simulation\Simulators.Tests\TestProjects\TargetedExe\TargetedExe.csproj", "{D292BF18-3956-4827-820E-254C3F81EF09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TargetedExe", "src\Simulation\Simulators.Tests\TestProjects\TargetedExe\TargetedExe.csproj", "{D292BF18-3956-4827-820E-254C3F81EF09}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj", "{DB45AD73-4D91-43F3-85CC-C63614A96FB0}"
 EndProject
@@ -71,7 +71,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Type2.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulators.Type2", "src\Simulation\Simulators.Type2.Tests\Tests.Microsoft.Quantum.Simulators.Type2.csproj", "{ED3D7040-4B3F-4217-A75E-9DF63DD84707}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntrinsicTests", "src\Simulation\Simulators.Tests\TestProjects\IntrinsicTests\IntrinsicTests.csproj", "{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntrinsicTests", "src\Simulation\Simulators.Tests\TestProjects\IntrinsicTests\IntrinsicTests.csproj", "{4EF958CA-B4A6-4E5F-924A-100B5615BEC3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulators.Type1", "src\Simulation\Simulators.Type1.Tests\Tests.Microsoft.Quantum.Simulators.Type1.csproj", "{EB6E3DBD-C884-4241-9BC4-8281191D1F53}"
 EndProject
