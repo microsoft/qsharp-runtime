@@ -32,7 +32,7 @@ type Emitter() =
         member this.ImplementsPostconditionVerification = false
         member this.ImplementsTransformation = true
 
-        member this.PreconditionVerification compilation = NotImplementedException() |> raise
+        member this.PreconditionVerification _ = NotImplementedException() |> raise
         member this.PostconditionVerification _ = NotImplementedException() |> raise
         
         member this.Transformation (compilation, transformed) = 
@@ -42,7 +42,7 @@ type Emitter() =
                 | _ -> step.Name
 
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
-            let allSources = GetSourceFiles.Apply compilation.Namespaces 
+            let allSources = GetSourceFiles.Apply compilation.Namespaces
 
             for source in allSources |> Seq.filter context.GenerateCodeForSource do
                 let content = SimulationCode.generate source context
