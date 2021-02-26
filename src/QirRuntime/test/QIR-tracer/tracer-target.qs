@@ -3,26 +3,35 @@
 
 namespace Microsoft.Quantum.Instructions {
 
+    // We'll use TargetInstruction attribute to suppress Q#'s compiler decoration of names for the generated callbacks.
+    open Microsoft.Quantum.Targeting;
+
+    @TargetInstruction("single_qubit_op")
     operation single_qubit_op(op_id: Int, duration: Int, qb : Qubit) : Unit {
         body intrinsic;
     }
 
+    @TargetInstruction("multi_qubit_op")
     operation multi_qubit_op(op_id: Int, duration: Int, qbs : Qubit[]) : Unit {
         body intrinsic;
     }
 
+    @TargetInstruction("single_qubit_op_ctl")
     operation single_qubit_op_ctl(op_id: Int, duration: Int, ctl : Qubit[], qb : Qubit) : Unit {
         body intrinsic;
     }
 
+    @TargetInstruction("multi_qubit_op_ctl")
     operation multi_qubit_op_ctl(op_id: Int, duration: Int, ctl : Qubit[], qbs : Qubit[]) : Unit {
         body intrinsic;
     }
 
+    @TargetInstruction("single_qubit_measure")
     operation single_qubit_measure(op_id: Int, duration: Int, qb : Qubit) : Result {
         body intrinsic;
     }
 
+    @TargetInstruction("joint_measure")
     operation joint_measure(op_id: Int, duration: Int, qbs : Qubit[]) : Result {
         body intrinsic;
     }
@@ -98,7 +107,9 @@ namespace Microsoft.Quantum.Instructions {
 
 namespace Microsoft.Quantum.Tracer {
 
-    @TargetInstruction("inject_global_barrier")
+    open Microsoft.Quantum.Targeting;
+
+    @TargetInstruction("inject_barrier")
     operation Barrier(id : Int, duration : Int) : Unit {
         body intrinsic;
     }
@@ -125,7 +136,7 @@ namespace Microsoft.Quantum.Intrinsic {
     is Adj + Ctl {
         body  (...) { Controlled X([control], target); }
         adjoint self;
-        controlled (ctls, ...) { Controlled X(ctls + control, target); }
+        controlled (ctls, ...) { Controlled X(ctls + [control], target); }
     }
 
     @Inline()
@@ -205,7 +216,7 @@ namespace Microsoft.Quantum.Intrinsic {
 
     @Inline()
     operation M(qb : Qubit) : Result {
-        body  (...) { return Phyz.Mz(qb); }
+        body  (...) { return Phys.Mz(qb); }
     }
 
     @Inline()
@@ -226,8 +237,8 @@ namespace Microsoft.Quantum.Intrinsic {
 
             // Single qubit measurement -- differentiate between Mx and Mz
             elif Length(paulis) == 1 {
-                if (paulis[0] == PauliX) { set res = Mx(qubits[0]); }
-                else { set res = Mz(qubits[0]); }
+                if (paulis[0] == PauliX) { set res = Phys.Mx(qubits[0]); }
+                else { set res = Phys.Mz(qubits[0]); }
             }
 
             // Specialize for two-qubit measurements: Mxx, Mxz, Mzx, Mzz

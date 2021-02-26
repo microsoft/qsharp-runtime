@@ -27,12 +27,12 @@ std::unordered_map<RESULT*, int>& AllocatedResults()
 
 extern "C"
 {
-    Result UseZero()
+    Result quantum__rt__result_zero()
     {
         return Microsoft::Quantum::g_context->simulator->UseZero();
     }
 
-    Result UseOne()
+    Result quantum__rt__result_one()
     {
         return Microsoft::Quantum::g_context->simulator->UseOne();
     }
