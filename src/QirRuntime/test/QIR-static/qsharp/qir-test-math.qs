@@ -273,49 +273,6 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
-    // Remove when the Q# compiler bug https://github.com/microsoft/qsharp-compiler/issues/877 is resolved:
-    //function MyRound(value : Double) : Int {                            // 4.x  4.5  5.x  5.5   -4.x  -4.5  -5.x -5.5
-    //
-    //    // Temporary piece of code to test a Q# compiler bug:
-    //
-    //    let truncated = Truncate(value);                                // 4    4    5    5     -4    -4    -5   -5
-    //    if truncated >= 0 {
-    //        let diff = value - IntAsDouble(truncated);                  // 0.x  0.5  0.x  0.5                           diff
-    //        if diff < 0.5               { return truncated; }           // 4         5                                  return
-    //        if diff > 0.5               { return (truncated + 1); }     // 5         6                                  return
-    //        if truncated % 2 == 0       { return truncated; }           //      4                                       return
-    //        else                        { return truncated + 1; }       //                6                             return
-    //    }
-    //    else {
-    //        let diff = IntAsDouble(truncated) - value;                  //                       0.x   0.5   0.x  0.5   diff
-    //        if diff < 0.5               { return truncated; }           //                      -4          -5
-    //        if diff > 0.5               { return (truncated - 1); }     //                      -5          -6
-    //        if truncated % 2 == 0       { return truncated; }           //                            -4
-    //        else                        { return truncated - 1; }       //                                       -6
-    //    }
-    //
-    //    // End of temporary piece of code.
-    //
-    //
-    //    // Temporary piece of code to work around the clang++ crash upon `Round()` (resolved in `0.15.2102129370-alpha`): 
-    //
-    //    //let truncated = Truncate(value);                             // 4    4    5    5     -4    -4    -5   -5
-    //    //if truncated >= 0 {
-    //    //    let diff = value - IntAsDouble(truncated);               // 0.x  0.5  0.x  0.5                           diff
-    //    //    if diff < 0.5               { return truncated; }        // 4         5                                  return
-    //    //    if diff > 0.5               { return (truncated + 1); }  // 5         6                                  return
-    //    //    if truncated % 2 == 0       { return truncated; }        //      4                                       return
-    //    //    return truncated + 1;                                    //                6                             return
-    //    //}
-    //    //let diff2 = IntAsDouble(truncated) - value;                  //                       0.x   0.5   0.x  0.5   diff
-    //    //if diff2 < 0.5               { return truncated; }           //                      -4          -5
-    //    //if diff2 > 0.5               { return (truncated - 1); }     //                      -5          -6
-    //    //if truncated % 2 == 0        { return truncated; }           //                            -4
-    //    //return truncated - 1;                                        //                                       -6
-    //
-    //    // End of temporary piece of code to work around the clang++ crash.
-    //}
-
     function IeeeRemainderTest() : Int {
 
         // function IeeeRemainder(x : Double, y : Double) : Double
@@ -332,7 +289,6 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
                         // the `remainder` and `IEEERemainder()` calculated below.
                         // That is normal but we avoid that.
                         let remainder = dividend - (divisor * IntAsDouble(Round(dividend / divisor)));  
-                                                                        //MyRound(dividend / divisor)));    // Remove when the https://github.com/microsoft/qsharp-compiler/issues/877 is resolved.
                         if not Close(remainder, IEEERemainder(dividend, divisor)) {
                             Message(DoubleAsString(remainder));     // The output for the test faiulure analysis, 
                             Message(DoubleAsString(dividend));      // if the failure happens.
