@@ -5,14 +5,14 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IGate_Ry : IOperationFactory
+    public interface IIntrinsicRy : IOperationFactory
     {
-        void Ry__Body(double angle, Qubit target);
+        void Body(double angle, Qubit target);
 
-        void Ry__AdjointBody(double angle, Qubit target);
+        void AdjointBody(double angle, Qubit target);
 
-        void Ry__ControlledBody(IQArray<Qubit> controls, double angle, Qubit target);
+        void ControlledBody(IQArray<Qubit> controls, double angle, Qubit target);
 
-        void Ry__ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target);
+        void ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target);
     }
 }

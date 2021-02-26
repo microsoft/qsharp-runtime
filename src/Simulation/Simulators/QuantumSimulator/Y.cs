@@ -2,24 +2,25 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void Y__Body(Qubit target)
+        void IIntrinsicY.Body(Qubit target)
         {
             this.CheckQubit(target);
 
             Y(this.Id, (uint)target.Id);
         }
 
-        public virtual void Y__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicY.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => Y__Body(target),
+                () => ((IIntrinsicY)this).Body(target),
                 (count, ids) => MCY(this.Id, count, ids, (uint)target.Id));
         }
     }

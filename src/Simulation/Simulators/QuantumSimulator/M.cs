@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Result M__Body(Qubit target)
+        Result IIntrinsicM.Body(Qubit target)
         {
             this.CheckQubit(target);
             //setting qubit as measured to allow for release

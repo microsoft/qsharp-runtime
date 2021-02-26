@@ -5,8 +5,8 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IGate_ApplyUncontrolledZ : IOperationFactory
+    public interface IIntrinsicApplyUncontrolledZ : IOperationFactory
     {
-        void ApplyUncontrolledZ__Body(Qubit target);
+        void Body(Qubit target);
     }
 }

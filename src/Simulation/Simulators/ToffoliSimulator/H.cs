@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -12,8 +13,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the operation.
         /// For the Toffoli simulator, the implementation throws a run-time error.
         /// </summary>
-        public void H__Body(Qubit target) => throw new NotImplementedException();
+        void IIntrinsicH.Body(Qubit target) => throw new NotImplementedException();
 
-        public void H__ControlledBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
+        void IIntrinsicH.ControlledBody(IQArray<Qubit> controls, Qubit target) => throw new NotImplementedException();
     }
 }
