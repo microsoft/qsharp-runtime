@@ -9,4 +9,4 @@ By default, the output produced during the simulation and the output returned by
 - **`-o`, `--operation-output`**: File to write the output of the Q# entry-point operation.
 
 
-The `qir-driver.cpp` file contains the logic that parses the command line arguments using the [CLI11]() library, and then invokes the entry point operation.
+The `qir-driver.cpp` file contains the logic that parses the command line arguments using the [CLI11](https://github.com/CLIUtils/CLI11) library, and then invokes the entry point operation.
