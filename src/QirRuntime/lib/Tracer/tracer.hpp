@@ -9,8 +9,8 @@
 #include <vector>
 
 #include "CoreTypes.hpp"
-#include "TracerTypes.hpp"
 #include "QuantumApi_I.hpp"
+#include "TracerTypes.hpp"
 
 namespace Microsoft
 {
@@ -75,6 +75,14 @@ namespace Quantum
         // layer that preceeded it, even if the new operations involve completely new qubits.
         LayerId globalBarrier = INVALID;
 
+        // The temporary barriers between layers that force operations, guarded by a condition on a measurement result,
+        // to be placed into layers _after_ the measurement.
+        std::vector<LayerId> conditionalFences;
+
+        // We don't expect the stack of conditional fences to be deep, so it's OK to recalculate the latest layer when
+        // the stack is modified.
+        LayerId latestConditionalFence = INVALID;
+
         // Mapping of operation ids to user-chosen names, for operations that user didn't name, the output will use
         // operation ids.
         std::unordered_map<OpId, std::string> opNames;
@@ -96,7 +104,7 @@ namespace Quantum
             return this->qubits[qubitIndex];
         }
 
-        // If no appropriate layer found, return `INVALID`
+        // If no appropriate layer found, returns `REQUESTNEW`.
         LayerId FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const;
 
         // Returns the index of the created layer.
@@ -105,10 +113,19 @@ namespace Quantum
         // Adds operation with given id into the given layer. Assumes that duration contraints have been satisfied.
         void AddOperationToLayer(OpId id, LayerId layer);
 
-        // Update the qubit state with the new layer information
+        // Update the qubit state with the new layer information.
         void UpdateQubitState(Qubit q, LayerId layer, Duration opDuration);
 
+        // Considers global barriers and conditional fences to find the barrier currently in effect.
+        LayerId GetEffectiveBarrier() const;
+
+        // For the given results finds the latest layer of the measurements that produced the results.
+        LayerId FindLatestMeasurementLayer(long count, Result* results);
+
       public:
+        // INVALID LayerId is treated as -Infinity, and REQUESTNEW -- as +Infinity
+        static LayerId LaterLayer(LayerId l1, LayerId l2);
+
         explicit CTracer(int preferredLayerDuration)
             : preferredLayerDuration(preferredLayerDuration)
         {
@@ -183,6 +200,14 @@ namespace Quantum
         // Backing of the rest of the bridge methods.
         // -------------------------------------------------------------------------------------------------------------
         LayerId InjectGlobalBarrier(OpId id, Duration duration);
+
+        struct FenceScope
+        {
+            CTracer* tracer = nullptr;
+            LayerId fence = INVALID;
+            explicit FenceScope(CTracer* tracer, long count1, Result* results1, long count2, Result* results2);
+            ~FenceScope();
+        };
 
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.

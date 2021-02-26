@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 #include "catch.hpp"
 
@@ -213,12 +213,190 @@ TEST_CASE("Layering measurements", "[tracer]")
     Qubit qs23[2] = {q2, q3};
     CHECK(2 == tr->GetLayerIdOfSourceMeasurement(tr->TraceMultiQubitMeasurement(5, 1, 2, qs23)));
     CHECK(1 == tr->TraceSingleQubitOp(3, 1, q4));
+}
 
-    const vector<Layer>& layers = tr->UseLayers();
-    REQUIRE(layers.size() == 3);
-    CHECK(layers[0].operations.size() == 3);
-    CHECK(layers[1].operations.size() == 2);
-    CHECK(layers[2].operations.size() == 1);
+TEST_CASE("Conditionals: noops", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 3, q1));
+    CHECK(1 == tr->TraceSingleQubitOp(1, 3, q1));
+    Result one = tr->UseOne();
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &one, 0, nullptr);
+        CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    }
+    {
+        CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &one);
+        CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    }
+    {
+        CTracer::FenceScope fs(tr.get(), 0, nullptr, 0, nullptr);
+        CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    }
+}
+
+TEST_CASE("Conditionals: a new layer because of the fence", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r, 0, nullptr);
+        CHECK(2 == tr->TraceSingleQubitOp(1, 1, q2));
+    }
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q3));
+}
+
+TEST_CASE("Conditionals: single fence", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r));
+    CHECK(2 == tr->TraceSingleQubitOp(1, 1, q1));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r, 0, nullptr);
+        CHECK(2 == tr->TraceSingleQubitOp(1, 1, q2));
+    }
+
+    CHECK(3 == tr->TraceSingleQubitOp(1, 1, q1));
+    CHECK(3 == tr->TraceSingleQubitOp(1, 1, q2));
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q3));
+    CHECK(1 == tr->TraceSingleQubitOp(1, 1, q3));
+    CHECK(2 == tr->TraceSingleQubitOp(1, 1, q3));
+}
+
+TEST_CASE("Conditionals: fence from two result arrays", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r1));
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    CHECK(1 == tr->TraceSingleQubitOp(1, 1, q2));
+    Result r2 = tr->TraceSingleQubitMeasurement(1, 1, q2);
+    CHECK(2 == tr->GetLayerIdOfSourceMeasurement(r2));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r1, 1, &r2);
+        CHECK(3 == tr->TraceSingleQubitOp(1, 1, q3));
+    }
+
+    CHECK(2 == tr->TraceSingleQubitOp(1, 1, q1));
+}
+
+TEST_CASE("Conditionals: nested fence is later than parent", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+    Qubit q4 = tr->AllocateQubit();
+    Qubit q5 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r1));
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    CHECK(1 == tr->TraceSingleQubitOp(1, 1, q2));
+    Result r2 = tr->TraceSingleQubitMeasurement(1, 1, q2);
+    CHECK(2 == tr->GetLayerIdOfSourceMeasurement(r2));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r1, 0, nullptr);
+        CHECK(2 == tr->TraceSingleQubitOp(1, 1, q3));
+        {
+            CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &r2);
+            CHECK(3 == tr->TraceSingleQubitOp(1, 1, q4));
+        }
+        CHECK(2 == tr->TraceSingleQubitOp(1, 1, q5));
+    }
+
+    CHECK(2 == tr->TraceSingleQubitOp(1, 1, q1));
+}
+
+TEST_CASE("Conditionals: nested fence is earlier than parent", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+    Qubit q4 = tr->AllocateQubit();
+    Qubit q5 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r1));
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q2));
+    CHECK(1 == tr->TraceSingleQubitOp(1, 1, q2));
+    Result r2 = tr->TraceSingleQubitMeasurement(1, 1, q2);
+    CHECK(2 == tr->GetLayerIdOfSourceMeasurement(r2));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r2, 0, nullptr);
+        CHECK(3 == tr->TraceSingleQubitOp(1, 1, q3));
+        {
+            CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &r1);
+            CHECK(3 == tr->TraceSingleQubitOp(1, 1, q4));
+        }
+        CHECK(3 == tr->TraceSingleQubitOp(1, 1, q5));
+    }
+    CHECK(2 == tr->TraceSingleQubitOp(1, 1, q1));
+}
+
+TEST_CASE("Conditionals: fences and barriers", "[tracer][tracer.conditionals]")
+{
+    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+
+    Qubit q1 = tr->AllocateQubit();
+    Qubit q2 = tr->AllocateQubit();
+    Qubit q3 = tr->AllocateQubit();
+    Qubit q4 = tr->AllocateQubit();
+    Qubit q5 = tr->AllocateQubit();
+
+    CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
+    Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
+    CHECK(1 == tr->GetLayerIdOfSourceMeasurement(r1));
+
+    CHECK(2 == tr->InjectGlobalBarrier(42, 1));
+
+    Result r2 = tr->TraceSingleQubitMeasurement(1, 1, q2);
+    CHECK(3 == tr->GetLayerIdOfSourceMeasurement(r2));
+
+    {
+        CTracer::FenceScope fs(tr.get(), 1, &r1, 0, nullptr);
+        CHECK(3 == tr->TraceSingleQubitOp(1, 1, q3));
+    }
+    {
+        CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &r2);
+        CHECK(4 == tr->TraceSingleQubitOp(1, 1, q4));
+    }
+    CHECK(3 == tr->TraceSingleQubitOp(1, 1, q5));
 }
 
 TEST_CASE("Output: to string", "[tracer]")

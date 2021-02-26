@@ -36,6 +36,13 @@ namespace Microsoft.Quantum.Instructions {
         body intrinsic;
     }
 
+    @TargetInstruction("apply_conditionally")
+    operation apply_conditionally(
+        measurementResults : Result[], resultsValues : Result[],
+        onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
+        body intrinsic;
+    }
+
     // Operations, used in Hadamard frame tracking
     @Inline()
     operation Tz(qb : Qubit) : Unit
@@ -209,9 +216,9 @@ namespace Microsoft.Quantum.Intrinsic {
     operation Rz(theta : Double, qb : Qubit) : Unit
     is Adj + Ctl {
         body  (...) { Phys.single_qubit_op(23, 1, qb); }
-        adjoint (...) { Phys.single_qubit_op(24, 1, qb); }
-        controlled (ctls, ...) { Phys.single_qubit_op_ctl(25, 1, ctls, qb); }
-        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(25, 1, ctls, qb); }
+        adjoint (...) { Phys.single_qubit_op(23, 1, qb); }
+        controlled (ctls, ...) { Phys.single_qubit_op_ctl(24, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(24, 1, ctls, qb); }
     }
 
     @Inline()
@@ -250,6 +257,17 @@ namespace Microsoft.Quantum.Intrinsic {
             //shouldn't get here
             return res;
         }
+    }
+
+    operation ApplyConditionallyIntrinsic(
+        measurementResults : Result[], resultsValues : Result[],
+        onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
+        body (...) { return Phys.apply_conditionally(measurementResults, resultsValues, onEqualOp, onNonEqualOp); }
+    }
+
+    operation ApplyIfElseIntrinsic(
+        measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
+        body (...) { return Phys.apply_conditionally([measurementResult], [Zero], onResultZeroOp, onResultOneOp); }
     }
 
     // operation SWAP(a : Qubit, b : Qubit) : Unit 

@@ -406,6 +406,14 @@ void QirCallable::Invoke(PTuple args, PTuple result)
     }
 }
 
+void QirCallable::Invoke()
+{
+    assert((this->appliedFunctor & QirCallable::Controlled) == 0 && "Cannot invoke controlled callable without args");
+    PTuple args = quantum__rt__tuple_create(0);
+    this->Invoke(args, nullptr);
+    quantum__rt__tuple_update_reference_count(args, -1);
+}
+
 // A + A = I; A + C = C + A = CA; C + C = C; CA + A = C; CA + C = CA
 void QirCallable::ApplyFunctor(int functor)
 {
