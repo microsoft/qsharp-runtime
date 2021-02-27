@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Testing.QIR {
+    open Microsoft.Quantum.Testing.QIR.Other;
     open Microsoft.Quantum.Testing.QIR.Math;
     open Microsoft.Quantum.Testing.QIR.Str;
     open Microsoft.Quantum.Testing.QIR.Out;
@@ -53,6 +54,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res16 = ArcSinTest();
             let res17 = ArcCosTest();
             let res18 = ArcTanTest();
+            let res19 = ParityTest();
             MessageTest("Test");
 
             // Conditionals:
