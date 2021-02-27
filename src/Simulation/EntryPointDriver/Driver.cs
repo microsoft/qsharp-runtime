@@ -305,6 +305,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             if (entryPointCommands.Count() == 1)
             {
                 var (epCommand, validators) = entryPointCommands.First();
+                epCommand.IsHidden = true;
                 simulate.AddCommand(epCommand);
                 SetSubCommandAsDefault(simulate, epCommand, validators);
                 return (simulate, validators);
@@ -333,6 +334,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             if (entryPointCommands.Count() == 1)
             {
                 var (epCommand, validators) = entryPointCommands.First();
+                epCommand.IsHidden = true;
                 submit.AddCommand(epCommand);
                 SetSubCommandAsDefault(submit, epCommand, validators);
                 return (submit, validators);
