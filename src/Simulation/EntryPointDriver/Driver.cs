@@ -297,9 +297,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates the simulate command.
         /// </summary>
         /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>Tuple with the created simulate command and the validators for that command.</returns>
-        private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateCommand(
-            IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
+        /// <returns>The created simulate command with the validators for that command.</returns>
+        private static CommandWithValidators CreateSimulateCommand(
+            IEnumerable<CommandWithValidators> entryPointCommands)
         {
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             if (entryPointCommands.Count() == 1)
@@ -324,8 +324,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates the Azure submit command.
         /// </summary>
         /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>Tuple with the created submit command and the validators for that command.</returns>
-        private static (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSubmitCommand(IEnumerable<(Command, IEnumerable<ValidateSymbol<CommandResult>>)> entryPointCommands)
+        /// <returns>The created submit command with the validators for that command.</returns>
+        private static CommandWithValidators CreateSubmitCommand(IEnumerable<CommandWithValidators> entryPointCommands)
         {
             var submit = new Command("submit", "Submit the program to Azure Quantum.")
             {
@@ -353,8 +353,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a sub command specific to the given entry point for the simulate command.
         /// </summary>
         /// <param name="entryPoint">The entry point to make a command for.</param>
-        /// <returns>Tuple with the command corresponding to the given entry point and the validators for that command.</returns>
-        private (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSimulateEntryPointCommand(IEntryPoint entryPoint)
+        /// <returns>The command corresponding to the given entry point with the validators for that command.</returns>
+        private CommandWithValidators CreateSimulateEntryPointCommand(IEntryPoint entryPoint)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
 
@@ -376,8 +376,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// Creates a sub command specific to the given entry point for the submit command.
         /// </summary>
         /// <param name="entryPoint">The entry point to make a command for.</param>
-        /// <returns>Tuple with the command corresponding to the given entry point and the validators for that command.</returns>
-        private (Command, IEnumerable<ValidateSymbol<CommandResult>>) CreateSubmitEntryPointCommand(IEntryPoint entryPoint)
+        /// <returns>The command corresponding to the given entry point with the validators for that command.</returns>
+        private CommandWithValidators CreateSubmitEntryPointCommand(IEntryPoint entryPoint)
         {
             var validators = Enumerable.Empty<ValidateSymbol<CommandResult>>();
 
@@ -496,6 +496,63 @@ namespace Microsoft.Quantum.EntryPointDriver
                 // Hide long argument descriptors.
                 var descriptor = base.ArgumentDescriptor(argument);
                 return descriptor.Length > 30 ? argument.Name : descriptor;
+            }
+        }
+
+        /// <summary>
+        /// Struct for housing a command with its validators.
+        /// </summary>
+        private struct CommandWithValidators
+        {
+            public Command Command;
+            public IEnumerable<ValidateSymbol<CommandResult>> Validators;
+
+            /// <summary>
+            /// Basic constructor.
+            /// </summary>
+            public CommandWithValidators(Command command, IEnumerable<ValidateSymbol<CommandResult>> validators)
+            {
+                Command = command;
+                Validators = validators;
+            }
+
+            /// <inheritdoc/>
+            public override bool Equals(object? obj)
+            {
+                return obj is CommandWithValidators other &&
+                       EqualityComparer<Command>.Default.Equals(Command, other.Command) &&
+                       EqualityComparer<IEnumerable<ValidateSymbol<CommandResult>>>.Default.Equals(Validators, other.Validators);
+            }
+
+            /// <inheritdoc/>
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Command, Validators);
+            }
+            
+            /// <summary>
+            /// Allows the type to be deconstructed as a tuple.
+            /// </summary>
+            public void Deconstruct(out Command command, out IEnumerable<ValidateSymbol<CommandResult>> validators)
+            {
+                command = Command;
+                validators = Validators;
+            }
+
+            /// <summary>
+            /// Allows the type to be converted to a tuple.
+            /// </summary>
+            public static implicit operator (Command Command, IEnumerable<ValidateSymbol<CommandResult>> Validators)(CommandWithValidators value)
+            {
+                return (value.Command, value.Validators);
+            }
+
+            /// <summary>
+            /// Allows the type to be converted from a tuple.
+            /// </summary>
+            public static implicit operator CommandWithValidators((Command Command, IEnumerable<ValidateSymbol<CommandResult>> Validators) value)
+            {
+                return new CommandWithValidators(value.Command, value.Validators);
             }
         }
     }
