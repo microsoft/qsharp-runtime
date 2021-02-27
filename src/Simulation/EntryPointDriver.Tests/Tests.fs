@@ -893,9 +893,45 @@ let ``Shows help text for submit command with default target`` () =
     given ["submit"; "--help"] |> yields message
 
 [<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
-let ``Supports multiple entry points`` () =
+let ``Supports simulating multiple entry points`` () =
     let given = test "Multiple entry points"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> yields "Hello from Entry Point 1!"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> yields "Hello from Entry Point 2!"
     given ["simulate"] |> fails
+    given [] |> fails
+
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
+let ``Supports simulating multiple entry points with different parameters`` () =
+    let given = test "Multiple entry points with different parameters"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"; "-n"; "42"] |> yields "42"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"; "-s"; "Hello, World!"] |> fails
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> fails
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"; "-s"; "Hello, World!"] |> yields "Hello, World!"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"; "-n"; "42"] |> fails
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> fails
+    given ["simulate"] |> fails
+    given [] |> fails
+
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
+let ``Supports submitting multiple entry points`` () =
+    let given = test "Multiple entry points"
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints1"])
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints2"])
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given submitWithNothingTarget |> fails
+    given [] |> fails
+
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
+let ``Supports submitting multiple entry points with different parameters`` () =
+    let given = test "Multiple entry points with different parameters"
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints1"; "-n"; "42"])
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints1"; "-s"; "Hello, World!"]) |> fails
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints1"]) |> fails
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints2"; "-s"; "Hello, World!"])
+    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints2"; "-n"; "42"]) |> fails
+    given (submitWithNothingTarget @ ["EntryPointTest.MultipleEntryPoints2"]) |> fails
+    given submitWithNothingTarget |> fails
     given [] |> fails

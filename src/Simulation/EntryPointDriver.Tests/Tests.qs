@@ -378,3 +378,17 @@ namespace EntryPointTest {
         return "Hello from Entry Point 2!";
     }
 }
+
+// --- Multiple entry points with different parameters
+
+namespace EntryPointTest {
+    @EntryPoint()
+    operation  MultipleEntryPoints1(n : Double) : Double {
+        return n;
+    }
+
+    @EntryPoint()
+    operation  MultipleEntryPoints2(s : String) : String {
+        return s;
+    }
+}
