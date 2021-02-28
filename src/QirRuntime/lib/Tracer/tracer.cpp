@@ -29,9 +29,9 @@ namespace Quantum
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // CTracer::LaterLayer
+    // CTracer::LaterLayerOf
     //------------------------------------------------------------------------------------------------------------------
-    /*static*/ LayerId CTracer::LaterLayer(LayerId l1, LayerId l2)
+    /*static*/ LayerId CTracer::LaterLayerOf(LayerId l1, LayerId l2)
     {
         return std::max(l1, l2);
     }
@@ -99,11 +99,11 @@ namespace Quantum
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // CTracer::GetEffectiveBarrier
+    // CTracer::GetEffectiveFence
     //------------------------------------------------------------------------------------------------------------------
-    LayerId CTracer::GetEffectiveBarrier() const
+    LayerId CTracer::GetEffectiveFence() const
     {
-        return CTracer::LaterLayer(this->globalBarrier, this->latestConditionalFence);
+        return CTracer::LaterLayerOf(this->globalBarrier, this->latestConditionalFence);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -115,12 +115,12 @@ namespace Quantum
 
         LayerId layerToInsertInto = REQUESTNEW;
 
-        const LayerId barrier = this->GetEffectiveBarrier();
-        const LayerId firstLayerAfterBarrier = barrier == INVALID ? this->metricsByLayer.empty() ? REQUESTNEW : 0
-                                               : barrier + 1 == this->metricsByLayer.size() ? REQUESTNEW
-                                                                                            : barrier + 1;
+        const LayerId barrier = this->GetEffectiveFence();
+        const LayerId firstLayerAfterBarrier =
+            (barrier == INVALID ? (this->metricsByLayer.empty() ? REQUESTNEW : 0)
+                                : ((barrier + 1 == this->metricsByLayer.size()) ? REQUESTNEW : barrier + 1));
 
-        LayerId candidate = CTracer::LaterLayer(qstate.layer, firstLayerAfterBarrier);
+        LayerId candidate = CTracer::LaterLayerOf(qstate.layer, firstLayerAfterBarrier);
         assert(candidate != INVALID);
 
         if (candidate != REQUESTNEW)
@@ -185,7 +185,7 @@ namespace Quantum
         this->seenOps.insert(id);
 
         QubitState& qstate = this->UseQubit(target);
-        const LayerId barrier = this->GetEffectiveBarrier();
+        const LayerId barrier = this->GetEffectiveFence();
         if (opDuration == 0 && (qstate.layer == INVALID || (barrier != INVALID && qstate.layer < barrier)))
         {
             qstate.pendingZeroDurationOps.push_back(id);
@@ -300,7 +300,7 @@ namespace Quantum
         for (long i = 0; i < count; i++)
         {
             const LayerId id = this->GetLayerIdOfSourceMeasurement(results[i]);
-            latest = CTracer::LaterLayer(latest, id);
+            latest = CTracer::LaterLayerOf(latest, id);
         }
         return latest;
     }
@@ -316,7 +316,7 @@ namespace Quantum
         const LayerId fence2 =
             (rs2 != nullptr && count2 > 0) ? this->tracer->FindLatestMeasurementLayer(count2, rs2) : INVALID;
 
-        this->fence = CTracer::LaterLayer(fence1, fence2);
+        this->fence = CTracer::LaterLayerOf(fence1, fence2);
         if (this->fence == INVALID)
         {
             return;
@@ -324,7 +324,7 @@ namespace Quantum
         assert(this->fence < this->tracer->metricsByLayer.size());
 
         this->tracer->conditionalFences.push_back(this->fence);
-        this->tracer->latestConditionalFence = CTracer::LaterLayer(this->tracer->latestConditionalFence, this->fence);
+        this->tracer->latestConditionalFence = CTracer::LaterLayerOf(this->tracer->latestConditionalFence, this->fence);
     }
     CTracer::FenceScope::~FenceScope()
     {

@@ -71,12 +71,15 @@ namespace Quantum
         // The index into the vector is treated as implicit id of the layer.
         std::vector<Layer> metricsByLayer;
 
-        // The last global barrier, injected by the user. No new operations can be added to the barrier or to any of the
-        // layer that preceeded it, even if the new operations involve completely new qubits.
+        // The last barrier, injected by the user. No new operations can be added to the barrier or to any of the
+        // layer that preceeded it, even if the new operations involve completely new qubits. Thus, the barriers act
+        // as permanent fences, that are activated at the moment the tracer executes the corresponding user code and are
+        // never removed.
         LayerId globalBarrier = INVALID;
 
-        // The temporary barriers between layers that force operations, guarded by a condition on a measurement result,
-        // to be placed into layers _after_ the measurement.
+        // The conditional fences are layers that contain measurements for results used to guard conditional branches.
+        // The set of fences is a stack (for nested conditionals) but we use vector to store them so we can recalculate
+        // the latest (by time) fence when the stack is popped.
         std::vector<LayerId> conditionalFences;
 
         // We don't expect the stack of conditional fences to be deep, so it's OK to recalculate the latest layer when
@@ -116,15 +119,15 @@ namespace Quantum
         // Update the qubit state with the new layer information.
         void UpdateQubitState(Qubit q, LayerId layer, Duration opDuration);
 
-        // Considers global barriers and conditional fences to find the barrier currently in effect.
-        LayerId GetEffectiveBarrier() const;
+        // Considers global barriers and conditional fences to find the fence currently in effect.
+        LayerId GetEffectiveFence() const;
 
         // For the given results finds the latest layer of the measurements that produced the results.
         LayerId FindLatestMeasurementLayer(long count, Result* results);
 
       public:
-        // INVALID LayerId is treated as -Infinity, and REQUESTNEW -- as +Infinity
-        static LayerId LaterLayer(LayerId l1, LayerId l2);
+        // Returns the later layer of the two. INVALID LayerId is treated as -Infinity, and REQUESTNEW -- as +Infinity.
+        static LayerId LaterLayerOf(LayerId l1, LayerId l2);
 
         explicit CTracer(int preferredLayerDuration)
             : preferredLayerDuration(preferredLayerDuration)

@@ -12,7 +12,7 @@ namespace Quantum
     using Duration = int;
     using LayerId = int64_t;
 
-    constexpr LayerId INVALID = std::numeric_limits<int64_t>::min();
-    constexpr LayerId REQUESTNEW = std::numeric_limits<int64_t>::max();
+    constexpr LayerId INVALID = std::numeric_limits<LayerId>::min();
+    constexpr LayerId REQUESTNEW = std::numeric_limits<LayerId>::max();
 }
 }
