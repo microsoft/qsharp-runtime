@@ -119,6 +119,16 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
 
         /// <summary>
+        /// The target option.
+        /// </summary>
+        private readonly OptionInfo<string?> TargetOption;
+
+        /// <summary>
+        /// The simulator option.
+        /// </summary>
+        private readonly OptionInfo<string> SimulatorOption;
+
+        /// <summary>
         /// The driver settings.
         /// </summary>
         private readonly DriverSettings settings;
@@ -136,6 +146,25 @@ namespace Microsoft.Quantum.EntryPointDriver
         public Driver(DriverSettings settings, IEnumerable<IEntryPoint> entryPoints)
         {
             this.settings = settings;
+
+            this.SimulatorOption = new OptionInfo<string>(
+                this.settings.SimulatorOptionAliases,
+                this.settings.DefaultSimulatorName,
+                "The name of the simulator to use.",
+                suggestions: new[]
+                {
+                    this.settings.QuantumSimulatorName,
+                    this.settings.ToffoliSimulatorName,
+                    this.settings.ResourcesEstimatorName,
+                    this.settings.DefaultSimulatorName
+                });
+
+            var targetAliases = ImmutableList.Create("--target");
+            const string targetDescription = "The target device ID.";
+            this.TargetOption = string.IsNullOrWhiteSpace(settings.DefaultExecutionTarget)
+                ? new OptionInfo<string?>(targetAliases, targetDescription)
+                : new OptionInfo<string?>(targetAliases, this.settings.DefaultExecutionTarget, targetDescription);
+
             this.entryPoints = entryPoints.ToList().AsReadOnly();
         }
 
@@ -367,7 +396,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
-            validators = validators.Concat(AddOptionIfAvailable(command, this.CreateSimulatorOption(entryPoint)));
+            validators = validators.Concat(AddOptionIfAvailable(command, this.SimulatorOption));
 
             return (command, validators);
         }
@@ -394,7 +423,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 .Concat(AddOptionIfAvailable(command, SubscriptionOption))
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
-                .Concat(AddOptionIfAvailable(command, this.CreateTargetOption(entryPoint)))
+                .Concat(AddOptionIfAvailable(command, this.TargetOption))
                 .Concat(AddOptionIfAvailable(command, StorageOption))
                 .Concat(AddOptionIfAvailable(command, AadTokenOption))
                 .Concat(AddOptionIfAvailable(command, BaseUriOption))
@@ -412,38 +441,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
-        /// Creates the simulation option for the simulate command with the given entry point.
-        /// </summary>
-        /// <param name="entryPoint">The entry point.</param>
-        /// <returns>The OptionInfor for the simulator option.</returns>
-        private OptionInfo<string> CreateSimulatorOption(IEntryPoint entryPoint) =>
-            new OptionInfo<string>(
-                this.settings.SimulatorOptionAliases,
-                entryPoint.DefaultSimulatorName,
-                "The name of the simulator to use.",
-                suggestions: new[]
-                {
-                    this.settings.QuantumSimulatorName,
-                    this.settings.ToffoliSimulatorName,
-                    this.settings.ResourcesEstimatorName,
-                    entryPoint.DefaultSimulatorName
-                });
-
-        /// <summary>
-        /// Creates the target option for the Azure submit command with the given entry point.
-        /// </summary>
-        /// <param name="entryPoint">The entry point.</param>
-        /// <returns>The OptionInfo for the --target option.</returns>
-        private OptionInfo<string?> CreateTargetOption(IEntryPoint entryPoint)
-        {
-            var targetAliases = ImmutableList.Create("--target");
-            const string targetDescription = "The target device ID.";
-            return string.IsNullOrWhiteSpace(entryPoint.DefaultExecutionTarget)
-                ? new OptionInfo<string?>(targetAliases, targetDescription)
-                : new OptionInfo<string?>(targetAliases, entryPoint.DefaultExecutionTarget, targetDescription);
-        }
-
-        /// <summary>
         /// Simulates the entry point.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
@@ -451,7 +448,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="entryPoint">The entry point to simulate.</param>
         /// <returns>The exit code.</returns>
         private Task<int> Simulate(ParseResult parseResult, string simulator, IEntryPoint entryPoint) =>
-            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, this.CreateSimulatorOption(entryPoint), simulator));
+            entryPoint.Simulate(parseResult, settings, DefaultIfShadowed(entryPoint, this.SimulatorOption, simulator));
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
@@ -466,7 +463,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(entryPoint, this.CreateTargetOption(entryPoint), azureSettings.Target),
+                Target = DefaultIfShadowed(entryPoint, this.TargetOption, azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),

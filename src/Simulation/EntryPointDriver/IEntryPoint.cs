@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -35,16 +33,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         IEnumerable<Option> Options { get; }
 
         /// <summary>
-        /// The name of the default simulator to use when simulating the entry point.
-        /// </summary>
-        string DefaultSimulatorName { get; }
-
-        /// <summary>
-        /// The default execution target when to use when submitting the entry point to Azure Quantum.
-        /// </summary>
-        string DefaultExecutionTarget { get; }
-
-        /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
@@ -60,14 +48,5 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
         Task<int> Simulate(ParseResult parseResult, DriverSettings settings, string simulator);
-
-        /// <summary>
-        /// Creates an instance of the default simulator if it is a custom simulator.
-        /// </summary>
-        /// <returns>An instance of the default custom simulator.</returns>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the default simulator is not a custom simulator.
-        /// </exception>
-        IOperationFactory CreateDefaultCustomSimulator();
     }
 }
