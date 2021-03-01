@@ -29,19 +29,21 @@ TEST_CASE("Invoke each intrinsic from Q# core once", "[qir-tracer]")
     tr->PrintLayerMetrics(out, ",", true /*printZeroMetrics*/);
     INFO(out.str());
 
-    // TestCoreIntrinsics happens to produce 24 layers right now and we are not checking whether that's expected -- as 
+    // TestCoreIntrinsics happens to produce 24 layers right now and we are not checking whether that's expected -- as
     // testing of layering logic is better done by unit tests.
     CHECK(layers.size() == 24);
 }
 
-TEST_CASE("Measurements can be counted but cannot be compared", "[qir-tracer]")
+TEST_CASE("Conditional execution on measurement result", "[qir-tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, g_operationNames);
     QirContextScope qirctx(tr.get(), false /*trackAllocatedObjects*/);
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestMeasurements__body(false /*compare*/));
-    CHECK(tr->UseLayers().size() == 1);
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestMeasurements__body());
 
-    REQUIRE_THROWS(Microsoft__Quantum__Testing__Tracer__TestMeasurements__body(true /*compare*/));
+    std::stringstream out;
+    tr->PrintLayerMetrics(out, ",", true /*printZeroMetrics*/);
+    INFO(out.str());
+    CHECK(tr->UseLayers().size() == 5);
 }
-}
+} // namespace TracerUser
