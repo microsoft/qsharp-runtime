@@ -175,8 +175,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         public async Task<int> Run(string[] args)
         {
-            var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand);
-            var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand);
+            var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand).ToList();
+            var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand).ToList();
 
             var (simulate, simulateValidators) = CreateSimulateCommand(simulateSubCommands);
             var (submit, _) = CreateSubmitCommand(submitSubCommands);
@@ -398,7 +398,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             validators = validators.Concat(AddOptionIfAvailable(command, this.SimulatorOption));
 
-            return (command, validators);
+            return (command, validators.ToList());
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                     command,
                     new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
 
-            return (command, validators);
+            return (command, validators.ToList());
         }
 
         /// <summary>
