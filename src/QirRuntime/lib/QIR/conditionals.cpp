@@ -9,13 +9,6 @@
 #include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
-static void Apply(QirCallable* clb)
-{
-    PTuple argsTuple = quantum__rt__tuple_create(0);
-    quantum__rt__callable_invoke(clb, argsTuple /*args*/, nullptr /*result*/);
-    quantum__rt__tuple_update_reference_count(argsTuple, -1);
-}
-
 static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
 {
     assert(rs1 != nullptr && rs2 != nullptr && rs1->count == rs2->count);
@@ -38,8 +31,8 @@ extern "C"
 {
     void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
-        QirCallable* clbApply = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
-        Apply(clbApply);
+        QirCallable* clb = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
+        clb->Invoke();
     }
 
     void quantum__qis__applyconditionallyintrinsic__body(
@@ -48,7 +41,7 @@ extern "C"
         QirCallable* clbOnAllEqual,
         QirCallable* clbOnSomeDifferent)
     {
-        QirCallable* clbApply = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
-        Apply(clbApply);
+        QirCallable* clb = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
+        clb->Invoke();
     }
 }
