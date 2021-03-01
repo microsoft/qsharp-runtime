@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "CLI11.hpp"
+#include "quantum__qis_internal.hpp"
 #include "QirContext.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
@@ -70,7 +71,7 @@ int main(int argc, char* argv[])
         {
             simulatorOutputFileBuffer.open(simulatorOutputFile, std::ios::out);
             std::ostream simulatorOutputFileStream(&simulatorOutputFileBuffer);
-            // TODO: Call into the QIR runtime API to redirect the output of the simulator.
+            Quantum::Qis::Internal::SetOutputStream(simulatorOutputFileStream);
             simulatorOutputStream = &simulatorOutputFileStream;
         }
 
@@ -83,9 +84,6 @@ int main(int argc, char* argv[])
             std::ostream operationOutputFileStream(&operationOutputFileBuffer);
             operationOutputStream = &operationOutputFileStream;
         }
-
-        // TODO: Remove this after the Message Q# function is integrated into the QIR runtime.
-        (*operationOutputStream) << "SIMULATOR OUTPUT\n----------------" << std::endl;
 
         // Start simulation.
         std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
