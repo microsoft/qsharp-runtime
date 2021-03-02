@@ -207,69 +207,69 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The subscription ID.
         /// </summary>
-        internal string? Subscription { get; set; }
+        public string? Subscription { get; set; }
 
         /// <summary>
         /// The resource group name.
         /// </summary>
-        internal string? ResourceGroup { get; set; }
+        public string? ResourceGroup { get; set; }
 
         /// <summary>
         /// The workspace name.
         /// </summary>
-        internal string? Workspace { get; set; }
+        public string? Workspace { get; set; }
 
         /// <summary>
         /// The target device ID.
         /// </summary>
-        internal string? Target { get; set; }
+        public string? Target { get; set; }
 
         /// <summary>
         /// The storage account connection string.
         /// </summary>
-        internal string? Storage { get; set; }
+        public string? Storage { get; set; }
 
         /// <summary>
         /// The Azure Active Directory authentication token.
         /// </summary>
-        internal string? AadToken { get; set; }
+        public string? AadToken { get; set; }
 
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
         /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
         /// </summary>
-        internal Uri? BaseUri { get; set; }
+        public Uri? BaseUri { get; set; }
 
         /// <summary>
         /// The location to use with the default Azure Quantum endpoint.
         /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
         /// </summary>
-        internal string? Location { get; set; }
+        public string? Location { get; set; }
 
         /// <summary>
         /// The name of the submitted job.
         /// </summary>
-        internal string? JobName { get; set; }
+        public string? JobName { get; set; }
 
         /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
-        internal int Shots { get; set; }
+        public int Shots { get; set; }
 
         /// <summary>
         /// The information to show in the output after the job is submitted.
         /// </summary>
-        internal OutputFormat Output { get; set; }
+        public OutputFormat Output { get; set; }
 
         /// <summary>
         /// Validate the program and options, but do not submit to Azure Quantum.
         /// </summary>
-        internal bool DryRun { get; set; }
+        public bool DryRun { get; set; }
 
         /// <summary>
         /// Show additional information about the submission.
         /// </summary>
-        internal bool Verbose { get; set; }
+        public bool Verbose { get; set; }
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
