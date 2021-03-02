@@ -63,4 +63,18 @@ extern "C"
     {
         return tracer->TraceMultiQubitMeasurement(id, duration, qs->count, reinterpret_cast<Qubit*>(qs->buffer));
     }
+
+    void quantum__qis__apply_conditionally( // NOLINT
+        QirArray* rs1,
+        QirArray* rs2,
+        QirCallable* clbOnAllEqual,
+        QirCallable* clbOnSomeDifferent)
+    {
+        CTracer::FenceScope sf(
+            tracer.get(), rs1->count, reinterpret_cast<Result*>(rs1->buffer), rs2->count,
+            reinterpret_cast<Result*>(rs2->buffer));
+
+        clbOnAllEqual->Invoke();
+        clbOnSomeDifferent->Invoke();
+    }
 }
