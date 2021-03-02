@@ -23,13 +23,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
-        /// <param name="entryPoint">The entry point.</param>
         /// <param name="info">The information about the entry point.</param>
         /// <param name="input">The input argument tuple to the entry point.</param>
         /// <param name="settings">The submission settings.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> Submit<TIn, TOut>(
-            IEntryPoint entryPoint, EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
+        public static async Task<int> Submit<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
         {
             if (settings.Verbose)
             {

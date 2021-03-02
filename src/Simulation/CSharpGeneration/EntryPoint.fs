@@ -108,7 +108,6 @@ let private submitMethod context entryPoint =
     let settingsParamName = "settings"
     let args =
         [
-            ident "this" :> ExpressionSyntax
             ident callableName <|.|> ident "Info"
             ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
             ident settingsParamName :> ExpressionSyntax
