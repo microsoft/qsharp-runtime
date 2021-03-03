@@ -3,11 +3,11 @@
 
 #include "CLI11.hpp"
 #include "CoreTypes.hpp"
-#include "quantum__qis_internal.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
+#include "quantum__qis_internal.hpp"
 #include <cctype>
 #include <iostream>
 #include <map>
@@ -21,13 +21,11 @@ extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // 
     int64_t intValue,
     double doubleValue);
 
-map<string, PauliId> PauliMap
-{
+map<string, PauliId> PauliMap{
     {"PauliI", PauliId::PauliId_I},
     {"PauliX", PauliId::PauliId_X},
     {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
-};
+    {"PauliZ", PauliId::PauliId_Z}};
 
 int main(int argc, char* argv[])
 {
@@ -39,7 +37,8 @@ int main(int argc, char* argv[])
         // N.B. These options should be present in all standalone drivers.
         string simulationOutputFile;
         CLI::Option* simulationOutputFileOpt = app.add_option(
-            "-s,--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
+            "-s,--simulation-output", simulationOutputFile,
+            "File where the output produced during the simulation is written");
 
         string operationOutputFile;
         CLI::Option* operationOutputFileOpt = app.add_option(
@@ -48,34 +47,29 @@ int main(int argc, char* argv[])
         // Add the options that correspond to the parameters that the QIR entry-point needs.
         // Option for a Q# Int type.
         int64_t intValue = 0;
-        CLI::Option* intValueOpt = app.add_option("--int-value", intValue, "An integer value");
-        intValueOpt->required();
+        app.add_option("--int-value", intValue, "An integer value")->required();
 
         // Option for a Q# Double type.
         double_t doubleValue = 0.0;
-        CLI::Option* doubleValueOpt = app.add_option("--double-value", doubleValue, "A double value");
-        doubleValueOpt->required();
+        app.add_option("--double-value", doubleValue, "A double value")->required();
 
         // Option for a Q# Bool type.
         bool boolValue = false;
-        CLI::Option* boolValueOpt = app.add_option("--bool-value", boolValue, "A bool value");
-        boolValueOpt->required();
+        app.add_option("--bool-value", boolValue, "A bool value")->required();
 
         // Option for Q# Pauli type.
         PauliId pauliValue = PauliId::PauliId_I;
-        CLI::Option* pauliValueOpt = app.add_option("--pauli-value", pauliValue, "A Pauli value");
-        pauliValueOpt->required();
-        pauliValueOpt->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
+        app.add_option("--pauli-value", pauliValue, "A Pauli value")
+            ->required()
+            ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
+        // TODO: Add option for Q# Range type.
         // TODO: Add option for Q# Result type.
         // TODO: Add option for Q# String type.
 
         // Option for a Q# Array<Int> type.
         vector<int64_t> integerArray;
-        CLI::Option* integerArrayOpt = app.add_option("--integer-array", integerArray, "An integer array");
-        integerArrayOpt->required();
-
-        // TODO: Add option for Q# Tuple<T> type.
+        CLI::Option* integerArrayOpt = app.add_option("--integer-array", integerArray, "An integer array")->required();
 
         // With all the options added, parse arguments from the command line.
         CLI11_PARSE(app, argc, argv);
