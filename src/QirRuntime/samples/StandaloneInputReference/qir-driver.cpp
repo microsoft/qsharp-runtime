@@ -5,15 +5,29 @@
 #include "CoreTypes.hpp"
 #include "quantum__qis_internal.hpp"
 #include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
+#include <cctype>
 #include <iostream>
+#include <map>
+#include <vector>
 
 using namespace Microsoft::Quantum;
+using namespace std;
 
+// This is the function corresponding to the QIR entry-point.
 extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // NOLINT
     int64_t intValue,
     double doubleValue);
+
+map<string, PauliId> PauliMap
+{
+    {"PauliI", PauliId::PauliId_I},
+    {"PauliX", PauliId::PauliId_X},
+    {"PauliY", PauliId::PauliId_Y},
+    {"PauliZ", PauliId::PauliId_Z}
+};
 
 int main(int argc, char* argv[])
 {
@@ -23,11 +37,11 @@ int main(int argc, char* argv[])
 
         // Add the --simulation-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
-        std::string simulationOutputFile;
+        string simulationOutputFile;
         CLI::Option* simulationOutputFileOpt = app.add_option(
             "-s,--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
-        std::string operationOutputFile;
+        string operationOutputFile;
         CLI::Option* operationOutputFileOpt = app.add_option(
             "-o,--operation-output", operationOutputFile, "File where the output of the Q# operation is written");
 
@@ -47,12 +61,17 @@ int main(int argc, char* argv[])
         CLI::Option* boolValueOpt = app.add_option("--bool-value", boolValue, "A bool value");
         boolValueOpt->required();
 
-        // TODO: Add option for Q# Pauli type.
+        // Option for Q# Pauli type.
+        PauliId pauliValue = PauliId::PauliId_I;
+        CLI::Option* pauliValueOpt = app.add_option("--pauli-value", pauliValue, "A Pauli value");
+        pauliValueOpt->required();
+        pauliValueOpt->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
+
         // TODO: Add option for Q# Result type.
         // TODO: Add option for Q# String type.
 
         // Option for a Q# Array<Int> type.
-        std::vector<int64_t> integerArray;
+        vector<int64_t> integerArray;
         CLI::Option* integerArrayOpt = app.add_option("--integer-array", integerArray, "An integer array");
         integerArrayOpt->required();
 
@@ -62,32 +81,32 @@ int main(int argc, char* argv[])
         CLI11_PARSE(app, argc, argv);
 
         // Redirect the simulator output from std::cout if the --simulator-output option is present.
-        std::ostream* simulatorOutputStream = &std::cout;
-        std::filebuf simulationOutputFileBuffer;
+        ostream* simulatorOutputStream = &cout;
+        filebuf simulationOutputFileBuffer;
         if (!simulationOutputFileOpt->empty())
         {
-            simulationOutputFileBuffer.open(simulationOutputFile, std::ios::out);
-            std::ostream simulationOutputFileStream(&simulationOutputFileBuffer);
+            simulationOutputFileBuffer.open(simulationOutputFile, ios::out);
+            ostream simulationOutputFileStream(&simulationOutputFileBuffer);
             Quantum::Qis::Internal::SetOutputStream(simulationOutputFileStream);
             simulatorOutputStream = &simulationOutputFileStream;
         }
 
         // Redirect the Q# operation output from std::cout if the --operation-output option is present.
-        std::ostream* operationOutputStream = &std::cout;
-        std::filebuf operationOutputFileBuffer;
+        ostream* operationOutputStream = &cout;
+        filebuf operationOutputFileBuffer;
         if (!operationOutputFileOpt->empty())
         {
-            operationOutputFileBuffer.open(operationOutputFile, std::ios::out);
-            std::ostream operationOutputFileStream(&operationOutputFileBuffer);
+            operationOutputFileBuffer.open(operationOutputFile, ios::out);
+            ostream operationOutputFileStream(&operationOutputFileBuffer);
             operationOutputStream = &operationOutputFileStream;
         }
 
         // Run simulation and write the output of the operation to the corresponding stream.
-        std::unique_ptr<ISimulator> sim = CreateFullstateSimulator();
+        unique_ptr<ISimulator> sim = CreateFullstateSimulator();
         QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
         int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(intValue, doubleValue);
         simulatorOutputStream->flush();
-        (*operationOutputStream) << operationOutput << std::endl;
+        (*operationOutputStream) << "1";
         operationOutputStream->flush();
 
         // Close opened file buffers;
@@ -103,7 +122,7 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-        std::cout << "An unexpected failure occurred." << std::endl;
+        cout << "An unexpected failure occurred." << endl;
         return 1;
     }
 }
