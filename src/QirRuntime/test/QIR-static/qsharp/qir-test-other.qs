@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Testing.QIR.Other {
             [PauliI, PauliI,  PauliX, PauliI,  PauliY, PauliI,  PauliZ, PauliI]) { return  5; }
 
         // The Pauli array items are default-initialized to PauliI.
-        if 0 != PauliArrayAsInt(new Pauli[31]) { return  6; }
+        if 0 != PauliArrayAsInt(new Pauli[31]) { return  6; }   // Todo: Replace `new Pauli[31]` with `[PauliI, size=31]` when that is implemented.
 
         if 0x3000000000000000 != PauliArrayAsInt(new Pauli[31] w/ 30 <- PauliY) { return  7; }
 

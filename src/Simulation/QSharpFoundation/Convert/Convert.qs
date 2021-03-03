@@ -154,7 +154,7 @@ namespace Microsoft.Quantum.Convert {
     /// Each Pauli operator can be encoded using two bits:
     /// $$
     /// \begin{align}
-    ///     \quad I \mapsto 00, \quad X \mapsto 01, \quad Y \mapsto 11,
+    ///     \boldone \mapsto 00, \quad X \mapsto 01, \quad Y \mapsto 11,
     ///     \quad Z \mapsto 10.
     /// \end{align}
     /// $$
@@ -170,8 +170,7 @@ namespace Microsoft.Quantum.Convert {
         }
 
         mutable result = 0;
-        for index in (len-1)..-1..0 {
-            let p = paulis[index];
+        for p in paulis[(len-1)..-1..0] {
             set result <<<= 2;
             if   p == PauliI { set result += 0; }
             elif p == PauliX { set result += 1; }
