@@ -8,6 +8,7 @@
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "quantum__qis_internal.hpp"
+#include "quantum__rt.hpp"
 #include <cctype>
 #include <iostream>
 #include <map>
@@ -63,9 +64,21 @@ int main(int argc, char* argv[])
             ->required()
             ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
-        // TODO: Add option for Q# Range type.
+        // Option for Q# Range type.
+        tuple<int64_t, int64_t, int64_t> rangeValue(0, 0, 0);
+        app.add_option("--range-value", rangeValue, "A Range value (start, step, end)")->required();
+        QirRange qirRange = {
+            get<0>(rangeValue), // Start
+            get<1>(rangeValue), // Step
+            get<2>(rangeValue)  // End
+        };
+
         // TODO: Add option for Q# Result type.
-        // TODO: Add option for Q# String type.
+
+        // Option for Q# String type.
+        string stringValue;
+        app.add_option("--string-value", stringValue, "A String value")->required();
+        QirString* qirString = quantum__rt__string_create(stringValue.c_str());
 
         // Option for a Q# Array<Int> type.
         vector<int64_t> integerArray;
