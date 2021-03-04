@@ -28,11 +28,21 @@ map<string, PauliId> PauliMap{
     {"PauliY", PauliId::PauliId_Y},
     {"PauliZ", PauliId::PauliId_Z}};
 
+map<string, bool> ResultMap{
+    {"0", false},
+    {"Zero", false},
+    {"1", true},
+    {"One", true}};
+
 int main(int argc, char* argv[])
 {
     try
     {
         CLI::App app("QIR Standalone Entry Point Inputs Reference");
+
+        // Initialize simulator.
+        unique_ptr<ISimulator> sim = CreateFullstateSimulator();
+        QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
 
         // Add the --simulation-output and --operation-output options.
         // N.B. These options should be present in all standalone drivers.
@@ -73,7 +83,13 @@ int main(int argc, char* argv[])
             get<2>(rangeValue)  // End
         };
 
-        // TODO: Add option for Q# Result type.
+        // Option for Q# Result type.
+        bool resultValue = false;
+        app.add_option("--result-value", resultValue, "A Result value")
+            ->required()
+            ->transform(CLI::CheckedTransformer(ResultMap, CLI::ignore_case));
+
+        Result result = resultValue ? sim->UseOne() : sim->UseZero();
 
         // Option for Q# String type.
         string stringValue;
@@ -109,8 +125,6 @@ int main(int argc, char* argv[])
         }
 
         // Run simulation and write the output of the operation to the corresponding stream.
-        unique_ptr<ISimulator> sim = CreateFullstateSimulator();
-        QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
         int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(intValue, doubleValue);
         simulatorOutputStream->flush();
         (*operationOutputStream) << "1";
