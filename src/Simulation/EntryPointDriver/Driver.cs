@@ -178,13 +178,13 @@ namespace Microsoft.Quantum.EntryPointDriver
             var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand).ToList();
             var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand).ToList();
 
-            var (simulate, simulateValidators) = CreateSimulateCommand(simulateSubCommands);
-            var (submit, _) = CreateSubmitCommand(submitSubCommands);
+            var simulate = CreateSimulateCommand(simulateSubCommands);
+            var submit = CreateSubmitCommand(submitSubCommands);
 
-            var root = new RootCommand() { simulate, submit };
+            var root = new RootCommand() { simulate.Command, submit.Command };
             if (this.entryPoints.Count() == 1)
             {
-                SetSubCommandAsDefault(root, simulate, simulateValidators);
+                SetSubCommandAsDefault(root, simulate.Command, simulate.Validators);
                 root.Description = this.entryPoints.First().Summary;
             }
 
@@ -333,19 +333,19 @@ namespace Microsoft.Quantum.EntryPointDriver
             var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
             if (entryPointCommands.Count() == 1)
             {
-                var (epCommand, validators) = entryPointCommands.First();
-                epCommand.IsHidden = true;
-                simulate.AddCommand(epCommand);
-                SetSubCommandAsDefault(simulate, epCommand, validators);
-                return (simulate, validators);
+                var epCommandWValidators = entryPointCommands.First();
+                epCommandWValidators.Command.IsHidden = true;
+                simulate.AddCommand(epCommandWValidators.Command);
+                SetSubCommandAsDefault(simulate, epCommandWValidators.Command, epCommandWValidators.Validators);
+                return new CommandWithValidators(simulate, epCommandWValidators.Validators);
             }
             else
             {
-                foreach (var (epCommand, _) in entryPointCommands)
+                foreach (var epCommandWValidators in entryPointCommands)
                 {
-                    simulate.AddCommand(epCommand);
+                    simulate.AddCommand(epCommandWValidators.Command);
                 }
-                return (simulate, Enumerable.Empty<ValidateSymbol<CommandResult>>());
+                return new CommandWithValidators(simulate, Enumerable.Empty<ValidateSymbol<CommandResult>>());
             }
         }
 
@@ -362,19 +362,19 @@ namespace Microsoft.Quantum.EntryPointDriver
             };
             if (entryPointCommands.Count() == 1)
             {
-                var (epCommand, validators) = entryPointCommands.First();
-                epCommand.IsHidden = true;
-                submit.AddCommand(epCommand);
-                SetSubCommandAsDefault(submit, epCommand, validators);
-                return (submit, validators);
+                var epCommandWValidators = entryPointCommands.First();
+                epCommandWValidators.Command.IsHidden = true;
+                submit.AddCommand(epCommandWValidators.Command);
+                SetSubCommandAsDefault(submit, epCommandWValidators.Command, epCommandWValidators.Validators);
+                return new CommandWithValidators(submit, epCommandWValidators.Validators);
             }
             else
             {
-                foreach (var (epCommand, _) in entryPointCommands)
+                foreach (var epCommandWValidators in entryPointCommands)
                 {
-                    submit.AddCommand(epCommand);
+                    submit.AddCommand(epCommandWValidators.Command);
                 }
-                return (submit, Enumerable.Empty<ValidateSymbol<CommandResult>>());
+                return new CommandWithValidators(submit, Enumerable.Empty<ValidateSymbol<CommandResult>>());
             }
         }
 
@@ -398,7 +398,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             validators = validators.Concat(AddOptionIfAvailable(command, this.SimulatorOption));
 
-            return (command, validators.ToList());
+            return new CommandWithValidators(command, validators.ToList());
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                     command,
                     new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
 
-            return (command, validators.ToList());
+            return new CommandWithValidators(command, validators.ToList());
         }
 
         /// <summary>
@@ -511,45 +511,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 Command = command;
                 Validators = validators;
-            }
-
-            /// <inheritdoc/>
-            public override bool Equals(object? obj)
-            {
-                return obj is CommandWithValidators other &&
-                       EqualityComparer<Command>.Default.Equals(Command, other.Command) &&
-                       EqualityComparer<IEnumerable<ValidateSymbol<CommandResult>>>.Default.Equals(Validators, other.Validators);
-            }
-
-            /// <inheritdoc/>
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Command, Validators);
-            }
-            
-            /// <summary>
-            /// Allows the type to be deconstructed as a tuple.
-            /// </summary>
-            public void Deconstruct(out Command command, out IEnumerable<ValidateSymbol<CommandResult>> validators)
-            {
-                command = Command;
-                validators = Validators;
-            }
-
-            /// <summary>
-            /// Allows the type to be converted to a tuple.
-            /// </summary>
-            public static implicit operator (Command Command, IEnumerable<ValidateSymbol<CommandResult>> Validators)(CommandWithValidators value)
-            {
-                return (value.Command, value.Validators);
-            }
-
-            /// <summary>
-            /// Allows the type to be converted from a tuple.
-            /// </summary>
-            public static implicit operator CommandWithValidators((Command Command, IEnumerable<ValidateSymbol<CommandResult>> Validators) value)
-            {
-                return new CommandWithValidators(value.Command, value.Validators);
             }
         }
     }
