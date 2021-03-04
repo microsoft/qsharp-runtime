@@ -234,7 +234,7 @@ let private mainMethod context entryPoints =
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
 /// Generates a namespace for the main function
-let mainNamespace context entryPoints =
+let private mainNamespace context entryPoints =
     let mainClass =
         ``class`` entryPointClassName ``<<`` [] ``>>``
             ``:`` None ``,`` []
@@ -249,16 +249,17 @@ let mainNamespace context entryPoints =
             [mainClass]
         ``}``
 
+/// Generates the C# source code for the file containing the Main function.
+let generateMainSource context entryPoints =
+    let mainNS = mainNamespace context entryPoints
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) [mainNS :> MemberDeclarationSyntax]
+    |> ``with leading comments`` SimulationCode.autogenComment
+    |> SimulationCode.formatSyntaxTree
+
 /// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generateSource context (entryPoints : seq<QsCallable>) (mainNamespace : NamespaceDeclarationSyntax option) =
+let generateSource context (entryPoints : seq<QsCallable>) =
     let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
-
-    let epNamespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps]
-
-    let namespaces =
-        match mainNamespace with
-        | Some mainNamespace -> mainNamespace :: epNamespaces
-        | None -> epNamespaces
-    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) (namespaces |> List.map (fun ns -> ns :> MemberDeclarationSyntax))
+    let namespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps :> MemberDeclarationSyntax]
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) namespaces
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree

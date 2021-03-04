@@ -71,10 +71,10 @@ let private compileQSharp source =
 let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
     let entryPoints = seq { for ep in compilation.EntryPoints -> context.allCallables.[ep] }
-    let mainNS = EntryPoint.mainNamespace context entryPoints
     [
         SimulationCode.generate testFile context
-        EntryPoint.generateSource context entryPoints (Some mainNS)
+        EntryPoint.generateSource context entryPoints
+        EntryPoint.generateMainSource context entryPoints
     ]
 
 /// The full path to a referenced assembly given its short name.
