@@ -143,7 +143,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoints">The entry points.</param>
-        public Driver(DriverSettings settings, IEnumerable<IEntryPoint> entryPoints)
+        public Driver(DriverSettings settings, IReadOnlyCollection<IEntryPoint> entryPoints)
         {
             this.settings = settings;
 
@@ -165,7 +165,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 ? new OptionInfo<string?>(targetAliases, targetDescription)
                 : new OptionInfo<string?>(targetAliases, this.settings.DefaultExecutionTarget, targetDescription);
 
-            this.entryPoints = entryPoints.ToList().AsReadOnly();
+            this.entryPoints = entryPoints;
         }
 
         /// <summary>

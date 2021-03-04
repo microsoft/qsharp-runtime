@@ -57,7 +57,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
-        /// <param name="createDefaultCustomSimulator">The function for crating a new instance of the default simulator if it is a custom simulator.</param>
+        /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
         public DriverSettings(
             IImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,

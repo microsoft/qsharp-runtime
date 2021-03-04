@@ -16,14 +16,13 @@ open Microsoft.Quantum.QsCompiler.Transformations.BasicTransformations
 type Emitter() =
 
     let _AssemblyConstants = new Dictionary<_, _>()
-    let mutable _Diagnostics = []
 
     interface IRewriteStep with
 
         member this.Name = "CSharpGeneration"
         member this.Priority = -1 // doesn't matter because this rewrite step is the only one in the dll
         member this.AssemblyConstants = upcast _AssemblyConstants
-        member this.GeneratedDiagnostics = upcast _Diagnostics
+        member this.GeneratedDiagnostics = upcast []
 
         member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false

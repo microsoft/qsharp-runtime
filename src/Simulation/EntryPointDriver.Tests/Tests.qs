@@ -369,12 +369,12 @@ namespace EntryPointTest {
 
 namespace EntryPointTest {
     @EntryPoint()
-    operation  MultipleEntryPoints1() : String {
+    operation MultipleEntryPoints1() : String {
         return "Hello from Entry Point 1!";
     }
 
     @EntryPoint()
-    operation  MultipleEntryPoints2() : String {
+    operation MultipleEntryPoints2() : String {
         return "Hello from Entry Point 2!";
     }
 }
@@ -383,12 +383,12 @@ namespace EntryPointTest {
 
 namespace EntryPointTest {
     @EntryPoint()
-    operation  MultipleEntryPoints1(n : Double) : Double {
+    operation MultipleEntryPoints1(n : Double) : Double {
         return n;
     }
 
     @EntryPoint()
-    operation  MultipleEntryPoints2(s : String) : String {
+    operation MultipleEntryPoints2(s : String) : String {
         return s;
     }
 }

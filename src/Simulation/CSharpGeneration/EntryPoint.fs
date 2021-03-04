@@ -57,7 +57,7 @@ let private parameterOptionsProperty parameters =
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``]
         get (``=>`` (``new array`` (Some optionTypeName) options))
 
-/// A method that creates an instance of the default simulator if it is a custom simulator.
+/// A lambda that creates an instance of the default simulator if it is a custom simulator.
 let private customSimulatorFactory name =
     let isCustomSimulator =
         not <| List.contains name [
@@ -176,13 +176,12 @@ let private entryPointClass context (entryPoint : QsCallable) =
         ``}``
 
 /// Generates a namespace for a set of entry points that share the namespace
-let private entryPointNamespace context name (entryPoints : seq<QsCallable>) =
+let private entryPointNamespace context name entryPoints =
     ``namespace`` name
         ``{``
             []
             [for ep in entryPoints -> entryPointClass context ep]
         ``}``
-        :> MemberDeclarationSyntax
 
 /// Returns the driver settings object.
 let private driverSettings context =
@@ -215,7 +214,7 @@ let private driverSettings context =
     :> ExpressionSyntax
 
 /// The main method for the standalone executable.
-let private mainMethod context (entryPoints : seq<QsCallable>) =
+let private mainMethod context entryPoints =
 
     let entryPointArrayMembers =
         [
@@ -235,7 +234,7 @@ let private mainMethod context (entryPoints : seq<QsCallable>) =
         (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
 
 /// Generates a namespace for the main function
-let mainNamespace context (entryPoints : seq<QsCallable>) =
+let mainNamespace context entryPoints =
     let mainClass =
         ``class`` entryPointClassName ``<<`` [] ``>>``
             ``:`` None ``,`` []
@@ -258,8 +257,8 @@ let generateSource context (entryPoints : seq<QsCallable>) (mainNamespace : Name
 
     let namespaces =
         match mainNamespace with
-        | Some mainNamespace -> (mainNamespace :> MemberDeclarationSyntax) :: epNamespaces
+        | Some mainNamespace -> mainNamespace :: epNamespaces
         | None -> epNamespaces
-    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) namespaces
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) (namespaces |> List.map (fun ns -> ns :> MemberDeclarationSyntax))
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
