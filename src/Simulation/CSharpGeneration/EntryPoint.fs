@@ -98,7 +98,7 @@ let private callableTypeNames context (callable : QsCallable) =
     callableName, argTypeName, returnTypeName
 
 /// Generates the class name for an entry point class.
-let private generateEntryPointClassName (entryPoint : QsCallable) =
+let private entryPointClassFullName (entryPoint : QsCallable) =
     { Namespace = entryPoint.FullName.Namespace; Name = entryPointClassName + entryPoint.FullName.Name }
 
 /// Generates the Submit method for an entry point class.
@@ -168,7 +168,7 @@ let private entryPointClass context (entryPoint : QsCallable) =
         simulateMethod context entryPoint
     ]
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
-    ``class`` ((generateEntryPointClassName entryPoint).Name) ``<<`` [] ``>>``
+    ``class`` ((entryPointClassFullName entryPoint).Name) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
@@ -219,7 +219,7 @@ let private mainMethod context entryPoints =
     let entryPointArrayMembers =
         [
             for ep in entryPoints do
-                let name = generateEntryPointClassName ep
+                let name = entryPointClassFullName ep
                 ``new`` (``type`` (name.ToString())) ``(`` [] ``)``
         ]
 

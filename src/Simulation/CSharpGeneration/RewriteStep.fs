@@ -22,7 +22,7 @@ type Emitter() =
         member this.Name = "CSharpGeneration"
         member this.Priority = -1 // doesn't matter because this rewrite step is the only one in the dll
         member this.AssemblyConstants = upcast _AssemblyConstants
-        member this.GeneratedDiagnostics = upcast []
+        member this.GeneratedDiagnostics = Seq.empty
 
         member this.ImplementsPreconditionVerification = false
         member this.ImplementsPostconditionVerification = false
