@@ -886,7 +886,7 @@ let ``Shows help text for submit command with default target`` () =
     let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message
 
-[<Fact>]
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
 let ``Supports simulating multiple entry points`` () =
     let given = test "Multiple entry points"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> yields "Hello from Entry Point 1!"
@@ -894,7 +894,7 @@ let ``Supports simulating multiple entry points`` () =
     given ["simulate"] |> fails
     given [] |> fails
 
-[<Fact>]
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
 let ``Supports simulating multiple entry points with different parameters`` () =
     let given = test "Multiple entry points with different parameters"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints1"; "-n"; "42"] |> yields "42"
@@ -906,7 +906,7 @@ let ``Supports simulating multiple entry points with different parameters`` () =
     given ["simulate"] |> fails
     given [] |> fails
 
-[<Fact>]
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
 let ``Supports submitting multiple entry points`` () =
     let options =
         [
@@ -927,7 +927,7 @@ let ``Supports submitting multiple entry points`` () =
     given (["submit"] @ options) |> fails
     given [] |> fails
 
-[<Fact>]
+[<Fact(Skip="Multiple Entry Points not yet supported in compiler.")>]
 let ``Supports submitting multiple entry points with different parameters`` () =
     let options =
         [
