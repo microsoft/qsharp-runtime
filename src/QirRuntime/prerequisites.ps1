@@ -5,10 +5,13 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         choco install llvm
         choco install ninja
-    } else {
-        #brew install llvm  # this seems to mess up native simulator build, probably because of STD libs
-                            # llvm should be already available on later Linux/Darwin systems
+    } elseif ($IsMacOS) {
         brew install ninja
+    } else {
+        sudo apt update
+        sudo apt-get install -y ninja-build
+        sudo apt-get install -y clang-11
+        sudo apt-get install -y clang-tidy-11
     }
 }
 

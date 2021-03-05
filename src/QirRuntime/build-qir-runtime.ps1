@@ -18,6 +18,8 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     $oldCXX = $env:CXX
     $oldRC = $env:RC
 
+    $clangTidy = ""
+
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
         Write-Host "On MacOS build QIR Runtim using the default C/C++ compiler (should be AppleClang)"
@@ -25,9 +27,10 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
     {
         Write-Host "On Linux build QIR Runtime using Clang"
-        $env:CC = "/usr/bin/clang"
-        $env:CXX = "/usr/bin/clang++"
-        $env:RC = "/usr/bin/clang++"
+        $env:CC = "/usr/bin/clang-11"
+        $env:CXX = "/usr/bin/clang++-11"
+        $env:RC = "/usr/bin/clang++-11"
+        $clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy-11"
     }
     elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
     {
@@ -48,7 +51,7 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
 
     Push-Location $qirRuntimeBuildFolder
 
-    cmake -G Ninja -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
+    cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
     cmake --build . --target install
 
     Pop-Location
