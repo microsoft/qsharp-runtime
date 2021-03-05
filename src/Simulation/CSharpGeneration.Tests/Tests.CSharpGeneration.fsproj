@@ -57,4 +57,9 @@
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
+  <!-- Explicitly depend on the version of the LSP package used by the compiler. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Protocol" Version="16.9.1180" />
+  </ItemGroup>
+
 </Project>
