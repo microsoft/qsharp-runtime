@@ -18,7 +18,7 @@ target_link_libraries(qir-input-reference-standalone PUBLIC
   simulators
 )
 
-set(standalone_includes ""${PROJECT_SOURCE_DIR}/externals/CLI11"")
+set(standalone_includes "${PROJECT_SOURCE_DIR}/externals/CLI11")
 
 target_include_directories(qir-input-reference-standalone PUBLIC
   "${standalone_includes}"
