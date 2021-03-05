@@ -24,7 +24,12 @@ using namespace std;
 // This is the function corresponding to the QIR entry-point.
 extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // NOLINT
     int64_t intValue,
-    double doubleValue);
+    double doubleValue,
+    Result resultValue,
+    QirString* stringValue,
+    int64_t rangeStart,
+    int64_t rangeStep,
+    int64_t rangeEnd);
 
 map<string, PauliId> PauliMap{
     {"PauliI", PauliId::PauliId_I},
@@ -79,11 +84,6 @@ int main(int argc, char* argv[])
     // Option for Q# Range type.
     tuple<int64_t, int64_t, int64_t> rangeValue(0, 0, 0);
     app.add_option("--range-value", rangeValue, "A Range value (start, step, end)")->required();
-    QirRange qirRange = {
-        get<0>(rangeValue), // Start
-        get<1>(rangeValue), // Step
-        get<2>(rangeValue)  // End
-    };
 
     // Option for Q# Result type.
     bool resultValue = false;
@@ -91,22 +91,36 @@ int main(int argc, char* argv[])
         ->required()
         ->transform(CLI::CheckedTransformer(ResultMap, CLI::ignore_case));
 
-    Result result = resultValue ? sim->UseOne() : sim->UseZero();
 
     // Option for Q# String type.
     string stringValue;
     app.add_option("--string-value", stringValue, "A String value")->required();
-    QirString* qirString = quantum__rt__string_create(stringValue.c_str());
 
     // Option for a Q# Array<Int> type.
     vector<int64_t> integerArray;
-    CLI::Option* integerArrayOpt = app.add_option("--integer-array", integerArray, "An integer array")->required();
-    int32_t arrayItemSize = sizeof(int64_t);
-    QirArray* qirArray = quantum__rt__array_create_1d(arrayItemSize, integerArray.size());
-    memcpy(qirArray->buffer, integerArray.data(), arrayItemSize * integerArray.size());
+    app.add_option("--integer-array", integerArray, "An integer array")->required();
 
     // With all the options added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
+
+    // Translate values to its final form after parsing.
+    // Create QirRange.
+    QirRange qirRange = {
+        get<0>(rangeValue), // Start
+        get<1>(rangeValue), // Step
+        get<2>(rangeValue)  // End
+    };
+
+    // Create a Result.
+    Result result = resultValue ? sim->UseOne() : sim->UseZero();
+
+    // Create a QirString.
+    QirString* qirString = quantum__rt__string_create(stringValue.c_str());
+
+    // Create a QirArray.
+    int32_t arrayItemSize = sizeof(int64_t);
+    QirArray* qirArray = quantum__rt__array_create_1d(arrayItemSize, integerArray.size());
+    memcpy(qirArray->buffer, integerArray.data(), arrayItemSize * integerArray.size());
 
     // Redirect the simulator output from std::cout if the --simulator-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -128,7 +142,9 @@ int main(int argc, char* argv[])
     }
 
     // Run simulation and write the output of the operation to the corresponding stream.
-    int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(intValue, doubleValue);
+    int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(
+        intValue, doubleValue, result, qirString, qirRange.start, qirRange.step, qirRange.end);
+
     simulatorOutputStream->flush();
     (*operationOutputStream) << operationOutput << endl;
     operationOutputStream->flush();
