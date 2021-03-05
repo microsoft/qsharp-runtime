@@ -63,7 +63,7 @@ let private compileQSharp source =
     let compilation = compilationManager.Build ()
     let errors =
         compilation.Diagnostics ()
-        |> Seq.filter (fun diagnostic -> diagnostic.Severity = DiagnosticSeverity.Error)
+        |> Seq.filter (fun diagnostic -> diagnostic.Severity = Nullable DiagnosticSeverity.Error)
     Assert.Empty errors
     compilation.BuiltCompilation
 
