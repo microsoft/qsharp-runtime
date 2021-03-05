@@ -99,4 +99,16 @@ if __name__ == '__main__':
     log(test_binary)
     subprocess.run(test_binary + " ~[skip]", shell = True)
 
+  log("========= Running samples =========")
+  subprocess.run(
+    "qir-input-reference-standalone" +\
+    " --int-value 1" +\
+    " --double-value 0.5" +\
+    " --bool-value true" +\
+    " --integer-array 1 2 3 4 5" +\
+    " --pauli-value PauliX" +\
+    " --range-value 1 10 1" +\
+    " --string-value SampleString" +\
+    " --result-value zero")
+
   print("\n")

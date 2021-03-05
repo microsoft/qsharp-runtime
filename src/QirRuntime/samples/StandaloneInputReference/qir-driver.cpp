@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     // Run simulation and write the output of the operation to the corresponding stream.
     int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(intValue, doubleValue);
     simulatorOutputStream->flush();
-    (*operationOutputStream) << "1";
+    (*operationOutputStream) << operationOutput << endl;
     operationOutputStream->flush();
 
     // Close opened file buffers;
