@@ -10,6 +10,7 @@
 #include "quantum__qis_internal.hpp"
 #include "quantum__rt.hpp"
 #include <cctype>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -103,22 +104,20 @@ int main(int argc, char* argv[])
 
     // Redirect the simulator output from std::cout if the --simulator-output option is present.
     ostream* simulatorOutputStream = &cout;
-    filebuf simulationOutputFileBuffer;
+    ofstream simulationOutputFileStream;
     if (!simulationOutputFileOpt->empty())
     {
-        simulationOutputFileBuffer.open(simulationOutputFile, ios::out);
-        ostream simulationOutputFileStream(&simulationOutputFileBuffer);
+        simulationOutputFileStream.open(simulationOutputFile);
         Quantum::Qis::Internal::SetOutputStream(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 
     // Redirect the Q# operation output from std::cout if the --operation-output option is present.
     ostream* operationOutputStream = &cout;
-    filebuf operationOutputFileBuffer;
+    ofstream operationOutputFileStream;
     if (!operationOutputFileOpt->empty())
     {
-        operationOutputFileBuffer.open(operationOutputFile, ios::out);
-        ostream operationOutputFileStream(&operationOutputFileBuffer);
+        operationOutputFileStream.open(operationOutputFile);
         operationOutputStream = &operationOutputFileStream;
     }
 
@@ -129,13 +128,13 @@ int main(int argc, char* argv[])
     operationOutputStream->flush();
 
     // Close opened file buffers;
-    if (!simulationOutputFileOpt->empty())
+    if (simulationOutputFileStream.is_open())
     {
-        simulationOutputFileBuffer.close();
+        simulationOutputFileStream.close();
     }
 
-    if (!operationOutputFileOpt->empty())
+    if (operationOutputFileStream.is_open())
     {
-        operationOutputFileBuffer.close();
+        operationOutputFileStream.close();
     }
 }
