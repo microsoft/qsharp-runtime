@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <cctype>
+#include <cstring> // for memcpy
 #include <fstream>
 #include <iostream>
 #include <map>
