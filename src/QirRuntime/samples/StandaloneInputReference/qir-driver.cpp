@@ -1,19 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include "CLI11.hpp"
-#include "CoreTypes.hpp"
-#include "QirContext.hpp"
-#include "QirTypes.hpp"
-#include "QuantumApi_I.hpp"
-#include "SimFactory.hpp"
-#include "quantum__qis_internal.hpp"
-#include "quantum__rt.hpp"
 #include <cctype>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <vector>
+
+#include "CoreTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
+#include "QuantumApi_I.hpp"
+#include "SimFactory.hpp"
+
+#include "quantum__qis_internal.hpp"
+#include "quantum__rt.hpp"
+
+#include "CLI11.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
