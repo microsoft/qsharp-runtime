@@ -98,6 +98,9 @@ int main(int argc, char* argv[])
     // Option for a Q# Array<Int> type.
     vector<int64_t> integerArray;
     CLI::Option* integerArrayOpt = app.add_option("--integer-array", integerArray, "An integer array")->required();
+    int32_t arrayItemSize = sizeof(int64_t);
+    QirArray* qirArray = quantum__rt__array_create_1d(arrayItemSize, integerArray.size());
+    memcpy(qirArray->buffer, integerArray.data(), arrayItemSize * integerArray.size());
 
     // With all the options added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
