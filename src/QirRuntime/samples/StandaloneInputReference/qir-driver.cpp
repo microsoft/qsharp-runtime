@@ -101,6 +101,12 @@ int main(int argc, char* argv[])
         ->required()
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
+    // Option for a Q# Array<Pauli> type.
+    std::vector<PauliId> pauliArray;
+    app.add_option("--pauli-array", pauliArray, "A Pauli array")
+        ->required()
+        ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
+
     // Option for Q# Range type.
     tuple<int64_t, int64_t, int64_t> rangeValue(0, 0, 0);
     app.add_option("--range-value", rangeValue, "A Range value (start, step, end)")->required();
