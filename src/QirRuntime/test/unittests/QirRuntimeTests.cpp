@@ -11,6 +11,7 @@
 
 #include "QirTypes.hpp"
 #include "quantum__qis.hpp"
+#include "qsharp__core__qis.hpp"
 #include "quantum__rt.hpp"
 
 #include "BitStates.hpp"

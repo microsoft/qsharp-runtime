@@ -2,6 +2,7 @@ set(component_name "simulators")
 
 set(source_files
   "FullstateSimulator.cpp"
+  "setup.cpp"
   "ToffoliSimulator.cpp"
 )
 

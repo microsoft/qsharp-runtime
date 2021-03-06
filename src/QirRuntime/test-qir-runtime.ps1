@@ -5,7 +5,7 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     if ($Env:ENABLE_QIRRUNTIME -eq "true") {
         Write-Host "##[info]Test QIR Runtime"
 
-        Push-Location (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
+        Push-Location (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION test)
 
         ctest --verbose
 

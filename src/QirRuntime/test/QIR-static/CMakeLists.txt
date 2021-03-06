@@ -28,8 +28,10 @@ target_link_libraries(qir-static-tests PUBLIC
   ${QIR_TESTS_LIBS}
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  ${QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB}
   qir-rt-support
   qir-qis-support
+  qsharp-core-qis-support
   simulators
 )
 

@@ -14,9 +14,11 @@ target_link_libraries(qir-tracer-tests PUBLIC
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_TRACER_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  ${QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB}
   tracer
   qir-rt-support
   qir-qis-support
+  qsharp-core-qis-support
 )
 
 target_include_directories(qir-tracer-tests PUBLIC

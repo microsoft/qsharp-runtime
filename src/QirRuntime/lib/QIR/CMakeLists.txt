@@ -15,13 +15,13 @@ compile_from_qir(bridge-rt ${bridge_rt_target})
 # create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
-  "allocationsTracker.cpp"
-  "arrays.cpp"
-  "callables.cpp"
-  "context.cpp"
-  "delegated.cpp"
-  "strings.cpp"
-  "utils.cpp"
+  allocationsTracker.cpp
+  arrays.cpp
+  callables.cpp
+  context.cpp
+  delegated.cpp
+  strings.cpp
+  utils.cpp
 )
 
 add_library(qir-rt-support ${rt_sup_source_files})
@@ -50,7 +50,6 @@ compile_from_qir(bridge-qis ${bridge_qis_target})
 #
 set(qis_sup_source_files
   conditionals.cpp
-  intrinsics.cpp
   intrinsicsMath.cpp
   intrinsicsOut.cpp
 )
@@ -66,5 +65,26 @@ set_property(TARGET qir-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 add_dependencies(qir-qis-support ${bridge_qis_target})
 
+#===============================================================================
+# Produce the qir dynamic library
+#
+add_library(qir SHARED)
 
+target_link_libraries(qir
+  ${QIR_BRIDGE_UTILITY_LIB}
+  ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  ${CMAKE_DL_LIBS}
+  qir-rt-support-obj
+  qir-qis-support-obj
+)
 
+target_include_directories(qir PUBLIC 
+   ${public_includes}
+)
+
+set_property(TARGET qir PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+install(TARGETS qir
+  RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin" 
+  LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
+)

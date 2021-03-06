@@ -8,8 +8,10 @@ target_link_libraries(fullstate-simulator-tests PUBLIC
   ${QIR_UTILITY_LIB} # created by compile_from_qir
   ${QIR_BRIDGE_UTILITY_LIB}
   ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  ${QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB}
   qir-rt-support
   qir-qis-support
+  qsharp-core-qis-support
   simulators
 )
 
