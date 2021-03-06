@@ -31,6 +31,12 @@ extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // 
     int64_t rangeStep,
     int64_t rangeEnd);
 
+map<string, char> BoolMap{
+    {"0", 0x0},
+    {"false", 0x0},
+    {"1", 0x1},
+    {"true", 0x1}};
+
 map<string, PauliId> PauliMap{
     {"PauliI", PauliId::PauliId_I},
     {"PauliX", PauliId::PauliId_X},
@@ -67,13 +73,27 @@ int main(int argc, char* argv[])
     int64_t intValue = 0;
     app.add_option("--int-value", intValue, "An integer value")->required();
 
+    // Option for a Q# Array<Int> type.
+    vector<int64_t> integerArray;
+    app.add_option("--integer-array", integerArray, "An integer array")->required();
+
     // Option for a Q# Double type.
     double_t doubleValue = 0.0;
     app.add_option("--double-value", doubleValue, "A double value")->required();
 
+    // Option for a Q# Array<Double> type.
+    vector<double_t> doubleArray;
+    app.add_option("--double-array", doubleArray, "A double array")->required();
+
     // Option for a Q# Bool type.
     bool boolValue = false;
     app.add_option("--bool-value", boolValue, "A bool value")->required();
+
+    // Option for a Q# Array<Bool> type.
+    std::vector<char> boolArray;
+    app.add_option("--bool-array", boolArray, "A bool array")
+        ->required()
+        ->transform(CLI::CheckedTransformer(BoolMap, CLI::ignore_case));
 
     // Option for Q# Pauli type.
     PauliId pauliValue = PauliId::PauliId_I;
@@ -91,19 +111,34 @@ int main(int argc, char* argv[])
         ->required()
         ->transform(CLI::CheckedTransformer(ResultMap, CLI::ignore_case));
 
-
     // Option for Q# String type.
     string stringValue;
     app.add_option("--string-value", stringValue, "A String value")->required();
-
-    // Option for a Q# Array<Int> type.
-    vector<int64_t> integerArray;
-    app.add_option("--integer-array", integerArray, "An integer array")->required();
 
     // With all the options added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
 
     // Translate values to its final form after parsing.
+    // Create a QirArray of integer values.
+    int32_t integerSize = sizeof(int64_t);
+    QirArray* qirIntArray = quantum__rt__array_create_1d(integerSize, integerArray.size());
+    memcpy(qirIntArray->buffer, integerArray.data(), integerSize * integerArray.size());
+
+    // Create a QirArray of double values.
+    int32_t doubleSize = sizeof(double_t);
+    QirArray* qirDoubleArray = quantum__rt__array_create_1d(doubleSize, doubleArray.size());
+    memcpy(qirDoubleArray->buffer, doubleArray.data(), doubleSize * doubleArray.size());
+
+    // Create a QirArray of bool values.
+    int32_t boolSize = sizeof(bool);
+    bool* boolBuffer = new bool[boolArray.size()];
+    for (int index = 0; index < boolArray.size(); index++) {
+        boolBuffer[index] = boolArray[index] == 0x1 ? true : false;
+    }
+
+    QirArray* qirboolArray = quantum__rt__array_create_1d(boolSize, boolArray.size());
+    memcpy(qirboolArray->buffer, boolBuffer, boolSize * boolArray.size());
+
     // Create QirRange.
     QirRange qirRange = {
         get<0>(rangeValue), // Start
@@ -116,11 +151,6 @@ int main(int argc, char* argv[])
 
     // Create a QirString.
     QirString* qirString = quantum__rt__string_create(stringValue.c_str());
-
-    // Create a QirArray.
-    int32_t arrayItemSize = sizeof(int64_t);
-    QirArray* qirArray = quantum__rt__array_create_1d(arrayItemSize, integerArray.size());
-    memcpy(qirArray->buffer, integerArray.data(), arrayItemSize * integerArray.size());
 
     // Redirect the simulator output from std::cout if the --simulator-output option is present.
     ostream* simulatorOutputStream = &cout;
