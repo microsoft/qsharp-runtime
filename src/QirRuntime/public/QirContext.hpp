@@ -25,7 +25,8 @@ namespace Quantum
         QirExecutionContext(ISimulator* sim, bool trackAllocatedObjects);
         ~QirExecutionContext();
     };
-    extern QIR_SHARED_API thread_local std::unique_ptr<QirExecutionContext> g_context;
+    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
+    extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
 
     struct QIR_SHARED_API QirContextScope
     {
