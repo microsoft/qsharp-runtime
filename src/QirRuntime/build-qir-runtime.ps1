@@ -53,17 +53,34 @@ if ($Env:ENABLE_QIRRUNTIME -eq "true") {
     Push-Location $qirRuntimeBuildFolder
 
     cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to generate QIR Runtime."
+    }
     cmake --build . --target install
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
+    }
+
+    $os = "win32"
+    $pattern = "*.dll"
+    if ($IsMacOS) {
+        $os = "osx"
+        $pattern = "*.dylib"
+    } elseif ($IsLinux) {
+        $os = "linux"
+        $pattern = "*.so"
+    }
+    $osQirDropFolder = Join-Path $Env:DROPS_DIR QIR $os
+    if (!(Test-Path $osQirDropFolder)) {
+        New-Item -Path $osQirDropFolder -ItemType "directory"
+    }
+    Copy-Item (Join-Path . bin $pattern) $osQirDropFolder
 
     Pop-Location
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX
     $env:RC = $oldRC
-
-    if ($LastExitCode -ne 0) {
-        Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
-    }
 } else {
     Write-Host "To enable build of QIR Runtime set ENABLE_QIRRUNTIME environment variable to 'true'"
 }
