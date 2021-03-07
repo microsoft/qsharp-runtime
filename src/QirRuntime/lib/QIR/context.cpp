@@ -18,6 +18,8 @@ namespace Microsoft
 namespace Quantum
 {
     thread_local std::unique_ptr<QirExecutionContext> g_context = nullptr;
+    std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
+
     void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);

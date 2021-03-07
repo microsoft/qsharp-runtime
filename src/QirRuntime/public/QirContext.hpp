@@ -26,7 +26,7 @@ namespace Quantum
         ~QirExecutionContext();
     };
     extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-    extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
+    extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext();
 
     struct QIR_SHARED_API QirContextScope
     {
