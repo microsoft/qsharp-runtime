@@ -24,6 +24,7 @@ add_library(qsharp-core-qis-support-obj OBJECT ${qsharp_core_sup_source_files})
 target_source_from_qir_obj(qsharp-core-qis-support-obj qsharp-core-qis)
 target_include_directories(qsharp-core-qis-support-obj PUBLIC ${public_includes})
 set_property(TARGET qsharp-core-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_compile_definitions(qsharp-core-qis-support-obj PUBLIC EXPORT_QIR_API)
 
 #===============================================================================
 # Produce the QSharpCore dynamic library

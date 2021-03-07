@@ -14,7 +14,7 @@ namespace Quantum
     void ReleaseQirContext();
 
     struct AllocationsTracker;
-    struct QirExecutionContext
+    struct QIR_SHARED_API QirExecutionContext
     {
         ISimulator* simulator = nullptr;
         bool trackAllocatedObjects = false;
@@ -23,9 +23,9 @@ namespace Quantum
         QirExecutionContext(ISimulator* sim, bool trackAllocatedObjects);
         ~QirExecutionContext();
     };
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
+    extern QIR_SHARED_API thread_local std::unique_ptr<QirExecutionContext> g_context;
 
-    struct QirContextScope
+    struct QIR_SHARED_API QirContextScope
     {
         QirContextScope(ISimulator* sim, bool trackAllocatedObjects = false)
         {

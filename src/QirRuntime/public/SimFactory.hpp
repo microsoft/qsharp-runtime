@@ -10,10 +10,10 @@ namespace Microsoft
 namespace Quantum
 {
     // Toffoli Simulator
-    std::unique_ptr<ISimulator> CreateToffoliSimulator();
+    QIR_SHARED_API std::unique_ptr<ISimulator> CreateToffoliSimulator();
 
     // Full State Simulator
-    std::unique_ptr<ISimulator> CreateFullstateSimulator();
+    QIR_SHARED_API std::unique_ptr<ISimulator> CreateFullstateSimulator();
 
 } // namespace Quantum
 } // namespace Microsoft

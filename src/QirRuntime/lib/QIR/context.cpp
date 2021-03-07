@@ -9,12 +9,6 @@
 #include "QuantumApi_I.hpp"
 #include "allocationsTracker.hpp"
 
-#ifdef _WIN32
-#define QIR_SHARED_API __declspec(dllexport)
-#else
-#define QIR_SHARED_API
-#endif
-
 // These two globals are used in QIR _directly_ so have to define them outside of the context.
 extern "C" QIR_SHARED_API Result ResultOne = nullptr;
 extern "C" QIR_SHARED_API Result ResultZero = nullptr;

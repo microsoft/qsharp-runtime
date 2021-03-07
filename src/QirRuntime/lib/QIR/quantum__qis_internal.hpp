@@ -6,12 +6,6 @@
 // To be included by the QIS implementation and QIS tests only.
 // Not to be included by parties outside QIS.
 
-#ifdef _WIN32
-#define QIR_SHARED_API __declspec(dllexport)
-#else
-#define QIR_SHARED_API
-#endif
-
 // For test purposes only:
 namespace Quantum // Replace with `namespace Quantum::Qis::Internal` after migration to C++17.
 {

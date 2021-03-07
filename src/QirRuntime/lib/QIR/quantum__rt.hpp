@@ -14,12 +14,6 @@ struct QirCallable;
 struct QirString;
 struct QirBigInt;
 
-#ifdef _WIN32
-#define QIR_SHARED_API __declspec(dllexport)
-#else
-#define QIR_SHARED_API
-#endif
-
 extern "C"
 {
     struct QirRange

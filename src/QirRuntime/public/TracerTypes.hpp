@@ -3,6 +3,8 @@
 #pragma once
 
 #include <limits>
+#include "CoreTypes.hpp"
+
 namespace Microsoft
 {
 namespace Quantum
@@ -12,7 +14,7 @@ namespace Quantum
     using Duration = int;
     using LayerId = int64_t;
 
-    constexpr LayerId INVALID = std::numeric_limits<LayerId>::min();
-    constexpr LayerId REQUESTNEW = std::numeric_limits<LayerId>::max();
+    constexpr QIR_SHARED_API LayerId INVALID = std::numeric_limits<LayerId>::min();
+    constexpr QIR_SHARED_API LayerId REQUESTNEW = std::numeric_limits<LayerId>::max();
 }
 }

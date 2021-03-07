@@ -7,12 +7,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#ifdef _WIN32
-#define QIR_SHARED_API __declspec(dllexport)
-#else
-#define QIR_SHARED_API
-#endif
-
 struct QirArray;
 struct QirCallable;
 struct QirString;
