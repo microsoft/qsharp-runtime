@@ -18,7 +18,7 @@ set(qsharp_core_sup_source_files
 add_library(qsharp-core-qis-support ${qsharp_core_sup_source_files})
 target_include_directories(qsharp-core-qis-support PUBLIC ${public_includes})
 add_dependencies(qsharp-core-qis-support ${qsharp_core_qis_target})
-target_compile_definitions(qsharp-core-qis-support-obj PRIVATE EXPORT_QIR_API=1)
+target_compile_definitions(qsharp-core-qis-support PRIVATE EXPORT_QIR_API)
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qsharp-core-qis-support-obj OBJECT ${qsharp_core_sup_source_files})
@@ -41,7 +41,7 @@ target_link_libraries(QSharpCore
 )
 
 target_include_directories(QSharpCore PUBLIC ${public_includes})
-target_compile_definitions(QSharpCore PRIVATE EXPORT_QIR_API=1)
+target_compile_definitions(QSharpCore PRIVATE EXPORT_QIR_API)
 
 set_property(TARGET QSharpCore PROPERTY POSITION_INDEPENDENT_CODE ON)
 
