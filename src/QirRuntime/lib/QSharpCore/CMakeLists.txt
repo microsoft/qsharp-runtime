@@ -16,27 +16,24 @@ set(qsharp_core_sup_source_files
 )
 
 add_library(qsharp-core-qis-support ${qsharp_core_sup_source_files})
-
 target_include_directories(qsharp-core-qis-support PUBLIC ${public_includes})
+add_dependencies(qsharp-core-qis-support ${qsharp_core_qis_target})
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qsharp-core-qis-support-obj OBJECT ${qsharp_core_sup_source_files})
+target_source_from_qir_obj(qsharp-core-qis-support-obj qsharp-core-qis)
 target_include_directories(qsharp-core-qis-support-obj PUBLIC ${public_includes})
 set_property(TARGET qsharp-core-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-add_dependencies(qsharp-core-qis-support ${qsharp_core_qis_target})
 
 #===============================================================================
 # Produce the QSharpCore dynamic library
 #
-add_library(QSharpCore SHARED
-  $<TARGET_OBJECTS:qsharp-core-qis-support-obj>
-  $<TARGET_OBJECTS:simulators-obj>
-)
+add_library(QSharpCore SHARED)
 
 target_link_libraries(QSharpCore
-  ${QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB}
   ${CMAKE_DL_LIBS}
+  qsharp-core-qis-support-obj
+  simulators-obj
 )
 
 target_include_directories(QSharpCore PUBLIC 
@@ -46,7 +43,6 @@ target_include_directories(QSharpCore PUBLIC
 set_property(TARGET QSharpCore PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 install(TARGETS QSharpCore
-  RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin" 
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
 

@@ -54,3 +54,15 @@ macro(compile_from_qir source_file target)
       add_custom_target(${target} DEPENDS ${QIR_UTILITY_LIB})
     endif()
 endmacro(compile_from_qir)
+
+macro(target_source_from_qir_obj target_name source_file)
+    target_sources(${target_name} PUBLIC 
+        "${CMAKE_CURRENT_BINARY_DIR}/${source_file}.obj"
+    )
+    SET_SOURCE_FILES_PROPERTIES(
+        "${source_file}.obj"
+        PROPERTIES
+        EXTERNAL_OBJECT true
+        GENERATED true
+    )
+endmacro()

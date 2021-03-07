@@ -25,15 +25,14 @@ set(rt_sup_source_files
 )
 
 add_library(qir-rt-support ${rt_sup_source_files})
-
 target_include_directories(qir-rt-support PUBLIC ${public_includes})
+add_dependencies(qir-rt-support ${bridge_rt_target})
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
+target_source_from_qir_obj(qir-rt-support-obj bridge-rt)
 target_include_directories(qir-rt-support-obj PUBLIC ${public_includes})
 set_property(TARGET qir-rt-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-add_dependencies(qir-rt-support ${bridge_rt_target})
 
 #+++++++++++++++++++++++++++++++++++++
 # qir-qis
@@ -55,15 +54,14 @@ set(qis_sup_source_files
 )
 
 add_library(qir-qis-support ${qis_sup_source_files})
-
 target_include_directories(qir-qis-support PUBLIC ${public_includes})
+add_dependencies(qir-qis-support ${bridge_qis_target})
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-qis-support-obj OBJECT ${qis_sup_source_files})
+target_source_from_qir_obj(qir-qis-support-obj bridge-qis)
 target_include_directories(qir-qis-support-obj PUBLIC ${public_includes})
 set_property(TARGET qir-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-add_dependencies(qir-qis-support ${bridge_qis_target})
 
 #===============================================================================
 # Produce the qir dynamic library
@@ -71,8 +69,6 @@ add_dependencies(qir-qis-support ${bridge_qis_target})
 add_library(qir SHARED)
 
 target_link_libraries(qir
-  ${QIR_BRIDGE_UTILITY_LIB}
-  ${QIR_BRIDGE_QIS_UTILITY_LIB}
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
   qir-qis-support-obj
@@ -85,6 +81,5 @@ target_include_directories(qir PUBLIC
 set_property(TARGET qir PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 install(TARGETS qir
-  RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin" 
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )

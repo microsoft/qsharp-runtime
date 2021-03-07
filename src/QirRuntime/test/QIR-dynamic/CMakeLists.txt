@@ -1,13 +1,3 @@
-# compile test ll files into a library, have to use custom commands for this
-set(CLANG_ARGS "-c")
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CLANG_ARGS
-    "${CLANG_ARGS}"
-    "-O0"
-    "-D_DEBUG"
-  )
-endif()
-
 set(TEST_FILES
   qir-test-random
 )

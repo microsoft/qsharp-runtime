@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+    & (Join-Path $PSScriptRoot .. .. build set-env.ps1)
     Write-Host "##[info]Compile Q# Projects into QIR"
     $qirStaticPath = Join-Path $PSScriptRoot test QIR-static qsharp
     dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
