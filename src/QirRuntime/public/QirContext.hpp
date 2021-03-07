@@ -12,10 +12,10 @@ namespace Microsoft
 namespace Quantum
 {
     struct ISimulator;
-    void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects = false);
-    void ReleaseQirContext();
-
     struct AllocationsTracker;
+
+    QIR_SHARED_API void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects = false);
+    QIR_SHARED_API void ReleaseQirContext();
     struct QIR_SHARED_API QirExecutionContext
     {
         ISimulator* simulator = nullptr;
