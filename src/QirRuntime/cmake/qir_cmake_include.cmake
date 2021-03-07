@@ -30,6 +30,7 @@ macro(compile_from_qir source_file target)
         COMMAND ${CMAKE_CXX_COMPILER}
         ARGS ${CLANG_ARGS} ${INFILE} "-o" ${OBJFILE}
         DEPENDS ${INFILE}
+        BYPRODUCTS ${OBJFILE}
         COMMENT "Compiling ${source_file}.ll"
         VERBATIM
     )
@@ -56,11 +57,10 @@ macro(compile_from_qir source_file target)
 endmacro(compile_from_qir)
 
 macro(target_source_from_qir_obj target_name source_file)
-    SET_SOURCE_FILES_PROPERTIES(
+    set_source_files_properties(
         "${source_file}.obj"
         PROPERTIES
         EXTERNAL_OBJECT true
-        GENERATED true
     )
     target_sources(${target_name} PUBLIC 
         "${CMAKE_CURRENT_BINARY_DIR}/${source_file}.obj"

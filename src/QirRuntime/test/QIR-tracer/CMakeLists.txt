@@ -11,8 +11,10 @@ add_executable(qir-tracer-tests
 
 target_link_libraries(qir-tracer-tests PUBLIC
   ${QIR_UTILITY_LIB} # set by compile_from_qir
-  qir
-  qirtracer
+  "-L${CMAKE_BINARY_DIR}/lib/QIR"
+  -lqir
+  "-L${CMAKE_BINARY_DIR}/lib/Tracer"
+  -lqirtracer
 )
 
 target_include_directories(qir-tracer-tests PUBLIC
