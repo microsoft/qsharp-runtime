@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include "CoreTypes.hpp"
+
 namespace Microsoft
 {
 namespace Quantum
