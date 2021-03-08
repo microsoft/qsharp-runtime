@@ -64,21 +64,21 @@ declare void @quantum__qis__z__ctl(%struct.QirArray*, %class.QUBIT*)
 ; quantum.qis namespace implementations
 ;
 
-define void @__quantum__qis__exp__body(%Array* %.paulis, double %angle, %Array* %.qubits) {
+define dllexport void @__quantum__qis__exp__body(%Array* %.paulis, double %angle, %Array* %.qubits) {
   %paulis = bitcast %Array* %.paulis to %struct.QirArray*
   %qubits = bitcast %Array* %.qubits to %struct.QirArray*
   call void @quantum__qis__exp__body(%struct.QirArray* %paulis, double %angle, %struct.QirArray* %qubits)
   ret void
 }
 
-define void @__quantum__qis__exp__adj(%Array* %.paulis, double %angle, %Array* %.qubits) {
+define dllexport void @__quantum__qis__exp__adj(%Array* %.paulis, double %angle, %Array* %.qubits) {
   %paulis = bitcast %Array* %.paulis to %struct.QirArray*
   %qubits = bitcast %Array* %.qubits to %struct.QirArray*
   call void @quantum__qis__exp__adj(%struct.QirArray* %paulis, double %angle, %struct.QirArray* %qubits)
   ret void
 }
 
-define void @__quantum__qis__exp__ctl(%Array* %.ctls, {%Array*, double, %Array*}* %.args) {
+define dllexport void @__quantum__qis__exp__ctl(%Array* %.ctls, {%Array*, double, %Array*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
   %.ppaulis = getelementptr inbounds {%Array*, double, %Array*}, {%Array*, double, %Array*}* %.args, i32 0, i32 0
@@ -97,7 +97,7 @@ define void @__quantum__qis__exp__ctl(%Array* %.ctls, {%Array*, double, %Array*}
   ret void
 }
 
-define void @__quantum__qis__exp__ctladj(%Array* %.ctls, { %Array*, double, %Array* }* %.args) {
+define dllexport void @__quantum__qis__exp__ctladj(%Array* %.ctls, { %Array*, double, %Array* }* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
   %.ppaulis = getelementptr inbounds {%Array*, double, %Array*}, {%Array*, double, %Array*}* %.args, i32 0, i32 0
@@ -116,20 +116,20 @@ define void @__quantum__qis__exp__ctladj(%Array* %.ctls, { %Array*, double, %Arr
   ret void
 }
 
-define void @__quantum__qis__h__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__h__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__h__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__h__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__h__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__h__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define %Result* @__quantum__qis__measure__body(%Array* %.paulis, %Array* %.qubits) {
+define dllexport %Result* @__quantum__qis__measure__body(%Array* %.paulis, %Array* %.qubits) {
   %paulis = bitcast %Array* %.paulis to %struct.QirArray*
   %qubits = bitcast %Array* %.qubits to %struct.QirArray*
   %r = call %class.RESULT* @quantum__qis__measure__body(%struct.QirArray* %paulis, %struct.QirArray* %qubits)
@@ -137,21 +137,21 @@ define %Result* @__quantum__qis__measure__body(%Array* %.paulis, %Array* %.qubit
   ret %Result* %.r
 }
 
-define void @__quantum__qis__r__body(%Pauli %.pauli, double %theta, %Qubit* %.q) {
+define dllexport void @__quantum__qis__r__body(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %pauli = zext %Pauli %.pauli to %PauliId
   call void @quantum__qis__r__body(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__adj(%Pauli %.pauli, double %theta, %Qubit* %.q) {
+define dllexport void @__quantum__qis__r__adj(%Pauli %.pauli, double %theta, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %pauli = zext %Pauli %.pauli to %PauliId
   call void @quantum__qis__r__adj(%PauliId %pauli, double %theta, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__r__ctl(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
+define dllexport void @__quantum__qis__r__ctl(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
   %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
@@ -169,7 +169,7 @@ define void @__quantum__qis__r__ctl(%Array* %.ctls, {%Pauli, double, %Qubit*}* %
   ret void
 }
 
-define void @__quantum__qis__r__ctladj(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
+define dllexport void @__quantum__qis__r__ctladj(%Array* %.ctls, {%Pauli, double, %Qubit*}* %.args) {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
 
   %.ppauli = getelementptr inbounds {%Pauli, double, %Qubit*}, {%Pauli, double, %Qubit*}* %.args, i32 0, i32 0
@@ -187,91 +187,91 @@ define void @__quantum__qis__r__ctladj(%Array* %.ctls, {%Pauli, double, %Qubit*}
   ret void
 }
 
-define void @__quantum__qis__s__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__s__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__s__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__s__adj(%Qubit* %.q) {
+define dllexport void @__quantum__qis__s__adj(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__s__adj(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__s__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__s__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__s__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__s__ctladj(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__s__ctladj(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__s__ctladj(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__t__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__t__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__t__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__t__adj(%Qubit* %.q) {
+define dllexport void @__quantum__qis__t__adj(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__t__adj(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__t__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__t__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__t__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__t__ctladj(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__t__ctladj(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__t__ctladj(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__x__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__x__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__x__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__x__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__x__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__x__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__y__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__y__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__y__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__y__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__y__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__y__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__z__body(%Qubit* %.q) {
+define dllexport void @__quantum__qis__z__body(%Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__z__body(%class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
+define dllexport void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   call void @quantum__qis__z__ctl(%struct.QirArray* %ctls, %class.QUBIT* %q)

@@ -35,7 +35,7 @@ declare void @quantum__qis__message__body(%struct.QirString* %str)
 
 ;===============================================================================
 ;
-define void @__quantum__qis__message__body(%String* %.str) {
+define dllexport void @__quantum__qis__message__body(%String* %.str) {
   %str = bitcast %String* %.str to %struct.QirString*
   call void @quantum__qis__message__body(%struct.QirString* %str)
   ret void
@@ -65,44 +65,44 @@ declare double      @quantum__qis__ieeeremainder__body(double %y, double %x)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 
 ; API for the user code:
-define double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
+define dllexport double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
   %result = call double @llvm.sqrt.f64(double -1.0)         ; sqrt(<negative>) -> NaN   
   ret double %result
 }
 
-define i1 @__quantum__qis__isnan__body(double %d) {         ; http://www.cplusplus.com/reference/cmath/isnan/
+define dllexport i1 @__quantum__qis__isnan__body(double %d) {         ; http://www.cplusplus.com/reference/cmath/isnan/
   %result = call i1 @quantum__qis__isnan__body(double %d)
   ret i1 %result
 }
 
-define double @__quantum__qis__infinity__body() {           ; https://en.cppreference.com/w/c/numeric/math/INFINITY
+define dllexport double @__quantum__qis__infinity__body() {           ; https://en.cppreference.com/w/c/numeric/math/INFINITY
   %result = call double @quantum__qis__infinity__body()
   ret double %result
 }
 
-define i1 @__quantum__qis__isinf__body(double %d) {         ; https://en.cppreference.com/w/cpp/numeric/math/isinf
+define dllexport i1 @__quantum__qis__isinf__body(double %d) {         ; https://en.cppreference.com/w/cpp/numeric/math/isinf
   %result = call i1 @quantum__qis__isinf__body(double %d)   
   ret i1 %result
 }
 
-define double @__quantum__qis__sqrt__body(double %d) {      ; https://en.cppreference.com/w/cpp/numeric/math/sqrt
+define dllexport double @__quantum__qis__sqrt__body(double %d) {      ; https://en.cppreference.com/w/cpp/numeric/math/sqrt
   %result = call double @llvm.sqrt.f64(double %d)           
   ret double %result
 }
 
-define double @__quantum__qis__log__body(double %d) {       ; https://en.cppreference.com/w/cpp/numeric/math/log
+define dllexport double @__quantum__qis__log__body(double %d) {       ; https://en.cppreference.com/w/cpp/numeric/math/log
   %result = call double @llvm.log.f64(double %d)           
   ret double %result
 }
 
-define i1 @__quantum__qis__isnegativeinfinity__body(double %d) {    ; Q#: function IsNegativeInfinity(d : Double) : Bool
+define dllexport i1 @__quantum__qis__isnegativeinfinity__body(double %d) {    ; Q#: function IsNegativeInfinity(d : Double) : Bool
                                                                     ; https://en.cppreference.com/w/cpp/numeric/math/log    https://llvm.org/docs/LangRef.html#llvm-log-intrinsic
   %negInf = call double @llvm.log.f64(double 0.0)                   ; ln(0) -> (-infinity)
   %result = fcmp oeq double %negInf, %d                             ; %result = (%negInf == %d)
   ret i1 %result
 }
 
-define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: function ArcTan2 (y : Double, x : Double) : Double
+define dllexport double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: function ArcTan2 (y : Double, x : Double) : Double
                                                                     ; https://en.cppreference.com/w/cpp/numeric/math/atan2
   %result = call double @quantum__qis__arctan2__body(double %y, double %x)
   ret double %result
@@ -110,21 +110,21 @@ define double @__quantum__qis__arctan2__body(double %y, double %x) {  ; Q#: func
 
 ; function Sin (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.sin
-define double @__quantum__qis__sin__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/sin
+define dllexport double @__quantum__qis__sin__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/sin
     %result = call double @llvm.sin.f64(double %theta)          ; https://llvm.org/docs/LangRef.html#llvm-sin-intrinsic
     ret double %result
 }
 
 ; function Cos (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.cos
-define double @__quantum__qis__cos__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/cos
+define dllexport double @__quantum__qis__cos__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/cos
     %result = call double @llvm.cos.f64(double %theta)          ; https://llvm.org/docs/LangRef.html#llvm-cos-intrinsic
     ret double %result
 }
 
 ; function Tan (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.tan
-define double @__quantum__qis__tan__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/tan
+define dllexport double @__quantum__qis__tan__body(double %theta) {       ; https://en.cppreference.com/w/cpp/numeric/math/tan
     %sin = call double @llvm.sin.f64(double %theta)
     %cos = call double @llvm.cos.f64(double %theta)
     %result = fdiv double %sin, %cos                            ; tg(x) = sin(x) / cos(x)
@@ -133,21 +133,21 @@ define double @__quantum__qis__tan__body(double %theta) {       ; https://en.cpp
 
 ; function Sinh (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.sinh
-define double @__quantum__qis__sinh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/sinh
+define dllexport double @__quantum__qis__sinh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/sinh
     %result = call double @quantum__qis__sinh__body(double %theta)
     ret double %result
 }
 
 ; function Cosh (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.cosh
-define double @__quantum__qis__cosh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/cosh
+define dllexport double @__quantum__qis__cosh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/cosh
     %result = call double @quantum__qis__cosh__body(double %theta)
     ret double %result
 }
 
 ; function Tanh (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.tanh
-define double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/tanh
+define dllexport double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cppreference.com/w/cpp/numeric/math/tanh
     %sin = call double @__quantum__qis__sinh__body(double %theta)
     %cos = call double @__quantum__qis__cosh__body(double %theta)
     %result = fdiv double %sin, %cos                            ; tanh(x) = sinh(x) / cosh(x)
@@ -156,28 +156,28 @@ define double @__quantum__qis__tanh__body(double %theta) {      ; https://en.cpp
 
 ; function ArcSin (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arcsin
-define double @__quantum__qis__arcsin__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/asin
+define dllexport double @__quantum__qis__arcsin__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/asin
     %result = call double @quantum__qis__arcsin__body(double %theta)
     ret double %result
 }
 
 ; function ArcCos (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arccos
-define double @__quantum__qis__arccos__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/acos
+define dllexport double @__quantum__qis__arccos__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/acos
     %result = call double @quantum__qis__arccos__body(double %theta)
     ret double %result
 }
 
 ; function ArcTan (theta : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.math.arctan
-define double @__quantum__qis__arctan__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/atan
+define dllexport double @__quantum__qis__arctan__body(double %theta) {    ; https://en.cppreference.com/w/cpp/numeric/math/atan
     %result = call double @quantum__qis__arctan__body(double %theta)
     ret double %result
 }
 
 
 ; function IEEERemainder(x : Double, y : Double) : Double
-define double @__quantum__qis__ieeeremainder__body(double %x, double %y) {
+define dllexport double @__quantum__qis__ieeeremainder__body(double %x, double %y) {
   %result = call double @quantum__qis__ieeeremainder__body(double %x, double %y)
   ret double %result
 }
@@ -185,7 +185,7 @@ define double @__quantum__qis__ieeeremainder__body(double %x, double %y) {
 
 ; operation DrawRandomInt (min : Int, max : Int) : Int      
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.random.drawrandomint
-define i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {  
+define dllexport i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {  
   %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
   ret i64 %result
 }
@@ -197,7 +197,7 @@ declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.Q
 declare void @quantum__qis__applyconditionallyintrinsic__body(
   %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
 
-define void @__quantum__qis__applyifelseintrinsic__body(
+define dllexport void @__quantum__qis__applyifelseintrinsic__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
 
   %r = bitcast %Result* %.r to %class.RESULT*
@@ -208,7 +208,7 @@ define void @__quantum__qis__applyifelseintrinsic__body(
   ret void
 }
 
-define void @__quantum__qis__applyconditionallyintrinsic__body(
+define dllexport void @__quantum__qis__applyconditionallyintrinsic__body(
   %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
 
   %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*

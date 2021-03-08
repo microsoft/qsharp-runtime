@@ -36,14 +36,14 @@ declare void @quantum__qis__apply_conditionally(
 ;===============================================================================
 ; quantum__trc namespace implementations
 ;
-define void @__quantum__qis__single_qubit_op(i32 %id, i32 %duration, %Qubit* %.q)
+define dllexport void @__quantum__qis__single_qubit_op(i32 %id, i32 %duration, %Qubit* %.q)
 {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   call void @quantum__qis__single_qubit_op(i32 %id, i32 %duration, %class.QUBIT* %q)
   ret void
 }
 
-define void @__quantum__qis__single_qubit_op_ctl(i32 %id, i32 %duration, %Array* %.ctls, %Qubit* %.q)
+define dllexport void @__quantum__qis__single_qubit_op_ctl(i32 %id, i32 %duration, %Array* %.ctls, %Qubit* %.q)
 {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
@@ -51,14 +51,14 @@ define void @__quantum__qis__single_qubit_op_ctl(i32 %id, i32 %duration, %Array*
   ret void
 }
 
-define void @__quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %Array* %.qs)
+define dllexport void @__quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %Array* %.qs)
 {
   %qs = bitcast %Array* %.qs to %struct.QirArray*
   call void @quantum__qis__multi_qubit_op(i32 %id, i32 %duration, %struct.QirArray* %qs)
   ret void
 }
 
-define void @__quantum__qis__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* %.ctls, %Array* %.qs)
+define dllexport void @__quantum__qis__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* %.ctls, %Array* %.qs)
 {
   %ctls = bitcast %Array* %.ctls to %struct.QirArray*
   %qs = bitcast %Array* %.qs to %struct.QirArray*
@@ -66,13 +66,13 @@ define void @__quantum__qis__multi_qubit_op_ctl(i32 %id, i32 %duration, %Array* 
   ret void
 }
 
-define void @__quantum__qis__inject_barrier(i32 %id, i32 %duration)
+define dllexport void @__quantum__qis__inject_barrier(i32 %id, i32 %duration)
 {
   call void @quantum__qis__inject_barrier(i32 %id, i32 %duration)
   ret void
 }
 
-define %Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %.q)
+define dllexport %Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %.q)
 {
   %q = bitcast %Qubit* %.q to %class.QUBIT*
   %r = call %class.RESULT* @quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %class.QUBIT* %q)
@@ -80,7 +80,7 @@ define %Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Q
   ret %Result* %.r
 }
 
-define %Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %.qs)
+define dllexport %Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %.qs)
 {
   %qs = bitcast %Array* %.qs to %struct.QirArray*
   %r = call %class.RESULT* @quantum__qis__joint_measure(i32 %id, i32 %duration, %struct.QirArray* %qs)
@@ -88,7 +88,7 @@ define %Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %
   ret %Result* %.r
 }
 
-define void @__quantum__qis__apply_conditionally(
+define dllexport void @__quantum__qis__apply_conditionally(
   %Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different) {
 
   %rs1 = bitcast %Array* %.rs1 to %struct.QirArray*
