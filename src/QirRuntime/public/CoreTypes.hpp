@@ -27,8 +27,6 @@ typedef QUBIT* Qubit;
 
 class RESULT;
 typedef RESULT* Result;
-extern "C" QIR_SHARED_API Result ResultOne;
-extern "C" QIR_SHARED_API Result ResultZero;
 
 enum ResultValue
 {

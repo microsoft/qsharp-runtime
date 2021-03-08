@@ -10,8 +10,8 @@
 #include "allocationsTracker.hpp"
 
 // These two globals are used in QIR _directly_ so have to define them outside of the context.
-extern "C" Result ResultOne = nullptr;
-extern "C" Result ResultZero = nullptr;
+extern "C" QIR_SHARED_API Result ResultOne = nullptr;
+extern "C" QIR_SHARED_API Result ResultZero = nullptr;
 
 namespace Microsoft
 {

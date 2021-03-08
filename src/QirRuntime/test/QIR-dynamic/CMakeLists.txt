@@ -1,6 +1,12 @@
-set(TEST_FILES
-  qir-test-random
-)
+if (WIN32)
+  set(TEST_FILES
+    qir-test-random-win
+  )
+else()
+  set(TEST_FILES
+    qir-test-random-lnx
+  )
+endif()
 
 foreach(file ${TEST_FILES})
   compile_from_qir(${file} "") # don't create a target per file

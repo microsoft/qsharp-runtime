@@ -1,5 +1,19 @@
+if (WIN32)
+  set(TEST_FILES
+    tracer-qir-win
+  )
+else()
+  set(TEST_FILES
+    tracer-qir-lnx
+  )
+endif()
 
-compile_from_qir(tracer-qir tracer_qir)
+foreach(file ${TEST_FILES})
+  compile_from_qir(${file} "") # don't create a target per file
+  list(APPEND QIR_TESTS_LIBS ${QIR_UTILITY_LIB})
+endforeach()
+
+add_custom_target(tracer_qir_test_lib DEPENDS ${QIR_TESTS_LIBS})
 
 #==============================================================================
 # The executable target for QIR tests triggers the custom actions to compile ll files
@@ -10,7 +24,7 @@ add_executable(qir-tracer-tests
 )
 
 target_link_libraries(qir-tracer-tests PUBLIC
-  ${QIR_UTILITY_LIB} # set by compile_from_qir
+  ${QIR_TESTS_LIBS}
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lqir
   "-L${CMAKE_BINARY_DIR}/lib/Tracer"
@@ -22,7 +36,7 @@ target_include_directories(qir-tracer-tests PUBLIC
   "${public_includes}"
   "${PROJECT_SOURCE_DIR}/lib/Tracer"
 )
-add_dependencies(qir-tracer-tests tracer_qir)
+add_dependencies(qir-tracer-tests tracer_qir_test_lib)
 
 install(TARGETS qir-tracer-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
 add_unit_test(qir-tracer-tests)
