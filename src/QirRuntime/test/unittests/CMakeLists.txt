@@ -23,5 +23,6 @@ target_include_directories(qir-runtime-unittests PUBLIC
    "${PROJECT_SOURCE_DIR}/lib/QSharpCore"
    "${PROJECT_SOURCE_DIR}/lib/Tracer"
 )
+target_compile_definitions(qir-runtime-unittests PRIVATE EXPORT_QIR_API)
 install(TARGETS qir-runtime-unittests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
 add_unit_test(qir-runtime-unittests)

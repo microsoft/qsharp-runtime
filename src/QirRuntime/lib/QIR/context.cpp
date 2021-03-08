@@ -10,8 +10,8 @@
 #include "allocationsTracker.hpp"
 
 // These two globals are used in QIR _directly_ so have to define them outside of the context.
-extern "C" QIR_SHARED_API Result ResultOne = nullptr;
-extern "C" QIR_SHARED_API Result ResultZero = nullptr;
+Result ResultOne = nullptr;
+Result ResultZero = nullptr;
 
 namespace Microsoft
 {
@@ -46,8 +46,8 @@ namespace Quantum
             g_context->allocationsTracker->CheckForLeaks();
         }
 
-        ResultOne = nullptr;
-        ResultZero = nullptr;
+        ::ResultOne = nullptr;
+        ::ResultZero = nullptr;
         g_context.reset(nullptr);
     }
 

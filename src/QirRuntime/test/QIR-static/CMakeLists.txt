@@ -40,6 +40,7 @@ target_include_directories(qir-static-tests PUBLIC
   "${public_includes}"
   "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
+target_compile_definitions(qir-static-tests PRIVATE EXPORT_QIR_API)
 add_dependencies(qir-static-tests qir_static_test_lib)
 
 install(TARGETS qir-static-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
