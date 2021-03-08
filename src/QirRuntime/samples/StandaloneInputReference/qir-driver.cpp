@@ -31,11 +31,13 @@ extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // 
     int64_t rangeStep,
     int64_t rangeEnd);
 
-map<string, char> BoolMap{
-    {"0", 0x0},
-    {"false", 0x0},
-    {"1", 0x1},
-    {"true", 0x1}};
+const char FalseAsChar = 0x0;
+const char TrueAsChar = 0x1;
+map<string, bool> BoolAsCharMap{
+    {"0", FalseAsChar},
+    {"false", FalseAsChar},
+    {"1", TrueAsChar},
+    {"true", TrueAsChar}};
 
 map<string, PauliId> PauliMap{
     {"PauliI", PauliId::PauliId_I},
@@ -43,11 +45,58 @@ map<string, PauliId> PauliMap{
     {"PauliY", PauliId::PauliId_Y},
     {"PauliZ", PauliId::PauliId_Z}};
 
-map<string, bool> ResultMap{
-    {"0", false},
-    {"Zero", false},
-    {"1", true},
-    {"One", true}};
+map<string, char> ResultAsCharMap{
+    {"0", FalseAsChar},
+    {"Zero", FalseAsChar},
+    {"false", FalseAsChar},
+    {"1", TrueAsChar},
+    {"One", TrueAsChar},
+    {"true", TrueAsChar}};
+
+template<typename T>
+QirArray* CreateQirArray(T* dataBuffer, int64_t itemCount)
+{
+    int32_t typeSize = sizeof(T); // NOLINT
+    QirArray* qirArray = quantum__rt__array_create_1d(typeSize, itemCount);
+    memcpy(qirArray->buffer, dataBuffer, typeSize * itemCount);
+    return qirArray;
+}
+
+template<typename D, typename S>
+void TranslateVectorToBuffer(D** destinationBuffer, vector<S>sourceVector, function<D(S)> translationFunction)
+{
+    *destinationBuffer = new D[sourceVector.size()];
+    for (int index = 0; index < sourceVector.size(); index++)
+    {
+        (*destinationBuffer)[index] = translationFunction(sourceVector[index]);
+    }
+}
+
+using RangeTuple = tuple<int64_t, int64_t, int64_t>;
+QirRange TranslateRangeTupleToQirRange(RangeTuple rangeTuple)
+{
+    QirRange qirRange = {
+        get<0>(rangeTuple), // Start
+        get<1>(rangeTuple), // Step
+        get<2>(rangeTuple)  // End
+    };
+
+    return qirRange;
+}
+
+// TODO: Maybe not needed.
+bool TranslateCharToBool(char boolAsChar)
+{
+    return (boolAsChar != FalseAsChar);
+}
+
+// TODO: Add explanation.
+Result RuntimeResultZero = nullptr;
+Result RuntimeResultOne = nullptr;
+Result TranslateCharToResult(char resultAsChar)
+{
+    return resultAsChar == FalseAsChar ? RuntimeResultZero : RuntimeResultOne;
+}
 
 int main(int argc, char* argv[])
 {
@@ -56,6 +105,8 @@ int main(int argc, char* argv[])
     // Initialize simulator.
     unique_ptr<ISimulator> sim = CreateFullstateSimulator();
     QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+    RuntimeResultZero = sim->UseZero(); // TODO: Maybe remove.
+    RuntimeResultOne = sim->UseOne(); // TODO: Maybe remove.
 
     // Add the --simulation-output and --operation-output options.
     // N.B. These options should be present in all standalone drivers.
@@ -74,26 +125,27 @@ int main(int argc, char* argv[])
     app.add_option("--int-value", intValue, "An integer value")->required();
 
     // Option for a Q# Array<Int> type.
-    vector<int64_t> integerArray;
-    app.add_option("--integer-array", integerArray, "An integer array")->required();
+    vector<int64_t> integerVector;
+    app.add_option("--integer-array", integerVector, "An integer array")->required();
 
     // Option for a Q# Double type.
     double_t doubleValue = 0.0;
     app.add_option("--double-value", doubleValue, "A double value")->required();
 
     // Option for a Q# Array<Double> type.
-    vector<double_t> doubleArray;
-    app.add_option("--double-array", doubleArray, "A double array")->required();
+    vector<double_t> doubleVector;
+    app.add_option("--double-array", doubleVector, "A double array")->required();
 
     // Option for a Q# Bool type.
     bool boolValue = false;
     app.add_option("--bool-value", boolValue, "A bool value")->required();
 
     // Option for a Q# Array<Bool> type.
-    std::vector<char> boolArray;
-    app.add_option("--bool-array", boolArray, "A bool array")
+    // TODO: Add explanation.
+    vector<char> boolAsCharVector;
+    app.add_option("--bool-array", boolAsCharVector, "A bool array")
         ->required()
-        ->transform(CLI::CheckedTransformer(BoolMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(BoolAsCharMap, CLI::ignore_case));
 
     // Option for Q# Pauli type.
     PauliId pauliValue = PauliId::PauliId_I;
@@ -102,20 +154,33 @@ int main(int argc, char* argv[])
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
     // Option for a Q# Array<Pauli> type.
-    std::vector<PauliId> pauliArray;
-    app.add_option("--pauli-array", pauliArray, "A Pauli array")
+    std::vector<PauliId> pauliVector;
+    app.add_option("--pauli-array", pauliVector, "A Pauli array")
         ->required()
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
     // Option for Q# Range type.
-    tuple<int64_t, int64_t, int64_t> rangeValue(0, 0, 0);
+    RangeTuple rangeValue(0, 0, 0);
     app.add_option("--range-value", rangeValue, "A Range value (start, step, end)")->required();
 
+    // Option for a Q# Array<Range> type.
+    // TODO.
+    vector<RangeTuple> rangeTupleVector;
+    app.add_option("--range-array", rangeTupleVector, "A Range array")->required();
+
     // Option for Q# Result type.
-    bool resultValue = false;
-    app.add_option("--result-value", resultValue, "A Result value")
+    // TODO: N.B.
+    char resultAsCharValue = FalseAsChar;
+    app.add_option("--result-value", resultAsCharValue, "A Result value")
         ->required()
-        ->transform(CLI::CheckedTransformer(ResultMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
+
+    // Option for a Q# Array<Result> type.
+    // TODO: N.B.
+    vector<char> resultAsCharVector;
+    app.add_option("--result-array", resultAsCharVector, "A Result array")
+        ->required()
+        ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
 
     // Option for Q# String type.
     string stringValue;
@@ -126,34 +191,37 @@ int main(int argc, char* argv[])
 
     // Translate values to its final form after parsing.
     // Create a QirArray of integer values.
-    int32_t integerSize = sizeof(int64_t);
-    QirArray* qirIntArray = quantum__rt__array_create_1d(integerSize, integerArray.size());
-    memcpy(qirIntArray->buffer, integerArray.data(), integerSize * integerArray.size());
+    QirArray* qirIntegerArray = CreateQirArray(integerVector.data(), integerVector.size());
 
     // Create a QirArray of double values.
-    int32_t doubleSize = sizeof(double_t);
-    QirArray* qirDoubleArray = quantum__rt__array_create_1d(doubleSize, doubleArray.size());
-    memcpy(qirDoubleArray->buffer, doubleArray.data(), doubleSize * doubleArray.size());
+    QirArray* qirDoubleArray = CreateQirArray(doubleVector.data(), doubleVector.size());
 
     // Create a QirArray of bool values.
-    int32_t boolSize = sizeof(bool);
-    bool* boolBuffer = new bool[boolArray.size()];
-    for (int index = 0; index < boolArray.size(); index++) {
-        boolBuffer[index] = boolArray[index] == 0x1 ? true : false;
-    }
+    // TODO: Explain.
+    bool* boolArray = nullptr;
+    TranslateVectorToBuffer<bool, char>(&boolArray, boolAsCharVector, TranslateCharToBool);
+    QirArray* qirboolArray = CreateQirArray(boolArray, boolAsCharVector.size());
 
-    QirArray* qirboolArray = quantum__rt__array_create_1d(boolSize, boolArray.size());
-    memcpy(qirboolArray->buffer, boolBuffer, boolSize * boolArray.size());
+    // Create a QirArray of Pauli values.
+    QirArray* qirPauliArray = CreateQirArray(pauliVector.data(), pauliVector.size());
 
-    // Create QirRange.
-    QirRange qirRange = {
-        get<0>(rangeValue), // Start
-        get<1>(rangeValue), // Step
-        get<2>(rangeValue)  // End
-    };
+    // Create a QirRange.
+    QirRange qirRange = TranslateRangeTupleToQirRange(rangeValue);
+
+    // Create a QirArray of Range values.
+    QirRange* rangeArray = nullptr;
+    TranslateVectorToBuffer<QirRange, RangeTuple>(&rangeArray, rangeTupleVector, TranslateRangeTupleToQirRange);
+    QirArray* qirRangeArray = CreateQirArray(rangeArray, rangeTupleVector.size());
 
     // Create a Result.
-    Result result = resultValue ? sim->UseOne() : sim->UseZero();
+    Result result = TranslateCharToResult(resultAsCharValue);
+
+    // Create a QirArray of Result values.
+    Result* resultArray = nullptr;
+    TranslateVectorToBuffer<Result, char>(
+        &resultArray, resultAsCharVector, TranslateCharToResult);
+
+    QirArray* qirResultArray = CreateQirArray(resultArray, resultAsCharVector.size());
 
     // Create a QirString.
     QirString* qirString = quantum__rt__string_create(stringValue.c_str());
