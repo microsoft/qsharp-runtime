@@ -19,7 +19,7 @@ namespace Quantum
     /*==================================================================================================================
         Layer
     ==================================================================================================================*/
-    struct Layer
+    struct QIR_SHARED_API Layer
     {
         // Start time of the layer.
         const Time startTime;
@@ -43,7 +43,7 @@ namespace Quantum
     /*==================================================================================================================
         QubitState
     ==================================================================================================================*/
-    struct QubitState
+    struct QIR_SHARED_API QubitState
     {
         // The last layer this qubit was used in, `INVALID` means the qubit haven't been used yet in any
         // operations of non-zero duration.
@@ -60,7 +60,7 @@ namespace Quantum
     /*==================================================================================================================
         The tracer implements resource estimation. See readme in this folder for details.
     ==================================================================================================================*/
-    class CTracer : public ISimulator
+    class QIR_SHARED_API CTracer : public ISimulator
     {
         // For now the tracer assumes no reuse of qubits.
         std::vector<QubitState> qubits;
@@ -225,8 +225,8 @@ namespace Quantum
         void PrintLayerMetrics(std::ostream& out, const std::string& separator, bool printZeroMetrics) const;
     };
 
-    std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
-    std::shared_ptr<CTracer> CreateTracer(
+    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
+    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(
         int preferredLayerDuration,
         const std::unordered_map<OpId, std::string>& opNames);
 
