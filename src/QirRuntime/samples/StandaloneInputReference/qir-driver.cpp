@@ -84,13 +84,13 @@ QirRange TranslateRangeTupleToQirRange(RangeTuple rangeTuple)
     return qirRange;
 }
 
-// TODO: Maybe not needed.
 bool TranslateCharToBool(char boolAsChar)
 {
     return (boolAsChar != FalseAsChar);
 }
 
-// TODO: Add explanation.
+// Result Zero and One are opaque types defined by the runtime. They are declared here and initialized before executing
+// the simulation.
 Result RuntimeResultZero = nullptr;
 Result RuntimeResultOne = nullptr;
 Result TranslateCharToResult(char resultAsChar)
@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
     // Initialize simulator.
     unique_ptr<ISimulator> sim = CreateFullstateSimulator();
     QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
-    RuntimeResultZero = sim->UseZero(); // TODO: Maybe remove.
-    RuntimeResultOne = sim->UseOne(); // TODO: Maybe remove.
+    RuntimeResultZero = sim->UseZero();
+    RuntimeResultOne = sim->UseOne();
 
     // Add the --simulation-output and --operation-output options.
     // N.B. These options should be present in all standalone drivers.
@@ -141,7 +141,8 @@ int main(int argc, char* argv[])
     app.add_option("--bool-value", boolValue, "A bool value")->required();
 
     // Option for a Q# Array<Bool> type.
-    // TODO: Add explanation.
+    // N.B. For command line parsing, a char vector is used because vector<bool> is a specialized version of vector not
+    //      supported by CLI11.
     vector<char> boolAsCharVector;
     app.add_option("--bool-array", boolAsCharVector, "A bool array")
         ->required()
@@ -160,23 +161,26 @@ int main(int argc, char* argv[])
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
     // Option for Q# Range type.
+    // N.B. RangeTuple type is used here instead of QirRange because CLI11 supports tuple parsing which is leveraged and
+    //      the tuple is later translated to QirRange.
     RangeTuple rangeValue(0, 0, 0);
     app.add_option("--range-value", rangeValue, "A Range value (start, step, end)")->required();
 
     // Option for a Q# Array<Range> type.
-    // TODO.
     vector<RangeTuple> rangeTupleVector;
     app.add_option("--range-array", rangeTupleVector, "A Range array")->required();
 
     // Option for Q# Result type.
-    // TODO: N.B.
+    // N.B. This is implemented as a char rather than a boolean to be consistent with the way an array of results has to
+    //      be implemented.
     char resultAsCharValue = FalseAsChar;
     app.add_option("--result-value", resultAsCharValue, "A Result value")
         ->required()
         ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
 
     // Option for a Q# Array<Result> type.
-    // TODO: N.B.
+    // N.B. Similarly to the case of Q# Array<bool>, for command line parsing, a char vector is used because CLI11 does
+    //      not support vector<bool> since it is a specialized version of vector.
     vector<char> resultAsCharVector;
     app.add_option("--result-array", resultAsCharVector, "A Result array")
         ->required()
@@ -197,7 +201,6 @@ int main(int argc, char* argv[])
     QirArray* qirDoubleArray = CreateQirArray(doubleVector.data(), doubleVector.size());
 
     // Create a QirArray of bool values.
-    // TODO: Explain.
     bool* boolArray = nullptr;
     TranslateVectorToBuffer<bool, char>(&boolArray, boolAsCharVector, TranslateCharToBool);
     QirArray* qirboolArray = CreateQirArray(boolArray, boolAsCharVector.size());
