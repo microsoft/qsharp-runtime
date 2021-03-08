@@ -103,12 +103,17 @@ if __name__ == '__main__':
   subprocess.run(
     "qir-input-reference-standalone" +\
     " --int-value 1" +\
-    " --double-value 0.5" +\
-    " --bool-value true" +\
     " --integer-array 1 2 3 4 5" +\
+    " --double-value 0.5" +\
+    " --double-array 0.1 0.2 0.3 0.4 0.5" +\
+    " --bool-value true" +\
+    " --bool-array true TRUE false fALSe 0" +\
     " --pauli-value PauliX" +\
-    " --range-value 1 10 1" +\
-    " --string-value SampleString" +\
-    " --result-value zero")
+    " --pauli-array PauliI paulix PAULIY PAulIZ" +\
+    " --range-value 1 2 10" +\
+    " --range-array 1 2 10 5 5 50 10 1 20" +\
+    " --string-value ASampleString" +\
+    " --result-value one" +\
+    " --result-array one ONE true TRUE 1 zero ZERO false FALSE 0")
 
   print("\n")
