@@ -45,10 +45,14 @@ def do_build(root_dir, should_make, should_build, flavor):
 
   flavorWithDebInfo = flavor
   if flavor == "Release" :
-      flavorWithDebInfo = "RelWithDebInfo"
+    flavorWithDebInfo = "RelWithDebInfo"
+
+  clangTidy = "clang-tidy"
+  if platform.system() == "Linux" :
+    clangTidy = "clang-tidy-11"
 
   if should_make:
-    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
+    cmd = "cmake -G Ninja -DCMAKE_CXX_CLANG_TIDY=" + clangTidy + " -DCMAKE_BUILD_TYPE=" + flavorWithDebInfo + " ../../.."
     log("running: " + cmd)
     result = subprocess.run(cmd, shell = True)
     if result.returncode != 0:
