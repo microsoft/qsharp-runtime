@@ -4,8 +4,8 @@
 %Qubit = type opaque
 %Array = type opaque
 
-@ResultZero = external global %Result*
-@ResultOne = external global %Result*
+@ResultZero = external dllimport global %Result*
+@ResultOne = external dllimport global %Result*
 @PauliI = constant i2 0
 @PauliX = constant i2 1
 @PauliY = constant i2 -1
