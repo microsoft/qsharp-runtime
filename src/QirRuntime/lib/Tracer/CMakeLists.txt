@@ -42,5 +42,6 @@ target_compile_definitions(qirtracer PRIVATE EXPORT_QIR_API)
 set_property(TARGET qirtracer PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 install(TARGETS qirtracer
+  RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
