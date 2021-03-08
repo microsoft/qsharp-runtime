@@ -22,16 +22,9 @@ You can use CMake directly. For example, to produce a release build:
 4. cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
 5. cmake --build .
 
-Or you can run `build.py` script from QirRuntime folder. The default options for the script are `make debug`.
+Or you can run `build-qir-runtime.ps1` script from QirRuntime folder. The script will place the build artifacts into `build/[Debug|Release]` folder. We strongly recommend doing local builds using the build script because it also runs clang-tidy if it is installed.
 
-- (Windows) `python build.py [make/nomake] [debug|release] [noqirgen]`
-- (Linux) `python3 build.py [make/nomake] [debug|release] [noqirgen]`
-
-The script will place the build artifacts into `build/[Windows|Linux]/[Debug|Release]` folder. We strongly recommend
- doing local builds using the build script because it also runs clang-tidy.
-
-CI builds and tests are enabled for this project. The build has no external dependencies, but some of the tests depend
- on `Microsoft.Quantum.Simulator.Runtime` library.
+CI builds and tests are enabled for this project. The build for `test/QIR-static/qsharp/qir-gen.csproj` has project dependencies on other parts of the runtime and may trigger a build for those components, while some of the tests depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built from.
 
 ### Windows pre-reqs
 
@@ -40,7 +33,6 @@ CI builds and tests are enabled for this project. The build has no external depe
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
 1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
-1. <_optional_> To use build/test scripts install Python 3.8.
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
@@ -58,7 +50,6 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
         - $ export CXX=/usr/bin/clang++-11
     1. `$ sudo apt install clang-tidy-11` (`$ clang-tidy-11 --version` should return 'LLVM version 11.0.0')
     1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
-    1. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
