@@ -26,6 +26,8 @@ Or you can run `build-qir-runtime.ps1` script from QirRuntime folder. The script
 
 CI builds and tests are enabled for this project. The build for `test/QIR-static/qsharp/qir-gen.csproj` has project dependencies on other parts of the runtime and may trigger a build for those components, while some of the tests depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built from.
 
+To install prerequisite tools for building the QIR runtime, you can set the `ENABLE_QIRRUNTIME` environment variable to the string `"true"` and run `prerequisites.ps1` or manually install pre-reqs with the steps listed below.
+
 ### Windows pre-reqs
 
 1. Install Clang 11, Ninja and CMake from the public distros.

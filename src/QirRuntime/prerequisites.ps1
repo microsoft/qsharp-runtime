@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 if ($Env:ENABLE_QIRRUNTIME -eq "true") {
-    if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+    if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))) -and
+    !(Get-Command clang -ErrorAction SilentlyContinue)) {
         choco install llvm
         choco install ninja
     } elseif ($IsMacOS) {
