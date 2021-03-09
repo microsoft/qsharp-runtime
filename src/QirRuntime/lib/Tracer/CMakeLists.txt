@@ -25,23 +25,23 @@ set_property(TARGET tracer-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(tracer-obj PRIVATE EXPORT_QIR_API)
 
 #===============================================================================
-# Produce the qirtracer dynamic library
+# Produce the Microsoft.Quantum.Qir.Tracer dynamic library
 #
-add_library(qirtracer SHARED)
+add_library(Microsoft.Quantum.Qir.Tracer SHARED)
 
-target_link_libraries(qirtracer
+target_link_libraries(Microsoft.Quantum.Qir.Tracer
   ${CMAKE_DL_LIBS}
   tracer-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
 )
 
-target_include_directories(qirtracer PUBLIC ${includes})
-target_compile_definitions(qirtracer PRIVATE EXPORT_QIR_API)
+target_include_directories(Microsoft.Quantum.Qir.Tracer PUBLIC ${includes})
+target_compile_definitions(Microsoft.Quantum.Qir.Tracer PRIVATE EXPORT_QIR_API)
 
-set_property(TARGET qirtracer PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET Microsoft.Quantum.Qir.Tracer PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-install(TARGETS qirtracer
+install(TARGETS Microsoft.Quantum.Qir.Tracer
   RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )

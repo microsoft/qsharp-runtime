@@ -16,7 +16,7 @@ endforeach()
 add_custom_target(qir_dynamic_test_lib DEPENDS ${QIR_TESTS_LIBS})
 
 #==============================================================================
-# This executable target links test code against the dynamic QIR and QSharpCore libraries rather than the explicit
+# This executable target links test code against the dynamic libraries rather than the explicit
 # static QIR/RT libs (qir will statically link in the bridge via transitivity of target_link_libraries).
 #
 add_executable(qir-dynamic-tests
@@ -28,7 +28,7 @@ target_link_libraries(qir-dynamic-tests PUBLIC
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
   "-L${CMAKE_BINARY_DIR}/lib/QSharpCore"
-  -lQSharpCore
+  -lMicrosoft.Quantum.Qir.QSharp.Core
 )
 
 target_include_directories(qir-dynamic-tests PUBLIC

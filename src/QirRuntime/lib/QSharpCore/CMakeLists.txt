@@ -28,11 +28,11 @@ set_property(TARGET qsharp-core-qis-support-obj PROPERTY POSITION_INDEPENDENT_CO
 target_compile_definitions(qsharp-core-qis-support-obj PUBLIC EXPORT_QIR_API)
 
 #===============================================================================
-# Produce the QSharpCore dynamic library
+# Produce the Microsoft.Quantum.Qir.QSharp.Core dynamic library
 #
-add_library(QSharpCore SHARED)
+add_library(Microsoft.Quantum.Qir.QSharp.Core SHARED)
 
-target_link_libraries(QSharpCore
+target_link_libraries(Microsoft.Quantum.Qir.QSharp.Core
   ${CMAKE_DL_LIBS}
   qsharp-core-qis-support-obj
   simulators-obj
@@ -40,12 +40,12 @@ target_link_libraries(QSharpCore
   -lMicrosoft.Quantum.Qir.Runtime
 )
 
-target_include_directories(QSharpCore PUBLIC ${public_includes})
-target_compile_definitions(QSharpCore PRIVATE EXPORT_QIR_API)
+target_include_directories(Microsoft.Quantum.Qir.QSharp.Core PUBLIC ${public_includes})
+target_compile_definitions(Microsoft.Quantum.Qir.QSharp.Core PRIVATE EXPORT_QIR_API)
 
-set_property(TARGET QSharpCore PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET Microsoft.Quantum.Qir.QSharp.Core PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-install(TARGETS QSharpCore
+install(TARGETS Microsoft.Quantum.Qir.QSharp.Core
   RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )

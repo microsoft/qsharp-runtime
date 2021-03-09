@@ -28,13 +28,13 @@ target_link_libraries(qir-tracer-tests PUBLIC
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
   "-L${CMAKE_BINARY_DIR}/lib/Tracer"
-  -lqirtracer
+  -lMicrosoft.Quantum.Qir.Tracer
 )
 
 target_include_directories(qir-tracer-tests PUBLIC
   "${test_includes}"
   "${public_includes}"
-  "${PROJECT_SOURCE_DIR}/lib/Tracer"
+  "${PROJECT_SOURCE_DIR}/lib/Tracer" # TODO: Remove this when tracer api is put into public headers.
 )
 add_dependencies(qir-tracer-tests tracer_qir_test_lib)
 
