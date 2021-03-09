@@ -5,7 +5,10 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
+
+#include "CLI11.hpp"
 
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
@@ -15,8 +18,6 @@
 
 #include "quantum__qis_internal.hpp"
 #include "quantum__rt.hpp"
-
-#include "CLI11.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
@@ -63,13 +64,15 @@ QirArray* CreateQirArray(T* dataBuffer, int64_t itemCount)
 }
 
 template<typename D, typename S>
-void TranslateVectorToBuffer(D** destinationBuffer, vector<S>sourceVector, function<D(S)> translationFunction)
+unique_ptr<D[]> TranslateVectorToBuffer(vector<S>sourceVector, function<D(S)> translationFunction)
 {
-    *destinationBuffer = new D[sourceVector.size()];
+    unique_ptr<D[]> buffer (new D[sourceVector.size()]);
     for (int index = 0; index < sourceVector.size(); index++)
     {
-        (*destinationBuffer)[index] = translationFunction(sourceVector[index]);
+        buffer[index] = translationFunction(sourceVector[index]);
     }
+
+    return buffer;
 }
 
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
@@ -201,9 +204,8 @@ int main(int argc, char* argv[])
     QirArray* qirDoubleArray = CreateQirArray(doubleVector.data(), doubleVector.size());
 
     // Create a QirArray of bool values.
-    bool* boolArray = nullptr;
-    TranslateVectorToBuffer<bool, char>(&boolArray, boolAsCharVector, TranslateCharToBool);
-    QirArray* qirboolArray = CreateQirArray(boolArray, boolAsCharVector.size());
+    unique_ptr<bool[]> boolArray = TranslateVectorToBuffer<bool, char>(boolAsCharVector, TranslateCharToBool);
+    QirArray* qirboolArray = CreateQirArray(boolArray.get(), boolAsCharVector.size());
 
     // Create a QirArray of Pauli values.
     QirArray* qirPauliArray = CreateQirArray(pauliVector.data(), pauliVector.size());
@@ -212,19 +214,17 @@ int main(int argc, char* argv[])
     QirRange qirRange = TranslateRangeTupleToQirRange(rangeValue);
 
     // Create a QirArray of Range values.
-    QirRange* rangeArray = nullptr;
-    TranslateVectorToBuffer<QirRange, RangeTuple>(&rangeArray, rangeTupleVector, TranslateRangeTupleToQirRange);
-    QirArray* qirRangeArray = CreateQirArray(rangeArray, rangeTupleVector.size());
+    unique_ptr<QirRange[]> rangeArray = TranslateVectorToBuffer<QirRange, RangeTuple>(
+        rangeTupleVector, TranslateRangeTupleToQirRange);
+
+    QirArray* qirRangeArray = CreateQirArray(rangeArray.get(), rangeTupleVector.size());
 
     // Create a Result.
     Result result = TranslateCharToResult(resultAsCharValue);
 
     // Create a QirArray of Result values.
-    Result* resultArray = nullptr;
-    TranslateVectorToBuffer<Result, char>(
-        &resultArray, resultAsCharVector, TranslateCharToResult);
-
-    QirArray* qirResultArray = CreateQirArray(resultArray, resultAsCharVector.size());
+    unique_ptr<Result[]> resultArray = TranslateVectorToBuffer<Result, char>(resultAsCharVector, TranslateCharToResult);
+    QirArray* qirResultArray = CreateQirArray(resultArray.get(), resultAsCharVector.size());
 
     // Create a QirString.
     QirString* qirString = quantum__rt__string_create(stringValue.c_str());
