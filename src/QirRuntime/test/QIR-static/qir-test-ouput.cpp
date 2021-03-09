@@ -6,6 +6,7 @@
 #include "catch.hpp"
 
 #include "QirTypes.hpp"
+#include "SimFactory.hpp"
 #include "qsharp__foundation_internal.hpp"
 
 extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(void*); // NOLINT
@@ -17,12 +18,12 @@ extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(void*);
 struct OstreamRedirectorScoped
 {
     OstreamRedirectorScoped(std::ostream& newOstream)
-        : old(Quantum::Qis::Internal::SetOutputStream(newOstream))
+        : old(Microsoft::Quantum::SetOutputStream(newOstream))
     {}
 
     ~OstreamRedirectorScoped()
     {
-        Quantum::Qis::Internal::SetOutputStream(old);
+        Microsoft::Quantum::SetOutputStream(old);
     }
 
   private:

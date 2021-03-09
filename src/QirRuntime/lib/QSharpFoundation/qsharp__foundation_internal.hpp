@@ -15,7 +15,6 @@ namespace Qis
     {
         extern char const excStrDrawRandomInt[];
 
-        extern std::ostream& SetOutputStream(std::ostream& newOStream);
         void RandomizeSeed(bool randomize);
         int64_t GetLastGeneratedRandomNumber();
     } // namespace Internal

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "QirTypes.hpp"
+#include "SimFactory.hpp"
 #include "qsharp__foundation__qis.hpp"
 
 // Forward declarations:
@@ -28,20 +29,16 @@ static std::ostream& GetOutputStream()
 }
 
 
-// For test purposes only:
-namespace Quantum           // Replace with `namespace Quantum::Qis::Internal` after migration to C++17.
+namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
-namespace Qis
+namespace Quantum
 {
-    namespace Internal
+    std::ostream& SetOutputStream(std::ostream & newOStream)
     {
-        std::ostream& SetOutputStream(std::ostream & newOStream)
-        {
-            std::ostream& oldOStream = *currentOutputStream;
-            currentOutputStream = &newOStream;
-            return oldOStream;
-        }
-    } // namespace Internal
-} // namespace Qis
+        std::ostream& oldOStream = *currentOutputStream;
+        currentOutputStream = &newOStream;
+        return oldOStream;
+    }
 } // namespace Quantum
+} // namespace Microsoft
 
