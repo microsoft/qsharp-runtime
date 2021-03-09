@@ -257,13 +257,13 @@ int main(int argc, char* argv[])
     operationOutputStream->flush();
 
     // Close opened file buffers;
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
-
     if (operationOutputFileStream.is_open())
     {
         operationOutputFileStream.close();
+    }
+
+    if (simulationOutputFileStream.is_open())
+    {
+        simulationOutputFileStream.close();
     }
 }
