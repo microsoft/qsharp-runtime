@@ -58,14 +58,16 @@ type Emitter() =
                     |> Seq.groupBy (fun ep -> ep.Source.CodeFile)
 
                 let content = EntryPoint.generateMainSource context entryPointCallables
-                let outputFolder = Path.GetFullPath(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar.ToString());
-                let outputUri = Uri(outputFolder);
-                let fileDir = Path.GetDirectoryName(outputUri.LocalPath);
-                let targetFile = Path.GetFullPath(Path.Combine(fileDir, "EntryPoint.g.Main.cs"));
-                if content <> null then
-                    if not (Directory.Exists(fileDir)) then
-                        Directory.CreateDirectory(fileDir) |> ignore;
-                    File.WriteAllText(targetFile, content);
+                //let outputFolder = Path.GetFullPath(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar.ToString())
+                //let outputUri = Uri(outputFolder)
+                //let fileDir = Path.GetDirectoryName(outputUri.LocalPath)
+                //let targetFile = Path.GetFullPath(Path.Combine(fileDir, "EntryPoint.g.Main.cs"))
+                //if content <> null then
+                //    if not (Directory.Exists(fileDir)) then
+                //        Directory.CreateDirectory(fileDir) |> ignore
+                //    File.WriteAllText(targetFile, content)
+
+                CompilationLoader.WriteFile("EntryPoint.g.Main.cs", dir, content)
 
                 for (sourceFile, callables) in entryPointSources do
                     let content = EntryPoint.generateSource context callables
