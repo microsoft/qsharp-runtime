@@ -38,8 +38,13 @@ elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWit
     $env:CC = "clang.exe"
     $env:CXX = "clang++.exe"
     $env:RC = "clang++.exe"
-    $llvmExtras = (Join-Path $PSScriptRoot "externals/LLVM")
+    $llvmExtras = Join-Path $PSScriptRoot externals LLVM
     $env:PATH += ";$llvmExtras"
+
+    if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
+        # LLVM was installed by Chocolatey, so add the install location to the path.
+        $env:PATH += ";$($env:SystemDrive)\Program Files\LLVM\bin"
+    }
 
     if (Get-Command clang-tidy -ErrorAction SilentlyContinue) {
         # Only run clang-tidy if it's installed. This is because the package used by chocolatey on
