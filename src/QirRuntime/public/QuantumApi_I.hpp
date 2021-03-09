@@ -52,7 +52,7 @@ namespace Quantum
         // The callback should be invoked on each basis vector (in the standard computational basis) in little-endian
         // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);
-        virtual void GetState(TGetStateCallback callback) = 0;
+        virtual void GetState(TGetStateCallback callback, long numQubits = 0, Qubit qubits[] = nullptr) = 0;
 
         // Both Assert methods return `true`, if the assert holds, `false` otherwise.
         virtual bool Assert(

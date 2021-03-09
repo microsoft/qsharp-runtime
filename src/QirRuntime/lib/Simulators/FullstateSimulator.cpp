@@ -179,11 +179,24 @@ namespace Quantum
             return this;
         }
 
-        void GetState(TGetStateCallback callback) override
+        void GetState(TGetStateCallback callback, long numQubits = 0, Qubit qubits[] = nullptr) override
         {
-            typedef bool (*TDump)(unsigned, TGetStateCallback);
-            static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
-            dump(this->simulatorId, callback);
+            if (numQubits == 0)
+            {
+                typedef bool (*TDump)(unsigned, TGetStateCallback);
+                static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
+                dump(this->simulatorId, callback);
+            }
+            else
+            {
+                auto ids = GetQubitIds(numQubits, qubits);
+                typedef bool (*TDumpQubits)(unsigned, unsigned, unsigned*, TGetStateCallback);
+                static TDumpQubits dumpQubits = reinterpret_cast<TDumpQubits>(this->GetProc("DumpQubits"));
+                if (!dumpQubits(this->simulatorId, numQubits, ids.data(), callback))
+                {
+                    throw std::logic_error("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
+                }
+            }
         }
 
         virtual std::string QubitToString(Qubit q) override

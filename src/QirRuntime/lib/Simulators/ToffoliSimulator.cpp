@@ -139,7 +139,7 @@ namespace Quantum
             return std::abs(actualZeroProbability - probabilityOfZero) < precision;
         }
 
-        void GetState(TGetStateCallback callback) override
+        void GetState(TGetStateCallback callback, long numQubits = 0, Qubit qubits[] = nullptr) override
         {
             throw std::logic_error("operation_not_supported");
         }
