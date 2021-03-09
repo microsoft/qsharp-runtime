@@ -6,7 +6,7 @@ message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 project(qirruntime)
 
 # specify the C++ standard, compiler and other tools
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
@@ -28,6 +28,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
 set(test_includes   "${PROJECT_SOURCE_DIR}/externals/catch2" "${PROJECT_SOURCE_DIR}/test")
+set(externals_includes "${PROJECT_SOURCE_DIR}/externals/fmt/include")
 
 #===============================================================================
 # testing related
@@ -123,4 +124,4 @@ endif()
 
 add_subdirectory(lib)
 add_subdirectory(test)
-
+# add_subdirectory(externals/fmt)

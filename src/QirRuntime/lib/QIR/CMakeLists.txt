@@ -53,15 +53,16 @@ set(qis_sup_source_files
   intrinsics.cpp
   intrinsicsMath.cpp
   intrinsicsOut.cpp
+  intrinsicsFormat.cpp
 )
 
 add_library(qir-qis-support ${qis_sup_source_files})
 
-target_include_directories(qir-qis-support PUBLIC ${public_includes})
+target_include_directories(qir-qis-support PUBLIC ${public_includes} ${externals_includes})
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-qis-support-obj OBJECT ${qis_sup_source_files})
-target_include_directories(qir-qis-support-obj PUBLIC ${public_includes})
+target_include_directories(qir-qis-support-obj PUBLIC ${public_includes} ${externals_includes})
 set_property(TARGET qir-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 add_dependencies(qir-qis-support ${bridge_qis_target})

@@ -167,5 +167,12 @@ namespace Microsoft.Quantum.Convert {
         body intrinsic;
     }
 
+    function FormattedI(fmt : String, value : Int) : String {    // For `Int` formatting.
+        body intrinsic; 
+    }
+
+    function FormattedD(fmt : String, value : Double) : String {    // For `Double` formatting.
+        body intrinsic; 
+    }
 }
 

@@ -61,6 +61,7 @@ extern "C"
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
     QIR_SHARED_API void quantum__qis__message__body(QirString* qstr); // NOLINT
+    QIR_SHARED_API QirString* quantum__qis__formattedi__body(QirString* fmtstr, uint64_t value); // NOLINT
 
     // Q# Math:
     QIR_SHARED_API bool quantum__qis__isnan__body(double d);               // NOLINT

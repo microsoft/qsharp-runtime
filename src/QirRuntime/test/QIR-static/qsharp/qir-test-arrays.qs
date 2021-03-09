@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Testing.QIR.Math;
     open Microsoft.Quantum.Testing.QIR.Str;
     open Microsoft.Quantum.Testing.QIR.Out;
+    open Microsoft.Quantum.Testing.QIR.Format;
 
     @EntryPoint()
     operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int {
@@ -55,6 +56,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res17 = ArcCosTest();
             let res18 = ArcTanTest();
             let res19 = ParityTest();
+            let res20 = FormattedITest("{x}", 0);
             MessageTest("Test");
 
             // Conditionals:
