@@ -57,6 +57,7 @@ type Emitter() =
                     entryPointCallables
                     |> Seq.groupBy (fun ep -> ep.Source.CodeFile)
 
+                // ToDo: remove commented out code
                 let content = EntryPoint.generateMainSource context entryPointCallables
                 //let outputFolder = Path.GetFullPath(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar.ToString())
                 //let outputUri = Uri(outputFolder)
