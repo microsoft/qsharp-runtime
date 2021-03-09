@@ -11,7 +11,7 @@ This folder contains QIR runtime project, which includes implementation of the
 
 ## Build
 
-The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(10.0.0). Other versions of the tools might work
+The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(11.0.0). Other versions of the tools might work
  but haven't been tested. Only x64 architecture is supported.
 
 You can use CMake directly. For example, to produce a release build:
@@ -35,7 +35,7 @@ CI builds and tests are enabled for this project. The build has no external depe
 
 ### Windows pre-reqs
 
-1. Install Clang, Ninja and CMake from the public distros.
+1. Install Clang 11, Ninja and CMake from the public distros.
 1. Add all three to your/system `%PATH%`.
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
@@ -52,11 +52,11 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 1. In the Ubuntu's terminal:
     1. `$ sudo apt install cmake` (`$ cmake --version` should return 3.16.3)
     1. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
-    1. `$ sudo apt install clang` (`$ clang++ --version` should return 10.0.0)
+    1. `$ sudo apt install clang-11` (`$ clang++-11 --version` should return 11.0.0)
     1. Set Clang as the preferred C/C++ compiler:
-        - $ export CC=/usr/bin/clang
-        - $ export CXX=/usr/bin/clang++
-    1. `$ sudo apt install clang-tidy` (`$ clang-tidy --version` should return 'LLVM version 10.0.0')
+        - $ export CC=/usr/bin/clang-11
+        - $ export CXX=/usr/bin/clang++-11
+    1. `$ sudo apt install clang-tidy-11` (`$ clang-tidy-11 --version` should return 'LLVM version 11.0.0')
     1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
     1. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
 
