@@ -159,42 +159,4 @@ namespace Microsoft.Quantum.Convert
         }
     }
 
-    public partial class PauliArrayAsInt
-    {
-        public class Native : PauliArrayAsInt
-        {
-            static long PauliBitsFunc(IQArray<Pauli> pauli)
-            {
-                if (pauli.Length > 31) { throw new ExecutionFailException("Cannot pack bits of Pauli array longer than 31"); }
-                ulong res = 0;
-                for (long i = pauli.Length - 1; i >= 0; --i)
-                {
-                    res <<= 2;
-                    if (pauli[i] == Pauli.PauliZ)
-                    {
-                        res |= 2;
-                    }
-                    else if (pauli[i] == Pauli.PauliX)
-                    {
-                        res |= 1;
-                    }
-                    else if (pauli[i] == Pauli.PauliY)
-                    {
-                        res |= 3;
-                    }
-                    else if (pauli[i] == Pauli.PauliI)
-                    {
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.Assert(false, "this line should never be reached");
-                    }
-                }
-                return System.Convert.ToInt64(res);
-            }
-
-            public Native(IOperationFactory m) : base(m) { }
-            public override Func<IQArray<Pauli>, long> __Body__ => PauliBitsFunc;
-        }
-    }
 }
