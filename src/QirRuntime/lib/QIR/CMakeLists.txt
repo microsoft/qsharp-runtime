@@ -41,33 +41,6 @@ target_compile_definitions(qir-rt-support-obj PRIVATE EXPORT_QIR_API)
 #+++++++++++++++++++++++++++++++++++++
 
 #===============================================================================
-# create a utility lib from bridge-qis.ll
-#
-set(bridge_qis_target "bridge_qis_target")
-compile_from_qir(bridge-qis ${bridge_qis_target})
-
-#===============================================================================
-# create qir-qis-support lib from the C++ sources
-#
-set(qis_sup_source_files
-  conditionals.cpp
-  intrinsicsMath.cpp
-  intrinsicsOut.cpp
-)
-
-add_library(qir-qis-support ${qis_sup_source_files})
-target_include_directories(qir-qis-support PUBLIC ${public_includes})
-add_dependencies(qir-qis-support ${bridge_qis_target})
-target_compile_definitions(qir-qis-support PRIVATE EXPORT_QIR_API)
-
-# Produce object lib we'll use to create a shared lib (so/dll) later on
-add_library(qir-qis-support-obj OBJECT ${qis_sup_source_files})
-target_source_from_qir_obj(qir-qis-support-obj bridge-qis)
-target_include_directories(qir-qis-support-obj PUBLIC ${public_includes})
-set_property(TARGET qir-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_compile_definitions(qir-qis-support-obj PRIVATE EXPORT_QIR_API)
-
-#===============================================================================
 # Produce the Microsoft.Quantum.Qir.Runtime dynamic library
 #
 add_library(Microsoft.Quantum.Qir.Runtime SHARED)
@@ -75,7 +48,6 @@ add_library(Microsoft.Quantum.Qir.Runtime SHARED)
 target_link_libraries(Microsoft.Quantum.Qir.Runtime
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
-  qir-qis-support-obj
 )
 
 target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})

@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "QirTypes.hpp"
-#include "quantum__qis.hpp"
+#include "qsharp__foundation__qis.hpp"
 
 // Forward declarations:
 static std::ostream& GetOutputStream();

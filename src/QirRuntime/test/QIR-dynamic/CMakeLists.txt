@@ -27,6 +27,8 @@ target_link_libraries(qir-dynamic-tests PUBLIC
   ${QIR_TESTS_LIBS}
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpFoundation"
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
   "-L${CMAKE_BINARY_DIR}/lib/QSharpCore"
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )

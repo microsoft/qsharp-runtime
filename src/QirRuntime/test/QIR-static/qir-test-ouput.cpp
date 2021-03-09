@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 #include "QirTypes.hpp"
-#include "quantum__qis_internal.hpp"
+#include "qsharp__foundation_internal.hpp"
 
 extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(void*); // NOLINT
 

@@ -4,7 +4,7 @@
 #include <cassert>
 #include <unordered_map>
 
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"

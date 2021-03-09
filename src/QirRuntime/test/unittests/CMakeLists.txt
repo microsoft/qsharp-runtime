@@ -10,7 +10,7 @@ add_executable(qir-runtime-unittests
 
 target_link_libraries(qir-runtime-unittests PUBLIC
   qir-rt-support
-  qir-qis-support
+  qsharp-foundation-qis-support
   qsharp-core-qis-support
   simulators
   tracer
@@ -20,6 +20,7 @@ target_include_directories(qir-runtime-unittests PUBLIC
   "${test_includes}"
    ${public_includes}
    "${PROJECT_SOURCE_DIR}/lib/QIR"
+   "${PROJECT_SOURCE_DIR}/lib/QSharpFoundation"
    "${PROJECT_SOURCE_DIR}/lib/QSharpCore"
    "${PROJECT_SOURCE_DIR}/lib/Tracer"
 )

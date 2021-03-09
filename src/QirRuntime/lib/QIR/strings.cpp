@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 #include "QirTypes.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 std::unordered_map<std::string, QirString*>& AllocatedStrings()
 {

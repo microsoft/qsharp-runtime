@@ -27,10 +27,10 @@ add_executable(qir-static-tests
 target_link_libraries(qir-static-tests PUBLIC
   ${QIR_TESTS_LIBS}
   ${QIR_BRIDGE_UTILITY_LIB}
-  ${QIR_BRIDGE_QIS_UTILITY_LIB}
+  ${QSHARP_FOUNDATION_BRIDGE_QIS_UTILITY_LIB}
   ${QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB}
   qir-rt-support
-  qir-qis-support
+  qsharp-foundation-qis-support
   qsharp-core-qis-support
   simulators
 )
@@ -39,6 +39,7 @@ target_include_directories(qir-static-tests PUBLIC
   "${test_includes}"
   "${public_includes}"
   "${PROJECT_SOURCE_DIR}/lib/QIR"
+  "${PROJECT_SOURCE_DIR}/lib/QSharpFoundation"
 )
 target_compile_definitions(qir-static-tests PRIVATE EXPORT_QIR_API)
 add_dependencies(qir-static-tests qir_static_test_lib)
