@@ -26,7 +26,7 @@ add_executable(qir-tracer-tests
 target_link_libraries(qir-tracer-tests PUBLIC
   ${QIR_TESTS_LIBS}
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lqir
+  -lMicrosoft.Quantum.Qir.Runtime
   "-L${CMAKE_BINARY_DIR}/lib/Tracer"
   -lqirtracer
 )

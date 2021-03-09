@@ -26,7 +26,7 @@ add_executable(qir-dynamic-tests
 target_link_libraries(qir-dynamic-tests PUBLIC
   ${QIR_TESTS_LIBS}
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lqir
+  -lMicrosoft.Quantum.Qir.Runtime
   "-L${CMAKE_BINARY_DIR}/lib/QSharpCore"
   -lQSharpCore
 )

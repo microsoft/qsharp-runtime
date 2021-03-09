@@ -37,7 +37,7 @@ target_link_libraries(QSharpCore
   qsharp-core-qis-support-obj
   simulators-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lqir
+  -lMicrosoft.Quantum.Qir.Runtime
 )
 
 target_include_directories(QSharpCore PUBLIC ${public_includes})

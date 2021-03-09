@@ -33,7 +33,7 @@ target_link_libraries(qirtracer
   ${CMAKE_DL_LIBS}
   tracer-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lqir
+  -lMicrosoft.Quantum.Qir.Runtime
 )
 
 target_include_directories(qirtracer PUBLIC ${includes})

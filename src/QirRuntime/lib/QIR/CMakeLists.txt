@@ -68,22 +68,22 @@ set_property(TARGET qir-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(qir-qis-support-obj PRIVATE EXPORT_QIR_API)
 
 #===============================================================================
-# Produce the qir dynamic library
+# Produce the Microsoft.Quantum.Qir.Runtime dynamic library
 #
-add_library(qir SHARED)
+add_library(Microsoft.Quantum.Qir.Runtime SHARED)
 
-target_link_libraries(qir
+target_link_libraries(Microsoft.Quantum.Qir.Runtime
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
   qir-qis-support-obj
 )
 
-target_include_directories(qir PUBLIC ${public_includes})
-target_compile_definitions(qir PRIVATE EXPORT_QIR_API)
+target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})
+target_compile_definitions(Microsoft.Quantum.Qir.Runtime PRIVATE EXPORT_QIR_API)
 
-set_property(TARGET qir PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET Microsoft.Quantum.Qir.Runtime PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-install(TARGETS qir
+install(TARGETS Microsoft.Quantum.Qir.Runtime
   RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
