@@ -27,10 +27,7 @@ extern "C" int64_t Quantum__StandaloneSupportedInputs__ExerciseInputs__body( // 
     int64_t intValue,
     double doubleValue,
     Result resultValue,
-    QirString* stringValue,
-    int64_t rangeStart,
-    int64_t rangeStep,
-    int64_t rangeEnd);
+    QirString* stringValue);
 
 const char FalseAsChar = 0x0;
 const char TrueAsChar = 0x1;
@@ -250,7 +247,7 @@ int main(int argc, char* argv[])
 
     // Run simulation and write the output of the operation to the corresponding stream.
     int64_t operationOutput = Quantum__StandaloneSupportedInputs__ExerciseInputs__body(
-        intValue, doubleValue, result, qirString, qirRange.start, qirRange.step, qirRange.end);
+        intValue, doubleValue, result, qirString);
 
     simulatorOutputStream->flush();
     (*operationOutputStream) << operationOutput << endl;
