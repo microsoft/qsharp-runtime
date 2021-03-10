@@ -13,7 +13,7 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "QirRuntime.hpp"
 
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
     // Initialize simulator.
-    unique_ptr<ISimulator> sim = CreateFullstateSimulator();
+    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
     RuntimeResultZero = sim->UseZero();
     RuntimeResultOne = sim->UseOne();
