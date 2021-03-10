@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <iostream>
 
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 #include "QirTypes.hpp"
 

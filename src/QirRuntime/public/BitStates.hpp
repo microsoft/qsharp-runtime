@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "CoreTypes.hpp"
+
 namespace Microsoft
 {
 namespace Quantum
@@ -10,7 +12,7 @@ namespace Quantum
     /*==============================================================================
         Provides dynamically extendable storage for packed bits
     ==============================================================================*/
-    struct BitStates
+    struct QIR_SHARED_API BitStates
     {
         typedef uint64_t TSLOT;
         static constexpr int slotSizeBits = sizeof(TSLOT) * 8;

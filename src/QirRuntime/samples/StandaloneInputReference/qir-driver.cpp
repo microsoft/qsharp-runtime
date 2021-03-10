@@ -15,9 +15,7 @@
 #include "QirTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
-
-#include "quantum__qis_internal.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
@@ -226,13 +224,13 @@ int main(int argc, char* argv[])
     // Create a QirString.
     QirString* qirString = quantum__rt__string_create(stringValue.c_str());
 
-    // Redirect the simulator output from std::cout if the --simulator-output option is present.
+    // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
     ofstream simulationOutputFileStream;
     if (!simulationOutputFileOpt->empty())
     {
         simulationOutputFileStream.open(simulationOutputFile);
-        Quantum::Qis::Internal::SetOutputStream(simulationOutputFileStream);
+        SetOutputStream(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 

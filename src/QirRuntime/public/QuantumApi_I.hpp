@@ -8,7 +8,7 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    struct IQuantumGateSet
+    struct QIR_SHARED_API IQuantumGateSet
     {
         virtual ~IQuantumGateSet() {}
 
@@ -45,7 +45,7 @@ namespace Quantum
         virtual void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) = 0;
     };
 
-    struct IDiagnostics
+    struct QIR_SHARED_API IDiagnostics
     {
         virtual ~IDiagnostics() {}
 
@@ -71,7 +71,7 @@ namespace Quantum
             const char* failureMessage) = 0;
     };
 
-    struct ISimulator
+    struct QIR_SHARED_API ISimulator
     {
         virtual ~ISimulator() {}
 

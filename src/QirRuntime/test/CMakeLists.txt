@@ -1,3 +1,5 @@
+include(unit_test_include)
+
 add_subdirectory(FullstateSimulator)
 add_subdirectory(QIR-dynamic)
 add_subdirectory(QIR-static)

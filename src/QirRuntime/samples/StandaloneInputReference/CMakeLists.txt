@@ -1,7 +1,6 @@
 #=======================================================================================================================
 # This is a reference make file on how to build a QIR-based standalone executable.
 #=======================================================================================================================
-
 add_executable(qir-input-reference-standalone
   qir-driver.cpp
 )
@@ -11,11 +10,12 @@ compile_from_qir(qir-standalone-input-reference qir_standalone_input_reference_t
 
 target_link_libraries(qir-input-reference-standalone PUBLIC
   ${QIR_UTILITY_LIB} # created by compile_from_qir
-  ${QIR_BRIDGE_UTILITY_LIB}
-  ${QIR_BRIDGE_QIS_UTILITY_LIB}
-  qir-rt-support
-  qir-qis-support
-  simulators
+  "-L${CMAKE_BINARY_DIR}/lib/QIR"
+  -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpFoundation"
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpCore"
+  -lMicrosoft.Quantum.Qir.QSharp.Core
 )
 
 set(standalone_includes "${PROJECT_SOURCE_DIR}/externals/CLI11")
@@ -23,7 +23,6 @@ set(standalone_includes "${PROJECT_SOURCE_DIR}/externals/CLI11")
 target_include_directories(qir-input-reference-standalone PUBLIC
   "${standalone_includes}"
   "${public_includes}"
-  "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
 
 add_dependencies(qir-input-reference-standalone qir_standalone_input_reference_target)
