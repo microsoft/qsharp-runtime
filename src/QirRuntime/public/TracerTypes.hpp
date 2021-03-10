@@ -3,6 +3,7 @@
 #pragma once
 
 #include <limits>
+
 namespace Microsoft
 {
 namespace Quantum

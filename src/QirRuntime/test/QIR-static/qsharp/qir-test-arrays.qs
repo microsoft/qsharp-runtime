@@ -55,6 +55,8 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res17 = ArcCosTest();
             let res18 = ArcTanTest();
             let res19 = ParityTest();
+            let res20 = PauliArrayAsIntTest();
+            let res21 = PauliArrayAsIntFailTest();
             MessageTest("Test");
 
             // Conditionals:

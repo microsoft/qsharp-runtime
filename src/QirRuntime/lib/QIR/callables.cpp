@@ -11,7 +11,7 @@
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 #include "allocationsTracker.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
 

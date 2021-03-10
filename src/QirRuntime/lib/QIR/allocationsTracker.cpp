@@ -3,7 +3,7 @@
 
 #include "allocationsTracker.hpp"
 
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 using namespace std;
 

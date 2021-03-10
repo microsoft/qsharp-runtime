@@ -4,9 +4,9 @@
 #include <cmath>
 #include <random>
 #include <stdexcept>
-#include "quantum__qis.hpp"
-#include "quantum__qis_internal.hpp"
-#include "quantum__rt.hpp"
+#include "qsharp__foundation__qis.hpp"
+#include "qsharp__foundation_internal.hpp"
+#include "QirRuntime.hpp"
 
 // Forward declarations:
 namespace // Visible in this translation unit only.

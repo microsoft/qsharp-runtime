@@ -5,16 +5,18 @@
 
 #include <memory>
 
+#include "CoreTypes.hpp"
+
 namespace Microsoft
 {
 namespace Quantum
 {
     struct ISimulator;
-    void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects = false);
-    void ReleaseQirContext();
-
     struct AllocationsTracker;
-    struct QirExecutionContext
+
+    QIR_SHARED_API void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects = false);
+    QIR_SHARED_API void ReleaseQirContext();
+    struct QIR_SHARED_API QirExecutionContext
     {
         ISimulator* simulator = nullptr;
         bool trackAllocatedObjects = false;
@@ -24,8 +26,9 @@ namespace Quantum
         ~QirExecutionContext();
     };
     extern thread_local std::unique_ptr<QirExecutionContext> g_context;
+    extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext();
 
-    struct QirContextScope
+    struct QIR_SHARED_API QirContextScope
     {
         QirContextScope(ISimulator* sim, bool trackAllocatedObjects = false)
         {

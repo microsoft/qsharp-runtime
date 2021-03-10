@@ -10,8 +10,9 @@
 #include <vector>
 
 #include "QirTypes.hpp"
-#include "quantum__qis.hpp"
-#include "quantum__rt.hpp"
+#include "qsharp__foundation__qis.hpp"
+#include "qsharp__core__qis.hpp"
+#include "QirRuntime.hpp"
 
 #include "BitStates.hpp"
 #include "QirContext.hpp"

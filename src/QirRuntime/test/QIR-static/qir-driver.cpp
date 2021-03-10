@@ -14,7 +14,7 @@
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
