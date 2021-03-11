@@ -72,7 +72,7 @@ if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
 }
 
-$os = "win32"
+$os = "win"
 $pattern = "*.dll"
 if ($IsMacOS) {
     $os = "osx"

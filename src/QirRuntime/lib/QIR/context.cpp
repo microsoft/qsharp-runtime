@@ -6,7 +6,7 @@
 #include "QirContext.hpp"
 
 #include "CoreTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "allocationsTracker.hpp"
 
 // These two globals are used in QIR _directly_ so have to define them outside of the context.
@@ -20,15 +20,15 @@ namespace Quantum
     thread_local std::unique_ptr<QirExecutionContext> g_context = nullptr;
     std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
 
-    void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects)
+    void InitializeQirContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);
         g_context = std::make_unique<QirExecutionContext>(sim, trackAllocatedObjects);
 
-        if (g_context->simulator != nullptr)
+        if (g_context->driver != nullptr)
         {
-            ResultOne = g_context->simulator->UseOne();
-            ResultZero = g_context->simulator->UseZero();
+            ResultOne = g_context->driver->UseOne();
+            ResultZero = g_context->driver->UseZero();
         }
         else
         {
@@ -51,8 +51,8 @@ namespace Quantum
         g_context.reset(nullptr);
     }
 
-    QirExecutionContext::QirExecutionContext(ISimulator* sim, bool trackAllocatedObjects)
-        : simulator(sim)
+    QirExecutionContext::QirExecutionContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
+        : driver(sim)
         , trackAllocatedObjects(trackAllocatedObjects)
     {
         if (this->trackAllocatedObjects)
