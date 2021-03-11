@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"

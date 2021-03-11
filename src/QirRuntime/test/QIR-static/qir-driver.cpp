@@ -11,7 +11,7 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
 #include "QirRuntime.hpp"
