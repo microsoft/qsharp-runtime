@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Testing.QIR {
+    open Microsoft.Quantum.Testing.QIR.Other;
     open Microsoft.Quantum.Testing.QIR.Math;
     open Microsoft.Quantum.Testing.QIR.Str;
     open Microsoft.Quantum.Testing.QIR.Out;
@@ -32,7 +33,8 @@ namespace Microsoft.Quantum.Testing.QIR {
 
         // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
         if (compilerDecoy) {
-            let res1 = TestControlled();
+            let res1_1 = TestFunctors();
+            let res1_2 = TestFunctorsNoArgs();
             let res2 = TestPartials(17, 42);
             TestQubitResultManagement();
 
@@ -42,7 +44,23 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res6 = ArcTan2Test();
             let res7 = PauliToStringTest();
             let res8 = TestDrawRandomInt(0, 1);
+            let res9 = SinTest();
+            let res10 = CosTest();
+            let res11 = TanTest();
+            let res12 = SinhTest();
+            let res13 = CoshTest();
+            let res14 = TanhTest();
+            let res15 = IeeeRemainderTest();
+            let res16 = ArcSinTest();
+            let res17 = ArcCosTest();
+            let res18 = ArcTanTest();
+            let res19 = ParityTest();
             MessageTest("Test");
+
+            // Conditionals:
+            TestApplyIf();
+            TestApplyIfWithFunctors();
+            TestApplyConditionally();
         }
         return sum;
     }

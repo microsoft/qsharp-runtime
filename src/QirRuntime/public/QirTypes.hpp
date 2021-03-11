@@ -166,6 +166,7 @@ struct QirCallable
     void UpdateAliasCount(int increment);
 
     void Invoke(PTuple args, PTuple result);
+    void Invoke(); // a shortcut to invoke a callable with no arguments and Unit result
     void ApplyFunctor(int functor);
 
     void InvokeCaptureCallback(int index, int64_t parameter);

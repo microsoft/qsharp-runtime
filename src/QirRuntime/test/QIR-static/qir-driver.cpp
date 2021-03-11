@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <cassert>
 #include <bitset>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_set>
 
 #include "CoreTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "QuantumApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "QirContext.hpp"
-#include "QirTypes.hpp"
 #include "quantum__rt.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
@@ -223,8 +223,8 @@ TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 }
 #endif
 
-// The Microsoft__Quantum__Testing__QIR__TestControlled__body tests needs proper semantics of X and M, and nothing else.
-// The validation is done inside the test and it would return an error code in case of failure.
+// The Microsoft__Quantum__Testing__QIR__TestFunctors__body tests needs proper semantics of X and M, and nothing else.
+// The validation is done inside the test and it would throw in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
@@ -299,13 +299,18 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
-extern "C" void Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__body(Qubit q)                             // NOLINT
+static int g_cKCalls = 0;
+static int g_cKCallsControlled = 0;
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__body();       // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body(); // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                              // NOLINT
 {
+    g_cKCalls++;
     g_ctrqapi->X(q);
 }
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
+    g_cKCallsControlled++;
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
@@ -314,7 +319,13 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestControlled__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__body());
+
+    const int cKCalls = g_cKCalls;
+    const int cKCallsControlled = g_cKCallsControlled;
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body());
+    CHECK(g_cKCalls - cKCalls == 3);
+    CHECK(g_cKCallsControlled - cKCallsControlled == 5);
 
     g_ctrqapi = nullptr;
 }
