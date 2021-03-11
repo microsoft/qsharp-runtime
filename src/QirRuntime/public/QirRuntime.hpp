@@ -56,7 +56,7 @@ extern "C"
     // ------------------------------------------------------------------------
 
     // Allocate a block of memory on the heap.
-    QIR_SHARED_API char* quantum__rt__heap_alloc(int size); // NOLINT
+    QIR_SHARED_API char* quantum__rt__heap_alloc(uint64_t size); // NOLINT
 
     // Release a block of allocated heap memory.
     QIR_SHARED_API void quantum__rt__heap_free(char* buffer); // NOLINT

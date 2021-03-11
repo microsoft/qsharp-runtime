@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_set>
 #include <iostream>
+#include <cstdint>
 
 #include "QirRuntime.hpp"
 
@@ -20,9 +21,13 @@ std::unordered_set<char*>& UseMemoryTracker()
 extern "C"
 {
     // Allocate a block of memory on the heap.
-    char* quantum__rt__heap_alloc(int size) // NOLINT
+    char* quantum__rt__heap_alloc(uint64_t size) // NOLINT
     {
-        char* buffer = new char[size];
+        char* buffer = new (std::nothrow) char[size];
+        if(buffer == nullptr)
+        {
+            quantum__rt__fail(quantum__rt__string_create("Allocation Failed"));
+        }
         #ifndef NDEBUG
             UseMemoryTracker().insert(buffer);
         #endif

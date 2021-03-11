@@ -37,7 +37,7 @@
 ;------------------------------------------------------------------------------
 ; classical
 ;
-declare i8* @quantum__rt__heap_alloc(i32)
+declare i8* @quantum__rt__heap_alloc(i64)
 declare void @quantum__rt__heap_free(i8*)
 declare void @quantum__rt__fail(%"struct.QirString"*)
 
@@ -111,8 +111,8 @@ declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* d
 ;------------------------------------------------------------------------------
 ; classical bridge
 ;
-define dllexport i8* @__quantum__rt__heap_alloc(i32 %size) {
-  %mem = call i8* @quantum__rt__heap_alloc(i32 %size)
+define dllexport i8* @__quantum__rt__heap_alloc(i64 %size) {
+  %mem = call i8* @quantum__rt__heap_alloc(i64 %size)
   ret i8* %mem
 }
 
