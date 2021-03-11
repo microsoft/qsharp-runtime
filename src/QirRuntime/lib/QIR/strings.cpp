@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <cstdint>
 
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
@@ -153,6 +154,16 @@ extern "C"
         oss << range.end;
 
         return quantum__rt__string_create(oss.str().c_str());
+    }
+
+    const char* quantum__rt_string_get_data(QirString* str) // NOLINT
+    {
+        return str->str.c_str();
+    }
+
+    uint32_t quantum__rt_string_get_length(QirString* str)  // NOLINT
+    {
+        return str->str.size();
     }
 
     // Implemented in delegated.cpp:
