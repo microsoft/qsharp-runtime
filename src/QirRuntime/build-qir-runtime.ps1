@@ -71,19 +71,19 @@ if ($LastExitCode -ne 0) {
 }
 
 $os = "win"
-$pattern = "*.dll"
+$pattern = @("*.dll", "*.lib")
 if ($IsMacOS) {
     $os = "osx"
-    $pattern = "*.dylib"
+    $pattern = @("*.dylib")
 } elseif ($IsLinux) {
     $os = "linux"
-    $pattern = "*.so"
+    $pattern = @("*.so")
 }
 $osQirDropFolder = Join-Path $Env:DROPS_DIR QIR $os
 if (!(Test-Path $osQirDropFolder)) {
     New-Item -Path $osQirDropFolder -ItemType "directory"
 }
-Copy-Item (Join-Path . bin $pattern) $osQirDropFolder
+$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder }
 
 Pop-Location
 
