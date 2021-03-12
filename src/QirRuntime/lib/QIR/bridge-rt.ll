@@ -379,7 +379,7 @@ define dllexport void @__quantum__rt__callable_memory_management(i32 %index, %Ca
 ; NYI:
 ;define dllexport %String* @__quantum__rt__bigint_to_string(%BigInt*)
 
-define dllexport %String* @__quantum__rt__string_create(i32 %length_ignored, i8* %null_terminated_buffer) {
+define dllexport %String* @__quantum__rt__string_create(i8* %null_terminated_buffer) {
   %str = call %"struct.QirString"* @quantum__rt__string_create(i8* %null_terminated_buffer)
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str
