@@ -49,5 +49,6 @@ set_property(TARGET Microsoft.Quantum.Qir.QSharp.Foundation PROPERTY POSITION_IN
 install(TARGETS Microsoft.Quantum.Qir.QSharp.Foundation
   RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
+  ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
 

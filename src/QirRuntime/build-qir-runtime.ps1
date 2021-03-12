@@ -38,8 +38,6 @@ elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWit
     $env:CC = "clang.exe"
     $env:CXX = "clang++.exe"
     $env:RC = "clang++.exe"
-    $llvmExtras = Join-Path $PSScriptRoot externals LLVM
-    $env:PATH += ";$llvmExtras"
 
     if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
         # LLVM was installed by Chocolatey, so add the install location to the path.
@@ -73,19 +71,19 @@ if ($LastExitCode -ne 0) {
 }
 
 $os = "win"
-$pattern = "*.dll"
+$pattern = @("*.dll", "*.lib")
 if ($IsMacOS) {
     $os = "osx"
-    $pattern = "*.dylib"
+    $pattern = @("*.dylib")
 } elseif ($IsLinux) {
     $os = "linux"
-    $pattern = "*.so"
+    $pattern = @("*.so")
 }
 $osQirDropFolder = Join-Path $Env:DROPS_DIR QIR $os
 if (!(Test-Path $osQirDropFolder)) {
     New-Item -Path $osQirDropFolder -ItemType "directory"
 }
-Copy-Item (Join-Path . bin $pattern) $osQirDropFolder
+$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder }
 
 Pop-Location
 
