@@ -283,9 +283,8 @@ define dllexport void @__quantum__rt__array_update_reference_count(%Array* %.ar,
   ret void
 }
 
-define dllexport void @__quantum__rt__array_update_alias_count(%Array* %.ar, i64 %.c) {
+define dllexport void @__quantum__rt__array_update_alias_count(%Array* %.ar, i32 %c) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__array_update_alias_count(%"struct.QirArray"* %ar, i32 %c)
   ret void
 }
@@ -305,9 +304,8 @@ define dllexport void @__quantum__rt__tuple_update_reference_count(%Tuple* %.th,
   ret void
 }
 
-define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i64 %.c) {
+define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i32 %c) {
   %th = bitcast %Tuple* %.th to i8*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__tuple_update_alias_count(i8* %th, i32 %c)
   ret void
 }
@@ -321,9 +319,8 @@ define dllexport void @__quantum__rt__callable_update_reference_count(%Callable*
   ret void
 }
 
-define dllexport void @__quantum__rt__callable_update_alias_count(%Callable* %.clb, i64 %.c) {
+define dllexport void @__quantum__rt__callable_update_alias_count(%Callable* %.clb, i32 %c) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__callable_update_alias_count(%"struct.QirCallable"* %clb, i32 %c)
   ret void
 }
