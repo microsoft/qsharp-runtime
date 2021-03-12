@@ -4,6 +4,7 @@
 /// # Summary
 /// These functions provide information about the environment in which the quantum computation is occuring.
 namespace Microsoft.Quantum.Environment {
+
     /// # Summary
     /// Returns the number of qubits currently available to use.
     ///
@@ -12,8 +13,13 @@ namespace Microsoft.Quantum.Environment {
     /// If the target machine being used does not provide this information, then
     /// `-1` is returned.
     ///
+    /// # Remarks
+    /// This operation is no longer supported, and will be removed in a future
+    /// version.
+    ///
     /// # See Also
     /// - GetQubitsAvailableToBorrow
+    @Deprecated("")
     operation GetQubitsAvailableToUse () : Int {
         body intrinsic;
     }
@@ -27,8 +33,13 @@ namespace Microsoft.Quantum.Environment {
     /// If the target machine being used does not provide this information, then
     /// `-1` is returned.
     ///
+    /// # Remarks
+    /// This operation is no longer supported, and will be removed in a future
+    /// version.
+    ///
     /// # See Also
     /// - GetQubitsAvailableToUse
+    @Deprecated("")
     operation GetQubitsAvailableToBorrow () : Int {
         body intrinsic;
     }

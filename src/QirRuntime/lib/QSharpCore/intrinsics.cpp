@@ -4,14 +4,15 @@
 /*=============================================================================
     QIR assumes a single global execution context.
     To support the dispatch over the qir-bridge, the clients must register their
-    Microsoft::Quantum::ISimulator* first.
+    Microsoft::Quantum::IRuntimeDriver* first.
 =============================================================================*/
 #include <cassert>
 #include <vector>
 
 #include "qsharp__core__qis.hpp"
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
+#include "QSharpSimApi_I.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 
@@ -29,6 +30,11 @@ static std::vector<PauliId> ExtractPauliIds(QirArray* paulis)
     return pauliIds;
 }
 
+static Microsoft::Quantum::IQuantumGateSet* GateSet()
+{
+    return dynamic_cast<Microsoft::Quantum::IQuantumGateSet*>(Microsoft::Quantum::GlobalContext()->driver);
+}
+
 extern "C"
 {
     void quantum__qis__exp__body(QirArray* paulis, double angle, QirArray* qubits)
@@ -36,7 +42,7 @@ extern "C"
         assert(paulis->count == qubits->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->Exp(
+        return GateSet()->Exp(
             paulis->count, reinterpret_cast<PauliId*>(pauliIds.data()), reinterpret_cast<Qubit*>(qubits->buffer),
             angle);
     }
@@ -51,7 +57,7 @@ extern "C"
         assert(paulis->count == qubits->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledExp(
+        return GateSet()->ControlledExp(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), paulis->count,
             reinterpret_cast<PauliId*>(pauliIds.data()), reinterpret_cast<Qubit*>(qubits->buffer), angle);
     }
@@ -63,12 +69,12 @@ extern "C"
 
     void quantum__qis__h__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->H(qubit);
+        GateSet()->H(qubit);
     }
 
     void quantum__qis__h__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledH(
+        GateSet()->ControlledH(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
@@ -78,13 +84,13 @@ extern "C"
         assert(count == paulis->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return Microsoft::Quantum::GlobalContext()->simulator->Measure(
+        return GateSet()->Measure(
             count, reinterpret_cast<PauliId*>(pauliIds.data()), count, reinterpret_cast<Qubit*>(qubits->buffer));
     }
 
     void quantum__qis__r__body(PauliId axis, double angle, QUBIT* qubit)
     {
-        return Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->R(axis, qubit, angle);
+        return GateSet()->R(axis, qubit, angle);
     }
 
     void quantum__qis__r__adj(PauliId axis, double angle, QUBIT* qubit)
@@ -94,7 +100,7 @@ extern "C"
 
     void quantum__qis__r__ctl(QirArray* ctls, PauliId axis, double angle, QUBIT* qubit)
     {
-        return Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledR(
+        return GateSet()->ControlledR(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), axis, qubit, angle);
     }
 
@@ -105,78 +111,78 @@ extern "C"
 
     void quantum__qis__s__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->S(qubit);
+        GateSet()->S(qubit);
     }
 
     void quantum__qis__s__adj(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->AdjointS(qubit);
+        GateSet()->AdjointS(qubit);
     }
 
     void quantum__qis__s__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledS(
+        GateSet()->ControlledS(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__s__ctladj(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledAdjointS(
+        GateSet()->ControlledAdjointS(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__t__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->T(qubit);
+        GateSet()->T(qubit);
     }
 
     void quantum__qis__t__adj(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->AdjointT(qubit);
+        GateSet()->AdjointT(qubit);
     }
 
     void quantum__qis__t__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledT(
+        GateSet()->ControlledT(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__t__ctladj(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledAdjointT(
+        GateSet()->ControlledAdjointT(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__x__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->X(qubit);
+        GateSet()->X(qubit);
     }
 
     void quantum__qis__x__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledX(
+        GateSet()->ControlledX(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__y__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->Y(qubit);
+        GateSet()->Y(qubit);
     }
 
     void quantum__qis__y__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledY(
+        GateSet()->ControlledY(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 
     void quantum__qis__z__body(Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->Z(qubit);
+        GateSet()->Z(qubit);
     }
 
     void quantum__qis__z__ctl(QirArray* ctls, Qubit qubit)
     {
-        Microsoft::Quantum::GlobalContext()->simulator->AsQuantumGateSet()->ControlledZ(
+        GateSet()->ControlledZ(
             ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), qubit);
     }
 }

@@ -4,7 +4,8 @@
 #include <cassert>
 #include <vector>
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
+#include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 
 #include "BitStates.hpp"
@@ -17,7 +18,7 @@ namespace Quantum
         CToffoliSimulator
         Simulator for reversible classical logic.
     ==============================================================================*/
-    class CToffoliSimulator final : public ISimulator, public IQuantumGateSet, public IDiagnostics
+    class CToffoliSimulator final : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
     {
         long lastUsedId = -1;
 
@@ -40,39 +41,8 @@ namespace Quantum
         ~CToffoliSimulator() = default;
 
         ///
-        /// Implementation of ISimulator
+        /// Implementation of IRuntimeDriver
         ///
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            return this;
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return this;
-        }
-
-        Result M(Qubit qubit) override
-        {
-            return (this->states.IsBitSetAt(GetQubitId(qubit)) ? one : zero);
-        }
-
-        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
-        {
-            bool odd = false;
-            for (long i = 0; i < numBases; i++)
-            {
-                if (bases[i] == PauliId_X || bases[i] == PauliId_Y)
-                {
-                    throw std::runtime_error("Toffoli simulator only supports measurements in Z basis");
-                }
-                if (bases[i] == PauliId_Z)
-                {
-                    odd ^= (this->states.IsBitSetAt(GetQubitId(targets[i])));
-                }
-            }
-            return odd ? one : zero;
-        }
-
         void ReleaseResult(Result result) override {}
 
         bool AreEqualResults(Result r1, Result r2) override
@@ -172,6 +142,24 @@ namespace Quantum
         }
 
 
+        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+        {
+            bool odd = false;
+            for (long i = 0; i < numBases; i++)
+            {
+                if (bases[i] == PauliId_X || bases[i] == PauliId_Y)
+                {
+                    throw std::runtime_error("Toffoli simulator only supports measurements in Z basis");
+                }
+                if (bases[i] == PauliId_Z)
+                {
+                    odd ^= (this->states.IsBitSetAt(GetQubitId(targets[i])));
+                }
+            }
+            return odd ? one : zero;
+        }
+
+
         //
         // The rest of the gate set Toffoli simulator doesn't support
         //
@@ -255,7 +243,7 @@ namespace Quantum
         }
     };
 
-    std::unique_ptr<ISimulator> CreateToffoliSimulator()
+    std::unique_ptr<IRuntimeDriver> CreateToffoliSimulator()
     {
         return std::make_unique<CToffoliSimulator>();
     }

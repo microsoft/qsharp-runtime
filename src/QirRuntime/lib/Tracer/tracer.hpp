@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "CoreTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "TracerTypes.hpp"
 
 namespace Microsoft
@@ -60,7 +60,7 @@ namespace Quantum
     /*==================================================================================================================
         The tracer implements resource estimation. See readme in this folder for details.
     ==================================================================================================================*/
-    class QIR_SHARED_API CTracer : public ISimulator
+    class QIR_SHARED_API CTracer : public IRuntimeDriver
     {
         // For now the tracer assumes no reuse of qubits.
         std::vector<QubitState> qubits;
@@ -141,29 +141,13 @@ namespace Quantum
         }
 
         // -------------------------------------------------------------------------------------------------------------
-        // ISimulator interface
+        // IRuntimeDriver interface
         // -------------------------------------------------------------------------------------------------------------
         Qubit AllocateQubit() override;
         void ReleaseQubit(Qubit qubit) override;
         std::string QubitToString(Qubit qubit) override;
         void ReleaseResult(Result result) override;
 
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            throw std::logic_error("Not supported: all intrinsics must be converted to tracing operations");
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return nullptr;
-        }
-        Result M(Qubit target) override
-        {
-            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
-        }
-        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
-        {
-            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
-        }
         bool AreEqualResults(Result r1, Result r2) override
         {
             throw std::logic_error("Cannot compare results while tracing!");

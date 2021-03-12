@@ -38,8 +38,6 @@ elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWit
     $env:CC = "clang.exe"
     $env:CXX = "clang++.exe"
     $env:RC = "clang++.exe"
-    $llvmExtras = Join-Path $PSScriptRoot externals LLVM
-    $env:PATH += ";$llvmExtras"
 
     if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
         # LLVM was installed by Chocolatey, so add the install location to the path.
@@ -72,7 +70,7 @@ if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
 }
 
-$os = "win32"
+$os = "win"
 $pattern = "*.dll"
 if ($IsMacOS) {
     $os = "osx"

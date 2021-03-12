@@ -37,7 +37,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         allocated.ExtendToInclude(maxResults);
     }
 
-    Result M(Qubit) override
+    Result Measure(long, PauliId[], long, Qubit[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
@@ -74,8 +74,8 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     std::unique_ptr<ResultsReferenceCountingTestQAPI> qapi = std::make_unique<ResultsReferenceCountingTestQAPI>(3);
     QirContextScope qirctx(qapi.get());
 
-    Result r1 = qapi->M(nullptr); // we don't need real qubits for this test
-    Result r2 = qapi->M(nullptr);
+    Result r1 = qapi->Measure(0, nullptr, 0, nullptr); // we don't need real qubits for this test
+    Result r2 = qapi->Measure(0, nullptr, 0, nullptr);
     REQUIRE(quantum__rt__result_equal(r1, r1));
     REQUIRE(!quantum__rt__result_equal(r1, r2));
 
@@ -85,7 +85,7 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     // share a result a few times
     quantum__rt__result_update_reference_count(r1, 2);
 
-    Result r3 = qapi->M(nullptr);
+    Result r3 = qapi->Measure(0, nullptr, 0, nullptr);
 
     // release shared result, the test QAPI will verify double release
     quantum__rt__result_update_reference_count(r1, -3); // one release for shared and for the original allocation
