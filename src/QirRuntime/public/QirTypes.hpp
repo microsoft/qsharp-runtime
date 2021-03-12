@@ -6,10 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "CoreTypes.hpp"
+
 /*======================================================================================================================
     QirArray
 ======================================================================================================================*/
-struct QirArray
+struct QIR_SHARED_API QirArray
 {
     int64_t count = 0; // overall size of the array across all dimensions
     const int itemSizeInBytes = 0;
@@ -41,7 +43,7 @@ struct QirArray
 /*======================================================================================================================
     QirString is just a wrapper around std::string
 ======================================================================================================================*/
-struct QirString
+struct QIR_SHARED_API QirString
 {
     long refCount = 1;
     std::string str;
@@ -57,7 +59,7 @@ struct QirString
     tuple is created.
 ======================================================================================================================*/
 using PTuple = char*;
-struct QirTupleHeader
+struct QIR_SHARED_API QirTupleHeader
 {
     int32_t refCount = 0;
     int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
@@ -86,7 +88,7 @@ struct QirTupleHeader
 /*======================================================================================================================
     A helper type for unpacking tuples used by multi-level controlled callables
 ======================================================================================================================*/
-struct TupleWithControls
+struct QIR_SHARED_API TupleWithControls
 {
     QirArray* controls;
     TupleWithControls* innerTuple;
@@ -120,7 +122,7 @@ static_assert(
 ======================================================================================================================*/
 typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
 typedef void (*t_CaptureCallback)(PTuple, int64_t);
-struct QirCallable
+struct QIR_SHARED_API QirCallable
 {
     static int constexpr Adjoint = 1;
     static int constexpr Controlled = 1 << 1;
@@ -166,6 +168,7 @@ struct QirCallable
     void UpdateAliasCount(int increment);
 
     void Invoke(PTuple args, PTuple result);
+    void Invoke(); // a shortcut to invoke a callable with no arguments and Unit result
     void ApplyFunctor(int functor);
 
     void InvokeCaptureCallback(int index, int64_t parameter);

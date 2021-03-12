@@ -9,8 +9,8 @@
 #include <vector>
 
 #include "CoreTypes.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "TracerTypes.hpp"
-#include "QuantumApi_I.hpp"
 
 namespace Microsoft
 {
@@ -19,7 +19,7 @@ namespace Quantum
     /*==================================================================================================================
         Layer
     ==================================================================================================================*/
-    struct Layer
+    struct QIR_SHARED_API Layer
     {
         // Start time of the layer.
         const Time startTime;
@@ -43,7 +43,7 @@ namespace Quantum
     /*==================================================================================================================
         QubitState
     ==================================================================================================================*/
-    struct QubitState
+    struct QIR_SHARED_API QubitState
     {
         // The last layer this qubit was used in, `INVALID` means the qubit haven't been used yet in any
         // operations of non-zero duration.
@@ -60,7 +60,7 @@ namespace Quantum
     /*==================================================================================================================
         The tracer implements resource estimation. See readme in this folder for details.
     ==================================================================================================================*/
-    class CTracer : public ISimulator
+    class QIR_SHARED_API CTracer : public IRuntimeDriver
     {
         // For now the tracer assumes no reuse of qubits.
         std::vector<QubitState> qubits;
@@ -71,9 +71,20 @@ namespace Quantum
         // The index into the vector is treated as implicit id of the layer.
         std::vector<Layer> metricsByLayer;
 
-        // The last global barrier, injected by the user. No new operations can be added to the barrier or to any of the
-        // layer that preceeded it, even if the new operations involve completely new qubits.
+        // The last barrier, injected by the user. No new operations can be added to the barrier or to any of the
+        // layer that preceeded it, even if the new operations involve completely new qubits. Thus, the barriers act
+        // as permanent fences, that are activated at the moment the tracer executes the corresponding user code and are
+        // never removed.
         LayerId globalBarrier = INVALID;
+
+        // The conditional fences are layers that contain measurements for results used to guard conditional branches.
+        // The set of fences is a stack (for nested conditionals) but we use vector to store them so we can recalculate
+        // the latest (by time) fence when the stack is popped.
+        std::vector<LayerId> conditionalFences;
+
+        // We don't expect the stack of conditional fences to be deep, so it's OK to recalculate the latest layer when
+        // the stack is modified.
+        LayerId latestConditionalFence = INVALID;
 
         // Mapping of operation ids to user-chosen names, for operations that user didn't name, the output will use
         // operation ids.
@@ -96,7 +107,7 @@ namespace Quantum
             return this->qubits[qubitIndex];
         }
 
-        // If no appropriate layer found, return `INVALID`
+        // If no appropriate layer found, returns `REQUESTNEW`.
         LayerId FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const;
 
         // Returns the index of the created layer.
@@ -105,10 +116,19 @@ namespace Quantum
         // Adds operation with given id into the given layer. Assumes that duration contraints have been satisfied.
         void AddOperationToLayer(OpId id, LayerId layer);
 
-        // Update the qubit state with the new layer information
+        // Update the qubit state with the new layer information.
         void UpdateQubitState(Qubit q, LayerId layer, Duration opDuration);
 
+        // Considers global barriers and conditional fences to find the fence currently in effect.
+        LayerId GetEffectiveFence() const;
+
+        // For the given results finds the latest layer of the measurements that produced the results.
+        LayerId FindLatestMeasurementLayer(long count, Result* results);
+
       public:
+        // Returns the later layer of the two. INVALID LayerId is treated as -Infinity, and REQUESTNEW -- as +Infinity.
+        static LayerId LaterLayerOf(LayerId l1, LayerId l2);
+
         explicit CTracer(int preferredLayerDuration)
             : preferredLayerDuration(preferredLayerDuration)
         {
@@ -121,29 +141,13 @@ namespace Quantum
         }
 
         // -------------------------------------------------------------------------------------------------------------
-        // ISimulator interface
+        // IRuntimeDriver interface
         // -------------------------------------------------------------------------------------------------------------
         Qubit AllocateQubit() override;
         void ReleaseQubit(Qubit qubit) override;
         std::string QubitToString(Qubit qubit) override;
         void ReleaseResult(Result result) override;
 
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            throw std::logic_error("Not supported: all intrinsics must be converted to tracing operations");
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return nullptr;
-        }
-        Result M(Qubit target) override
-        {
-            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
-        }
-        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
-        {
-            throw std::logic_error("Not supported: all measurements must be converted to tracing operations");
-        }
         bool AreEqualResults(Result r1, Result r2) override
         {
             throw std::logic_error("Cannot compare results while tracing!");
@@ -184,6 +188,14 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         LayerId InjectGlobalBarrier(OpId id, Duration duration);
 
+        struct FenceScope
+        {
+            CTracer* tracer = nullptr;
+            LayerId fence = INVALID;
+            explicit FenceScope(CTracer* tracer, long count1, Result* results1, long count2, Result* results2);
+            ~FenceScope();
+        };
+
         // -------------------------------------------------------------------------------------------------------------
         // Configuring the tracer and getting data back from it.
         // -------------------------------------------------------------------------------------------------------------
@@ -197,8 +209,8 @@ namespace Quantum
         void PrintLayerMetrics(std::ostream& out, const std::string& separator, bool printZeroMetrics) const;
     };
 
-    std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
-    std::shared_ptr<CTracer> CreateTracer(
+    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
+    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(
         int preferredLayerDuration,
         const std::unordered_map<OpId, std::string>& opNames);
 

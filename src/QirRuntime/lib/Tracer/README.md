@@ -72,20 +72,24 @@ As the tracer is executing a sequential quantum program, it will compute a time 
  using the _conceptual_ algorithm, described below (aka "tetris algorithm"). The actual implementation of layering might
  be done differently, as long as the resulting layering is the same as if running the conceptual algorithm.
 
-A ___barrier___ is a layer that acts as if it was containing all currently allocated qubits and no operation can be added
- into it.
-
-A user can inject _barriers_ by calling `__quantum__qis__global_barrier` function. The user can choose duration of
- a barrier which would affect start time of the following layers but no operations will be added to a barrier,
- independent of its duration.
+A layer _L(T,N)_ acts as a ___fence___ if it does _not_ accepts any new operations, even if these operations don't
+ involve qubits from _Qubits(T,N)_.
 
 __Conditional execution on measurement results__: The Tracer will execute LLVM IR's branching structures "as is",
  depending on the values of the corresponding variables at runtime. To enable estimation of branches that depend on a
- measurement result, the source Q# program will have to be authored in such a way that the Q# compiler will translate the
- conditionals into corresponding callbacks to the tracer. The tracer will add operations from _both branches_ into the
- layers it creates to compute the upper bound estimate.
+ measurement result, the source Q# program must be authored in such a way that the Q# compiler will translate the
+ conditionals into corresponding callbacks to the tracer (`__quantum__qis__apply_conditionally`). The tracer will
+ execute _both branches_ of the conditional statement to compute the upper bound estimate. The conditional callbacks
+ will mark the layers that contain measurements that produced the results used in conditionals as _fences_ for the
+ duration of the conditional callback.
 
-The following operations are _not_ supported inside conditional callbacks and would cause a runtime failure:
+A user can create special layers that act as permanent _fences_ by calling `__quantum__qis__inject_barrier` function. The
+ user can choose duration of a barrier which would affect start time of the following layers but no operations will be
+ added to a barrier, independent of its duration. _Terminology note_: 'fence' is a role of layer, which might be assigned
+ to a layer temporarily or permanently; 'barrier' is a special layer the user can inject that has the role of a permanent
+ fence and contains no operations.
+
+__TODO__: figure out which operations should or should _not_ be supported inside conditional callbacks. For example:
 
 - nested conditional callbacks;
 - measurements;
@@ -201,7 +205,7 @@ TBD but lower priority.
 | `%Result* @__quantum__qis__single_qubit_measure(i32 %id, i32 %duration, %Qubit* %q)` | Function for counting measurements of a single qubit. The user can assign different operation ids for different measurement bases. |
 | `%Result* @__quantum__qis__joint_measure(i32 %id, i32 %duration, %Array* %qs)` | Function for counting joint-measurements of qubits. The user can assign different operation ids for different measurement bases. |
 | `void __quantum__qis__swap(%Qubit* %q1, %Qubit* %q2)` | See [Special handling of SWAP](#special-handling-of-swap) for details. |
-| TODO: handling of conditionals on measurement results | |
+| `void __quantum__qis__apply_conditionally(%Array* %.rs1, %Array* %.rs2, %Callable* %.clb_on_equal, %Callable* %.clb_on_different)` | The first two arguments contain arrays of results to be compared pairwise. The third argument is a callable that represents the branch that would be executed if all results compared equal and the forth argument is a callable that represents the branch that would be executed if any of the results compared different. The tracer executes _both_ branches.|
 
 _Note on operation ids_: The user is responsible for using operation ids in a consistent manner. Operations with the
  same id will be counted by the tracer as the _same_ operation, even accross invocations with different number of target

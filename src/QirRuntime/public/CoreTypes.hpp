@@ -1,6 +1,19 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 #pragma once
 
 #include <cstdint>
+
+#ifdef _WIN32
+#ifdef EXPORT_QIR_API
+#define QIR_SHARED_API __declspec(dllexport)
+#else
+#define QIR_SHARED_API __declspec(dllimport)
+#endif
+#else
+#define QIR_SHARED_API
+#endif
 
 // The core types will be exposed in the C-interfaces for interop, thus no
 // namespaces or scoped enums can be used to define them.
