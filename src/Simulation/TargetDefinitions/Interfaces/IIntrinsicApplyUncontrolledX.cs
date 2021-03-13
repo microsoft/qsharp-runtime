@@ -5,8 +5,8 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IGate_Reset : IOperationFactory
+    public interface IIntrinsicApplyUncontrolledX : IOperationFactory
     {
-        void Reset__Body(Qubit target);
+        void Body(Qubit target);
     }
 }

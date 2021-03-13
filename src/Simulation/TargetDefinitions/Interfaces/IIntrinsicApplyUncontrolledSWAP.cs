@@ -5,8 +5,8 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IGate_ApplyControlledX : IOperationFactory
+    public interface IIntrinsicApplyUncontrolledSWAP : IOperationFactory
     {
-        void ApplyControlledX__Body(Qubit control, Qubit target);
+        void Body(Qubit qubit1, Qubit qubit2);
     }
 }

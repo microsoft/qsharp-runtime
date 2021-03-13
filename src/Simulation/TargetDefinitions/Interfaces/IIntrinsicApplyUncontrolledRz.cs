@@ -5,8 +5,10 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IGate_ApplyUncontrolledX : IOperationFactory
+    public interface IIntrinsicApplyUncontrolledRz : IOperationFactory
     {
-        void ApplyUncontrolledX__Body(Qubit target);
+        void Body(double angle, Qubit target);
+
+        void AdjointBody(double angle, Qubit target);
     }
 }
