@@ -48,6 +48,8 @@ declare %class.QUBIT* @quantum__rt__qubit_allocate()
 declare void @quantum__rt__qubit_release(%class.QUBIT*)
 declare i1 @quantum__rt__result_equal(%class.RESULT*, %class.RESULT*)
 declare void @quantum__rt__result_update_reference_count(%class.RESULT* %r, i32 %c)
+declare %class.RESULT* @quantum__rt__result_get_zero()
+declare %class.RESULT* @quantum__rt__result_get_one()
 
 ;------------------------------------------------------------------------------
 ; arrays
@@ -178,6 +180,18 @@ define dllexport void @__quantum__rt__result_update_reference_count(%Result* %.r
   %r = bitcast %Result* %.r to %class.RESULT*
   call void @quantum__rt__result_update_reference_count(%class.RESULT* %r, i32 %c)
   ret void
+}
+
+define dllexport %Result* @__quantum__rt__result_get_zero() {
+  %result = call %class.RESULT* @quantum__rt__result_get_zero()
+  %.result = bitcast %class.RESULT* %result to %Result*
+  ret %Result* %.result
+}
+
+define dllexport %Result* @__quantum__rt__result_get_one() {
+  %result = call %class.RESULT* @quantum__rt__result_get_one()
+  %.result = bitcast %class.RESULT* %result to %Result*
+  ret %Result* %.result
 }
 
 

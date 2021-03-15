@@ -78,9 +78,8 @@ extern "C"
     // becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void quantum__rt__result_update_reference_count(RESULT*, int32_t); // NOLINT
 
-    // Not in the QIR spec right now
-    QIR_SHARED_API RESULT* quantum__rt__result_one(); // NOLINT
-    QIR_SHARED_API RESULT* quantum__rt__result_zero(); // NOLINT
+    QIR_SHARED_API RESULT* quantum__rt__result_get_one(); // NOLINT
+    QIR_SHARED_API RESULT* quantum__rt__result_get_zero(); // NOLINT
 
     // ------------------------------------------------------------------------
     // Tuples
