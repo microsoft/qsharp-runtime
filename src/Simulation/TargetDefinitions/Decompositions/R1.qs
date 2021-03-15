@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies a rotation about the $\ket{1}$ state by a given angle.
@@ -25,7 +24,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// R(PauliZ, theta, qubit);
     /// R(PauliI, -theta, qubit);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.R1")
     operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         R(PauliZ, theta, qubit);
         R(PauliI, -theta, qubit);

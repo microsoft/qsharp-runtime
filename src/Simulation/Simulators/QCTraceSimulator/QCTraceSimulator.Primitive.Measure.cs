@@ -5,10 +5,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 {
     using System;
     using Microsoft.Quantum.Simulation.Core;
+    using Microsoft.Quantum.Intrinsic.Interfaces;
 
     public partial class QCTraceSimulatorImpl
     {
-        public virtual Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             return this.Measure(paulis, targets);
         }

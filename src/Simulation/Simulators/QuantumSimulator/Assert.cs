@@ -2,9 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
 using static System.Math;
 

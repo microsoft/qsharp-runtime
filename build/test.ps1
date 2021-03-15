@@ -13,18 +13,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
 } else {
     Write-Host "Skipping test of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }
-
-if (($Env:ENABLE_NATIVE -ne "false") -and ($Env:ENABLE_QIRRUNTIME -eq "true")) {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
-    & "$qirRuntime/test-qir-runtime.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME `
-                and ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
-}
-
 function Test-One {
     Param($project)
 
@@ -48,6 +36,17 @@ function Test-One {
 }
 
 Test-One '../Simulation.sln'
+
+if (($Env:ENABLE_NATIVE -ne "false") -and ($Env:ENABLE_QIRRUNTIME -eq "true")) {
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
+    & "$qirRuntime/test-qir-runtime.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME `
+                and ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
+}
 
 if (-not $all_ok) {
     throw "At least one project failed during testing. Check the logs."

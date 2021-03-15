@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Diagnostics {
     internal operation PrepareEntangledState (left : Qubit[], right : Qubit[]) : Unit
     is Adj + Ctl {
 
-        for (idxQubit in 0 .. Length(left) - 1)
+        for idxQubit in 0 .. Length(left) - 1
         {
             H(left[idxQubit]);
             Controlled X([left[idxQubit]], right[idxQubit]);
@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Operation defining the expected behavior for the operation under test.
     operation AssertOperationsEqualReferenced (nQubits : Int, actual : (Qubit[] => Unit), expected : (Qubit[] => Unit is Adj)) : Unit {
         // Prepare a reference register entangled with the target register.
-        using ((reference, target) = (Qubit[nQubits], Qubit[nQubits])) {
+        use (reference, target) = (Qubit[nQubits], Qubit[nQubits]) {
             PrepareEntangledState(reference, target);
             actual(target);
             Adjoint expected(target);

@@ -1,7 +1,6 @@
-set(component_name "simulators")
-
 set(source_files
   "FullstateSimulator.cpp"
+  "setup.cpp"
   "ToffoliSimulator.cpp"
 )
 
@@ -13,14 +12,15 @@ set(includes
 #===============================================================================
 # Produce static lib for users to link directly to
 
-add_library(${component_name} STATIC ${source_files})
-target_include_directories(${component_name} PUBLIC ${includes})
-target_link_libraries(${component_name} ${CMAKE_DL_LIBS})
+add_library(simulators STATIC ${source_files})
+target_include_directories(simulators PUBLIC ${includes})
+target_link_libraries(simulators ${CMAKE_DL_LIBS})
+target_compile_definitions(simulators PRIVATE EXPORT_QIR_API)
 
 #===============================================================================
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 
-set(component_name_obj "${component_name}-obj")
-add_library(${component_name_obj} OBJECT ${source_files})
-target_include_directories(${component_name_obj} PUBLIC ${includes})
-set_property(TARGET ${component_name_obj} PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(simulators-obj OBJECT ${source_files})
+target_include_directories(simulators-obj PUBLIC ${includes})
+set_property(TARGET simulators-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_compile_definitions(simulators-obj PRIVATE EXPORT_QIR_API)
