@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Performs a joint measurement of one or more qubits in the
@@ -39,7 +38,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
-    @EnableTestingViaName("Test.TargetDefinitions.Measure")
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
         if (Length(bases) != Length(qubits)) { fail "Arrays 'bases' and 'qubits' must be of the same length."; }
         mutable res = One;
@@ -53,9 +51,9 @@ namespace Microsoft.Quantum.Intrinsic {
             }
         }
         else {
-            using( q = Qubit() ) {
+            use q = Qubit() {
                 H(q);
-                for( k in 0 .. Length(bases) - 1 ) {
+                for k in 0 .. Length(bases) - 1 {
                     if( bases[k] == PauliX ) { Controlled X ([qubits[k]], q); }
                     if( bases[k] == PauliZ ) { Controlled Z ([qubits[k]], q); }
                     if( bases[k] == PauliY ) { Controlled Y ([qubits[k]], q); }

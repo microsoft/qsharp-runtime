@@ -89,9 +89,10 @@ namespace N1
     let parse files =
         let mutable errors = [] : Diagnostic list
         let addError (diag : Diagnostic) =
-            match diag.Severity with
-            | DiagnosticSeverity.Error -> errors <- diag :: errors
-            | _ -> ()
+            if diag.Severity.HasValue then
+                match diag.Severity.Value with
+                | DiagnosticSeverity.Error -> errors <- diag :: errors
+                | _ -> ()
         let addSourceFile (mgr:CompilationUnitManager) fileName =
             let fileId = new Uri(Path.GetFullPath fileName)
             let file = CompilationUnitManager.InitializeFileManager(fileId, File.ReadAllText fileName)

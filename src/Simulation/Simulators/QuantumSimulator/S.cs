@@ -1,43 +1,42 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void S__Body(Qubit target)
+        void IIntrinsicS.Body(Qubit target)
         {
             this.CheckQubit(target);
 
             S(this.Id, (uint)target.Id);
         }
 
-        public virtual void S__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicS.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => S__Body(target),
+                () => ((IIntrinsicS)this).Body(target),
                 (count, ids) => MCS(this.Id, count, ids, (uint)target.Id));
         }
 
-        public virtual void S__AdjointBody(Qubit target)
+        void IIntrinsicS.AdjointBody(Qubit target)
         {
             this.CheckQubit(target);
 
             AdjS(this.Id, (uint)target.Id);
         }
 
-        public virtual void S__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicS.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
             this.CheckQubits(controls, target);
 
             SafeControlled(controls,
-                () => S__AdjointBody(target),
+                () => ((IIntrinsicS)this).AdjointBody(target),
                 (count, ids) => MCAdjS(this.Id, count, ids, (uint)target.Id));
         }
     }

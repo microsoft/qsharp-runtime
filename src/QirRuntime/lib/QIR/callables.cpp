@@ -1,17 +1,17 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
+#include <cstring> // for memcpy
 #include <limits>
 #include <memory>
 #include <stdexcept>
-#include <string.h> // for memcpy
 #include <vector>
 
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "allocationsTracker.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
 
@@ -404,6 +404,14 @@ void QirCallable::Invoke(PTuple args, PTuple result)
         quantum__rt__array_update_reference_count(controls, -1);
         flat->Release();
     }
+}
+
+void QirCallable::Invoke()
+{
+    assert((this->appliedFunctor & QirCallable::Controlled) == 0 && "Cannot invoke controlled callable without args");
+    PTuple args = quantum__rt__tuple_create(0);
+    this->Invoke(args, nullptr);
+    quantum__rt__tuple_update_reference_count(args, -1);
 }
 
 // A + A = I; A + C = C + A = CA; C + C = C; CA + A = C; CA + C = CA

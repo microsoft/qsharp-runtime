@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
-    @EnableTestingViaName("Test.TargetDefinitions.PreparePostM")
     internal operation PreparePostM(result : Result, qubit : Qubit) : Unit {
         // This platform requires reset after measurement, and then must
         // re-prepare the measured state in the qubit.

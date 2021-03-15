@@ -1,20 +1,20 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
 #include <bitset>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_set>
 
 #include "CoreTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
@@ -70,7 +70,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
-extern "C" bool Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body(); // NOLINT
 struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     // no intelligent reuse, we just want to check that QIR releases all qubits
@@ -157,8 +157,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Qubit_Result_Management__body();
-    REQUIRE(res);
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body());
 
     // check that all qubits have been released
     for (size_t id = 0; id < sim->qubits.size(); id++)
@@ -224,8 +223,8 @@ TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 }
 #endif
 
-// The Microsoft__Quantum__Testing__QIR__TestControlled__body tests needs proper semantics of X and M, and nothing else.
-// The validation is done inside the test and it would return an error code in case of failure.
+// The Microsoft__Quantum__Testing__QIR__TestFunctors__body tests needs proper semantics of X and M, and nothing else.
+// The validation is done inside the test and it would throw in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
@@ -300,13 +299,18 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 FunctorsTestSimulator* g_ctrqapi = nullptr;
-extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestControlled__body(); // NOLINT
-extern "C" void __quantum__qis__k__body(Qubit q)                             // NOLINT
+static int g_cKCalls = 0;
+static int g_cKCallsControlled = 0;
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__body();       // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body(); // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                              // NOLINT
 {
+    g_cKCalls++;
     g_ctrqapi->X(q);
 }
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
+    g_cKCallsControlled++;
     g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
@@ -315,7 +319,13 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
     QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__TestControlled__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__body());
+
+    const int cKCalls = g_cKCalls;
+    const int cKCallsControlled = g_cKCallsControlled;
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body());
+    CHECK(g_cKCalls - cKCalls == 3);
+    CHECK(g_cKCallsControlled - cKCallsControlled == 5);
 
     g_ctrqapi = nullptr;
 }

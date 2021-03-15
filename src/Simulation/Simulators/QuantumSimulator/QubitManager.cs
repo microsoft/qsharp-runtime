@@ -5,7 +5,6 @@ using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {

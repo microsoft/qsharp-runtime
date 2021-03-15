@@ -3,7 +3,6 @@
 
 namespace Microsoft.Quantum.Measurement {
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Measures a single qubit in the Y basis,
@@ -21,7 +20,6 @@ namespace Microsoft.Quantum.Measurement {
     ///
     /// # Output
     /// The result of measuring `target` in the Pauli $Y$ basis.
-    @EnableTestingViaName("Test.TargetDefinitions.MResetY")
     operation MResetY (target : Qubit) : Result {
         MapPauli(target, PauliZ, PauliY);
         let result = M(target);

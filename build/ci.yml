@@ -22,7 +22,7 @@ variables:
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
   CI: "true"
-  ENABLE_QIRRUNTIME: "true"
+  ENABLE_QIRRUNTIME: "false"
 
 jobs:
 - job: build
