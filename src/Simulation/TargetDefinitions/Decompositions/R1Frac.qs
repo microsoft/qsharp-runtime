@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Diagnostics;
 
     /// # Summary
     /// Applies a rotation about the $\ket{1}$ state by an angle specified
@@ -35,7 +34,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// RFrac(PauliZ, -numerator, denominator + 1, qubit);
     /// RFrac(PauliI, numerator, denominator + 1, qubit);
     /// ```
-    @EnableTestingViaName("Test.TargetDefinitions.R1Frac")
     operation R1Frac (numerator : Int, power : Int, qubit : Qubit) : Unit is Adj + Ctl {
         RFrac(PauliZ, -numerator, power + 1, qubit);
         RFrac(PauliI, numerator, power + 1, qubit);

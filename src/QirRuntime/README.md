@@ -11,7 +11,7 @@ This folder contains QIR runtime project, which includes implementation of the
 
 ## Build
 
-The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(10.0.0). Other versions of the tools might work
+The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(11.0.0). Other versions of the tools might work
  but haven't been tested. Only x64 architecture is supported.
 
 You can use CMake directly. For example, to produce a release build:
@@ -22,40 +22,36 @@ You can use CMake directly. For example, to produce a release build:
 4. cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
 5. cmake --build .
 
-Or you can run `build.py` script from QirRuntime folder. The default options for the script are `make debug`.
+Or you can run `build-qir-runtime.ps1` script from QirRuntime folder. The script will place the build artifacts into `build/[Debug|Release]` folder. We strongly recommend doing local builds using the build script because it also runs clang-tidy if it is installed.
 
-- (Windows) `python build.py [make/nomake] [debug|release]`
-- (Linux) `python3 build.py [make/nomake] [debug|release]`
+CI builds and tests are enabled for this project. The build for `test/QIR-static/qsharp/qir-gen.csproj` has project dependencies on other parts of the runtime and may trigger a build for those components, while some of the tests depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built from.
 
-The script will place the build artifacts into `build/[Windows|Linux]/[Debug|Release]` folder. We strongly recommend
- doing local builds using the build script because it also runs clang-tidy.
-
-CI builds and tests are enabled for this project. The build has no external dependencies, but some of the tests depend
- on `Microsoft.Quantum.Simulator.Runtime` library.
+To install prerequisite tools for building the QIR runtime, you can set the `ENABLE_QIRRUNTIME` environment variable to the string `"true"` and run `prerequisites.ps1` or manually install pre-reqs with the steps listed below (Windows script relies on [Chocolatey](https://chocolatey.org/) for installation).
 
 ### Windows pre-reqs
 
-1. Install Clang, Ninja and CMake from the public distros.
-2. Add all three to your/system `%PATH%`.
-3. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
-4. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
-5. <_optional_> To use build/test scripts install Python 3.8.
+1. Install Clang 11, Ninja and CMake from the public distros.
+1. Add all three to your/system `%PATH%`.
+1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
+1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
+1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
 
 ### Linux via WSL pre-reqs
 
-1. On the host Windows machine [enable WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) and install Ubuntu 20.04 LTS.
-2. In the Ubuntu's terminal:
+1. On the host Windows machine [enable WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) and install
+ Ubuntu 20.04 LTS.
+1. In the Ubuntu's terminal:
     1. `$ sudo apt install cmake` (`$ cmake --version` should return 3.16.3)
-    2. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
-    3. `$ sudo apt install clang` (`$ clang++ --version` should return 10.0.0)
-    4. Set Clang as the preferred C/C++ compiler:
-        - $ export CC=/usr/bin/clang
-        - $ export CXX=/usr/bin/clang++
-    5. `$ sudo apt install clang-tidy` (`$ clang-tidy --version` should return 'LLVM version 10.0.0')
-    6. <_optional_> To use build/test scripts, check that you have python3 installed (it should be by default).
+    1. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
+    1. `$ sudo apt install clang-11` (`$ clang++-11 --version` should return 11.0.0)
+    1. Set Clang as the preferred C/C++ compiler:
+        - $ export CC=/usr/bin/clang-11
+        - $ export CXX=/usr/bin/clang++-11
+    1. `$ sudo apt install clang-tidy-11` (`$ clang-tidy-11 --version` should return 'LLVM version 11.0.0')
+    1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
@@ -64,6 +60,11 @@ See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with W
 Some of the tests depend on Microsoft.Quantum.Simulator.Runtime library. To run them make sure to build Native simulator
  from this repository or provide your own version of the library in a folder the OS would search during dynamic library
  lookup.
+
+Some of the tests use generated QIR (*.ll) files as build input. Currently the files are checked-in as part of the project
+ but in the future they will be replaced by automatic generation during build. To regenerate the files, run generateqir.py
+ or build/test scripts without specifying `noqirgen`. To use the checked-in files without regenerating them, run build/test
+ scripts with `noqirgen` argument.
 
 ### Running tests with test.py
 
@@ -162,8 +163,6 @@ CMake doesn't support using LLVM's IR files as input so instead we invoke Clang 
 1. All functionality related to BigInt type (including `__quantum__rt__bigint_to_string`) NYI.
 1. QIR is assumed to be __single threaded__. No effort was made to make the bridge and runtime thread safe.
 1. Strings are implemented as a thin wrapper over std::string with virtually no optimizations.
-1. `__quantum__rt__string_create` currently doesn't conform to the spec (it expects a null terminated string rather than
- a string of specified length).
 1. Variadic functions (e.g. `__quantum__rt__array_create`) require platform specific bridges. The currently implemented
  bridge is for Windows.
 1. Qubit borrowing NYI (needs both bridge and simulator's support).

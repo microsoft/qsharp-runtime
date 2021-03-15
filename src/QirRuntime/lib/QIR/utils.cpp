@@ -1,15 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 #include <stdexcept>
 #include <memory>
 #include <unordered_set>
 #include <iostream>
 
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
-#include "qirTypes.hpp"
+#include "QirTypes.hpp"
 
 std::unordered_set<char*>& UseMemoryTracker()
 {

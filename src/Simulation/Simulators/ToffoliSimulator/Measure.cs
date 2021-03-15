@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -16,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// That is, Result.One is returned if an odd number of the measured qubits are
         /// in the One state.
         /// </summary>
-        public Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             Qubit? f(Pauli p, Qubit q) =>
                 p switch {

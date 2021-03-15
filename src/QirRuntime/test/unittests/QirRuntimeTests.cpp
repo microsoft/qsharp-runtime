@@ -4,18 +4,19 @@
 #include "catch.hpp"
 
 #include <algorithm>
+#include <cstring> // for memcpy
 #include <memory>
-#include <string.h> // for memcpy
 #include <unordered_map>
 #include <vector>
 
-#include "qirTypes.hpp"
-#include "quantum__qis.hpp"
-#include "quantum__rt.hpp"
+#include "QirTypes.hpp"
+#include "qsharp__foundation__qis.hpp"
+#include "qsharp__core__qis.hpp"
+#include "QirRuntime.hpp"
 
 #include "BitStates.hpp"
+#include "QirContext.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
 
 using namespace Microsoft::Quantum;
 
@@ -36,7 +37,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         allocated.ExtendToInclude(maxResults);
     }
 
-    Result M(Qubit) override
+    Result Measure(long, PauliId[], long, Qubit[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
@@ -73,8 +74,8 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     std::unique_ptr<ResultsReferenceCountingTestQAPI> qapi = std::make_unique<ResultsReferenceCountingTestQAPI>(3);
     QirContextScope qirctx(qapi.get());
 
-    Result r1 = qapi->M(nullptr); // we don't need real qubits for this test
-    Result r2 = qapi->M(nullptr);
+    Result r1 = qapi->Measure(0, nullptr, 0, nullptr); // we don't need real qubits for this test
+    Result r2 = qapi->Measure(0, nullptr, 0, nullptr);
     REQUIRE(quantum__rt__result_equal(r1, r1));
     REQUIRE(!quantum__rt__result_equal(r1, r2));
 
@@ -84,7 +85,7 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     // share a result a few times
     quantum__rt__result_update_reference_count(r1, 2);
 
-    Result r3 = qapi->M(nullptr);
+    Result r3 = qapi->Measure(0, nullptr, 0, nullptr);
 
     // release shared result, the test QAPI will verify double release
     quantum__rt__result_update_reference_count(r1, -3); // one release for shared and for the original allocation
@@ -912,10 +913,10 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
     CHECK_NOTHROW(ReleaseQirContext());
 }
 
-static void DummyCallableEntry(PTuple, PTuple, PTuple) {}
+static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
@@ -940,7 +941,7 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 TEST_CASE("Callables: copy elision", "[qir_support]")
 {
     QirContextScope qirctx(nullptr, true);
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirCallable* original =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);

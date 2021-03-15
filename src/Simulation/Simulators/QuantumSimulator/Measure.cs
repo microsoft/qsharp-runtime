@@ -2,14 +2,14 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);
             if (paulis.Length != targets.Length)

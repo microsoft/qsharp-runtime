@@ -1,36 +1,34 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include <assert.h>
+#include <cassert>
 
-#include "context.hpp"
+#include "QirContext.hpp"
 
 #include "CoreTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "allocationsTracker.hpp"
 
-#ifdef _WIN32
-#define QIR_SHARED_API __declspec(dllexport)
-#else
-#define QIR_SHARED_API
-#endif
-
+// These two globals are used in QIR _directly_ so have to define them outside of the context.
 extern "C" QIR_SHARED_API Result ResultOne = nullptr;
 extern "C" QIR_SHARED_API Result ResultZero = nullptr;
+
 namespace Microsoft
 {
 namespace Quantum
 {
     thread_local std::unique_ptr<QirExecutionContext> g_context = nullptr;
-    void InitializeQirContext(ISimulator* sim, bool trackAllocatedObjects)
+    std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
+
+    void InitializeQirContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);
         g_context = std::make_unique<QirExecutionContext>(sim, trackAllocatedObjects);
 
-        if (g_context->simulator != nullptr)
+        if (g_context->driver != nullptr)
         {
-            ResultOne = g_context->simulator->UseOne();
-            ResultZero = g_context->simulator->UseZero();
+            ResultOne = g_context->driver->UseOne();
+            ResultZero = g_context->driver->UseZero();
         }
         else
         {
@@ -53,8 +51,8 @@ namespace Quantum
         g_context.reset(nullptr);
     }
 
-    QirExecutionContext::QirExecutionContext(ISimulator* sim, bool trackAllocatedObjects)
-        : simulator(sim)
+    QirExecutionContext::QirExecutionContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
+        : driver(sim)
         , trackAllocatedObjects(trackAllocatedObjects)
     {
         if (this->trackAllocatedObjects)

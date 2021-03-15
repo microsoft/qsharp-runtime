@@ -5,18 +5,18 @@ steps:
 - template: steps-init.yml
 
 
-- powershell: ./build.ps1
+- pwsh: ./build.ps1
   displayName: "Building Q# runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)/build
 
 
-- powershell: ./test.ps1
+- pwsh: ./test.ps1
   displayName: "Testing Q# runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)/build
   condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
 
 
-- powershell: ./pack.ps1
+- pwsh: ./pack.ps1
   displayName: "Pack Q# runtime (Windows only)"
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)/build

@@ -164,7 +164,21 @@ namespace Microsoft.Quantum.Convert {
     /// the mappings of each Pauli operator in big-endian order
     /// `bits(Pn) ... bits(P0)`.
     function PauliArrayAsInt(paulis : Pauli[]) : Int {
-        body intrinsic;
+        let len = Length(paulis);
+        if len > 31 {
+            fail $"Cannot pack bits of Pauli array longer than 31 (got {len}).";
+        }
+
+        mutable result = 0;
+        for p in paulis[(len-1)..-1..0] {
+            set result <<<= 2;
+            if   p == PauliI { set result += 0; }
+            elif p == PauliX { set result += 1; }
+            elif p == PauliY { set result += 3; }
+            elif p == PauliZ { set result += 2; }
+            else { fail $"Unexpected Pauli value {p}."; }
+        }
+        return result;
     }
 
 }

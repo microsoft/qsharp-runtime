@@ -942,7 +942,7 @@ module SimulationCode =
             [ ``public`` ]
             ``{``
                 [
-                    (``ident`` "this") <|.|> (``ident`` "Gate") <-- (``ident`` "m") |~> ("IGate_" + name) |> statement
+                    (``ident`` "this") <|.|> (``ident`` "Impl") <-- (``ident`` "m") |> statement
                 ]
             ``}``
         :> MemberDeclarationSyntax
@@ -951,16 +951,16 @@ module SimulationCode =
     /// a Property that returns an instance of the operation by calling the
     /// IOperationFactory
     let buildOpsProperties context (operations : QsQualifiedName list): MemberDeclarationSyntax list =
-        let getCallableAccessModifier qualifiedName =
+        let getCallableAccess qualifiedName =
             match context.allCallables.TryGetValue qualifiedName with
-            | true, callable -> Some callable.Modifiers.Access
+            | true, callable -> Some callable.Access
             | false, _ -> None
 
         let getPropertyModifiers qualifiedName =
             // Use the right accessibility for the property depending on the accessibility of the callable.
             // Note: In C#, "private protected" is the intersection of protected and internal.
-            match getCallableAccessModifier qualifiedName |> Option.defaultValue DefaultAccess with
-            | DefaultAccess -> [ ``protected`` ]
+            match getCallableAccess qualifiedName |> Option.defaultValue Public with
+            | Public -> [ ``protected`` ]
             | Internal -> [ ``private``; ``protected`` ]
 
         let buildOne qualifiedName =
@@ -1046,7 +1046,6 @@ module SimulationCode =
                 | _ -> op.ArgumentTuple
             let argName, argsInit = getInputVarWithInit args
             let specCall =
-                (userDefinedName None op.FullName.Name) + "__" +
                 match sp.Kind with
                 | QsBody -> ""
                 | QsAdjoint -> "Adjoint"
@@ -1057,7 +1056,7 @@ module SimulationCode =
             let rec argsToVars = function
                 | QsTupleItem one -> [one.VariableName |> name]
                 | QsTuple many -> many |> Seq.map argsToVars |> List.concat
-            let callExp = (``ident`` "Gate") <.> (``ident`` specCall, argsToVars args)
+            let callExp = ``((`` (``cast`` ("IIntrinsic" + (userDefinedName None op.FullName.Name)) (``ident`` "Impl")) ``))`` <.> (``ident`` specCall, argsToVars args)
             let statements =
                 match sp.Signature.ReturnType.Resolution with
                 | QsTypeKind.UnitType ->
@@ -1283,8 +1282,8 @@ module SimulationCode =
             ``get`` (``=>`` (``literal`` name) )
         :> MemberDeclarationSyntax
 
-    let buildGate name =
-        ``propg`` ("IGate_" + name) "Gate" [ ``private``; ``protected`` ]
+    let buildImpl name =
+        ``propg`` "IOperationFactory" "Impl" [ ``private``; ``protected`` ]
         :> MemberDeclarationSyntax
 
     let buildFullName (name : QsQualifiedName) =
@@ -1444,8 +1443,8 @@ module SimulationCode =
                 (constructors @ properties @ methods)
             ``}``
 
-    let private classAccessModifier = function
-        | DefaultAccess -> ``public``
+    let private classAccess = function
+        | Public -> ``public``
         | Internal -> ``internal``
 
     // Builds the .NET class for the given operation.
@@ -1466,7 +1465,7 @@ module SimulationCode =
                 yield buildFullName context.current.Value
                 if globalContext.entryPoints |> Seq.contains op.FullName then
                     yield buildOperationInfoProperty globalContext inType outType nonGenericName
-                if isConcreteIntrinsic then yield buildGate name
+                if isConcreteIntrinsic then yield buildImpl name
                 yield! opProperties
             ]
 
@@ -1514,7 +1513,7 @@ module SimulationCode =
         let methods = [ opNames |> buildInit context; inData |> fst;  outData |> fst; buildRun context nonGenericName op.ArgumentTuple op.Signature.ArgumentType op.Signature.ReturnType ]
 
         let modifiers =
-            let access = classAccessModifier op.Modifiers.Access
+            let access = classAccess op.Access
             if opIsIntrinsic && not isConcreteIntrinsic then
                 [ access; ``abstract``; ``partial`` ]
             else
@@ -1609,7 +1608,7 @@ module SimulationCode =
 
         let baseClassName = udtBaseClassName context qsharpType
         let baseClass     = ``simpleBase`` baseClassName
-        let modifiers     = [ classAccessModifier udt.Modifiers.Access ]
+        let modifiers     = [ classAccess udt.Access ]
         let interfaces    = [ ``simpleBase`` "IApplyData" ]
         let constructors  = [ buildEmptyConstructor; buildBaseTupleConstructor ]
         let qubitsField   = buildQubitsField context qsharpType

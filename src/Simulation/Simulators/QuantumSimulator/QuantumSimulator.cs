@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
