@@ -56,9 +56,9 @@ namespace Microsoft.Quantum.Experimental
                     //       design and make it customizable.
                     // FIXME: In particular, this implementation uses a lot of
                     //        extraneous measurements.
-                    if (this.Parent.Measure__Body(new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(qubit)) == Result.One)
+                    if ((this.Parent as IIntrinsicMeasure).Body(new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(qubit)) == Result.One)
                     {
-                        this.Parent.X__Body(qubit);
+                        (this.Parent as IIntrinsicX).Body(qubit);
                     }
                 }
                 base.Release(qubit, wasUsedOnlyForBorrowing);
@@ -70,37 +70,37 @@ namespace Microsoft.Quantum.Experimental
             this.Id = NativeInterface.Init(capacity);
         }
 
-        public void Exp__Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             throw new NotImplementedException();
         }
 
-        public void Exp__AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        void IIntrinsicExp.AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             throw new NotImplementedException();
         }
 
-        public void Exp__ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        void IIntrinsicExp.ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             throw new NotImplementedException();
         }
 
-        public void Exp__ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
+        void IIntrinsicExp.ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             throw new NotImplementedException();
         }
 
-        public void H__Body(Qubit target)
+        void IIntrinsicH.Body(Qubit target)
         {
             NativeInterface.H(this.Id, target);
         }
 
-        public void H__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicH.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public Result Measure__Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
+        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             if (targets is { Count: 1 } && paulis is { Count: 1 } && paulis.Single() == Pauli.PauliZ)
             {
@@ -113,7 +113,7 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
-        public void R__Body(Pauli pauli, double angle, Qubit target)
+        void IIntrinsicR.Body(Pauli pauli, double angle, Qubit target)
         {
             if (pauli == Pauli.PauliI)
             {
@@ -123,16 +123,16 @@ namespace Microsoft.Quantum.Experimental
             throw new NotImplementedException("Arbitrary rotation with noise is not yet supported.");
         }
 
-        public void R__AdjointBody(Pauli pauli, double angle, Qubit target)
+        void IIntrinsicR.AdjointBody(Pauli pauli, double angle, Qubit target)
         {
-            R__Body(pauli, -angle, target);
+            (this as IIntrinsicR).Body(pauli, -angle, target);
         }
 
-        public void R__ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        void IIntrinsicR.ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
             if (controls is { Count: 0 })
             {
-                R__Body(pauli, angle, target);
+                (this as IIntrinsicR).Body(pauli, angle, target);
             }
             else
             {
@@ -140,62 +140,62 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
-        public void R__ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
+        void IIntrinsicR.ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
         {
-            R__ControlledBody(controls, pauli, -angle, target);
+            (this as IIntrinsicR).ControlledBody(controls, pauli, -angle, target);
         }
 
-        public void S__Body(Qubit target)
+        void IIntrinsicS.Body(Qubit target)
         {
             NativeInterface.S(this.Id, target);
         }
 
-        public void S__AdjointBody(Qubit target)
+        void IIntrinsicS.AdjointBody(Qubit target)
         {
             NativeInterface.SAdj(this.Id, target);
         }
 
-        public void S__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicS.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public void S__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicS.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public void T__Body(Qubit target)
+        void IIntrinsicT.Body(Qubit target)
         {
             NativeInterface.T(this.Id, target);
         }
 
-        public void T__AdjointBody(Qubit target)
+        void IIntrinsicT.AdjointBody(Qubit target)
         {
             NativeInterface.TAdj(this.Id, target);
         }
 
-        public void T__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicT.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public void T__ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicT.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public void X__Body(Qubit target)
+        void IIntrinsicX.Body(Qubit target)
         {
             NativeInterface.X(this.Id, target);
         }
 
-        public void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicX.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             // TODO: pass off to decompositions for more than one control.
             if (controls is { Count: 0 })
             {
-                X__Body(target);
+                (this as IIntrinsicX).Body(target);
             }
             else if (controls is { Count: 1 })
             {
@@ -207,27 +207,27 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
-        public void Y__Body(Qubit target)
+        void IIntrinsicY.Body(Qubit target)
         {
             NativeInterface.Y(this.Id, target);
         }
 
-        public void Y__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicY.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             throw new NotImplementedException();
         }
 
-        public void Z__Body(Qubit target)
+        void IIntrinsicZ.Body(Qubit target)
         {
             NativeInterface.Z(this.Id, target);
         }
 
-        public void Z__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicZ.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             // TODO: pass off to decompositions for more than one control.
             if (controls is { Count: 0 })
             {
-                Z__Body(target);
+                (this as IIntrinsicY).Body(target);
             }
             else if (controls is { Count: 1 })
             {
