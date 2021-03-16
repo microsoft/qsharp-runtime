@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public void Reset__Body(Qubit target)
+        void IIntrinsicReset.Body(Qubit target)
         {
             // The native simulator doesn't have a reset operation, so simulate
             // it via an M follow by a conditional X.

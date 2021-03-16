@@ -26,17 +26,6 @@ if ($Env:ENABLE_OPENSIM -ne "false") {
     Write-Host "Skipping build of native simulator because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
 }
 
-if ($Env:ENABLE_QIRRUNTIME -eq "true") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
-    & "$qirRuntime/build-qir-runtime.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
-}
-
-
 function Build-One {
     param(
         [string]$action,
@@ -65,6 +54,16 @@ function Build-One {
 Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
+
+if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
+    & "$qirRuntime/build-qir-runtime.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+}
 
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."

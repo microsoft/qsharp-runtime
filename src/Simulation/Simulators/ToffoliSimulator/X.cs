@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The implementation of the operation.
         /// For the Toffoli simulator, the implementation flips the target qubit.
         /// </summary>
-        public void X__Body(Qubit target)
+        void IIntrinsicX.Body(Qubit target)
         {
             if (target == null) return;
 
@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// For the Toffoli simulator, the implementation flips the target qubit 
         /// if all of the control qubits are 1.
         /// </summary>
-        public void X__ControlledBody(IQArray<Qubit> controls, Qubit target)
+        void IIntrinsicX.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
             if (target == null) return;
 

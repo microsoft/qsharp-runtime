@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void IsingZZ__Body(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingZZ.Body(double angle, Qubit target1, Qubit target2)
         {
             var paulis = new Pauli[]{ Pauli.PauliZ, Pauli.PauliZ };
             var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
@@ -17,16 +18,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
             Exp(this.Id, (uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
         }
 
-        public virtual void IsingZZ__AdjointBody(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingZZ.AdjointBody(double angle, Qubit target1, Qubit target2)
         {
-            IsingZZ__Body(-angle, target1, target2);
+            ((IIntrinsicIsingZZ)this).Body(-angle, target1, target2);
         }
 
-        public virtual void IsingZZ__ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingZZ.ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
             if (controls == null || controls.Length == 0)
             {
-                IsingZZ__Body(angle, target1, target2);
+                ((IIntrinsicIsingZZ)this).Body(angle, target1, target2);
             }
             else
             {
@@ -39,9 +40,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public virtual void IsingZZ__ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingZZ.ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
-            IsingZZ__ControlledBody(controls, -angle, target1, target2);
+            ((IIntrinsicIsingZZ)this).ControlledBody(controls, -angle, target1, target2);
         }
     }
 }

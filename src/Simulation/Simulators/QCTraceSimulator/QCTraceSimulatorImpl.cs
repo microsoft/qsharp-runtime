@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     /// <summary>
     /// Internals of <see cref="QCTraceSimulator"/>. For internal use only.
     /// </summary>
-    public partial class QCTraceSimulatorImpl : SimulatorBase, IGate_Measure
+    public partial class QCTraceSimulatorImpl : SimulatorBase, IIntrinsicMeasure
     {
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;

@@ -1,21 +1,25 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 #pragma once
 
 #include <memory>
 #include <vector>
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 
 namespace Microsoft
 {
 namespace Quantum
 {
     // Toffoli Simulator
-    std::unique_ptr<ISimulator> CreateToffoliSimulator();
+    QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateToffoliSimulator();
 
     // Full State Simulator
-    std::unique_ptr<ISimulator> CreateFullstateSimulator();
+    QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator();
 
-    std::unique_ptr<ISimulator> CreateOpenSystemsSimulator();
+    QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateOpenSystemsSimulator();
 
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream& newOStream);
 } // namespace Quantum
 } // namespace Microsoft
