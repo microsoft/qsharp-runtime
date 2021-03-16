@@ -4,10 +4,13 @@
 & (Join-Path $PSScriptRoot .. .. build set-env.ps1)
 Write-Host "##[info]Compile Q# Projects into QIR"
 $qirStaticPath = Join-Path $PSScriptRoot test QIR-static qsharp
-dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
-if ($LastExitCode -ne 0) {
-    Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
-    throw "Failed to compile Q# project at '$qirStaticPath' into QIR."
+if (!(Test-Path (Join-Path $qirStaticPath qir *.ll))) {
+    Write-Host "##[info]Build Q# project for QIR tests"
+    dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
+        throw "Failed to compile Q# project at '$qirStaticPath' into QIR."
+    }
 }
 Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination (Split-Path $qirStaticPath -Parent)
 # Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
