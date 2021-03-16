@@ -84,4 +84,39 @@ namespace Microsoft.Quantum.Tests {
         EqualityFactL(ModPowL(8675309L, 5792L, 2345678L), 1936199L, "ModPowL(8675309L, 5792L, 2345678L) was incorrect.");
     }
 
+    @Test("QuantumSimulator")
+    function NaNIsNotEqualToAnything() : Unit {
+        Contradiction(NaN() == NaN(), "NaN should not equal NaN.");
+        Contradiction(NaN() == 42.0, "NaN should not equal any finite number.");
+        Contradiction(NaN() == 1.0 / 0.0, "NaN should not equal any infinite value.");
+    }
+
+    @Test("QuantumSimulator")
+    function NaNIsNaN() : Unit {
+        Fact(IsNaN(NaN()), "NaN was not NaN.");
+        Contradiction(IsNaN(42.0), "42.0 should not be NaN.");
+        Contradiction(IsNaN(1.0 / 0.0), "+∞ should not be NaN.");
+    }
+
+    @Test("QuantumSimulator")
+    function InfinityIsInfinite() : Unit {
+        Contradiction(IsInfinite(NaN()), "NaN should not be infinite.");
+        Contradiction(IsInfinite(42.0), "42.0 should not be infinite.");
+        Fact(IsInfinite(1.0 / 0.0), "+∞ should be infinite.");
+        Fact(IsInfinite(-1.0 / 0.0), "-∞ should be infinite.");
+    }
+
+    @Test("QuantumSimulator")
+    function FiniteNumbersAreFinite() : Unit {
+        Contradiction(IsFinite(NaN()), "NaN should not be finite.");
+        Fact(IsFinite(42.0), "42.0 should be finite.");
+        Contradiction(IsFinite(1.0 / 0.0), "+∞ should not be finite.");
+        Contradiction(IsFinite(-1.0 / 0.0), "-∞ should not be finite.");
+    }
+
+    @Test("QuantumSimulator")
+    function FiniteFactIsCorrect() : Unit {
+        FiniteFact(42.0, "42.0 should be finite.");
+    }
+
 }
