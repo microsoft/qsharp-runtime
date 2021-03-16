@@ -45,7 +45,7 @@ Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
 
-if ($Env:ENABLE_QIRRUNTIME -eq "true") {
+if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
     & "$qirRuntime/build-qir-runtime.ps1"
     if ($LastExitCode -ne 0) {

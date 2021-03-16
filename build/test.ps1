@@ -37,7 +37,7 @@ function Test-One {
 
 Test-One '../Simulation.sln'
 
-if (($Env:ENABLE_NATIVE -ne "false") -and ($Env:ENABLE_QIRRUNTIME -eq "true")) {
+if (($Env:ENABLE_NATIVE -ne "false") -and ($Env:ENABLE_QIRRUNTIME -ne "false")) {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/QirRuntime")
     & "$qirRuntime/test-qir-runtime.ps1"
     if ($LastExitCode -ne 0) {
