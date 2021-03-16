@@ -42,7 +42,7 @@ namespace Quantum
 {
     // FIXME: support methods from public IDiagnostics; they currently
     //        just throw.
-    class OpenSystemSimulator : public ISimulator, public IQuantumGateSet, public IDiagnostics
+    class OpenSystemSimulator : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(size_t /*simulator id*/, size_t /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -99,15 +99,6 @@ namespace Quantum
         ~OpenSystemSimulator()
         {
             destroy(this->simulatorId);
-        }
-
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            return this;
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return this;
         }
 
         void GetState(TGetStateCallback callback) override
@@ -290,7 +281,7 @@ namespace Quantum
         }
     };
 
-    std::unique_ptr<ISimulator> CreateOpenSystemsSimulator()
+    std::unique_ptr<IRuntimeDriver> CreateOpenSystemsSimulator()
     {
         return std::make_unique<OpenSystemSimulator>();
     }
