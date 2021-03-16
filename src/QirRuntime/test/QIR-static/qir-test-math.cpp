@@ -6,7 +6,7 @@
 
 #include "catch.hpp"
 
-#include "quantum__qis_internal.hpp"
+#include "qsharp__foundation_internal.hpp"
 
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__body();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__body();                                   // NOLINT

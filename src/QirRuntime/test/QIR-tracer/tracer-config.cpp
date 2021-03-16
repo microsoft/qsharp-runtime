@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "tracer-config.hpp"
 
 namespace TracerUser
