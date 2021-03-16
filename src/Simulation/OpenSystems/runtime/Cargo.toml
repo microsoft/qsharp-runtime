@@ -40,8 +40,13 @@ web-sys = { version = "0.3.4",  features = ['console'], optional = true }
 
 [dev-dependencies]
 assert-json-diff = "2.0.1"
+criterion = { version = "0.3", features = ['html_reports', 'csv_output'] }
 
 [lib]
 name = "opensim"
 path = "src/lib.rs"
 crate-type = ["rlib", "staticlib", "cdylib"]
+
+[[bench]]
+name = "c_api_benchmark"
+harness = false
