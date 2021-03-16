@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Diagnostics {
+    open Microsoft.Quantum.Math;
 
     /// # Summary
     /// Declares that a classical condition is true.
