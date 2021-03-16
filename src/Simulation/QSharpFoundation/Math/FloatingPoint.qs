@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Math {
     /// # Remarks
     /// Since `NaN()` is the only floating-point value that does not equal
     /// itself, this function should be used instead of checking conditions such
-    /// as `d = NaN()`.
+    /// as `d == NaN()`.
     ///
     /// # See Also
     /// - Microsoft.Quantum.Math.NaN
@@ -63,6 +63,11 @@ namespace Microsoft.Quantum.Math {
     /// is it infinite. As such, both `IsInfinite(NaN())` and `IsFinite(NaN())`
     /// return `false`. To check a value against `NaN()`, use `IsNaN(d)`.
     ///
+    /// 
+    /// Note that even though this function returns `true` for both
+    /// positive and negative infinities, these values can still be
+    /// discriminated by checking `d > 0.0` and `d < 0.0`.
+    ///
     /// # Example
     /// ```qsharp
     /// Message($"{IsInfinite(42.0)}"); // false
@@ -76,8 +81,6 @@ namespace Microsoft.Quantum.Math {
     /// ```
     function IsInfinite(d : Double) : Bool {
         return d == 1.0 / 0.0 or d == -1.0 / 0.0;
-        // Positive and negative infinities can still be 
-        // discriminated by checking `d > 0.0` and `d < 0.0`.
     }
 
     /// # Summary
