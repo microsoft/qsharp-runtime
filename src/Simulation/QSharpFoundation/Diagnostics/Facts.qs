@@ -48,4 +48,27 @@ namespace Microsoft.Quantum.Diagnostics {
         if (actual) { fail message; }
     }
 
+    /// # Summary
+    /// Declares that a given floating-point value represents a finite
+    /// number, failing when this is not the case.
+    ///
+    /// # Input
+    /// ## d
+    /// The floating-point value that is to be checked.
+    /// ## message
+    /// Failure message to be printed in the case that `d` is either
+    /// not finite, or not a number.
+    ///
+    /// # Example
+    /// The following Q# code will fail when run:
+    /// ```qsharp
+    /// FiniteFact(NaN(), "NaN is not a finite number.");
+    /// ```
+    ///
+    /// # See Also
+    /// - Microsoft.Quantum.Diagnostics.Fact
+    function FiniteFact(d : Double, message : String) : Unit {
+        Fact(IsFinite(d), message);
+    }
+
 }
