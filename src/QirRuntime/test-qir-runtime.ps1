@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+$all_ok = $true
+
 Write-Host "##[info]Test QIR Runtime"
 
 Push-Location (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION test)
@@ -26,3 +28,7 @@ if ($LastExitCode -ne 0) {
 }
 
 Pop-Location
+
+if (-not $all_ok) {
+    throw "At least one project failed testing. Check the logs."
+}
