@@ -159,7 +159,6 @@ extern "C"
     // Initializes the callable with the provided function table and capture tuple. The capture tuple pointer
     // should be null if there is no capture.
     typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);                                                // NOLINT
-    typedef void (*t_CaptureCallback)(PTuple, int64_t);                                                     // NOLINT
     QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, t_CaptureCallback*, PTuple); // NOLINT
 
     // Adds the given integer value to the reference count for the callable. Deallocates the callable if the reference
@@ -183,9 +182,9 @@ extern "C"
     QIR_SHARED_API void quantum__rt__callable_make_controlled(QirCallable*); // NOLINT
 
     // Invokes the function at the given index in the memory management table of the callable with the capture tuple and
-    // the given 64-bit integer. Does nothing if if the memory management table pointer or the function pointer at that
+    // the given 32-bit integer. Does nothing if  the memory management table pointer or the function pointer at that
     // index is null.
-    QIR_SHARED_API void quantum__rt__callable_memory_management(int32_t, QirCallable*, int64_t); // NOLINT
+    QIR_SHARED_API void quantum__rt__callable_memory_management(int32_t, QirCallable*, int32_t); // NOLINT
 
     // ------------------------------------------------------------------------
     // Strings

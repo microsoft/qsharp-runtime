@@ -87,7 +87,7 @@ declare %"struct.QirCallable"* @quantum__rt__callable_copy(%"struct.QirCallable"
 declare %"struct.QirCallable"* @quantum__rt__callable_make_adjoint(%"struct.QirCallable"*)
 declare %"struct.QirCallable"* @quantum__rt__callable_make_controlled(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_update_alias_count(%"struct.QirCallable"*, i32)
-declare void @quantum__rt__callable_memory_management(i32, %"struct.QirCallable"*, i64)
+declare void @quantum__rt__callable_memory_management(i32, %"struct.QirCallable"*, i32)
 
 ;------------------------------------------------------------------------------
 ; strings
@@ -379,11 +379,32 @@ define dllexport %Callable* @__quantum__rt__callable_make_controlled(%Callable* 
   ret %Callable* %.clb_cnt
 }
 
-define dllexport void @__quantum__rt__callable_memory_management(i32 %index, %Callable* %.clb, i64 %parameter) {
+; After both the compiler and runtime are in sync with https://github.com/microsoft/qsharp-language/pull/83:
+;   Regenerate the following .ll files with the updated compiler such that they don't call this function any more:
+;     test\FullstateSimulator\qir-test-simulator.ll
+;     test\QIR-tracer\tracer-qir-lnx.ll
+;     test\QIR-tracer\tracer-qir-win.ll
+;   Remove this function.
+;   Resolve https://github.com/microsoft/qsharp-runtime/issues/568 (Remove `__quantum__rt__callable_memory_management()`)
+define dllexport void @__quantum__rt__callable_memory_management(i32 %index, %Callable* %.clb, i64 %.parameter) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  call void @quantum__rt__callable_memory_management(i32 %index, %"struct.QirCallable"* %clb, i64 %parameter)
+  %parameter = trunc i64 %.parameter to i32
+  call void @quantum__rt__callable_memory_management(i32 %index, %"struct.QirCallable"* %clb, i32 %parameter)
   ret void
 }
+
+define dllexport void @__quantum__rt__capture_update_reference_count(%Callable* %.clb, i32 %count) {
+  %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
+  call void @quantum__rt__callable_memory_management(i32 0, %"struct.QirCallable"* %clb, i32 %count)
+  ret void
+}
+
+define dllexport void @__quantum__rt__capture_update_alias_count(%Callable* %.clb, i32 %count) {
+  %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
+  call void @quantum__rt__callable_memory_management(i32 1, %"struct.QirCallable"* %clb, i32 %count)
+  ret void
+}
+
 ;------------------------------------------------------------------------------
 ; strings bridge
 ;

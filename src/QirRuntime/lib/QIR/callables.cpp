@@ -153,7 +153,7 @@ extern "C"
         callable->ApplyFunctor(QirCallable::Controlled);
     }
 
-    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int64_t parameter)
+    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int32_t parameter)
     {
         callable->InvokeCaptureCallback(index, parameter);
     }
@@ -443,7 +443,7 @@ void QirCallable::ApplyFunctor(int functor)
     }
 }
 
-void QirCallable::InvokeCaptureCallback(int index, int64_t parameter)
+void QirCallable::InvokeCaptureCallback(int32_t index, int32_t parameter)
 {
     assert(index >= 0 && index < QirCallable::CaptureCallbacksTableSize && "Capture callback index out of range");
 
