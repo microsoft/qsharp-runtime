@@ -117,14 +117,14 @@ impl Channel {
         Channel {
             n_qubits: n_qubits,
             data: match &self.data {
-                Unitary(u) => Unitary(extend_one_to_n(u, idx_qubit, n_qubits)),
+                Unitary(u) => Unitary(extend_one_to_n(u.view(), idx_qubit, n_qubits)),
                 KrausDecomposition(ks) => {
                     let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
                     let n_kraus = ks.shape()[0];
                     let mut extended: Array3<C64> = Array::zeros((n_kraus, new_dim, new_dim));
                     for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
                         let mut target = extended.index_axis_mut(Axis(0), idx_kraus);
-                        let big_kraus = extend_one_to_n(&kraus.to_owned(), idx_qubit, n_qubits);
+                        let big_kraus = extend_one_to_n(kraus.view(), idx_qubit, n_qubits);
                         target.assign(&big_kraus);
                     }
                     KrausDecomposition(extended)

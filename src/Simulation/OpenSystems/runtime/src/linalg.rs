@@ -46,14 +46,15 @@ impl ConjBy for Array2<C64> {
     }
 }
 
-pub trait Tensor {
+pub trait Tensor<Other> {
     type Output;
-    fn tensor(self: &Self, other: &Self) -> Self::Output;
+    fn tensor(self: Self, other: Other) -> Self::Output;
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for ArrayView1<'_, T> {
+impl <Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView1<'_, T> {
     type Output = Array1<T>;
-    fn tensor(&self, other: &Self) -> Self::Output {
+    fn tensor(self, other: Other) -> Self::Output {
+        let other: Self = other.into();
         let unflat = Array::from_shape_fn(
             (self.shape()[0], other.shape()[0]),
             |(i, j)| {
@@ -64,17 +65,19 @@ impl <T: Copy + Mul<Output = T>> Tensor for ArrayView1<'_, T> {
     }
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for Array1<T> {
+impl <Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array1<T> {
     type Output = Array1<T>;
 
-    fn tensor(self: &Self, other: &Self) -> Self::Output {
-        self.view().tensor(&other.view())
+    fn tensor(self: Self, other: Other) -> Self::Output {
+        let other: Self = other.into();
+        self.view().tensor(other).to_owned()
     }
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for ArrayView2<'_, T> {
+impl <Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView2<'_, T> {
     type Output = Array2<T>;
-    fn tensor(&self, other: &Self) -> Self::Output {
+    fn tensor(self, other: Other) -> Self::Output {
+        let other: Self = other.into();
         let unflat = Array::from_shape_fn(
             (self.shape()[0], other.shape()[0], self.shape()[1], other.shape()[1]),
             |(i, j, k, l)| {
@@ -85,11 +88,12 @@ impl <T: Copy + Mul<Output = T>> Tensor for ArrayView2<'_, T> {
     }
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for Array2<T> {
+impl <Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array2<T> {
     type Output = Array2<T>;
 
-    fn tensor(self: &Self, other: &Self) -> Self::Output {
-        self.view().tensor(&other.view())
+    fn tensor(self: Self, other: Other) -> Self::Output {
+        let other: Self = other.into();
+        self.view().tensor(other).to_owned()
     }
 }
 
@@ -118,19 +122,23 @@ impl <T: Clone + Zero> Trace for &Array2<T> {
 
 // FIXME: weaken data to be a view so that to_owned isn't needed.
 // FIXME: modify to Result<..., String> so that errors can propagate to the C API.
-pub fn extend_one_to_n(data: &Array2<C64>, idx_qubit: usize, n_qubits: usize) -> Array2<C64> {
+pub fn extend_one_to_n<'a>(data: ArrayView2<'a, C64>, idx_qubit: usize, n_qubits: usize) -> Array2<C64> {
     let n_left = idx_qubit;
     let n_right = n_qubits - idx_qubit - 1;
     match (n_left, n_right) {
         (0, _) => {
             let right_eye = nq_eye(n_right);
-            data.tensor(&right_eye)
+            data.view().tensor(&right_eye)
         },
         (_, 0) => {
             let left_eye = Array2::eye(2usize.pow(n_left.try_into().unwrap()));
-            left_eye.tensor(data)
+            left_eye.view().tensor(&data)
         },
-        (_, _) => nq_eye(n_left).tensor(&data.tensor(&nq_eye(n_right)))
+        (_, _) => {
+            let eye = nq_eye(n_right);
+            let right = data.view().tensor(&eye);
+            nq_eye(n_left).view().tensor(&right)
+        }
     }
 }
 
