@@ -11,10 +11,8 @@ use crate::QubitSized;
 use crate::State;
 use crate::C64;
 use crate::{log_as_err, log_message};
-use itertools::zip;
 use itertools::Itertools;
-use ndarray::Axis;
-use ndarray::{Array, Array2, Array3};
+use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
@@ -36,14 +34,25 @@ impl Channel {
             Ok(State {
                 n_qubits: self.n_qubits,
                 data: match &state.data {
-                    Pure(psi) => todo!(),
+                    Pure(psi) => match &self.data {
+                        Unitary(u) => Pure(u.dot(psi)),
+                        KrausDecomposition(ks) => {
+                            // We can't apply a channel with more than one Kraus operator (Choi rank > 1) to a
+                            // pure state directly, so if the Choi rank is bigger than 1, promote to
+                            // Mixed and recurse.
+                            if ks.shape()[0] == 1 {
+                                Pure({ let k: ArrayView2<C64> = ks.slice(s![0, .., ..]); k.dot(psi) })
+                            } else {
+                                self.apply(&state.to_mixed())?.data
+                            }
+                        }
+                    },
                     Mixed(rho) => match &self.data {
                         Unitary(u) => Mixed(rho.conjugate_by(&u.into())),
                         KrausDecomposition(ks) => Mixed({
                             let mut sum: Array2<C64> =
                                 Array::zeros((rho.shape()[0], rho.shape()[1]));
                             for k in ks.axis_iter(Axis(0)) {
-                                // FIXME: performance issue, this to_owned shouldn't be needed.
                                 sum = sum + rho.conjugate_by(&k);
                             }
                             sum
@@ -97,7 +106,7 @@ impl Channel {
                     "Expanding {}-qubit channels is not yet implemented.",
                     self.n_qubits
                 ));
-                todo!("");
+                unimplemented!("");
             }
         };
         expanded.apply(state)
@@ -135,7 +144,18 @@ impl Channel {
             n_qubits: n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_two_to_n(u, idx_qubit1, idx_qubit2, n_qubits)),
-                KrausDecomposition(ks) => todo!("extend_two_to_n for Kraus decompositions"),
+                KrausDecomposition(ks) => {
+                    // TODO: consolidate with extend_one_to_n, above.
+                    let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
+                    let n_kraus = ks.shape()[0];
+                    let mut extended: Array3<C64> = Array::zeros((n_kraus, new_dim, new_dim));
+                    for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
+                        let mut target = extended.index_axis_mut(Axis(0), idx_kraus);
+                        let big_kraus = extend_two_to_n(&kraus.to_owned(), idx_qubit1, idx_qubit2, n_qubits);
+                        target.assign(&big_kraus);
+                    }
+                    KrausDecomposition(extended)
+                }
             },
         }
     }

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#[macro_use(array)]
-
+#[macro_use(array, s)]
 extern crate ndarray;
+
 extern crate derive_more;
 extern crate serde;
 

@@ -1,13 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use ndarray::ArrayView2;
-use core::ops::Range;
+use ndarray::{ArrayView1, ArrayView2};
 use num_traits::Zero;
 use ndarray::{ Array, Array1, Array2 };
 use std::ops::Mul;
 use std::convert::TryInto;
-use std::cmp;
 
 use crate::{ C64, nq_eye };
 
@@ -49,11 +47,13 @@ impl ConjBy for Array2<C64> {
 }
 
 pub trait Tensor {
-    fn tensor(self: &Self, other: &Self) -> Self;
+    type Output;
+    fn tensor(self: &Self, other: &Self) -> Self::Output;
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for Array1<T> {
-    fn tensor(&self, other: &Self) -> Self {
+impl <T: Copy + Mul<Output = T>> Tensor for ArrayView1<'_, T> {
+    type Output = Array1<T>;
+    fn tensor(&self, other: &Self) -> Self::Output {
         let unflat = Array::from_shape_fn(
             (self.shape()[0], other.shape()[0]),
             |(i, j)| {
@@ -64,8 +64,17 @@ impl <T: Copy + Mul<Output = T>> Tensor for Array1<T> {
     }
 }
 
-impl <T: Copy + Mul<Output = T>> Tensor for Array2<T> {
-    fn tensor(&self, other: &Self) -> Self {
+impl <T: Copy + Mul<Output = T>> Tensor for Array1<T> {
+    type Output = Array1<T>;
+
+    fn tensor(self: &Self, other: &Self) -> Self::Output {
+        self.view().tensor(&other.view())
+    }
+}
+
+impl <T: Copy + Mul<Output = T>> Tensor for ArrayView2<'_, T> {
+    type Output = Array2<T>;
+    fn tensor(&self, other: &Self) -> Self::Output {
         let unflat = Array::from_shape_fn(
             (self.shape()[0], other.shape()[0], self.shape()[1], other.shape()[1]),
             |(i, j, k, l)| {
@@ -73,6 +82,14 @@ impl <T: Copy + Mul<Output = T>> Tensor for Array2<T> {
             }
         );
         unflat.into_shape((self.shape()[0] * other.shape()[0], self.shape()[1] * other.shape()[1])).unwrap()
+    }
+}
+
+impl <T: Copy + Mul<Output = T>> Tensor for Array2<T> {
+    type Output = Array2<T>;
+
+    fn tensor(self: &Self, other: &Self) -> Self::Output {
+        self.view().tensor(&other.view())
     }
 }
 

@@ -9,7 +9,7 @@ use crate::states::StateData::Pure;
 use crate::QubitSized;
 use crate::linalg::Trace;
 use crate::C64;
-use ndarray::{ Array1, Array2 };
+use ndarray::{Array1, Array2, Axis};
 use std::convert::TryInto;
 use crate::linalg::{ Tensor };
 use serde::{ Serialize, Deserialize };
@@ -66,6 +66,25 @@ impl State {
         State {
             n_qubits: n_qubits,
             data: Mixed(common_matrices::elementary_matrix((0, 0), (new_dim, new_dim)))
+        }
+    }
+
+    /// Returns a copy of this state, represented as a mixed state.
+    pub fn to_mixed(self: &Self) -> State {
+        State {
+            n_qubits: self.n_qubits,
+            data: match &self.data {
+                Mixed(rho) => Mixed(rho.clone()),
+                Pure(psi) => Mixed({
+                    // Take the outer product of psi with its complex conjugate
+                    // by using insert_axis.
+                    // Note that since we can't prove that this is a dim2 array,
+                    // we can't use the HasDagger trait here yet; that's a possible
+                    // improvement for the HasDagger trait itself.
+                    let psi = psi.view().insert_axis(Axis(1));
+                    psi.t().map(|e| e.conj()) * psi
+                })
+            }
         }
     }
 }
