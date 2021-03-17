@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <iostream>
 #include <cstdint>
+#include <cstdlib>
 
 #include "QirRuntime.hpp"
 
@@ -43,6 +44,11 @@ extern "C"
             UseMemoryTracker().erase(iter);
         #endif
         delete[] buffer;
+    }
+
+    char* quantum__rt__memory_allocate(uint64_t size)
+    {
+        return (char *)malloc((size_t)size);
     }
 
     // Fail the computation with the given error message.

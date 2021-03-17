@@ -39,6 +39,7 @@
 ;
 declare i8* @quantum__rt__heap_alloc(i64)
 declare void @quantum__rt__heap_free(i8*)
+declare i8* @quantum__rt__memory_allocate(i64)
 declare void @quantum__rt__fail(%"struct.QirString"*)
 
 ;------------------------------------------------------------------------------
@@ -123,6 +124,12 @@ define dllexport i8* @__quantum__rt__heap_alloc(i64 %size) {
 define dllexport void @__quantum__rt__heap_free(i8* %mem) {
   call void @quantum__rt__heap_free(i8* %mem)
   ret void
+}
+
+; Returns a pointer to the malloc-allocated block.
+define dllexport i8* @__quantum__rt__memory_allocate(i64 %size) {
+  %result = call i8* @quantum__rt__memory_allocate(i64 %size)
+  ret i8* %result
 }
 
 define dllexport void @__quantum__rt__fail(%String* %.str) {

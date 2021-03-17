@@ -61,6 +61,9 @@ extern "C"
     // Release a block of allocated heap memory.
     QIR_SHARED_API void quantum__rt__heap_free(char* buffer); // NOLINT
 
+    // Returns a pointer to the malloc-allocated block.
+    QIR_SHARED_API char* quantum__rt__memory_allocate(uint64_t size); // NOLINT
+
     // Fail the computation with the given error message.
     QIR_SHARED_API void quantum__rt__fail(QirString* msg); // NOLINT
 
