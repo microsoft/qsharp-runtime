@@ -1,6 +1,6 @@
-// This set of benchmarks exercises the open systems simulator exclusively via
-// its C API, so as to gauge any potential issues for C-based consumers of the
-// simulator.
+//! This set of benchmarks exercises the open systems simulator exclusively via
+//! its C API, so as to gauge any potential issues for C-based consumers of the
+//! simulator.
 
 use std::ffi::CString;
 use criterion::{criterion_group, criterion_main, Criterion};

@@ -8,10 +8,10 @@ extern crate derive_more;
 extern crate serde;
 
 pub mod c_api;
+pub mod linalg;
+pub mod common_matrices;
 mod utils;
-mod common_matrices;
 mod states;
-mod linalg;
 mod channels;
 mod noise_model;
 mod instrument;
@@ -25,6 +25,7 @@ pub use crate::states::State;
 pub use crate::channels::Channel;
 pub use crate::channels::ChannelData::KrausDecomposition;
 pub use crate::channels::ChannelData::Unitary;
+
 
 use serde::{ Serialize, Deserialize };
 

@@ -119,9 +119,9 @@ impl <T: Clone + Zero> Trace for &Array2<T> {
     }
 }
 
-
-// FIXME: weaken data to be a view so that to_owned isn't needed.
 // FIXME: modify to Result<..., String> so that errors can propagate to the C API.
+// FIXME[perf]: This function is significantly slower than would be expected
+//              from microbenchmarks on tensor and nq_eye directly.
 pub fn extend_one_to_n<'a>(data: ArrayView2<'a, C64>, idx_qubit: usize, n_qubits: usize) -> Array2<C64> {
     let n_left = idx_qubit;
     let n_right = n_qubits - idx_qubit - 1;
