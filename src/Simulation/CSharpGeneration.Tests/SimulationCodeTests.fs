@@ -2183,32 +2183,48 @@ namespace N1
                     (__arg19__.Item1, __arg19__.Item2, (1L, Result.One))
                 ))
                 .Apply((0L, Result.Zero));"
-            "partialGeneric1__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
-            "partialGeneric2__.Partial((0L, Result.Zero, (_, Result.One))).Apply(1L);"
-            "partialGeneric2__.Partial((_, _, (1L, Result.One))).Apply((0L, Result.Zero));"
-            "partialGeneric2__.Partial((0L, _, (1L, _))).Apply((Result.Zero, Result.One));"
+            "partialGeneric1__
+                .Partial(new Func<(Result,Result), (Int64,Result,(Int64,Result))>((__arg20__) =>
+                    (0L, __arg20__.Item1, (1L, __arg20__.Item2))
+                ))
+                .Apply((Result.Zero, Result.One));"
+            "partialGeneric2__
+                .Partial(new Func<Int64, (Int64,Result,(Int64,Result))>((__arg21__) =>
+                    (0L, Result.Zero, (__arg21__, Result.One))
+                ))
+                .Apply(1L);"
+            "partialGeneric2__
+                .Partial(new Func<(Int64,Result), (Int64,Result,(Int64,Result))>((__arg22__) =>
+                    (__arg22__.Item1, __arg22__.Item2, (1L, Result.One))
+                ))
+                .Apply((0L, Result.Zero));"
+            "partialGeneric2__
+                .Partial(new Func<(Result,Result), (Int64,Result,(Int64,Result))>((__arg23__) =>
+                    (0L, __arg23__.Item1, (1L, __arg23__.Item2))
+                ))
+                .Apply((Result.Zero, Result.One));"
             "partialInput
-                .Partial(new Func<(Double,(Result,Result)), (Int64,(Double,Double),(Result,Result,Result))>((__arg20__) =>
+                .Partial(new Func<(Double,(Result,Result)), (Int64,(Double,Double),(Result,Result,Result))>((__arg24__) =>
                     (
                         1L,
-                        (__arg20__.Item1, 1.1D),
-                        (Result.Zero, __arg20__.Item2.Item1, __arg20__.Item2.Item2)
+                        (__arg24__.Item1, 1.1D),
+                        (Result.Zero, __arg24__.Item2.Item1, __arg24__.Item2.Item2)
                     )
                 ))
                 .Apply((2.2D, (Result.One, Result.One)));"
             """
             return partialUnitary
-                .Partial(new Func<IQArray<Qubit>, (Double,ICallable,IQArray<Qubit>)>((__arg21__) =>
+                .Partial(new Func<IQArray<Qubit>, (Double,ICallable,IQArray<Qubit>)>((__arg25__) =>
                 (
                     1.1D,
-                    partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg22__) =>
+                    partialFunction__.Partial(new Func<(Int64,Double), (Int64,Double,Pauli)>((__arg26__) =>
                         (
-                            __arg22__.Item1,
-                            __arg22__.Item2,
+                            __arg26__.Item1,
+                            __arg26__.Item2,
                             Pauli.PauliX
                         )
                     )),
-                    __arg21__)
+                    __arg25__)
                 ));
             """
         ]
