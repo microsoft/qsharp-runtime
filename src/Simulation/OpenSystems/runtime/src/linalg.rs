@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use ndarray::ArrayView2;
 use core::ops::Range;
 use num_traits::Zero;
 use ndarray::{ Array, Array1, Array2 };
@@ -11,26 +12,38 @@ use std::cmp;
 use crate::{ C64, nq_eye };
 
 pub trait HasDagger {
+    type Output;
+
     /// Returns the hermitian conjugate (colloquially, the dagger) of a
     /// borrowed reference as a new copy.
     ///
     /// For most types implementing this trait, the hermitian conjugate
     /// is represented by the conjugate transpose.
-    fn dag(self: &Self) -> Self;
+    fn dag(self: &Self) -> Self::Output;
 }
 
 impl HasDagger for Array2<C64> {
+    type Output = Self;
+
     fn dag(self: &Self) -> Self {
         self.t().map(|element| element.conj())
     }
 }
 
+impl HasDagger for ArrayView2<'_, C64> {
+    type Output = Array2<C64>;
+
+    fn dag(self: &Self) -> Self::Output {
+        self.t().map(|element| element.conj())
+    }
+}
+
 pub trait ConjBy {
-    fn conjugate_by(self: &Self, op: &Array2<C64>) -> Self;
+    fn conjugate_by(self: &Self, op: &ArrayView2<C64>) -> Self;
 }
 
 impl ConjBy for Array2<C64> {
-    fn conjugate_by(self: &Self, op: &Array2<C64>) -> Self {
+    fn conjugate_by(self: &Self, op: &ArrayView2<C64>) -> Self {
         op.dot(self).dot(&op.dag())
     }
 }

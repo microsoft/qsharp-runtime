@@ -1,31 +1,32 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
-use crate::{ log_as_err, log_message };
-use crate::NoiseModel;
-use crate::linalg::{ extend_one_to_n, extend_two_to_n };
-use itertools::zip;
-use std::ops::Add;
-use std::convert::TryInto;
-use ndarray::Axis;
+use crate::channels::ChannelData::{KrausDecomposition, Unitary};
+use crate::linalg::ConjBy;
+use crate::linalg::{extend_one_to_n, extend_two_to_n};
+use crate::states::StateData::{Mixed, Pure};
 use crate::zeros_like;
-use std::ops::Mul;
-use crate::channels::ChannelData::{ Unitary, KrausDecomposition };
-use crate::states::StateData::{ Pure, Mixed };
+use crate::NoiseModel;
+use crate::QubitSized;
 use crate::State;
 use crate::C64;
-use ndarray::{ Array, Array2, Array3 };
-use crate::QubitSized;
-use crate::linalg::ConjBy;
+use crate::{log_as_err, log_message};
+use itertools::zip;
 use itertools::Itertools;
-use num_traits::{ Zero, One };
-use serde::{ Serialize, Deserialize };
+use ndarray::Axis;
+use ndarray::{Array, Array2, Array3};
+use num_traits::{One, Zero};
+use serde::{Deserialize, Serialize};
+use std::convert::TryInto;
+use std::ops::Add;
+use std::ops::Mul;
 
 pub type Channel = QubitSized<ChannelData>;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum ChannelData {
     Unitary(Array2<C64>),
-    KrausDecomposition(Array3<C64>)
-    // TODO: Superoperator and Choi reps.
+    KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
 }
 
 impl Channel {
@@ -37,17 +38,18 @@ impl Channel {
                 data: match &state.data {
                     Pure(psi) => todo!(),
                     Mixed(rho) => match &self.data {
-                        Unitary(u) => Mixed(rho.conjugate_by(u)),
+                        Unitary(u) => Mixed(rho.conjugate_by(&u.into())),
                         KrausDecomposition(ks) => Mixed({
-                            let mut sum: Array2<C64> = Array::zeros((rho.shape()[0], rho.shape()[1]));
+                            let mut sum: Array2<C64> =
+                                Array::zeros((rho.shape()[0], rho.shape()[1]));
                             for k in ks.axis_iter(Axis(0)) {
                                 // FIXME: performance issue, this to_owned shouldn't be needed.
-                                sum = sum + rho.conjugate_by(&k.to_owned());
+                                sum = sum + rho.conjugate_by(&k);
                             }
                             sum
-                        })
-                    }
-                }
+                        }),
+                    },
+                },
             })
         } else {
             Err(format!(
@@ -80,7 +82,7 @@ impl Channel {
             return log_as_err(format!(
                 "Qubit indices were specified as {:?}, but this channel only acts on {} qubits.",
                 idx_qubits, self.n_qubits
-            ))
+            ));
         }
 
         // At this point we know that idx_qubits has self.n_qubits many unique
@@ -89,11 +91,12 @@ impl Channel {
         // the ordinary apply method.
         let expanded = match self.n_qubits {
             1 => self.extend_one_to_n(idx_qubits[0], state.n_qubits),
-            2 => {
-                self.extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)
-            },
+            2 => self.extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits),
             _ => {
-                log_message(&format!("Expanding {}-qubit channels is not yet implemented.", self.n_qubits));
+                log_message(&format!(
+                    "Expanding {}-qubit channels is not yet implemented.",
+                    self.n_qubits
+                ));
                 todo!("");
             }
         };
@@ -112,30 +115,28 @@ impl Channel {
                     let mut extended: Array3<C64> = Array::zeros((n_kraus, new_dim, new_dim));
                     for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
                         let mut target = extended.index_axis_mut(Axis(0), idx_kraus);
-                        let big_kraus = extend_one_to_n(
-                            &kraus.to_owned(),
-                            idx_qubit, n_qubits
-                        );
+                        let big_kraus = extend_one_to_n(&kraus.to_owned(), idx_qubit, n_qubits);
                         target.assign(&big_kraus);
-                    };
+                    }
                     KrausDecomposition(extended)
                 }
-            }
+            },
         }
     }
 
-    pub fn extend_two_to_n(self: &Self, idx_qubit1: usize, idx_qubit2: usize, n_qubits: usize) -> Channel {        
+    pub fn extend_two_to_n(
+        self: &Self,
+        idx_qubit1: usize,
+        idx_qubit2: usize,
+        n_qubits: usize,
+    ) -> Channel {
         assert_eq!(self.n_qubits, 2);
         Channel {
             n_qubits: n_qubits,
             data: match &self.data {
-                Unitary(u) => {
-                    Unitary(extend_two_to_n(u, idx_qubit1, idx_qubit2, n_qubits))
-                },
-                KrausDecomposition(ks) => {
-                    todo!("extend_two_to_n for Kraus decompositions")
-                }
-            }
+                Unitary(u) => Unitary(extend_two_to_n(u, idx_qubit1, idx_qubit2, n_qubits)),
+                KrausDecomposition(ks) => todo!("extend_two_to_n for Kraus decompositions"),
+            },
         }
     }
 }
@@ -156,8 +157,8 @@ impl Mul<&Channel> for C64 {
                     ks.index_axis_mut(Axis(0), 0).assign(&(self.sqrt() * u));
                     ks
                 }),
-                KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks)
-            }
+                KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
+            },
         }
     }
 }
@@ -197,16 +198,15 @@ impl Mul<&Channel> for &Channel {
                     // post-multiply each kraus operator by u.
                     let mut post = zeros_like(ks);
                     for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
-                        post.index_axis_mut(Axis(0), idx_kraus).assign(
-                            &u.dot(&kraus)
-                        );
+                        post.index_axis_mut(Axis(0), idx_kraus)
+                            .assign(&u.dot(&kraus));
                     }
                     KrausDecomposition(post)
-                },
+                }
                 // TODO: product of two kraus decompositions would be... not
                 //       fun.
-                _ => todo!()
-            }
+                _ => todo!(),
+            },
         }
     }
 }
@@ -223,22 +223,22 @@ impl Add<&Channel> for &Channel {
                     let mut sum = Array::zeros([
                         ks1.shape()[0] + ks2.shape()[0],
                         ks1.shape()[1],
-                        ks1.shape()[2]
+                        ks1.shape()[2],
                     ]);
                     for (idx_kraus, kraus) in ks1.axis_iter(Axis(0)).enumerate() {
                         sum.index_axis_mut(Axis(0), idx_kraus).assign(&kraus);
                     }
                     for (idx_kraus, kraus) in ks2.axis_iter(Axis(0)).enumerate() {
-                        sum.index_axis_mut(Axis(0), ks1.shape()[0] + idx_kraus).assign(&kraus);
+                        sum.index_axis_mut(Axis(0), ks1.shape()[0] + idx_kraus)
+                            .assign(&kraus);
                     }
                     KrausDecomposition(sum)
-                },
-                _ => todo!()
-            }
+                }
+                _ => todo!(),
+            },
         }
     }
 }
-
 
 impl Mul<Channel> for &Channel {
     type Output = Channel;
@@ -298,14 +298,13 @@ pub fn amplitude_damping_channel(gamma: f64) -> Channel {
         n_qubits: 1,
         data: KrausDecomposition(array![
             [
-                [ C64::one(), C64::zero() ],
-                [ C64::zero(), C64::one() * (1.0 - gamma).sqrt()]
+                [C64::one(), C64::zero()],
+                [C64::zero(), C64::one() * (1.0 - gamma).sqrt()]
             ],
-
             [
-                [ C64::zero(), C64::one() * gamma.sqrt() ],
-                [ C64::zero(), C64::zero() ]
+                [C64::zero(), C64::one() * gamma.sqrt()],
+                [C64::zero(), C64::zero()]
             ]
-        ])
+        ]),
     }
 }

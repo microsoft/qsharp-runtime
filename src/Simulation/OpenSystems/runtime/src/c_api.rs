@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::{Channel, NoiseModel, State};
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::ptr;
-use crate::{ Channel, NoiseModel, State };
-use lazy_static::lazy_static;
 use std::sync::Mutex;
-use std::collections::HashMap;
 
 struct CApiState {
     register_state: State,
-    noise_model: NoiseModel
+    noise_model: NoiseModel,
 }
 
 lazy_static! {
@@ -34,7 +34,11 @@ fn as_capi_err(result: Result<(), String>) -> i64 {
     }
 }
 
-fn apply<F: Fn(&NoiseModel) -> &Channel>(sim_id: usize, idxs: &[usize], channel_fn: F) -> Result<(), String> {
+fn apply<F: Fn(&NoiseModel) -> &Channel>(
+    sim_id: usize,
+    idxs: &[usize],
+    channel_fn: F,
+) -> Result<(), String> {
     let state = &mut *STATE.lock().unwrap();
     if let Some(sim_state) = state.get_mut(&sim_id) {
         let channel = channel_fn(&sim_state.noise_model);
@@ -42,8 +46,8 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(sim_id: usize, idxs: &[usize], channel_
             Ok(new_state) => {
                 sim_state.register_state = new_state;
                 Ok(())
-            },
-            Err(err) => Err(err)
+            }
+            Err(err) => Err(err),
         }
     } else {
         return Err(format!("No simulator with id {}.", sim_id).to_string());
@@ -53,7 +57,7 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(sim_id: usize, idxs: &[usize], channel_
 // C API FUNCTIONS //
 
 #[no_mangle]
-pub extern fn get_name() -> *const c_char {
+pub extern "C" fn get_name() -> *const c_char {
     // There's a whole dance we have to do in order to allow the memory
     // allocated for a string to be deallocated on the .NET side.
 
@@ -63,7 +67,7 @@ pub extern fn get_name() -> *const c_char {
 }
 
 #[no_mangle]
-pub extern fn lasterr() -> *const c_char {
+pub extern "C" fn lasterr() -> *const c_char {
     match &*LAST_ERROR.lock().unwrap() {
         None => ptr::null(),
         Some(msg) => {
@@ -75,23 +79,21 @@ pub extern fn lasterr() -> *const c_char {
 }
 
 #[no_mangle]
-pub extern fn init(initial_capacity: usize) -> usize {
+pub extern "C" fn init(initial_capacity: usize) -> usize {
     let state = &mut *STATE.lock().unwrap();
-    let id = 1 + state.keys().fold(
-        std::usize::MIN, |a, b| a.max(*b)
-    );
+    let id = 1 + state.keys().fold(std::usize::MIN, |a, b| a.max(*b));
     state.insert(
         id,
         CApiState {
             register_state: State::new_mixed(initial_capacity),
-            noise_model: NoiseModel::ideal()
-        }
+            noise_model: NoiseModel::ideal(),
+        },
     );
     id
 }
 
 #[no_mangle]
-pub extern fn destroy(sim_id: usize) -> i64 {
+pub extern "C" fn destroy(sim_id: usize) -> i64 {
     as_capi_err({
         let state = &mut *STATE.lock().unwrap();
         if state.contains_key(&sim_id) {
@@ -104,26 +106,27 @@ pub extern fn destroy(sim_id: usize) -> i64 {
 }
 
 #[no_mangle]
-pub extern fn dump_to_console(sim_id: usize) -> () {
+pub extern "C" fn dump_to_console(sim_id: usize) -> () {
     // FIXME: implement this
 }
 
 #[no_mangle]
-pub extern fn x(sim_id: usize, idx: usize) -> i64 {
+pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.x))
 }
 
 #[no_mangle]
-pub extern fn y(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.y))}
+pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
+    as_capi_err(apply(sim_id, &[idx], |model| &model.y))
+}
 
 #[no_mangle]
-pub extern fn z(sim_id: usize, idx: usize) -> i64 {
+pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.z))
 }
 
 #[no_mangle]
-pub extern fn h(sim_id: usize, idx: usize) -> i64 {
+pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.h))
 }
 
@@ -149,11 +152,13 @@ pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
 
 #[no_mangle]
 pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx_control, idx_target], |model| &model.cnot))
+    as_capi_err(apply(sim_id, &[idx_control, idx_target], |model| {
+        &model.cnot
+    }))
 }
 
 #[no_mangle]
-pub extern fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
+pub extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
     as_capi_err({
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {
@@ -171,12 +176,16 @@ pub extern fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
 }
 
 #[no_mangle]
-pub extern fn get_noise_model(sim_id: usize) -> *const c_char {
+pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
     let state = &*STATE.lock().unwrap();
     if let Some(sim_state) = state.get(&sim_id) {
         let serialized = CString::new(
-            serde_json::to_string(&sim_state.noise_model).unwrap().as_str()
-        ).unwrap().into_raw();
+            serde_json::to_string(&sim_state.noise_model)
+                .unwrap()
+                .as_str(),
+        )
+        .unwrap()
+        .into_raw();
         // Need to forget that we hold this reference so that it doesn't
         // get released after returning to C.
         std::mem::forget(serialized);
@@ -189,68 +198,67 @@ pub extern fn get_noise_model(sim_id: usize) -> *const c_char {
 /// Returns a JSON serialization of the ideal noise model (i.e.: a noise model
 /// that agrees with closed-system simulation).
 #[no_mangle]
-pub extern fn ideal_noise_model() -> *const c_char {
+pub extern "C" fn ideal_noise_model() -> *const c_char {
     let serialized = CString::new(
-        serde_json::to_string(&NoiseModel::ideal()).unwrap().as_str()
-    ).unwrap().into_raw();
+        serde_json::to_string(&NoiseModel::ideal())
+            .unwrap()
+            .as_str(),
+    )
+    .unwrap()
+    .into_raw();
     std::mem::forget(serialized);
     serialized
 }
 
-
 #[no_mangle]
-pub extern fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
+pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
     if new_model.is_null() {
         return as_capi_err(Err("set_noise_model called with null pointer".to_string()));
     }
 
-    let c_str = unsafe {
-        CStr::from_ptr(new_model)
-    };
+    let c_str = unsafe { CStr::from_ptr(new_model) };
 
-    as_capi_err(
-        match c_str.to_str() {
-            Ok(serialized_noise_model) => {
-                match serde_json::from_str(serialized_noise_model) {
-                    Ok(noise_model) => {
-                        let state = &mut *STATE.lock().unwrap();
-                        if let Some(sim_state) = state.get_mut(&sim_id) {
-                            sim_state.noise_model = noise_model;
-                            Ok(())
-                        } else {
-                            Err(format!("No simulator with id {} exists.", sim_id).to_string())
-                        }
-                    },
-                    Err(serialization_error) => Err(format!(
-                        "{} error deserializing noise model at line {}, column {}.",
-                        match serialization_error.classify() {
-                            serde_json::error::Category::Data => "Data / schema",
-                            serde_json::error::Category::Eof => "End-of-file",
-                            serde_json::error::Category::Io => "I/O",
-                            serde_json::error::Category::Syntax => "Syntax",
-                        },
-                        serialization_error.line(),
-                        serialization_error.column()
-                    ))
+    as_capi_err(match c_str.to_str() {
+        Ok(serialized_noise_model) => match serde_json::from_str(serialized_noise_model) {
+            Ok(noise_model) => {
+                let state = &mut *STATE.lock().unwrap();
+                if let Some(sim_state) = state.get_mut(&sim_id) {
+                    sim_state.noise_model = noise_model;
+                    Ok(())
+                } else {
+                    Err(format!("No simulator with id {} exists.", sim_id).to_string())
                 }
-            },
-            Err(msg) => Err(
-                format!(
-                    "UTF-8 error decoding serialized noise model; was valid until byte {}.",
-                    msg.valid_up_to()
-                )
-            )
-        }
-    )
+            }
+            Err(serialization_error) => Err(format!(
+                "{} error deserializing noise model at line {}, column {}.",
+                match serialization_error.classify() {
+                    serde_json::error::Category::Data => "Data / schema",
+                    serde_json::error::Category::Eof => "End-of-file",
+                    serde_json::error::Category::Io => "I/O",
+                    serde_json::error::Category::Syntax => "Syntax",
+                },
+                serialization_error.line(),
+                serialization_error.column()
+            )),
+        },
+        Err(msg) => Err(format!(
+            "UTF-8 error decoding serialized noise model; was valid until byte {}.",
+            msg.valid_up_to()
+        )),
+    })
 }
 
 #[no_mangle]
-pub extern fn get_current_state(sim_id: usize) -> *const c_char {
+pub extern "C" fn get_current_state(sim_id: usize) -> *const c_char {
     let state = &mut *STATE.lock().unwrap();
     if let Some(sim_state) = state.get_mut(&sim_id) {
         let serialized = CString::new(
-            serde_json::to_string(&sim_state.register_state).unwrap().as_str()
-        ).unwrap().into_raw();
+            serde_json::to_string(&sim_state.register_state)
+                .unwrap()
+                .as_str(),
+        )
+        .unwrap()
+        .into_raw();
         std::mem::forget(serialized);
         serialized
     } else {
