@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 //! The benchmarks in this module exercise the internals of the simulator at
 //! a low level, and thus are not indicative of user-facing performance.
 //! Rather, these microbenchmarks are intended to help diagnose what the root
@@ -5,7 +8,7 @@
 //! In particular, optimizing these benchmarks may not translate into improved
 //! performance in user code.
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use opensim::{common_matrices, linalg::Tensor, linalg::{extend_one_to_n, extend_two_to_n}, nq_eye};
 
 fn linalg(c: &mut Criterion) {

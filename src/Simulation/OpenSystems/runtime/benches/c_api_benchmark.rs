@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 //! This set of benchmarks exercises the open systems simulator exclusively via
 //! its C API, so as to gauge any potential issues for C-based consumers of the
 //! simulator.

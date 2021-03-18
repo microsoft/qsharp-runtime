@@ -106,11 +106,6 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
 }
 
 #[no_mangle]
-pub extern "C" fn dump_to_console(sim_id: usize) -> () {
-    // FIXME: implement this
-}
-
-#[no_mangle]
 pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.x))
 }

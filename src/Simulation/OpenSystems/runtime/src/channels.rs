@@ -41,7 +41,10 @@ impl Channel {
                             // pure state directly, so if the Choi rank is bigger than 1, promote to
                             // Mixed and recurse.
                             if ks.shape()[0] == 1 {
-                                Pure({ let k: ArrayView2<C64> = ks.slice(s![0, .., ..]); k.dot(psi) })
+                                Pure({
+                                    let k: ArrayView2<C64> = ks.slice(s![0, .., ..]);
+                                    k.dot(psi)
+                                })
                             } else {
                                 self.apply(&state.to_mixed())?.data
                             }
@@ -98,9 +101,26 @@ impl Channel {
         // indices in ascending order, so we can proceed to make a new channel
         // that expands this channel to act on the full register and then use
         // the ordinary apply method.
-        let expanded = match self.n_qubits {
-            1 => self.extend_one_to_n(idx_qubits[0], state.n_qubits),
-            2 => self.extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits),
+        // TODO[perf]: For larger systems, this could be improved by using
+        //             matrix multiplication kernels to avoid extending
+        //             channels to larger Hilbert spaces.
+        //             For smaller systems, extending channels and possibly
+        //             caching them is likely to be more performant; need to
+        //             tune to find crossover point.
+        match self.n_qubits {
+            1 => {
+                if state.n_qubits == 1 {
+                    self.apply(state)
+                } else {
+                    self.extend_one_to_n(idx_qubits[0], state.n_qubits)
+                        .apply(state)
+                }
+            }
+            // TODO[perf]: If the size of the register matches the size of the
+            //             channel, permute rather than expanding.
+            2 => self
+                .extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)
+                .apply(state),
             _ => {
                 log_message(&format!(
                     "Expanding {}-qubit channels is not yet implemented.",
@@ -108,8 +128,7 @@ impl Channel {
                 ));
                 unimplemented!("");
             }
-        };
-        expanded.apply(state)
+        }
     }
 
     pub fn extend_one_to_n(self: &Self, idx_qubit: usize, n_qubits: usize) -> Channel {

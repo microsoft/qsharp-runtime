@@ -1,21 +1,25 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 [package]
 name = "opensim"
 version = "0.1.0"
 authors = ["Christopher Granade <cgranade@cgranade.com>"]
 edition = "2018"
 
+[lib]
+name = "opensim"
+path = "src/lib.rs"
+crate-type = ["rlib", "staticlib", "cdylib"]
+
 [features]
 default = []
-
-# When enabled, web-sys-log allows for logging runtime error messages and
-# warnings via console.log.
 web-sys-log = ["web-sys"]
 
 [profile.release]
-opt-level = 'z'     # Optimize for size.
+opt-level = 3
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'unwind'
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 ndarray = { version = "0.13.1", features = ["serde"] }
@@ -41,11 +45,6 @@ web-sys = { version = "0.3.4",  features = ['console'], optional = true }
 [dev-dependencies]
 assert-json-diff = "2.0.1"
 criterion = { version = "0.3", features = ['html_reports', 'csv_output'] }
-
-[lib]
-name = "opensim"
-path = "src/lib.rs"
-crate-type = ["rlib", "staticlib", "cdylib"]
 
 [[bench]]
 name = "c_api_benchmark"
