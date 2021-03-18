@@ -50,3 +50,7 @@ crate-type = ["rlib", "staticlib", "cdylib"]
 [[bench]]
 name = "c_api_benchmark"
 harness = false
+
+[[bench]]
+name = "microbenchmark"
+harness = false
