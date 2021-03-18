@@ -22,8 +22,11 @@ namespace Microsoft.Quantum.Testing.QIR
                 Controlled op(ctls, target);
                 Adjoint Controlled op(ctls, target);
                 if (M(target) != Zero) { set res = 2; }
-                H(ctls[0]);
-                H(ctls[1]);
+                else
+                {
+                    H(ctls[0]);
+                    H(ctls[1]);
+                }
             }
         }
         return res;
