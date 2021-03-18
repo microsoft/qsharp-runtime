@@ -142,7 +142,7 @@ pub fn extend_one_to_n<'a>(data: ArrayView2<'a, C64>, idx_qubit: usize, n_qubits
     }
 }
 
-pub fn extend_two_to_n(data: &Array2<C64>, idx_qubit1: usize, idx_qubit2: usize, n_qubits: usize) -> Array2<C64> {
+pub fn extend_two_to_n(data: ArrayView2<C64>, idx_qubit1: usize, idx_qubit2: usize, n_qubits: usize) -> Array2<C64> {
     // TODO: double check that data is 4x4.
     let mut permutation = Array::from((0..n_qubits).collect::<Vec<usize>>());
     match (idx_qubit1, idx_qubit2) {
@@ -159,9 +159,10 @@ pub fn extend_two_to_n(data: &Array2<C64>, idx_qubit1: usize, idx_qubit2: usize,
 
     // TODO: there is almost definitely a more elegant way to write this.
     if n_qubits == 2 {
-        permute_mtx(data, &permutation.to_vec()[..])
+        // TODO[perf]: Eliminate the to_owned here by weakening permute_mtx.
+        permute_mtx(&data.to_owned(), &permutation.to_vec()[..])
     } else {
-        permute_mtx(&data.tensor(&nq_eye(n_qubits - 2)), &permutation.to_vec()[..])
+        permute_mtx(&data.view().tensor(&nq_eye(n_qubits - 2)), &permutation.to_vec()[..])
     }
 }
 

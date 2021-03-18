@@ -6,7 +6,7 @@
 //! performance in user code.
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
-use opensim::{common_matrices, linalg::extend_one_to_n, linalg::Tensor, nq_eye};
+use opensim::{common_matrices, linalg::Tensor, linalg::{extend_one_to_n, extend_two_to_n}, nq_eye};
 
 fn linalg(c: &mut Criterion) {
     let mut group = c.benchmark_group("linalg");
@@ -30,6 +30,23 @@ fn linalg(c: &mut Criterion) {
                 let data = nq_eye(1);
                 b.iter(|| {
                     let _extended = extend_one_to_n(data.view(), *i, 3);
+                })
+            },
+        );
+    }
+    for idx_qubit in [0usize, 1, 2].iter() {
+        group.bench_with_input(
+            format!(
+                "extend_two_to_n(n_left: {}, n_right: {})",
+                idx_qubit,
+                2 - idx_qubit
+            ),
+            idx_qubit,
+            |b, i| {
+                // Create some test data.
+                let data = common_matrices::cnot();
+                b.iter(|| {
+                    let _extended = extend_two_to_n(data.view(), *i, 3, 4);
                 })
             },
         );
