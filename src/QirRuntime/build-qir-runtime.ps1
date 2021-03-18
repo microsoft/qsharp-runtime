@@ -2,19 +2,33 @@
 # Licensed under the MIT License.
 
 & (Join-Path $PSScriptRoot .. .. build set-env.ps1)
-Write-Host "##[info]Compile Q# Projects into QIR"
-$qirStaticPath = Join-Path $PSScriptRoot test QIR-static qsharp
-if (!(Test-Path (Join-Path $qirStaticPath qir *.ll))) {
-    Write-Host "##[info]Build Q# project for QIR tests"
-    dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
-    if ($LastExitCode -ne 0) {
-        Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
-        throw "Failed to compile Q# project at '$qirStaticPath' into QIR."
+
+function Build-QirProject {
+    param (
+        [string]
+        $FolderPath
+    )
+
+    if (!(Test-Path (Join-Path $FolderPath qir *.ll))) {
+        Write-Host "##[info]Build Q# project for QIR tests '$FolderPath'"
+        dotnet build $FolderPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
+        if ($LastExitCode -ne 0) {
+            Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$FolderPath' into QIR."
+            throw "Failed to compile Q# project at '$FolderPath' into QIR."
+        }
     }
+    Copy-Item -Path (Join-Path $FolderPath qir *.ll) -Destination (Split-Path $FolderPath -Parent)
+    # Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
+    Copy-Item -Path (Join-Path $FolderPath qir *.ll) -Destination $Env:DROPS_DIR
 }
-Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination (Split-Path $qirStaticPath -Parent)
-# Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
-Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination $Env:DROPS_DIR
+
+Write-Host "##[info]Compile Q# Projects into QIR"
+Build-QirProject (Join-Path $PSScriptRoot test QIR-static qsharp)
+Build-QirProject (Join-Path $PSScriptRoot test QIR-dynamic qsharp)
+Build-QirProject (Join-Path $PSScriptRoot test QIR-tracer qsharp)
+Build-QirProject (Join-Path $PSScriptRoot test FullstateSimulator qsharp)
+Build-QirProject (Join-Path $PSScriptRoot samples StandaloneInputReference qsharp)
+
 
 Write-Host "##[info]Build QIR Runtime"
 $oldCC = $env:CC
