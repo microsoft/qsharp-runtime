@@ -7,5 +7,10 @@ Push-Location (Join-Path $PSScriptRoot runtime)
     # Free disk space by cleaning up target/${config}/deps.
     # Note that this takes longer, but saves ~1 GB of space, which is
     # exceptionally helpful in CI builds.
-    Remove-Item -Recurse (Join-Path . target ("$Env:BUILD_CONFIGURATION" -eq "Release" ? "release" : "debug") "deps");
+    @("release", "debug") | ForEach-Object {
+        $config = $_;
+        @("deps", "build", "incremental") | ForEach-Object {
+            Remove-Item -Recurse (Join-Path . target $config $_) -ErrorAction Continue -Verbose;
+        }
+    }
 Pop-Location
