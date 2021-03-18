@@ -4,10 +4,13 @@
 & (Join-Path $PSScriptRoot .. .. build set-env.ps1)
 Write-Host "##[info]Compile Q# Projects into QIR"
 $qirStaticPath = Join-Path $PSScriptRoot test QIR-static qsharp
-dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
-if ($LastExitCode -ne 0) {
-    Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
-    return
+if (!(Test-Path (Join-Path $qirStaticPath qir *.ll))) {
+    Write-Host "##[info]Build Q# project for QIR tests"
+    dotnet build $qirStaticPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to compile Q# project at '$qirStaticPath' into QIR."
+        throw "Failed to compile Q# project at '$qirStaticPath' into QIR."
+    }
 }
 Copy-Item -Path (Join-Path $qirStaticPath qir *.ll) -Destination (Split-Path $qirStaticPath -Parent)
 # Also copy to drops so it ends up in build artifacts, for easier post-build debugging.
@@ -59,15 +62,20 @@ if (-not (Test-Path $qirRuntimeBuildFolder)) {
     New-Item -Path $qirRuntimeBuildFolder -ItemType "directory"
 }
 
+$all_ok = $true
+
 Push-Location $qirRuntimeBuildFolder
 
 cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../..
 if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to generate QIR Runtime."
-}
-cmake --build . --target install
-if ($LastExitCode -ne 0) {
-    Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
+    $all_ok = $false
+} else {
+    cmake --build . --target install
+    if ($LastExitCode -ne 0) {
+        Write-Host "##vso[task.logissue type=error;]Failed to build QIR Runtime."
+        $all_ok = $false
+    }
 }
 
 $os = "win"
@@ -90,3 +98,7 @@ Pop-Location
 $env:CC = $oldCC
 $env:CXX = $oldCXX
 $env:RC = $oldRC
+
+if (-not $all_ok) {
+    throw "At least one project failed to compile. Check the logs."
+}
