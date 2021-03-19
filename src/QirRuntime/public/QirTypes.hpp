@@ -63,7 +63,7 @@ struct QIR_SHARED_API QirTupleHeader
 {
     int32_t refCount = 0;
     int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
-    int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer
+    int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer (in bytes)
 
     // flexible array member, must be last in the struct
     char data[];
@@ -121,7 +121,7 @@ static_assert(
     QirCallable
 ======================================================================================================================*/
 typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
-typedef void (*t_CaptureCallback)(PTuple, int64_t);
+typedef void (*t_CaptureCallback)(PTuple, int32_t);
 struct QIR_SHARED_API QirCallable
 {
     static int constexpr Adjoint = 1;
@@ -171,5 +171,5 @@ struct QIR_SHARED_API QirCallable
     void Invoke(); // a shortcut to invoke a callable with no arguments and Unit result
     void ApplyFunctor(int functor);
 
-    void InvokeCaptureCallback(int index, int64_t parameter);
+    void InvokeCaptureCallback(int32_t index, int32_t parameter);
 };

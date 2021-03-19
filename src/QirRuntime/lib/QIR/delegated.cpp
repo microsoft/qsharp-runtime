@@ -27,12 +27,12 @@ std::unordered_map<RESULT*, int>& AllocatedResults()
 
 extern "C"
 {
-    Result quantum__rt__result_zero()
+    Result quantum__rt__result_get_zero()
     {
         return Microsoft::Quantum::g_context->driver->UseZero();
     }
 
-    Result quantum__rt__result_one()
+    Result quantum__rt__result_get_one()
     {
         return Microsoft::Quantum::g_context->driver->UseOne();
     }
