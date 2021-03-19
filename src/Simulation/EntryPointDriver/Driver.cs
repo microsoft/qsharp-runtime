@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
-    using Validators = List<ValidateSymbol<CommandResult>>;
+    using Validators = ImmutableList<ValidateSymbol<CommandResult>>;
 
     /// <summary>
     /// The entry point driver is the entry point for the C# application that executes Q# entry points.
@@ -284,10 +284,10 @@ namespace Microsoft.Quantum.EntryPointDriver
                     $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.";
 
                 command.AddValidator(validator);
-                return new Validators() { validator };
+                return ImmutableList.Create(validator);
             }
 
-            return new Validators();
+            return Validators.Empty;
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             };
 
             command.AddValidator(validator);
-            return new Validators() { validator };
+            return ImmutableList.Create(validator);
         }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 {
                     simulate.AddCommand(epCommandWValidators.Command);
                 }
-                return new CommandWithValidators(simulate, new Validators());
+                return new CommandWithValidators(simulate, Validators.Empty);
             }
         }
 
@@ -376,7 +376,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 {
                     submit.AddCommand(epCommandWValidators.Command);
                 }
-                return new CommandWithValidators(submit, new Validators());
+                return new CommandWithValidators(submit, Validators.Empty);
             }
         }
 
@@ -431,7 +431,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                     command,
                     new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
 
-            return new CommandWithValidators(command, validators.ToList());
+            return new CommandWithValidators(command, validators.ToImmutableList());
         }
 
         /// <summary>
