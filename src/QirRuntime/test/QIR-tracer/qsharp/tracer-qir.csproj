@@ -4,10 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <QirGeneration>True</QirGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" /> 
-  </ItemGroup>
 
 </Project>

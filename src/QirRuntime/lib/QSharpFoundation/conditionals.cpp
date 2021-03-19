@@ -31,7 +31,7 @@ extern "C"
 {
     void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
-        QirCallable* clb = quantum__rt__result_equal(r, quantum__rt__result_zero()) ? clbOnZero : clbOnOne;
+        QirCallable* clb = quantum__rt__result_equal(r, quantum__rt__result_get_zero()) ? clbOnZero : clbOnOne;
         clb->Invoke();
     }
 
