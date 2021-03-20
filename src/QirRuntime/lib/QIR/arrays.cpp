@@ -231,6 +231,8 @@ extern "C"
 
             qa->ownsQubits = false;
         }
+
+        quantum__rt__array_update_reference_count(qa, -1);
     }
 
     QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)
