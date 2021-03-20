@@ -18,6 +18,29 @@ type Emitter() =
 
     let _AssemblyConstants = new Dictionary<_, _>()
 
+    let _FileNamesGenerated = new HashSet<string>();
+
+    member private this.WriteFile (fileId : string) outputFolder (fileEnding : string) content overwrite =
+        let mutable fileEnding = fileEnding 
+        let withOutEnding = Path.GetFileNameWithoutExtension(fileId)
+        let mutable targetFile = Path.GetFullPath(Path.Combine(outputFolder, withOutEnding + fileEnding))
+
+        if (not overwrite) && _FileNamesGenerated.Contains(targetFile) then
+            let mutable enumeration = 1
+            let pos = fileEnding.LastIndexOf('.')
+            let (beforeEnumeration, afterEnumeration) =
+                if pos = -1
+                then "", fileEnding
+                else fileEnding.Substring(0, pos), fileEnding.Substring(pos)
+            while _FileNamesGenerated.Contains(targetFile) && enumeration < 100 do
+                fileEnding <- beforeEnumeration + enumeration.ToString() + afterEnumeration
+                targetFile <- Path.GetFullPath(Path.Combine(outputFolder, withOutEnding + fileEnding))
+                enumeration <- enumeration + 1
+
+        _FileNamesGenerated.Add targetFile |> ignore
+        CompilationLoader.GeneratedFile(fileId, outputFolder, fileEnding, content) |> ignore
+
+
     interface IRewriteStep with
 
         member this.Name = "CSharpGeneration"
@@ -43,10 +66,10 @@ type Emitter() =
 
             for source in allSources |> Seq.filter context.GenerateCodeForSource do
                 let content = SimulationCode.generate source context
-                CompilationLoader.GeneratedFile(source, dir, ".g.cs", content) |> ignore
+                this.WriteFile source dir ".g.cs" content false
             for source in allSources |> Seq.filter (not << context.GenerateCodeForSource) do
                 let content = SimulationCode.loadedViaTestNames source context
-                if content <> null then CompilationLoader.GeneratedFile(source, dir, ".dll.g.cs", content) |> ignore
+                this.WriteFile source dir ".dll.g.cs" content false
 
             if not compilation.EntryPoints.IsEmpty then
 
@@ -60,11 +83,11 @@ type Emitter() =
 
                 let mainSourceFile = "./EntryPoint" |> Path.GetFullPath |> Uri |> CompilationUnitManager.GetFileId
                 let content = EntryPoint.generateMainSource context entryPointCallables
-                CompilationLoader.GeneratedFile(mainSourceFile, dir, ".g.Main.cs", content) |> ignore
+                this.WriteFile mainSourceFile dir ".g.Main.cs" content false
 
                 for (sourceFile, callables) in entryPointSources do
                     let content = EntryPoint.generateSource context callables
-                    CompilationLoader.GeneratedFile(sourceFile, dir, ".g.EntryPoint.cs", content) |> ignore
+                    this.WriteFile sourceFile dir ".g.EntryPoint.cs" content false
 
             transformed <- compilation
             true
