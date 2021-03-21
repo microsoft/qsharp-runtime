@@ -152,7 +152,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             var intrinsicAssembly = coreAssembly;
             if (intrinsicAssembly == null)
             {
-                var currentName = this.GetType().Assembly.GetName();
+                var currentName = typeof(QCTraceSimulatorImpl).Assembly.GetName();
                 var coreName = currentName.FullName.Replace("Simulators", "QSharp.Core");
                 try
                 {
