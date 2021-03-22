@@ -891,18 +891,32 @@ let ``Supports simulating multiple entry points`` () =
     let given = test "Multiple entry points"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> yields "Hello from Entry Point 1!"
     given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> yields "Hello from Entry Point 2!"
+    given ["simulate"; "EntryPointTest3.MultipleEntryPoints3"] |> yields "Hello from Entry Point 3!"
     given ["simulate"] |> fails
     given [] |> fails
 
 [<Fact>]
 let ``Supports simulating multiple entry points with different parameters`` () =
     let given = test "Multiple entry points with different parameters"
-    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"; "-n"; "42"] |> yields "42"
-    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"; "-s"; "Hello, World!"] |> fails
+    let entryPoint1Args = ["-n"; "42.5"]
+    let entryPoint2Args = ["-s"; "Hello, World!"]
+    let entryPoint3Args = ["-i"; "3"]
+    
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint1Args) |> yields "42.5"
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint2Args) |> fails
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint3Args) |> fails
     given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> fails
-    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"; "-s"; "Hello, World!"] |> yields "Hello, World!"
-    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"; "-n"; "42"] |> fails
+    
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint1Args) |> fails
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint2Args) |> yields "Hello, World!"
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint3Args) |> fails
     given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> fails
+    
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint1Args) |> fails
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint2Args) |> fails
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint3Args) |> yields "3"
+    given ["simulate"; "EntryPointTest3.MultipleEntryPoints3"] |> fails
+    
     given ["simulate"] |> fails
     given [] |> fails
 
@@ -920,10 +934,10 @@ let ``Supports submitting multiple entry points`` () =
             "test.nothing"
         ]
     let given = test "Multiple entry points"
-    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ options)
-    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
-    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ options)
-    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ options) |> succeeds
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ options) |> succeeds
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ options) |> succeeds
     given (["submit"] @ options) |> fails
     given [] |> fails
 
@@ -940,19 +954,26 @@ let ``Supports submitting multiple entry points with different parameters`` () =
             "--target"
             "test.nothing"
         ]
-    let entryPoint1Args = ["-n"; "42"]
+    let entryPoint1Args = ["-n"; "42.5"]
     let entryPoint2Args = ["-s"; "Hello, World!"]
+    let entryPoint3Args = ["-i"; "3"]
     let given = test "Multiple entry points with different parameters"
-    
-    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint1Args @ options)
-    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint1Args @ options) |> succeeds
     given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint2Args @ options) |> fails
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint3Args @ options) |> fails
     given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ options) |> fails
 
     given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint1Args @ options) |> fails
-    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint2Args @ options)
-    |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint2Args @ options) |> succeeds
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint3Args @ options) |> fails
     given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ options) |> fails
+
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint1Args @ options) |> fails
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint2Args @ options) |> fails
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint3Args @ options) |> succeeds
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ options) |> fails
 
     given submitWithNothingTarget |> fails
     given [] |> fails
