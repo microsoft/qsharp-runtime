@@ -58,7 +58,7 @@ type Emitter() =
                     entryPointCallables
                     |> Seq.groupBy (fun ep -> ep.Source.CodeFile)
 
-                let mainSourceFile = "./EntryPoint" |> Path.GetFullPath |> Uri |> CompilationUnitManager.GetFileId
+                let mainSourceFile = (dir, "EntryPoint") |> Path.Combine |> Path.GetFullPath |> Uri |> CompilationUnitManager.GetFileId
                 let content = EntryPoint.generateMainSource context entryPointCallables
                 CompilationLoader.GeneratedFile(mainSourceFile, dir, ".g.Main.cs", content) |> ignore
 
