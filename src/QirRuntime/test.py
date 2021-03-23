@@ -100,8 +100,10 @@ if __name__ == '__main__':
     subprocess.run(test_binary + " ~[skip]", shell = True)
 
   log("========= Running samples =========")
+  sample_binary = os.path.join(install_dir, "qir-input-reference-standalone" + exe_ext)
+  log(sample_binary)
   subprocess.run(
-    "qir-input-reference-standalone" +\
+    sample_binary +\
     " --int-value 1" +\
     " --integer-array 1 2 3 4 5" +\
     " --double-value 0.5" +\
@@ -114,6 +116,7 @@ if __name__ == '__main__':
     " --range-array 1 2 10 5 5 50 10 1 20" +\
     " --string-value ASampleString" +\
     " --result-value one" +\
-    " --result-array one ONE 1 zero ZERO 0")
+    " --result-array one ONE 1 zero ZERO 0" +\
+    " --string-array StringA StringB StringC")
 
   print("\n")
