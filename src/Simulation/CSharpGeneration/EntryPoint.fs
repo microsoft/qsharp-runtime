@@ -26,24 +26,6 @@ let entryPointClassName = "__QsEntryPoint__"
 /// The namespace containing the non-generated parts of the entry point driver.
 let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
 
-/// The driver settings object.
-let private driverSettings =
-    let newDriverSettings = driverNamespace + ".DriverSettings" |> ``type`` |> SyntaxFactory.ObjectCreationExpression
-    let namedArg (name : string) expr = SyntaxFactory.NameColon name |> (SyntaxFactory.Argument expr).WithNameColon
-    let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
-    let simulatorOptionAliases =
-        [ literal <| "--" + fst CommandLineArguments.SimulatorOption 
-          literal <| "-" + snd CommandLineArguments.SimulatorOption ]
-        |> immutableList
-    [ namedArg "simulatorOptionAliases" simulatorOptionAliases
-      namedArg "quantumSimulatorName" <| literal AssemblyConstants.QuantumSimulator
-      namedArg "toffoliSimulatorName" <| literal AssemblyConstants.ToffoliSimulator
-      namedArg "resourcesEstimatorName" <| literal AssemblyConstants.ResourcesEstimator ]
-    |> SyntaxFactory.SeparatedList
-    |> SyntaxFactory.ArgumentList
-    |> newDriverSettings.WithArgumentList
-    :> ExpressionSyntax
-
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
     | QsTupleItem variable ->
@@ -75,7 +57,7 @@ let private parameterOptionsProperty parameters =
     ``property-arrow_get`` optionsEnumerableTypeName "Options" [``public``]
         get (``=>`` (``new array`` (Some optionTypeName) options))
 
-/// A method that creates an instance of the default simulator if it is a custom simulator.
+/// A lambda that creates an instance of the default simulator if it is a custom simulator.
 let private customSimulatorFactory name =
     let isCustomSimulator =
         not <| List.contains name [
@@ -87,11 +69,7 @@ let private customSimulatorFactory name =
         if isCustomSimulator
         then ``new`` (``type`` name) ``(`` [] ``)``
         else upcast SyntaxFactory.ThrowExpression (``new`` (``type`` "InvalidOperationException") ``(`` [] ``)``)
-        
-    arrow_method "IOperationFactory" "CreateDefaultCustomSimulator" ``<<`` [] ``>>``
-        ``(`` [] ``)``
-        [``public``]
-        (Some (``=>`` factory))
+    ``() =>`` [] factory :> ExpressionSyntax
 
 /// A method that creates the argument tuple for the entry point, given the command-line parsing result.
 let private createArgument context entryPoint =
@@ -119,65 +97,169 @@ let private callableTypeNames context (callable : QsCallable) =
     let returnTypeName = SimulationCode.roslynTypeName context callable.Signature.ReturnType
     callableName, argTypeName, returnTypeName
 
-/// The main method for the standalone executable.
-let private mainMethod context entryPoint =
+/// Generates the class name for an entry point class.
+let private entryPointClassFullName (entryPoint : QsCallable) =
+    { Namespace = entryPoint.FullName.Namespace; Name = entryPointClassName + entryPoint.FullName.Name }
+
+/// Generates the Submit method for an entry point class.
+let private submitMethod context entryPoint =
+    let callableName, _, _ = callableTypeNames context entryPoint
+    let parseResultParamName = "parseResult"
+    let settingsParamName = "settings"
+    let args =
+        [
+            ident callableName <|.|> ident "Info"
+            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
+            ident settingsParamName :> ExpressionSyntax
+        ]
+    arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
+        ``(``
+            [
+                param parseResultParamName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
+                param settingsParamName ``of`` (``type`` (driverNamespace + ".AzureSettings"))
+            ]
+        ``)``
+        [``public``]
+        (Some (``=>`` (ident (driverNamespace + ".Azure") <.> (ident "Submit", args))))
+
+/// Generates the Simulate method for an entry point class.
+let private simulateMethod context entryPoint =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
-    let driverType = generic (driverNamespace + ".Driver") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
-    let entryPointInstance = ``new`` (``type`` entryPointClassName) ``(`` [] ``)``
-    let driver = ``new`` driverType ``(`` [driverSettings; entryPointInstance] ``)``
-    let commandLineArgsName = "args"
-    arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
-        ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
-        [``private``; ``static``; async]
-        (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
+    let simulationType = generic (driverNamespace + ".Simulation") ``<<`` [callableName; argTypeName; returnTypeName] ``>>``
+    let parseResultParamName = "parseResult"
+    let settingsParamName = "settings"
+    let simulatorParamName = "simulator"
+    let args =
+        [
+            ident "this" :> ExpressionSyntax
+            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
+            ident settingsParamName :> ExpressionSyntax
+            ident simulatorParamName :> ExpressionSyntax
+        ]
+    arrow_method "System.Threading.Tasks.Task<int>" "Simulate" ``<<`` [] ``>>``
+        ``(``
+            [
+                param parseResultParamName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")
+                param settingsParamName ``of`` (``type`` (driverNamespace + ".DriverSettings"))
+                param simulatorParamName ``of`` (``type`` "string")
+            ]
+        ``)``
+        [``public``]
+        (Some (``=>`` (simulationType <.> (ident "Simulate", args))))
 
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
-let private entryPointClass context entryPoint =
-    let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
+let private entryPointClass context (entryPoint : QsCallable) =
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
+    let nameProperty =
+        entryPoint.FullName.ToString()
+        |> literal
+        |> property "Name" "string"
     let summaryProperty =
         (PrintSummary entryPoint.Documentation false).Trim ()
         |> literal
         |> property "Summary" "string"
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
-    let defaultSimulator =
-        context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
-        |> fun (_, value) -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value
-    let defaultSimulatorNameProperty = literal defaultSimulator |> property "DefaultSimulatorName" "string"
-    let defaultExecutionTargetProperty =
-        context.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget
-        |> (fun (_, value) -> if value = null then "" else value)
-        |> literal
-        |> property "DefaultExecutionTarget" "string"
-    let infoProperty =
-        property "Info" (sprintf "EntryPointInfo<%s, %s>" argTypeName returnTypeName)
-                        (ident callableName <|.|> ident "Info")
     let members : MemberDeclarationSyntax list = [
+        nameProperty
         summaryProperty
         parameterOptionsProperty parameters
-        defaultSimulatorNameProperty
-        defaultExecutionTargetProperty
-        infoProperty
-        customSimulatorFactory defaultSimulator
         createArgument context entryPoint
-        mainMethod context entryPoint
+        submitMethod context entryPoint
+        simulateMethod context entryPoint
     ]
-    let baseName = sprintf "%s.IEntryPoint<%s, %s>" driverNamespace argTypeName returnTypeName
-    ``class`` entryPointClassName``<<`` [] ``>>``
+    let baseName = sprintf "%s.IEntryPoint" driverNamespace
+    ``class`` ((entryPointClassFullName entryPoint).Name) ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``
             members
         ``}``
 
-/// Generates C# source code for a standalone executable that runs the Q# entry point.
-let generate context (entryPoint : QsCallable) =
-    let ns =
-        ``namespace`` entryPoint.FullName.Namespace
+/// Generates a namespace for a set of entry points that share the namespace
+let private entryPointNamespace context name entryPoints =
+    ``namespace`` name
+        ``{``
+            []
+            [for ep in entryPoints -> entryPointClass context ep]
+        ``}``
+
+/// Returns the driver settings object.
+let private driverSettings context =
+    let newDriverSettings = driverNamespace + ".DriverSettings" |> ``type`` |> SyntaxFactory.ObjectCreationExpression
+    let namedArg (name : string) expr = SyntaxFactory.NameColon name |> (SyntaxFactory.Argument expr).WithNameColon
+    let immutableList elements = invoke (ident "System.Collections.Immutable.ImmutableList.Create") ``(`` elements ``)``
+    let simulatorOptionAliases =
+        [ literal <| "--" + fst CommandLineArguments.SimulatorOption
+          literal <| "-" + snd CommandLineArguments.SimulatorOption ]
+        |> immutableList
+    let defaultSimulator =
+        context.assemblyConstants.TryGetValue AssemblyConstants.DefaultSimulator
+        |> fun (_, value) -> if String.IsNullOrWhiteSpace value then AssemblyConstants.QuantumSimulator else value
+    let defaultExecutionTarget =
+        context.assemblyConstants.TryGetValue AssemblyConstants.ExecutionTarget
+        |> (fun (_, value) -> if value = null then "" else value)
+        |> literal
+    [
+        namedArg "simulatorOptionAliases" simulatorOptionAliases
+        namedArg "quantumSimulatorName" <| literal AssemblyConstants.QuantumSimulator
+        namedArg "toffoliSimulatorName" <| literal AssemblyConstants.ToffoliSimulator
+        namedArg "resourcesEstimatorName" <| literal AssemblyConstants.ResourcesEstimator
+        namedArg "defaultSimulatorName" <| literal defaultSimulator
+        namedArg "defaultExecutionTarget" <| defaultExecutionTarget
+        namedArg "createDefaultCustomSimulator" <| customSimulatorFactory defaultSimulator
+    ]
+    |> SyntaxFactory.SeparatedList
+    |> SyntaxFactory.ArgumentList
+    |> newDriverSettings.WithArgumentList
+    :> ExpressionSyntax
+
+/// The main method for the standalone executable.
+let private mainMethod context entryPoints =
+
+    let entryPointArrayMembers =
+        [
+            for ep in entryPoints do
+                let name = entryPointClassFullName ep
+                ``new`` (``type`` (name.ToString())) ``(`` [] ``)``
+        ]
+
+    let entryPointArray =
+        ``new array`` (Some (driverNamespace + ".IEntryPoint")) entryPointArrayMembers
+
+    let driver = ``new`` (``type`` (driverNamespace + ".Driver")) ``(`` [driverSettings context; entryPointArray] ``)``
+    let commandLineArgsName = "args"
+    arrow_method "System.Threading.Tasks.Task<int>" "Main" ``<<`` [] ``>>``
+        ``(`` [param commandLineArgsName ``of`` (``type`` "string[]")] ``)``
+        [``private``; ``static``; async]
+        (Some (``=>`` (await (driver <.> (ident "Run", [ident commandLineArgsName])))))
+
+/// Generates a namespace for the main function
+let private mainNamespace context entryPoints =
+    let mainClass =
+        ``class`` entryPointClassName ``<<`` [] ``>>``
+            ``:`` None ``,`` []
+            [``internal``]
             ``{``
-                (Seq.map using SimulationCode.autoNamespaces)
-                [entryPointClass context entryPoint]
+                [mainMethod context entryPoints]
             ``}``
-    ``compilation unit`` [] [] [ns]
+
+    ``namespace`` entryPointClassName
+        ``{``
+            []
+            [mainClass]
+        ``}``
+
+/// Generates the C# source code for the file containing the Main function.
+let generateMainSource context entryPoints =
+    let mainNS = mainNamespace context entryPoints
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) [mainNS :> MemberDeclarationSyntax]
+    |> ``with leading comments`` SimulationCode.autogenComment
+    |> SimulationCode.formatSyntaxTree
+
+/// Generates C# source code for a standalone executable that runs the Q# entry point.
+let generateSource context (entryPoints : seq<QsCallable>) =
+    let entryPointNamespaces = entryPoints |> Seq.groupBy (fun ep -> ep.FullName.Namespace)
+    let namespaces = [for ns, eps in entryPointNamespaces -> entryPointNamespace context ns eps :> MemberDeclarationSyntax]
+    ``compilation unit`` [] (Seq.map using SimulationCode.autoNamespaces) namespaces
     |> ``with leading comments`` SimulationCode.autogenComment
     |> SimulationCode.formatSyntaxTree
