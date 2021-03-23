@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "QirTypes.hpp"
-#include "SimFactory.hpp"
-#include "qsharp__foundation__qis.hpp"
+//#include "SimFactory.hpp"
+//#include "qsharp__foundation__qis.hpp"
 
 // Forward declarations:
 static std::ostream& GetOutputStream();
@@ -13,7 +13,7 @@ static std::ostream& GetOutputStream();
 // Public API:
 extern "C"
 {
-    void quantum__qis__message__body(QirString* qstr)   // NOLINT
+    void quantum__rt__message(QirString* qstr)   // NOLINT
     {
         GetOutputStream() << qstr->str << std::endl;
     }

@@ -27,7 +27,7 @@ namespace Quantum
 */
 extern "C"
 {
-    QIR_SHARED_API void quantum__qis__message__body(QirString* qstr); // NOLINT
+    //QIR_SHARED_API void quantum__qis__message__body(QirString* qstr); // NOLINT
 
     // Q# Math:
     QIR_SHARED_API bool quantum__qis__isnan__body(double d);               // NOLINT

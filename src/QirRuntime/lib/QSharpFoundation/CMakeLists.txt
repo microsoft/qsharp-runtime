@@ -13,7 +13,6 @@ compile_from_qir(qsharp-foundation-qis ${qsharp_foundation_qis_target})
 #
 set(qsharp_foundation_sup_source_files
   intrinsicsMath.cpp
-  intrinsicsOut.cpp
   conditionals.cpp
 )
 
