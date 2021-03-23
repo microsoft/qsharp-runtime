@@ -59,10 +59,4 @@ extern "C"
         throw std::runtime_error(str);
     }
 
-    // Include the given message in the computation's execution log or equivalent.
-    // TODO: should we allow the user to register their own output?
-    void quantum__rt__message(QirString* msg) // NOLINT
-    {
-        std::cout << msg->str;
-    }
 }

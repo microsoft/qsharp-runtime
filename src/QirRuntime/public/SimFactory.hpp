@@ -18,6 +18,5 @@ namespace Quantum
     // Full State Simulator
     QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator();
 
-    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream& newOStream);
 } // namespace Quantum
 } // namespace Microsoft
