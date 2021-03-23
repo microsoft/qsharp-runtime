@@ -107,9 +107,9 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-InteropRange TranslateRangeTupleToInteropRange(RangeTuple& rangeTuple)
+InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
-    InteropRange range(rangeTuple);
+    InteropRange* range = new InteropRange(rangeTuple);
     return range;
 }
 
@@ -234,8 +234,8 @@ int main(int argc, char* argv[])
 
     // Create an interop range.
     unique_ptr<InteropRange> rangeValue = CreateInteropRange(rangeTuple);
-    vector<InteropRange> rangeVector;
-    TranslateVector<RangeTuple, InteropRange>(rangeTupleVector, rangeVector, TranslateRangeTupleToInteropRange);
+    vector<InteropRange*> rangeVector;
+    TranslateVector<RangeTuple, InteropRange*>(rangeTupleVector, rangeVector, TranslateRangeTupleToInteropRangePointer);
     unique_ptr<InteropArray> rangeArray = CreateInteropArray(rangeVector);
 
     // Create an interop array of Result values.
