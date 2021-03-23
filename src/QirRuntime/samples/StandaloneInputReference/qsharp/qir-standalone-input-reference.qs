@@ -12,17 +12,16 @@
         {
             if (first)
             {
+                set first = false;
                 set itemsString = itemsString + $"{item}";
             }
             else
             {
                 set itemsString = itemsString + $", {item}";
             }
-
-            set first = false;
         }
 
-        set itemsString = itemsString + $"]";
+        set itemsString = itemsString + "]";
         return itemsString;
     }
 
