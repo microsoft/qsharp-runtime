@@ -108,6 +108,11 @@ InteropRange TranslateRangeTupleToInteropRange(RangeTuple rangeTuple)
     return range;
 }
 
+const char* TranslateStringToCharBuffer(string s)
+{
+    return s.c_str();
+}
+
 int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point Inputs Reference");
@@ -196,6 +201,11 @@ int main(int argc, char* argv[])
     string stringValue;
     app.add_option("--string-value", stringValue, "A String value")->required();
 
+    // Option for a Q# Array<String> type.
+    vector<string> stringVector;
+    app.add_option("--string-array", stringVector, "A String array")->required();
+
+
     // With all the options added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
 
@@ -225,6 +235,11 @@ int main(int argc, char* argv[])
 
     // Create an interop array of Result values.
     unique_ptr<InteropArray> resultArray = CreateInteropArray(resultAsCharVector);
+
+    // Create an interop array of String values.
+    vector<const char *> stringBufferVector;
+    TranslateVector<string, const char*>(stringVector, stringBufferVector, TranslateStringToCharBuffer);
+    unique_ptr<InteropArray> stringArray = CreateInteropArray(stringBufferVector);
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
