@@ -114,6 +114,6 @@ if __name__ == '__main__':
     " --range-array 1 2 10 5 5 50 10 1 20" +\
     " --string-value ASampleString" +\
     " --result-value one" +\
-    " --result-array one ONE true TRUE 1 zero ZERO false FALSE 0")
+    " --result-array one ONE 1 zero ZERO 0")
 
   print("\n")
