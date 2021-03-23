@@ -95,6 +95,15 @@ unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
     return range;
 }
 
+template<typename T>
+void FreePointerVector(vector<T*>& v)
+{
+    for (auto p : v)
+    {
+        delete p;
+    }
+}
+
 char TranslatePauliToChar(PauliId& pauli)
 {
     return static_cast<char>(pauli);
@@ -271,6 +280,7 @@ int main(int argc, char* argv[])
         resultArray.get(),
         stringValue.c_str());
 
+    FreePointerVector(rangeVector);
     simulatorOutputStream->flush();
     if (simulationOutputFileStream.is_open())
     {
