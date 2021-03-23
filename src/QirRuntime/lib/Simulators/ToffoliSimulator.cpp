@@ -65,7 +65,7 @@ namespace Quantum
         Qubit AllocateQubit() override
         {
             this->lastUsedId++;
-            this->states.emplace_back();
+            this->states.emplace_back(false);
             return reinterpret_cast<Qubit>(this->lastUsedId);
         }
 

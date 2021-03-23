@@ -31,9 +31,9 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     }
 
     ResultsReferenceCountingTestQAPI(int maxResults)
-        : maxResults(maxResults)
+        : maxResults(maxResults),
+        allocated(maxResults, false)
     {
-        allocated = std::vector<bool>(maxResults);
     }
 
     Result Measure(long, PauliId[], long, Qubit[]) override
@@ -707,10 +707,11 @@ struct QubitTestQAPI : public SimulatorStub
     }
 
     QubitTestQAPI(int maxQubits)
-        : maxQubits(maxQubits)
+        : maxQubits(maxQubits),
+        allocated(maxQubits, false)
     {
-        allocated = std::vector<bool>(maxQubits);
     }
+
     Qubit AllocateQubit() override
     {
         assert(this->lastId < this->maxQubits);
