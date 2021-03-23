@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "QirTypes.hpp"
+#include "QirRuntime.hpp"
 //#include "SimFactory.hpp"
 //#include "qsharp__foundation__qis.hpp"
 
