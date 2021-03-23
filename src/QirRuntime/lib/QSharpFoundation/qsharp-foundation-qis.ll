@@ -31,15 +31,13 @@
 %struct.QirString = type opaque
 %PauliId = type i32
 
-;declare void @quantum__qis__message__body(%struct.QirString* %str)
-declare void @quantum__rt__message(%"struct.QirString"* %str)
+declare dllimport void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;===============================================================================
 ;
 ; To do: remove this function after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
 define dllexport void @__quantum__qis__message__body(%String* %.str) {
   %str = bitcast %String* %.str to %struct.QirString*
-  ;call void @quantum__qis__message__body(%struct.QirString* %str)
   call void @quantum__rt__message(%"struct.QirString"* %str)
   ret void
 }

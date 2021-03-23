@@ -5,8 +5,6 @@
 
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
-//#include "SimFactory.hpp"
-//#include "qsharp__foundation__qis.hpp"
 
 // Forward declarations:
 static std::ostream& GetOutputStream();
