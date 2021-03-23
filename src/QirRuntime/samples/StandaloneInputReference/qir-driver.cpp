@@ -10,6 +10,7 @@
 #include "CLI11.hpp"
 
 #include "QirContext.hpp"
+#include "QirRuntime.hpp"
 #include "SimFactory.hpp"
 
 using namespace Microsoft::Quantum;
@@ -19,13 +20,28 @@ struct InteropArray
 {
     int64_t Size;
     void* Data;
+
+    InteropArray(int64_t size, void* data) :
+        Size(size),
+        Data(data){}
 };
 
+using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
     int64_t Start;
     int64_t Step;
     int64_t End;
+
+    InteropRange() :
+        Start(0),
+        Step(0),
+        End(0){}
+
+    InteropRange(RangeTuple rangeTuple) :
+        Start(get<0>(rangeTuple)),
+        Step(get<1>(rangeTuple)),
+        End(get<2>(rangeTuple)){}
 };
 
 // This is the function corresponding to the QIR entry-point.
@@ -67,48 +83,37 @@ map<string, char> ResultAsCharMap{
 };
 
 template<typename T>
-unique_ptr<InteropArray> CreateInteropArray(vector<T> v)
+unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
 {
-    unique_ptr<InteropArray> array(new InteropArray());
-    array->Size = v.size();
-    array->Data = v.data();
+    unique_ptr<InteropArray> array(new InteropArray(v.size(), v.data()));
     return array;
 }
 
-using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
 {
-    unique_ptr<InteropRange> range(new InteropRange());
-    range->Start = get<0>(rangeTuple);
-    range->Step = get<1>(rangeTuple);
-    range->End = get<2>(rangeTuple);
+    unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
     return range;
 }
 
-char TranslatePauliToChar(PauliId pauli)
+char TranslatePauliToChar(PauliId& pauli)
 {
     return static_cast<char>(pauli);
 }
 
 template<typename S, typename D>
-void TranslateVector(vector<S>sourceVector, vector<D>& destinationVector, function<D(S)> translationFunction)
+void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, function<D(S&)> translationFunction)
 {
     destinationVector.resize(sourceVector.size());
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-InteropRange TranslateRangeTupleToInteropRange(RangeTuple rangeTuple)
+InteropRange TranslateRangeTupleToInteropRange(RangeTuple& rangeTuple)
 {
-    InteropRange range = {
-        get<0>(rangeTuple), // Start
-        get<1>(rangeTuple), // Step
-        get<2>(rangeTuple)  // End
-    };
-
+    InteropRange range(rangeTuple);
     return range;
 }
 
-const char* TranslateStringToCharBuffer(string s)
+const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }
