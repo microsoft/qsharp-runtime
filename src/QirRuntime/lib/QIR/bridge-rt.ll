@@ -142,6 +142,12 @@ define dllexport void @__quantum__rt__fail(%String* %.str) {
   ret void
 }
 
+define dllexport void @__quantum__rt__message(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  call void @quantum__rt__message(%"struct.QirString"* %str)
+  ret void
+}
+
 
 ;------------------------------------------------------------------------------
 ; qubits bridge
@@ -496,15 +502,6 @@ define dllexport i32 @__quantum__rt_string_get_length(%String* %.str) {
   ret i32 %result 
 }
 
-
-;------------------------------------------------------------------------------
-; message bridge
-;
-define dllexport void @__quantum__rt__message(%String* %.str) {
-  %str = bitcast %String* %.str to %"struct.QirString"*
-  call void @quantum__rt__message(%"struct.QirString"* %str)
-  ret void
-}
 
 
 ;------------------------------------------------------------------------------
