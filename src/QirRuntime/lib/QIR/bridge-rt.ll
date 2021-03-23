@@ -108,6 +108,10 @@ declare i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
 declare i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
 
 
+;------------------------------------------------------------------------------
+; message
+;
+declare void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;=======================================================================================================================
 ; __quantum__rt__* bridge implementation
@@ -135,6 +139,12 @@ define dllexport i8* @__quantum__rt__memory_allocate(i64 %size) {
 define dllexport void @__quantum__rt__fail(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
   call void @quantum__rt__fail(%"struct.QirString"* %str)
+  ret void
+}
+
+define dllexport void @__quantum__rt__message(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  call void @quantum__rt__message(%"struct.QirString"* %str)
   ret void
 }
 
@@ -480,17 +490,18 @@ define dllexport %String* @__quantum__rt__range_to_string(%Range %.range) {
   ret %String* %.str
 }
 
-define i8* @__quantum__rt_string_get_data(%String* %.str) {
+define dllexport i8* @__quantum__rt_string_get_data(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
   %result = call i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
   ret i8* %result 
 }
 
-define i32 @__quantum__rt_string_get_length(%String* %.str) {
+define dllexport i32 @__quantum__rt_string_get_length(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
   %result = call i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
   ret i32 %result 
 }
+
 
 
 ;------------------------------------------------------------------------------

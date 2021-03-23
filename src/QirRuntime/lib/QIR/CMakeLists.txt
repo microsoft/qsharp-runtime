@@ -22,6 +22,7 @@ set(rt_sup_source_files
   delegated.cpp
   strings.cpp
   utils.cpp
+  rtOut.cpp
 )
 
 add_library(qir-rt-support ${rt_sup_source_files})

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <stdarg.h> // for va_list
+#include <ostream>
 
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
@@ -303,3 +304,12 @@ extern "C"
     // Returns true if the first big integer is greater than or equal to the second, false otherwise.
     // TODO QIR_SHARED_API bool quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
+
+// To do: consider extracting to QirRuntimeOut.hpp
+namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
+{
+namespace Quantum
+{
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
+} // namespace Microsoft
+} // namespace Quantum
