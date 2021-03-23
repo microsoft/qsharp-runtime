@@ -31,23 +31,24 @@ struct OstreamRedirectorScoped
 };
 
 
-TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
-{
-    const std::string       testStr1 = "Test String 1";
-    const std::string       testStr2 = "Test String 2";
+// To do: Uncomment after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
+// TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
+// {
+//     const std::string       testStr1 = "Test String 1";
+//     const std::string       testStr2 = "Test String 2";
 
-    std::ostringstream      outStrStream;
+//     std::ostringstream      outStrStream;
 
-    {
-        OstreamRedirectorScoped qOStreamRedirector(outStrStream);    // Redirect the output from std::cout to outStrStream.
+//     {
+//         OstreamRedirectorScoped qOStreamRedirector(outStrStream);    // Redirect the output from std::cout to outStrStream.
 
-        // Log something (to the redirected output):
-        QirString qstr{std::string(testStr1)};
-        Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
-        qstr.str = testStr2;
-        Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
+//         // Log something (to the redirected output):
+//         QirString qstr{std::string(testStr1)};
+//         Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
+//         qstr.str = testStr2;
+//         Microsoft__Quantum__Testing__QIR__Out__MessageTest__body(&qstr);
 
-    } // Recover the output stream.
+//     } // Recover the output stream.
 
-    REQUIRE(outStrStream.str() == (testStr1 + "\n" + testStr2 + "\n"));
-}
+//     REQUIRE(outStrStream.str() == (testStr1 + "\n" + testStr2 + "\n"));
+// }
