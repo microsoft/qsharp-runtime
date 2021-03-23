@@ -11,10 +11,10 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
@@ -49,24 +49,28 @@ To update the *.ll files to a newer version:
 - the generated file name.ll will be placed into `s` folder
 */
 
+struct Array {
+    int64_t itemSize;
+    void* buffer;
+};
+
 // The function replaces array[index] with value, then creates a new array that consists of every other element up to
 // index (starting from index backwards) and every element from index to the end. It returns the sum of elements in this
 // new array
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays( // NOLINT
-    int64_t count,
-    int64_t* array,
+    Array* array,
     int64_t index,
     int64_t val,
     bool compilerDecoy);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
-    // re-enable tracking when https://github.com/microsoft/qsharp-compiler/issues/844 is fixed
-    QirContextScope qirctx(nullptr, false /*trackAllocatedObjects*/);
+    QirContextScope qirctx(nullptr, true /*trackAllocatedObjects*/);
 
     constexpr int64_t n = 5;
     int64_t values[n] = {0, 1, 2, 3, 4};
+    auto array = Array{5, values};
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(n, values, 2, 42, false);
+    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays(&array, 2, 42, false);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 

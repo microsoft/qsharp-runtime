@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void ApplyUncontrolledSWAP__Body(Qubit qubit1, Qubit qubit2)
+        void IIntrinsicApplyUncontrolledSWAP.Body(Qubit qubit1, Qubit qubit2)
         {
             // Issue #44 (https://github.com/microsoft/qsharp-runtime/issues/44)
             // If/when the simulator provides access to the accelerated SWAP functionality,

@@ -9,7 +9,8 @@
 #include <memory>
 #include <vector>
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
+#include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 
 using namespace std;
@@ -78,7 +79,7 @@ namespace Microsoft
 namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
-    class CFullstateSimulator : public ISimulator, public IQuantumGateSet, public IDiagnostics
+    class CFullstateSimulator : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -170,15 +171,6 @@ namespace Quantum
             }
         }
 
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            return this;
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return this;
-        }
-
         void GetState(TGetStateCallback callback, long numQubits = 0, Qubit qubits[] = nullptr) override
         {
             if (numQubits == 0)
@@ -221,13 +213,6 @@ namespace Quantum
             static TReleaseQubit releaseQubit = reinterpret_cast<TReleaseQubit>(this->GetProc("release"));
 
             releaseQubit(this->simulatorId, GetQubitId(q));
-        }
-
-        Result M(Qubit q) override
-        {
-            typedef unsigned (*TM)(unsigned, unsigned);
-            static TM m = reinterpret_cast<TM>(this->GetProc("M"));
-            return reinterpret_cast<Result>(m(this->simulatorId, GetQubitId(q)));
         }
 
         Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
@@ -438,7 +423,7 @@ namespace Quantum
         }
     };
 
-    std::unique_ptr<ISimulator> CreateFullstateSimulator()
+    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
     {
         return std::make_unique<CFullstateSimulator>();
     }

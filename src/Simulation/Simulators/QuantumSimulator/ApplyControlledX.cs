@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void ApplyControlledX__Body(Qubit control, Qubit target)
+        void IIntrinsicApplyControlledX.Body(Qubit control, Qubit target)
         {
             this.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
 

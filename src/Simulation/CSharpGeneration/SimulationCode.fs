@@ -937,7 +937,7 @@ module SimulationCode =
             [ ``public`` ]
             ``{``
                 [
-                    (``ident`` "this") <|.|> (``ident`` "Gate") <-- (``ident`` "m") |~> ("IGate_" + name) |> statement
+                    (``ident`` "this") <|.|> (``ident`` "Impl") <-- (``ident`` "m") |> statement
                 ]
             ``}``
         :> MemberDeclarationSyntax
@@ -1041,7 +1041,6 @@ module SimulationCode =
                 | _ -> op.ArgumentTuple
             let argName, argsInit = getInputVarWithInit args
             let specCall =
-                (userDefinedName None op.FullName.Name) + "__" +
                 match sp.Kind with
                 | QsBody -> ""
                 | QsAdjoint -> "Adjoint"
@@ -1052,7 +1051,7 @@ module SimulationCode =
             let rec argsToVars = function
                 | QsTupleItem one -> [one.VariableName |> name]
                 | QsTuple many -> many |> Seq.map argsToVars |> List.concat
-            let callExp = (``ident`` "Gate") <.> (``ident`` specCall, argsToVars args)
+            let callExp = ``((`` (``cast`` ("IIntrinsic" + (userDefinedName None op.FullName.Name)) (``ident`` "Impl")) ``))`` <.> (``ident`` specCall, argsToVars args)
             let statements =
                 match sp.Signature.ReturnType.Resolution with
                 | QsTypeKind.UnitType ->
@@ -1278,8 +1277,8 @@ module SimulationCode =
             ``get`` (``=>`` (``literal`` name) )
         :> MemberDeclarationSyntax
 
-    let buildGate name =
-        ``propg`` ("IGate_" + name) "Gate" [ ``private``; ``protected`` ]
+    let buildImpl name =
+        ``propg`` "IOperationFactory" "Impl" [ ``private``; ``protected`` ]
         :> MemberDeclarationSyntax
 
     let buildFullName (name : QsQualifiedName) =
@@ -1461,7 +1460,7 @@ module SimulationCode =
                 yield buildFullName context.current.Value
                 if globalContext.entryPoints |> Seq.contains op.FullName then
                     yield buildOperationInfoProperty globalContext inType outType nonGenericName
-                if isConcreteIntrinsic then yield buildGate name
+                if isConcreteIntrinsic then yield buildImpl name
                 yield! opProperties
             ]
 

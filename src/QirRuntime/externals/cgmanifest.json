@@ -17,6 +17,14 @@
                     "RepositoryUrl": "https://github.com/catchorg/Catch2", 
                     "CommitHash": "87074da73ecb1c2e7c35fd14f50ca21c4c002adc" }
             }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "Git": { 
+                    "RepositoryUrl": "https://github.com/CLIUtils/CLI11", 
+                    "CommitHash": "5cb3efabce007c3a0230e4cc2e27da491c646b6c" }
+            }
         }
     ]
 }
