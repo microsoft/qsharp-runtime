@@ -20,16 +20,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 this.SimulatorId = simulatorId;
             }
 
-            public QSimQubit(int id, uint simulatorId, string label) : this(id, simulatorId) {
-                this.Label = label;
-            }
-
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             public uint SimulatorId { get; }
 
             public double Probability => JointEnsembleProbability(this.SimulatorId, 1, PAULI_Z, new uint[] { (uint)this.Id });
-
-            public string? Label {get; set;}
         }
     }
 }
