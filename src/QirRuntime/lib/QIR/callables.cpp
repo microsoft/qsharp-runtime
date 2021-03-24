@@ -181,13 +181,13 @@ int QirTupleHeader::Release()
     }
 
     assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
-    --this->refCount;
+    int retVal = --this->refCount;
     if (this->refCount == 0)
     {
         char* buffer = reinterpret_cast<char*>(this);
         delete[] buffer;
     }
-    return this->refCount;
+    return retVal;
 }
 
 QirTupleHeader* QirTupleHeader::Create(int size)
