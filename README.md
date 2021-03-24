@@ -2,7 +2,7 @@
 
 Welcome to the Microsoft Quantum Development Kit!
 
-This repository contains the runtime components for the [Quantum Development Kit](https://docs.microsoft.com/quantum/).
+This repository contains the runtime components for the [Quantum Development Kit](https://docs.microsoft.com/azure/quantum/).
 It consists of the libraries and packages needed to create and simulate quantum applications using Q#.
 
 - **[Azure/](./src/Azure/)**: Source for client package to create and manage jobs in Azure Quantum.
@@ -11,14 +11,14 @@ It consists of the libraries and packages needed to create and simulate quantum 
 
 ## New to Quantum? ##
 
-See the [introduction to quantum computing](https://docs.microsoft.com/quantum/concepts/) provided with the Quantum Development Kit.
+See the [introduction to quantum computing](https://docs.microsoft.com/azure/quantum/concepts-overview) provided with the Quantum Development Kit.
 
 
 ## Installing the Quantum Development Kit
 
-**If you're looking to use Q# to write quantum applications, please see the instructions on how to get started with using the [Quantum Development Kit](https://docs.microsoft.com/quantum/install-guide/) including the Q# compiler, language server, and development environment extensions.**
+**If you're looking to use Q# to write quantum applications, please see the instructions on how to get started with using the [Quantum Development Kit](https://docs.microsoft.com/azure/quantum/install-overview-qdk) including the Q# compiler, language server, and development environment extensions.**
 
-Please see the [installation guide](https://docs.microsoft.com/quantum/install-guide) for further information on how to get started using the Quantum Development Kit to develop quantum applications.
+Please see the [installation guide](https://docs.microsoft.com/azure/quantum/install-overview-qdk) for further information on how to get started using the Quantum Development Kit to develop quantum applications.
 You may also visit our [Quantum](https://github.com/microsoft/quantum) repository, which offers a wide variety of samples on how to write quantum based programs.
 
 
@@ -81,7 +81,7 @@ All unit tests are part of the `Simulation.sln` solution. To run the tests:
 ## Feedback ##
 
 If you have feedback about the Q# simulators or any other runtime component, please let us know by filing a [new issue](https://github.com/microsoft/qsharp-runtime/issues/new)!
-If you have feedback about some other part of the Microsoft Quantum Development Kit, please see the [contribution guide](https://docs.microsoft.com/quantum/contributing/) for more information.
+If you have feedback about some other part of the Microsoft Quantum Development Kit, please see the [contribution guide](https://docs.microsoft.com/azure/quantum/contributing-overview) for more information.
 
 
 ## Reporting Security Issues
@@ -111,4 +111,4 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-For more details, please see [CONTRIBUTING.md](./CONTRIBUTING.md), or the [contribution guide](https://docs.microsoft.com/quantum/contributing/).
+For more details, please see [CONTRIBUTING.md](./CONTRIBUTING.md), or the [contribution guide](https://docs.microsoft.com/azure/quantum/contributing-overview).
