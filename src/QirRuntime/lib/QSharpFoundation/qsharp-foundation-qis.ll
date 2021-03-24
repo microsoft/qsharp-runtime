@@ -31,7 +31,7 @@
 %struct.QirString = type opaque
 %PauliId = type i32
 
-declare dllimport void @quantum__rt__message(%"struct.QirString"* %str)
+declare void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;===============================================================================
 ;
@@ -64,6 +64,7 @@ declare double      @quantum__qis__arccos__body(double %theta)
 declare double      @quantum__qis__arctan__body(double %theta)
 declare double      @quantum__qis__ieeeremainder__body(double %y, double %x)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
+declare double      @quantum__qis__drawrandomdouble__body(double %min, double %max)
 
 ; API for the user code:
 define dllexport double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
@@ -190,6 +191,15 @@ define dllexport i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {
   %result = call i64 @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
   ret i64 %result
 }
+
+; operation DrawRandomDouble (min : Double, max : Double) : Double
+; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.random.drawrandomdouble
+define double @__quantum__qis__drawrandomdouble__body(double %min, double %max) {
+  %result = call double @quantum__qis__drawrandomdouble__body(double %min, double %max)
+  ret double %result
+}
+
+
 
 ;===============================================================================
 ; quantum.qis conditional functions

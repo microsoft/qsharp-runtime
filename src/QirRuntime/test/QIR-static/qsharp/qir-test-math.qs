@@ -66,6 +66,10 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return DrawRandomInt(min, max);
     }
 
+    operation TestDrawRandomDouble(min : Double, max : Double) : Double {
+        return DrawRandomDouble(min, max);
+    }
+
     function Close(expected : Double, actual : Double) : Bool {
         let neighbourhood = 0.0000001;  // On x86-64 + Win the error is in 16th digit after the decimal point. 
                                         // E.g. enstead of 0.0 there can be 0.00000000000000012.

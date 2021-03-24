@@ -40,6 +40,7 @@ extern "C"
 
     QIR_SHARED_API double quantum__qis__ieeeremainder__body(double x, double y);                // NOLINT
     QIR_SHARED_API int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum); // NOLINT
+    QIR_SHARED_API double quantum__qis__drawrandomdouble__body(double minimum, double maximum); // NOLINT
 
     // Q# ApplyIf:
     QIR_SHARED_API void quantum__qis__applyifelseintrinsic__body(RESULT*, QirCallable*, QirCallable*); // NOLINT
