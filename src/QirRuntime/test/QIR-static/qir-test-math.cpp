@@ -22,6 +22,7 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__body();   
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__body();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__body();                         // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(int64_t min, int64_t max); // NOLINT
+extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(double min, double max);  // NOLINT
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
 {
@@ -97,7 +98,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
         const uint64_t qsRndNum = 
             Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(std::numeric_limits<int64_t>::min(),
                                                                             std::numeric_limits<int64_t>::max());
-        const uint64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomNumber();  // This call must be done 
+        const uint64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomI64();  // This call must be done 
             // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body().
         REQUIRE(qsRndNum == cppRndNum);
     }
@@ -112,7 +113,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
     catch (std::runtime_error const& exc)
     {
-        REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomInt));
+        REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomVal));
     }
 
     // There is a strong difference in the opinions about how the random number generator must be tested.
@@ -201,3 +202,31 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     //     }
 
 } // TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
+
+TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
+{
+    // Test that the Q# random number generator is a wrapper around the C++ generator:
+    size_t times = 1000;
+    while(--times)
+    {
+        const double qsRndNum = 
+            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(std::numeric_limits<double>::min(),
+                                                                               std::numeric_limits<double>::max());
+        const double cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomDouble();  // This call must be done 
+            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body().
+        REQUIRE(qsRndNum == cppRndNum);
+    }
+
+    // Make sure the correct exception is thrown if min > max:
+    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(10.0, 5.0), std::runtime_error);
+
+    // Check the exception string:
+    try
+    {
+        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(10.0, 5.0);
+    }
+    catch (std::runtime_error const& exc)
+    {
+        REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomVal));
+    }
+} // TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")

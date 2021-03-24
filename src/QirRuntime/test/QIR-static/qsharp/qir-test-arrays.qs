@@ -57,6 +57,7 @@ namespace Microsoft.Quantum.Testing.QIR {
             let res19 = ParityTest();
             let res20 = PauliArrayAsIntTest();
             let res21 = PauliArrayAsIntFailTest();
+            let res22 = TestDrawRandomDouble(0.0, 1.0);
             MessageTest("Test");
 
             // Conditionals:
