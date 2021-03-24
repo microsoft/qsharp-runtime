@@ -61,7 +61,7 @@ struct QIR_SHARED_API QirString
 using PTuple = char*;
 struct QIR_SHARED_API QirTupleHeader
 {
-    int32_t refCount = 0;
+    int     refCount = 0;
     int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
     int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer (in bytes)
 
