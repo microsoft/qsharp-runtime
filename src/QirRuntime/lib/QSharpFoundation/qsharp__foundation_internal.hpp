@@ -13,10 +13,11 @@ namespace Qis
 {
     namespace Internal
     {
-        extern char const excStrDrawRandomInt[];
+        extern char const excStrDrawRandomVal[];
 
         void RandomizeSeed(bool randomize);
-        int64_t GetLastGeneratedRandomNumber();
+        int64_t GetLastGeneratedRandomI64();
+        double GetLastGeneratedRandomDouble();
     } // namespace Internal
 } // namespace Qis
 } // namespace Quantum

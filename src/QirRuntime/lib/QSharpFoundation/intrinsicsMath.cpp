@@ -12,7 +12,8 @@
 namespace // Visible in this translation unit only.
 {
 extern thread_local bool randomizeSeed;
-extern int64_t lastGeneratedRndNum;
+extern int64_t lastGeneratedRndI64;
+extern double lastGeneratedRndDouble;
 }
 
 // Implementation:
@@ -74,7 +75,7 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)
     {
-        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomInt));
+        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
     }
 
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
@@ -83,8 +84,30 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
                                                 ? std::random_device()() :  // Default
                                                 0);                         // For test purposes only.
 
-    lastGeneratedRndNum = std::uniform_int_distribution<int64_t>(minimum, maximum)(gen);
-    return lastGeneratedRndNum;
+    lastGeneratedRndI64 = std::uniform_int_distribution<int64_t>(minimum, maximum)(gen);
+    return lastGeneratedRndI64;
+}
+
+double quantum__qis__drawrandomdouble__body(double minimum, double maximum)
+{
+    if(minimum > maximum)
+    {
+        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
+    }
+
+    // For testing purposes we need separate generators for Int and Double:
+    // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+    // https://en.cppreference.com/w/cpp/numeric/random
+    thread_local static std::mt19937_64 gen(randomizeSeed
+                                                ? std::random_device()() :  // Default
+                                                0);                         // For test purposes only.
+
+    // https://en.cppreference.com/w/cpp/numeric/random/uniform_real_distribution
+    lastGeneratedRndDouble = std::uniform_real_distribution<double>(
+            minimum, 
+            std::nextafter(maximum, std::numeric_limits<double>::max())) // "Notes" section.
+        (gen);    
+    return lastGeneratedRndDouble;
 }
 
 } // extern "C"
@@ -92,7 +115,8 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 namespace // Visible in this translation unit only.
 {
 thread_local bool randomizeSeed = true;
-int64_t lastGeneratedRndNum = 0;
+int64_t lastGeneratedRndI64 = 0;
+double lastGeneratedRndDouble = 0.0;
 }
 
 // For test purposes only:
@@ -102,17 +126,23 @@ namespace Qis
 {
     namespace Internal
     {
-        char const excStrDrawRandomInt[] = "Invalid Argument: minimum > maximum for DrawRandomInt()";
+        char const excStrDrawRandomVal[] = "Invalid Argument: minimum > maximum";
 
         void RandomizeSeed(bool randomize)
         {
             randomizeSeed = randomize;
         }
 
-        int64_t GetLastGeneratedRandomNumber()
+        int64_t GetLastGeneratedRandomI64()
         {
-            return lastGeneratedRndNum;
+            return lastGeneratedRndI64;
         }
+
+        double GetLastGeneratedRandomDouble()
+        {
+            return lastGeneratedRndDouble;
+        }
+
     } // namespace Internal
 } // namespace Qis
 } // namespace Quantum
