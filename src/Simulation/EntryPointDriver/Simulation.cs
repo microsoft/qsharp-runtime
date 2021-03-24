@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.CommandLine.Parsing;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -18,18 +17,18 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// <typeparam name="TCallable">The entry point's callable type.</typeparam>
     /// <typeparam name="TIn">The entry point's argument type.</typeparam>
     /// <typeparam name="TOut">The entry point's return type.</typeparam>
-    internal static class Simulation<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
+    public static class Simulation<TCallable, TIn, TOut> where TCallable : AbstractCallable, ICallable
     {
         /// <summary>
         /// Simulates the entry point.
         /// </summary>
-        /// <param name="settings">The driver settings.</param>
         /// <param name="entryPoint">The entry point.</param>
-        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="settings">The driver settings.</param>
         /// <param name="simulator">The simulator to use.</param>
         /// <returns>The exit code.</returns>
-        internal static async Task<int> Simulate(
-            DriverSettings settings, IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, string simulator)
+        public static async Task<int> Simulate(
+            IEntryPoint entryPoint, TIn input, DriverSettings settings, string simulator)
         {
             if (simulator == settings.ResourcesEstimatorName)
             {
@@ -44,7 +43,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                     null;
 
                 var resourcesEstimator = new ResourcesEstimator(coreAssembly);
-                await resourcesEstimator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
+                await resourcesEstimator.Run<TCallable, TIn, TOut>(input);
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }
             else
@@ -54,30 +53,29 @@ namespace Microsoft.Quantum.EntryPointDriver
                         ? (false, () => new QuantumSimulator())
                         : simulator == settings.ToffoliSimulatorName
                         ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
-                        : (true, entryPoint.CreateDefaultCustomSimulator);
-                if (isCustom && simulator != entryPoint.DefaultSimulatorName)
+                        : (true, settings.CreateDefaultCustomSimulator);
+                if (isCustom && simulator != settings.DefaultSimulatorName)
                 {
                     DisplayCustomSimulatorError(simulator);
                     return 1;
                 }
-                await RunSimulator(entryPoint, parseResult, createSimulator);
+                await RunSimulator(input, createSimulator);
             }
+
             return 0;
         }
 
         /// <summary>
         /// Runs the entry point on a simulator and displays its return value.
         /// </summary>
-        /// <param name="entryPoint">The entry point.</param>
-        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="input">The input argument tuple to the entry point.</param>
         /// <param name="createSimulator">A function that creates an instance of the simulator to use.</param>
-        private static async Task RunSimulator(
-            IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, Func<IOperationFactory> createSimulator)
+        private static async Task RunSimulator(TIn input, Func<IOperationFactory> createSimulator)
         {
             var simulator = createSimulator();
             try
             {
-                var value = await simulator.Run<TCallable, TIn, TOut>(entryPoint.CreateArgument(parseResult));
+                var value = await simulator.Run<TCallable, TIn, TOut>(input);
                 if (!(value is QVoid))
                 {
                     Console.WriteLine(value);
