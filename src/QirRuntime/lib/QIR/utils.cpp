@@ -6,6 +6,8 @@
 #include <memory>
 #include <unordered_set>
 #include <iostream>
+#include <cstdint>
+#include <cstdlib>
 
 #include "QirRuntime.hpp"
 
@@ -20,9 +22,13 @@ std::unordered_set<char*>& UseMemoryTracker()
 extern "C"
 {
     // Allocate a block of memory on the heap.
-    char* quantum__rt__heap_alloc(int size) // NOLINT
+    char* quantum__rt__heap_alloc(uint64_t size) // NOLINT
     {
-        char* buffer = new char[size];
+        char* buffer = new (std::nothrow) char[size];
+        if(buffer == nullptr)
+        {
+            quantum__rt__fail(quantum__rt__string_create("Allocation Failed"));
+        }
         #ifndef NDEBUG
             UseMemoryTracker().insert(buffer);
         #endif
@@ -40,6 +46,11 @@ extern "C"
         delete[] buffer;
     }
 
+    char* quantum__rt__memory_allocate(uint64_t size)
+    {
+        return (char *)malloc((size_t)size);
+    }
+
     // Fail the computation with the given error message.
     void quantum__rt__fail(QirString* msg) // NOLINT
     {
@@ -48,10 +59,4 @@ extern "C"
         throw std::runtime_error(str);
     }
 
-    // Include the given message in the computation's execution log or equivalent.
-    // TODO: should we allow the user to register their own output?
-    void quantum__rt__message(QirString* msg) // NOLINT
-    {
-        std::cout << msg->str;
-    }
 }

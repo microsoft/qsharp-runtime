@@ -8,8 +8,6 @@
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 
-#include "BitStates.hpp"
-
 namespace Microsoft
 {
 namespace Quantum
@@ -24,7 +22,7 @@ namespace Quantum
 
         // State of a qubit is represented by a bit in states indexed by qubit's id,
         // bits 0 and 1 correspond to |0> and |1> states respectively.
-        BitStates states;
+        std::vector<bool> states;
 
         // The clients should never attempt to derefenece the Result, so we'll use fake
         // pointers to avoid allocation and deallocation.
@@ -67,7 +65,7 @@ namespace Quantum
         Qubit AllocateQubit() override
         {
             this->lastUsedId++;
-            this->states.ExtendToInclude(this->lastUsedId);
+            this->states.emplace_back(false);
             return reinterpret_cast<Qubit>(this->lastUsedId);
         }
 
@@ -75,13 +73,15 @@ namespace Quantum
         {
             const long id = GetQubitId(qubit);
             assert(id <= this->lastUsedId);
-            assert(!this->states.IsBitSetAt(id));
+            assert(!this->states.at(id));
+            this->lastUsedId--;
+            this->states.pop_back();
         }
 
         std::string QubitToString(Qubit qubit) override
         {
             const long id = GetQubitId(qubit);
-            return std::to_string(id) + ":" + (this->states.IsBitSetAt(id) ? "1" : "0");
+            return std::to_string(id) + ":" + (this->states.at(id) ? "1" : "0");
         }
 
         ///
@@ -120,7 +120,7 @@ namespace Quantum
         ///
         void X(Qubit qubit) override
         {
-            this->states.FlipBitAt(GetQubitId(qubit));
+            this->states.at(GetQubitId(qubit)).flip();
         }
 
         void ControlledX(long numControls, Qubit* const controls, Qubit qubit) override
@@ -128,7 +128,7 @@ namespace Quantum
             bool allControlsSet = true;
             for (long i = 0; i < numControls; i++)
             {
-                if (!this->states.IsBitSetAt(GetQubitId(controls[i])))
+                if (!this->states.at(GetQubitId(controls[i])))
                 {
                     allControlsSet = false;
                     break;
@@ -137,7 +137,7 @@ namespace Quantum
 
             if (allControlsSet)
             {
-                this->states.FlipBitAt(GetQubitId(qubit));
+                this->states.at(GetQubitId(qubit)).flip();
             }
         }
 
@@ -153,7 +153,7 @@ namespace Quantum
                 }
                 if (bases[i] == PauliId_Z)
                 {
-                    odd ^= (this->states.IsBitSetAt(GetQubitId(targets[i])));
+                    odd ^= (this->states.at(GetQubitId(targets[i])));
                 }
             }
             return odd ? one : zero;

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <stdarg.h> // for va_list
+#include <ostream>
 
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
@@ -56,10 +57,13 @@ extern "C"
     // ------------------------------------------------------------------------
 
     // Allocate a block of memory on the heap.
-    QIR_SHARED_API char* quantum__rt__heap_alloc(int size); // NOLINT
+    QIR_SHARED_API char* quantum__rt__heap_alloc(uint64_t size); // NOLINT
 
     // Release a block of allocated heap memory.
     QIR_SHARED_API void quantum__rt__heap_free(char* buffer); // NOLINT
+
+    // Returns a pointer to the malloc-allocated block.
+    QIR_SHARED_API char* quantum__rt__memory_allocate(uint64_t size); // NOLINT
 
     // Fail the computation with the given error message.
     QIR_SHARED_API void quantum__rt__fail(QirString* msg); // NOLINT
@@ -78,9 +82,8 @@ extern "C"
     // becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void quantum__rt__result_update_reference_count(RESULT*, int32_t); // NOLINT
 
-    // Not in the QIR spec right now
-    QIR_SHARED_API RESULT* quantum__rt__result_one(); // NOLINT
-    QIR_SHARED_API RESULT* quantum__rt__result_zero(); // NOLINT
+    QIR_SHARED_API RESULT* quantum__rt__result_get_one(); // NOLINT
+    QIR_SHARED_API RESULT* quantum__rt__result_get_zero(); // NOLINT
 
     // ------------------------------------------------------------------------
     // Tuples
@@ -160,7 +163,6 @@ extern "C"
     // Initializes the callable with the provided function table and capture tuple. The capture tuple pointer
     // should be null if there is no capture.
     typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);                                                // NOLINT
-    typedef void (*t_CaptureCallback)(PTuple, int64_t);                                                     // NOLINT
     QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, t_CaptureCallback*, PTuple); // NOLINT
 
     // Adds the given integer value to the reference count for the callable. Deallocates the callable if the reference
@@ -184,9 +186,9 @@ extern "C"
     QIR_SHARED_API void quantum__rt__callable_make_controlled(QirCallable*); // NOLINT
 
     // Invokes the function at the given index in the memory management table of the callable with the capture tuple and
-    // the given 64-bit integer. Does nothing if if the memory management table pointer or the function pointer at that
+    // the given 32-bit integer. Does nothing if  the memory management table pointer or the function pointer at that
     // index is null.
-    QIR_SHARED_API void quantum__rt__callable_memory_management(int32_t, QirCallable*, int64_t); // NOLINT
+    QIR_SHARED_API void quantum__rt__callable_memory_management(int32_t, QirCallable*, int32_t); // NOLINT
 
     // ------------------------------------------------------------------------
     // Strings
@@ -227,6 +229,14 @@ extern "C"
 
     // Returns a string representation of the range.
     QIR_SHARED_API QirString* quantum__rt__range_to_string(const QirRange&); // NOLINT
+
+    // Returns a pointer to an array that contains a null-terminated sequence of characters 
+    // (i.e., a C-string) representing the current value of the string object.
+    QIR_SHARED_API const char* quantum__rt_string_get_data(QirString* str); // NOLINT
+
+    // Returns the length of the string, in terms of bytes.
+    // http://www.cplusplus.com/reference/string/string/size/
+    QIR_SHARED_API uint32_t quantum__rt_string_get_length(QirString* str);  // NOLINT
 
     // Returns a string representation of the big integer.
     // TODO QIR_SHARED_API QirString* quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
@@ -294,3 +304,12 @@ extern "C"
     // Returns true if the first big integer is greater than or equal to the second, false otherwise.
     // TODO QIR_SHARED_API bool quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
+
+// To do: consider extracting to QirRuntimeOut.hpp
+namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
+{
+namespace Quantum
+{
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
+} // namespace Microsoft
+} // namespace Quantum

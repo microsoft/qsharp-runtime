@@ -153,7 +153,7 @@ extern "C"
         callable->ApplyFunctor(QirCallable::Controlled);
     }
 
-    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int64_t parameter)
+    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int32_t parameter)
     {
         callable->InvokeCaptureCallback(index, parameter);
     }
@@ -181,13 +181,13 @@ int QirTupleHeader::Release()
     }
 
     assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
-    --this->refCount;
+    int retVal = --this->refCount;
     if (this->refCount == 0)
     {
         char* buffer = reinterpret_cast<char*>(this);
         delete[] buffer;
     }
-    return this->refCount;
+    return retVal;
 }
 
 QirTupleHeader* QirTupleHeader::Create(int size)
@@ -443,7 +443,7 @@ void QirCallable::ApplyFunctor(int functor)
     }
 }
 
-void QirCallable::InvokeCaptureCallback(int index, int64_t parameter)
+void QirCallable::InvokeCaptureCallback(int32_t index, int32_t parameter)
 {
     assert(index >= 0 && index < QirCallable::CaptureCallbacksTableSize && "Capture callback index out of range");
 

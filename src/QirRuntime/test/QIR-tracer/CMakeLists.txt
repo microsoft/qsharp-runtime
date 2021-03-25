@@ -1,12 +1,6 @@
-if (WIN32)
-  set(TEST_FILES
-    tracer-qir-win
-  )
-else()
-  set(TEST_FILES
-    tracer-qir-lnx
-  )
-endif()
+set(TEST_FILES
+  tracer-qir
+)
 
 foreach(file ${TEST_FILES})
   compile_from_qir(${file} "") # don't create a target per file

@@ -563,7 +563,7 @@ namespace Microsoft.Quantum.Simulation.Common
         void OnFail(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionDispatchInfo);
 
         /// <summary>
-        /// Called when qubits are allocated by Q# <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 
+        /// Called when qubits are allocated by Q# <a href="https://docs.microsoft.com/azure/quantum/user-guide/language/statements/quantummemorymanagement#use-statement"><c>using</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that are being allocated</param>.
         /// <remarks>
@@ -573,7 +573,7 @@ namespace Microsoft.Quantum.Simulation.Common
         void OnAllocateQubits(IQArray<Qubit> qubits);
 
         /// <summary>
-        /// Called when qubits are released in Q# in the end of <a href="https://docs.microsoft.com/quantum/language/statements#clean-qubits"><c>using</c></a> block. 
+        /// Called when qubits are released in Q# in the end of <a href="https://docs.microsoft.com/azure/quantum/user-guide/language/statements/quantummemorymanagement#use-statement"><c>using</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that are being released</param>.
         /// <remarks>
@@ -583,7 +583,7 @@ namespace Microsoft.Quantum.Simulation.Common
         void OnReleaseQubits(IQArray<Qubit> qubits);
 
         /// <summary>
-        /// Called when qubits are borrowed by Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
+        /// Called when qubits are borrowed by Q# <a href="https://docs.microsoft.com/azure/quantum/user-guide/language/statements/quantummemorymanagement#borrow-statement"><c>borrowing</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that are being borrowed</param>.
         /// <param name="allocatedForBorrowingCount">Number of qubits that have been allocated for borrowing. This might happen if there have not been enough already allocated qubits available for borrowing.</param>.
@@ -594,7 +594,7 @@ namespace Microsoft.Quantum.Simulation.Common
         void OnBorrowQubits(IQArray<Qubit> qubits, long allocatedForBorrowingCount);
 
         /// <summary>
-        /// Called when qubits are returned in the end of Q# <a href="https://docs.microsoft.com/quantum/language/statements#dirty-qubits"><c>borrowing</c></a> block. 
+        /// Called when qubits are returned in the end of Q# <a href="https://docs.microsoft.com/azure/quantum/user-guide/language/statements/quantummemorymanagement#borrow-statement"><c>borrowing</c></a> block. 
         /// </summary>
         /// <param name="qubits">Qubits that have been borrowed and are now being returned</param>.
         /// <param name="releasedOnReturnCount">Number of qubits that have been released once returned. This might happen if they have been allocated only for borrowing.</param>.

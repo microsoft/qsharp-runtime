@@ -37,8 +37,9 @@
 ;------------------------------------------------------------------------------
 ; classical
 ;
-declare i8* @quantum__rt__heap_alloc(i32)
+declare i8* @quantum__rt__heap_alloc(i64)
 declare void @quantum__rt__heap_free(i8*)
+declare i8* @quantum__rt__memory_allocate(i64)
 declare void @quantum__rt__fail(%"struct.QirString"*)
 
 ;------------------------------------------------------------------------------
@@ -48,6 +49,8 @@ declare %class.QUBIT* @quantum__rt__qubit_allocate()
 declare void @quantum__rt__qubit_release(%class.QUBIT*)
 declare i1 @quantum__rt__result_equal(%class.RESULT*, %class.RESULT*)
 declare void @quantum__rt__result_update_reference_count(%class.RESULT* %r, i32 %c)
+declare %class.RESULT* @quantum__rt__result_get_zero()
+declare %class.RESULT* @quantum__rt__result_get_one()
 
 ;------------------------------------------------------------------------------
 ; arrays
@@ -85,7 +88,7 @@ declare %"struct.QirCallable"* @quantum__rt__callable_copy(%"struct.QirCallable"
 declare %"struct.QirCallable"* @quantum__rt__callable_make_adjoint(%"struct.QirCallable"*)
 declare %"struct.QirCallable"* @quantum__rt__callable_make_controlled(%"struct.QirCallable"*)
 declare void @quantum__rt__callable_update_alias_count(%"struct.QirCallable"*, i32)
-declare void @quantum__rt__callable_memory_management(i32, %"struct.QirCallable"*, i64)
+declare void @quantum__rt__callable_memory_management(i32, %"struct.QirCallable"*, i32)
 
 ;------------------------------------------------------------------------------
 ; strings
@@ -101,8 +104,14 @@ declare %"struct.QirString"* @quantum__rt__result_to_string(%class.RESULT*)
 declare %"struct.QirString"* @quantum__rt__pauli_to_string(%PauliId)
 declare %"struct.QirString"* @quantum__rt__qubit_to_string(%class.QUBIT*)
 declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* dereferenceable(24) %range)
+declare i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
+declare i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
 
 
+;------------------------------------------------------------------------------
+; message
+;
+declare void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;=======================================================================================================================
 ; __quantum__rt__* bridge implementation
@@ -111,8 +120,8 @@ declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* d
 ;------------------------------------------------------------------------------
 ; classical bridge
 ;
-define dllexport i8* @__quantum__rt__heap_alloc(i32 %size) {
-  %mem = call i8* @quantum__rt__heap_alloc(i32 %size)
+define dllexport i8* @__quantum__rt__heap_alloc(i64 %size) {
+  %mem = call i8* @quantum__rt__heap_alloc(i64 %size)
   ret i8* %mem
 }
 
@@ -121,9 +130,21 @@ define dllexport void @__quantum__rt__heap_free(i8* %mem) {
   ret void
 }
 
+; Returns a pointer to the malloc-allocated block.
+define dllexport i8* @__quantum__rt__memory_allocate(i64 %size) {
+  %result = call i8* @quantum__rt__memory_allocate(i64 %size)
+  ret i8* %result
+}
+
 define dllexport void @__quantum__rt__fail(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
   call void @quantum__rt__fail(%"struct.QirString"* %str)
+  ret void
+}
+
+define dllexport void @__quantum__rt__message(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  call void @quantum__rt__message(%"struct.QirString"* %str)
   ret void
 }
 
@@ -172,11 +193,22 @@ define dllexport i1 @__quantum__rt__result_equal(%Result* %.r1, %Result* %.r2) {
   ret i1 %c
 }
 
-define dllexport void @__quantum__rt__result_update_reference_count(%Result* %.r, i64 %.c) {
+define dllexport void @__quantum__rt__result_update_reference_count(%Result* %.r, i32 %c) {
   %r = bitcast %Result* %.r to %class.RESULT*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__result_update_reference_count(%class.RESULT* %r, i32 %c)
   ret void
+}
+
+define dllexport %Result* @__quantum__rt__result_get_zero() {
+  %result = call %class.RESULT* @quantum__rt__result_get_zero()
+  %.result = bitcast %class.RESULT* %result to %Result*
+  ret %Result* %.result
+}
+
+define dllexport %Result* @__quantum__rt__result_get_one() {
+  %result = call %class.RESULT* @quantum__rt__result_get_one()
+  %.result = bitcast %class.RESULT* %result to %Result*
+  ret %Result* %.result
 }
 
 
@@ -276,16 +308,14 @@ define dllexport %Array* @__quantum__rt__array_slice_1d(%Array* %.ar, %Range %.r
   ret %Array* %.slice
 }
 
-define dllexport void @__quantum__rt__array_update_reference_count(%Array* %.ar, i64 %.c) {
+define dllexport void @__quantum__rt__array_update_reference_count(%Array* %.ar, i32 %c) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__array_update_reference_count(%"struct.QirArray"* %ar, i32 %c)
   ret void
 }
 
-define dllexport void @__quantum__rt__array_update_alias_count(%Array* %.ar, i64 %.c) {
+define dllexport void @__quantum__rt__array_update_alias_count(%Array* %.ar, i32 %c) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__array_update_alias_count(%"struct.QirArray"* %ar, i32 %c)
   ret void
 }
@@ -299,16 +329,14 @@ define dllexport %Tuple* @__quantum__rt__tuple_create(i64 %size) {
   ret %Tuple* %.th
 }
 
-define dllexport void @__quantum__rt__tuple_update_reference_count(%Tuple* %.th, i64 %.c) {
+define dllexport void @__quantum__rt__tuple_update_reference_count(%Tuple* %.th, i32 %c) {
   %th = bitcast %Tuple* %.th to i8*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__tuple_update_reference_count(i8* %th, i32 %c)
   ret void
 }
 
-define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i64 %.c) {
+define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i32 %c) {
   %th = bitcast %Tuple* %.th to i8*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__tuple_update_alias_count(i8* %th, i32 %c)
   ret void
 }
@@ -316,16 +344,14 @@ define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i64
 ;------------------------------------------------------------------------------
 ; callables bridge
 ;
-define dllexport void @__quantum__rt__callable_update_reference_count(%Callable* %.clb, i64 %.c) {
+define dllexport void @__quantum__rt__callable_update_reference_count(%Callable* %.clb, i32 %c) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__callable_update_reference_count(%"struct.QirCallable"* %clb, i32 %c)
   ret void
 }
 
-define dllexport void @__quantum__rt__callable_update_alias_count(%Callable* %.clb, i64 %.c) {
+define dllexport void @__quantum__rt__callable_update_alias_count(%Callable* %.clb, i32 %c) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__callable_update_alias_count(%"struct.QirCallable"* %clb, i32 %c)
   ret void
 }
@@ -370,26 +396,32 @@ define dllexport %Callable* @__quantum__rt__callable_make_controlled(%Callable* 
   ret %Callable* %.clb_cnt
 }
 
-define dllexport void @__quantum__rt__callable_memory_management(i32 %index, %Callable* %.clb, i64 %parameter) {
+define dllexport void @__quantum__rt__capture_update_reference_count(%Callable* %.clb, i32 %count) {
   %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
-  call void @quantum__rt__callable_memory_management(i32 %index, %"struct.QirCallable"* %clb, i64 %parameter)
+  call void @quantum__rt__callable_memory_management(i32 0, %"struct.QirCallable"* %clb, i32 %count)
   ret void
 }
+
+define dllexport void @__quantum__rt__capture_update_alias_count(%Callable* %.clb, i32 %count) {
+  %clb = bitcast %Callable* %.clb to %"struct.QirCallable"*
+  call void @quantum__rt__callable_memory_management(i32 1, %"struct.QirCallable"* %clb, i32 %count)
+  ret void
+}
+
 ;------------------------------------------------------------------------------
 ; strings bridge
 ;
 ; NYI:
 ;define dllexport %String* @__quantum__rt__bigint_to_string(%BigInt*)
 
-define dllexport %String* @__quantum__rt__string_create(i32 %length_ignored, i8* %null_terminated_buffer) {
+define dllexport %String* @__quantum__rt__string_create(i8* %null_terminated_buffer) {
   %str = call %"struct.QirString"* @quantum__rt__string_create(i8* %null_terminated_buffer)
   %.str = bitcast %"struct.QirString"* %str to %String*
   ret %String* %.str
 }
 
-define dllexport void @__quantum__rt__string_update_reference_count(%String* %.str, i64 %.c) {
+define dllexport void @__quantum__rt__string_update_reference_count(%String* %.str, i32 %c) {
   %str = bitcast %String* %.str to %"struct.QirString"*
-  %c = trunc i64 %.c to i32
   call void @quantum__rt__string_update_reference_count(%"struct.QirString"* %str, i32 %c)
   ret void
 }
@@ -458,13 +490,27 @@ define dllexport %String* @__quantum__rt__range_to_string(%Range %.range) {
   ret %String* %.str
 }
 
+define dllexport i8* @__quantum__rt_string_get_data(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  %result = call i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
+  ret i8* %result 
+}
+
+define dllexport i32 @__quantum__rt_string_get_length(%String* %.str) {
+  %str = bitcast %String* %.str to %"struct.QirString"*
+  %result = call i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
+  ret i32 %result 
+}
+
+
+
 ;------------------------------------------------------------------------------
 ; bigints bridge
 ;
 ; NYI:
 ;define dllexport %BigInt* @__quantum__rt__bigint_create_i64(i64)
 ;define dllexport %BigInt* @__quantum__rt__bigint_create_array(i32, [0 x i8])
-;define dllexport void @__quantum__rt__bigint_update_reference_count(%BigInt*, i64)
+;define dllexport void @__quantum__rt__bigint_update_reference_count(%BigInt*, i32)
 ;define dllexport %BigInt* @__quantum__rt__bigint_negate(%BigInt*)
 ;define dllexport %BigInt* @__quantum__rt__bigint_add(%BigInt*, %BigInt*)
 ;define dllexport %BigInt* @__quantum__rt__bigint_subtract(%BigInt*, %BigInt*)

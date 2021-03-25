@@ -8,7 +8,7 @@ declare i64 @__quantum__rt__array_get_size(%Array*, i32)
 declare i8* @__quantum__rt__array_get_element_ptr(%Array*, ...)
 declare i32 @__quantum__rt__array_get_dim(%Array*)
 declare %Array* @__quantum__rt__array_project(%Array*, i32, i64)
-declare void @__quantum__rt__array_update_reference_count(%Array*, i64)
+declare void @__quantum__rt__array_update_reference_count(%Array*, i32)
 declare void @DebugLog(i64)
 
 ; manually authored test for multi-dimensional arrays (Q# doesn't support multi-dimentional arrays yet)
@@ -25,8 +25,8 @@ define i64 @TestMultidimArrays(i8 %val, i64 %dim0, i64 %dim1, i64 %dim2)
   %project_val = load i8, i8* %project_elem_ptr
   %val64 = sext i8 %project_val to i64
 
-  call void @__quantum__rt__array_update_reference_count(%Array* %.ar, i64 -1)
-  call void @__quantum__rt__array_update_reference_count(%Array* %.project, i64 -1)
+  call void @__quantum__rt__array_update_reference_count(%Array* %.ar, i32 -1)
+  call void @__quantum__rt__array_update_reference_count(%Array* %.project, i32 -1)
 
   %t1 = add i64 %project_dim0, %project_dim1
   %t2 = sext i32 %project_dims to i64
