@@ -14,7 +14,6 @@
 #include "qsharp__core__qis.hpp"
 #include "QirRuntime.hpp"
 
-#include "BitStates.hpp"
 #include "QirContext.hpp"
 #include "SimulatorStub.hpp"
 
@@ -22,9 +21,9 @@ using namespace Microsoft::Quantum;
 
 struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
-    int lastId = 1;
+    int lastId = -1;
     const int maxResults;
-    BitStates allocated;
+    std::vector<bool> allocated;
 
     static int GetResultId(Result r)
     {
@@ -32,16 +31,16 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     }
 
     ResultsReferenceCountingTestQAPI(int maxResults)
-        : maxResults(maxResults + 2)
+        : maxResults(maxResults),
+        allocated(maxResults, false)
     {
-        allocated.ExtendToInclude(maxResults);
     }
 
     Result Measure(long, PauliId[], long, Qubit[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
-        this->allocated.SetBitAt(this->lastId);
+        this->allocated.at(this->lastId) = true;;
         return reinterpret_cast<Result>(this->lastId);
     }
     Result UseZero() override
@@ -56,8 +55,8 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         const int id = GetResultId(result);
         INFO(id);
-        REQUIRE(this->allocated.IsBitSetAt(id));
-        this->allocated.FlipBitAt(id);
+        REQUIRE(this->allocated.at(id));
+        this->allocated.at(id).flip();
     }
     bool AreEqualResults(Result r1, Result r2) override
     {
@@ -66,7 +65,14 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 
     bool HaveResultsInFlight() const
     {
-        return this->allocated.IsAny();
+        for (const auto& b : this->allocated)
+        {
+            if (b)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 };
 TEST_CASE("Results: comparison and reference counting", "[qir_support]")
@@ -693,7 +699,7 @@ struct QubitTestQAPI : public SimulatorStub
 {
     int lastId = -1;
     const int maxQubits;
-    BitStates allocated;
+    std::vector<bool> allocated;
 
     static int GetQubitId(Qubit q)
     {
@@ -701,23 +707,24 @@ struct QubitTestQAPI : public SimulatorStub
     }
 
     QubitTestQAPI(int maxQubits)
-        : maxQubits(maxQubits)
+        : maxQubits(maxQubits),
+        allocated(maxQubits, false)
     {
-        allocated.ExtendToInclude(maxQubits);
     }
+
     Qubit AllocateQubit() override
     {
         assert(this->lastId < this->maxQubits);
         this->lastId++;
-        this->allocated.SetBitAt(this->lastId);
+        this->allocated.at(this->lastId) = true;
         return reinterpret_cast<Qubit>(this->lastId);
     }
     void ReleaseQubit(Qubit qubit) override
     {
         const int id = GetQubitId(qubit);
         INFO(id);
-        REQUIRE(this->allocated.IsBitSetAt(id));
-        this->allocated.FlipBitAt(id);
+        REQUIRE(this->allocated.at(id));
+        this->allocated.at(id).flip();
     }
     std::string QubitToString(Qubit qubit) override
     {
@@ -735,12 +742,19 @@ struct QubitTestQAPI : public SimulatorStub
 
     bool HaveQubitsInFlight() const
     {
-        return this->allocated.IsAny();
+        for (const auto& b : this->allocated)
+        {
+            if (b)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 };
 TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 {
-    std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(3);
+    std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(4);
     QirContextScope qirctx(qapi.get());
     QirString* qstr = nullptr;
 
