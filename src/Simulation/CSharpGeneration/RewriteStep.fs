@@ -22,8 +22,8 @@ type Emitter() =
 
     member private this.WriteFile (fileId : string) outputFolder (fileEnding : string) content overwrite =
         let mutable fileEnding = fileEnding 
-        let withOutEnding = Path.GetFileNameWithoutExtension(fileId)
-        let mutable targetFile = Path.GetFullPath(Path.Combine(outputFolder, withOutEnding + fileEnding))
+        let withoutEnding = Path.GetFileNameWithoutExtension(fileId)
+        let mutable targetFile = Path.GetFullPath(Path.Combine(outputFolder, withoutEnding + fileEnding))
 
         if (not overwrite) && _FileNamesGenerated.Contains(targetFile) then
             let mutable enumeration = 1
@@ -34,11 +34,12 @@ type Emitter() =
                 else fileEnding.Substring(0, pos), fileEnding.Substring(pos)
             while _FileNamesGenerated.Contains(targetFile) && enumeration < 100 do
                 fileEnding <- beforeEnumeration + enumeration.ToString() + afterEnumeration
-                targetFile <- Path.GetFullPath(Path.Combine(outputFolder, withOutEnding + fileEnding))
+                targetFile <- Path.GetFullPath(Path.Combine(outputFolder, withoutEnding + fileEnding))
                 enumeration <- enumeration + 1
 
         _FileNamesGenerated.Add targetFile |> ignore
-        CompilationLoader.GeneratedFile(fileId, outputFolder, fileEnding, content) |> ignore
+        let flatFileId = (outputFolder, Path.GetFileName(fileId)) |> Path.Combine |> Path.GetFullPath |> Uri |> CompilationUnitManager.GetFileId
+        CompilationLoader.GeneratedFile(flatFileId, outputFolder, fileEnding, content) |> ignore
 
 
     interface IRewriteStep with
