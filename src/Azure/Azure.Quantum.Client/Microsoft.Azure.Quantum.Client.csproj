@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ProjectUrl>https://docs.microsoft.com/quantum/</ProjectUrl>
-    <PackageReleaseNotes>See: https://docs.microsoft.com/quantum/relnotes/</PackageReleaseNotes>
+    <ProjectUrl>https://docs.microsoft.com/azure/quantum/</ProjectUrl>
+    <PackageReleaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
     <PackageTags>Azure Quantum Q# QSharp</PackageTags>

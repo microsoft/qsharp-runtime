@@ -13,6 +13,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
+    <!-- Don't generate API docs for test cases. -->
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
