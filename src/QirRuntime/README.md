@@ -1,6 +1,7 @@
 # The Native QIR Runtime
 
-This folder contains QIR runtime project, which includes implementation of the
+This folder contains the Quantum Intermediate Representation (QIR) Runtime project. QIR is a subset of the [LLVM](https://llvm.org/) Intermediate Representation.
+QIR Runtime includes implementation of the
  [QIR specification](https://github.com/microsoft/qsharp-language/tree/main/Specifications/QIR) and the bridge to
  compile QIR to be run against the native full state simulator.
 
@@ -11,24 +12,17 @@ This folder contains QIR runtime project, which includes implementation of the
 
 ## Build
 
+### Prerequisites
 The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(11.0.0). Other versions of the tools might work
- but haven't been tested. Only x64 architecture is supported.
+ but haven't been tested. Only x64 architecture is supported.  
+For runing the PowerShell scripts below use the powershell core (`pwsh`),
+e.g. [this one](https://github.com/PowerShell/PowerShell/releases/download/v7.1.2/PowerShell-7.1.2-win-x64.msi), not the inbox PowerShell.
 
-You can use CMake directly. For example, to produce a release build:
+To install prerequisite tools for building the QIR runtime, you can set the `ENABLE_QIRRUNTIME` environment variable to the string `"true"` 
+and run [`prerequisites.ps1`](prerequisites.ps1), or manually install pre-reqs with the steps listed below
+(Windows steps rely on [Chocolatey](https://chocolatey.org/) for installation).
 
-1. navigate into QirRuntime folder
-2. mkdir build
-3. cd build
-4. cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
-5. cmake --build .
-
-Or you can run `build-qir-runtime.ps1` script from QirRuntime folder. The script will place the build artifacts into `build/[Debug|Release]` folder. We strongly recommend doing local builds using the build script because it also runs clang-tidy if it is installed.
-
-CI builds and tests are enabled for this project. The build for `test/QIR-static/qsharp/qir-gen.csproj` has project dependencies on other parts of the runtime and may trigger a build for those components, while some of the tests depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built from.
-
-To install prerequisite tools for building the QIR runtime, you can set the `ENABLE_QIRRUNTIME` environment variable to the string `"true"` and run `prerequisites.ps1` or manually install pre-reqs with the steps listed below (Windows script relies on [Chocolatey](https://chocolatey.org/) for installation).
-
-### Windows pre-reqs
+#### Windows pre-reqs
 
 1. Install Clang 11, Ninja and CMake from the public distros.
 1. Add all three to your/system `%PATH%`.
@@ -39,7 +33,7 @@ To install prerequisite tools for building the QIR runtime, you can set the `ENA
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
 
-### Linux via WSL pre-reqs
+#### Linux via WSL pre-reqs
 
 1. On the host Windows machine [enable WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) and install
  Ubuntu 20.04 LTS.
@@ -55,35 +49,51 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
-## Test
+### Build Commands
+To build QirRuntime you can run [`build-qir-runtime.ps1`](build-qir-runtime.ps1) script from QirRuntime folder:
+```batch
+pwsh build-qir-runtime.ps1
+```
+  
+The script will create the `build/{Debug|Release}` folder and place the build artifacts in it. The configuration `Debug|Release`
+is specified with the `BUILD_CONFIGURATION` environment variable.
+If the variable is not set then the default is specified in [`set-env.ps1`](../../build/set-env.ps1).  
+We strongly recommend doing local builds using this [`build-qir-runtime.ps1`](build-qir-runtime.ps1) build script 
+because it is used by the continuous integration (CI) infrastructure, and this script also runs clang-tidy if it is installed.
 
-Some of the tests depend on Microsoft.Quantum.Simulator.Runtime library. To run them make sure to build Native simulator
- from this repository or provide your own version of the library in a folder the OS would search during dynamic library
- lookup.
+Or you can use CMake directly (not recommended). For example in Windows you can enter the following commands in the command line:
+```batch
+rem Navigate into QirRuntime folder.
 
-Some of the tests use generated QIR (*.ll) files as build input. Currently the files are checked-in as part of the project
- but in the future they will be replaced by automatic generation during build. To regenerate the files, run generateqir.py
- or build/test scripts without specifying `noqirgen`. To use the checked-in files without regenerating them, run build/test
- scripts with `noqirgen` argument.
+rem Creatge the `build` directory:
+mkdir build
 
-### Running tests with test.py
+rem Enter the `build` directory:
+pushd build
 
-To execute all tests locally run `test.py` from the project's root folder:
+rem Prepare for the build:
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
 
-- (Windows) `python test.py [nobuild] [debug/release]`
-- (Linux) `python3 test.py [nobuild] [debug/release]`
+rem Build (you will likely need to issue this command several times, see issue #589):
+cmake --build .
 
-The script will trigger an incremental build unless `nobuild` options is specified. Tests from the "[skip]" category
- won't be run.
+rem Return from the `build` directory:
+popd
+```
+## Tests
 
-### Running tests with CTest
+### Prerequisites
+Some of the tests below depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built at a higher level of the directory tree.
+To build that library follow the instructions in [`qsharp-runtime/README.md`](../../README.md)
+(make sure to build the native simulator, see `quantum-simulator.sln` in that file,
+or provide your own version of the library in a folder the OS would search during dynamic library lookup).
 
-All native tests, including QIR, use catch2 and are fully integrated with CTest. Navigate into
- `build/[Windows|Linux]/[Debug|Release]` folder and run `ctest`. No configuration options required. The results will be
- logged into the corresponding `build/[Windows|Linux]/[Debug|Release]/<target_path>/<test_binary_name>_results.xml` file.
- Tests from the "[skip]" category won't be run.
+### Running the Tests
 
-### Running test binaries individually
+```batch
+pwsh test-qir-runtime.ps1
+```
+### Running Test Binaries Individually
 
 `<test_binary> -help` provides details on how to run a subset of the tests and other options. For example, you can
  filter tests from the "[skip]" category out by `<test_binary> ~[skip]`.
