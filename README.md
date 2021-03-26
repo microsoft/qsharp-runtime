@@ -57,7 +57,36 @@ To build on other platforms:
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
-    * (On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)) Install `g++`.
+    * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
+      * Install `g++`.
+      * The build does not accept `dotnet-*-5.0`, install `dotnet-*-3.1`:
+
+```sh
+qsharp-runtime$ dpkg -l *dotnet*
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                      Version      Architecture Description
++++-=========================-============-============-=================================================================
+un  dotnet                    <none>       <none>       (no description available)
+ii  dotnet-apphost-pack-3.1   3.1.13-1     amd64        Microsoft.NETCore.App.Host 3.1.13
+ii  dotnet-host               5.0.4-1      amd64        Microsoft .NET Host - 5.0.4
+ii  dotnet-hostfxr-3.1        3.1.13-1     amd64        Microsoft .NET Core Host FX Resolver - 3.1.13 3.1.13
+un  dotnet-nightly            <none>       <none>       (no description available)
+ii  dotnet-runtime-3.1        3.1.13-1     amd64        Microsoft .NET Core Runtime - 3.1.13 Microsoft.NETCore.App 3.1.13
+ii  dotnet-runtime-deps-3.1   3.1.13-1     amd64        dotnet-runtime-deps-3.1 3.1.13
+ii  dotnet-sdk-3.1            3.1.407-1    amd64        Microsoft .NET Core SDK 3.1.407
+ii  dotnet-targeting-pack-3.1 3.1.0-1      amd64        Microsoft.NETCore.App.Ref 3.1.0
+
+qsharp-runtime$ dpkg -l *aspnet*
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                          Version      Architecture Description
++++-=============================-============-============-=================================
+ii  aspnetcore-runtime-3.1        3.1.13-1     amd64
+ii  aspnetcore-targeting-pack-3.1 3.1.10-1     amd64
+```
 2. Run [bootstrap.ps1](./bootstrap.ps1)
     * The script might install additional tools (a specific compiler, build tools, etc)
     * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
