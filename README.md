@@ -59,7 +59,7 @@ To build on other platforms:
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
       * Install `g++` (e.g. in Ubuntu 20.04 `sudo apt-get install g++`).
-      * The build does not accept `dotnet-*-5.0`/`aspnetcore-*-5.0` packages, install `dotnet-*-3.1`/`aspnetcore-*-3.1`
+      * The build does not accept `dotnet-*-5.0` packages, install `dotnet-*-3.1`
         (`sudo apt-get install dotnet-sdk-3.1`). The possible result can be:
 
 ```sh
@@ -78,15 +78,6 @@ ii  dotnet-runtime-3.1        3.1.13-1     amd64        Microsoft .NET Core Runt
 ii  dotnet-runtime-deps-3.1   3.1.13-1     amd64        dotnet-runtime-deps-3.1 3.1.13
 ii  dotnet-sdk-3.1            3.1.407-1    amd64        Microsoft .NET Core SDK 3.1.407
 ii  dotnet-targeting-pack-3.1 3.1.0-1      amd64        Microsoft.NETCore.App.Ref 3.1.0
-
-qsharp-runtime$ dpkg -l *aspnet*
-Desired=Unknown/Install/Remove/Purge/Hold
-| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
-|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name                          Version      Architecture Description
-+++-=============================-============-============-=================================
-ii  aspnetcore-runtime-3.1        3.1.13-1     amd64
-ii  aspnetcore-targeting-pack-3.1 3.1.10-1     amd64
 ```
 2. Run [bootstrap.ps1](./bootstrap.ps1)
     * The script might install additional tools (a specific compiler, build tools, etc)
