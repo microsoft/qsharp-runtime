@@ -49,6 +49,12 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
+#### Other Prerequisites
+The build depends on `Microsoft.Quantum.Simulator.Runtime` dynamic library built at a higher level of the directory tree.
+To build that library follow the instructions in [`qsharp-runtime/README.md`](../../README.md#building-from-source)
+(up to and including the step `Simulation.sln`).
+
+
 ### Build Commands
 To build QirRuntime you can run [`build-qir-runtime.ps1`](build-qir-runtime.ps1) script from QirRuntime folder:
 ```batch
@@ -63,34 +69,30 @@ because it is used by the continuous integration (CI) infrastructure, and this s
 
 Or you can use CMake directly (not recommended). For example in Windows you can enter the following commands in the command line:
 ```batch
-rem Navigate into QirRuntime folder.
+@rem Navigate to QirRuntime folder.
 
-rem Creatge the `build` directory:
+@rem Creatge the `build` directory:
 mkdir build
 
-rem Enter the `build` directory:
+@rem Enter the `build` directory:
 pushd build
 
-rem Prepare for the build:
+@rem Prepare for the build:
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
 
-rem Build (you will likely need to issue this command several times, see issue #589):
+@rem Build (you will likely need to issue this command several times, see issue #589):
 cmake --build .
 
-rem Return from the `build` directory:
+@rem Return from the `build` directory:
 popd
 ```
 ## Tests
 
-### Prerequisites
-Some of the tests below depend on `Microsoft.Quantum.Simulator.Runtime` dynamic library built at a higher level of the directory tree.
-To build that library follow the instructions in [`qsharp-runtime/README.md`](../../README.md)
-(make sure to build the native simulator, see `quantum-simulator.sln` in that file,
-or provide your own version of the library in a folder the OS would search during dynamic library lookup).
-
-### Running the Tests
+### Running All Tests
 
 ```batch
+@rem Navigate to QirRuntime folder.
+
 pwsh test-qir-runtime.ps1
 ```
 ### Running Test Binaries Individually
