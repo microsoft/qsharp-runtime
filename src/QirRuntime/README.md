@@ -68,29 +68,7 @@ pwsh build-qir-runtime.ps1
 The script will create the `build/{Debug|Release}` folder and place the build artifacts in it. The configuration `Debug|Release`
 is specified with the `BUILD_CONFIGURATION` environment variable.
 If the variable is not set then the default is specified in [`set-env.ps1`](../../build/set-env.ps1).  
-We strongly recommend doing local builds using this [`build-qir-runtime.ps1`](build-qir-runtime.ps1) build script 
-because it is used by the continuous integration (CI) infrastructure, and this script also runs clang-tidy if it is installed.
 
-Though it is not recommended, you can also use CMake directly.
-For example, in Windows you can enter the following commands in the command line:
-```powershell
-# Navigate to QirRuntime folder.
-
-# Creatge the `build` directory:
-mkdir build
-
-# Enter the `build` directory:
-pushd build
-
-# Prepare for the build:
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
-
-# Build (you will likely need to issue this command several times, see issue #589):
-cmake --build .
-
-# Return from the `build` directory:
-popd
-```
 ## Tests
 
 ### Running All Tests
