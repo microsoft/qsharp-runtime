@@ -60,7 +60,7 @@ To build on other platforms:
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
       * Install `g++` (e.g. in Ubuntu 20.04 `sudo apt-get install g++`).
       * The build does not accept `dotnet-*-5.0`/`aspnetcore-*-5.0` packages, install `dotnet-*-3.1`/`aspnetcore-*-3.1`
-        (`sudo apt-get install aspnetcore-runtime-3.1 dotnet-sdk-3.1`). The possible result can be:
+        (`sudo apt-get install dotnet-sdk-3.1`). The possible result can be:
 
 ```sh
 qsharp-runtime$ dpkg -l *dotnet*
