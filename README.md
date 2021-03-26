@@ -58,8 +58,9 @@ To build on other platforms:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
-      * Install `g++`.
-      * The build does not accept `dotnet-*-5.0`, install `dotnet-*-3.1`:
+      * Install `g++` (e.g. in Ubuntu 20.04 `sudo apt-get install g++`).
+      * The build does not accept `dotnet-*-5.0`/`aspnetcore-*-5.0` packages, install `dotnet-*-3.1`/`aspnetcore-*-3.1`
+        (`sudo apt-get install aspnetcore-runtime-3.1 dotnet-sdk-3.1`). The possible result can be:
 
 ```sh
 qsharp-runtime$ dpkg -l *dotnet*

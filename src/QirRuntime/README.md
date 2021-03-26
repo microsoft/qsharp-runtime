@@ -1,9 +1,9 @@
 # The Native QIR Runtime
 
-This folder contains the Quantum Intermediate Representation (QIR) Runtime project. QIR is a subset of the [LLVM](https://llvm.org/) Intermediate Representation.
-QIR Runtime includes implementation of the
+This folder contains the Quantum Intermediate Representation (QIR) Runtime project. The QIR is a subset of the [LLVM](https://llvm.org/) Intermediate Representation.
+The QIR runtime includes an implementation of the
  [QIR specification](https://github.com/microsoft/qsharp-language/tree/main/Specifications/QIR) and the bridge to
- compile QIR to be run against the native full state simulator.
+ run QIR against the native full state simulator.
 
 - `public` folder contains the public headers
 - `lib` folder contains the implementation of the runtime and the simulators.
@@ -13,14 +13,16 @@ QIR Runtime includes implementation of the
 ## Build
 
 ### Prerequisites
+
 The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(11.0.0). Other versions of the tools might work
  but haven't been tested. Only x64 architecture is supported.  
-For runing the PowerShell scripts below use the powershell core (`pwsh`),
-e.g. [this one](https://github.com/PowerShell/PowerShell/releases/download/v7.1.2/PowerShell-7.1.2-win-x64.msi), not the inbox PowerShell.
+For running the PowerShell scripts below use 
+[PowerShell Core or PowerShell 7+ (`pwsh`)](https://github.com/PowerShell/PowerShell), not the inbox PowerShell.
 
 To install prerequisite tools for building the QIR runtime, you can set the `ENABLE_QIRRUNTIME` environment variable to the string `"true"` 
-and run [`prerequisites.ps1`](prerequisites.ps1), or manually install pre-reqs with the steps listed below
-(Windows steps rely on [Chocolatey](https://chocolatey.org/) for installation).
+and run [`prerequisites.ps1`](prerequisites.ps1), or manually install pre-reqs with the steps listed below.
+Note that on Windows, this script relies on the [Chocolatey package manager](https://chocolatey.org/),
+while on macOS, `prerequisites.ps1` relies on the [`brew` package manager](https://brew.sh).
 
 #### Windows pre-reqs
 
@@ -50,12 +52,14 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
 #### Other Prerequisites
+
 The build depends on `Microsoft.Quantum.Simulator.Runtime` dynamic library built at a higher level of the directory tree.
 To build that library follow the instructions in [`qsharp-runtime/README.md`](../../README.md#building-from-source)
 (up to and including the step `Simulation.sln`).
 
 
 ### Build Commands
+
 To build QirRuntime you can run [`build-qir-runtime.ps1`](build-qir-runtime.ps1) script from QirRuntime folder:
 ```batch
 pwsh build-qir-runtime.ps1
@@ -67,34 +71,36 @@ If the variable is not set then the default is specified in [`set-env.ps1`](../.
 We strongly recommend doing local builds using this [`build-qir-runtime.ps1`](build-qir-runtime.ps1) build script 
 because it is used by the continuous integration (CI) infrastructure, and this script also runs clang-tidy if it is installed.
 
-Or you can use CMake directly (not recommended). For example in Windows you can enter the following commands in the command line:
-```batch
-@rem Navigate to QirRuntime folder.
+Though it is not recommended, you can also use CMake directly.
+For example, in Windows you can enter the following commands in the command line:
+```powershell
+# Navigate to QirRuntime folder.
 
-@rem Creatge the `build` directory:
+# Creatge the `build` directory:
 mkdir build
 
-@rem Enter the `build` directory:
+# Enter the `build` directory:
 pushd build
 
-@rem Prepare for the build:
+# Prepare for the build:
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
 
-@rem Build (you will likely need to issue this command several times, see issue #589):
+# Build (you will likely need to issue this command several times, see issue #589):
 cmake --build .
 
-@rem Return from the `build` directory:
+# Return from the `build` directory:
 popd
 ```
 ## Tests
 
 ### Running All Tests
 
-```batch
-@rem Navigate to QirRuntime folder.
+```powershell
+# Navigate to QirRuntime folder.
 
 pwsh test-qir-runtime.ps1
 ```
+
 ### Running Test Binaries Individually
 
 `<test_binary> -help` provides details on how to run a subset of the tests and other options. For example, you can
