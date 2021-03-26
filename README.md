@@ -57,6 +57,7 @@ To build on other platforms:
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
+    * (On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)) Install `g++`.
 2. Run [bootstrap.ps1](./bootstrap.ps1)
     * The script might install additional tools (a specific compiler, build tools, etc)
     * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
