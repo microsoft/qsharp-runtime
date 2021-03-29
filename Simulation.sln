@@ -85,34 +85,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Type3.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulators.Type3", "src\Simulation\Simulators.Type3.Tests\Tests.Microsoft.Quantum.Simulators.Type3.csproj", "{7F80466B-A6B5-4EF1-A9E9-22ABAE3C20C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A6394A39-9862-4D5C-8FA1-81B61B424EE6}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QirRuntime", "QirRuntime", "{223F1FAE-5551-4237-AE8A-73502B007003}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E9FC86D7-DBE1-44B8-BF7F-61109E1AFE86}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-static", "QIR-static", "{9BED35A6-3FBF-4A55-8424-C801BEB64D68}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-gen", "src\QirRuntime\test\QIR-static\qsharp\qir-gen.csproj", "{DC69B7C8-7B25-4C12-878A-DF59722C306E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FullstateSimulator", "FullstateSimulator", "{932E88FC-AB51-449D-937E-BB3050DF37C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-test-simulator", "src\QirRuntime\test\FullstateSimulator\qsharp\qir-test-simulator.csproj", "{D529DE2B-C65B-4B89-82F3-FF712BC832BC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-dynamic", "QIR-dynamic", "{E0DE8EF7-A587-4D02-8813-B344365E5CF8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-test-random", "src\QirRuntime\test\QIR-dynamic\qsharp\qir-test-random.csproj", "{9FCFB543-A126-41DF-80A3-40A6AFBA4F4F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-tracer", "QIR-tracer", "{99C04F12-B449-4832-BFD6-FE5E91BAE393}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracer-qir", "src\QirRuntime\test\QIR-tracer\qsharp\tracer-qir.csproj", "{390608C0-35C4-4E81-8BF8-91F9EA9C1CDA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{306E9DC4-15F6-4D98-8846-34EBBBC45CB0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneInputReference", "StandaloneInputReference", "{700A1D87-D0DE-4621-A6CD-3DC0AA47D492}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-standalone-input-reference", "src\QirRuntime\samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{91DF2E6D-65C1-478E-A276-337A40ADB1FB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

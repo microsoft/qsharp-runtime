@@ -1,0 +1,37 @@
+set(TEST_FILES
+  qir-test-random
+)
+
+foreach(file ${TEST_FILES})
+  compile_from_qir(${file} "") # don't create a target per file
+  list(APPEND QIR_TESTS_LIBS ${QIR_UTILITY_LIB})
+endforeach()
+
+add_custom_target(qir_dynamic_test_lib DEPENDS ${QIR_TESTS_LIBS})
+
+#==============================================================================
+# This executable target links test code against the dynamic libraries rather than the explicit
+# static QIR/RT libs (qir will statically link in the bridge via transitivity of target_link_libraries).
+#
+add_executable(qir-dynamic-tests
+  qir-driver.cpp
+)
+
+target_link_libraries(qir-dynamic-tests PUBLIC
+  ${QIR_TESTS_LIBS}
+  "-L${CMAKE_BINARY_DIR}/lib/QIR"
+  -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpFoundation"
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpCore"
+  -lMicrosoft.Quantum.Qir.QSharp.Core
+)
+
+target_include_directories(qir-dynamic-tests PUBLIC
+  ${test_includes}
+  ${public_includes}
+)
+add_dependencies(qir-dynamic-tests qir_dynamic_test_lib)
+
+install(TARGETS qir-dynamic-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+add_unit_test(qir-dynamic-tests)
