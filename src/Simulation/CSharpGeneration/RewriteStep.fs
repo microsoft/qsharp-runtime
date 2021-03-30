@@ -20,8 +20,11 @@ type Emitter() =
 
     let _FileNamesGenerated = new HashSet<string>();
 
+    [<Literal>]
+    let _EnumerationLimit = 100;
+
     member private this.WriteFile (fileId : string) outputFolder (fileEnding : string) content overwrite =
-        let mutable fileEnding = fileEnding 
+        let mutable fileEnding = fileEnding
         let withoutEnding = Path.GetFileNameWithoutExtension(fileId)
         let mutable targetFile = Path.GetFullPath(Path.Combine(outputFolder, withoutEnding + fileEnding))
 
@@ -32,15 +35,13 @@ type Emitter() =
                 if pos = -1
                 then "", fileEnding
                 else fileEnding.Substring(0, pos), fileEnding.Substring(pos)
-            while _FileNamesGenerated.Contains(targetFile) && enumeration < 100 do
+            while _FileNamesGenerated.Contains(targetFile) && enumeration < _EnumerationLimit do
                 fileEnding <- beforeEnumeration + enumeration.ToString() + afterEnumeration
                 targetFile <- Path.GetFullPath(Path.Combine(outputFolder, withoutEnding + fileEnding))
                 enumeration <- enumeration + 1
 
         _FileNamesGenerated.Add targetFile |> ignore
-        let flatFileId = (outputFolder, Path.GetFileName(fileId)) |> Path.Combine |> Path.GetFullPath |> Uri |> CompilationUnitManager.GetFileId
-        CompilationLoader.GeneratedFile(flatFileId, outputFolder, fileEnding, content) |> ignore
-
+        File.WriteAllText(targetFile, content)
 
     interface IRewriteStep with
 
@@ -58,12 +59,20 @@ type Emitter() =
 
         member this.Transformation (compilation, transformed) =
             let step = this :> IRewriteStep
-            let dir = step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath |> function
-                | true, outputFolder when outputFolder <> null -> Path.Combine(outputFolder, "src")
-                | _ -> step.Name
+            let dir =
+                step.AssemblyConstants.TryGetValue AssemblyConstants.OutputPath
+                |> function
+                    | true, outputFolder when outputFolder <> null -> Path.Combine(outputFolder, "src")
+                    | _ -> step.Name
+                |> (fun str -> (str.TrimEnd [| Path.DirectorySeparatorChar; Path.AltDirectorySeparatorChar |]) + Path.DirectorySeparatorChar.ToString() |> Uri)
+                |> (fun uri -> uri.LocalPath |> Path.GetDirectoryName)
 
             let context = CodegenContext.Create (compilation, step.AssemblyConstants)
             let allSources = GetSourceFiles.Apply compilation.Namespaces
+            
+            if (allSources.Count > 0 || not (compilation.EntryPoints.IsEmpty)) && not (Directory.Exists dir) then
+                Directory.CreateDirectory dir
+                |> ignore
 
             for source in allSources |> Seq.filter context.GenerateCodeForSource do
                 let content = SimulationCode.generate source context
