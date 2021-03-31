@@ -1,31 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-/*=============================================================================
-    QIR assumes a single global execution context.
-    To support the dispatch over the qir-bridge, the clients must implement
-    Microsoft::Quantum::IQuantumGateSet* g_qapi;
-=============================================================================*/
-#include <assert.h>
+#include <cassert>
 #include <unordered_map>
 
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 
-#ifdef _WIN32
-#define EXPORTAPI extern "C" __declspec(dllexport)
-#else
-#define EXPORTAPI extern "C"
-#endif
-EXPORTAPI void SetupQirToRunOnFullStateSimulator()
-{
-    // Leak the simulator, because the QIR only creates one and it will exist for the duration of the session
-    InitializeQirContext(Microsoft::Quantum::CreateFullstateSimulator().release(), false /*trackAllocatedObjects*/);
-}
+/*=============================================================================
+    Note: QIR assumes a single global execution context!
+=============================================================================*/
 
 // QIR specification requires the Result type to be reference counted, even though Results are created by the target and
 // qubits, created by the same target, aren't reference counted. To minimize the implementation burden on the target,
@@ -39,24 +27,24 @@ std::unordered_map<RESULT*, int>& AllocatedResults()
 
 extern "C"
 {
-    Result UseZero()
+    Result quantum__rt__result_get_zero()
     {
-        return Microsoft::Quantum::g_context->simulator->UseZero();
+        return Microsoft::Quantum::g_context->driver->UseZero();
     }
 
-    Result UseOne()
+    Result quantum__rt__result_get_one()
     {
-        return Microsoft::Quantum::g_context->simulator->UseOne();
+        return Microsoft::Quantum::g_context->driver->UseOne();
     }
 
     QUBIT* quantum__rt__qubit_allocate() // NOLINT
     {
-        return Microsoft::Quantum::g_context->simulator->AllocateQubit();
+        return Microsoft::Quantum::g_context->driver->AllocateQubit();
     }
 
     void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
     {
-        Microsoft::Quantum::g_context->simulator->ReleaseQubit(qubit);
+        Microsoft::Quantum::g_context->driver->ReleaseQubit(qubit);
     }
 
     void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
@@ -88,7 +76,7 @@ extern "C"
             if (rit == trackedResults.end())
             {
                 assert(increment == -1);
-                Microsoft::Quantum::g_context->simulator->ReleaseResult(r);
+                Microsoft::Quantum::g_context->driver->ReleaseResult(r);
             }
             else
             {
@@ -97,7 +85,7 @@ extern "C"
                 if (newRefcount == 0)
                 {
                     trackedResults.erase(rit);
-                    Microsoft::Quantum::g_context->simulator->ReleaseResult(r);
+                    Microsoft::Quantum::g_context->driver->ReleaseResult(r);
                 }
                 else
                 {
@@ -113,13 +101,13 @@ extern "C"
         {
             return true;
         }
-        return Microsoft::Quantum::g_context->simulator->AreEqualResults(r1, r2);
+        return Microsoft::Quantum::g_context->driver->AreEqualResults(r1, r2);
     }
 
     // Returns a string representation of the result.
     QirString* quantum__rt__result_to_string(RESULT* result) // NOLINT
     {
-        ResultValue rv = Microsoft::Quantum::g_context->simulator->GetResultValue(result);
+        ResultValue rv = Microsoft::Quantum::g_context->driver->GetResultValue(result);
         assert(rv != Result_Pending);
 
         return (rv == Result_Zero) ? quantum__rt__string_create("Zero") : quantum__rt__string_create("One");
@@ -128,6 +116,6 @@ extern "C"
     // Returns a string representation of the qubit.
     QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(Microsoft::Quantum::g_context->simulator->QubitToString(qubit).c_str());
+        return quantum__rt__string_create(Microsoft::Quantum::g_context->driver->QubitToString(qubit).c_str());
     }
 }

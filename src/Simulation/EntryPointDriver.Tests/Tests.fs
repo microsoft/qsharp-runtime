@@ -63,17 +63,18 @@ let private compileQSharp source =
     let compilation = compilationManager.Build ()
     let errors =
         compilation.Diagnostics ()
-        |> Seq.filter (fun diagnostic -> diagnostic.Severity = DiagnosticSeverity.Error)
+        |> Seq.filter (fun diagnostic -> diagnostic.Severity = Nullable DiagnosticSeverity.Error)
     Assert.Empty errors
     compilation.BuiltCompilation
 
 /// Generates C# source code from the compiled Q# syntax tree using the given assembly constants.
 let private generateCSharp constants (compilation : QsCompilation) =
     let context = CodegenContext.Create (compilation, constants)
-    let entryPoint = context.allCallables.[Seq.exactlyOne compilation.EntryPoints]
+    let entryPoints = seq { for ep in compilation.EntryPoints -> context.allCallables.[ep] }
     [
         SimulationCode.generate testFile context
-        EntryPoint.generate context entryPoint
+        EntryPoint.generateSource context entryPoints
+        EntryPoint.generateMainSource context entryPoints
     ]
 
 /// The full path to a referenced assembly given its short name.
@@ -128,7 +129,7 @@ let private testAssembly testName constants =
 /// Runs the entry point in the assembly with the given command-line arguments, and returns the output, errors, and exit
 /// code.
 let private run (assembly : Assembly) (args : string[]) =
-    let entryPoint = assembly.GetType (sprintf "%s.%s" testNamespace EntryPoint.entryPointClassName)
+    let entryPoint = assembly.GetType (sprintf "%s.%s" EntryPoint.entryPointClassName EntryPoint.entryPointClassName)
     let main = entryPoint.GetMethod("Main", BindingFlags.NonPublic ||| BindingFlags.Static)
     let previousCulture = CultureInfo.DefaultThreadCurrentCulture
     let previousOut = Console.Out
@@ -191,7 +192,7 @@ let private testWithTarget defaultTarget =
     |> testWithConstants
 
 /// Standard command-line arguments for the "submit" command without specifying a target.
-let private submitWithoutTarget = 
+let private submitWithoutTarget =
     [ "submit"
       "--subscription"
       "mySubscription"
@@ -420,7 +421,7 @@ let ``Accepts one-tuple`` () =
     let given = test "Accepts one-tuple"
     given ["-x"; "7"; "-y"; "8"] |> yields "7 8"
 
-[<Fact>]    
+[<Fact>]
 let ``Accepts two-tuple`` () =
     let given = test "Accepts two-tuple"
     given ["-x"; "7"; "-y"; "8"; "-z"; "9"] |> yields "7 8 9"
@@ -451,7 +452,7 @@ let ``Shadows --simulator`` () =
     |> yields (sprintf "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
                         %s"
                        AssemblyConstants.ResourcesEstimator)
-    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails 
+    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails
     given ["-s"; "foo"] |> fails
 
 [<Fact>]
@@ -836,6 +837,9 @@ let ``Shows help text for submit command`` () =
                       %s submit [options]
 
                     Options:
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
@@ -849,9 +853,6 @@ let ``Shows help text for submit command`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
-                      -n <n> (REQUIRED)                                   A number.
-                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-                      --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
     let given = test "Help"
     given ["submit"; "--help"] |> yields message
@@ -865,6 +866,9 @@ let ``Shows help text for submit command with default target`` () =
                       %s submit [options]
 
                     Options:
+                      -n <n> (REQUIRED)                                   A number.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
@@ -878,9 +882,98 @@ let ``Shows help text for submit command with default target`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
-                      -n <n> (REQUIRED)                                   A number.
-                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
-                      --my-cool-bool (REQUIRED)                           A neat bit.
                       -?, -h, --help                                      Show help and usage information"
     let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message
+
+[<Fact>]
+let ``Supports simulating multiple entry points`` () =
+    let given = test "Multiple entry points"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> yields "Hello from Entry Point 1!"
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> yields "Hello from Entry Point 2!"
+    given ["simulate"; "EntryPointTest3.MultipleEntryPoints3"] |> yields "Hello from Entry Point 3!"
+    given ["simulate"] |> fails
+    given [] |> fails
+
+[<Fact>]
+let ``Supports simulating multiple entry points with different parameters`` () =
+    let given = test "Multiple entry points with different parameters"
+    let entryPoint1Args = ["-n"; "42.5"]
+    let entryPoint2Args = ["-s"; "Hello, World!"]
+    let entryPoint3Args = ["-i"; "3"]
+    
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint1Args) |> yields "42.5"
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint2Args) |> fails
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint3Args) |> fails
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints1"] |> fails
+    
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint1Args) |> fails
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint2Args) |> yields "Hello, World!"
+    given (["simulate"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint3Args) |> fails
+    given ["simulate"; "EntryPointTest.MultipleEntryPoints2"] |> fails
+    
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint1Args) |> fails
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint2Args) |> fails
+    given (["simulate"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint3Args) |> yields "3"
+    given ["simulate"; "EntryPointTest3.MultipleEntryPoints3"] |> fails
+    
+    given ["simulate"] |> fails
+    given [] |> fails
+
+[<Fact>]
+let ``Supports submitting multiple entry points`` () =
+    let options =
+        [
+            "--subscription"
+            "mySubscription"
+            "--resource-group"
+            "myResourceGroup"
+            "--workspace"
+            "myWorkspace"
+            "--target"
+            "test.nothing"
+        ]
+    let given = test "Multiple entry points"
+    let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ options) |> succeeds
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ options) |> succeeds
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ options) |> succeeds
+    given (["submit"] @ options) |> fails
+    given [] |> fails
+
+[<Fact>]
+let ``Supports submitting multiple entry points with different parameters`` () =
+    let options =
+        [
+            "--subscription"
+            "mySubscription"
+            "--resource-group"
+            "myResourceGroup"
+            "--workspace"
+            "myWorkspace"
+            "--target"
+            "test.nothing"
+        ]
+    let entryPoint1Args = ["-n"; "42.5"]
+    let entryPoint2Args = ["-s"; "Hello, World!"]
+    let entryPoint3Args = ["-i"; "3"]
+    let given = test "Multiple entry points with different parameters"
+    let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint1Args @ options) |> succeeds
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint2Args @ options) |> fails
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ entryPoint3Args @ options) |> fails
+    given (["submit"; "EntryPointTest.MultipleEntryPoints1"] @ options) |> fails
+
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint1Args @ options) |> fails
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint2Args @ options) |> succeeds
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ entryPoint3Args @ options) |> fails
+    given (["submit"; "EntryPointTest.MultipleEntryPoints2"] @ options) |> fails
+
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint1Args @ options) |> fails
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint2Args @ options) |> fails
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint3Args @ options) |> succeeds
+    given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ options) |> fails
+
+    given submitWithNothingTarget |> fails
+    given [] |> fails

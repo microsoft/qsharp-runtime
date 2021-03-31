@@ -1,23 +1,35 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-if ($Env:ENABLE_NATIVE -ne "false") {
-    if ($Env:ENABLE_QIRRUNTIME -eq "true") {
-        Write-Host "##[info]Test QIR Runtime"
+& (Join-Path $PSScriptRoot .. .. build set-env.ps1)
+$all_ok = $true
 
-        Push-Location (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
+Write-Host "##[info]Test QIR Runtime"
 
-        ctest --verbose
+Push-Location (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION test)
 
-        if ($LastExitCode -ne 0) {
-            Write-Host "##vso[task.logissue type=error;]Failed to test QIR Runtime"
-            $script:all_ok = $False
-        }
+ctest --verbose
 
-        Pop-Location
-    } else {
-        Write-Host "Skipping testing qir runtime because ENABLE_QIRRUNTIME variable set to: $Env:ENABLE_QIRRUNTIME."
-    }
-} else {
-    Write-Host "Skipping native components because ENABLE_NATIVE variable set to: $Env:ENABLE_NATIVE."
+if ($LastExitCode -ne 0) {
+    Write-Host "##vso[task.logissue type=error;]Failed to test QIR Runtime"
+    $script:all_ok = $False
+}
+
+Pop-Location
+
+Write-Host "##[info]Test QIR Standalone Sample"
+
+Push-Location (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION samples StandaloneInputReference)
+
+ctest --verbose
+
+if ($LastExitCode -ne 0) {
+    Write-Host "##vso[task.logissue type=error;]Failed to test QIR Standalone Sample"
+    $script:all_ok = $False
+}
+
+Pop-Location
+
+if (-not $all_ok) {
+    throw "At least one project failed testing. Check the logs."
 }

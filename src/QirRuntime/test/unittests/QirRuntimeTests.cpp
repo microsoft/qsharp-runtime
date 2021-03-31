@@ -4,25 +4,26 @@
 #include "catch.hpp"
 
 #include <algorithm>
+#include <cstring> // for memcpy
 #include <memory>
-#include <string.h> // for memcpy
 #include <unordered_map>
 #include <vector>
 
-#include "qirTypes.hpp"
-#include "quantum__rt.hpp"
+#include "QirTypes.hpp"
+#include "qsharp__foundation__qis.hpp"
+#include "qsharp__core__qis.hpp"
+#include "QirRuntime.hpp"
 
-#include "BitStates.hpp"
+#include "QirContext.hpp"
 #include "SimulatorStub.hpp"
-#include "context.hpp"
 
 using namespace Microsoft::Quantum;
 
 struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
-    int lastId = 1;
+    int lastId = -1;
     const int maxResults;
-    BitStates allocated;
+    std::vector<bool> allocated;
 
     static int GetResultId(Result r)
     {
@@ -30,16 +31,16 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     }
 
     ResultsReferenceCountingTestQAPI(int maxResults)
-        : maxResults(maxResults + 2)
+        : maxResults(maxResults),
+        allocated(maxResults, false)
     {
-        allocated.ExtendToInclude(maxResults);
     }
 
-    Result M(Qubit) override
+    Result Measure(long, PauliId[], long, Qubit[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
-        this->allocated.SetBitAt(this->lastId);
+        this->allocated.at(this->lastId) = true;;
         return reinterpret_cast<Result>(this->lastId);
     }
     Result UseZero() override
@@ -54,8 +55,8 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         const int id = GetResultId(result);
         INFO(id);
-        REQUIRE(this->allocated.IsBitSetAt(id));
-        this->allocated.FlipBitAt(id);
+        REQUIRE(this->allocated.at(id));
+        this->allocated.at(id).flip();
     }
     bool AreEqualResults(Result r1, Result r2) override
     {
@@ -64,7 +65,14 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 
     bool HaveResultsInFlight() const
     {
-        return this->allocated.IsAny();
+        for (const auto& b : this->allocated)
+        {
+            if (b)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 };
 TEST_CASE("Results: comparison and reference counting", "[qir_support]")
@@ -72,8 +80,8 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     std::unique_ptr<ResultsReferenceCountingTestQAPI> qapi = std::make_unique<ResultsReferenceCountingTestQAPI>(3);
     QirContextScope qirctx(qapi.get());
 
-    Result r1 = qapi->M(nullptr); // we don't need real qubits for this test
-    Result r2 = qapi->M(nullptr);
+    Result r1 = qapi->Measure(0, nullptr, 0, nullptr); // we don't need real qubits for this test
+    Result r2 = qapi->Measure(0, nullptr, 0, nullptr);
     REQUIRE(quantum__rt__result_equal(r1, r1));
     REQUIRE(!quantum__rt__result_equal(r1, r2));
 
@@ -83,7 +91,7 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
     // share a result a few times
     quantum__rt__result_update_reference_count(r1, 2);
 
-    Result r3 = qapi->M(nullptr);
+    Result r3 = qapi->Measure(0, nullptr, 0, nullptr);
 
     // release shared result, the test QAPI will verify double release
     quantum__rt__result_update_reference_count(r1, -3); // one release for shared and for the original allocation
@@ -691,7 +699,7 @@ struct QubitTestQAPI : public SimulatorStub
 {
     int lastId = -1;
     const int maxQubits;
-    BitStates allocated;
+    std::vector<bool> allocated;
 
     static int GetQubitId(Qubit q)
     {
@@ -699,23 +707,24 @@ struct QubitTestQAPI : public SimulatorStub
     }
 
     QubitTestQAPI(int maxQubits)
-        : maxQubits(maxQubits)
+        : maxQubits(maxQubits),
+        allocated(maxQubits, false)
     {
-        allocated.ExtendToInclude(maxQubits);
     }
+
     Qubit AllocateQubit() override
     {
         assert(this->lastId < this->maxQubits);
         this->lastId++;
-        this->allocated.SetBitAt(this->lastId);
+        this->allocated.at(this->lastId) = true;
         return reinterpret_cast<Qubit>(this->lastId);
     }
     void ReleaseQubit(Qubit qubit) override
     {
         const int id = GetQubitId(qubit);
         INFO(id);
-        REQUIRE(this->allocated.IsBitSetAt(id));
-        this->allocated.FlipBitAt(id);
+        REQUIRE(this->allocated.at(id));
+        this->allocated.at(id).flip();
     }
     std::string QubitToString(Qubit qubit) override
     {
@@ -733,12 +742,19 @@ struct QubitTestQAPI : public SimulatorStub
 
     bool HaveQubitsInFlight() const
     {
-        return this->allocated.IsAny();
+        for (const auto& b : this->allocated)
+        {
+            if (b)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 };
 TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 {
-    std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(3);
+    std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(4);
     QirContextScope qirctx(qapi.get());
     QirString* qstr = nullptr;
 
@@ -911,10 +927,10 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
     CHECK_NOTHROW(ReleaseQirContext());
 }
 
-static void DummyCallableEntry(PTuple, PTuple, PTuple) {}
+static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
@@ -939,7 +955,7 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 TEST_CASE("Callables: copy elision", "[qir_support]")
 {
     QirContextScope qirctx(nullptr, true);
-    t_CallableEntry entries[4] = {DummyCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirCallable* original =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);
@@ -980,4 +996,100 @@ TEST_CASE("Tuples: copy elision", "[qir_support]")
     quantum__rt__tuple_update_reference_count(self, -1);
     quantum__rt__tuple_update_reference_count(other1, -1);
     quantum__rt__tuple_update_reference_count(other2, -1);
+}
+
+// Adjoints for R and Exp are implemented by qis, so let's check they at least do the angle invertion in adjoints.
+struct AdjointsTestSimulator : public SimulatorStub
+{
+    int lastId = -1;
+    double rotationAngle = 0.0;
+    double exponentAngle = 0.0;
+
+    Qubit AllocateQubit() override
+    {
+        return reinterpret_cast<Qubit>(++this->lastId);
+    }
+    void ReleaseQubit(Qubit qubit) override {}
+    Result UseZero() override
+    {
+        return reinterpret_cast<Result>(0);
+    }
+    Result UseOne() override
+    {
+        return reinterpret_cast<Result>(1);
+    }
+
+    void R(PauliId, Qubit, double theta) override
+    {
+        this->rotationAngle += theta;
+    }
+    void Exp(long count, PauliId* paulis, Qubit*, double theta) override
+    {
+        this->exponentAngle += theta;
+
+        // check that paulis were unpacked correctly (this assumes that the tests always invoke with the same axes)
+        REQUIRE(count == 2);
+        CHECK(paulis[0] == PauliId_Z);
+        CHECK(paulis[1] == PauliId_Y);
+    }
+    void ControlledR(long, Qubit*, PauliId, Qubit, double theta) override
+    {
+        this->rotationAngle += theta;
+    }
+    void ControlledExp(long, Qubit*, long count, PauliId* paulis, Qubit*, double theta) override
+    {
+        this->exponentAngle += theta;
+
+        // check that paulis were unpacked correctly (this assumes that the tests always invoke with the same axes)
+        REQUIRE(count == 2);
+        CHECK(paulis[0] == PauliId_Z);
+        CHECK(paulis[1] == PauliId_Y);
+    }
+};
+TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
+{
+    std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
+    QirContextScope qirctx(qapi.get());
+
+    const double angle = 0.42;
+
+    Qubit target = quantum__rt__qubit_allocate();
+    QirArray* ctrls = quantum__rt__qubit_allocate_array(2);
+
+    quantum__qis__r__body(PauliId_Y, angle, target);
+    quantum__qis__r__adj(PauliId_Y, angle, target);
+    quantum__qis__r__ctl(ctrls, PauliId_X, angle, target);
+    quantum__qis__r__ctladj(ctrls, PauliId_X, angle, target);
+
+    quantum__rt__qubit_release_array(ctrls);
+    quantum__rt__array_update_reference_count(ctrls, -1);
+    quantum__rt__qubit_release(target);
+
+    REQUIRE(qapi->rotationAngle == Approx(0).epsilon(0.0001));
+}
+
+TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
+{
+    std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
+    QirContextScope qirctx(qapi.get());
+
+    const double angle = 0.42;
+
+    QirArray* targets = quantum__rt__qubit_allocate_array(2);
+    QirArray* ctrls = quantum__rt__qubit_allocate_array(2);
+    QirArray* axes = quantum__rt__array_create_1d(1 /*element size*/, 2 /*count*/);
+    axes->buffer[0] = 2;
+    axes->buffer[1] = 3;
+
+    quantum__qis__exp__body(axes, angle, targets);
+    quantum__qis__exp__adj(axes, angle, targets);
+    quantum__qis__exp__ctl(ctrls, axes, angle, targets);
+    quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
+
+    quantum__rt__qubit_release_array(ctrls);
+    quantum__rt__array_update_reference_count(ctrls, -1);
+    quantum__rt__qubit_release_array(targets);
+    quantum__rt__array_update_reference_count(targets, -1);
+
+    REQUIRE(qapi->exponentAngle == Approx(0).epsilon(0.0001));
 }

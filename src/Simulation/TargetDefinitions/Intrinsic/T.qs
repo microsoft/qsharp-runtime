@@ -19,7 +19,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    @EnableTestingViaName("Test.TargetDefinitions.T")
     operation T (qubit : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }

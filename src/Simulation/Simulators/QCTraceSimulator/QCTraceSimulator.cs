@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
     /// <para>
     /// Q# operations are mapped to C# types. For example, the 
     /// C# type <see cref="Microsoft.Quantum.Intrinsic.X"/> 
-    /// corresponds to the Q# operation <a href="https://docs.microsoft.com/qsharp/api/prelude/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a>. 
+    /// corresponds to the Q# operation <a href="https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.intrinsic.x">Microsoft.Quantum.Intrinsic.X</a>.
     /// When the value of the metrics is requested for a Q# operation, 
     /// the corresponding C# type is passed as type parameter.
     /// </para>

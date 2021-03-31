@@ -1,19 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
+#include <cstring> // for memcpy
 #include <memory>
 #include <numeric>
 #include <stdexcept>
-#include <string.h> // for memcpy
 #include <vector>
 
 #include "CoreTypes.hpp"
+#include "QirContext.hpp"
+#include "QirTypes.hpp"
 #include "allocationsTracker.hpp"
-#include "context.hpp"
-#include "qirTypes.hpp"
-#include "quantum__rt.hpp"
+#include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
 
@@ -231,6 +231,8 @@ extern "C"
 
             qa->ownsQubits = false;
         }
+
+        quantum__rt__array_update_reference_count(qa, -1);
     }
 
     QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)

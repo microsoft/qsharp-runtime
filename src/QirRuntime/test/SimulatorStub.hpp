@@ -2,22 +2,15 @@
 
 #include <exception>
 
-#include "QuantumApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
+#include "QSharpSimApi_I.hpp"
 
 namespace Microsoft
 {
 namespace Quantum
 {
-    struct SimulatorStub : public ISimulator, public IQuantumGateSet
+    struct SimulatorStub : public IRuntimeDriver, public IQuantumGateSet
     {
-        IQuantumGateSet* AsQuantumGateSet() override
-        {
-            return this;
-        }
-        IDiagnostics* AsDiagnostics() override
-        {
-            return nullptr;
-        }
         Qubit AllocateQubit() override
         {
             throw std::logic_error("not_implemented");
@@ -100,23 +93,19 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented");
         }
-        void SAdjoint(Qubit target) override
+        void AdjointS(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void TAdjoint(Qubit target) override
+        void AdjointT(Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledSAdjoint(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }
-        void ControlledTAdjoint(long numControls, Qubit controls[], Qubit target) override
-        {
-            throw std::logic_error("not_implemented");
-        }
-        Result M(Qubit target) override
+        void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) override
         {
             throw std::logic_error("not_implemented");
         }

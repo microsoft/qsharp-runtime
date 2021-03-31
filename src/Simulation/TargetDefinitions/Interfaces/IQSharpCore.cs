@@ -4,14 +4,14 @@
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IQSharpCore :
-        IGate_Exp,
-        IGate_H,
-        IGate_Measure,
-        IGate_R,
-        IGate_S,
-        IGate_T,
-        IGate_X,
-        IGate_Y,
-        IGate_Z
+        IIntrinsicExp,
+        IIntrinsicH,
+        IIntrinsicMeasure,
+        IIntrinsicR,
+        IIntrinsicS,
+        IIntrinsicT,
+        IIntrinsicX,
+        IIntrinsicY,
+        IIntrinsicZ
     { }
 }

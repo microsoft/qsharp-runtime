@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// Constructor used by entry point driver to provide the assembly for core types that
         /// need to be overriden.
         /// </summary>
-        public ResourcesEstimator(Assembly coreAssembly) : base(RecommendedConfig(), coreAssembly)
+        public ResourcesEstimator(Assembly? coreAssembly) : base(RecommendedConfig(), coreAssembly)
         {
         }
 

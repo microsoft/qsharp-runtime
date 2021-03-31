@@ -89,7 +89,6 @@ namespace Microsoft.Quantum.Intrinsic
         }
     }
 
-
     [Obsolete("This class is deprecated and will be removed in a future release. Considering using the corresponding callable class from 'Microsoft.Quantum.Intrinsic' directly.")]
     public class QSimExp : Exp
     {

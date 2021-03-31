@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
     /// <summary>
     /// Internals of <see cref="QCTraceSimulator"/>. For internal use only.
     /// </summary>
-    public partial class QCTraceSimulatorImpl : SimulatorBase, IGate_Measure
+    public partial class QCTraceSimulatorImpl : SimulatorBase, IIntrinsicMeasure
     {
         protected readonly QCTraceSimulatorConfiguration configuration;
         private readonly QCTraceSimulatorCore tracingCore;
@@ -152,41 +152,43 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
             var intrinsicAssembly = coreAssembly;
             if (intrinsicAssembly == null)
             {
-                intrinsicAssembly = 
-                    (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    where assembly.GetType("Microsoft.Quantum.Intrinsic.X") != null
-                    select assembly).First();
-            }
-            IEnumerable<Type> primitiveOperationTypes =
-                from op in intrinsicAssembly.GetExportedTypes()
-                where op.IsSubclassOf(typeof(AbstractCallable))
-                select op;
-
-            if (primitiveOperationTypes.Count() == 0)
-            {
-                throw new Exception("Unable to load intrinsic types. The ResourcesEstimator can only be used with the default execution target.");
+                var currentName = typeof(QCTraceSimulatorImpl).Assembly.GetName();
+                var coreName = currentName.FullName.Replace("Simulators", "QSharp.Core");
+                try
+                {
+                    intrinsicAssembly = AppDomain.CurrentDomain.Load(coreName);
+                }
+                catch { }
             }
 
-            IEnumerable<Type> primitiveOperationAsCircuits =
-                from op in typeof(Circuits.X).Assembly.GetExportedTypes()
-                where op.IsSubclassOf(typeof(AbstractCallable))
-                      && op.Namespace == typeof(Circuits.X).Namespace
-                select op;
-
-            foreach (Type operationType in primitiveOperationTypes)
+            if (intrinsicAssembly != null)
             {
-                IEnumerable<Type> machingCircuitTypes =
-                    from op in primitiveOperationAsCircuits
-                    where op.Name == operationType.Name
+                IEnumerable<Type> primitiveOperationTypes =
+                    from op in intrinsicAssembly.GetExportedTypes()
+                    where op.IsSubclassOf(typeof(AbstractCallable))
                     select op;
 
-                int numberOfMatchesFound = machingCircuitTypes.Count();
-                Debug.Assert(
-                     numberOfMatchesFound <= 1,
-                    "There should be at most one matching operation.");
-                if (numberOfMatchesFound == 1)
+                IEnumerable<Type> primitiveOperationAsCircuits =
+                    from op in typeof(Circuits.X).Assembly.GetExportedTypes()
+                    where op.IsSubclassOf(typeof(AbstractCallable))
+                        && op.Namespace == typeof(Circuits.X).Namespace
+                    select op;
+
+                foreach (Type operationType in primitiveOperationTypes)
                 {
-                    Register(operationType, machingCircuitTypes.First(), operationType.ICallableType());
+                    IEnumerable<Type> machingCircuitTypes =
+                        from op in primitiveOperationAsCircuits
+                        where op.Name == operationType.Name
+                        select op;
+
+                    int numberOfMatchesFound = machingCircuitTypes.Count();
+                    Debug.Assert(
+                        numberOfMatchesFound <= 1,
+                        "There should be at most one matching operation.");
+                    if (numberOfMatchesFound == 1)
+                    {
+                        Register(operationType, machingCircuitTypes.First(), operationType.ICallableType());
+                    }
                 }
             }
         }

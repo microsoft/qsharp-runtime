@@ -4,19 +4,19 @@
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IType2Core :
-        IGate_H,
-        IGate_IsingXX,
-        IGate_IsingYY,
-        IGate_IsingZZ,
-        IGate_M,
-        IGate_Rx,
-        IGate_Ry,
-        IGate_Rz,
-        IGate_S,
-        IGate_SWAP,
-        IGate_T,
-        IGate_X,
-        IGate_Y,
-        IGate_Z
+        IIntrinsicH,
+        IIntrinsicIsingXX,
+        IIntrinsicIsingYY,
+        IIntrinsicIsingZZ,
+        IIntrinsicM,
+        IIntrinsicRx,
+        IIntrinsicRy,
+        IIntrinsicRz,
+        IIntrinsicS,
+        IIntrinsicSWAP,
+        IIntrinsicT,
+        IIntrinsicX,
+        IIntrinsicY,
+        IIntrinsicZ
     { }
 }

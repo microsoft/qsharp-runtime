@@ -3,22 +3,22 @@
 
 namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: update namespace to a more appropriate name
 {
-    operation NoOp() : Unit is Ctl + Adj {}
+    open Microsoft.Quantum.Canon;
 
     // Private helper operations.
-    operation Delay<'T>(op : ('T => Unit), arg : 'T, aux : Unit) : Unit {
+    internal operation Delay<'T>(op : ('T => Unit), arg : 'T, aux : Unit) : Unit {
         op(arg);
     }
 
-    operation DelayC<'T>(op : ('T => Unit is Ctl), arg : 'T, aux : Unit) : Unit is Ctl {
+    internal operation DelayC<'T>(op : ('T => Unit is Ctl), arg : 'T, aux : Unit) : Unit is Ctl {
         op(arg);
     }
 
-    operation DelayA<'T>(op : ('T => Unit is Adj), arg : 'T, aux : Unit) : Unit is Adj {
+    internal operation DelayA<'T>(op : ('T => Unit is Adj), arg : 'T, aux : Unit) : Unit is Adj {
         op(arg);
     }
 
-    operation DelayCA<'T>(op : ('T => Unit is Ctl + Adj), arg : 'T, aux : Unit) : Unit is Ctl + Adj {
+    internal operation DelayCA<'T>(op : ('T => Unit is Ctl + Adj), arg : 'T, aux : Unit) : Unit is Ctl + Adj {
         op(arg);
     }
 
@@ -29,20 +29,36 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     }
 
     operation ApplyIfElseIntrinsicA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit is Adj {
-        body intrinsic;
-        adjoint intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        adjoint (...) {
+            ApplyIfElseIntrinsic(measurementResult, Adjoint onResultZeroOp, Adjoint onResultOneOp);
+        }
     }
 
     operation ApplyIfElseIntrinsicC(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit is Ctl {
-        body intrinsic;
-        controlled intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        controlled (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled onResultZeroOp(ctls, _), Controlled onResultOneOp(ctls, _));
+        }
     }
 
     operation ApplyIfElseIntrinsicCA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
-        body intrinsic;
-        adjoint intrinsic;
-        controlled intrinsic;
-        controlled adjoint intrinsic;
+        body (...) {
+            ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+        }
+        adjoint (...) {
+            ApplyIfElseIntrinsic(measurementResult, Adjoint onResultZeroOp, Adjoint onResultOneOp);
+        }
+        controlled (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled onResultZeroOp(ctls, _), Controlled onResultOneOp(ctls, _));
+        }
+        controlled adjoint (ctls, ...) {
+            ApplyIfElseIntrinsic(measurementResult, Controlled Adjoint onResultZeroOp(ctls, _), Controlled Adjoint onResultOneOp(ctls, _));
+        }
     }
 
 
@@ -52,20 +68,36 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     }
 
     operation ApplyConditionallyIntrinsicA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit is Adj {
-        body intrinsic;
-        adjoint intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        adjoint (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Adjoint onEqualOp, Adjoint onNonEqualOp);
+        }
     }
 
     operation ApplyConditionallyIntrinsicC(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit is Ctl {
-        body intrinsic;
-        controlled intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        controlled (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled onEqualOp(ctls, _), Controlled onNonEqualOp(ctls, _));
+        }
     }
 
     operation ApplyConditionallyIntrinsicCA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
-        body intrinsic;
-        adjoint intrinsic;
-        controlled intrinsic;
-        controlled adjoint intrinsic;
+        body (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+        }
+        adjoint (...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Adjoint onEqualOp, Adjoint onNonEqualOp);
+        }
+        controlled (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled onEqualOp(ctls, _), Controlled onNonEqualOp(ctls, _));
+        }
+        controlled adjoint (ctls, ...) {
+            ApplyConditionallyIntrinsic(measurementResults, resultsValues, Controlled Adjoint onEqualOp(ctls, _), Controlled Adjoint onNonEqualOp(ctls, _));
+        }
     }
 
 
@@ -102,25 +134,25 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     // if (measurementResult == Zero) {onResultZeroOp(zeroArg);}
     operation ApplyIfZero<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T)) : Unit {
         let zeroOp = Delay(onResultZeroOp, zeroArg, _);
-        let oneOp = Delay(NoOp, (), _);
+        let oneOp = Delay(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsic(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfZeroA<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj), zeroArg : 'T)) : Unit is Adj{
         let zeroOp = DelayA(onResultZeroOp, zeroArg, _);
-        let oneOp = DelayA(NoOp, (), _);
+        let oneOp = DelayA(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicA(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfZeroC<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Ctl), zeroArg : 'T)) : Unit is Ctl {
         let zeroOp = DelayC(onResultZeroOp, zeroArg, _);
-        let oneOp = DelayC(NoOp, (), _);
+        let oneOp = DelayC(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicC(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfZeroCA<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Ctl + Adj), zeroArg : 'T)) : Unit is Ctl + Adj {
         let zeroOp = DelayCA(onResultZeroOp, zeroArg, _);
-        let oneOp = DelayCA(NoOp, (), _);
+        let oneOp = DelayCA(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicCA(measurementResult, zeroOp, oneOp);
     }
 
@@ -130,25 +162,25 @@ namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: updat
     // if (measurementResult == One) {onResultOneOp(oneArg);}
     operation ApplyIfOne<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit), oneArg : 'T)) : Unit {
         let oneOp = Delay(onResultOneOp, oneArg, _);
-        let zeroOp = Delay(NoOp, (), _);
+        let zeroOp = Delay(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsic(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfOneA<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Adj), oneArg : 'T)) : Unit is Adj {
         let oneOp = DelayA(onResultOneOp, oneArg, _);
-        let zeroOp = DelayA(NoOp, (), _);
+        let zeroOp = DelayA(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicA(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfOneC<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Ctl), oneArg : 'T)) : Unit is Ctl {
         let oneOp = DelayC(onResultOneOp, oneArg, _);
-        let zeroOp = DelayC(NoOp, (), _);
+        let zeroOp = DelayC(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicC(measurementResult, zeroOp, oneOp);
     }
 
     operation ApplyIfOneCA<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Ctl + Adj), oneArg : 'T)) : Unit is Ctl + Adj {
         let oneOp = DelayCA(onResultOneOp, oneArg, _);
-        let zeroOp = DelayCA(NoOp, (), _);
+        let zeroOp = DelayCA(NoOp<Unit>, (), _);
         ApplyIfElseIntrinsicCA(measurementResult, zeroOp, oneOp);
     }
 

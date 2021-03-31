@@ -1,15 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
+using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        public virtual void IsingXX__Body(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingXX.Body(double angle, Qubit target1, Qubit target2)
         {
             var paulis = new Pauli[]{ Pauli.PauliX, Pauli.PauliX };
             var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
@@ -19,16 +18,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
             Exp(this.Id, (uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
         }
 
-        public virtual void IsingXX__AdjointBody(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingXX.AdjointBody(double angle, Qubit target1, Qubit target2)
         {
-            IsingXX__Body(-angle, target1, target2);
+            ((IIntrinsicIsingXX)this).Body(-angle, target1, target2);
         }
 
-        public virtual void IsingXX__ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingXX.ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
             if (controls == null || controls.Length == 0)
             {
-                IsingXX__Body(angle, target1, target2);
+                ((IIntrinsicIsingXX)this).Body(angle, target1, target2);
             }
             else
             {
@@ -41,9 +40,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public virtual void IsingXX__ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicIsingXX.ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
-            IsingXX__ControlledBody(controls, -angle, target1, target2);
+            ((IIntrinsicIsingXX)this).ControlledBody(controls, -angle, target1, target2);
         }
     }
 }
