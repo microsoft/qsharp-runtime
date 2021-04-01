@@ -39,7 +39,7 @@ add_test(
 if(DEFINED ENV{NATIVE_SIMULATOR})
     set(TEST_DEPS1 $ENV{NATIVE_SIMULATOR})
 else()
-    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../Simulation/native/build/${CMAKE_BUILD_TYPE}")
+    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/${CMAKE_BUILD_TYPE}")
 endif()
 
 set(TEST_DEPS2 "${CMAKE_BINARY_DIR}/bin")
