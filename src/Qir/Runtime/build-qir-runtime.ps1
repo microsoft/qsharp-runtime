@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-& (Join-Path $PSScriptRoot .. .. build set-env.ps1)
+& (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
 
 function Build-QirProject {
     param (
