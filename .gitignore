@@ -24,6 +24,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Dd]rops/
+[Dd]ocs/
 **/qir-gen.ll
 
 # Visual Studio 2015/2017 cache/options directory
@@ -339,6 +340,3 @@ ASALocalRun/
 /src/Simulation/Simulators.Tests/TestProjects/QSharpExe/built
 /src/Simulation/Simulators.Tests/TestProjects/TargetedExe/built
 dbw_test
-
-# Generated Q# docs
-**/docs
