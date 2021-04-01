@@ -105,7 +105,7 @@ $osQirDropFolder = Join-Path $Env:DROPS_DIR QIR $os
 if (!(Test-Path $osQirDropFolder)) {
     New-Item -Path $osQirDropFolder -ItemType "directory"
 }
-$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder -ErrorAction SilentlyContinue}
+$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder -ErrorAction SilentlyContinue }
 
 Pop-Location
 
