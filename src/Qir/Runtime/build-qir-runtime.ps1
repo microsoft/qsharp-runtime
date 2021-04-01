@@ -71,7 +71,7 @@ elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWit
     Write-Host "##vso[task.logissue type=error;]Failed to identify the OS. Will use default CXX compiler"
 }
 
-$qirRuntimeBuildFolder = (Join-Path $PSScriptRoot "build\$Env:BUILD_CONFIGURATION")
+$qirRuntimeBuildFolder = (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION)
 if (-not (Test-Path $qirRuntimeBuildFolder)) {
     New-Item -Path $qirRuntimeBuildFolder -ItemType "directory"
 }
@@ -105,7 +105,7 @@ $osQirDropFolder = Join-Path $Env:DROPS_DIR QIR $os
 if (!(Test-Path $osQirDropFolder)) {
     New-Item -Path $osQirDropFolder -ItemType "directory"
 }
-$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder }
+$pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder -ErrorAction SilentlyContinue }
 
 Pop-Location
 
