@@ -21,7 +21,7 @@ Write-Host "##[info]Test QIR Standalone Sample"
 
 Push-Location (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION samples StandaloneInputReference)
 
-ctest --verbose --output-on-failure
+ctest --verbose
 
 if ($LastExitCode -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test QIR Standalone Sample"
