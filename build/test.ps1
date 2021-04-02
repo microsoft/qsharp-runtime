@@ -43,6 +43,12 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
+
+    $qirController = (Join-Path $PSScriptRoot "../src/Qir/Controller")
+    & "$qirController/test-controller.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
 } else {
     Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME `
                 and ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."

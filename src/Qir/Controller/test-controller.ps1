@@ -50,3 +50,7 @@ Foreach-Object {
 
     Write-Host "##[info]Test case '$($_.BaseName)' passed"
 }
+
+if (-not $all_ok) {
+    throw "At least one project failed testing. Check the logs."
+}
