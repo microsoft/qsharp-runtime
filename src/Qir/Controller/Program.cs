@@ -16,31 +16,32 @@ namespace Microsoft.Quantum.Qir
 
             // Create and add options to the root command.
             var inputOption = new Option<FileInfo>(
-                aliases: new string[] { "--input", "-i" })
+                aliases: new string[] { "--input"})
             {
                 Description = "Path to the file that contains the input.",
-                Required = true
+                IsRequired = true
             };
-
+            
             rootCommand.AddOption(inputOption);
             var outputOption = new Option<FileInfo>(
-                aliases: new string[] { "--output", "-o" })
+                aliases: new string[] { "--output"})
             {
                 Description = "Path to the file to which the output will be written.",
-                Required = true
+                IsRequired = true
             };
 
             rootCommand.AddOption(outputOption);
             var errorOption = new Option<FileInfo>(
-                aliases: new string[] { "--error", "-e" })
+                aliases: new string[] { "--error",})
             {
                 Description = "Path to the file to which errors will be logged.",
-                Required = true
+                IsRequired = true
             };
 
             rootCommand.AddOption(errorOption);
+
             // Bind to a handler and invoke.
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, FileInfo>(Controller.Execute);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, FileInfo>((input, output, error) => Controller.Execute(input, output, error));
             rootCommand.Invoke(args);
         }
     }

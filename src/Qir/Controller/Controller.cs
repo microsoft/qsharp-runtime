@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.IO;
+using System.Text;
 
 namespace Microsoft.Quantum.Qir
 {
@@ -13,9 +13,14 @@ namespace Microsoft.Quantum.Qir
             FileInfo output,
             FileInfo error)
         {
-            Console.WriteLine(input.FullName);
-            Console.WriteLine(output.FullName);
-            Console.WriteLine(error.FullName);
+            var outputFileStream = output.Exists ? output.OpenWrite() : output.Create();
+            outputFileStream.Write(new UTF8Encoding().GetBytes("output"));
+            outputFileStream.Flush();
+            outputFileStream.Close();
+            var errorFileStream = error.Exists ? error.OpenWrite() : error.Create();
+            errorFileStream.Write(new UTF8Encoding().GetBytes("error"));
+            errorFileStream.Flush();
+            errorFileStream.Close();
         }
     }
 }
