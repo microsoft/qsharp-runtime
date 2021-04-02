@@ -22,6 +22,7 @@ if (-not (Test-Path Env:AGENT_OS)) {
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/Native")
             .\build-native-simulator.ps1
         Pop-Location
+        $Env:BUILD_CONFIGURATION = $null
     }
 
     Write-Host "Build simulation solution"

@@ -21,6 +21,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     Write-Host "Skipping installing prerequisites for native simulator because ENABLE_NATIVE variable set to: $Env:ENABLE_NATIVE"
 }
 
-Push-Location (Join-Path $PSScriptRoot "../src/QirRuntime")
+Push-Location (Join-Path $PSScriptRoot "../src/Qir/Runtime")
     .\prerequisites.ps1
 Pop-Location
