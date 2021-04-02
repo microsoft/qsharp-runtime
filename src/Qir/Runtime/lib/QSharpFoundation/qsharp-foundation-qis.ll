@@ -194,7 +194,7 @@ define dllexport i64 @__quantum__qis__drawrandomint__body(i64 %min, i64 %max) {
 
 ; operation DrawRandomDouble (min : Double, max : Double) : Double
 ; https://docs.microsoft.com/qsharp/api/qsharp/microsoft.quantum.random.drawrandomdouble
-define double @__quantum__qis__drawrandomdouble__body(double %min, double %max) {
+define dllexport double @__quantum__qis__drawrandomdouble__body(double %min, double %max) {
   %result = call double @quantum__qis__drawrandomdouble__body(double %min, double %max)
   ret double %result
 }
