@@ -6,12 +6,6 @@
 #+++++++++++++++++++++++++++++++++++++
 
 #===============================================================================
-# create a utility lib from bridge-rt.ll
-#
-set(bridge_rt_target "bridge_rt_target")
-compile_from_qir(bridge-rt ${bridge_rt_target})
-
-#===============================================================================
 # create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
@@ -25,14 +19,9 @@ set(rt_sup_source_files
   rtOut.cpp
 )
 
-add_library(qir-rt-support ${rt_sup_source_files})
-target_include_directories(qir-rt-support PUBLIC ${public_includes})
-add_dependencies(qir-rt-support ${bridge_rt_target})
-target_compile_definitions(qir-rt-support PRIVATE EXPORT_QIR_API)
-
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
-target_source_from_qir_obj(qir-rt-support-obj bridge-rt)
+target_source_from_qir(qir-rt-support-obj bridge-rt.ll)
 target_include_directories(qir-rt-support-obj PUBLIC ${public_includes})
 set_property(TARGET qir-rt-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(qir-rt-support-obj PRIVATE EXPORT_QIR_API)

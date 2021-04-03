@@ -8,15 +8,6 @@ set(includes
   "${public_includes}"
 )
 
-
-#===============================================================================
-# Produce static lib for users to link directly to
-
-add_library(simulators STATIC ${source_files})
-target_include_directories(simulators PUBLIC ${includes})
-target_link_libraries(simulators ${CMAKE_DL_LIBS})
-target_compile_definitions(simulators PRIVATE EXPORT_QIR_API)
-
 #===============================================================================
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 

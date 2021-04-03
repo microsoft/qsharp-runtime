@@ -24,24 +24,12 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline")
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../Common/cmake")
 
 set(public_includes "${PROJECT_SOURCE_DIR}/public")
+set(common_includes "${PROJECT_SOURCE_DIR}/../Common/Include")
 
 include(qir_cmake_include)
 
-if (WIN32)
-  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/bridge-rt-u.lib")
-  set(QSHARP_FOUNDATION_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QSharpFoundation/qsharp-foundation-qis-u.lib")
-  set(QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QSharpCore/qsharp-core-qis-u.lib")
-  set(QIR_BRIDGE_TRACER_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/Tracer/tracer-bridge-u.lib")
-else()
-  set(QIR_BRIDGE_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QIR/libbridge-rt-u.a")
-  set(QSHARP_FOUNDATION_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QSharpFoundation/libqsharp-foundation-qis-u.a")
-  set(QSHARP_CORE_BRIDGE_QIS_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/QSharpCore/libqsharp-core-qis-u.a")
-  set(QIR_BRIDGE_TRACER_UTILITY_LIB "${PROJECT_BINARY_DIR}/lib/Tracer/libtracer-bridge-u.a")
-endif()
-
 add_subdirectory(lib)
-add_subdirectory(samples)
-add_subdirectory(test)
+add_subdirectory(unittests)
