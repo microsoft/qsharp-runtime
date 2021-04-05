@@ -7,7 +7,7 @@ The QIR runtime includes an implementation of the
 
 - `public` folder contains the public headers
 - `lib` folder contains the implementation of the runtime and the simulators.
-- `test` folder contains tests for the runtime
+- `unittests` folder contains tests for the runtime
 - `externals` folder contains external dependencies. We'll strive to keep those minimal.
 
 ## Build
@@ -70,6 +70,10 @@ is specified with the `BUILD_CONFIGURATION` environment variable.
 If the variable is not set then the default is specified in [`set-env.ps1`](../../build/set-env.ps1).  
 
 ## Tests
+
+The tests in the `unittests` folder are those that are compiled directly against the object libraries
+from the runtime, and verify behavior of the runtime using more than the public API. For tests that 
+verify behavior of the public API surface using compiled QIR from Q# projects, see the `src/Qir/Tests` folder.
 
 ### Running All Tests
 
