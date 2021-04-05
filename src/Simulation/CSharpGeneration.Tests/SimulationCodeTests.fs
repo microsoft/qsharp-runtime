@@ -250,6 +250,24 @@ namespace N1
 
     [<Fact>]
     let ``testGeneratedFileNames`` () =
+        
+        let outputDir = "output" |> Path.GetFullPath
+        let outputDirSrc = Path.Combine(outputDir, "src")
+
+        let intrinsic = Path.Combine(outputDirSrc, "Intrinsic.g.cs")
+        let helloWorld = Path.Combine(outputDirSrc, "HelloWorld.g.cs")
+        let helloWorld1 = Path.Combine(outputDirSrc, "HelloWorld.g1.cs")
+        let helloOther = Path.Combine(outputDirSrc, "HelloOther.g.cs")
+
+        let deleteFile filePath =
+            if File.Exists filePath then
+                File.Delete filePath
+        
+        intrinsic |> deleteFile
+        helloWorld |> deleteFile
+        helloWorld1 |> deleteFile
+        helloOther |> deleteFile
+        
         let compilation = parse [
                 Path.Combine("Circuits", "Intrinsic.qs")
                 Path.Combine("Circuits", "HelloWorld.qs")
@@ -257,38 +275,25 @@ namespace N1
                 Path.Combine("Circuits", "SubDirectory", "HelloOther.qs")
                 ]
         let transformed = ref { Namespaces = ImmutableArray<QsNamespace>.Empty; EntryPoints = ImmutableArray<QsQualifiedName>.Empty }
-        
         let rewriteStep = Emitter() :> IRewriteStep
-        
-        let outputDir = "output" |> Path.GetFullPath
-        let outputDirSrc = Path.Combine(outputDir, "src")
-
         rewriteStep.AssemblyConstants.Add(AssemblyConstants.OutputPath, outputDir)
         rewriteStep.Transformation(compilation, transformed) |> ignore
 
-        let intrinsic = Path.Combine(outputDirSrc, "Intrinsic.g.cs")
-        let helloWorld = Path.Combine(outputDirSrc, "HelloWorld.g.cs")
-        let helloWorld1 = Path.Combine(outputDirSrc, "HelloWorld.g1.cs")
-        let helloOther = Path.Combine(outputDirSrc, "HelloOther.g.cs")
-
         let mutable allFilesFound = true
-        
-        let deleteFile filePath =
+        let checkAndDeleteFile filePath =
             if File.Exists filePath then
                 File.Delete filePath
             else
                 allFilesFound <- false
 
-        intrinsic |> deleteFile
-        helloWorld |> deleteFile
-        helloWorld1 |> deleteFile
-        helloOther |> deleteFile
+        intrinsic |> checkAndDeleteFile
+        helloWorld |> checkAndDeleteFile
+        helloWorld1 |> checkAndDeleteFile
+        helloOther |> checkAndDeleteFile
 
         let deleteDir dirPath =
             if Directory.Exists dirPath && Directory.EnumerateFileSystemEntries dirPath |> Seq.isEmpty then
                 Directory.Delete dirPath
-            else
-                allFilesFound <- false
 
         outputDirSrc |> deleteDir
         outputDir |> deleteDir
