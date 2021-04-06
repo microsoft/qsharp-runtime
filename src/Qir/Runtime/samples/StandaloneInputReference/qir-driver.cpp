@@ -132,8 +132,17 @@ int main(int argc, char* argv[])
     CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
     // Initialize simulator.
-    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+    try 
+    {
+        unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+
+    }
+    catch (std::runtime_error const& exc)
+    {
+        std::cerr << "Failed to instantiate full state simulator.\n" << exc.what() << std::endl;
+        return 1;
+    }
 
     // Add the --simulation-output options.
     // N.B. This option should be present in all standalone drivers.
