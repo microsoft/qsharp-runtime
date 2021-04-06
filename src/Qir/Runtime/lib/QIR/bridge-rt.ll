@@ -104,8 +104,8 @@ declare %"struct.QirString"* @quantum__rt__result_to_string(%class.RESULT*)
 declare %"struct.QirString"* @quantum__rt__pauli_to_string(%PauliId)
 declare %"struct.QirString"* @quantum__rt__qubit_to_string(%class.QUBIT*)
 declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* dereferenceable(24) %range)
-declare i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
-declare i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
+declare i8* @quantum__rt__string_get_data(%"struct.QirString"* %str)
+declare i32 @quantum__rt__string_get_length(%"struct.QirString"* %str)
 
 
 ;------------------------------------------------------------------------------
@@ -490,15 +490,15 @@ define dllexport %String* @__quantum__rt__range_to_string(%Range %.range) {
   ret %String* %.str
 }
 
-define dllexport i8* @__quantum__rt_string_get_data(%String* %.str) {
+define dllexport i8* @__quantum__rt__string_get_data(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
-  %result = call i8* @quantum__rt_string_get_data(%"struct.QirString"* %str)
+  %result = call i8* @quantum__rt__string_get_data(%"struct.QirString"* %str)
   ret i8* %result 
 }
 
-define dllexport i32 @__quantum__rt_string_get_length(%String* %.str) {
+define dllexport i32 @__quantum__rt__string_get_length(%String* %.str) {
   %str = bitcast %String* %.str to %"struct.QirString"*
-  %result = call i32 @quantum__rt_string_get_length(%"struct.QirString"* %str)
+  %result = call i32 @quantum__rt__string_get_length(%"struct.QirString"* %str)
   ret i32 %result 
 }
 

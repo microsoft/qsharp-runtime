@@ -56,6 +56,13 @@ namespace Microsoft.Quantum.Simulation.Common
         public abstract string Name { get; }
 
         /// <summary>
+        /// When exception printing is enabled, the value of this property controls stack trace printout.
+        /// When set to <c>true</c> (default), the stack trace is printed in addition to the exception message."
+        /// When set to <c>false</c>, the exception message is printed without the stack trace."
+        /// </summary>
+        public bool EnableStackTracePrinting { get; set; } = true;
+
+        /// <summary>
         /// If the execution finishes in failure, this method returns the call-stack of the Q# operations 
         /// executed up to the point when the failure happened.
         /// If the execution was successful, this method returns null.
@@ -140,12 +147,15 @@ namespace Microsoft.Quantum.Simulation.Common
         protected void WriteStackTraceToLog(Exception exception, IEnumerable<StackFrame> callStack)
         {
             OnLog?.Invoke($"Unhandled exception. {exception.GetType().FullName}: {exception.Message}");
-            var first = true;
-            foreach (var sf in callStack)
+            if (EnableStackTracePrinting)
             {
-                var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
-                OnLog?.Invoke(msg);
-                first = false;
+                var first = true;
+                foreach (var sf in callStack)
+                {
+                    var msg = (first ? " ---> " : "   at ") + sf.ToStringWithBestSourceLocation();
+                    OnLog?.Invoke(msg);
+                    first = false;
+                }
             }
             OnLog?.Invoke("");
         }
