@@ -174,7 +174,7 @@ The tracer will have options to output the estimates into command line or into a
 - Zero counts for the statistics _can_ be replaced with empty string.
 
 The map of operation ids to names can be passed to the tracer's constructor as `std::unordered_map<OpId, std::string>`.
- The mapping can be partial, ids will be used in the ouput for unnamed operations.
+ The mapping can be partial, ids will be used in the output for unnamed operations.
 
 Example of valid output:
 

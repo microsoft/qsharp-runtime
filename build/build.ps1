@@ -47,7 +47,7 @@ Build-One 'build' '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirRuntime/build-qir-runtime.ps1"
+    & "$qirRuntime/build-qir-runtime.ps1" -buildAll $false
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
