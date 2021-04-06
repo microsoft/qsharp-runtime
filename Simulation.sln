@@ -93,25 +93,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7F7BB60A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FullstateSimulator", "FullstateSimulator", "{EAC5EAE7-D1B3-4726-AFDB-73000E62176A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-test-simulator", "src\Qir\Tests\FullstateSimulator\qsharp\qir-test-simulator.csproj", "{C7531119-9730-497A-9D11-8BBB3761B726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-test-simulator", "src\Qir\Tests\FullstateSimulator\qsharp\qir-test-simulator.csproj", "{C7531119-9730-497A-9D11-8BBB3761B726}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-dynamic", "QIR-dynamic", "{3DFACF7F-D5C2-455B-AB8A-26908DEF7E2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-test-random", "src\Qir\Tests\QIR-dynamic\qsharp\qir-test-random.csproj", "{5DBF6402-D9CD-4470-A309-3755CFDA42CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-test-random", "src\Qir\Tests\QIR-dynamic\qsharp\qir-test-random.csproj", "{5DBF6402-D9CD-4470-A309-3755CFDA42CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-static", "QIR-static", "{54000816-122C-4AA0-9FE9-B0ABB9547232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-gen", "src\Qir\Tests\QIR-static\qsharp\qir-gen.csproj", "{33ED37AB-61B1-4A49-9952-58D19AA8EF30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-gen", "src\Qir\Tests\QIR-static\qsharp\qir-gen.csproj", "{33ED37AB-61B1-4A49-9952-58D19AA8EF30}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QIR-tracer", "QIR-tracer", "{522EAA31-6317-42D5-831F-C39313DF03A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracer-qir", "src\Qir\Tests\QIR-tracer\qsharp\tracer-qir.csproj", "{002174F4-BFA8-4675-908D-0E9C32ED951A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tracer-qir", "src\Qir\Tests\QIR-tracer\qsharp\tracer-qir.csproj", "{002174F4-BFA8-4675-908D-0E9C32ED951A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AAFB81D3-BC87-404D-BA64-AF40B2D2E45A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneInputReference", "StandaloneInputReference", "{A7DB7367-9FD6-4164-8263-A05077BE54AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-standalone-input-reference", "src\Qir\Samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{D7D34736-A719-4B45-A33F-2723F59EC29D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-standalone-input-reference", "src\Qir\Samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{D7D34736-A719-4B45-A33F-2723F59EC29D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controller", "Controller", "{4E07F247-ED93-4497-8B58-022314308E67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QirController", "src\Qir\Controller\QirController.csproj", "{A77E6661-D143-4E3E-BCD1-8E321A966829}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -749,6 +753,22 @@ Global
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|x64.Build.0 = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|x64.ActiveCfg = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|x64.Build.0 = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -802,6 +822,8 @@ Global
 		{AAFB81D3-BC87-404D-BA64-AF40B2D2E45A} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
 		{A7DB7367-9FD6-4164-8263-A05077BE54AB} = {AAFB81D3-BC87-404D-BA64-AF40B2D2E45A}
 		{D7D34736-A719-4B45-A33F-2723F59EC29D} = {A7DB7367-9FD6-4164-8263-A05077BE54AB}
+		{4E07F247-ED93-4497-8B58-022314308E67} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
+		{A77E6661-D143-4E3E-BCD1-8E321A966829} = {4E07F247-ED93-4497-8B58-022314308E67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
