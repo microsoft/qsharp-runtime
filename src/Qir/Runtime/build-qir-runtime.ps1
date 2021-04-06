@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+ param (
+    [bool]$buildAll = $true
+ )
+
 & (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
 
 function Build-QirProject {
@@ -9,7 +13,7 @@ function Build-QirProject {
         $FolderPath
     )
 
-    if (!(Test-Path (Join-Path $FolderPath qir *.ll))) {
+    if ($buildAll -Or !(Test-Path (Join-Path $FolderPath qir *.ll))) {
         Write-Host "##[info]Build Q# project for QIR tests '$FolderPath'"
         dotnet build $FolderPath -c $Env:BUILD_CONFIGURATION -v $Env:BUILD_VERBOSITY
         if ($LastExitCode -ne 0) {
@@ -106,6 +110,8 @@ if (!(Test-Path $osQirDropFolder)) {
     New-Item -Path $osQirDropFolder -ItemType "directory"
 }
 $pattern | Foreach-Object { Copy-Item (Join-Path . bin $_) $osQirDropFolder -ErrorAction SilentlyContinue }
+Copy-Item (Join-Path $env:NATIVE_SIMULATOR "Microsoft.Quantum.Simulator.Runtime.dll") $osQirDropFolder -ErrorAction SilentlyContinue
+$env:PATH += ";" + $osQirDropFolder
 
 Pop-Location
 
