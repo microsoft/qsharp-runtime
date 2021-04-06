@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Random {
     /// probability.
     ///
     /// # Remarks
-    /// Fails if `max < min`.
+    /// Fails if `max <= min`.
     ///
     /// # Example
     /// The following Q# snippet randomly rolls a six-sided die:
@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Random {
     /// uniform probability.
     ///
     /// # Remarks
-    /// Fails if `max < min`.
+    /// Fails if `max <= min`.
     ///
     /// # Example
     /// The following Q# snippet randomly draws an angle between $0$ and $2 \pi$:
