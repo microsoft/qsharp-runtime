@@ -112,6 +112,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneInputReference", "StandaloneInputReference", "{A7DB7367-9FD6-4164-8263-A05077BE54AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-standalone-input-reference", "src\Qir\Samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{D7D34736-A719-4B45-A33F-2723F59EC29D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
