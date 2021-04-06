@@ -116,6 +116,12 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
         REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomVal));
     }
 
+    // Test equal minimum and maximum:
+    for(uint64_t num: { -5, 0, 3 } )
+    {
+        REQUIRE(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(num, num) == num);
+    }
+
     // There is a strong difference in the opinions about how the random number generator must be tested.
     // More or less agreed-upon items are:
     //  * The test must be 100% deterministic, i.e. must not fail, even with a very low probability. 
