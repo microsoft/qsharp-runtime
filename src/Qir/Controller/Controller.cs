@@ -2,25 +2,48 @@
 // Licensed under the MIT License.
 
 using System.IO;
-using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Quantum.Qir.Driver;
+using Microsoft.Quantum.Qir.Executable;
+using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
 namespace Microsoft.Quantum.Qir
 {
-    internal static class Controller
+    public static class Controller
     {
-        internal static void Execute(
-            FileInfo input,
-            FileInfo output,
-            FileInfo error)
+        public static async Task ExecuteAsync(
+            FileInfo inputFile,
+            FileInfo outputFile,
+            DirectoryInfo libraryDirectory,
+            FileInfo errorFile,
+            FileInfo bytecodeFile,
+            IQirDriverGenerator driverGenerator,
+            IQirExecutableGenerator executableGenerator,
+            IQuantumExecutableRunner executableRunner)
         {
-            var outputFileStream = output.Exists ? output.OpenWrite() : output.Create();
-            outputFileStream.Write(new UTF8Encoding().GetBytes("output"));
-            outputFileStream.Flush();
-            outputFileStream.Close();
-            var errorFileStream = error.Exists ? error.OpenWrite() : error.Create();
-            errorFileStream.Write(new UTF8Encoding().GetBytes("error"));
-            errorFileStream.Flush();
-            errorFileStream.Close();
+            // TODO: Error handling.
+            // TODO: Logging.
+            // Step 1: Parse input.
+            using var inputFileStream = inputFile.OpenRead();
+            var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
+
+            // Step 2: Create bytecode file.
+            using (var bytecodeFileStream = bytecodeFile.OpenWrite())
+            {
+                await bytecodeFileStream.WriteAsync(input.QirBytecode.Array, input.QirBytecode.Offset, input.QirBytecode.Count);
+            }
+
+            // Step 3: Create the driver file.
+            var driverFile = new FileInfo(Constant.FilePath.DriverFilePath);
+            await driverGenerator.GenerateQirDriverCppAsync(input.EntryPoint, driverFile);
+
+            // Step 4: Create the executable.
+            var executableFile = new FileInfo(Constant.FilePath.ExecutableFilePath);
+            await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, executableFile);
+
+            // Step 5: Run the executable.
+            using var outputFileStream = outputFile.Exists ? outputFile.OpenWrite() : outputFile.Create();
+            await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
         }
     }
 }

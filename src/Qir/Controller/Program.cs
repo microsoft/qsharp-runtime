@@ -4,6 +4,8 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using Microsoft.Quantum.Qir.Driver;
+using Microsoft.Quantum.Qir.Executable;
 
 namespace Microsoft.Quantum.Qir
 {
@@ -31,6 +33,15 @@ namespace Microsoft.Quantum.Qir
             };
 
             rootCommand.AddOption(outputOption);
+
+            var libraryDirectoryOption = new Option<DirectoryInfo>(
+            aliases: new string[] { "--libraryDirectory" })
+            {
+                Description = "Path to the directory containing the libraries that must be linked to the driver executable.",
+                IsRequired = true
+            };
+
+            rootCommand.AddOption(libraryDirectoryOption);
             var errorOption = new Option<FileInfo>(
                 aliases: new string[] { "--error",})
             {
@@ -40,8 +51,17 @@ namespace Microsoft.Quantum.Qir
 
             rootCommand.AddOption(errorOption);
 
+            var execGenerator = new QirExecutableGenerator(new ClangClient());
+            var driverGenerator = new QirDriverGenerator();
+            var execRunner = new QuantumExecutableRunner();
+
+            // The bytecode file is not needed as an input to the program, but we provide the path as an argument to the controller so it can be configured by tests.
+            var bytecodeFile = new FileInfo(Constant.FilePath.BytecodeFilePath);
+
             // Bind to a handler and invoke.
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, FileInfo>((input, output, error) => Controller.Execute(input, output, error));
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, FileInfo>(
+                async (input, output, libraryDirectory, error) =>
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner));
             rootCommand.Invoke(args);
         }
     }
