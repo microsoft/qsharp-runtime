@@ -3,7 +3,7 @@
 Welcome, and thank you for your interest in contributing to Q#!
 
 There are many ways in which you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved.
-For more details on how to contribute to Q# or the rest of the Quantum Development Kit, please see the [contribution guide](https://docs.microsoft.com/quantum/contributing/).
+For more details on how to contribute to Q# or the rest of the Quantum Development Kit, please see the [contribution guide](https://docs.microsoft.com/azure/quantum/contributing-overview).
 
 ## Asking Questions
 
@@ -18,7 +18,7 @@ Have a feature request?
 We want to hear about it!
 Here's how you can make reporting your issue as effective as possible.
 
-The Quantum Development Kit is distributed across multiple repositories. Filing an issue against the correct repository will help address it swiftly. Check the list [in the contribution guide](https://docs.microsoft.com/quantum/contributing/#where-do-contributions-go) to figure out which repo is a good place to file it.
+The Quantum Development Kit is distributed across multiple repositories. Filing an issue against the correct repository will help address it swiftly. Check the list [in the contribution guide](https://docs.microsoft.com/azure/quantum/contributing-overview#where-do-contributions-go) to figure out which repo is a good place to file it.
 You can follow the [template](https://github.com/microsoft/qsharp-runtime/issues/new?assignees=&labels=bug&template=bug_report.md&title=) for reporting issues on this repository. 
 
 
@@ -43,7 +43,7 @@ please file one following the [feature request template](https://github.com/micr
 We will respond to feature requests and follow up with a discussion around its feasibility, 
 how one might go about implementing it, and whether that is something we would consider adding to our repo. 
 There are several reasons why we might not be able to eventually merge even a great feature for one reason or another. 
-Take a look at our general contribution guide for [reasons why this might be the case](https://docs.microsoft.com/quantum/contributing/code#when-well-reject-a-pull-request). 
+Take a look at our general contribution guide for [reasons why this might be the case](https://docs.microsoft.com/azure/quantum/contributing-code#when-well-reject-a-pull-request). 
 Even if we are not able to incorporate something into the packages and extensions we distribute, 
 we encourage you to pursue your passion project in your own fork, 
 and share and discuss your thoughts and progress on the corresponding issue. 
@@ -53,12 +53,12 @@ search for example for the [good-first-issue](https://github.com/microsoft/qshar
 Also, look for issues that have already been discussed in more detail, 
 and check if you can help someone who has already started working on it. 
 
-Whether you want to help fixing bugs or add new features, please take a look at our general guide for [Contributing Code](https://docs.microsoft.com/quantum/contributing/code).
+Whether you want to help fixing bugs or add new features, please take a look at our general guide for [Contributing Code](https://docs.microsoft.com/azure/quantum/contributing-code).
 
 ## Contributing Documentation
 
 If you are interested in contributing to conceptual documentation about Q#, please see the [MicrosoftDocs/quantum-docs-pr](https://github.com/MicrosoftDocs/quantum-docs-pr) repository.
-If you are interested in contributing API references, please see [Contributing Code](https://docs.microsoft.com/quantum/contributing/code) in the contribution guide.
+If you are interested in contributing API references, please see [Contributing Code](https://docs.microsoft.com/azure/quantum/contributing-code) in the contribution guide.
 
 And last but not least:
 

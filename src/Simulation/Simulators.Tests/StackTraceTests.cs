@@ -381,6 +381,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 Assert.StartsWith("   at Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.AlwaysFail4 on", logs[5]);
                 Assert.Equal("", logs[6]);
             }
+
+            logs.Clear();
+            sim.EnableStackTracePrinting = false;
+            try
+            {
+                QVoid res = sim.Execute<AlwaysFail4, QVoid, QVoid>(QVoid.Instance);
+            }
+            catch (ExecutionFailException)
+            {
+                Assert.Equal(2, logs.Count);
+                Assert.StartsWith("Unhandled exception. Microsoft.Quantum.Simulation.Core.ExecutionFailException: Always fail", logs[0]);
+                Assert.Equal("", logs[1]);
+            }
         }
     }
 }

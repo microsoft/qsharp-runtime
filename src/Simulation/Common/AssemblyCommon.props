@@ -5,9 +5,9 @@
     <Authors>Microsoft</Authors>
     <Product>Microsoft Quantum Development Kit Preview</Product>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
-    <PackageReleaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</PackageReleaseNotes>
+    <PackageReleaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <ProjectUrl>https://docs.microsoft.com/quantum/</ProjectUrl>
+    <ProjectUrl>https://docs.microsoft.com/azure/quantum/</ProjectUrl>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
     <PackageIcon>qdk-nuget-icon.png</PackageIcon>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

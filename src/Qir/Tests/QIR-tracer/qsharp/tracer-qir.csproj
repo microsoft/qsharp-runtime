@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.210324735-alpha">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <QirGeneration>True</QirGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+  </PropertyGroup>
+
+</Project>

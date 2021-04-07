@@ -21,12 +21,6 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     Write-Host "Skipping installing prerequisites for native simulator because ENABLE_NATIVE variable set to: $Env:ENABLE_NATIVE"
 }
 
-# At the moment the QIR Runtime build isn't enabled locally by default.
-if ($Env:ENABLE_QIRRUNTIME -eq "true") {
-    Push-Location (Join-Path $PSScriptRoot "../src/QirRuntime")
-        .\prerequisites.ps1
-    Pop-Location
-} else {
-    Write-Host "Skipping installing prerequisites for qir runtime because ENABLE_QIRRUNTIME variable set to: $Env:ENABLE_QIRRUNTIME"
-}
-
+Push-Location (Join-Path $PSScriptRoot "../src/Qir/Runtime")
+    .\prerequisites.ps1
+Pop-Location
