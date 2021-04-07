@@ -3,12 +3,6 @@
 #+++++++++++++++++++++++++++++++++++++
 
 #===============================================================================
-# create a utility lib from qsharp-foundation-qis.ll
-#
-set(qsharp_foundation_qis_target "qsharp_foundation_qis_target")
-compile_from_qir(qsharp-foundation-qis ${qsharp_foundation_qis_target})
-
-#===============================================================================
 # create qsharp-foundation-qis-support lib from the C++ sources
 #
 set(qsharp_foundation_sup_source_files
@@ -16,15 +10,13 @@ set(qsharp_foundation_sup_source_files
   conditionals.cpp
 )
 
-add_library(qsharp-foundation-qis-support ${qsharp_foundation_sup_source_files})
-target_include_directories(qsharp-foundation-qis-support PUBLIC ${public_includes})
-add_dependencies(qsharp-foundation-qis-support ${qsharp_foundation_qis_target})
-target_compile_definitions(qsharp-foundation-qis-support PRIVATE EXPORT_QIR_API)
-
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qsharp-foundation-qis-support-obj OBJECT ${qsharp_foundation_sup_source_files})
-target_source_from_qir_obj(qsharp-foundation-qis-support-obj qsharp-foundation-qis)
-target_include_directories(qsharp-foundation-qis-support-obj PUBLIC ${public_includes})
+target_source_from_qir(qsharp-foundation-qis-support-obj qsharp-foundation-qis.ll)
+target_include_directories(qsharp-foundation-qis-support-obj PUBLIC
+  ${public_includes}
+  ${common_includes}
+)
 set_property(TARGET qsharp-foundation-qis-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(qsharp-foundation-qis-support-obj PUBLIC EXPORT_QIR_API)
 
@@ -39,8 +31,12 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Foundation
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
 )
+add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 
-target_include_directories(Microsoft.Quantum.Qir.QSharp.Foundation PUBLIC ${public_includes})
+target_include_directories(Microsoft.Quantum.Qir.QSharp.Foundation PUBLIC 
+  ${public_includes}
+  ${common_includes}
+)
 target_compile_definitions(Microsoft.Quantum.Qir.QSharp.Foundation PRIVATE EXPORT_QIR_API)
 
 set_property(TARGET Microsoft.Quantum.Qir.QSharp.Foundation PROPERTY POSITION_INDEPENDENT_CODE ON)

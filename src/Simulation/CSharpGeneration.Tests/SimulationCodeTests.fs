@@ -108,10 +108,10 @@ namespace N1
                 |> failwith
             let functorGenSuccessful = CodeGeneration.GenerateFunctorSpecializations(compilation, &compilation)
             // todo: we might want to raise an error here if the functor generation fails (which will be the case for incorrect code)
-            compilation.Namespaces
+            compilation
         with | e -> sprintf "compilation threw exception: \n%s" e.Message |> failwith // should never happen (all exceptions are caught by the compiler)
 
-    let syntaxTree = parse [ (Path.Combine("Circuits", "Intrinsic.qs")); (Path.Combine("Circuits", "CodegenTests.qs")) ]
+    let syntaxTree = parse [ (Path.Combine("Circuits", "Intrinsic.qs")); (Path.Combine("Circuits", "CodegenTests.qs")) ] |> (fun compilation -> compilation.Namespaces)
 
     let globalContext = CodegenContext.Create syntaxTree
 
@@ -225,9 +225,9 @@ namespace N1
             expected
             |> (fun s -> s.Replace("%%%", fullPath |> HttpUtility.JavaScriptStringEncode |> escapeCSharpString))
             |> (fun s -> s.Replace("%%", fullPath |> escapeCSharpString))
-        let tree = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
+        let compilation = parse [Path.Combine ("Circuits", "Intrinsic.qs"); fileName]
         let actual =
-            CodegenContext.Create (tree, ImmutableDictionary.Empty)
+            CodegenContext.Create (compilation, ImmutableDictionary.Empty)
             |> generate (Path.GetFullPath fileName)
         Assert.Equal(expected |> clearFormatting, actual |> clearFormatting)
 
@@ -248,6 +248,58 @@ namespace N1
         List.zip expected actual
         |> List.iter Assert.Equal<'Z>
 
+    [<Fact>]
+    let ``testGeneratedFileNames`` () =
+        
+        let outputDir = "output" |> Path.GetFullPath
+        let outputDirSrc = Path.Combine(outputDir, "src")
+
+        let intrinsic = Path.Combine(outputDirSrc, "Intrinsic.g.cs")
+        let helloWorld = Path.Combine(outputDirSrc, "HelloWorld.g.cs")
+        let helloWorld1 = Path.Combine(outputDirSrc, "HelloWorld.g1.cs")
+        let helloOther = Path.Combine(outputDirSrc, "HelloOther.g.cs")
+
+        let deleteFile filePath =
+            if File.Exists filePath then
+                File.Delete filePath
+        
+        intrinsic |> deleteFile
+        helloWorld |> deleteFile
+        helloWorld1 |> deleteFile
+        helloOther |> deleteFile
+        
+        let compilation = parse [
+                Path.Combine("Circuits", "Intrinsic.qs")
+                Path.Combine("Circuits", "HelloWorld.qs")
+                Path.Combine("Circuits", "SubDirectory", "HelloWorld.qs")
+                Path.Combine("Circuits", "SubDirectory", "HelloOther.qs")
+                ]
+        let transformed = ref { Namespaces = ImmutableArray<QsNamespace>.Empty; EntryPoints = ImmutableArray<QsQualifiedName>.Empty }
+        let rewriteStep = Emitter() :> IRewriteStep
+        rewriteStep.AssemblyConstants.Add(AssemblyConstants.OutputPath, outputDir)
+        rewriteStep.Transformation(compilation, transformed) |> ignore
+
+        let mutable allFilesFound = true
+        let checkAndDeleteFile filePath =
+            if File.Exists filePath then
+                File.Delete filePath
+            else
+                allFilesFound <- false
+
+        intrinsic |> checkAndDeleteFile
+        helloWorld |> checkAndDeleteFile
+        helloWorld1 |> checkAndDeleteFile
+        helloOther |> checkAndDeleteFile
+
+        let deleteDir dirPath =
+            if Directory.Exists dirPath && Directory.EnumerateFileSystemEntries dirPath |> Seq.isEmpty then
+                Directory.Delete dirPath
+
+        outputDirSrc |> deleteDir
+        outputDir |> deleteDir
+
+        Assert.True allFilesFound
+    
     [<Fact>]
     let ``tupleBaseClassName test`` () =
         let testOne (_, udt) expected =

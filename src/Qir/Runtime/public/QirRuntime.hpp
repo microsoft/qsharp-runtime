@@ -232,11 +232,11 @@ extern "C"
 
     // Returns a pointer to an array that contains a null-terminated sequence of characters 
     // (i.e., a C-string) representing the current value of the string object.
-    QIR_SHARED_API const char* quantum__rt_string_get_data(QirString* str); // NOLINT
+    QIR_SHARED_API const char* quantum__rt__string_get_data(QirString* str); // NOLINT
 
     // Returns the length of the string, in terms of bytes.
     // http://www.cplusplus.com/reference/string/string/size/
-    QIR_SHARED_API uint32_t quantum__rt_string_get_length(QirString* str);  // NOLINT
+    QIR_SHARED_API uint32_t quantum__rt__string_get_length(QirString* str);  // NOLINT
 
     // Returns a string representation of the big integer.
     // TODO QIR_SHARED_API QirString* quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
