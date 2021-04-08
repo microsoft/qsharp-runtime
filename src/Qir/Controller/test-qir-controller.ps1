@@ -8,6 +8,10 @@ Write-Host "##[info]Test QIR Controller"
 $controllerProject = (Join-Path $PSScriptRoot QirController.csproj)
 $testCasesFolder = (Join-Path $PSScriptRoot "test-cases")
 $testArtifactsFolder = (Join-Path $PSScriptRoot "test-artifacts")
+if (!(Test-Path $testCasesFolder)) {
+    Write-Host "No tests found. Returning."
+    return
+}
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
 }
