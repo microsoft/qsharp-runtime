@@ -14,6 +14,12 @@ namespace Microsoft.Quantum.Qir
     {
         static void Main(string[] args)
         {
+            var logger = new Logger(new Clock());
+            var execGenerator = new QirExecutableGenerator(new ClangClient(logger), logger);
+            var driverGenerator = new QirDriverGenerator(logger);
+            var execRunner = new QuantumExecutableRunner(logger);
+            logger.LogInfo("QIR controller beginning.");
+
             var rootCommand = new RootCommand(
                 description: "Builds and runs QIR executable.");
 
@@ -51,11 +57,6 @@ namespace Microsoft.Quantum.Qir
             };
 
             rootCommand.AddOption(errorOption);
-
-            var execGenerator = new QirExecutableGenerator(new ClangClient());
-            var driverGenerator = new QirDriverGenerator();
-            var execRunner = new QuantumExecutableRunner();
-            var logger = new Logger(new Clock());
 
             // The bytecode file is not needed as an input to the program, but we provide the path as an argument to the controller so it can be configured by tests.
             var bytecodeFile = new FileInfo(Constant.FilePath.BytecodeFilePath);

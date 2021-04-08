@@ -41,6 +41,7 @@ namespace Tests.QirController
             bytecodeFile = new FileInfo($"{Guid.NewGuid()}-bytecode");
             errorFile = new FileInfo($"{Guid.NewGuid()}-error");
             outputFile = new FileInfo($"{Guid.NewGuid()}-output");
+            loggerMock = new Mock<ILogger>();
 
             // Create a QirExecutableWrapper to be used by the tests.
             byte[] bytecode = { 1, 2, 3, 4, 5 };

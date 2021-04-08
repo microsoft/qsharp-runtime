@@ -3,16 +3,19 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir.Executable
 {
     public class QirExecutableGenerator : IQirExecutableGenerator
     {
         private readonly IClangClient clangClient;
+        private readonly ILogger logger;
 
-        public QirExecutableGenerator(IClangClient clangClient)
+        public QirExecutableGenerator(IClangClient clangClient, ILogger logger)
         {
             this.clangClient = clangClient;
+            this.logger = logger;
         }
 
         public Task GenerateExecutableAsync(FileInfo driverFile, FileInfo bytecodeFile, DirectoryInfo libraryDirectory, FileInfo executableFile)

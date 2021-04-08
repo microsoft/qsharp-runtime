@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+
 namespace Microsoft.Quantum.Qir.Utility
 {
     /// <summary>
@@ -20,5 +22,11 @@ namespace Microsoft.Quantum.Qir.Utility
         /// </summary>
         /// <param name="message">Message to log.</param>
         void LogError(string message);
+
+        /// <summary>
+        /// Formats an exception into an error log. Logs the exception type, message, and stack trace.
+        /// </summary>
+        /// <param name="e">Exception to log.</param>
+        void LogException(Exception e);
     }
 }

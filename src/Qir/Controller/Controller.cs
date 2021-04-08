@@ -57,6 +57,8 @@ namespace Microsoft.Quantum.Qir
             }
             catch (Exception e)
             {
+                logger.LogError("An error has been encountered. Will write an error to the error file and delete any output that has been generated.");
+                logger.LogException(e);
                 await WriteExceptionToFileAsync(e, errorFile);
                 outputFile.Delete();
             }
