@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Driver;
 using Microsoft.Quantum.Qir.Executable;
 using Microsoft.Quantum.Qir.Model;
+using Microsoft.Quantum.Qir.Utility;
 using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
 namespace Microsoft.Quantum.Qir
@@ -22,30 +23,35 @@ namespace Microsoft.Quantum.Qir
             FileInfo bytecodeFile,
             IQirDriverGenerator driverGenerator,
             IQirExecutableGenerator executableGenerator,
-            IQuantumExecutableRunner executableRunner)
+            IQuantumExecutableRunner executableRunner,
+            ILogger logger)
         {
-            // TODO: Logging.
             try
             {
                 // Step 1: Parse input.
+                logger.LogInfo("Parsing input.");
                 using var inputFileStream = inputFile.OpenRead();
                 var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
 
                 // Step 2: Create bytecode file.
+                logger.LogInfo("Creating bytecode file.");
                 using (var bytecodeFileStream = bytecodeFile.OpenWrite())
                 {
                     await bytecodeFileStream.WriteAsync(input.QirBytecode.Array, input.QirBytecode.Offset, input.QirBytecode.Count);
                 }
 
-                // Step 3: Create the driver file.
+                // Step 3: Create driver file.
+                logger.LogInfo("Creating driver file.");
                 var driverFile = new FileInfo(Constant.FilePath.DriverFilePath);
                 await driverGenerator.GenerateQirDriverCppAsync(input.EntryPoint, driverFile);
 
-                // Step 4: Create the executable.
+                // Step 4: Create executable.
+                logger.LogInfo("Compiling and linking executable.");
                 var executableFile = new FileInfo(Constant.FilePath.ExecutableFilePath);
                 await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, executableFile);
 
-                // Step 5: Run the executable.
+                // Step 5: Run executable.
+                logger.LogInfo("Running executable.");
                 using var outputFileStream = outputFile.OpenWrite();
                 await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
             }

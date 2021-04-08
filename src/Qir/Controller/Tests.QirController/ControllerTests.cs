@@ -11,6 +11,7 @@ using Microsoft.Quantum.Qir;
 using Microsoft.Quantum.Qir.Driver;
 using Microsoft.Quantum.Qir.Executable;
 using Microsoft.Quantum.Qir.Model;
+using Microsoft.Quantum.Qir.Utility;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper;
 using Moq;
@@ -24,6 +25,7 @@ namespace Tests.QirController
         private Mock<IQirDriverGenerator> driverGeneratorMock;
         private Mock<IQirExecutableGenerator> executableGeneratorMock;
         private Mock<IQuantumExecutableRunner> executableRunnerMock;
+        private Mock<ILogger> loggerMock;
         private FileInfo inputFile;
         private FileInfo bytecodeFile;
         private FileInfo errorFile;
@@ -95,7 +97,8 @@ namespace Tests.QirController
                 bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
-                executableRunnerMock.Object);
+                executableRunnerMock.Object,
+                loggerMock.Object);
 
             // Verify driver was created.
             driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppAsync(
@@ -141,7 +144,8 @@ namespace Tests.QirController
                 bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
-                executableRunnerMock.Object);
+                executableRunnerMock.Object,
+                loggerMock.Object);
 
             // Verify error file was created and contains the error.
             Assert.True(errorFile.Exists);
@@ -174,7 +178,8 @@ namespace Tests.QirController
                 bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
-                executableRunnerMock.Object);
+                executableRunnerMock.Object,
+                loggerMock.Object);
 
             // Verify error file was created and contains the error.
             Assert.True(errorFile.Exists);
@@ -213,7 +218,8 @@ namespace Tests.QirController
                 bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
-                executableRunnerMock.Object);
+                executableRunnerMock.Object,
+                loggerMock.Object);
 
             // Verify error file was created and contains the error.
             Assert.True(errorFile.Exists);

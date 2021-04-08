@@ -6,6 +6,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using Microsoft.Quantum.Qir.Driver;
 using Microsoft.Quantum.Qir.Executable;
+using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir
 {
@@ -54,6 +55,7 @@ namespace Microsoft.Quantum.Qir
             var execGenerator = new QirExecutableGenerator(new ClangClient());
             var driverGenerator = new QirDriverGenerator();
             var execRunner = new QuantumExecutableRunner();
+            var logger = new Logger(new Clock());
 
             // The bytecode file is not needed as an input to the program, but we provide the path as an argument to the controller so it can be configured by tests.
             var bytecodeFile = new FileInfo(Constant.FilePath.BytecodeFilePath);
@@ -61,7 +63,7 @@ namespace Microsoft.Quantum.Qir
             // Bind to a handler and invoke.
             rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, FileInfo>(
                 async (input, output, libraryDirectory, error) =>
-                    await Controller.ExecuteAsync(input, output, libraryDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner));
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner, logger));
             rootCommand.Invoke(args);
         }
     }
