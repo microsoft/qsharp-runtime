@@ -1,0 +1,30 @@
+{
+    "Registrations":[
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "llvm-ar.exe",
+                    "Version": "10.0.0",
+                    "DownloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "Git": { 
+                    "RepositoryUrl": "https://github.com/catchorg/Catch2", 
+                    "CommitHash": "87074da73ecb1c2e7c35fd14f50ca21c4c002adc" }
+            }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "Git": { 
+                    "RepositoryUrl": "https://github.com/CLIUtils/CLI11", 
+                    "CommitHash": "5cb3efabce007c3a0230e4cc2e27da491c646b6c" }
+            }
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.15.210324288-alpha">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -25,7 +25,7 @@
 
   <Target Name="BeforeCSharpCompile">
     <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.g.cs" Exclude="@(Compile)" AutoGen="true" />
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>
   </Target>
 
