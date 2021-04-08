@@ -11,9 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <BondCodegen Remove="test-artifacts\**" />
     <BondCodegen Remove="Tests.QirController\**" />
+    <Compile Remove="test-artifacts\**" />
     <Compile Remove="Tests.QirController\**" />
+    <EmbeddedResource Remove="test-artifacts\**" />
     <EmbeddedResource Remove="Tests.QirController\**" />
+    <None Remove="test-artifacts\**" />
     <None Remove="Tests.QirController\**" />
   </ItemGroup>
 
