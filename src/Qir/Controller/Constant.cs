@@ -12,5 +12,11 @@ namespace Microsoft.Quantum.Qir
             public const string DriverFilePath = "/home/driver.cpp";
             public const string ExecutableFilePath = "/home/simulation.exe";
         }
+
+        // TODO: errors will be added as dependencies are implemented.
+        public static class ErrorCode
+        {
+            public const string InternalError = "InternalError";
+        }
     }
 }

@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir;
 using Microsoft.Quantum.Qir.Driver;
 using Microsoft.Quantum.Qir.Executable;
+using Microsoft.Quantum.Qir.Model;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper;
 using Moq;
@@ -112,6 +114,118 @@ namespace Tests.QirController
                 It.Is<FileInfo>(actualExecutableFile => actualExecutableFile.FullName == expectedExecutablePath.FullName),
                 It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
                 It.Is<FileInfo>(actualOutputFile => actualOutputFile.FullName == outputFile.FullName)));
+        }
+
+        [Fact]
+        public async Task TestExecuteEncountersGenericExceptionWithOutputFileAlreadyCreated()
+        {
+            var libraryDirectory = new DirectoryInfo("libraries");
+            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
+            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+                .ThrowsAsync(new Exception("exception message"));
+
+            // Create output file to ensure that it will be deleted unconditionally.
+            using (var outputFileStream = outputFile.OpenWrite())
+            using (var streamWriter = new StreamWriter(outputFileStream))
+            {
+                await streamWriter.WriteAsync("program output");
+            }
+
+            // Execute controller.
+            await Controller.ExecuteAsync(
+                inputFile,
+                outputFile,
+                libraryDirectory,
+                errorFile,
+                bytecodeFile,
+                driverGeneratorMock.Object,
+                executableGeneratorMock.Object,
+                executableRunnerMock.Object);
+
+            // Verify error file was created and contains the error.
+            Assert.True(errorFile.Exists);
+            using var errorFileStream = errorFile.OpenRead();
+            using var streamReader = new StreamReader(errorFileStream);
+            var errorFileContents = await streamReader.ReadToEndAsync();
+            var error = JsonSerializer.Deserialize<Error>(errorFileContents);
+            Assert.Equal(ErrorMessages.InternalError, error.Message);
+            Assert.Equal(Constant.ErrorCode.InternalError, error.Code);
+
+            // Verify output file was deleted.
+            Assert.False(outputFile.Exists);
+        }
+
+        [Fact]
+        public async Task TestExecuteEncountersGenericExceptionWithOutputFileNeverCreated()
+        {
+            var libraryDirectory = new DirectoryInfo("libraries");
+            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
+            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+                .ThrowsAsync(new Exception("exception message"));
+
+            // Execute controller.
+            await Controller.ExecuteAsync(
+                inputFile,
+                outputFile,
+                libraryDirectory,
+                errorFile,
+                bytecodeFile,
+                driverGeneratorMock.Object,
+                executableGeneratorMock.Object,
+                executableRunnerMock.Object);
+
+            // Verify error file was created and contains the error.
+            Assert.True(errorFile.Exists);
+            using var errorFileStream = errorFile.OpenRead();
+            using var streamReader = new StreamReader(errorFileStream);
+            var errorFileContents = await streamReader.ReadToEndAsync();
+            var error = JsonSerializer.Deserialize<Error>(errorFileContents);
+            Assert.Equal(ErrorMessages.InternalError, error.Message);
+            Assert.Equal(Constant.ErrorCode.InternalError, error.Code);
+        }
+
+        [Fact]
+        public async Task TestExecuteEncountersControllerException()
+        {
+            var exceptionMessage = "exception message";
+            var errorCode = "error code";
+            var libraryDirectory = new DirectoryInfo("libraries");
+            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
+            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+                .ThrowsAsync(new ControllerException(exceptionMessage, errorCode));
+
+            // Create output file to ensure that it will be deleted unconditionally.
+            using (var outputFileStream = outputFile.OpenWrite())
+            using (var streamWriter = new StreamWriter(outputFileStream))
+            {
+                await streamWriter.WriteAsync("program output");
+            }
+
+            // Execute controller.
+            await Controller.ExecuteAsync(
+                inputFile,
+                outputFile,
+                libraryDirectory,
+                errorFile,
+                bytecodeFile,
+                driverGeneratorMock.Object,
+                executableGeneratorMock.Object,
+                executableRunnerMock.Object);
+
+            // Verify error file was created and contains the error.
+            Assert.True(errorFile.Exists);
+            using var errorFileStream = errorFile.OpenRead();
+            using var streamReader = new StreamReader(errorFileStream);
+            var errorFileContents = await streamReader.ReadToEndAsync();
+            var error = JsonSerializer.Deserialize<Error>(errorFileContents);
+            Assert.Equal(exceptionMessage, error.Message);
+            Assert.Equal(errorCode, error.Code);
+
+            // Verify output file was deleted.
+            Assert.False(outputFile.Exists);
         }
 
         private bool EntryPointsAreEqual(EntryPointOperation entryPointA, EntryPointOperation entryPointB)
