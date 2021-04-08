@@ -2,21 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Quantum.Qir;
-using Microsoft.Quantum.Qir.Driver;
-using Microsoft.Quantum.Qir.Executable;
-using Microsoft.Quantum.Qir.Model;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
-using Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper;
 using Moq;
 using Xunit;
-using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
 namespace Tests.QirController
 {

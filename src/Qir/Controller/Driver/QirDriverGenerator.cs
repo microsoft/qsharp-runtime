@@ -4,6 +4,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
+using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
 namespace Microsoft.Quantum.Qir.Driver
@@ -17,9 +18,14 @@ namespace Microsoft.Quantum.Qir.Driver
             this.logger = logger;
         }
 
-        public Task GenerateQirDriverCppAsync(EntryPointOperation entryPointOperation, FileInfo driverFile)
+        public async Task GenerateQirDriverCppAsync(EntryPointOperation entryPointOperation, FileInfo driverFile)
         {
-            throw new System.NotImplementedException();
+            await Task.Run(() =>
+            {
+                logger.LogInfo("Creating driver file.");
+                using var driverFileStream = driverFile.OpenWrite();
+                QirDriverGeneration.GenerateQirDriverCpp(entryPointOperation, driverFileStream);
+            });
         }
     }
 }
