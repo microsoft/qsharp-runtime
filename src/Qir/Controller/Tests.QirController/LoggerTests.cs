@@ -1,22 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Quantum.Qir;
-using Microsoft.Quantum.Qir.Driver;
-using Microsoft.Quantum.Qir.Executable;
-using Microsoft.Quantum.Qir.Model;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
-using Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper;
 using Moq;
 using Xunit;
-using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
 namespace Tests.QirController
 {
@@ -36,8 +25,9 @@ namespace Tests.QirController
         {
             using var consoleOutput = new StringWriter();
             var message = "some message";
-            clockMock.SetupGet(obj => obj.Now).Returns(DateTimeOffset.MinValue);
-            var expectedLog = "1/1/0001 12:00:00 AM +00:00 [INFO]: some message" + Environment.NewLine;
+            var time = DateTimeOffset.MinValue;
+            clockMock.SetupGet(obj => obj.Now).Returns(time);
+            var expectedLog = $"{time} [INFO]: some message" + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogInfo(message);
             var actualLog = consoleOutput.ToString();
@@ -49,8 +39,9 @@ namespace Tests.QirController
         {
             using var consoleOutput = new StringWriter();
             var message = "some message";
-            clockMock.SetupGet(obj => obj.Now).Returns(DateTimeOffset.MinValue);
-            var expectedLog = "1/1/0001 12:00:00 AM +00:00 [ERROR]: some message" + Environment.NewLine;
+            var time = DateTimeOffset.MinValue;
+            clockMock.SetupGet(obj => obj.Now).Returns(time);
+            var expectedLog = $"{time} [ERROR]: some message" + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogError(message);
             var actualLog = consoleOutput.ToString();
@@ -61,9 +52,10 @@ namespace Tests.QirController
         public void TestLogExceptionWithoutStackTrace()
         {
             using var consoleOutput = new StringWriter();
-            clockMock.SetupGet(obj => obj.Now).Returns(DateTimeOffset.MinValue);
+            var time = DateTimeOffset.MinValue;
+            clockMock.SetupGet(obj => obj.Now).Returns(time);
             var exception = new InvalidOperationException();
-            var expectedLog = "1/1/0001 12:00:00 AM +00:00 [ERROR]: " +
+            var expectedLog = $"{time} [ERROR]: " +
                 "Exception encountered: System.InvalidOperationException: " +
                 exception.Message + Environment.NewLine + exception.StackTrace + Environment.NewLine;
             Console.SetOut(consoleOutput);
@@ -76,7 +68,8 @@ namespace Tests.QirController
         public void TestLogExceptionWithStackTrace()
         {
             using var consoleOutput = new StringWriter();
-            clockMock.SetupGet(obj => obj.Now).Returns(DateTimeOffset.MinValue);
+            var time = DateTimeOffset.MinValue;
+            clockMock.SetupGet(obj => obj.Now).Returns(time);
             Exception exception;
             try
             {
@@ -88,7 +81,7 @@ namespace Tests.QirController
                 exception = thrownException;
             }
 
-            var expectedLog = "1/1/0001 12:00:00 AM +00:00 [ERROR]: " +
+            var expectedLog = $"{time} [ERROR]: " +
                 "Exception encountered: System.InvalidOperationException: " +
                 exception.Message + Environment.NewLine + exception.StackTrace + Environment.NewLine;
             Console.SetOut(consoleOutput);
