@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Qir
                 using var inputFileStream = inputFile.OpenRead();
                 var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
 
-                // Step 32: Create driver.
+                // Step 2: Create driver.
                 logger.LogInfo("Creating driver file.");
                 var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
                 await driverGenerator.GenerateQirDriverCppAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
