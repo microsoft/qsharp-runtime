@@ -6,10 +6,6 @@
     <RootNamespace>Microsoft.Quantum.Qir</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-
   <ItemGroup>
     <BondCodegen Remove="test-artifacts\**" />
     <BondCodegen Remove="Tests.QirController\**" />

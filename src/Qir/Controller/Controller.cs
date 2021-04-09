@@ -15,12 +15,16 @@ namespace Microsoft.Quantum.Qir
 {
     public static class Controller
     {
+        private const string SourceDirectoryPath = "src";
+        private const string BinaryDirectoryPath = "bin";
+        private const string ExecutableName = "simulation.exe";
+
         public static async Task ExecuteAsync(
             FileInfo inputFile,
             FileInfo outputFile,
             DirectoryInfo libraryDirectory,
+            DirectoryInfo includeDirectory,
             FileInfo errorFile,
-            FileInfo bytecodeFile,
             IQirDriverGenerator driverGenerator,
             IQirExecutableGenerator executableGenerator,
             IQuantumExecutableRunner executableRunner,
@@ -33,24 +37,18 @@ namespace Microsoft.Quantum.Qir
                 using var inputFileStream = inputFile.OpenRead();
                 var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
 
-                // Step 2: Create bytecode file.
-                logger.LogInfo("Creating bytecode file.");
-                using (var bytecodeFileStream = bytecodeFile.OpenWrite())
-                {
-                    await bytecodeFileStream.WriteAsync(input.QirBytecode.Array, input.QirBytecode.Offset, input.QirBytecode.Count);
-                }
-
-                // Step 3: Create driver file.
+                // Step 32: Create driver.
                 logger.LogInfo("Creating driver file.");
-                var driverFile = new FileInfo(Constant.FilePath.DriverFilePath);
-                await driverGenerator.GenerateQirDriverCppAsync(input.EntryPoint, driverFile);
+                var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
+                await driverGenerator.GenerateQirDriverCppAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
 
-                // Step 4: Create executable.
+                // Step 3: Create executable.
                 logger.LogInfo("Compiling and linking executable.");
-                var executableFile = new FileInfo(Constant.FilePath.ExecutableFilePath);
-                await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, executableFile);
+                var binaryDirectory = new DirectoryInfo(BinaryDirectoryPath);
+                var executableFile = new FileInfo(Path.Combine(BinaryDirectoryPath, ExecutableName));
+                await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory);
 
-                // Step 5: Run executable.
+                // Step 4: Run executable.
                 logger.LogInfo("Running executable.");
                 using var outputFileStream = outputFile.OpenWrite();
                 await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);

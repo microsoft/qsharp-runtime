@@ -11,11 +11,11 @@ namespace Microsoft.Quantum.Qir.Executable
         /// <summary>
         /// Generates a quantum simulation program executable.
         /// </summary>
-        /// <param name="driverFile">The C++ source driver file.</param>
-        /// <param name="bytecodeFile">The QIR bytecode.</param>
+        /// <param name="executableFile">File path to create the executable at. Dependencies will be copied to its directory.</param>
+        /// <param name="sourceDirectory">Location of the source files.</param>
         /// <param name="libraryDirectory">Location of the libraries that must be linked.</param>
-        /// <param name="executableFile">File path to create the executable at.</param>
+        /// <param name="includeDirectory">Location of the headers that must be included.</param>
         /// <returns></returns>
-        Task GenerateExecutableAsync(FileInfo driverFile, FileInfo bytecodeFile, DirectoryInfo libraryDirectory, FileInfo executableFile);
+        public Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory);
     }
 }

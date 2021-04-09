@@ -17,11 +17,13 @@ namespace Microsoft.Quantum.Qir.Executable
             this.logger = logger;
         }
 
-        public async Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string outputPath)
+        public async Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string includePath, string outputPath)
         {
             var inputsArg = string.Join(' ', inputFiles);
+
+            // string.Join does not automatically prepend the delimiter, so it is included again in the string here.
             var librariesArg = $"{LinkFlag} {string.Join(LinkFlag, libraries)}";
-            var arguments = $"{inputsArg} -L {libraryPath} {librariesArg} -o {outputPath}";
+            var arguments = $"{inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath}";
             logger.LogInfo($"Invoking clang with the following arguments: {arguments}");
             var result = await Process.ExecuteAsync(
                 "clang",

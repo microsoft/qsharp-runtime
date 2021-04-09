@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Qir.Executable
             this.logger = logger;
         }
 
-        public async Task GenerateExecutableAsync(FileInfo driverFile, FileInfo bytecodeFile, DirectoryInfo libraryDirectory, FileInfo executableFile)
+        public Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
         {
             logger.LogInfo("Generating executable.");
             string[] inputFiles = { driverFile.FullName, bytecodeFile.FullName };

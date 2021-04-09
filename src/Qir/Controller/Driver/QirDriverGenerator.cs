@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
@@ -18,7 +19,7 @@ namespace Microsoft.Quantum.Qir.Driver
             this.logger = logger;
         }
 
-        public async Task GenerateQirDriverCppAsync(EntryPointOperation entryPointOperation, FileInfo driverFile)
+        public Task GenerateQirDriverCppAsync(DirectoryInfo sourceDirectory, EntryPointOperation entryPointOperation, ArraySegment<byte> bytecode)
         {
             await Task.Run(() =>
             {
