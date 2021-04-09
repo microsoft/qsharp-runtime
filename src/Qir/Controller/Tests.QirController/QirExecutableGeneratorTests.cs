@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,36 +13,124 @@ using Xunit;
 
 namespace Tests.QirController
 {
-    public class QirExecutableGeneratorTests
+    public class QirExecutableGeneratorTests : IDisposable
     {
         private readonly Mock<IClangClient> clangClientMock;
         private readonly QirExecutableGenerator executableGenerator;
+        private readonly DirectoryInfo sourceDirectory;
+        private readonly DirectoryInfo includeDirectory;
+        private readonly DirectoryInfo libraryDirectory;
+        private readonly DirectoryInfo binDirectory;
+        private readonly IList<FileInfo> libraryFiles;
+        private readonly IList<FileInfo> sourceFiles;
+        private readonly IList<FileInfo> includeFiles;
 
         public QirExecutableGeneratorTests()
         {
             clangClientMock = new Mock<IClangClient>();
             executableGenerator = new QirExecutableGenerator(clangClientMock.Object, Mock.Of<ILogger>());
+
+            // Set up files.
+            var prefix = Guid.NewGuid().ToString();
+            binDirectory = new DirectoryInfo($"{prefix}-bin");
+            binDirectory.Create();
+            libraryDirectory = new DirectoryInfo($"{prefix}-library");
+            libraryDirectory.Create();
+            libraryFiles = new List<FileInfo>()
+            {
+                CreateFile("lib1", libraryDirectory, "lib1 contents"),
+                CreateFile("lib2", libraryDirectory, "lib2 contents"),
+            };
+            includeDirectory = new DirectoryInfo($"{prefix}-include");
+            includeDirectory.Create();
+            includeFiles = new List<FileInfo>()
+            {
+                CreateFile("incl1", includeDirectory, "incl1 contents"),
+                CreateFile("incl2", includeDirectory, "incl2 contents"),
+            };
+            sourceDirectory = new DirectoryInfo($"{prefix}-source");
+            sourceDirectory.Create();
+            sourceFiles = new List<FileInfo>()
+            {
+                CreateFile("src1", sourceDirectory, "src1 contents"),
+                CreateFile("src2", sourceDirectory, "src2 contents"),
+            };
+        }
+
+        public void Dispose()
+        {
+            DeleteDirectory(sourceDirectory);
+            DeleteDirectory(includeDirectory);
+            DeleteDirectory(libraryDirectory);
+            DeleteDirectory(binDirectory);
         }
 
         [Fact]
         public async Task TestGenerateExecutable()
         {
-            var driverFile = new FileInfo("driver");
-            var bytecodeFile = new FileInfo("bytecode");
-            var libraryDirectory = new DirectoryInfo("libraries");
-            var executableFile = new FileInfo("executable");
             string[] expectedLibraries = {
                 "Microsoft.Quantum.Qir.Runtime",
                 "Microsoft.Quantum.Qir.QSharp.Foundation",
-                "Microsoft.Quantum.Qir.QSharp.Core",
+                "Microsoft.Quantum.Qir.QSharp.Core"
             };
-            string[] expectedInputFiles = { driverFile.FullName, bytecodeFile.FullName };
-            await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, executableFile);
+
+            var executableFile = new FileInfo(Path.Combine(binDirectory.FullName, "executableFile"));
+            await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory);
+
+            // Verify invocation of clang.
             clangClientMock.Verify(obj => obj.CreateExecutableAsync(
-                It.Is<string[]>(s => s.SequenceEqual(expectedInputFiles)),
+                It.Is<string[]>(s => s.SequenceEqual(sourceFiles.Select(fileInfo => fileInfo.FullName))),
                 It.Is<string[]>(s => s.SequenceEqual(expectedLibraries)),
                 libraryDirectory.FullName,
+                includeDirectory.FullName,
                 executableFile.FullName));
+
+            // Verify files were copied.
+            Assert.True(FilesWereCopied(includeFiles.ToArray(), binDirectory));
+            Assert.True(FilesWereCopied(libraryFiles.ToArray(), binDirectory));
+        }
+
+        private static FileInfo CreateFile(string fileName, DirectoryInfo directory, string contents)
+        {
+            var filePath = Path.Combine(directory.FullName, fileName);
+            var fileInfo = new FileInfo(filePath);
+            using var fileStream = fileInfo.OpenWrite();
+            using var streamWriter = new StreamWriter(fileStream);
+            streamWriter.Write(contents);
+            return fileInfo;
+        }
+
+        private static void DeleteDirectory(DirectoryInfo directory)
+        {
+            foreach (var file in directory.GetFiles())
+            {
+                file.Delete();
+            }
+            directory.Delete();
+        }
+
+        private static bool FilesWereCopied(FileInfo[] files, DirectoryInfo destinationDirectory)
+        {
+            var destinationDirectoryFiles = destinationDirectory.GetFiles();
+            foreach (var file in files)
+            {
+                var copiedFile = destinationDirectoryFiles.FirstOrDefault(fileInfo => fileInfo.Name == file.Name);
+                if (copiedFile == null)
+                {
+                    return false;
+                }
+
+                using var originalFileReader = file.OpenText();
+                var originalFileContents = originalFileReader.ReadToEnd();
+                using var copiedFileReader = copiedFile.OpenText();
+                var copiedFileContents = copiedFileReader.ReadToEnd();
+                if (originalFileContents != copiedFileContents)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

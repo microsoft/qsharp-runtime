@@ -21,12 +21,13 @@ namespace Microsoft.Quantum.Qir.Driver
 
         public Task GenerateQirDriverCppAsync(DirectoryInfo sourceDirectory, EntryPointOperation entryPointOperation, ArraySegment<byte> bytecode)
         {
-            await Task.Run(() =>
-            {
-                logger.LogInfo("Creating driver file.");
-                using var driverFileStream = driverFile.OpenWrite();
-                QirDriverGeneration.GenerateQirDriverCpp(entryPointOperation, driverFileStream);
-            });
+            //await Task.Run(() =>
+            //{
+            //    logger.LogInfo("Creating driver file.");
+            //    using var driverFileStream = driverFile.OpenWrite();
+            //    QirDriverGeneration.GenerateQirDriverCpp(entryPointOperation, driverFileStream);
+            //});
+            throw new NotImplementedException();
         }
     }
 }
