@@ -37,15 +37,6 @@ Foreach-Object {
             Write-Host $actualOutput
             $script:all_ok = $False
         }
-        elseif ((Test-Path $errorFile)) {
-            $actualError = Get-Content -Path $errorFile -Raw
-
-            # An error file should not have been generated, so fail test if one was found.
-            Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
-            Write-Host "##[info]Unexpected error file was found:"
-            Write-Host $actualError
-            $script:all_ok = $False
-        }
         else {
             Write-Host "##[info]Test case '$($_.BaseName)' passed"
         }
@@ -62,15 +53,6 @@ Foreach-Object {
         Write-Host $actualError
         $script:all_ok = $False
         continue
-    }
-    elseif ((Test-Path $outputFile)) {
-        $actualOutput = Get-Content -Path $outputFile -Raw
-
-        # An error file should not have been generated, so fail test if one was found.
-        Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
-        Write-Host "##[info]Unexpected output file was found:"
-        Write-Host $actualOutput
-        $script:all_ok = $False
     }
     else {
         Write-Host "##[info]Test case '$($_.BaseName)' passed"
