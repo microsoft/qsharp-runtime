@@ -123,47 +123,7 @@ namespace Tests.QirController
         }
 
         [Fact]
-        public async Task TestExecuteEncountersGenericExceptionWithOutputFileAlreadyCreated()
-        {
-            var libraryDirectory = new DirectoryInfo("libraries");
-            var includeDirectory = new DirectoryInfo("includes");
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>()))
-                .ThrowsAsync(new Exception("exception message"));
-
-            // Create output file to ensure that it will be deleted unconditionally.
-            using (var outputFileStream = outputFile.OpenWrite())
-            using (var streamWriter = new StreamWriter(outputFileStream))
-            {
-                await streamWriter.WriteAsync("program output");
-            }
-
-            // Execute controller.
-            await Controller.ExecuteAsync(
-                inputFile,
-                outputFile,
-                libraryDirectory,
-                includeDirectory,
-                errorFile,
-                driverGeneratorMock.Object,
-                executableGeneratorMock.Object,
-                executableRunnerMock.Object,
-                loggerMock.Object);
-
-            // Verify error file was created and contains the error.
-            Assert.True(errorFile.Exists);
-            using var errorFileStream = errorFile.OpenRead();
-            using var streamReader = new StreamReader(errorFileStream);
-            var errorFileContents = await streamReader.ReadToEndAsync();
-            var error = JsonSerializer.Deserialize<Error>(errorFileContents);
-            Assert.Equal(ErrorMessages.InternalError, error.Message);
-            Assert.Equal(Constant.ErrorCode.InternalError, error.Code);
-
-            // Verify output file was deleted.
-            Assert.False(outputFile.Exists);
-        }
-
-        [Fact]
-        public async Task TestExecuteEncountersGenericExceptionWithOutputFileNeverCreated()
+        public async Task TestExecuteEncountersGenericException()
         {
             var libraryDirectory = new DirectoryInfo("libraries");
             var includeDirectory = new DirectoryInfo("includes");
@@ -202,13 +162,6 @@ namespace Tests.QirController
             executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>()))
                 .ThrowsAsync(new ControllerException(exceptionMessage, errorCode));
 
-            // Create output file to ensure that it will be deleted unconditionally.
-            using (var outputFileStream = outputFile.OpenWrite())
-            using (var streamWriter = new StreamWriter(outputFileStream))
-            {
-                await streamWriter.WriteAsync("program output");
-            }
-
             // Execute controller.
             await Controller.ExecuteAsync(
                 inputFile,
@@ -229,9 +182,6 @@ namespace Tests.QirController
             var error = JsonSerializer.Deserialize<Error>(errorFileContents);
             Assert.Equal(exceptionMessage, error.Message);
             Assert.Equal(errorCode, error.Code);
-
-            // Verify output file was deleted.
-            Assert.False(outputFile.Exists);
         }
 
         private bool EntryPointsAreEqual(EntryPointOperation entryPointA, EntryPointOperation entryPointB)
