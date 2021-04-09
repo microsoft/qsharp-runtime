@@ -66,13 +66,10 @@ namespace Microsoft.Quantum.Qir
 
             rootCommand.AddOption(errorOption);
 
-            // The bytecode file is not needed as an input to the program, but we provide the path as an argument to the controller so it can be configured by tests.
-            var bytecodeFile = new FileInfo(Constant.FilePath.BytecodeFilePath);
-
             // Bind to a handler and invoke.
             rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, DirectoryInfo, FileInfo>(
                 async (input, output, libraryDirectory, includeDirectory, error) =>
-                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner, logger));
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, driverGenerator, execGenerator, execRunner, logger));
             rootCommand.Invoke(args);
         }
     }

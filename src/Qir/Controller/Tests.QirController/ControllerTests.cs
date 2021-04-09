@@ -78,18 +78,17 @@ namespace Tests.QirController
         {
             var libraryDirectory = new DirectoryInfo("libraries");
             var includeDirectory = new DirectoryInfo("includes");
-            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
-            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>())).Callback(() =>
+            FileInfo actualExecutableFile = null;
+            Action<FileInfo, DirectoryInfo, DirectoryInfo, DirectoryInfo> generateExecutableCallback = async (executableFile, srcDir, libDir, inclDir) =>
             {
-                // Verify that the "bytecode" file was created correctly.
-                using var bytecode = bytecodeFile.OpenRead();
-                Assert.Equal(bytecode.Length, input.QirBytecode.Count);
-                for (var i = 0; i < bytecode.Length; ++i)
-                {
-                    Assert.Equal(input.QirBytecode[i], bytecode.ReadByte());
-                }
-            });
+                actualExecutableFile = executableFile;
+                await Task.CompletedTask;
+            };
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(
+                It.IsAny<FileInfo>(),
+                It.IsAny<DirectoryInfo>(),
+                It.Is<DirectoryInfo>(actualLibraryDirectory => actualLibraryDirectory.FullName == libraryDirectory.FullName),
+                It.Is<DirectoryInfo>(actualIncludeDirectory => actualIncludeDirectory.FullName == includeDirectory.FullName))).Callback(generateExecutableCallback);
 
             await Controller.ExecuteAsync(
                 inputFile,
@@ -97,7 +96,6 @@ namespace Tests.QirController
                 libraryDirectory,
                 includeDirectory,
                 errorFile,
-                bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
                 executableRunnerMock.Object,
@@ -105,22 +103,22 @@ namespace Tests.QirController
 
             // Verify driver was created.
             driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppAsync(
+                It.IsAny<DirectoryInfo>(),
                 It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
-                It.Is<FileInfo>(fileInfo => fileInfo.FullName == expectedDriverPath.FullName)));
+                It.Is<ArraySegment<byte>>(bytecode => BytecodesAreEqual(bytecode, input.QirBytecode))));
 
             // Verify executable was generated.
             executableGeneratorMock.Verify(obj => obj.GenerateExecutableAsync(
-                It.Is<FileInfo>(driverPath => driverPath.FullName == expectedDriverPath.FullName),
-                It.Is<FileInfo>(actualBytecodeFile => actualBytecodeFile.FullName == bytecodeFile.FullName),
+                It.IsAny<FileInfo>(),
+                It.IsAny<DirectoryInfo>(),
                 It.Is<DirectoryInfo>(actualLibraryDirectory => actualLibraryDirectory.FullName == libraryDirectory.FullName),
-                It.Is<DirectoryInfo>(actualIncludeDirectory => actualIncludeDirectory.FullName == includeDirectory.FullName),
-                It.Is<FileInfo>(actualExecutableFile => actualExecutableFile.FullName == expectedExecutablePath.FullName)));
+                It.Is<DirectoryInfo>(actualIncludeDirectory => actualIncludeDirectory.FullName == includeDirectory.FullName)));
+            Assert.NotNull(actualExecutableFile);
 
             // Verify executable was run.
             executableRunnerMock.Verify(obj => obj.RunExecutableAsync(
-                It.Is<FileInfo>(actualExecutableFile => actualExecutableFile.FullName == expectedExecutablePath.FullName),
+                It.Is<FileInfo>(executableFile => actualExecutableFile.FullName == executableFile.FullName),
                 It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
-                It.Is<DirectoryInfo>(actualLibraryDirectory => actualLibraryDirectory.FullName == libraryDirectory.FullName),
                 It.Is<FileInfo>(actualOutputFile => actualOutputFile.FullName == outputFile.FullName)));
         }
 
@@ -129,9 +127,7 @@ namespace Tests.QirController
         {
             var libraryDirectory = new DirectoryInfo("libraries");
             var includeDirectory = new DirectoryInfo("includes");
-            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
-            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>()))
                 .ThrowsAsync(new Exception("exception message"));
 
             // Create output file to ensure that it will be deleted unconditionally.
@@ -148,7 +144,6 @@ namespace Tests.QirController
                 libraryDirectory,
                 includeDirectory,
                 errorFile,
-                bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
                 executableRunnerMock.Object,
@@ -172,9 +167,7 @@ namespace Tests.QirController
         {
             var libraryDirectory = new DirectoryInfo("libraries");
             var includeDirectory = new DirectoryInfo("includes");
-            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
-            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>()))
                 .ThrowsAsync(new Exception("exception message"));
 
             // Execute controller.
@@ -184,7 +177,6 @@ namespace Tests.QirController
                 libraryDirectory,
                 includeDirectory,
                 errorFile,
-                bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
                 executableRunnerMock.Object,
@@ -207,9 +199,7 @@ namespace Tests.QirController
             var errorCode = "error code";
             var libraryDirectory = new DirectoryInfo("libraries");
             var includeDirectory = new DirectoryInfo("includes");
-            var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
-            var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>()))
                 .ThrowsAsync(new ControllerException(exceptionMessage, errorCode));
 
             // Create output file to ensure that it will be deleted unconditionally.
@@ -226,7 +216,6 @@ namespace Tests.QirController
                 libraryDirectory,
                 includeDirectory,
                 errorFile,
-                bytecodeFile,
                 driverGeneratorMock.Object,
                 executableGeneratorMock.Object,
                 executableRunnerMock.Object,
@@ -251,6 +240,24 @@ namespace Tests.QirController
                 .GetMethod("ValueEquals", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(EntryPointOperation), typeof(EntryPointOperation) }, null);
             object[] parameters = { entryPointA, entryPointB };
             return (bool)method.Invoke(null, parameters);
+        }
+
+        private bool BytecodesAreEqual(ArraySegment<byte> bytecodeA, ArraySegment<byte> bytecodeB)
+        {
+            if (bytecodeA.Count != bytecodeB.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < bytecodeA.Count; ++i)
+            {
+                if (bytecodeA[i] != bytecodeB[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

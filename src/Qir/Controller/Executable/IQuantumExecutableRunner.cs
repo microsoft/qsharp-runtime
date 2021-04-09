@@ -14,9 +14,8 @@ namespace Microsoft.Quantum.Qir.Executable
         /// </summary>
         /// <param name="executableFile">Location of the executable to run.</param>
         /// <param name="entryPointOperation">Entry point and arguments to pass.</param>
-        /// <param name="libraryDirectory">Location of the libraries that are linked to the executable.</param>
         /// <param name="outputFile">Location to write program output.</param>
         /// <returns></returns>
-        Task RunExecutableAsync(FileInfo executableFile, EntryPointOperation entryPointOperation, DirectoryInfo libraryDirectory, FileInfo outputFile);
+        Task RunExecutableAsync(FileInfo executableFile, EntryPointOperation entryPointOperation, FileInfo outputFile);
     }
 }

@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Qir.Executable
             this.logger = logger;
         }
 
-        public Task RunExecutableAsync(FileInfo executableFile, EntryPointOperation entryPointOperation, DirectoryInfo libraryDirectory, FileInfo outputFile)
+        public Task RunExecutableAsync(FileInfo executableFile, EntryPointOperation entryPointOperation, FileInfo outputFile)
         {
             throw new System.NotImplementedException();
         }

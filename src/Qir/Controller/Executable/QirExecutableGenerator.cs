@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Qir.Executable
             this.logger = logger;
         }
 
-        public Task GenerateExecutableAsync(FileInfo driverFile, FileInfo bytecodeFile, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, FileInfo executableFile)
+        public Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
         {
             // TODO: Compile and link libraries- "Microsoft.Quantum.Qir.Runtime", "Microsoft.Quantum.Qir.QSharp.Foundation", "Microsoft.Quantum.Qir.QSharp.Core"
             throw new System.NotImplementedException();
