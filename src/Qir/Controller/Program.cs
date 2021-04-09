@@ -48,6 +48,7 @@ namespace Microsoft.Quantum.Qir
                 IsRequired = true
             };
 
+            rootCommand.AddOption(libraryDirectoryOption);
             var includeDirectoryOption = new Option<DirectoryInfo>(
             aliases: new string[] { "--includeDirectory" })
             {
@@ -55,7 +56,7 @@ namespace Microsoft.Quantum.Qir
                 IsRequired = true
             };
 
-            rootCommand.AddOption(libraryDirectoryOption);
+            rootCommand.AddOption(includeDirectoryOption);
             var errorOption = new Option<FileInfo>(
                 aliases: new string[] { "--error",})
             {
