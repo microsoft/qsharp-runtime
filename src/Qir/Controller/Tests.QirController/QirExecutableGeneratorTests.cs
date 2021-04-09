@@ -59,10 +59,10 @@ namespace Tests.QirController
 
         public void Dispose()
         {
-            DeleteDirectory(sourceDirectory);
-            DeleteDirectory(includeDirectory);
-            DeleteDirectory(libraryDirectory);
-            DeleteDirectory(binDirectory);
+            Util.DeleteDirectory(sourceDirectory);
+            Util.DeleteDirectory(includeDirectory);
+            Util.DeleteDirectory(libraryDirectory);
+            Util.DeleteDirectory(binDirectory);
         }
 
         [Fact]
@@ -98,15 +98,6 @@ namespace Tests.QirController
             using var streamWriter = new StreamWriter(fileStream);
             streamWriter.Write(contents);
             return fileInfo;
-        }
-
-        private static void DeleteDirectory(DirectoryInfo directory)
-        {
-            foreach (var file in directory.GetFiles())
-            {
-                file.Delete();
-            }
-            directory.Delete();
         }
 
         private static bool FilesWereCopied(FileInfo[] files, DirectoryInfo destinationDirectory)
