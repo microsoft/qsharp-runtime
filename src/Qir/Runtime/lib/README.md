@@ -1,3 +1,31 @@
+# Directory Structure
+
+[../../../Simulation/README.md](../../../Simulation/README.md)
+
+This directory structure mirrors how the Q# language runtime itself is implemented,
+namely that the QSharpFoundation is code that is specific to the concepts and patterns inherent in Q#
+while QSharpCore is the default quantum instruction target package that is part of the QDK.
+This was introduced as part of the target package feature work, specifically the
+[PR #476](https://github.com/microsoft/qsharp-runtime/pull/476).
+
+
+## QSharpFoundation
+Is a project defined [here](../../../Simulation/QSharpFoundation).
+
+## QSharpCore 
+Is a project defined [here](../../../Simulation/QSharpCore).
+
+## QIR
+Anything that is required by the [QIR specs](https://github.com/microsoft/qsharp-language/tree/main/Specifications/QIR),
+which in particular includes the ["methods that delegate to the simulators"](QIR/bridge-rt.ll#46), should live in the QIR folder.
+They require support from the backend, but are not language-specific.  
+Both the Q# Core and the Q# Foundation are Q#-specific in that these are the target instructions that the Q# libraries are built on.
+
+Qubit allocation (`@quantum__rt__qubit_allocate()`, `@quantum__rt__qubit_release()`), as a specific example,
+is not part of one target package or another, but rather part of the QSharp Foundation package,
+which is why it is defined there in the QIR as well. 
+
+
 # API Dependency
 
 (Try to keep the readability balance between the web view and raw file, give the preference to the raw file)
@@ -32,4 +60,3 @@ Same-level entities are independent of each other (unless specified otherwise). 
 **QSharpCore**          Defines `@__quantum__qis__*()` quantum gate set entry points.  
                         Each API depends on `GlobalContext()`, `IQuantumGateSet`.  
                         Uses `QirArray *` from `public\QirTypes.hpp`.
-
