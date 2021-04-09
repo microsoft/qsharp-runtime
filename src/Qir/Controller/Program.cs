@@ -4,6 +4,9 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using Microsoft.Quantum.Qir.Driver;
+using Microsoft.Quantum.Qir.Executable;
+using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir
 {
@@ -11,6 +14,12 @@ namespace Microsoft.Quantum.Qir
     {
         static void Main(string[] args)
         {
+            var logger = new Logger(new Clock());
+            var execGenerator = new QirExecutableGenerator(new ClangClient(logger), logger);
+            var driverGenerator = new QirDriverGenerator(logger);
+            var execRunner = new QuantumExecutableRunner(logger);
+            logger.LogInfo("QIR controller beginning.");
+
             var rootCommand = new RootCommand(
                 description: "Builds and runs QIR executable.");
 
@@ -31,6 +40,23 @@ namespace Microsoft.Quantum.Qir
             };
 
             rootCommand.AddOption(outputOption);
+
+            var libraryDirectoryOption = new Option<DirectoryInfo>(
+            aliases: new string[] { "--libraryDirectory" })
+            {
+                Description = "Path to the directory containing the libraries that must be linked to the driver executable.",
+                IsRequired = true
+            };
+
+            rootCommand.AddOption(libraryDirectoryOption);
+            var includeDirectoryOption = new Option<DirectoryInfo>(
+            aliases: new string[] { "--includeDirectory" })
+            {
+                Description = "Path to the directory containing headers that must be included by the C++ driver.",
+                IsRequired = true
+            };
+
+            rootCommand.AddOption(includeDirectoryOption);
             var errorOption = new Option<FileInfo>(
                 aliases: new string[] { "--error",})
             {
@@ -41,7 +67,9 @@ namespace Microsoft.Quantum.Qir
             rootCommand.AddOption(errorOption);
 
             // Bind to a handler and invoke.
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, FileInfo>((input, output, error) => Controller.Execute(input, output, error));
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, DirectoryInfo, FileInfo>(
+                async (input, output, libraryDirectory, includeDirectory, error) =>
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, driverGenerator, execGenerator, execRunner, logger));
             rootCommand.Invoke(args);
         }
     }

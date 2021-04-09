@@ -339,3 +339,6 @@ ASALocalRun/
 /src/Simulation/Simulators.Tests/TestProjects/QSharpExe/built
 /src/Simulation/Simulators.Tests/TestProjects/TargetedExe/built
 dbw_test
+
+# Controller test artifacts
+/src/Qir/Controller/test-artifacts/
