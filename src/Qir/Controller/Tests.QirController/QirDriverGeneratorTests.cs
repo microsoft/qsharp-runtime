@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Driver;
-using Microsoft.Quantum.Qir.Executable;
 using Microsoft.Quantum.Qir.Utility;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using Moq;
