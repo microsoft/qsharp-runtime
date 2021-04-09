@@ -19,6 +19,7 @@ namespace Microsoft.Quantum.Qir
             FileInfo inputFile,
             FileInfo outputFile,
             DirectoryInfo libraryDirectory,
+            DirectoryInfo includeDirectory,
             FileInfo errorFile,
             FileInfo bytecodeFile,
             IQirDriverGenerator driverGenerator,
@@ -48,12 +49,12 @@ namespace Microsoft.Quantum.Qir
                 // Step 4: Create executable.
                 logger.LogInfo("Compiling and linking executable.");
                 var executableFile = new FileInfo(Constant.FilePath.ExecutableFilePath);
-                await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, executableFile);
+                await executableGenerator.GenerateExecutableAsync(driverFile, bytecodeFile, libraryDirectory, includeDirectory, executableFile);
 
                 // Step 5: Run executable.
                 logger.LogInfo("Running executable.");
                 using var outputFileStream = outputFile.OpenWrite();
-                await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
+                await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, libraryDirectory, outputFile);
             }
             catch (Exception e)
             {

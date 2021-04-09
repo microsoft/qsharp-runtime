@@ -20,7 +20,7 @@ Foreach-Object {
     # Get the paths to the output and error files to pass to the QIR controller.
     $outputFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".out"))
     $errorFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".err"))
-    dotnet run --project $controllerProject -- --input $_.FullName --output $outputFile --error $errorFile --libraryDirectory "placeholder for now"
+    dotnet run --project $controllerProject -- --input $_.FullName --output $outputFile --error $errorFile --includeDirectory "placeholder for now" --libraryDirectory "placeholder for now"
 
     # Compare the expected content of the output and error files vs the actual content.
     $expectedOutputFile = (Join-Path $testCasesFolder ($_.BaseName + ".out"))

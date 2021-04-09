@@ -10,6 +10,6 @@ namespace Microsoft.Quantum.Qir.Executable
     /// </summary>
     public interface IClangClient
     {
-        Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string outputPath);
+        Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string includePath, string outputPath);
     }
 }

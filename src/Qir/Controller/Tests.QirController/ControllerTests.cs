@@ -77,9 +77,10 @@ namespace Tests.QirController
         public async Task TestExecute()
         {
             var libraryDirectory = new DirectoryInfo("libraries");
+            var includeDirectory = new DirectoryInfo("includes");
             var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
             var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>())).Callback(() =>
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>())).Callback(() =>
             {
                 // Verify that the "bytecode" file was created correctly.
                 using var bytecode = bytecodeFile.OpenRead();
@@ -94,6 +95,7 @@ namespace Tests.QirController
                 inputFile,
                 outputFile,
                 libraryDirectory,
+                includeDirectory,
                 errorFile,
                 bytecodeFile,
                 driverGeneratorMock.Object,
@@ -111,12 +113,14 @@ namespace Tests.QirController
                 It.Is<FileInfo>(driverPath => driverPath.FullName == expectedDriverPath.FullName),
                 It.Is<FileInfo>(actualBytecodeFile => actualBytecodeFile.FullName == bytecodeFile.FullName),
                 It.Is<DirectoryInfo>(actualLibraryDirectory => actualLibraryDirectory.FullName == libraryDirectory.FullName),
+                It.Is<DirectoryInfo>(actualIncludeDirectory => actualIncludeDirectory.FullName == includeDirectory.FullName),
                 It.Is<FileInfo>(actualExecutableFile => actualExecutableFile.FullName == expectedExecutablePath.FullName)));
 
             // Verify executable was run.
             executableRunnerMock.Verify(obj => obj.RunExecutableAsync(
                 It.Is<FileInfo>(actualExecutableFile => actualExecutableFile.FullName == expectedExecutablePath.FullName),
                 It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
+                It.Is<DirectoryInfo>(actualLibraryDirectory => actualLibraryDirectory.FullName == libraryDirectory.FullName),
                 It.Is<FileInfo>(actualOutputFile => actualOutputFile.FullName == outputFile.FullName)));
         }
 
@@ -124,9 +128,10 @@ namespace Tests.QirController
         public async Task TestExecuteEncountersGenericExceptionWithOutputFileAlreadyCreated()
         {
             var libraryDirectory = new DirectoryInfo("libraries");
+            var includeDirectory = new DirectoryInfo("includes");
             var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
             var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
                 .ThrowsAsync(new Exception("exception message"));
 
             // Create output file to ensure that it will be deleted unconditionally.
@@ -141,6 +146,7 @@ namespace Tests.QirController
                 inputFile,
                 outputFile,
                 libraryDirectory,
+                includeDirectory,
                 errorFile,
                 bytecodeFile,
                 driverGeneratorMock.Object,
@@ -165,9 +171,10 @@ namespace Tests.QirController
         public async Task TestExecuteEncountersGenericExceptionWithOutputFileNeverCreated()
         {
             var libraryDirectory = new DirectoryInfo("libraries");
+            var includeDirectory = new DirectoryInfo("includes");
             var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
             var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
                 .ThrowsAsync(new Exception("exception message"));
 
             // Execute controller.
@@ -175,6 +182,7 @@ namespace Tests.QirController
                 inputFile,
                 outputFile,
                 libraryDirectory,
+                includeDirectory,
                 errorFile,
                 bytecodeFile,
                 driverGeneratorMock.Object,
@@ -198,9 +206,10 @@ namespace Tests.QirController
             var exceptionMessage = "exception message";
             var errorCode = "error code";
             var libraryDirectory = new DirectoryInfo("libraries");
+            var includeDirectory = new DirectoryInfo("includes");
             var expectedDriverPath = new FileInfo(Constant.FilePath.DriverFilePath);
             var expectedExecutablePath = new FileInfo(Constant.FilePath.ExecutableFilePath);
-            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
+            executableGeneratorMock.Setup(obj => obj.GenerateExecutableAsync(It.IsAny<FileInfo>(), It.IsAny<FileInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<DirectoryInfo>(), It.IsAny<FileInfo>()))
                 .ThrowsAsync(new ControllerException(exceptionMessage, errorCode));
 
             // Create output file to ensure that it will be deleted unconditionally.
@@ -215,6 +224,7 @@ namespace Tests.QirController
                 inputFile,
                 outputFile,
                 libraryDirectory,
+                includeDirectory,
                 errorFile,
                 bytecodeFile,
                 driverGeneratorMock.Object,

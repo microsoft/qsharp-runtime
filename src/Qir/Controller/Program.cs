@@ -48,6 +48,13 @@ namespace Microsoft.Quantum.Qir
                 IsRequired = true
             };
 
+            var includeDirectoryOption = new Option<DirectoryInfo>(
+            aliases: new string[] { "--includeDirectory" })
+            {
+                Description = "Path to the directory containing headers that must be included by the C++ driver.",
+                IsRequired = true
+            };
+
             rootCommand.AddOption(libraryDirectoryOption);
             var errorOption = new Option<FileInfo>(
                 aliases: new string[] { "--error",})
@@ -62,9 +69,9 @@ namespace Microsoft.Quantum.Qir
             var bytecodeFile = new FileInfo(Constant.FilePath.BytecodeFilePath);
 
             // Bind to a handler and invoke.
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, FileInfo>(
-                async (input, output, libraryDirectory, error) =>
-                    await Controller.ExecuteAsync(input, output, libraryDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner, logger));
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, DirectoryInfo, FileInfo>(
+                async (input, output, libraryDirectory, includeDirectory, error) =>
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, bytecodeFile, driverGenerator, execGenerator, execRunner, logger));
             rootCommand.Invoke(args);
         }
     }
