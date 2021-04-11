@@ -469,16 +469,16 @@ namespace Microsoft.Quantum.Simulation.Common
             public override Func<(long, long), long> __Body__ => arg =>
             {
                 var (min, max) = arg;
-                if (max <= min)
+                if (max < min)
                 {
-                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                    throw new ExecutionFailException($"Max must be greater than or equal to min, but {max} < {min}.");
                 }
                 return sim.RandomGenerator.NextLong(min, max);
             };
         }
 
         /// <summary>
-        ///     Implements the DrawRandomInt operation from the
+        ///     Implements the DrawRandomDouble operation from the
         ///     Microsoft.Quantum.Random namespace.
         /// </summary>
         public class DrawRandomDouble : Random.DrawRandomDouble
@@ -490,9 +490,9 @@ namespace Microsoft.Quantum.Simulation.Common
             public override Func<(double, double), double> __Body__ => arg =>
             {
                 var (min, max) = arg;
-                if (max <= min)
+                if (max < min)
                 {
-                    throw new ExecutionFailException($"Max must be greater than min, but {max} <= {min}.");
+                    throw new ExecutionFailException($"Max must be greater than or equal to min, but {max} < {min}.");
                 }
                 var delta = max - min;
                 return min + delta * sim.RandomGenerator.NextDouble();
