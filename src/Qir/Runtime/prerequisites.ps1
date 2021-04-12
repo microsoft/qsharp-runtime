@@ -8,6 +8,9 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             choco install ninja
         }
     } elseif ($IsMacOS) {
+        # temporary workaround for Bintray sunset
+        # remove this after Homebrew is updated to 3.1.1 on MacOS image, see:
+        # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md
         brew update
         brew install ninja
     } else {
