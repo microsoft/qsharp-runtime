@@ -8,6 +8,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             choco install ninja
         }
     } elseif ($IsMacOS) {
+        brew update
         brew install ninja
     } else {
         sudo apt update
