@@ -8,13 +8,13 @@
     <owners>QuantumEngineering, Microsoft</owners>
 
     <license type="expression">MIT</license>
-    <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
+    <projectUrl>https://docs.microsoft.com/azure/quantum</projectUrl>
     <icon>images\qdk-nuget-icon.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>C# code generation for executing Q# programs on a quantum simulator.</description>
 
-    <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
+    <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
 
     <copyright>$copyright$</copyright>
     <tags>Quantum Q# QSharp</tags>

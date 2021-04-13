@@ -14,9 +14,13 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - AssertQubit
-    operation AssertAllZero (qubits : Qubit[]) : Unit {
+    ///
+    /// # Remarks
+    /// Note that the Adjoint and Controlled versions of this operation will not
+    /// check the condition.
+    operation AssertAllZero (qubits : Qubit[]) : Unit is Adj + Ctl {
         body (...) {
-            for (qubit in qubits) {
+            for qubit in qubits {
                 AssertQubit(Zero, qubit);
             }
         }
@@ -39,10 +43,14 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - AssertQubitWithinTolerance
-    operation AssertAllZeroWithinTolerance(qubits : Qubit[], tolerance : Double) : Unit {
+    ///
+    /// # Remarks
+    /// Note that the Adjoint and Controlled versions of this operation will not
+    /// check the condition.
+    operation AssertAllZeroWithinTolerance(qubits : Qubit[], tolerance : Double) : Unit is Adj + Ctl{
 
         body (...) {
-            for (qubit in qubits) {
+            for qubit in qubits {
                 AssertQubitWithinTolerance(Zero, qubit, tolerance);
             }
         }
@@ -52,6 +60,7 @@ namespace Microsoft.Quantum.Diagnostics {
         controlled (ctrls, ...) {
             AssertAllZeroWithinTolerance(qubits, tolerance);
         }
+        controlled adjoint self;
     }
 
 }

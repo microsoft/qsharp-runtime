@@ -7,11 +7,11 @@
     <authors>Microsoft</authors>
     <owners>QuantumEngineering, Microsoft</owners>
     <license type="expression">MIT</license>
-    <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
+    <projectUrl>https://docs.microsoft.com/azure/quantum</projectUrl>
     <icon>images\qdk-nuget-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Classical simulators of quantum computers for the Q# programming language.</description>
-    <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
+    <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Quantum Q# QSharp</tags>
   </metadata>

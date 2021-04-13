@@ -76,9 +76,24 @@ namespace Microsoft.Quantum.Tests {
     @Test("ToffoliSimulator")
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation CheckDrawRandomIntObeysRanges() : Unit {
-        let randomInt = DrawRandomInt(0, 45);
+        mutable randomInt = DrawRandomInt(0, 45);
         if (randomInt > 45 or randomInt < 0) {
             fail $"DrawRandomInt(0, 45) returned {randomInt}, outside the allowed range.";
+        }
+
+        set randomInt = DrawRandomInt(0, 0);
+        if (randomInt > 0 or randomInt < 0) {
+            fail $"DrawRandomInt(0, 0) returned {randomInt}, outside the allowed range.";
+        }
+
+        set randomInt = DrawRandomInt(-3, -3);
+        if (randomInt > -3 or randomInt < -3) {
+            fail $"DrawRandomInt(-3, -3) returned {randomInt}, outside the allowed range.";
+        }
+
+        set randomInt = DrawRandomInt(3, 3);
+        if (randomInt > 3 or randomInt < 3) {
+            fail $"DrawRandomInt(3, 3) returned {randomInt}, outside the allowed range.";
         }
     }
     
