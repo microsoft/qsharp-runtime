@@ -18,6 +18,7 @@ struct CApiState {
 lazy_static! {
     static ref STATE: Mutex<HashMap<usize, CApiState>> = Mutex::new(HashMap::new());
     static ref LAST_ERROR: Mutex<Option<String>> = Mutex::new(None);
+    static ref Q_COUNT: Mutex<usize> = Mutex::new(0);
 }
 
 // UTILITY FUNCTIONS //
@@ -111,8 +112,18 @@ pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
 }
 
 #[no_mangle]
+pub extern "C" fn __quantum__qis__x__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.x).unwrap();
+}
+
+#[no_mangle]
 pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.y))
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__y__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.y).unwrap();
 }
 
 #[no_mangle]
@@ -121,8 +132,18 @@ pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
 }
 
 #[no_mangle]
+pub extern "C" fn __quantum__qis__z__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.z).unwrap();
+}
+
+#[no_mangle]
 pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.h))
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__h__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.h).unwrap();
 }
 
 #[no_mangle]
@@ -131,8 +152,18 @@ pub fn s(sim_id: usize, idx: usize) -> i64 {
 }
 
 #[no_mangle]
+pub extern "C" fn __quantum__qis__s__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.s).unwrap();
+}
+
+#[no_mangle]
 pub fn s_adj(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.s_adj))
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__s__adj(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.s_adj).unwrap();
 }
 
 #[no_mangle]
@@ -141,8 +172,18 @@ pub fn t(sim_id: usize, idx: usize) -> i64 {
 }
 
 #[no_mangle]
+pub extern "C" fn __quantum__qis__t__body(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.t).unwrap();
+}
+
+#[no_mangle]
 pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.t_adj))
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__t__adj(qubit_id: usize) {
+    let _ = apply(1, &[qubit_id], |model| &model.t_adj).unwrap();
 }
 
 #[no_mangle]
@@ -150,6 +191,13 @@ pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx_control, idx_target], |model| {
         &model.cnot
     }))
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__cnot__body(control_id: usize, target_id: usize) {
+    let _ = apply(1, &[control_id, target_id], |model| {
+        &model.cnot
+    }).unwrap();
 }
 
 #[no_mangle]
@@ -168,6 +216,19 @@ pub extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
             Err(format!("No simulator with id {} exists.", sim_id).to_string())
         }
     })
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__qis__m__body(qubit_id: usize) -> usize {
+    let state = &mut *STATE.lock().unwrap();
+    if let Some(sim_state) = state.get_mut(&1) {
+        let instrument = &sim_state.noise_model.z_meas;
+        let (result, new_state) = instrument.sample(&[qubit_id], &sim_state.register_state);
+        sim_state.register_state = new_state;
+        result
+    } else {
+        panic!("No simulator with id {} exists.", 0);
+    }
 }
 
 #[no_mangle]
@@ -259,4 +320,41 @@ pub extern "C" fn get_current_state(sim_id: usize) -> *const c_char {
     } else {
         ptr::null()
     }
+}
+
+#[no_mangle]
+pub extern "C" fn get_qubit_id(qubit_id: usize) -> usize {
+    qubit_id
+}
+
+#[no_mangle]
+pub extern "C" fn allocate_qubit() -> usize {
+    // Because Q# always allocates and releases qubits in strict FILO, we can use the
+    // bit vector itself to track the currently "live" qubits.
+    let mut qc = Q_COUNT.lock().unwrap();
+    *qc += 1;
+    *qc - 1
+}
+
+#[no_mangle]
+pub extern "C" fn release_qubit(_qubit_id: usize) {
+    *(Q_COUNT.lock().unwrap()) -= 1;
+}
+
+#[no_mangle]
+pub extern "C" fn release_result(_: usize) {}
+
+#[no_mangle]
+pub extern "C" fn use_zero() -> usize {
+    0
+}
+
+#[no_mangle]
+pub extern "C" fn use_one() -> usize {
+    1
+}
+
+#[no_mangle]
+pub extern "C" fn are_equal_results(r1: usize, r2: usize) -> bool {
+    r1 == r2
 }
