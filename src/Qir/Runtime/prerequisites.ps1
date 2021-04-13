@@ -6,7 +6,9 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (!(Get-Command clang -ErrorAction SilentlyContinue)) {
             choco install llvm
             choco install ninja
-            choco install rustup.install
+            # NB: The chocolatey package for rustup is currently nonfunctional,
+            #     so we rely on Rust being installed via Azure Pipelines.
+            # choco install rustup.install
         }
     } elseif ($IsMacOS) {
         # temporary workaround for Bintray sunset
