@@ -5,6 +5,9 @@
 
 namespace Microsoft.Quantum.Runtime
 {
+    /// <summary>
+    /// A machine that can execute quantum programs on Azure.
+    /// </summary>
     public interface IAzureMachine
     {
         /// <summary>

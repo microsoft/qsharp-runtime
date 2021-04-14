@@ -12,7 +12,7 @@ using Core = Microsoft.Quantum.Simulation.Core;
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
-    /// A machine that can submit QIR programs to Azure.
+    /// A machine that can execute QIR programs on Azure.
     /// </summary>
     public interface IQirMachine : IAzureMachine
     {
