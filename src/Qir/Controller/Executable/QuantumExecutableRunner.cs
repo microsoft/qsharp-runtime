@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
+using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
 namespace Microsoft.Quantum.Qir.Executable
@@ -21,21 +21,15 @@ namespace Microsoft.Quantum.Qir.Executable
 
         public async Task RunExecutableAsync(FileInfo executableFile, EntryPointOperation entryPointOperation, FileInfo outputFile)
         {
-            var arguments = GenerateArgumentsString(entryPointOperation.Arguments);
+            var arguments = QirDriverGeneration.GenerateCommandLineArguments(entryPointOperation.Arguments);
             logger.LogInfo($"Invoking executable {executableFile.FullName} with the following arguments: {arguments}");
-            using var outputFileStream = outputFile.OpenWrite();
-            using var streamWriter = new StreamWriter(outputFileStream);
+            arguments = $"-s {outputFile.FullName} {arguments}";
             var result = await Process.ExecuteAsync(
                 executableFile.FullName,
                 arguments,
-                stdOut: async s => { await streamWriter.WriteAsync(s); },
+                stdOut: s => { logger.LogInfo(s); },
                 stdErr: s => { logger.LogError("executable: " + s); });
-            logger.LogInfo("Executable has finished running.");
-        }
-
-        private string GenerateArgumentsString(IList<Argument> args)
-        {
-            throw new System.NotImplementedException();
+            logger.LogInfo($"Executable has finished running. Result code: {result}");
         }
     }
 }

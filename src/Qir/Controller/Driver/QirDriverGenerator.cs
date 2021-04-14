@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
@@ -13,7 +12,7 @@ namespace Microsoft.Quantum.Qir.Driver
 {
     public class QirDriverGenerator : IQirDriverGenerator
     {
-        private const string BytecodeFileName = "bytecode.ll";
+        private const string BytecodeFileName = "qir.bc";
         private const string DriverFileName = "driver.cpp";
         private readonly ILogger logger;
 

@@ -38,8 +38,7 @@ namespace Microsoft.Quantum.Qir.Executable
                 var libraryFiles = libraryDirectory.GetFiles();
                 foreach (var file in libraryFiles)
                 {
-                    var newFile = file.CopyTo(Path.Combine(binDirectory.FullName, file.Name));
-                    logger.LogInfo($"Copied file {file.FullName} to {newFile.FullName}");
+                    CopyFileIfNotExists(file, binDirectory);
                 }
 
                 // Copy all include contents to bin.
@@ -47,13 +46,22 @@ namespace Microsoft.Quantum.Qir.Executable
                 var includeFiles = includeDirectory.GetFiles();
                 foreach (var file in includeFiles)
                 {
-                    var newFile = file.CopyTo(Path.Combine(binDirectory.FullName, file.Name));
-                    logger.LogInfo($"Copied file {file.FullName} to {newFile.FullName}");
+                    CopyFileIfNotExists(file, binDirectory);
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
                 await clangClient.CreateExecutableAsync(inputFiles, LibrariesToLink, libraryDirectory.FullName, includeDirectory.FullName, executableFile.FullName);
             });
+        }
+
+        private void CopyFileIfNotExists(FileInfo fileToCopy, DirectoryInfo destinationDirectory)
+        {
+            var newPath = Path.Combine(destinationDirectory.FullName, fileToCopy.Name);
+            if (!File.Exists(newPath))
+            {
+                var newFile = fileToCopy.CopyTo(newPath);
+                logger.LogInfo($"Copied file {fileToCopy.FullName} to {newFile.FullName}");
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Tests.QirController
             driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppHelper(It.Is<EntryPointOperation>(actualEntryPoint => Util.EntryPointsAreEqual(entryPoint, actualEntryPoint)), It.IsAny<Stream>()));
 
             // Verify that the "bytecode" file was created correctly.
-            var bytecodeFilePath = new FileInfo(Path.Combine(sourceDirectory.FullName, "bytecode.ll"));
+            var bytecodeFilePath = new FileInfo(Path.Combine(sourceDirectory.FullName, "qir.bc"));
             using var bytecodeFileStream = bytecodeFilePath.OpenRead();
             Assert.Equal(bytecodeFileStream.Length, bytecode.Count);
             for (var i = 0; i < bytecodeFileStream.Length; ++i)

@@ -50,7 +50,6 @@ namespace Microsoft.Quantum.Qir
 
                 // Step 4: Run executable.
                 logger.LogInfo("Running executable.");
-                using var outputFileStream = outputFile.OpenWrite();
                 await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
             }
             catch (Exception e)
