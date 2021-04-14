@@ -267,14 +267,14 @@ pub extern "C" fn ideal_noise_model() -> *const c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
+pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) {
     if new_model.is_null() {
-        return as_capi_err(Err("set_noise_model called with null pointer".to_string()));
+        panic!("set_noise_model called with null pointer");
     }
 
     let c_str = unsafe { CStr::from_ptr(new_model) };
 
-    as_capi_err(match c_str.to_str() {
+    (match c_str.to_str() {
         Ok(serialized_noise_model) => match serde_json::from_str(serialized_noise_model) {
             Ok(noise_model) => {
                 let state = &mut *STATE.lock().unwrap();
@@ -301,7 +301,7 @@ pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i6
             "UTF-8 error decoding serialized noise model; was valid until byte {}.",
             msg.valid_up_to()
         )),
-    })
+    }).unwrap();
 }
 
 #[no_mangle]
