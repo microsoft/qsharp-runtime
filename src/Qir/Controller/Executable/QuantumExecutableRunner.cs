@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Qir.Executable
             var result = await Process.ExecuteAsync(
                 executableFile.FullName,
                 arguments,
-                stdOut: s => { logger.LogInfo(s); },
+                stdOut: s => { logger.LogInfo("executable: " + s); },
                 stdErr: s => { logger.LogError("executable: " + s); });
             logger.LogInfo($"Executable has finished running. Result code: {result}");
         }
