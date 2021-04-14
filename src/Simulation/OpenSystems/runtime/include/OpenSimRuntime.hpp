@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 
-// Bridge for connecting C++ to the Open System Simulator Rust Implementation
+// Bridge for connecting C++ to the Quantum Driver Rust Implimentaiton Project (QDRIP)
 
 #include <cassert>
 #include <string>
@@ -17,6 +17,7 @@ extern "C"
 {
     size_t init(size_t initialcapacity);
     i64 destroy(size_t sim_id);
+    void set_noise_model(size_t sim_id, const char* model);
 
     unsigned get_qubit_id(Qubit qubit); //NOLINT
     Qubit allocate_qubit(); //NOLINT
@@ -27,7 +28,7 @@ extern "C"
     bool are_equal_results(Result r1, Result r2); //NOLINT
 }
 
-class CDriver : public IRuntimeDriver
+class COpenSimDriver : public IRuntimeDriver
 {
     unsigned GetQubitId(Qubit qubit) const
     {
@@ -35,13 +36,18 @@ class CDriver : public IRuntimeDriver
     }
 
 public:
-    CDriver()
+    COpenSimDriver()
     {
         assert(init(3) == 1);
     }
-    ~CDriver()
+    ~COpenSimDriver()
     {
-        destroy(1);
+        assert(destroy(1) == 0);
+    }
+
+    void SetNoiseModel(string model)
+    {
+        set_noise_model(1, model.c_str());
     }
 
     string QubitToString(Qubit qubit) override

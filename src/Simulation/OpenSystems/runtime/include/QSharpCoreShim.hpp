@@ -58,4 +58,20 @@ extern "C"
     {
         throw std::logic_error("operation_not_supported");
     }
+    void __quantum__qis__r__body(PauliId pauli, Qubit qubit) // NOLINT
+    {
+        // throw std::logic_error("operation_not_supported");
+    }
+    void __quantum__qis__r__adj(PauliId pauli, Qubit qubit) // NOLINT
+    {
+        // throw std::logic_error("operation_not_supported");
+    }
+    void __quantum__qis__r__ctl(QirArray* controls, PauliId pauli, Qubit qubit) // NOLINT
+    {
+        // throw std::logic_error("operation_not_supported");
+    }
+    void __quantum__qis__r__ctladj(QirArray* controls, PauliId pauli, Qubit qubit) // NOLINT
+    {
+        // throw std::logic_error("operation_not_supported");
+    }
 }
