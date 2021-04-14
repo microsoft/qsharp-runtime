@@ -7,18 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <BondCodegen Remove="src\**" />
     <BondCodegen Remove="test-artifacts\**" />
     <BondCodegen Remove="Tests.QirController\**" />
+    <Compile Remove="src\**" />
     <Compile Remove="test-artifacts\**" />
     <Compile Remove="Tests.QirController\**" />
+    <EmbeddedResource Remove="src\**" />
     <EmbeddedResource Remove="test-artifacts\**" />
     <EmbeddedResource Remove="Tests.QirController\**" />
+    <None Remove="src\**" />
     <None Remove="test-artifacts\**" />
     <None Remove="Tests.QirController\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.15.2104135800-alpha" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.15.2104136007-alpha" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
   </ItemGroup>
 

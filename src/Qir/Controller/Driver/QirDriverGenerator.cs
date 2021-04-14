@@ -26,6 +26,11 @@ namespace Microsoft.Quantum.Qir.Driver
             // Wrapped in a task because DirectoryInfo operations are not asynchronous.
             await Task.Run(async () =>
             {
+                if (sourceDirectory.Exists)
+                {
+                    sourceDirectory.Delete(true);
+                }
+
                 sourceDirectory.Create();
                 logger.LogInfo($"Created source directory at {sourceDirectory.FullName}.");
 

@@ -23,7 +23,13 @@ namespace Microsoft.Quantum.Qir.Executable
         {
             var arguments = QirDriverGeneration.GenerateCommandLineArguments(entryPointOperation.Arguments);
             logger.LogInfo($"Invoking executable {executableFile.FullName} with the following arguments: {arguments}");
-            arguments = $"-s {outputFile.FullName} {arguments}";
+            arguments = $"--simulation-output {outputFile.FullName} {arguments}";
+            if (outputFile.Exists)
+            {
+                outputFile.Delete();
+            }
+
+            outputFile.Create().Dispose();
             var result = await Process.ExecuteAsync(
                 executableFile.FullName,
                 arguments,

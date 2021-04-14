@@ -183,6 +183,53 @@ namespace Tests.QirController
             Assert.Equal(errorCode, error.Code);
         }
 
+        [Fact]
+        public void DeleteThisTest()
+        {
+            var entryPoint = new EntryPointOperation
+            {
+                Arguments = new List<Argument>
+                {
+                    new Argument
+                    {
+                        Name = "intArray",
+                        ArrayType = DataType.IntegerType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Integer = new List<long> {9, 4, 4, 2, 3}
+                                }
+                            }
+                        },
+                        Position = 0,
+                    }
+                },
+
+                Name = "Quantum__StandaloneSupportedInputs__ExerciseInputs",
+            };
+
+            var qirFile = new FileInfo(@"C:\Users\alchocro\Desktop\qir-standalone-input-reference.ll");
+            using var inputStream = qirFile.OpenRead();
+            byte[] buffer = new byte[inputStream.Length];
+            inputStream.Read(buffer, 0, (int)inputStream.Length);
+            var arraySegment = new ArraySegment<byte>(buffer);
+            var executionWrapper = new QirExecutionWrapper
+            {
+                EntryPoint = entryPoint,
+                QirBytecode = arraySegment,
+            };
+
+            var testCaseFile = new FileInfo(@"C:\Users\alchocro\git-repos\qsharp-runtime\src\Qir\Controller\test-cases\standalone-input-test.in");
+            testCaseFile.Delete();
+            using var outputStream = testCaseFile.OpenWrite();
+            Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols.SerializeToFastBinary(executionWrapper, outputStream);
+            Assert.False(true);
+       }
+
         private bool BytecodesAreEqual(ArraySegment<byte> bytecodeA, ArraySegment<byte> bytecodeB)
         {
             if (bytecodeA.Count != bytecodeB.Count)
