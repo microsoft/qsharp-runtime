@@ -18,8 +18,8 @@ target_include_directories(open-systems-simulator-tests PUBLIC
   "${public_includes}"
   "${PROJECT_SOURCE_DIR}/lib/QIR"
 )
-add_dependencies(open-systems-simulator-tests qir_test_opensimulator_target)
+# add_dependencies(open-systems-simulator-tests qir_test_opensimulator_target)
 
-install(TARGETS open-systems-simulator-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
-add_unit_test(open-systems-simulator-tests)
+# install(TARGETS open-systems-simulator-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
+# add_unit_test(open-systems-simulator-tests)
 

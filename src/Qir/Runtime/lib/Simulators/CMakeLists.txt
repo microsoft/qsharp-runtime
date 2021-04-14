@@ -2,7 +2,9 @@ set(source_files
   "FullstateSimulator.cpp"
   "setup.cpp"
   "ToffoliSimulator.cpp"
-  "OpenSystemsSimulator.cpp"
+  # NB: Disabled temporarily until we can build crates into OBJECT CMake
+  #     libraries.
+  # "OpenSystemsSimulator.cpp"
 )
 
 set(includes

@@ -25,7 +25,7 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Core
   ${CMAKE_DL_LIBS}
   qsharp-core-qis-support-obj
   simulators-obj
-  opensim
+  # opensim
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
 )
