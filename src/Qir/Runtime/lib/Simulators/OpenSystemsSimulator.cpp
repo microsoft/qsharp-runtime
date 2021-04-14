@@ -141,7 +141,7 @@ namespace Quantum
             // TODO
         }
 
-        Result M(Qubit q) override
+        Result M(Qubit q)
         {
             size_t result;
             m(this->simulatorId, GetQubitId(q), &result);
