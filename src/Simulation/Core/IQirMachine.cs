@@ -43,57 +43,49 @@ namespace Microsoft.Quantum.Runtime
         public class Bool : ArgumentValue
         {
             public bool Value { get; }
-
             public Bool(bool value) => this.Value = value;
         }
 
         public class Int : ArgumentValue
         {
             public long Value { get; }
-
             public Int(long value) => this.Value = value;
         }
 
         public class Double : ArgumentValue
         {
             public double Value { get; }
-
             public Double(double value) => this.Value = value;
         }
 
         public class Pauli : ArgumentValue
         {
             public Core.Pauli Value { get; }
-
             public Pauli(Core.Pauli value) => this.Value = value;
         }
 
         public class Range : ArgumentValue
         {
             public QRange Value { get; }
-
             public Range(QRange value) => this.Value = value;
         }
 
         public class Result : ArgumentValue
         {
             public Core.Result Value { get; }
-
             public Result(Core.Result value) => this.Value = value;
         }
 
         public class String : ArgumentValue
         {
             public string Value { get; }
-
             public String(string value) => this.Value = value;
         }
 
         public class Array : ArgumentValue
         {
-            public QArray<ArgumentValue> Values { get; }
-
-            public Array(QArray<ArgumentValue> values) => this.Values = values;
+            public IQArray<ArgumentValue> Values { get; }
+            public Array(IQArray<ArgumentValue> values) => this.Values = values;
         }
     }
 }
