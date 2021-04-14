@@ -31,7 +31,7 @@
     }
 
     @EntryPoint()
-    operation ExerciseInputs (intValue : Int, intArray : Int[], doubleValue : Double, doubleArray : Double[], boolValue : Bool, boolArray : Bool[], pauliValue : Pauli, pauliArray : Pauli[], rangeValue : Range, resultValue : Result, resultArray : Result[], stringValue : String) : Unit {
+    operation ExerciseInputs (intValue : Int, intArray : Int[], doubleValue : Double, doubleArray : Double[], boolValue : Bool, boolArray : Bool[], pauliValue : Pauli, pauliArray : Pauli[], rangeValue : Range, resultValue : Result, resultArray : Result[], stringValue : String, stringArray : String[]) : Unit {
         Message("Exercise Supported Inputs Reference");
         Message($"intValue: {intValue}");
         Message($"intArray: {ArrayToString<Int>(intArray)} ({Count(TautologyPredicate<Int>, intArray)})");
@@ -45,5 +45,6 @@
         Message($"resultValue: {resultValue}");
         Message($"resultArray: {ArrayToString<Result>(resultArray)} ({Count(TautologyPredicate<Result>, resultArray)})");
         Message($"stringValue: {stringValue}");
+        Message($"stringArray: {ArrayToString<String>(stringArray)} ({Count(TautologyPredicate<String>, stringArray)})");
     }
 }

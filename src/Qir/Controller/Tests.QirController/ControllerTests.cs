@@ -192,6 +192,19 @@ namespace Tests.QirController
                 {
                     new Argument
                     {
+                        Name = "intValue",
+                        Type = DataType.IntegerType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Integer = 42,
+                            }
+                        },
+                        Position = 0,
+                    },
+                    new Argument
+                    {
                         Name = "intArray",
                         ArrayType = DataType.IntegerType,
                         Type = DataType.ArrayType,
@@ -201,11 +214,210 @@ namespace Tests.QirController
                             {
                                 Array = new ArrayValue()
                                 {
-                                    Integer = new List<long> {9, 4, 4, 2, 3}
+                                    Integer = new List<long> {long.MaxValue, 4, 4, 2, 3}
                                 }
                             }
                         },
-                        Position = 0,
+                        Position = 1,
+                    },
+                    new Argument
+                    {
+                        Name = "doubleValue",
+                        Type = DataType.DoubleType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Double = 3.14,
+                            }
+                        },
+                        Position = 1,
+                    },
+                    new Argument
+                    {
+                        Name = "doubleArray",
+                        ArrayType = DataType.DoubleType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Double = new List<double> {0.6, 0.4, 43.2}
+                                }
+                            }
+                        },
+                        Position = 2,
+                    },
+                    new Argument
+                    {
+                        Name = "boolValue",
+                        Type = DataType.BoolType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Bool = true,
+                            }
+                        },
+                        Position = 3,
+                    },
+                    new Argument
+                    {
+                        Name = "boolArray",
+                        ArrayType = DataType.BoolType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Bool = new List<bool> {true, false, true, true, false}
+                                }
+                            }
+                        },
+                        Position = 4,
+                    },
+                    new Argument
+                    {
+                        Name = "pauliValue",
+                        Type = DataType.PauliType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Pauli = PauliValue.PauliZ,
+                            }
+                        },
+                        Position = 5,
+                    },
+                    new Argument
+                    {
+                        Name = "pauliArray",
+                        ArrayType = DataType.PauliType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Pauli = new List<PauliValue> {PauliValue.PauliX, PauliValue.PauliI, PauliValue.PauliY, PauliValue.PauliY, PauliValue.Z}
+                                }
+                            }
+                        },
+                        Position = 6,
+                    },
+                    new Argument
+                    {
+                        Name = "rangeValue",
+                        Type = DataType.RangeType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Range = new RangeValue
+                                {
+                                    Start = 3,
+                                    Step = 12,
+                                    End = 27,
+                                }
+                            }
+                        },
+                        Position = 7,
+                    },
+                    new Argument
+                    {
+                        Name = "rangeArray",
+                        ArrayType = DataType.RangeType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Range = new List<RangeValue>
+                                    {
+                                        new RangeValue
+                                        {
+                                            Start = 0,
+                                            Step = 3,
+                                            End = 99,
+                                        },
+                                        new RangeValue
+                                        {
+                                            Start = 2,
+                                            Step = 5,
+                                            End = 102,
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        Position = 8,
+                    },
+                    new Argument
+                    {
+                        Name = "resultValue",
+                        Type = DataType.ResultType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Result = ResultValue.One,
+                            }
+                        },
+                        Position = 9,
+                    },
+                    new Argument
+                    {
+                        Name = "resultArray",
+                        ArrayType = DataType.ResultType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    Result = new List<ResultValue> { ResultValue.One, ResultValue.One, ResultValue.Zero, ResultValue.One}
+                                }
+                            }
+                        },
+                        Position = 10,
+                    },
+                    new Argument
+                    {
+                        Name = "stringValue",
+                        Type = DataType.StringType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                String = "string value",
+                            }
+                        },
+                        Position = 11,
+                    },
+                    new Argument
+                    {
+                        Name = "stringArray",
+                        ArrayType = DataType.StringType,
+                        Type = DataType.ArrayType,
+                        Values = new List<ArgumentValue>
+                        {
+                            new ArgumentValue
+                            {
+                                Array = new ArrayValue()
+                                {
+                                    String = new List<string> {"string a", "string b", "string c"}
+                                }
+                            }
+                        },
+                        Position = 12,
                     }
                 },
 
@@ -228,7 +440,7 @@ namespace Tests.QirController
             using var outputStream = testCaseFile.OpenWrite();
             Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols.SerializeToFastBinary(executionWrapper, outputStream);
             Assert.False(true);
-       }
+        }
 
         private bool BytecodesAreEqual(ArraySegment<byte> bytecodeA, ArraySegment<byte> bytecodeB)
         {
