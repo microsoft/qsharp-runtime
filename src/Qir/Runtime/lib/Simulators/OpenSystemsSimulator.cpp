@@ -8,8 +8,9 @@
 #include <memory>
 #include <vector>
 
+#include "QirRuntimeApi_I.hpp"
+#include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
-#include "QuantumApi_I.hpp"
 
 using namespace std;
 typedef long long int i64;
@@ -17,23 +18,25 @@ typedef long long int i64;
 // Define the API with the open systems simulator.
 extern "C"
 {
-    size_t init(size_t initialcapacity);
-    i64 destroy(size_t sim_id);
-    void dump_to_console(size_t sim_id);
-    i64 x(size_t sim_id, size_t idx);
-    i64 y(size_t sim_id, size_t idx);
-    i64 z(size_t sim_id, size_t idx);
-    i64 h(size_t sim_id, size_t idx);
-    i64 s(size_t sim_id, size_t idx);
-    i64 s_adj(size_t sim_id, size_t idx);
-    i64 t(size_t sim_id, size_t idx);
-    i64 t_adj(size_t sim_id, size_t idx);
-    i64 cnot(size_t sim_id, size_t idx_control, size_t idx_target);
-    i64 m(size_t sim_id, size_t idx, size_t* result_out);
-    const char* lasterr();
-    const char* get_noise_model(size_t sim_id);
-    i64 set_noise_model(size_t sim_id, const char* new_model);
-    const char* get_current_state(size_t sim_id);
+    // NB: We disable clang-tidy rules for case conventions here, as the names
+    //     reflect the Rust naming conventions used in the opensim crate.
+    size_t init(size_t initialcapacity); // NOLINT(readability-identifier-naming)
+    i64 destroy(size_t sim_id); // NOLINT(readability-identifier-naming)
+    void dump_to_console(size_t sim_id); // NOLINT(readability-identifier-naming)
+    i64 x(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 y(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 z(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 h(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 s(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 s_adj(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 t(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 t_adj(size_t sim_id, size_t idx); // NOLINT(readability-identifier-naming)
+    i64 cnot(size_t sim_id, size_t idx_control, size_t idx_target); // NOLINT(readability-identifier-naming)
+    i64 m(size_t sim_id, size_t idx, size_t* result_out); // NOLINT(readability-identifier-naming)
+    const char* lasterr(); // NOLINT(readability-identifier-naming)
+    const char* get_noise_model(size_t sim_id); // NOLINT(readability-identifier-naming)
+    i64 set_noise_model(size_t sim_id, const char* new_model); // NOLINT(readability-identifier-naming)
+    const char* get_current_state(size_t sim_id); // NOLINT(readability-identifier-naming)
 }
 
 namespace Microsoft
@@ -42,7 +45,7 @@ namespace Quantum
 {
     // FIXME: support methods from public IDiagnostics; they currently
     //        just throw.
-    class OpenSystemSimulator : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
+    class COpenSystemSimulator : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(size_t /*simulator id*/, size_t /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(
@@ -91,12 +94,12 @@ namespace Quantum
         }
 
       public:
-        OpenSystemSimulator()
+        COpenSystemSimulator()
         {
             // FIXME: allow setting number of qubits.
             this->simulatorId = init(3);
         }
-        ~OpenSystemSimulator()
+        ~COpenSystemSimulator()
         {
             destroy(this->simulatorId);
         }
@@ -283,7 +286,7 @@ namespace Quantum
 
     std::unique_ptr<IRuntimeDriver> CreateOpenSystemsSimulator()
     {
-        return std::make_unique<OpenSystemSimulator>();
+        return std::make_unique<COpenSystemSimulator>();
     }
 } // namespace Quantum
 } // namespace Microsoft
