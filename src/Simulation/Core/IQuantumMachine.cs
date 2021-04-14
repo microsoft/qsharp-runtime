@@ -9,25 +9,12 @@ namespace Microsoft.Quantum.Runtime
     /// <summary>
     /// Interface that a quantum machine must implement.
     /// </summary>
-    public interface IQuantumMachine
+    public interface IQuantumMachine : IAzureMachine
     {
-
         /// <summary>
         /// Function that configures a job object before submission.
         /// </summary>
         public delegate void ConfigureJob(object job);
-
-        /// <summary>
-        /// Gets the ID of the quantum machine provider.
-        /// </summary>
-        string ProviderId { get; }
-
-        /// <summary>
-        /// Gets the name of the target quantum machine.
-        /// A provider may expose multiple targets that can be used to execute programs.
-        /// Users may select which target they would like to be used for execution.
-        /// </summary>
-        string Target { get; }
 
         /// <summary>
         /// Executes a Q# program.
