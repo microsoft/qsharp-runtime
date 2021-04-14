@@ -21,8 +21,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Corrosion)
-
-corrosion_import_crate(MANIFEST_PATH ../../../Simulation/OpenSystems/runtime/Cargo.toml)
+corrosion_import_crate(MANIFEST_PATH ../../../../Simulation/OpenSystems/runtime/Cargo.toml)
 
 #===============================================================================
 # Produce object lib we'll use to create a shared lib (so/dll) later on
