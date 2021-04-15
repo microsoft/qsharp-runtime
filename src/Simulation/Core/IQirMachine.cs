@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Core = Microsoft.Quantum.Simulation.Core;
@@ -52,10 +53,89 @@ namespace Microsoft.Quantum.Runtime
     }
 
     /// <summary>
+    /// The type of an argument to a QIR callable.
+    /// </summary>
+    public class ArgumentType
+    {
+        private ArgumentType()
+        {
+        }
+
+        /// <summary>
+        /// The boolean type.
+        /// </summary>
+        public static ArgumentType Bool { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The integer type.
+        /// </summary>
+        public static ArgumentType Int { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The double-precision floating point type.
+        /// </summary>
+        public static ArgumentType Double { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The Pauli operator type.
+        /// </summary>
+        public static ArgumentType Pauli { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The range type.
+        /// </summary>
+        public static ArgumentType Range { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The result type.
+        /// </summary>
+        public static ArgumentType Result { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The string type.
+        /// </summary>
+        public static ArgumentType String { get; } = new ArgumentType();
+
+        /// <summary>
+        /// The array type.
+        /// </summary>
+        public class Array : ArgumentType
+        {
+            /// <summary>
+            /// The type of the array items.
+            /// </summary>
+            public ArgumentType Item { get; }
+
+            /// <summary>
+            /// Creates a new array type.
+            /// </summary>
+            /// <param name="item">The type of the array items.</param>
+            public Array(ArgumentType item) => this.Item = item;
+
+            public override bool Equals(object obj) => obj is Array array && this.Item.Equals(array.Item);
+
+            public override int GetHashCode() => HashCode.Combine(1, this.Item.GetHashCode());
+        }
+
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+
+        public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
+
+        public static bool operator ==(ArgumentType lhs, ArgumentType rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(ArgumentType lhs, ArgumentType rhs) => !(lhs == rhs);
+    }
+
+    /// <summary>
     /// The value of an argument to a QIR callable is a discriminated union of the argument types.
     /// </summary>
     public abstract class ArgumentValue
     {
+        /// <summary>
+        /// The type of the argument.
+        /// </summary>
+        public abstract ArgumentType Type { get; }
+
         private ArgumentValue()
         {
         }
@@ -69,6 +149,8 @@ namespace Microsoft.Quantum.Runtime
             /// The value of the argument.
             /// </summary>
             public bool Value { get; }
+
+            public override ArgumentType Type => ArgumentType.Bool;
 
             /// <summary>
             /// Creates a boolean argument value.
@@ -87,6 +169,8 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public long Value { get; }
 
+            public override ArgumentType Type => ArgumentType.Int;
+
             /// <summary>
             /// Creates an integer argument value.
             /// </summary>
@@ -103,6 +187,8 @@ namespace Microsoft.Quantum.Runtime
             /// The value of the argument.
             /// </summary>
             public double Value { get; }
+
+            public override ArgumentType Type => ArgumentType.Double;
 
             /// <summary>
             /// Creates a double-precision floating point argument value.
@@ -121,6 +207,8 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public Core.Pauli Value { get; }
 
+            public override ArgumentType Type => ArgumentType.Pauli;
+
             /// <summary>
             /// Creates a Pauli operator argument value.
             /// </summary>
@@ -137,6 +225,8 @@ namespace Microsoft.Quantum.Runtime
             /// The value of the argument.
             /// </summary>
             public QRange Value { get; }
+
+            public override ArgumentType Type => ArgumentType.Range;
 
             /// <summary>
             /// Creates a range argument value.
@@ -155,6 +245,8 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public Core.Result Value { get; }
 
+            public override ArgumentType Type => ArgumentType.Result;
+
             /// <summary>
             /// Creates a result argument value.
             /// </summary>
@@ -171,6 +263,8 @@ namespace Microsoft.Quantum.Runtime
             /// The value of the argument.
             /// </summary>
             public string Value { get; }
+
+            public override ArgumentType Type => ArgumentType.String;
 
             /// <summary>
             /// Creates a string argument value.
@@ -189,30 +283,24 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public IQArray<ArgumentValue> Values { get; }
 
-            private Array(IQArray<ArgumentValue> values) => this.Values = values;
+            /// <summary>
+            /// The type of the array items.
+            /// </summary>
+            public ArgumentType ItemType { get; }
+
+            public override ArgumentType Type => new ArgumentType.Array(this.ItemType);
+
+            private Array(IQArray<ArgumentValue> values, ArgumentType itemType) => 
+                (this.Values, this.ItemType) = (values, itemType);
 
             /// <summary>
             /// Tries to create an array argument value.
             /// </summary>
             /// <param name="values">The values of the argument.</param>
-            /// <returns>The array or <c>null</c> if not all values are of the same type.</returns>
-            public static Array? TryCreate(IQArray<ArgumentValue> values) => 
-                IsHomogeneous(values) ? new Array(values) : null;
-
-            private static bool IsHomogeneous(IQArray<ArgumentValue> values) => values
-                .Zip(values.Skip(1), ValueTuple.Create)
-                .All(pair => pair switch 
-                {
-                    (Bool _, Bool _) => true,
-                    (Int _, Int _) => true,
-                    (Double _, Double _) => true,
-                    (Pauli _, Pauli _) => true,
-                    (Range _, Range _) => true,
-                    (Result _, Result _) => true,
-                    (String _, String _) => true,
-                    (Array _, Array _) => true,
-                    _ => false
-                });
+            /// <param name="itemType">The type of the values.</param>
+            /// <returns>The array or <c>null</c> if not all values have the type <paramref name="itemType"/>.</returns>
+            public static Array? TryCreate(IQArray<ArgumentValue> values, ArgumentType itemType) =>
+                values.All(value => value.Type == itemType) ? new Array(values, itemType) : null;
         }
     }
 }
