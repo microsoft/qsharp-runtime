@@ -180,7 +180,7 @@ namespace Microsoft.Quantum.Runtime
         }
 
         /// <summary>
-        /// An array argument value where all values in the array are of the same type.
+        /// An array argument value where all values are of the same type.
         /// </summary>
         public class Array : ArgumentValue
         {
@@ -189,15 +189,15 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public IQArray<ArgumentValue> Values { get; }
 
+            private Array(IQArray<ArgumentValue> values) => this.Values = values;
+
             /// <summary>
-            /// Creates an array argument value.
+            /// Tries to create an array argument value.
             /// </summary>
             /// <param name="values">The values of the argument.</param>
-            /// <exception cref="ArgumentException">The array values are not all of the same type.</exception>
-            public Array(IQArray<ArgumentValue> values) =>
-                this.Values = IsHomogeneous(values)
-                    ? values
-                    : throw new ArgumentException("The array values are not all of the same type.");
+            /// <returns>The array or <c>null</c> if not all values are of the same type.</returns>
+            public static Array? TryCreate(IQArray<ArgumentValue> values) => 
+                IsHomogeneous(values) ? new Array(values) : null;
 
             private static bool IsHomogeneous(IQArray<ArgumentValue> values) => values
                 .Zip(values.Skip(1), ValueTuple.Create)
