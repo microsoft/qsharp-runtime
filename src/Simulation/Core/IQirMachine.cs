@@ -3,8 +3,10 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Simulation.Core;
 using Core = Microsoft.Quantum.Simulation.Core;
@@ -178,7 +180,7 @@ namespace Microsoft.Quantum.Runtime
         }
 
         /// <summary>
-        /// An array argument value.
+        /// An array argument value where all values in the array are of the same type.
         /// </summary>
         public class Array : ArgumentValue
         {
@@ -191,7 +193,26 @@ namespace Microsoft.Quantum.Runtime
             /// Creates an array argument value.
             /// </summary>
             /// <param name="values">The values of the argument.</param>
-            public Array(IQArray<ArgumentValue> values) => this.Values = values;
+            /// <exception cref="ArgumentException">The array values are not all of the same type.</exception>
+            public Array(IQArray<ArgumentValue> values) =>
+                this.Values = IsHomogeneous(values)
+                    ? values
+                    : throw new ArgumentException("The array values are not all of the same type.");
+
+            private static bool IsHomogeneous(IQArray<ArgumentValue> values) => values
+                .Zip(values.Skip(1), ValueTuple.Create)
+                .All(pair => pair switch 
+                {
+                    (Bool _, Bool _) => true,
+                    (Int _, Int _) => true,
+                    (Double _, Double _) => true,
+                    (Pauli _, Pauli _) => true,
+                    (Range _, Range _) => true,
+                    (Result _, Result _) => true,
+                    (String _, String _) => true,
+                    (Array _, Array _) => true,
+                    _ => false
+                });
         }
     }
 }
