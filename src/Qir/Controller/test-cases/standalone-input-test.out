@@ -1,14 +1,14 @@
-﻿Exercise Supported Inputs Reference
-intValue: 135
-intArray: [5, 9223372036854775807, 544] (3)
+Exercise Supported Inputs Reference
+intValue: 42
+intArray: [9223372036854775807, 4, 4, 2, 3] (5)
 doubleValue: 3.14000000000000012
-doubleArray: [0.42999999999999999, 0.42999999999999999, 943.39999999999997726] (3)
+doubleArray: [0.59999999999999998, 0.40000000000000002, 43.20000000000000284] (3)
 boolValue: true
-boolArray: [true, true, false, true] (4)
-pauliValue: PauliY
-pauliArray: [PauliZ, PauliI, PauliX, PauliY, PauliZ] (5)
-rangeValue: 4..33..70
+boolArray: [true, false, true, true, false] (5)
+pauliValue: PauliZ
+pauliArray: [PauliX, PauliI, PauliY, PauliY, PauliZ] (5)
+rangeValue: 3..12..27
 resultValue: One
-resultArray: [One, Zero, One] (3)
+resultArray: [One, One, Zero, One] (4)
 stringValue: string value
 ()

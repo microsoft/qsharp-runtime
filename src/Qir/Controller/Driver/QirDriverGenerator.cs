@@ -23,8 +23,6 @@ namespace Microsoft.Quantum.Qir.Driver
 
         public async Task GenerateQirDriverCppAsync(DirectoryInfo sourceDirectory, EntryPointOperation entryPointOperation, ArraySegment<byte> bytecode)
         {
-            return;
-
             // Wrapped in a task because DirectoryInfo operations are not asynchronous.
             await Task.Run(async () =>
             {
