@@ -41,17 +41,22 @@ namespace Microsoft.Quantum.Qir.Executable
                     CopyFileIfNotExists(file, binDirectory);
                 }
 
-                // Copy all include contents to bin.
-                logger.LogInfo("Copying include directory contents into the executable's folder.");
+                // Copy all include contents to src.
+                logger.LogInfo("Copying include directory contents into the source folder.");
                 var includeFiles = includeDirectory.GetFiles();
                 foreach (var file in includeFiles)
                 {
-                    CopyFileIfNotExists(file, binDirectory);
+                    CopyFileIfNotExists(file, sourceDirectory);
                 }
 
-                var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
+                var inputFiles = sourceDirectory.GetFiles().Where(IsInputFile).Select(fileInfo => fileInfo.FullName).ToArray();
                 await clangClient.CreateExecutableAsync(inputFiles, LibrariesToLink, libraryDirectory.FullName, includeDirectory.FullName, executableFile.FullName);
             });
+        }
+
+        private bool IsInputFile(FileInfo file)
+        {
+            return file.Extension == Constant.FileExtension.BytecodeExtension || file.Extension == Constant.FileExtension.CppExtension;
         }
 
         private void CopyFileIfNotExists(FileInfo fileToCopy, DirectoryInfo destinationDirectory)

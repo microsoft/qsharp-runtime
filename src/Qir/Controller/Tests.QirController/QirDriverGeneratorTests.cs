@@ -15,12 +15,12 @@ namespace Tests.QirController
 {
     public class QirDriverGeneratorTests : IDisposable
     {
-        private readonly Mock<QirDriverGenerator> driverGeneratorMock;
+        private readonly Mock<QirSourceFileGenerator> driverGeneratorMock;
         private readonly DirectoryInfo sourceDirectory;
 
         public QirDriverGeneratorTests()
         {
-            driverGeneratorMock = new Mock<QirDriverGenerator>(Mock.Of<ILogger>()) { CallBase = true };
+            driverGeneratorMock = new Mock<QirSourceFileGenerator>(Mock.Of<ILogger>()) { CallBase = true };
             driverGeneratorMock.Setup(obj => obj.GenerateQirDriverCppHelper(It.IsAny<EntryPointOperation>(), It.IsAny<Stream>()));
             sourceDirectory = new DirectoryInfo($"{Guid.NewGuid()}-source");
         }
@@ -47,7 +47,7 @@ namespace Tests.QirController
             };
             byte[] bytes = { 1, 2, 3, 4, 5 };
             var bytecode = new ArraySegment<byte>(bytes, 1, 3);
-            await driverGeneratorMock.Object.GenerateQirDriverCppAsync(sourceDirectory, entryPoint, bytecode);
+            await driverGeneratorMock.Object.GenerateQirSourceFilesAsync(sourceDirectory, entryPoint, bytecode);
             driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppHelper(It.Is<EntryPointOperation>(actualEntryPoint => Util.EntryPointsAreEqual(entryPoint, actualEntryPoint)), It.IsAny<Stream>()));
 
             // Verify that the "bytecode" file was created correctly.

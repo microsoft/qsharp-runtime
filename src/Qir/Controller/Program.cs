@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Qir
         {
             var logger = new Logger(new Clock());
             var execGenerator = new QirExecutableGenerator(new ClangClient(logger), logger);
-            var driverGenerator = new QirDriverGenerator(logger);
+            var driverGenerator = new QirSourceFileGenerator(logger);
             var execRunner = new QuantumExecutableRunner(logger);
             logger.LogInfo("QIR controller beginning.");
 

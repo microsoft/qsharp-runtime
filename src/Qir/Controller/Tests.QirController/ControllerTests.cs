@@ -21,7 +21,7 @@ namespace Tests.QirController
 {
     public class ControllerTests : IDisposable
     {
-        private Mock<IQirDriverGenerator> driverGeneratorMock;
+        private Mock<IQirSourceFileGenerator> driverGeneratorMock;
         private Mock<IQirExecutableGenerator> executableGeneratorMock;
         private Mock<IQuantumExecutableRunner> executableRunnerMock;
         private Mock<ILogger> loggerMock;
@@ -33,7 +33,7 @@ namespace Tests.QirController
 
         public ControllerTests()
         {
-            driverGeneratorMock = new Mock<IQirDriverGenerator>();
+            driverGeneratorMock = new Mock<IQirSourceFileGenerator>();
             executableGeneratorMock = new Mock<IQirExecutableGenerator>();
             executableRunnerMock = new Mock<IQuantumExecutableRunner>();
             inputFile = new FileInfo($"{Guid.NewGuid()}-input");
@@ -101,7 +101,7 @@ namespace Tests.QirController
                 loggerMock.Object);
 
             // Verify driver was created.
-            driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppAsync(
+            driverGeneratorMock.Verify(obj => obj.GenerateQirSourceFilesAsync(
                 It.IsAny<DirectoryInfo>(),
                 It.Is<EntryPointOperation>(entryPoint => Util.EntryPointsAreEqual(entryPoint, input.EntryPoint)),
                 It.Is<ArraySegment<byte>>(bytecode => BytecodesAreEqual(bytecode, input.QirBytecode))));

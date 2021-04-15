@@ -10,5 +10,11 @@ namespace Microsoft.Quantum.Qir
         {
             public const string InternalError = "InternalError";
         }
+
+        public static class FileExtension
+        {
+            public const string CppExtension = ".cpp";
+            public const string BytecodeExtension = ".bc";
+        }
     }
 }

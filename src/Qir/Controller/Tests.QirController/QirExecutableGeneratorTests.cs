@@ -52,8 +52,8 @@ namespace Tests.QirController
             sourceDirectory.Create();
             sourceFiles = new List<FileInfo>()
             {
-                CreateFile("src1", sourceDirectory, "src1 contents"),
-                CreateFile("src2", sourceDirectory, "src2 contents"),
+                CreateFile("src1.cpp", sourceDirectory, "src1 contents"),
+                CreateFile("src2.bc", sourceDirectory, "src2 contents"),
             };
         }
 
@@ -86,7 +86,7 @@ namespace Tests.QirController
                 executableFile.FullName));
 
             // Verify files were copied.
-            Assert.True(FilesWereCopied(includeFiles.ToArray(), binDirectory));
+            Assert.True(FilesWereCopied(includeFiles.ToArray(), sourceDirectory));
             Assert.True(FilesWereCopied(libraryFiles.ToArray(), binDirectory));
         }
 

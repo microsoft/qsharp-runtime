@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Qir
             DirectoryInfo libraryDirectory,
             DirectoryInfo includeDirectory,
             FileInfo errorFile,
-            IQirDriverGenerator driverGenerator,
+            IQirSourceFileGenerator driverGenerator,
             IQirExecutableGenerator executableGenerator,
             IQuantumExecutableRunner executableRunner,
             ILogger logger)
@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.Qir
                 // Step 2: Create driver.
                 logger.LogInfo("Creating driver file.");
                 var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
-                await driverGenerator.GenerateQirDriverCppAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
+                await driverGenerator.GenerateQirSourceFilesAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
 
                 // Step 3: Create executable.
                 logger.LogInfo("Compiling and linking executable.");
