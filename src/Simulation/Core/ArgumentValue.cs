@@ -165,15 +165,10 @@ namespace Microsoft.Quantum.Runtime
             /// </summary>
             public IQArray<ArgumentValue> Values { get; }
 
-            /// <summary>
-            /// The type of the array items.
-            /// </summary>
-            public ArgumentType ItemType { get; }
+            public override ArgumentType Type { get; }
 
-            public override ArgumentType Type => new ArgumentType.Array(this.ItemType);
-
-            private Array(IQArray<ArgumentValue> values, ArgumentType itemType) => 
-                (this.Values, this.ItemType) = (values, itemType);
+            private Array(IQArray<ArgumentValue> values, ArgumentType itemType) =>
+                (this.Values, this.Type) = (values, new ArgumentType.Array(itemType));
 
             /// <summary>
             /// Tries to create an array argument value.
