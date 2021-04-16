@@ -21,6 +21,12 @@ namespace Microsoft.Quantum.Qir.Tools
             throw new NotImplementedException();
         }
 
+        // TODO: How arguments are passed to this API will change.
+        protected override string GetCommandLineArguments(IList<ArgumentValue> arguments)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override IList<string> GetLinkLibraries()
         {
             throw new NotImplementedException();
