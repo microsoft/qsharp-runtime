@@ -23,7 +23,6 @@ namespace Tests.QirController
         private readonly DirectoryInfo binDirectory;
         private readonly IList<FileInfo> libraryFiles;
         private readonly IList<FileInfo> sourceFiles;
-        private readonly IList<FileInfo> includeFiles;
 
         public QirExecutableGeneratorTests()
         {
@@ -43,11 +42,6 @@ namespace Tests.QirController
             };
             includeDirectory = new DirectoryInfo($"{prefix}-include");
             includeDirectory.Create();
-            includeFiles = new List<FileInfo>()
-            {
-                CreateFile("incl1", includeDirectory, "incl1 contents"),
-                CreateFile("incl2", includeDirectory, "incl2 contents"),
-            };
             sourceDirectory = new DirectoryInfo($"{prefix}-source");
             sourceDirectory.Create();
             sourceFiles = new List<FileInfo>()
@@ -86,7 +80,6 @@ namespace Tests.QirController
                 executableFile.FullName));
 
             // Verify files were copied.
-            Assert.True(FilesWereCopied(includeFiles.ToArray(), sourceDirectory));
             Assert.True(FilesWereCopied(libraryFiles.ToArray(), binDirectory));
         }
 

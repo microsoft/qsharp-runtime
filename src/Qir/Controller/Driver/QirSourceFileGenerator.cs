@@ -12,8 +12,8 @@ namespace Microsoft.Quantum.Qir.Driver
 {
     public class QirSourceFileGenerator : IQirSourceFileGenerator
     {
-        private const string BytecodeFileName = "qir" + Constant.FileExtension.BytecodeExtension;
-        private const string DriverFileName = "driver" + Constant.FileExtension.CppExtension;
+        private const string BytecodeFileName = "qir.bc";
+        private const string DriverFileName = "driver.cpp";
         private readonly ILogger logger;
 
         public QirSourceFileGenerator(ILogger logger)
