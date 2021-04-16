@@ -13,6 +13,10 @@ $headerPaths = @((Join-Path $PSScriptRoot "..\..\Qir\Common\externals\CLI11"), (
 $libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\build\Debug\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\Debug\netstandard2.1"))
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $libraryDirectory = (Join-Path $testArtifactsFolder "library")
+$runtimeScript = (Join-Path $PSScriptRoot "..\..\Qir\Runtime\build-qir-runtime.ps1")
+
+# Build the runtime
+Invoke-Expression $runtimeScript
 
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
