@@ -5,18 +5,15 @@ $all_ok = $True
 
 Write-Host "##[info]Test QIR Controller"
 
+$buildConfiguration = $Env:BUILD_CONFIGURATION
 $controllerProject = (Join-Path $PSScriptRoot QirController.csproj)
 $testCasesFolder = (Join-Path $PSScriptRoot "test-cases")
 $testArtifactsFolder = (Join-Path $PSScriptRoot "test-artifacts")
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $headerPaths = @((Join-Path $PSScriptRoot "..\..\Qir\Common\externals\CLI11"), (Join-Path $PSScriptRoot "..\..\Qir\Runtime\public"))
-$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\build\Debug\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\Debug\netstandard2.1"))
+$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\build\$buildConfiguration\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\$buildConfiguration\netstandard2.1"))
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $libraryDirectory = (Join-Path $testArtifactsFolder "library")
-$runtimeScript = (Join-Path $PSScriptRoot "..\..\Qir\Runtime\build-qir-runtime.ps1")
-
-# Build the runtime
-Invoke-Expression $runtimeScript
 
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
