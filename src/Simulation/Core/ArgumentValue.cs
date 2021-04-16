@@ -5,6 +5,7 @@
 
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
+using Core = Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Runtime
 {
@@ -87,7 +88,7 @@ namespace Microsoft.Quantum.Runtime
             /// <summary>
             /// The value of the argument.
             /// </summary>
-            public Simulation.Core.Pauli Value { get; }
+            public Core.Pauli Value { get; }
 
             public override ArgumentType Type => ArgumentType.Pauli;
 
@@ -95,7 +96,7 @@ namespace Microsoft.Quantum.Runtime
             /// Creates a Pauli operator argument value.
             /// </summary>
             /// <param name="value">The value of the argument.</param>
-            public Pauli(Simulation.Core.Pauli value) => this.Value = value;
+            public Pauli(Core.Pauli value) => this.Value = value;
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Microsoft.Quantum.Runtime
             /// <summary>
             /// The value of the argument.
             /// </summary>
-            public Simulation.Core.Result Value { get; }
+            public Core.Result Value { get; }
 
             public override ArgumentType Type => ArgumentType.Result;
 
@@ -133,7 +134,7 @@ namespace Microsoft.Quantum.Runtime
             /// Creates a result argument value.
             /// </summary>
             /// <param name="value">The value of the argument.</param>
-            public Result(Simulation.Core.Result value) => this.Value = value;
+            public Result(Core.Result value) => this.Value = value;
         }
 
         /// <summary>
