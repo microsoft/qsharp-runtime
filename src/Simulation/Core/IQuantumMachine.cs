@@ -7,9 +7,9 @@ using Microsoft.Quantum.Simulation.Core;
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
-    /// Interface that a quantum machine must implement.
+    /// An interface for submitting Q# programs to Azure.
     /// </summary>
-    public interface IQuantumMachine : IAzureMachine
+    public interface IQuantumMachine : IAzureSubmitter
     {
         /// <summary>
         /// Function that configures a job object before submission.

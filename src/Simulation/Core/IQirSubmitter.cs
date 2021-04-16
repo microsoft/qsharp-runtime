@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
-    /// A machine that can execute QIR programs on Azure.
+    /// An interface for submitting QIR programs to Azure.
     /// </summary>
-    public interface IQirMachine : IAzureMachine
+    public interface IQirSubmitter : IAzureSubmitter
     {
         /// <summary>
         /// Submits a job to execute a QIR program without waiting for execution to complete.
