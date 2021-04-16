@@ -3,9 +3,6 @@
 
 #nullable enable
 
-using System;
-using System.Runtime.CompilerServices;
-
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
@@ -70,15 +67,7 @@ namespace Microsoft.Quantum.Runtime
 
             public override bool Equals(object obj) => obj is Array array && this.Item.Equals(array.Item);
 
-            public override int GetHashCode() => HashCode.Combine(1, this.Item.GetHashCode());
+            public override int GetHashCode() => this.Item.GetHashCode() + 1;
         }
-
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
-
-        public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
-
-        public static bool operator ==(ArgumentType lhs, ArgumentType rhs) => lhs.Equals(rhs);
-
-        public static bool operator !=(ArgumentType lhs, ArgumentType rhs) => !(lhs == rhs);
     }
 }

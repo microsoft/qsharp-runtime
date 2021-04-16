@@ -179,7 +179,7 @@ namespace Microsoft.Quantum.Runtime
             /// <param name="itemType">The type of the values.</param>
             /// <returns>The array or <c>null</c> if not all values have the type <paramref name="itemType"/>.</returns>
             public static Array? TryCreate(ImmutableArray<ArgumentValue> values, ArgumentType itemType) =>
-                values.All(value => value.Type == itemType) ? new Array(values, itemType) : null;
+                values.All(value => value.Type.Equals(itemType)) ? new Array(values, itemType) : null;
         }
     }
 }
