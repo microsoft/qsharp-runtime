@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Quantum.Simulation.Core;
 using Core = Microsoft.Quantum.Simulation.Core;
@@ -164,11 +165,11 @@ namespace Microsoft.Quantum.Runtime
             /// <summary>
             /// The values of the argument.
             /// </summary>
-            public IQArray<ArgumentValue> Values { get; }
+            public ImmutableArray<ArgumentValue> Values { get; }
 
             public override ArgumentType Type { get; }
 
-            private Array(IQArray<ArgumentValue> values, ArgumentType itemType) =>
+            private Array(ImmutableArray<ArgumentValue> values, ArgumentType itemType) =>
                 (this.Values, this.Type) = (values, new ArgumentType.Array(itemType));
 
             /// <summary>
@@ -177,7 +178,7 @@ namespace Microsoft.Quantum.Runtime
             /// <param name="values">The values of the argument.</param>
             /// <param name="itemType">The type of the values.</param>
             /// <returns>The array or <c>null</c> if not all values have the type <paramref name="itemType"/>.</returns>
-            public static Array? TryCreate(IQArray<ArgumentValue> values, ArgumentType itemType) =>
+            public static Array? TryCreate(ImmutableArray<ArgumentValue> values, ArgumentType itemType) =>
                 values.All(value => value.Type == itemType) ? new Array(values, itemType) : null;
         }
     }
