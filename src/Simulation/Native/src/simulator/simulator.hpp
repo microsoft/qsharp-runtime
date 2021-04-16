@@ -304,7 +304,6 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void dump(TDumpToLocationCallback callback, TDumpLocation location) override
     {
-        recursive_lock_type l(mutex());
         flush();
 
         auto wfn = psi.data();

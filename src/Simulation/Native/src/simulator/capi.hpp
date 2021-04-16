@@ -8,7 +8,9 @@
 
 // SAL only defined in windows.
 #ifndef _In_
+// NOLINTNEXTLINE
 #define _In_
+// NOLINTNEXTLINE
 #define _In_reads_(n)
 #endif
 
