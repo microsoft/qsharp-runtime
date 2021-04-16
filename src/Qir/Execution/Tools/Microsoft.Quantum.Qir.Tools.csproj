@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Tools for interacting with QIR.</Description>
+    <PackageTags>Quantum QIR</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
