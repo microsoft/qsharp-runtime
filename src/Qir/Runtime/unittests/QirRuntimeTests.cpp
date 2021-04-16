@@ -921,11 +921,9 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 
     QirCallable* maybeLeaked =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);
-    //CHECK_THROWS(ReleaseQirContext());
     CHECK_THROWS(QirExecutionContext::Deinit());
 
     quantum__rt__callable_update_reference_count(maybeLeaked, -1);
-    //CHECK_NOTHROW(ReleaseQirContext());
     CHECK_NOTHROW(QirExecutionContext::Deinit());
 }
 
