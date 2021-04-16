@@ -5,6 +5,7 @@ using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools
 {
@@ -19,12 +20,12 @@ namespace Microsoft.Quantum.Qir.Tools
             this.QirBytecode = qirBytecode;
         }
 
-        public void Build(FileInfo executable, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
+        public Task BuildAsync(DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, FileInfo executable)
         {
             throw new NotImplementedException();
         }
 
-        protected abstract void GenerateDriver(Stream driver);
+        protected abstract Task GenerateDriverAsync(Stream driver);
 
         protected abstract IList<string> GetLinkLibraries();
     }

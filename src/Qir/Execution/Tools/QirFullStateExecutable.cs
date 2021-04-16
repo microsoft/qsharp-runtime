@@ -5,6 +5,7 @@ using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools
 {
@@ -15,7 +16,7 @@ namespace Microsoft.Quantum.Qir.Tools
         {
         }
 
-        protected override void GenerateDriver(Stream driver)
+        protected override Task GenerateDriverAsync(Stream driver)
         {
             throw new NotImplementedException();
         }
