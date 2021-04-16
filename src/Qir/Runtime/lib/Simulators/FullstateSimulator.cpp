@@ -8,10 +8,16 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <fstream>
 
+#include "capi.hpp"
+
+#include "QirTypes.hpp"
+#include "QirRuntime.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
+#include "OutputStream.hpp"
 
 using namespace std;
 
@@ -41,7 +47,7 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     if (handle == NULL)
     {
         throw std::runtime_error(
-            std::string("Failed to load ") + FULLSTATESIMULATORLIB + 
+            std::string("Failed to load ") + FULLSTATESIMULATORLIB +
             " (error code: " + std::to_string(GetLastError()) + ")");
     }
 #else
@@ -122,6 +128,7 @@ namespace Quantum
             return ids;
         }
 
+        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
         // use for debugging the simulator
         void DumpState()
         {
@@ -171,6 +178,7 @@ namespace Quantum
             }
         }
 
+        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
         void GetState(TGetStateCallback callback) override
         {
             typedef bool (*TDump)(unsigned, TGetStateCallback);
@@ -182,6 +190,9 @@ namespace Quantum
         {
             return std::to_string(GetQubitId(q));
         }
+
+        void DumpMachine(const void* location) override;
+        void DumpRegister(const void* location, const QirArray* qubits) override;
 
         Qubit AllocateQubit() override
         {
@@ -408,7 +419,109 @@ namespace Quantum
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
-    };
+
+      private:
+        std::ostream& GetOutStream(const void* location, std::ofstream& outFileStream);
+        void DumpMachineImpl(std::ostream& outStream);
+        void DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits);
+        void GetStateTo(TDumpLocation location, TDumpToLocationCallback callback);
+        bool GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits);
+
+      private:
+        TDumpToLocationCallback const dumpToLocationCallback = [](size_t idx, double re, double im, TDumpLocation location) -> bool
+            {
+                std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
+
+                if (re != 0 || im != 0)
+                {
+                    outStream << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
+                }
+                return true;
+            };
+    }; // class CFullstateSimulator
+
+    void CFullstateSimulator::DumpMachineImpl(std::ostream& outStream)
+    {
+        outStream << "*********************" << std::endl;
+        this->GetStateTo((TDumpLocation)&outStream, dumpToLocationCallback);
+        outStream << "*********************" << std::endl;
+        outStream.flush();
+    }
+
+    void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits)
+    {
+        outStream << "*********************" << std::endl;
+        if(!this->GetRegisterTo((TDumpLocation)&outStream, dumpToLocationCallback, qubits))
+        {
+            outStream << "## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##" << std::endl;
+        }
+        outStream << "*********************" << std::endl;
+        outStream.flush();
+    }
+
+    bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits)
+    {
+        // `qubits->buffer` points to the sequence of qubit ids each of type `void*` (logically `qubits->buffer` is of type `void**`).
+        // We need to pass to the native simulator the pointer to the sequence of `unsigned`.
+        std::vector<unsigned> unsQbIds(qubits->count);
+        size_t i = 0;
+        for (unsigned& qbId : unsQbIds)
+        {
+            qbId = (unsigned)(uintptr_t)(((void**)(qubits->buffer))[i]);
+            ++i;
+        }
+        static TDumpQubitsToLocationAPI dumpQubitsToLocation =
+            reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
+        return dumpQubitsToLocation(
+            this->simulatorId, (unsigned)(qubits->count), unsQbIds.data(), callback,
+            location);
+    }
+
+    void CFullstateSimulator::GetStateTo(TDumpLocation location, TDumpToLocationCallback callback)
+    {
+        static TDumpToLocationAPI dumpTo = reinterpret_cast<TDumpToLocationAPI>(this->GetProc("DumpToLocation"));
+        
+        dumpTo(this->simulatorId, callback, location);
+    }
+
+    std::ostream& CFullstateSimulator::GetOutStream(const void* location, std::ofstream& outFileStream)
+    {
+        // If the location is not nullptr and not empty string then dump to a file:
+        if((location != nullptr) &&
+            (((static_cast<const QirString *>(location))->str) != ""))
+        {
+            // Open the file for appending:
+            const std::string& filePath = (static_cast<const QirString *>(location))->str;
+
+            outFileStream.open(filePath, std::ofstream::out | std::ofstream::app);
+            if((outFileStream.rdstate() & std::ofstream::failbit) != 0)
+            {
+                QirString qstr {std::string("Failed to open dump file \"") +
+                                            filePath +
+                                            "\""};
+                quantum__rt__fail(&qstr);
+            }
+
+            return outFileStream;
+        }
+
+        // Otherwise dump to std::cout:
+        return OutputStream::Get();
+    }
+
+    void CFullstateSimulator::DumpMachine(const void* location)
+    {
+        std::ofstream outFileStream;
+        std::ostream& outStream = GetOutStream(location, outFileStream);
+        DumpMachineImpl(outStream);
+    }
+
+    void CFullstateSimulator::DumpRegister(const void* location, const QirArray* qubits)
+    {
+        std::ofstream outFileStream;
+        std::ostream& outStream = GetOutStream(location, outFileStream);
+        DumpRegisterImpl(outStream, qubits);
+    }
 
     std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
     {

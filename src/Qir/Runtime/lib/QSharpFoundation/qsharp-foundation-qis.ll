@@ -31,7 +31,8 @@
 %struct.QirString = type opaque
 %PauliId = type i32
 
-declare void @quantum__rt__message(%"struct.QirString"* %str)
+; To do: remove this declaration after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
+declare dllimport void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;===============================================================================
 ;
@@ -43,10 +44,11 @@ define dllexport void @__quantum__qis__message__body(%String* %.str) {
 }
 
 ;===============================================================================
-; quantum.qis math functions
+; quantum.qis math functions declarations
 ;
 
 ; LLVM intrinsics (https://llvm.org/docs/LangRef.html):
+; To do: consider calling these directly from the compiler-generated .ll code, rather than throug the QIR.
 declare double      @llvm.sqrt.f64(double %.val)
 declare double      @llvm.log.f64(double %Val)
 declare double      @llvm.sin.f64(double %Val)
@@ -66,6 +68,17 @@ declare double      @quantum__qis__ieeeremainder__body(double %y, double %x)
 declare i64         @quantum__qis__drawrandomint__body(i64 %min, i64 %max)
 declare double      @quantum__qis__drawrandomdouble__body(double %min, double %max)
 
+;===============================================================================
+; quantum.qis conditional functions declarations
+;
+declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
+declare void @quantum__qis__applyconditionallyintrinsic__body(
+  %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
+
+
+;===============================================================================
+; quantum.qis math functions implementation
+;
 ; API for the user code:
 define dllexport double @__quantum__qis__nan__body() {                ; Q#: function NAN() : Double       http://www.cplusplus.com/reference/cmath/nan-function/
   %result = call double @llvm.sqrt.f64(double -1.0)         ; sqrt(<negative>) -> NaN   
@@ -202,12 +215,8 @@ define dllexport double @__quantum__qis__drawrandomdouble__body(double %min, dou
 
 
 ;===============================================================================
-; quantum.qis conditional functions
+; quantum.qis conditional functions implementation
 ;
-declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.QirCallable*, %struct.QirCallable*)
-declare void @quantum__qis__applyconditionallyintrinsic__body(
-  %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
-
 define dllexport void @__quantum__qis__applyifelseintrinsic__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {
 
@@ -231,4 +240,3 @@ define dllexport void @__quantum__qis__applyconditionallyintrinsic__body(
     %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
   ret void
 }
-

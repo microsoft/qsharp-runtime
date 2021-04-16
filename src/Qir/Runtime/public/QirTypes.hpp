@@ -49,6 +49,7 @@ struct QIR_SHARED_API QirString
     std::string str;
 
     QirString(std::string&& str);
+    QirString(const char* cstr);
 };
 
 /*======================================================================================================================
@@ -58,7 +59,7 @@ struct QIR_SHARED_API QirString
     a header that contains the relevant data. The header immediately precedes the tuple's buffer in memory when the
     tuple is created.
 ======================================================================================================================*/
-using PTuple = char*;
+using PTuple = char*;   // To do: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
 struct QIR_SHARED_API QirTupleHeader
 {
     int     refCount = 0;
@@ -120,10 +121,11 @@ static_assert(
 /*======================================================================================================================
     QirCallable
 ======================================================================================================================*/
-typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
-typedef void (*t_CaptureCallback)(PTuple, int32_t);
 struct QIR_SHARED_API QirCallable
 {
+    typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
+    typedef void (*t_CaptureCallback)(PTuple, int32_t);
+
     static int constexpr Adjoint = 1;
     static int constexpr Controlled = 1 << 1;
 
@@ -172,4 +174,14 @@ struct QIR_SHARED_API QirCallable
     void ApplyFunctor(int functor);
 
     void InvokeCaptureCallback(int32_t index, int32_t parameter);
+};
+
+struct QIR_SHARED_API QirRange
+{
+    int64_t start;
+    int64_t step;
+    int64_t end;
+
+    QirRange();
+    QirRange(int64_t start, int64_t step, int64_t end);
 };

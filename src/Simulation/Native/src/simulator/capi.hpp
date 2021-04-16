@@ -16,18 +16,41 @@ extern "C"
 {
     // non-quantum
 
-    MICROSOFT_QUANTUM_DECL unsigned init();
-    MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid);
-    MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s);
+    MICROSOFT_QUANTUM_DECL unsigned init(); // NOLINT
+    MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid); // NOLINT
+    MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s); // NOLINT
     MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned sid, _In_ bool (*callback)(size_t, double, double));
     MICROSOFT_QUANTUM_DECL bool DumpQubits(
         _In_ unsigned sid,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q,
         _In_ bool (*callback)(size_t, double, double));
+
+    typedef void* TDumpLocation;
+    typedef bool (*TDumpToLocationCallback)(size_t, double, double, TDumpLocation);
+    // TDumpToLocationAPI is the siugnature of DumpToLocation. The caller needs to cast the address to TDumpToLocationAPI
+    // to correctly call DumpToLocation from outside of this dynamic library.
+    typedef void (*TDumpToLocationAPI)(unsigned sid, TDumpToLocationCallback callback, TDumpLocation location);
+    MICROSOFT_QUANTUM_DECL void DumpToLocation(_In_ unsigned sid, _In_ TDumpToLocationCallback callback, _In_ TDumpLocation location);
+
+    // TDumpQubitsToLocationAPI is the siugnature of DumpQubitsToLocation. The caller needs to cast the address to TDumpQubitsToLocationAPI
+    // to correctly call DumpQubitsToLocation from outside of this dynamic library.
+    typedef bool (*TDumpQubitsToLocationAPI)(
+        unsigned sid,
+        unsigned n,
+        unsigned* q,
+        TDumpToLocationCallback callback, 
+        TDumpLocation location);
+    MICROSOFT_QUANTUM_DECL bool DumpQubitsToLocation(
+        _In_ unsigned sid,
+        _In_ unsigned n,
+        _In_reads_(n) unsigned* q,
+        _In_ TDumpToLocationCallback callback, 
+        _In_ TDumpLocation location);
+
     MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned sid, _In_ void (*callback)(unsigned));
 
-    MICROSOFT_QUANTUM_DECL std::size_t random_choice(_In_ unsigned sid, _In_ std::size_t n, _In_reads_(n) double* p);
+    MICROSOFT_QUANTUM_DECL std::size_t random_choice(_In_ unsigned sid, _In_ std::size_t n, _In_reads_(n) double* p); // NOLINT
 
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability(
         _In_ unsigned sid,
@@ -44,9 +67,9 @@ extern "C"
     );
 
     // allocate and release
-    MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid);
-    MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q);
-    MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned sid);
+    MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid); // NOLINT
+    MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q); // NOLINT
+    MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned sid); // NOLINT
 
     // single-qubit gates
     MICROSOFT_QUANTUM_DECL void X(_In_ unsigned sid, _In_ unsigned q);
@@ -110,13 +133,13 @@ extern "C"
         _In_ unsigned sid,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q,
-        _In_ std::size_t table_size,
-        _In_reads_(table_size) std::size_t* permutation_table);
+        _In_ std::size_t table_size, // NOLINT
+        _In_reads_(table_size) std::size_t* permutation_table); // NOLINT
     MICROSOFT_QUANTUM_DECL void AdjPermuteBasis(
         _In_ unsigned sid,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q,
-        _In_ std::size_t table_size,
-        _In_reads_(table_size) std::size_t* permutation_table);
+        _In_ std::size_t table_size, // NOLINT
+        _In_reads_(table_size) std::size_t* permutation_table); // NOLINT
 
 }

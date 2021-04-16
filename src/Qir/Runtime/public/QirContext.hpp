@@ -14,30 +14,33 @@ namespace Quantum
     struct IRuntimeDriver;
     struct AllocationsTracker;
 
-    QIR_SHARED_API void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
-    QIR_SHARED_API void ReleaseQirContext();
     struct QIR_SHARED_API QirExecutionContext
     {
+        static void Init(IRuntimeDriver* simulator, bool trackAllocatedObjects = false);
+        static void Deinit();
+
+        QirExecutionContext(IRuntimeDriver* simulator, bool trackAllocatedObjects);
+        ~QirExecutionContext();
+
+        void OnAddRef(void* object);
+        void OnRelease(void* object);
+        void OnAllocate(void* object);
+
+        IRuntimeDriver* GetDriver() const;
+
+        struct QIR_SHARED_API Scoped
+        {
+            Scoped(IRuntimeDriver* sim, bool trackAllocatedObjects = false);
+            ~Scoped();
+        };
+
+      private:
         IRuntimeDriver* driver = nullptr;
         bool trackAllocatedObjects = false;
         std::unique_ptr<AllocationsTracker> allocationsTracker;
-
-        QirExecutionContext(IRuntimeDriver* sim, bool trackAllocatedObjects);
-        ~QirExecutionContext();
     };
-    extern thread_local std::unique_ptr<QirExecutionContext> g_context;
-    extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext();
+    
+    QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext();
 
-    struct QIR_SHARED_API QirContextScope
-    {
-        QirContextScope(IRuntimeDriver* sim, bool trackAllocatedObjects = false)
-        {
-            InitializeQirContext(sim, trackAllocatedObjects);
-        }
-        ~QirContextScope()
-        {
-            ReleaseQirContext();
-        }
-    };
 } // namespace Quantum
 } // namespace Microsoft

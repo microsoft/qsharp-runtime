@@ -6,6 +6,7 @@
 #include <complex>
 
 #include "CoreTypes.hpp"
+#include "QirTypes.hpp"
 
 namespace Microsoft
 {
@@ -58,7 +59,12 @@ namespace Quantum
         // The callback should be invoked on each basis vector (in the standard computational basis) in little-endian
         // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);
+
+        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
         virtual void GetState(TGetStateCallback callback) = 0;
+
+        virtual void DumpMachine(const void* location) = 0;
+        virtual void DumpRegister(const void* location, const QirArray* qubits) = 0;
 
         // Both Assert methods return `true`, if the assert holds, `false` otherwise.
         virtual bool Assert(

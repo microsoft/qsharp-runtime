@@ -145,7 +145,7 @@ There are two ways to compile and run the QIR files against the runtime.
 
 QIR's architecture assumes a single target, whether that be hardware or a particular simulator. As a result, there is no
  provision in the QIR specifications to choose a target dynamically. To connect QIR to the simulators from this runtime,
- we provide `InitializeQirContext` and `ReleaseQirContext` methods. Switching contexts while executing QIR isn't
+ we provide `QirExecutionContext::Init()` and `QirExecutionContext::Deinit()` methods. Switching contexts while executing QIR isn't
  supported and would yield undefined behavior.
 
 ### Building from IR files
@@ -166,8 +166,6 @@ CMake doesn't support using LLVM's IR files as input so instead we invoke Clang 
 1. Variadic functions (e.g. `__quantum__rt__array_create`) require platform specific bridges. The currently implemented
  bridge is for Windows.
 1. Qubit borrowing NYI (needs both bridge and simulator's support).
-1. `@ResultZero` and `@ResultOne` global variables, used in QIR generated from Q#, cannot be treated in a
- platform-agnostic way when linking against the shared qdk library.
 
 ## Coding style and conventions
 

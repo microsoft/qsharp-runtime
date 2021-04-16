@@ -233,7 +233,7 @@ define dllexport %Array* @__quantum__rt__array_copy(%Array* %.ar, i1 %force) {
 
 ; TODO: This bridge isn't cross-platform!
 ; it works on Windows but on Linux %args ends up not being a valid pointer.
-declare void @DebugLogPtr(i8*)
+;declare void @DebugLogPtr(i8*)
 define dllexport %Array* @__quantum__rt__array_create(i32 %item_size, i32 %dim_count, ...) {
   %args1 = alloca i8*, align 8
   %args2 = bitcast i8** %args1 to i8*

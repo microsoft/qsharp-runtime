@@ -302,6 +302,18 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         }
     }
 
+    void dump(TDumpToLocationCallback callback, TDumpLocation location) override
+    {
+        recursive_lock_type l(mutex());
+        flush();
+
+        auto wfn = psi.data();
+        for (std::size_t i = 0; i < wfn.size(); i++)
+        {
+            if (!callback(i, wfn[i].real(), wfn[i].imag(), location)) return;
+        }
+    }
+
     void dumpIds(void (*callback)(logical_qubit_id))
     {
         recursive_lock_type l(mutex());
@@ -311,6 +323,26 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         for (logical_qubit_id q : qubits)
         {
             callback(q);
+        }
+    }
+
+    bool dumpQubits(std::vector<logical_qubit_id> const& qs, TDumpToLocationCallback callback, TDumpLocation location) override
+    {
+        assert(qs.size() <= num_qubits());
+
+        WavefunctionStorage wfn(1ull << qs.size());
+
+        if (subsytemwavefunction(qs, wfn, 1e-10))
+        {
+            for (std::size_t i = 0; i < wfn.size(); i++)
+            {
+                if (!callback(i, wfn[i].real(), wfn[i].imag(), location)) break;
+            }
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
