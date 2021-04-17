@@ -128,7 +128,8 @@ namespace Quantum
             return ids;
         }
 
-        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // Use `DumpMachine()` and `DumpRegister()` instead.
         // use for debugging the simulator
         void DumpState()
         {
@@ -178,7 +179,8 @@ namespace Quantum
             }
         }
 
-        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // Use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
             typedef bool (*TDump)(unsigned, TGetStateCallback);
@@ -442,20 +444,28 @@ namespace Quantum
 
     void CFullstateSimulator::DumpMachineImpl(std::ostream& outStream)
     {
-        outStream << "*********************" << std::endl;
+        outStream << "# wave function for qubits (least to most significant qubit ids):" << std::endl;
         this->GetStateTo((TDumpLocation)&outStream, dumpToLocationCallback);
-        outStream << "*********************" << std::endl;
         outStream.flush();
     }
 
     void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits)
     {
-        outStream << "*********************" << std::endl;
+        outStream << "# wave function for qubits with ids (least to most significant): ";
+        for(int64_t idx = 0; idx < qubits->count; ++idx)
+        {
+            if(idx != 0)
+            {
+                outStream << "; ";
+            }
+            outStream << (uintptr_t)(((void **)(qubits->buffer))[idx]);
+        }
+        outStream << ':' << std::endl;
+
         if(!this->GetRegisterTo((TDumpLocation)&outStream, dumpToLocationCallback, qubits))
         {
             outStream << "## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##" << std::endl;
         }
-        outStream << "*********************" << std::endl;
         outStream.flush();
     }
 
@@ -493,13 +503,22 @@ namespace Quantum
             // Open the file for appending:
             const std::string& filePath = (static_cast<const QirString *>(location))->str;
 
-            outFileStream.open(filePath, std::ofstream::out | std::ofstream::app);
-            if((outFileStream.rdstate() & std::ofstream::failbit) != 0)
+            bool openException = false;
+            try
             {
-                QirString qstr {std::string("Failed to open dump file \"") +
-                                            filePath +
-                                            "\""};
-                quantum__rt__fail(&qstr);
+                outFileStream.open(filePath, std::ofstream::out | std::ofstream::app);
+            }
+            catch(const std::ofstream::failure& e)
+            {
+                openException = true;
+                std::cerr << "Exception caught: \"" << e.what() << "\".\n";
+            }
+            
+            if(   ((outFileStream.rdstate() & std::ofstream::failbit) != 0)
+               || openException)
+            {
+                std::cerr << "Failed to open dump file \"" + filePath + "\".\n";
+                return OutputStream::Get();     // Dump to std::cout.
             }
 
             return outFileStream;

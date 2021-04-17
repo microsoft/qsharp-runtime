@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// https://stackoverflow.com/a/5419388/6362941
-// https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574170031
-// https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574194191
+// https://stackoverflow.com/a/5419388/6362941  redirect std::cout to a string
+// Discussion/history and some more info about the output redirection:
+//  https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574170031 
+//  https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574194191
 
 #include <iostream>
 #include "OutputStream.hpp"

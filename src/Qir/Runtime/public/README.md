@@ -1,6 +1,6 @@
 # API Dependency
 
-(See the raw file. Please keep the raw file readable rather than the browser-rendered one)
+(Try to keep the readability balance between the web view and raw file, give the preference to the raw file)
 
 The listed earlier ones provide the functionality to the listed later ones  
 (the listed later ones include and/or call the listed earlier ones,  
@@ -9,9 +9,10 @@ the listed later ones cannot be compiled into an executable without the listed e
 Same-level entities are independent of each other (unless specified otherwise). Entities depend on the levels listed earlier only.  
 
 
-To do: Consider moving `public\` one level up, or all the rest one level down the directory tree.  
+TODO: Consider moving `public\` one level up, or all the rest one level down the directory tree.  
 
 ## Level 0. External To This Directory
+
 **..\..\Common\Include\qsharp__foundation_internal.hpp**
                         Depends on `QIR_SHARED_API` - consider moving below `public\`.
 
@@ -19,7 +20,8 @@ To do: Consider moving `public\` one level up, or all the rest one level down th
                         Depends on `public\` - consider moving below `public\`.
 
 
-## Level
+## Level 1
+
 **TracerTypes.hpp**     Defines types `OpId`, `Time`, `Duration`, `LayerId`; constants `INVALID`, `REQUESTNEW`.  
                         Does not depend on anything of our code.  
                         Only used by Tracer and Tracer Test. Consider moving from `public` to a location still visible for tests.
@@ -33,7 +35,7 @@ To do: Consider moving `public\` one level up, or all the rest one level down th
 **QirRuntime.hpp**      Declares `quantum__rt__*()`. Depends on the listed earlier ones.  
 
 
-## Level 
+## Level 2
 
 **OutputStream.hpp**    Defines `OutputStream`, `ScopedRedirector` - the means to redirect the output stream from `std::cout` to string, file, etc.  
                         Used by the tests that verify the output (e.g. `Message()`).  
@@ -49,7 +51,7 @@ To do: Consider moving `public\` one level up, or all the rest one level down th
 **QSharpSimApi_I.hpp**  Defines `IQuantumGateSet`, `IDiagnostics`.  
                         Depends on `QIR_SHARED_API`, `Qubit`, `PauliId`, `Result`, `QirArray`.  
 
-## Level 
+## Level 3
 
 **SimFactory.hpp**      Defines `CreateToffoliSimulator()`, `CreateFullstateSimulator()`.  
                         Depends on `QIR_SHARED_API`, `IRuntimeDriver`

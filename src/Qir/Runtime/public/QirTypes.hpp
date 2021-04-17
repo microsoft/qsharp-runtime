@@ -59,7 +59,7 @@ struct QIR_SHARED_API QirString
     a header that contains the relevant data. The header immediately precedes the tuple's buffer in memory when the
     tuple is created.
 ======================================================================================================================*/
-using PTuple = char*;   // To do: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
+using PTuple = char*;   // TODO: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
 struct QIR_SHARED_API QirTupleHeader
 {
     int     refCount = 0;

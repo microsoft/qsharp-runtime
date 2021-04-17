@@ -1,6 +1,6 @@
 # API Dependency
 
-(See the raw file. Please keep the raw file readable rather than the browser-rendered one)
+(Try to keep the readability balance between the web view and raw file, give the preference to the raw file)
 
 The listed earlier ones provide the functionality to the listed later ones  
 (the listed later ones include and/or call the listed earlier ones,  
@@ -10,6 +10,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 
 ## Level 0. External To This Solution
+
 **[lib]Microsoft.Quantum.Simulator.Runtime.{dll|dylib|so}** 
                             Full state simulator common for C# Runtime and Q# Runtime. Dynamic library.
 
@@ -18,6 +19,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 
 ## Level 1. External To This Directory
+
 **public\CoreTypes.hpp**    Defines `QIR_SHARED_API`, `QUBIT`, `Qubit`, `RESULT`, `Result`, `ResultValue`, `PauliId`.  
                             Does not depend on anything of our code.
 
@@ -39,6 +41,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 
 ## Level 2
+
 **ToffoliSimulator.cpp**    Defines `CToffoliSimulator`, `CreateToffoliSimulator()`.  
                             Depends on `IRuntimeDriver`, `IQuantumGateSet`, `IDiagnostics`, **public\CoreTypes.hpp**
 

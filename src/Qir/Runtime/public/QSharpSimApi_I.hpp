@@ -60,7 +60,8 @@ namespace Quantum
         // order until it returns `false` or the state is fully dumped.
         typedef bool (*TGetStateCallback)(size_t /*basis vector*/, double /* amplitude Re*/, double /* amplitude Im*/);
 
-        // To do: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
+        // Use `DumpMachine()` and `DumpRegister()` instead.
         virtual void GetState(TGetStateCallback callback) = 0;
 
         virtual void DumpMachine(const void* location) = 0;

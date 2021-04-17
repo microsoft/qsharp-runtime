@@ -31,12 +31,12 @@
 %struct.QirString = type opaque
 %PauliId = type i32
 
-; To do: remove this declaration after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
+; TODO: remove this declaration after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
 declare dllimport void @quantum__rt__message(%"struct.QirString"* %str)
 
 ;===============================================================================
 ;
-; To do: remove this function after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
+; TODO: remove this function after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
 define dllexport void @__quantum__qis__message__body(%String* %.str) {
   %str = bitcast %String* %.str to %struct.QirString*
   call void @quantum__rt__message(%"struct.QirString"* %str)
@@ -48,7 +48,7 @@ define dllexport void @__quantum__qis__message__body(%String* %.str) {
 ;
 
 ; LLVM intrinsics (https://llvm.org/docs/LangRef.html):
-; To do: consider calling these directly from the compiler-generated .ll code, rather than throug the QIR.
+; TODO: consider calling these directly from the compiler-generated .ll code, rather than through the QIR. #632
 declare double      @llvm.sqrt.f64(double %.val)
 declare double      @llvm.log.f64(double %Val)
 declare double      @llvm.sin.f64(double %Val)
@@ -215,7 +215,7 @@ define dllexport double @__quantum__qis__drawrandomdouble__body(double %min, dou
 
 
 ;===============================================================================
-; quantum.qis conditional functions implementation
+; quantum.qis conditional functions/operations implementation
 ;
 define dllexport void @__quantum__qis__applyifelseintrinsic__body(
   %Result* %.r, %Callable* %.clb_on_zero, %Callable* %.clb_on_one) {

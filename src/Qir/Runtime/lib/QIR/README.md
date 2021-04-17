@@ -1,6 +1,6 @@
 # API Dependency
 
-(See the raw file. Please keep the raw file readable rather than the browser-rendered one)
+(Try to keep the readability balance between the web view and raw file, give the preference to the raw file)
 
 The listed earlier ones provide the functionality to the listed later ones  
 (the listed later ones include and/or call the listed earlier ones,  
@@ -21,6 +21,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 
 ## Level 1
+
 **allocationsTracker.hpp**  Defines `Microsoft::Quantum::AllocationsTracker` that tracks the allocations and detects the mem leaks.  
                             Does not depend on anything of our code.  
 
@@ -32,6 +33,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 
 ## Level 2
+
 **allocationsTracker.cpp**  Implements the internals of `Microsoft::Quantum::AllocationsTracker`.  
                             Depends on `quantum__rt__fail()`, `quantum__rt__string_create()`  
 
@@ -40,6 +42,7 @@ Same-level entities are independent of each other (unless specified otherwise). 
                             Gets/returns `IRuntimeDriver *`.
 
 ## Level 3
+
 **delegated.cpp**           Implements `quantum__rt__result_*()`, `quantum__rt__qubit_{allocate,release,to_string}()`.  
                             Each API depends on `Microsoft::Quantum::GlobalContext()[->GetDriver()]`,  
                             `quantum__rt__qubit_to_string()`  also depends on strings.cpp's `quantum__rt__string_create()`.  
@@ -50,11 +53,13 @@ Same-level entities are independent of each other (unless specified otherwise). 
                             **delegated.cpp**'s `quantum__rt__qubit_allocate()`  
 
 ## Level 4
+
 **callables.cpp**           Defines the {internals of `QirTupleHeader`, `QirCallable`}, `quantum__rt__tuple_*()`, `quantum__rt__callable_*()`  
                             Depends on `QirArray`, `Microsoft::Quantum::GlobalContext()`, `quantum__rt__fail()`, `quantum__rt__string_create()`, `TupleWithControls`,  
                             Consider breaking up into **Tuples.cpp** and **Callables.cpp**.
 
 ## Level 5
+
 **bridge-rt.ll**            Defines the `@__quantum__rt__*` entry points (to be called by the `.ll` files generated from users' `.qs` files).  
                             The C++ Standard reserves the identifiers starting with double underscores `__`, that is why the definitions of `@__quantum__rt__*`
                             have been put to `.ll` file rather than `.cpp` file.  
