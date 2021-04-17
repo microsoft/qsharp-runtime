@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <vector>
+#include <iostream>
 
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
@@ -118,12 +119,14 @@ namespace Quantum
 
         void DumpMachine(const void* location) override
         {
-            throw std::logic_error("operation_not_supported");
+            std::cerr << __func__ << " is not yet implemented" << std::endl;
+            // TODO: How to implement: https://github.com/microsoft/qsharp-runtime/pull/634#discussion_r615183791
         }
 
         void DumpRegister(const void* location, const QirArray* qubits) override
         {
-            throw std::logic_error("operation_not_supported");
+            std::cerr << __func__ << " is not yet implemented" << std::endl;
+            // TODO: How to implement: https://github.com/microsoft/qsharp-runtime/pull/634#discussion_r615183791
         }
 
 
