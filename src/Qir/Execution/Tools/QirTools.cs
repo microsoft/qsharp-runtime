@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Qir.Tools
 {
     public static class QirTools
     {
-        public static Task BuildFromQSharpDll(FileInfo qsharpDll)
+        public static Task BuildFromQSharpDll(FileInfo qsharpDll, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, FileInfo executable)
         {
             throw new NotImplementedException();
         }
