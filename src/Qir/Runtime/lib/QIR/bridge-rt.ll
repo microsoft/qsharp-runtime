@@ -80,6 +80,7 @@ declare void @llvm.va_end(i8*)
 declare i8* @quantum__rt__tuple_create(i64)
 declare void @quantum__rt__tuple_update_reference_count(i8*, i32)
 declare void @quantum__rt__tuple_update_alias_count(i8*, i32)
+declare i8* @quantum__rt__tuple_copy(i8*, i1)
 
 declare void @quantum__rt__callable_update_reference_count(%"struct.QirCallable"*, i32)
 declare %"struct.QirCallable"* @quantum__rt__callable_create(void (i8*, i8*, i8*)**, void (i8*, i64)**, i8*)
@@ -339,6 +340,13 @@ define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i32
   %th = bitcast %Tuple* %.th to i8*
   call void @quantum__rt__tuple_update_alias_count(i8* %th, i32 %c)
   ret void
+}
+
+define dllexport %Tuple* @__quantum__rt__tuple_copy(%Tuple* %.th, i1 %force) {
+  %th = bitcast %Tuple* %.th to i8*
+  %th2 = call i8* @quantum__rt__tuple_copy(i8* %th, i1 %force)
+  %.th2 = bitcast i8* %th2 to %Tuple*
+  ret %Tuple* %.th2
 }
 
 ;------------------------------------------------------------------------------
