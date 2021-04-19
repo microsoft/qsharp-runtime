@@ -1,0 +1,26 @@
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+#nullable enable
+
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace Microsoft.Quantum.Runtime
+{
+    /// <summary>
+    /// An interface for submitting QIR programs to Azure.
+    /// </summary>
+    public interface IQirSubmitter : IAzureSubmitter
+    {
+        /// <summary>
+        /// Submits a job to execute a QIR program without waiting for execution to complete.
+        /// </summary>
+        /// <param name="qir">The QIR program as a byte stream.</param>
+        /// <param name="entryPoint">The fully-qualified name of the entry point to execute.</param>
+        /// <param name="arguments">The arguments to the entry point in the order in which they are declared.</param>
+        /// <returns>The submitted job.</returns>
+        Task<IQuantumMachineJob> SubmitAsync(Stream qir, string entryPoint, IReadOnlyList<Argument> arguments);
+    }
+}
