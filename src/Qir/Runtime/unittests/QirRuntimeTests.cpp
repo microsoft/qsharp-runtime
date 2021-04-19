@@ -905,7 +905,7 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
 static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
-    QirCallable::t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirExecutionContext::Init(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
@@ -930,7 +930,7 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 TEST_CASE("Callables: copy elision", "[qir_support]")
 {
     QirExecutionContext::Scoped qirctx(nullptr, true);
-    QirCallable::t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
+    t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirCallable* original =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);

@@ -113,8 +113,8 @@ extern "C"
     }
 
     QirCallable* quantum__rt__callable_create(
-        QirCallable::t_CallableEntry* entries,
-        QirCallable::t_CaptureCallback* captureCallbacks,
+        t_CallableEntry* entries,
+        t_CaptureCallback* captureCallbacks,
         PTuple capture)
     {
         assert(entries != nullptr);

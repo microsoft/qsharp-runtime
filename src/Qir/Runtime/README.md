@@ -145,8 +145,9 @@ There are two ways to compile and run the QIR files against the runtime.
 
 QIR's architecture assumes a single target, whether that be hardware or a particular simulator. As a result, there is no
  provision in the QIR specifications to choose a target dynamically. To connect QIR to the simulators from this runtime,
- we provide `QirExecutionContext::Init()` and `QirExecutionContext::Deinit()` methods. Switching contexts while executing QIR isn't
- supported and would yield undefined behavior.
+ we provide `QirExecutionContext::Init()` (earlier `InitializeQirContext`)
+ and `QirExecutionContext::Deinit()` (earlier `ReleaseQirContext`) methods.
+ Switching contexts while executing QIR isn't supported and would yield undefined behavior.
 
 ### Building from IR files
 

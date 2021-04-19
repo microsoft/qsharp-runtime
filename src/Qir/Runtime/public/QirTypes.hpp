@@ -121,11 +121,10 @@ static_assert(
 /*======================================================================================================================
     QirCallable
 ======================================================================================================================*/
+typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);    // TODO: Move to `QirCallable::t_CallableEntry`.
+typedef void (*t_CaptureCallback)(PTuple, int32_t);         // TODO: Move to `QirCallable::t_CaptureCallback`.
 struct QIR_SHARED_API QirCallable
 {
-    typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple);
-    typedef void (*t_CaptureCallback)(PTuple, int32_t);
-
     static int constexpr Adjoint = 1;
     static int constexpr Controlled = 1 << 1;
 

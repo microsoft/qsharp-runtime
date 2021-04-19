@@ -149,7 +149,7 @@ extern "C"
 
     // Initializes the callable with the provided function table and capture tuple. The capture tuple pointer
     // should be null if there is no capture.
-    QIR_SHARED_API QirCallable* quantum__rt__callable_create(QirCallable::t_CallableEntry*, QirCallable::t_CaptureCallback*, PTuple); // NOLINT
+    QIR_SHARED_API QirCallable* quantum__rt__callable_create(t_CallableEntry*, t_CaptureCallback*, PTuple); // NOLINT
 
     // Adds the given integer value to the reference count for the callable. Deallocates the callable if the reference
     // count becomes 0. The behavior is undefined if the reference count becomes negative.
@@ -290,3 +290,14 @@ extern "C"
     // Returns true if the first big integer is greater than or equal to the second, false otherwise.
     // TODO QIR_SHARED_API bool quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
+
+
+namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
+{
+namespace Quantum
+{
+    // Deprecated, use `Microsoft::Quantum::OutputStream::Set()` instead.
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
+} // namespace Microsoft
+} // namespace Quantum
+

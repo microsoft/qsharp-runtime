@@ -128,9 +128,7 @@ namespace Quantum
             return ids;
         }
 
-        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
-        // Use `DumpMachine()` and `DumpRegister()` instead.
-        // use for debugging the simulator
+        // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void DumpState()
         {
             std::cout << "*********************" << std::endl;
@@ -179,8 +177,7 @@ namespace Quantum
             }
         }
 
-        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
-        // Use `DumpMachine()` and `DumpRegister()` instead.
+        // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
             typedef bool (*TDump)(unsigned, TGetStateCallback);

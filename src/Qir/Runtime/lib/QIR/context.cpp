@@ -13,11 +13,25 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    std::unique_ptr<QirExecutionContext>& GlobalContext() 
-    { 
-        static std::unique_ptr<QirExecutionContext> g_context = nullptr;
-        
-        return g_context; 
+    static std::unique_ptr<QirExecutionContext> g_context = nullptr;
+    std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
+
+    void InitializeQirContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
+    {
+        assert(g_context == nullptr);
+        g_context = std::make_unique<QirExecutionContext>(sim, trackAllocatedObjects);
+    }
+
+    void ReleaseQirContext()
+    {
+        assert(g_context != nullptr);
+
+        if (g_context->trackAllocatedObjects)
+        {
+            g_context->allocationsTracker->CheckForLeaks();
+        }
+
+        g_context.reset(nullptr);
     }
 
     QirExecutionContext::QirExecutionContext(IRuntimeDriver* simulator, bool trackAllocatedObjects)
@@ -92,6 +106,16 @@ namespace Quantum
     QirExecutionContext::Scoped::~Scoped()
     {
         QirExecutionContext::Deinit();
+    }
+
+    QirContextScope::QirContextScope(IRuntimeDriver* sim, bool trackAllocatedObjects /*= false*/)
+    {
+        InitializeQirContext(sim, trackAllocatedObjects);
+    }
+    
+    QirContextScope::~QirContextScope()
+    {
+        ReleaseQirContext();
     }
 
 } // namespace Quantum

@@ -110,8 +110,7 @@ namespace Quantum
             return std::abs(actualZeroProbability - probabilityOfZero) < precision;
         }
 
-        // TODO: remove after the `function DumpMachine<'T> (location : 'T) : Unit` is implemented.
-        // Use `DumpMachine()` and `DumpRegister()` instead.
+        // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
             throw std::logic_error("operation_not_supported");

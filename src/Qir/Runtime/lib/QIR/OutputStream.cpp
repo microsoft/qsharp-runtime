@@ -36,5 +36,10 @@ namespace Quantum
         OutputStream::Set(old);
     }
 
+    std::ostream& SetOutputStream(std::ostream & newOStream)
+    {
+        return OutputStream::Set(newOStream);
+    }
+
 } // namespace Quantum
 } // namespace Microsoft
