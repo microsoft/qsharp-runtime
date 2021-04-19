@@ -8,7 +8,7 @@ using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
 namespace Microsoft.Quantum.Qir.Driver
 {
-    public interface IQirDriverGenerator
+    public interface IQirSourceFileGenerator
     {
         /// <summary>
         /// Generates the C++ driver source file and writes the bytecode to a file.
@@ -17,6 +17,6 @@ namespace Microsoft.Quantum.Qir.Driver
         /// <param name="entryPointOperation">Entry point information.</param>
         /// <param name="bytecode">The QIR bytecode.</param>
         /// <returns></returns>
-        Task GenerateQirDriverCppAsync(DirectoryInfo sourceDirectory, EntryPointOperation entryPointOperation, ArraySegment<byte> bytecode);
+        Task GenerateQirSourceFilesAsync(DirectoryInfo sourceDirectory, EntryPointOperation entryPointOperation, ArraySegment<byte> bytecode);
     }
 }
