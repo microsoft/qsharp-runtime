@@ -15,6 +15,20 @@ $libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\build\$buildConfi
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $libraryDirectory = (Join-Path $testArtifactsFolder "library")
 
+if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
+{
+    Write-Host "On Windows build using Clang"
+    $env:CC = "clang.exe"
+    $env:CXX = "clang++.exe"
+    $env:RC = "clang++.exe"
+
+    if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
+        # LLVM was installed by Chocolatey, so add the install location to the path.
+        $env:PATH += ";$($env:SystemDrive)\Program Files\LLVM\bin"
+        Write-Host "Adding clang to path."
+    }
+}
+
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
 }
