@@ -2,13 +2,13 @@
 // Licensed under the MIT License.
 
 using System;
-using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
+using Microsoft.Quantum.Simulation.Core;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.EntryPointDriver
@@ -16,19 +16,18 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// <summary>
     /// Provides entry point submission to Azure Quantum.
     /// </summary>
-    internal static class Azure
+    public static class Azure
     {
         /// <summary>
         /// Submits the entry point to Azure Quantum.
         /// </summary>
-        /// <param name="entryPoint">The entry point.</param>
-        /// <param name="parseResult">The command-line parsing result.</param>
-        /// <param name="settings">The submission settings.</param>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
+        /// <param name="info">The information about the entry point.</param>
+        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="settings">The submission settings.</param>
         /// <returns>The exit code.</returns>
-        internal static async Task<int> Submit<TIn, TOut>(
-            IEntryPoint<TIn, TOut> entryPoint, ParseResult parseResult, AzureSettings settings)
+        public static async Task<int> Submit<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
         {
             if (settings.Verbose)
             {
@@ -44,28 +43,27 @@ namespace Microsoft.Quantum.EntryPointDriver
                 return 1;
             }
 
-            var input = entryPoint.CreateArgument(parseResult);
             return settings.DryRun
-                ? Validate(machine, entryPoint, input)
-                : await SubmitJob(machine, entryPoint, input, settings);
+                ? Validate(machine, info, input)
+                : await SubmitJob(machine, info, input, settings);
         }
 
         /// <summary>
         /// Submits a job to Azure Quantum.
         /// </summary>
-        /// <param name="machine">The quantum machine target.</param>
-        /// <param name="entryPoint">The program entry point.</param>
-        /// <param name="input">The program input.</param>
-        /// <param name="settings">The submission settings.</param>
         /// <typeparam name="TIn">The input type.</typeparam>
         /// <typeparam name="TOut">The output type.</typeparam>
+        /// <param name="machine">The quantum machine target.</param>
+        /// <param name="info">The information about the entry point.</param>
+        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="settings">The submission settings.</param>
         /// <returns>The exit code.</returns>
         private static async Task<int> SubmitJob<TIn, TOut>(
-            IQuantumMachine machine, IEntryPoint<TIn, TOut> entryPoint, TIn input, AzureSettings settings)
+            IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
         {
             try
             {
-                var job = await machine.SubmitAsync(entryPoint.Info, input, new SubmissionContext
+                var job = await machine.SubmitAsync(info, input, new SubmissionContext
                 {
                     FriendlyName = settings.JobName,
                     Shots = settings.Shots
@@ -93,15 +91,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// Validates the program for the quantum machine target.
         /// </summary>
-        /// <param name="machine">The quantum machine target.</param>
-        /// <param name="entryPoint">The program entry point.</param>
-        /// <param name="input">The program input.</param>
         /// <typeparam name="TIn">The input type.</typeparam>
         /// <typeparam name="TOut">The output type.</typeparam>
+        /// <param name="machine">The quantum machine target.</param>
+        /// <param name="info">The information about the entry point.</param>
+        /// <param name="input">The input argument tuple to the entry point.</param>
         /// <returns>The exit code.</returns>
-        private static int Validate<TIn, TOut>(IQuantumMachine machine, IEntryPoint<TIn, TOut> entryPoint, TIn input)
+        private static int Validate<TIn, TOut>(IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input)
         {
-            var (isValid, message) = machine.Validate(entryPoint.Info, input);
+            var (isValid, message) = machine.Validate(info, input);
             Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
             if (!string.IsNullOrWhiteSpace(message))
             {
@@ -186,7 +184,7 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// <summary>
     /// The information to show in the output after the job is submitted.
     /// </summary>
-    internal enum OutputFormat
+    public enum OutputFormat
     {
         /// <summary>
         /// Show a friendly message with a URI that can be used to see the job results.
@@ -202,7 +200,7 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// <summary>
     /// Settings for a submission to Azure Quantum.
     /// </summary>
-    internal sealed class AzureSettings
+    public sealed class AzureSettings
     {
         /// <summary>
         /// The subscription ID.
