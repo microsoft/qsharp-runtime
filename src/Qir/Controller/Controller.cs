@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Qir
             DirectoryInfo libraryDirectory,
             DirectoryInfo includeDirectory,
             FileInfo errorFile,
-            IQirDriverGenerator driverGenerator,
+            IQirSourceFileGenerator driverGenerator,
             IQirExecutableGenerator executableGenerator,
             IQuantumExecutableRunner executableRunner,
             ILogger logger)
@@ -37,10 +37,10 @@ namespace Microsoft.Quantum.Qir
                 using var inputFileStream = inputFile.OpenRead();
                 var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
 
-                // Step 32: Create driver.
+                // Step 2: Create driver.
                 logger.LogInfo("Creating driver file.");
                 var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
-                await driverGenerator.GenerateQirDriverCppAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
+                await driverGenerator.GenerateQirSourceFilesAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
 
                 // Step 3: Create executable.
                 logger.LogInfo("Compiling and linking executable.");
@@ -50,12 +50,11 @@ namespace Microsoft.Quantum.Qir
 
                 // Step 4: Run executable.
                 logger.LogInfo("Running executable.");
-                using var outputFileStream = outputFile.OpenWrite();
                 await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
             }
             catch (Exception e)
             {
-                logger.LogError("An error has been encountered. Will write an error to the error file and delete any output that has been generated.");
+                logger.LogError("An error has been encountered. Will write an error to the error file.");
                 logger.LogException(e);
                 await WriteExceptionToFileAsync(e, errorFile);
             }

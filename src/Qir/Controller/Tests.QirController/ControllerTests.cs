@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir;
@@ -22,7 +21,7 @@ namespace Tests.QirController
 {
     public class ControllerTests : IDisposable
     {
-        private Mock<IQirDriverGenerator> driverGeneratorMock;
+        private Mock<IQirSourceFileGenerator> driverGeneratorMock;
         private Mock<IQirExecutableGenerator> executableGeneratorMock;
         private Mock<IQuantumExecutableRunner> executableRunnerMock;
         private Mock<ILogger> loggerMock;
@@ -34,7 +33,7 @@ namespace Tests.QirController
 
         public ControllerTests()
         {
-            driverGeneratorMock = new Mock<IQirDriverGenerator>();
+            driverGeneratorMock = new Mock<IQirSourceFileGenerator>();
             executableGeneratorMock = new Mock<IQirExecutableGenerator>();
             executableRunnerMock = new Mock<IQuantumExecutableRunner>();
             inputFile = new FileInfo($"{Guid.NewGuid()}-input");
@@ -102,9 +101,9 @@ namespace Tests.QirController
                 loggerMock.Object);
 
             // Verify driver was created.
-            driverGeneratorMock.Verify(obj => obj.GenerateQirDriverCppAsync(
+            driverGeneratorMock.Verify(obj => obj.GenerateQirSourceFilesAsync(
                 It.IsAny<DirectoryInfo>(),
-                It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
+                It.Is<EntryPointOperation>(entryPoint => Util.EntryPointsAreEqual(entryPoint, input.EntryPoint)),
                 It.Is<ArraySegment<byte>>(bytecode => BytecodesAreEqual(bytecode, input.QirBytecode))));
 
             // Verify executable was generated.
@@ -118,7 +117,7 @@ namespace Tests.QirController
             // Verify executable was run.
             executableRunnerMock.Verify(obj => obj.RunExecutableAsync(
                 It.Is<FileInfo>(executableFile => actualExecutableFile.FullName == executableFile.FullName),
-                It.Is<EntryPointOperation>(entryPoint => EntryPointsAreEqual(entryPoint, input.EntryPoint)),
+                It.Is<EntryPointOperation>(entryPoint => Util.EntryPointsAreEqual(entryPoint, input.EntryPoint)),
                 It.Is<FileInfo>(actualOutputFile => actualOutputFile.FullName == outputFile.FullName)));
         }
 
@@ -182,14 +181,6 @@ namespace Tests.QirController
             var error = JsonSerializer.Deserialize<Error>(errorFileContents);
             Assert.Equal(exceptionMessage, error.Message);
             Assert.Equal(errorCode, error.Code);
-        }
-
-        private bool EntryPointsAreEqual(EntryPointOperation entryPointA, EntryPointOperation entryPointB)
-        {
-            var method = typeof(Extensions)
-                .GetMethod("ValueEquals", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(EntryPointOperation), typeof(EntryPointOperation) }, null);
-            object[] parameters = { entryPointA, entryPointB };
-            return (bool)method.Invoke(null, parameters);
         }
 
         private bool BytecodesAreEqual(ArraySegment<byte> bytecodeA, ArraySegment<byte> bytecodeB)
