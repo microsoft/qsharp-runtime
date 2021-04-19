@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools
 {
+    /// <summary>
+    /// Class to create and run QIR-based executables that use the full-state simulator.
+    /// </summary>
     public class QirFullStateExecutable : QirExecutable
     {
+        /// <inheritdoc/>
         public QirFullStateExecutable(EntryPointOperation entryPoint, byte[] qirBytecode) :
             base(entryPoint, qirBytecode)
         {

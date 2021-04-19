@@ -9,18 +9,32 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools
 {
+    /// <summary>
+    /// Base for creating and running QIR-based executables.
+    /// </summary>
     public abstract class QirExecutable
     {
         private readonly EntryPointOperation EntryPointOperation;
         private readonly byte[] QirBytecode;
 
+        /// <summary>
+        /// Constructor for the QirExecutable class.
+        /// </summary>
+        /// <param name="entryPoint">Object that provides data to specify which entry-point to use for building and running a QIR-based executable.</param>
+        /// <param name="qirBytecode">QIR bytecode used to build the executable.</param>
         public QirExecutable(EntryPointOperation entryPoint, byte[] qirBytecode)
         {
             this.EntryPointOperation = entryPoint;
             this.QirBytecode = qirBytecode;
         }
 
-        public Task BuildAsync(DirectoryInfo librariesDirectory, DirectoryInfo includeDirectory, FileInfo executable)
+        /// <summary>
+        /// Creates a QIR-based executable.
+        /// </summary>
+        /// <param name="libraryDirectory">Directory where the libraries to link to are located.</param>
+        /// <param name="includeDirectory">Directory where the headers needed for compilation are located.</param>
+        /// <param name="executable">File to write the executable to.</param>
+        public Task BuildAsync(DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, FileInfo executable)
         {
             throw new NotImplementedException();
         }
