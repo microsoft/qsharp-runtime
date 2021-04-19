@@ -25,7 +25,7 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
         # LLVM was installed by Chocolatey, so add the install location to the path.
         $env:PATH += ";$($env:SystemDrive)\Program Files\LLVM\bin"
-        Write-Host "Adding clang to path."
+        Write-Host "Adding clang to path. Path: $env:PATH"
     }
 }
 
