@@ -13,7 +13,7 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    static std::unique_ptr<QirExecutionContext> g_context = nullptr;
+    std::unique_ptr<QirExecutionContext> g_context = nullptr;
     std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
 
     void InitializeQirContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
