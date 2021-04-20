@@ -13,6 +13,9 @@ namespace Microsoft.Quantum.Qir.Tools
     {
         public Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
 
+        // TODO: How arguments are passed to this API will change.
+        public string GetCommandLineArguments(string entryPointName, IDictionary<string, object> arguments);
+
         public IList<string> LinkLibraries { get; }
 
         public string SourceType { get; }
