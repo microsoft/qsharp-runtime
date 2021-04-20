@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
-namespace Microsoft.Quantum.Qir.Driver
+namespace Microsoft.Quantum.Qir.Tools.SourceGeneration
 {
     public interface IQirSourceFileGenerator
     {

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -20,20 +20,23 @@ namespace Microsoft.Quantum.Qir.Tools
         {
         }
 
-        protected override Task GenerateDriverAsync(Stream driver)
+        protected override async Task GenerateDriverAsync(Stream driver)
         {
-            throw new NotImplementedException();
+            await Task.Run(() => QirDriverGeneration.GenerateQirDriverCpp(EntryPointOperation, driver));
         }
 
-        // TODO: How arguments are passed to this API will change.
-        protected override string GetCommandLineArguments(IList<ArgumentValue> arguments)
+        protected override string GetCommandLineArguments(IList<Argument> arguments)
         {
-            throw new NotImplementedException();
+            return QirDriverGeneration.GenerateCommandLineArguments(arguments);
         }
 
         protected override IList<string> GetLinkLibraries()
         {
-            throw new NotImplementedException();
+            return new List<string> {
+                "Microsoft.Quantum.Qir.Runtime",
+                "Microsoft.Quantum.Qir.QSharp.Foundation",
+                "Microsoft.Quantum.Qir.QSharp.Core"
+            };
         }
     }
 }

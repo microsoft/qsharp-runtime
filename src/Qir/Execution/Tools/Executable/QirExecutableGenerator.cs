@@ -1,20 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
 
-namespace Microsoft.Quantum.Qir.Executable
+namespace Microsoft.Quantum.Qir.Tools.Executable
 {
     public class QirExecutableGenerator : IQirExecutableGenerator
     {
-        private static readonly string[] LibrariesToLink = {
-            "Microsoft.Quantum.Qir.Runtime",
-            "Microsoft.Quantum.Qir.QSharp.Foundation",
-            "Microsoft.Quantum.Qir.QSharp.Core"
-        };
         private readonly IClangClient clangClient;
         private readonly ILogger logger;
 
@@ -24,7 +20,7 @@ namespace Microsoft.Quantum.Qir.Executable
             this.logger = logger;
         }
 
-        public async Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
+        public async Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, IList<string> linkLibraries)
         {
             // Wrap in a Task.Run because FileInfo methods are not asynchronous.
             await Task.Run(async () =>
@@ -42,7 +38,7 @@ namespace Microsoft.Quantum.Qir.Executable
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
-                await clangClient.CreateExecutableAsync(inputFiles, LibrariesToLink, libraryDirectory.FullName, includeDirectory.FullName, executableFile.FullName);
+                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libraryDirectory.FullName, includeDirectory.FullName, executableFile.FullName);
             });
         }
 

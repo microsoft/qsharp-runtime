@@ -3,7 +3,7 @@
 
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.Qir.Executable
+namespace Microsoft.Quantum.Qir.Tools.Executable
 {
     /// <summary>
     /// Wraps the 'clang' tool used for compilation.

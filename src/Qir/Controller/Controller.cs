@@ -3,11 +3,11 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Driver;
-using Microsoft.Quantum.Qir.Executable;
 using Microsoft.Quantum.Qir.Model;
+using Microsoft.Quantum.Qir.Tools;
 using Microsoft.Quantum.Qir.Utility;
 using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
@@ -15,7 +15,6 @@ namespace Microsoft.Quantum.Qir
 {
     public static class Controller
     {
-        private const string SourceDirectoryPath = "src";
         private const string BinaryDirectoryPath = "bin";
         private const string ExecutableName = "simulation.exe";
 
@@ -25,10 +24,7 @@ namespace Microsoft.Quantum.Qir
             DirectoryInfo libraryDirectory,
             DirectoryInfo includeDirectory,
             FileInfo errorFile,
-            IQirSourceFileGenerator driverGenerator,
-            IQirExecutableGenerator executableGenerator,
-            IQuantumExecutableRunner executableRunner,
-            ILogger logger)
+           ILogger logger)
         {
             try
             {
@@ -37,20 +33,15 @@ namespace Microsoft.Quantum.Qir
                 using var inputFileStream = inputFile.OpenRead();
                 var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
 
-                // Step 2: Create driver.
-                logger.LogInfo("Creating driver file.");
-                var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
-                await driverGenerator.GenerateQirSourceFilesAsync(sourceDirectory, input.EntryPoint, input.QirBytecode);
-
-                // Step 3: Create executable.
-                logger.LogInfo("Compiling and linking executable.");
-                var binaryDirectory = new DirectoryInfo(BinaryDirectoryPath);
+                // Step 2: Create executable.
+                logger.LogInfo("Creating executable.");
+                var bytecodeArray = input.QirBytecode.Array.Skip(input.QirBytecode.Offset).Take(input.QirBytecode.Count).ToArray();
+                var executable = new QirFullStateExecutable(input.EntryPoint, bytecodeArray);
                 var executableFile = new FileInfo(Path.Combine(BinaryDirectoryPath, ExecutableName));
-                await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory);
+                await executable.BuildAsync(libraryDirectory, includeDirectory, executableFile);
 
-                // Step 4: Run executable.
-                logger.LogInfo("Running executable.");
-                await executableRunner.RunExecutableAsync(executableFile, input.EntryPoint, outputFile);
+                // Step 3: Run executable.
+                await executable.RunAsync(executableFile, outputFile);
             }
             catch (Exception e)
             {
