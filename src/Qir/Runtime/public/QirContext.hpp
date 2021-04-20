@@ -30,10 +30,10 @@ namespace Quantum
         std::unique_ptr<AllocationsTracker> allocationsTracker;
         // }
 
-        static void Init(IRuntimeDriver* simulator, bool trackAllocatedObjects = false);
+        static void Init(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
         static void Deinit();
 
-        QirExecutionContext(IRuntimeDriver* sim, bool trackAllocatedObjects);
+        QirExecutionContext(IRuntimeDriver* driver, bool trackAllocatedObjects);
         ~QirExecutionContext();
 
         void OnAddRef(void* object);
@@ -44,7 +44,7 @@ namespace Quantum
 
         struct QIR_SHARED_API Scoped
         {
-            Scoped(IRuntimeDriver* sim, bool trackAllocatedObjects = false);
+            Scoped(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
             ~Scoped();
         };
     };
@@ -56,7 +56,7 @@ namespace Quantum
     // Deprecated, use `QirExecutionContext::Scoped` instead.
     struct QIR_SHARED_API QirContextScope
     {
-        QirContextScope(IRuntimeDriver* sim, bool trackAllocatedObjects = false);
+        QirContextScope(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
         ~QirContextScope();
     };
 } // namespace Quantum

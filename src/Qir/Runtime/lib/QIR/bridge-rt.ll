@@ -238,7 +238,6 @@ define dllexport %Array* @__quantum__rt__array_create(i32 %item_size, i32 %dim_c
   %args2 = bitcast i8** %args1 to i8*
   call void @llvm.va_start(i8* %args2)
   %args = load i8*, i8** %args1, align 8
-  ;call void @DebugLogPtr(i8* %args)
   %ar = call %"struct.QirArray"* @quantum__rt__array_create_nonvariadic(i32 %item_size, i32 %dim_count, i8* %args)
   call void @llvm.va_end(i8* %args2)
   %.ar = bitcast  %"struct.QirArray"* %ar to %Array*

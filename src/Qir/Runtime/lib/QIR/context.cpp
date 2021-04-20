@@ -16,10 +16,10 @@ namespace Quantum
     std::unique_ptr<QirExecutionContext> g_context = nullptr;
     std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
 
-    void InitializeQirContext(IRuntimeDriver* sim, bool trackAllocatedObjects)
+    void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);
-        g_context = std::make_unique<QirExecutionContext>(sim, trackAllocatedObjects);
+        g_context = std::make_unique<QirExecutionContext>(driver, trackAllocatedObjects);
     }
 
     void ReleaseQirContext()
@@ -34,8 +34,8 @@ namespace Quantum
         g_context.reset(nullptr);
     }
 
-    QirExecutionContext::QirExecutionContext(IRuntimeDriver* simulator, bool trackAllocatedObjects)
-        : driver(simulator)
+    QirExecutionContext::QirExecutionContext(IRuntimeDriver* drv, bool trackAllocatedObjects)
+        : driver(drv)
         , trackAllocatedObjects(trackAllocatedObjects)
     {
         if (this->trackAllocatedObjects)
@@ -51,10 +51,10 @@ namespace Quantum
     // (we'll have to move `allocationsTracker.hpp` to `public/`).
     QirExecutionContext::~QirExecutionContext() = default;
 
-    void QirExecutionContext::Init(IRuntimeDriver* simulator, bool trackAllocatedObjects /*= false*/)
+    void QirExecutionContext::Init(IRuntimeDriver* driver, bool trackAllocatedObjects /*= false*/)
     {
         assert(GlobalContext() == nullptr);
-        GlobalContext() = std::make_unique<QirExecutionContext>(simulator, trackAllocatedObjects);
+        GlobalContext() = std::make_unique<QirExecutionContext>(driver, trackAllocatedObjects);
     }
 
     void QirExecutionContext::Deinit()
@@ -98,9 +98,9 @@ namespace Quantum
         return this->driver;
     }
 
-    QirExecutionContext::Scoped::Scoped(IRuntimeDriver* sim, bool trackAllocatedObjects /*= false*/)
+    QirExecutionContext::Scoped::Scoped(IRuntimeDriver* driver, bool trackAllocatedObjects /*= false*/)
     {
-        QirExecutionContext::Init(sim, trackAllocatedObjects);
+        QirExecutionContext::Init(driver, trackAllocatedObjects);
     }
 
     QirExecutionContext::Scoped::~Scoped()
@@ -108,9 +108,9 @@ namespace Quantum
         QirExecutionContext::Deinit();
     }
 
-    QirContextScope::QirContextScope(IRuntimeDriver* sim, bool trackAllocatedObjects /*= false*/)
+    QirContextScope::QirContextScope(IRuntimeDriver* driver, bool trackAllocatedObjects /*= false*/)
     {
-        InitializeQirContext(sim, trackAllocatedObjects);
+        InitializeQirContext(driver, trackAllocatedObjects);
     }
     
     QirContextScope::~QirContextScope()

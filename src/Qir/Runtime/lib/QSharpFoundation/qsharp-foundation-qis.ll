@@ -31,18 +31,6 @@
 %struct.QirString = type opaque
 %PauliId = type i32
 
-; TODO: remove this declaration after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
-declare dllimport void @quantum__rt__message(%"struct.QirString"* %str)
-
-;===============================================================================
-;
-; TODO: remove this function after the https://github.com/microsoft/qsharp-runtime/issues/578 is resolved.
-define dllexport void @__quantum__qis__message__body(%String* %.str) {
-  %str = bitcast %String* %.str to %struct.QirString*
-  call void @quantum__rt__message(%"struct.QirString"* %str)
-  ret void
-}
-
 ;===============================================================================
 ; quantum.qis math functions declarations
 ;

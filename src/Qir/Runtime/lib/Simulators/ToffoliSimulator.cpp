@@ -118,14 +118,12 @@ namespace Quantum
 
         void DumpMachine(const void* location) override
         {
-            std::cerr << __func__ << " is not yet implemented" << std::endl;
-            // TODO: How to implement: https://github.com/microsoft/qsharp-runtime/pull/634#discussion_r615183791
+            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
         }
 
         void DumpRegister(const void* location, const QirArray* qubits) override
         {
-            std::cerr << __func__ << " is not yet implemented" << std::endl;
-            // TODO: How to implement: https://github.com/microsoft/qsharp-runtime/pull/634#discussion_r615183791
+            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
         }
 
 
