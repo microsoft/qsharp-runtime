@@ -43,8 +43,8 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// Message($"{AbsD(314)}");   // 314
-    /// Message($"{AbsD(-271)}");  // 271
+    /// Message($"{AbsI(314)}");   // 314
+    /// Message($"{AbsI(-271)}");  // 271
     /// ```
     ///
     /// # See Also
@@ -66,8 +66,8 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// Message($"{AbsD(314L)}");   // 314L
-    /// Message($"{AbsD(-271L)}");  // 271L
+    /// Message($"{AbsL(314L)}");   // 314L
+    /// Message($"{AbsL(-271L)}");  // 271L
     /// ```
     ///
     /// # See Also
@@ -182,7 +182,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// let max = MaxD(314, 271);  // 314
+    /// let max = MaxI(314, 271);  // 314
     /// ```
     ///
     /// # See Also
@@ -207,7 +207,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// let max = MaxD(314L, 271L);  // 314L
+    /// let max = MaxL(314L, 271L);  // 314L
     /// ```
     ///
     /// # See Also
@@ -257,7 +257,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// let min = MinD(314, 271);  // 271
+    /// let min = MinI(314, 271);  // 271
     /// ```
     ///
     /// # See Also
@@ -282,7 +282,7 @@ namespace Microsoft.Quantum.Math {
     ///
     /// # Example
     /// ```qsharp
-    /// let min = MinD(314L, 271L);  // 271L
+    /// let min = MinL(314L, 271L);  // 271L
     /// ```
     ///
     /// # See Also
