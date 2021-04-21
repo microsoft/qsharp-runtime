@@ -4,6 +4,18 @@
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
 
+    function Count<'T>(predicate : ('T -> Bool), array : 'T[]) : Int {
+        mutable totalFound = 0;
+
+        for element in array {
+            if (predicate(element)) {
+                set totalFound += 1;
+            }
+        }
+
+        return totalFound;
+    }
+
     function ArrayToString<'T> (array : 'T[]) : String
     {
         mutable first = true;
