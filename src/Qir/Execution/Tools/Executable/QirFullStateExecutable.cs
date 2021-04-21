@@ -33,5 +33,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                 "Microsoft.Quantum.Qir.QSharp.Foundation",
                 "Microsoft.Quantum.Qir.QSharp.Core"
             };
+
+        public override string DriverFileExtension => "cpp";
     }
 }

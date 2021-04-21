@@ -15,11 +15,12 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
     /// </summary>
     public abstract class QirExecutable : IQirExecutable
     {
-        private const string DriverFileName = "qir.driver";
+        private const string DriverFileName = "driver";
         private const string BytecodeFileName = "qir.bc";
         protected FileInfo ExecutableFile { get; }
         private readonly byte[] qirBytecode;
         public virtual string SourceDirectoryPath => "src";
+        public abstract string DriverFileExtension { get; }
         private readonly ILogger logger;
         private readonly IQuantumExecutableRunner runner;
         private readonly IQirDriverGenerator driverGenerator;
@@ -47,15 +48,20 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             logger.LogInfo($"Created source directory at {sourceDirectory.FullName}.");
 
             // Create driver.
-            var driverFile = new FileInfo(Path.Combine(sourceDirectory.FullName, DriverFileName));
-            using var driverFileStream = driverFile.OpenWrite();
-            await driverGenerator.GenerateAsync(entryPoint, driverFileStream);
+            var driverFileNameWithExtension = Path.ChangeExtension(DriverFileName, DriverFileExtension);
+            var driverFile = new FileInfo(Path.Combine(sourceDirectory.FullName, driverFileNameWithExtension));
+            using (var driverFileStream = driverFile.OpenWrite())
+            {
+                await driverGenerator.GenerateAsync(entryPoint, driverFileStream);
+            }
             logger.LogInfo($"Created driver file at {driverFile.FullName}.");
 
             // Create bytecode file.
             var bytecodeFile = new FileInfo(Path.Combine(sourceDirectory.FullName, BytecodeFileName));
-            using var bytecodeFileStream = bytecodeFile.OpenWrite();
-            await bytecodeFileStream.WriteAsync(qirBytecode);
+            using (var bytecodeFileStream = bytecodeFile.OpenWrite())
+            {
+                await bytecodeFileStream.WriteAsync(qirBytecode);
+            }
             logger.LogInfo($"Created bytecode file at {bytecodeFile.FullName}.");
 
             await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectory, includeDirectory, LinkLibraries);
