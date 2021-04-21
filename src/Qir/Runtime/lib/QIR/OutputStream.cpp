@@ -7,6 +7,7 @@
 //  https://github.com/microsoft/qsharp-runtime/pull/511#discussion_r574194191
 
 #include <iostream>
+#include "QirRuntime.hpp"
 #include "OutputStream.hpp"
 
 namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
