@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             var clangClient = new ClangClient(logger);
             var executableGenerator = new QirExecutableGenerator(clangClient, logger);
             var runner = new QuantumExecutableRunner(logger);
-            return new QirFullStateExecutable(executableFile, qirBytecode, logger, driverGenerator, executableGenerator, runner) as IQirExecutable;
+            return new QirFullStateExecutable(executableFile, qirBytecode, logger, driverGenerator, executableGenerator, runner);
         }
 
         public override IList<string> LinkLibraries => new List<string> {

@@ -17,10 +17,13 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
     {
         private const string DriverFileName = "driver";
         private const string BytecodeFileName = "qir.bc";
-        protected FileInfo ExecutableFile { get; }
-        private readonly byte[] qirBytecode;
+
         public virtual string SourceDirectoryPath => "src";
         public abstract string DriverFileExtension { get; }
+
+        protected FileInfo ExecutableFile { get; }
+
+        private readonly byte[] qirBytecode;
         private readonly ILogger logger;
         private readonly IQuantumExecutableRunner runner;
         private readonly IQirDriverGenerator driverGenerator;
