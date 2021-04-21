@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "capi.hpp"
 #include "gates.hpp"
 #include "types.hpp"
 #include "util/openmp.hpp"
@@ -94,7 +95,16 @@ class SimulatorInterface
     {
         assert(false);
     }
-    virtual bool dumpQubits(std::vector<unsigned> const& qs, bool (*callback)(size_t, double, double))
+    virtual void dump(TDumpToLocationCallback, TDumpLocation)
+    {
+        assert(false);
+    }
+    virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
+    {
+        assert(false);
+        return false;
+    }
+    virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, TDumpToLocationCallback callback, TDumpLocation location)
     {
         assert(false);
         return false;

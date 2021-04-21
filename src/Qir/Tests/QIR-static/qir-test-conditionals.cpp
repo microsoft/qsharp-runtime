@@ -119,7 +119,7 @@ TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__body());
 
@@ -134,7 +134,7 @@ TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body());
 
@@ -149,7 +149,7 @@ TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body());
 

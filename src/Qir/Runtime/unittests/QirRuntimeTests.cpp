@@ -78,7 +78,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 TEST_CASE("Results: comparison and reference counting", "[qir_support]")
 {
     std::unique_ptr<ResultsReferenceCountingTestQAPI> qapi = std::make_unique<ResultsReferenceCountingTestQAPI>(3);
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
 
     Result r1 = qapi->Measure(0, nullptr, 0, nullptr); // we don't need real qubits for this test
     Result r2 = qapi->Measure(0, nullptr, 0, nullptr);
@@ -104,7 +104,6 @@ TEST_CASE("Results: comparison and reference counting", "[qir_support]")
 
 TEST_CASE("Arrays: one dimensional", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
     QirArray* a = quantum__rt__array_create_1d(sizeof(char), 5);
 
     memcpy(a->buffer, "Hello", 5);
@@ -127,8 +126,6 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
 
 TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int64_t count = 5 * 3 * 4; // 60
     QirArray* a = quantum__rt__array_create(sizeof(int), 3, (int64_t)5, (int64_t)3, (int64_t)4);
     REQUIRE(quantum__rt__array_get_dim(a) == 3);
@@ -162,8 +159,6 @@ TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
 
 TEST_CASE("Arrays: copy elision", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     QirArray* copy = quantum__rt__array_copy(nullptr, true /*force*/);
     CHECK(copy == nullptr);
 
@@ -191,8 +186,6 @@ TEST_CASE("Arrays: copy elision", "[qir_support]")
 
 TEST_CASE("Arrays: empty", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     QirArray* b = quantum__rt__array_create(sizeof(int), 3, (int64_t)4, (int64_t)0, (int64_t)3);
     REQUIRE(quantum__rt__array_get_dim(b) == 3);
     REQUIRE(quantum__rt__array_get_size(b, 0) == 4);
@@ -226,8 +219,6 @@ TEST_CASE("Arrays: empty", "[qir_support]")
 
 TEST_CASE("Arrays: check the slice range", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int64_t dim0 = 5;
     const int64_t dim1 = 6;
     QirArray* a = quantum__rt__array_create(sizeof(int), 2, dim0, dim1);
@@ -269,8 +260,6 @@ TEST_CASE("Arrays: check the slice range", "[qir_support]")
 
 TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int64_t dim = 5;
     QirArray* a = quantum__rt__array_create_1d(sizeof(char), dim);
     memcpy(a->buffer, "01234", 5);
@@ -302,7 +291,6 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
 
 TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
     const int64_t dim = 5;
     QirArray* a = quantum__rt__array_create_1d(sizeof(char), dim);
     memcpy(a->buffer, "01234", 5);
@@ -327,8 +315,6 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
 
 TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int32_t dims = 3;
     const int64_t dim0 = 5;
     const int64_t dim1 = 3;
@@ -446,8 +432,6 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
 
 TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int32_t dims = 3;
     const int64_t dim0 = 5;
     const int64_t dim1 = 3;
@@ -518,8 +502,6 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
 
 TEST_CASE("Arrays: project of 3D array", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     const int32_t dims = 3;
     const int64_t dim0 = 5;
     const int64_t dim1 = 3;
@@ -579,8 +561,6 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
 std::unordered_map<std::string, QirString*>& AllocatedStrings();
 TEST_CASE("Strings: reuse", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     QirString* a = quantum__rt__string_create("abc");
     QirString* b = quantum__rt__string_create("abc");
     QirString* c = quantum__rt__string_create("xyz");
@@ -601,8 +581,6 @@ TEST_CASE("Strings: reuse", "[qir_support]")
 
 TEST_CASE("Strings: concatenate", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     QirString* a = quantum__rt__string_create("abc");
     QirString* b = quantum__rt__string_create("xyz");
     QirString* abExpected = quantum__rt__string_create("abcxyz");
@@ -624,8 +602,6 @@ TEST_CASE("Strings: concatenate", "[qir_support]")
 
 TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     std::vector<QirString*> strings;
 
     strings.push_back(quantum__rt__int_to_string(0));
@@ -681,8 +657,6 @@ TEST_CASE("Strings: conversions from built-in types", "[qir_support]")
 
 TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr);
-
     QirString* qstr1 = quantum__rt__range_to_string({0, 1, 42});
     REQUIRE(qstr1->str == std::string("0..42"));
 
@@ -755,7 +729,7 @@ struct QubitTestQAPI : public SimulatorStub
 TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 {
     std::unique_ptr<QubitTestQAPI> qapi = std::make_unique<QubitTestQAPI>(4);
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
     QirString* qstr = nullptr;
 
     Qubit q = quantum__rt__qubit_allocate();
@@ -807,7 +781,7 @@ struct ControlledCallablesTestSimulator : public SimulatorStub
 TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
 {
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
 
     Qubit target = quantum__rt__qubit_allocate();
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
@@ -845,7 +819,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
 TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
 {
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
 
     Qubit target = quantum__rt__qubit_allocate();
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
@@ -891,7 +865,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
 
 TEST_CASE("Allocation tracking for arrays", "[qir_support]")
 {
-    InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
+    QirExecutionContext::Init(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
     QirArray* bounce = quantum__rt__array_create_1d(1, 1);
     quantum__rt__array_update_reference_count(bounce, -1);
@@ -902,15 +876,15 @@ TEST_CASE("Allocation tracking for arrays", "[qir_support]")
     CHECK_THROWS(quantum__rt__array_update_reference_count(releaseTwice, -1));
 
     QirArray* maybeLeaked = quantum__rt__array_create_1d(1, 1);
-    CHECK_THROWS(ReleaseQirContext());
+    CHECK_THROWS(QirExecutionContext::Deinit());
 
     quantum__rt__array_update_reference_count(maybeLeaked, -1);
-    CHECK_NOTHROW(ReleaseQirContext());
+    CHECK_NOTHROW(QirExecutionContext::Deinit());
 }
 
 TEST_CASE("Allocation tracking for tuples", "[qir_support]")
 {
-    InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
+    QirExecutionContext::Init(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
     PTuple bounce = quantum__rt__tuple_create(1);
     quantum__rt__tuple_update_reference_count(bounce, -1);
@@ -921,10 +895,11 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
     CHECK_THROWS(quantum__rt__tuple_update_reference_count(releaseTwice, -1));
 
     PTuple maybeLeaked = quantum__rt__tuple_create(1);
-    CHECK_THROWS(ReleaseQirContext());
+    CHECK_THROWS(QirExecutionContext::Deinit());
 
     quantum__rt__tuple_update_reference_count(maybeLeaked, -1);
-    CHECK_NOTHROW(ReleaseQirContext());
+    CHECK_NOTHROW(QirExecutionContext::Deinit());
+
 }
 
 static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
@@ -932,7 +907,7 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
     t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
-    InitializeQirContext(nullptr /*don't need a simulator*/, true /*track allocations*/);
+    QirExecutionContext::Init(nullptr /*don't need a simulator*/, true /*track allocations*/);
 
     QirCallable* bounce =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);
@@ -946,15 +921,15 @@ TEST_CASE("Allocation tracking for callables", "[qir_support]")
 
     QirCallable* maybeLeaked =
         quantum__rt__callable_create(entries, nullptr /*capture callbacks*/, nullptr /*capture tuple*/);
-    CHECK_THROWS(ReleaseQirContext());
+    CHECK_THROWS(QirExecutionContext::Deinit());
 
     quantum__rt__callable_update_reference_count(maybeLeaked, -1);
-    CHECK_NOTHROW(ReleaseQirContext());
+    CHECK_NOTHROW(QirExecutionContext::Deinit());
 }
 
 TEST_CASE("Callables: copy elision", "[qir_support]")
 {
-    QirContextScope qirctx(nullptr, true);
+    QirExecutionContext::Scoped qirctx(nullptr, true);
     t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
 
     QirCallable* original =
@@ -1049,7 +1024,7 @@ struct AdjointsTestSimulator : public SimulatorStub
 TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
 {
     std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
 
     const double angle = 0.42;
 
@@ -1071,7 +1046,7 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
 TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
 {
     std::unique_ptr<AdjointsTestSimulator> qapi = std::make_unique<AdjointsTestSimulator>();
-    QirContextScope qirctx(qapi.get());
+    QirExecutionContext::Scoped qirctx(qapi.get());
 
     const double angle = 0.42;
 
