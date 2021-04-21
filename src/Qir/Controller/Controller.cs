@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Model;
-using Microsoft.Quantum.Qir.Tools;
+using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
 using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
 
@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Qir
             DirectoryInfo libraryDirectory,
             DirectoryInfo includeDirectory,
             FileInfo errorFile,
-           ILogger logger)
+            ILogger logger)
         {
             try
             {
@@ -35,13 +35,18 @@ namespace Microsoft.Quantum.Qir
 
                 // Step 2: Create executable.
                 logger.LogInfo("Creating executable.");
-                var bytecodeArray = input.QirBytecode.Array.Skip(input.QirBytecode.Offset).Take(input.QirBytecode.Count).ToArray();
-                var executable = new QirFullStateExecutable(input.EntryPoint, bytecodeArray);
+                var bytecodeArray = input.QirBytecode.Array.Skip(input.QirBytecode.Offset).Take(input.QirBytecode.Count).ToList().ToArray();
                 var executableFile = new FileInfo(Path.Combine(BinaryDirectoryPath, ExecutableName));
-                await executable.BuildAsync(libraryDirectory, includeDirectory, executableFile);
+                var executable = QirFullStateExecutable.CreateInstance(executableFile, bytecodeArray, logger);
+                await executable.BuildAsync(input.EntryPoint, libraryDirectory, includeDirectory);
 
                 // Step 3: Run executable.
-                await executable.RunAsync(executableFile, outputFile);
+                if (outputFile.Exists)
+                {
+                    outputFile.Delete();
+                }
+                using var outputStream = outputFile.OpenWrite();
+                await executable.RunAsync(input.EntryPoint, outputStream);
             }
             catch (Exception e)
             {

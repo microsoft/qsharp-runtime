@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
             // string.Join does not automatically prepend the delimiter, so it is included again in the string here.
             var librariesArg = $"{LinkFlag} {string.Join(LinkFlag, libraries)}";
-            var arguments = $"-v {inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath}";
+            var arguments = $"{inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath}";
             logger.LogInfo($"Invoking clang with the following arguments: {arguments}");
             var taskCompletionSource = new TaskCompletionSource<bool>();
             using var process = new Process();

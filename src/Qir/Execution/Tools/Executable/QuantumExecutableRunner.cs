@@ -17,15 +17,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             this.logger = logger;
         }
 
-        public async Task RunExecutableAsync(FileInfo executableFile, FileInfo outputFile, string arguments)
+        public async Task RunExecutableAsync(FileInfo executableFile, Stream stream, string arguments)
         {
             logger.LogInfo($"Invoking executable {executableFile.FullName} with the following arguments: {arguments}");
-            if (outputFile.Exists)
-            {
-                outputFile.Delete();
-            }
-
-            outputFile.Create().Dispose();
             using var process = new Process();
             process.StartInfo = new ProcessStartInfo
             {
@@ -38,8 +32,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             process.Start();
             var output = await process.StandardOutput.ReadToEndAsync();
             process.WaitForExit();
-            using var outputFileStream = outputFile.OpenWrite();
-            using var streamWriter = new StreamWriter(outputFileStream);
+            using var streamWriter = new StreamWriter(stream);
             await streamWriter.WriteAsync(output);
             logger.LogInfo($"Executable has finished running. Result code: {process.ExitCode}");
         }
