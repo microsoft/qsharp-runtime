@@ -48,6 +48,7 @@ namespace Tests.QirController
             linkLibraries = new List<string> { "lib1", "lib2" };
             qirExecutable.SetupGet(obj => obj.LinkLibraries).Returns(linkLibraries);
             qirExecutable.SetupGet(obj => obj.SourceDirectoryPath).Returns(sourceDirectory.FullName);
+            qirExecutable.SetupGet(obj => obj.DriverFileExtension).Returns(".cpp");
         }
 
         public void Dispose()
@@ -83,7 +84,7 @@ namespace Tests.QirController
             }
 
             // Verify that the driver was written to the correct file.
-            var driver = new FileInfo(Path.Combine(sourceDirectory.FullName, "qir.driver"));
+            var driver = new FileInfo(Path.Combine(sourceDirectory.FullName, "driver.cpp"));
             using var driverStreamReader = driver.OpenText();
             var actualDriverContents = driverStreamReader.ReadToEnd();
             Assert.Equal(driverFileContents, actualDriverContents);
