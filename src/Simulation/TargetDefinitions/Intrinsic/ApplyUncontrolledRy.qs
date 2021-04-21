@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliY, theta, qubit);
     /// ```
-    internal operation ApplyUncontrolledRy (theta : Double, qubit : Qubit) : Unit is Adj {
+    operation ApplyUncontrolledRy (theta : Double, qubit : Qubit) : Unit {
         body intrinsic;
     }
 }

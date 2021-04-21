@@ -113,6 +113,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneInputReference", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-standalone-input-reference", "src\Qir\Samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{D7D34736-A719-4B45-A33F-2723F59EC29D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Type1Simulator", "Type1Simulator", "{6E7B23A9-9BE5-43F7-A9E3-A6E27F234C0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-test-simulator", "src\Qir\Tests\Type1Simulator\qsharp\qir-test-simulator.csproj", "{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -749,6 +753,22 @@ Global
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Debug|x64.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Release|x64.ActiveCfg = Release|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.Release|x64.Build.0 = Release|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -802,6 +822,8 @@ Global
 		{AAFB81D3-BC87-404D-BA64-AF40B2D2E45A} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
 		{A7DB7367-9FD6-4164-8263-A05077BE54AB} = {AAFB81D3-BC87-404D-BA64-AF40B2D2E45A}
 		{D7D34736-A719-4B45-A33F-2723F59EC29D} = {A7DB7367-9FD6-4164-8263-A05077BE54AB}
+		{6E7B23A9-9BE5-43F7-A9E3-A6E27F234C0A} = {7F7BB60A-5DCB-469E-8546-1BE9E3CAC833}
+		{C64B70BE-5012-4B8E-86EA-596DAE4D3CB5} = {6E7B23A9-9BE5-43F7-A9E3-A6E27F234C0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}

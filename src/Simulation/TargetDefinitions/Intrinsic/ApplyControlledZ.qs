@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// Controlled Z([control], target);
     /// ```
-    internal operation ApplyControlledZ (control : Qubit, target : Qubit) : Unit is Adj {
+    operation ApplyControlledZ (control : Qubit, target : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
     }

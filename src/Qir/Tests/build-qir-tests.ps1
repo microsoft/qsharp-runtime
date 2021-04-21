@@ -15,6 +15,7 @@ Build-QirProject (Join-Path $PSScriptRoot QIR-static qsharp) -SkipQSharpBuild:$S
 Build-QirProject (Join-Path $PSScriptRoot QIR-dynamic qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot QIR-tracer qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot FullstateSimulator qsharp) -SkipQSharpBuild:$SkipQSharpBuild
+Build-QirProject (Join-Path $PSScriptRoot Type1Simulator qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 
 if (-not (Build-CMakeProject $PSScriptRoot "QIR Tests")) {
     throw "At least one project failed to compile. Check the logs."
