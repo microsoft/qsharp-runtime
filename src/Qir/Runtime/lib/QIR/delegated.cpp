@@ -29,22 +29,22 @@ extern "C"
 {
     Result quantum__rt__result_get_zero()
     {
-        return Microsoft::Quantum::g_context->driver->UseZero();
+        return Microsoft::Quantum::GlobalContext()->GetDriver()->UseZero();
     }
 
     Result quantum__rt__result_get_one()
     {
-        return Microsoft::Quantum::g_context->driver->UseOne();
+        return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
     }
 
     QUBIT* quantum__rt__qubit_allocate() // NOLINT
     {
-        return Microsoft::Quantum::g_context->driver->AllocateQubit();
+        return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
     }
 
     void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
     {
-        Microsoft::Quantum::g_context->driver->ReleaseQubit(qubit);
+        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
     }
 
     void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
@@ -76,7 +76,7 @@ extern "C"
             if (rit == trackedResults.end())
             {
                 assert(increment == -1);
-                Microsoft::Quantum::g_context->driver->ReleaseResult(r);
+                Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseResult(r);
             }
             else
             {
@@ -85,7 +85,7 @@ extern "C"
                 if (newRefcount == 0)
                 {
                     trackedResults.erase(rit);
-                    Microsoft::Quantum::g_context->driver->ReleaseResult(r);
+                    Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseResult(r);
                 }
                 else
                 {
@@ -101,13 +101,13 @@ extern "C"
         {
             return true;
         }
-        return Microsoft::Quantum::g_context->driver->AreEqualResults(r1, r2);
+        return Microsoft::Quantum::GlobalContext()->GetDriver()->AreEqualResults(r1, r2);
     }
 
     // Returns a string representation of the result.
     QirString* quantum__rt__result_to_string(RESULT* result) // NOLINT
     {
-        ResultValue rv = Microsoft::Quantum::g_context->driver->GetResultValue(result);
+        ResultValue rv = Microsoft::Quantum::GlobalContext()->GetDriver()->GetResultValue(result);
         assert(rv != Result_Pending);
 
         return (rv == Result_Zero) ? quantum__rt__string_create("Zero") : quantum__rt__string_create("One");
@@ -116,6 +116,6 @@ extern "C"
     // Returns a string representation of the qubit.
     QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(Microsoft::Quantum::g_context->driver->QubitToString(qubit).c_str());
+        return quantum__rt__string_create(Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
     }
 }

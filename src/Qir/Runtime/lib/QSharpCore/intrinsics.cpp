@@ -32,7 +32,7 @@ static std::vector<PauliId> ExtractPauliIds(QirArray* paulis)
 
 static Microsoft::Quantum::IQuantumGateSet* GateSet()
 {
-    return dynamic_cast<Microsoft::Quantum::IQuantumGateSet*>(Microsoft::Quantum::GlobalContext()->driver);
+    return dynamic_cast<Microsoft::Quantum::IQuantumGateSet*>(Microsoft::Quantum::GlobalContext()->GetDriver());
 }
 
 extern "C"
