@@ -3,6 +3,7 @@
 
 #include "QirRuntime.hpp"
 #include "QSharpSimApi_I.hpp"
+#include "QirRuntimeApi_I.hpp"
 #include "QirContext.hpp"
 
 #include "qsharp__foundation__qis.hpp"
