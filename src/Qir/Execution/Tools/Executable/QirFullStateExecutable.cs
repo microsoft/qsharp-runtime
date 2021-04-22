@@ -19,15 +19,24 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         }
 
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger = null)
             : this(executableFile,
                   qirBytecode,
-                  logger,
                   new QirFullStateDriverGenerator(),
-                  new QirExecutableGenerator(new ClangClient(logger), logger),
-                  new QuantumExecutableRunner(logger))
+                  logger)
         {
         }
+
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, IQirDriverGenerator driverGenerator, ILogger logger = null)
+    : this(executableFile,
+          qirBytecode,
+          logger ?? new Logger(new Clock()),
+          driverGenerator,
+          new QirExecutableGenerator(new ClangClient(logger), logger),
+          new QuantumExecutableRunner(logger))
+        {
+        }
+
 
         public override IList<string> LinkLibraries => new List<string> {
                 "Microsoft.Quantum.Qir.Runtime",
