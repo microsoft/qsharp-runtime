@@ -54,6 +54,7 @@ extern "C"
 
     // Fail the computation with the given error message.
     [[noreturn]] QIR_SHARED_API void quantum__rt__fail(QirString* msg); // NOLINT
+    [[noreturn]] QIR_SHARED_API void quantum__rt__fail_cstr(const char* msg); // NOLINT
 
     // Include the given message in the computation's execution log or equivalent.
     QIR_SHARED_API void quantum__rt__message(QirString* msg); // NOLINT

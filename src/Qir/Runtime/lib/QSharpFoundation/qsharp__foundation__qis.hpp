@@ -41,4 +41,9 @@ extern "C"
         QirCallable*,
         QirCallable*);
 
+    // Q# Assert Measurement:
+    //QIR_SHARED_API void quantum__qis__assertmeasurement__body(QirArray* bases, QirArray* qubits, RESULT* result, QirString* msg); // NOLINT
+    QIR_SHARED_API void quantum__qis__assertmeasurementprobability__body(                                                         // NOLINT
+        QirArray* bases, QirArray* qubits, RESULT* result, double prob, QirString* msg, double tol);
+
 } // extern "C"

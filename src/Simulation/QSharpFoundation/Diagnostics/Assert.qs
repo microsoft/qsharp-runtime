@@ -23,9 +23,22 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
+
+    //operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
+    //is Adj + Ctl {
+    //    body intrinsic;
+    //}
     operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
     is Adj + Ctl {
-        body intrinsic;
+        body (...) {
+            AssertMeasurementProbability(bases, qubits, result, 1.0, msg, 1e-10);
+        }
+        adjoint (...) { 
+            // Empty.
+        }
+        controlled (controllingQubits, ...) { 
+            // Empty.
+        }
     }
     
     
@@ -65,5 +78,4 @@ namespace Microsoft.Quantum.Diagnostics {
     is Adj + Ctl {
         body intrinsic;
     }
-
 }
