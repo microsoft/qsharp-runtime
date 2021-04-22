@@ -13,7 +13,7 @@
 ======================================================================================================================*/
 struct QIR_SHARED_API QirArray
 {
-    int64_t count = 0; // overall size of the array across all dimensions
+    int64_t count = 0; // Overall number of elements in the array across all dimensions
     const int itemSizeInBytes = 0;
 
     const int dimensions = 1;

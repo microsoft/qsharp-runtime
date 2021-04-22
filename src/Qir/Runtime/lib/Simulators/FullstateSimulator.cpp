@@ -466,19 +466,12 @@ namespace Quantum
 
     bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits)
     {
-        // `qubits->buffer` points to the sequence of qubit ids each of type `void*` (logically `qubits->buffer` is of type `void**`).
-        // We need to pass to the native simulator the pointer to the sequence of `unsigned`.
-        std::vector<unsigned> unsQbIds(qubits->count);
-        size_t i = 0;
-        for (unsigned& qbId : unsQbIds)
-        {
-            qbId = (unsigned)(uintptr_t)(((void**)(qubits->buffer))[i]);
-            ++i;
-        }
+        vector<unsigned> ids = GetQubitIds((long)(qubits->count), (Qubit*)(qubits->buffer));
+
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
         return dumpQubitsToLocation(
-            this->simulatorId, (unsigned)(qubits->count), unsQbIds.data(), callback,
+            this->simulatorId, (unsigned)(qubits->count), ids.data(), callback,
             location);
     }
 
