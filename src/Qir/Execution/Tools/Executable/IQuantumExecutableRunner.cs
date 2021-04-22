@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    public interface IQuantumExecutableRunner
+    internal interface IQuantumExecutableRunner
     {
         /// <summary>
         /// Runs a quantum program executable with the given arguments.

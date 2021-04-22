@@ -7,7 +7,7 @@ using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    public class ClangClient : IClangClient
+    internal class ClangClient : IClangClient
     {
         private const string LinkFlag = " -l ";
         private readonly ILogger logger;

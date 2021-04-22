@@ -8,7 +8,7 @@ using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    public class QuantumExecutableRunner : IQuantumExecutableRunner
+    internal class QuantumExecutableRunner : IQuantumExecutableRunner
     {
         private readonly ILogger logger;
 

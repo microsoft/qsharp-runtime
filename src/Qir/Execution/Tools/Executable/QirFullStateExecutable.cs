@@ -13,19 +13,20 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
     /// </summary>
     public class QirFullStateExecutable : QirExecutable
     {
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
+        internal QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
             : base(executableFile, qirBytecode, logger, driverGenerator, executableGenerator, runner)
         {
 
         }
 
-        public static IQirExecutable CreateInstance(FileInfo executableFile, byte[] qirBytecode, ILogger logger)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger)
+            : this(executableFile,
+                  qirBytecode,
+                  logger,
+                  new QirFullStateDriverGenerator(),
+                  new QirExecutableGenerator(new ClangClient(logger), logger),
+                  new QuantumExecutableRunner(logger))
         {
-            var driverGenerator = new QirFullStateDriverGenerator();
-            var clangClient = new ClangClient(logger);
-            var executableGenerator = new QirExecutableGenerator(clangClient, logger);
-            var runner = new QuantumExecutableRunner(logger);
-            return new QirFullStateExecutable(executableFile, qirBytecode, logger, driverGenerator, executableGenerator, runner);
         }
 
         public override IList<string> LinkLibraries => new List<string> {

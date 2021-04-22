@@ -9,7 +9,7 @@ using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    public class QirExecutableGenerator : IQirExecutableGenerator
+    internal class QirExecutableGenerator : IQirExecutableGenerator
     {
         private readonly IClangClient clangClient;
         private readonly ILogger logger;

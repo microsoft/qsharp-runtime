@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         private readonly IQirDriverGenerator driverGenerator;
         private readonly IQirExecutableGenerator executableGenerator;
 
-        public QirExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
+        internal QirExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
         {
             ExecutableFile = executableFile;
             this.qirBytecode = qirBytecode;
