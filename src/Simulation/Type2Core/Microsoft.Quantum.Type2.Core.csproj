@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <Import Project="..\TargetDefinitions\TargetPackages\Type2.Package.props" />
 
