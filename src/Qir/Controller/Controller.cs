@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Qir
                 logger.LogInfo("Creating executable.");
                 var bytecodeArray = input.QirBytecode.Array.Skip(input.QirBytecode.Offset).Take(input.QirBytecode.Count).ToList().ToArray();
                 var executableFile = new FileInfo(Path.Combine(BinaryDirectoryPath, ExecutableName));
-                var executable = QirFullStateExecutable.CreateInstance(executableFile, bytecodeArray, logger);
+                var executable = new QirFullStateExecutable(executableFile, bytecodeArray, logger);
                 await executable.BuildAsync(input.EntryPoint, libraryDirectory, includeDirectory);
 
                 // Step 3: Run executable.

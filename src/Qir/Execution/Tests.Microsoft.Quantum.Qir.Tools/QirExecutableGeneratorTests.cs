@@ -11,7 +11,7 @@ using Microsoft.Quantum.Qir.Utility;
 using Moq;
 using Xunit;
 
-namespace Tests.QirController
+namespace Tests.Microsoft.Quantum.Qir.Tools
 {
     public class QirExecutableGeneratorTests : IDisposable
     {

@@ -12,7 +12,7 @@ using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 using Moq;
 using Xunit;
 
-namespace Tests.QirController
+namespace Tests.Microsoft.Quantum.Qir.Tools
 {
     public class QirExecutableTests : IDisposable
     {
