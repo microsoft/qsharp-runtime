@@ -15,6 +15,10 @@ If (($Env:ENABLE_NATIVE -ne "false") -and ($Env:NATIVE_SIMULATOR -eq $null) ) {
     $Env:NATIVE_SIMULATOR = (Join-Path $PSScriptRoot "..\src\Simulation\Native\build\drop")
 }
 
+if ($Env:ENABLE_QIRRUNTIME -ne "false" -and $Env:QIR_DROPS -eq $null) {
+    $Env:QIR_DROPS = (Join-Path $PSScriptRoot "../src/Qir/drops")
+}
+
 If ($Env:DROPS_DIR -eq $null) { $Env:DROPS_DIR =  [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\drops")) }
 
 If ($Env:NUGET_OUTDIR -eq $null) { $Env:NUGET_OUTDIR =  (Join-Path $Env:DROPS_DIR "nugets") }

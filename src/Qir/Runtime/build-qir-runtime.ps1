@@ -7,17 +7,22 @@ if (-not (Build-CMakeProject $PSScriptRoot "QIR Runtime")) {
     throw "At least one project failed to compile. Check the logs."
 }
 
-# Copy the results of runtime compilation and the corresponding headers to the drops folder so
+# Copy the results of runtime compilation and the corresponding headers to the QIR drops folder so
 # they can be included in pipeline artifacts.
-$qirDropsFolder = (Join-Path $Env:DROPS_DIR QIR)
-$qirDropsBin = (Join-Path $qirDropsFolder bin)
-$qirDropsInclude = (Join-Path $qirDropsFolder include)
-if (-not (Test-Path $qirDropsFolder)) {
-    New-Item -Path $qirDropsFolder -ItemType "directory"
+$osDir = "win-x64"
+if ($IsLinux) {
+    $osDir = "linux-x64"
+} elseif ($IsMacOS) {
+    $osDir = "osx-x64"
+}
+$qirDropsBin = (Join-Path $Env:QIR_DROPS bin $osDir native)
+$qirDropsInclude = (Join-Path $Env:QIR_DROPS include)
+if (-not (Test-Path $Env:QIR_DROPS)) {
+    New-Item -Path $Env:QIR_DROPS -ItemType "directory"
     New-Item -Path $qirDropsBin -ItemType "directory"
     New-Item -Path $qirDropsInclude -ItemType "directory"
 }
 $qirBinaries = (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION bin *)
 $qirIncludes = (Join-Path $PSScriptRoot public *)
-Copy-Item $qirBinaries $qirDropsBin
-Copy-Item $qirIncludes $qirDropsInclude
+Copy-Item $qirBinaries $qirDropsBin -Exclude "*unittests*","*.Tracer.*"
+Copy-Item $qirIncludes $qirDropsInclude -Exclude "*.md","Tracer*"
