@@ -6,7 +6,7 @@ message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 project(qir-tests)
 
 # specify the C++ standard, compiler and other tools
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
