@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <vector>
+#include <iostream>
 
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
@@ -109,9 +110,20 @@ namespace Quantum
             return std::abs(actualZeroProbability - probabilityOfZero) < precision;
         }
 
+        // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
             throw std::logic_error("operation_not_supported");
+        }
+
+        void DumpMachine(const void* location) override
+        {
+            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
+        }
+
+        void DumpRegister(const void* location, const QirArray* qubits) override
+        {
+            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
         }
 
 

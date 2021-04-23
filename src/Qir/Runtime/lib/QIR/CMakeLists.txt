@@ -9,6 +9,9 @@
 # create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
+  QirRange.cpp
+  OutputStream.cpp
+  Output.cpp
   allocationsTracker.cpp
   arrays.cpp
   callables.cpp
@@ -16,7 +19,6 @@ set(rt_sup_source_files
   delegated.cpp
   strings.cpp
   utils.cpp
-  rtOut.cpp
 )
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
