@@ -12,8 +12,7 @@
 
 #include "capi.hpp"
 
-#include "QirTypes.hpp"
-#include "QirRuntime.hpp"
+#include "QirTypes.hpp"         // TODO: Consider removing dependency on this file.
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"

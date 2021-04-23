@@ -75,7 +75,7 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)
     {
-        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
+        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal)); // TODO: Consider `quantum__rt__fail_cstr(const char *)`.
     }
 
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
@@ -92,7 +92,7 @@ double quantum__qis__drawrandomdouble__body(double minimum, double maximum)
 {
     if(minimum > maximum)
     {
-        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
+        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal)); // TODO: Consider `quantum__rt__fail_cstr(const char *)`.
     }
 
     // For testing purposes we need separate generators for Int and Double:

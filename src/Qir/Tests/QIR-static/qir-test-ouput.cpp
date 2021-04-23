@@ -4,7 +4,6 @@
 
 #include "catch.hpp"
 
-#include "QirRuntime.hpp"
 #include "OutputStream.hpp"
 
 extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__Interop(const char[]); // NOLINT
