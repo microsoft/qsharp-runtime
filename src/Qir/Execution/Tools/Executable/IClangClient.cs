@@ -3,12 +3,12 @@
 
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.Qir.Executable
+namespace Microsoft.Quantum.Qir.Tools.Executable
 {
     /// <summary>
     /// Wraps the 'clang' tool used for compilation.
     /// </summary>
-    public interface IClangClient
+    internal interface IClangClient
     {
         Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string includePath, string outputPath);
     }

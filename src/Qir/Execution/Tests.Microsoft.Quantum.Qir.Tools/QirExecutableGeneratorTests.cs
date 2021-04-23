@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Executable;
+using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
 using Moq;
 using Xunit;
 
-namespace Tests.QirController
+namespace Tests.Microsoft.Quantum.Qir.Tools
 {
     public class QirExecutableGeneratorTests : IDisposable
     {
@@ -23,6 +23,7 @@ namespace Tests.QirController
         private readonly DirectoryInfo binDirectory;
         private readonly IList<FileInfo> libraryFiles;
         private readonly IList<FileInfo> sourceFiles;
+        private IList<string> linkLibraries;
 
         public QirExecutableGeneratorTests()
         {
@@ -49,6 +50,7 @@ namespace Tests.QirController
                 CreateFile("src1.cpp", sourceDirectory, "src1 contents"),
                 CreateFile("src2.bc", sourceDirectory, "src2 contents"),
             };
+            linkLibraries = new List<string> { "lib1", "lib2" };
         }
 
         public void Dispose()
@@ -62,19 +64,13 @@ namespace Tests.QirController
         [Fact]
         public async Task TestGenerateExecutable()
         {
-            string[] expectedLibraries = {
-                "Microsoft.Quantum.Qir.Runtime",
-                "Microsoft.Quantum.Qir.QSharp.Foundation",
-                "Microsoft.Quantum.Qir.QSharp.Core"
-            };
-
             var executableFile = new FileInfo(Path.Combine(binDirectory.FullName, "executableFile"));
-            await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory);
+            await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory, linkLibraries);
 
             // Verify invocation of clang.
             clangClientMock.Verify(obj => obj.CreateExecutableAsync(
                 It.Is<string[]>(s => s.SequenceEqual(sourceFiles.Select(fileInfo => fileInfo.FullName))),
-                It.Is<string[]>(s => s.SequenceEqual(expectedLibraries)),
+                It.Is<string[]>(s => s.SequenceEqual(linkLibraries)),
                 libraryDirectory.FullName,
                 includeDirectory.FullName,
                 executableFile.FullName));
