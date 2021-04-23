@@ -14,4 +14,23 @@
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.15.2104135018-alpha" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Driver\QirCppDriver.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>QirCppDriver.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Driver\QirCppDriver.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>QirCppDriver.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>
