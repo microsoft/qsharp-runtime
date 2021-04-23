@@ -9,11 +9,11 @@ macro(add_unit_test target)
     if(DEFINED ENV{NATIVE_SIMULATOR})
         set(TEST_DEPS1 $ENV{NATIVE_SIMULATOR})
     else()
-        set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/${CMAKE_BUILD_TYPE}")
+        set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/$ENV{BUILD_CONFIGURATION}")
     endif()
 
     set(TEST_DEPS2 "${CMAKE_BINARY_DIR}/bin")
-    set(TEST_DEPS3 "${PROJECT_SOURCE_DIR}/../Runtime/build/${CMAKE_BUILD_TYPE}/bin")
+    set(TEST_DEPS3 "${PROJECT_SOURCE_DIR}/../Runtime/build/$ENV{BUILD_CONFIGURATION}/bin")
     set_property(TEST ${target} PROPERTY ENVIRONMENT
         "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${TEST_DEPS3}:${LD_LIBRARY_PATH}"
         "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${TEST_DEPS3}\;${PATH}"
