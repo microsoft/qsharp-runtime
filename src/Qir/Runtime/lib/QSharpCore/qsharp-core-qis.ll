@@ -61,6 +61,14 @@ declare void @quantum__qis__z__body(%class.QUBIT*)
 declare void @quantum__qis__z__ctl(%struct.QirArray*, %class.QUBIT*)
 
 ;===============================================================================
+; quantum.qis dump functions declarations
+;
+; Must be `const void* %location`, but `void *` is invalid (LLVM), and `const` is not supported.
+declare void @quantum__qis__dumpmachine__body(i8* %location)  
+declare void @quantum__qis__dumpregister__body(i8* %location, %struct.QirArray* %qubits)
+
+
+;===============================================================================
 ; quantum.qis namespace implementations
 ;
 
@@ -278,3 +286,17 @@ define dllexport void @__quantum__qis__z__ctl(%Array* %.ctls, %Qubit* %.q) {
   ret void
 }
 
+
+;===============================================================================
+; quantum.qis dump functions implementation
+;
+define dllexport void @__quantum__qis__dumpmachine__body(i8* %location) {
+  call void @quantum__qis__dumpmachine__body(i8* %location)
+  ret void
+}
+
+define dllexport void @__quantum__qis__dumpregister__body(i8* %location, %Array* %.qubits) {
+  %qubits = bitcast %Array* %.qubits to %struct.QirArray*
+  call void @quantum__qis__dumpregister__body(i8* %location, %struct.QirArray* %qubits)
+  ret void
+}

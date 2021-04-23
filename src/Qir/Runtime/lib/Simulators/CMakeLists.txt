@@ -1,11 +1,12 @@
 set(source_files
   "FullstateSimulator.cpp"
-  "setup.cpp"
   "ToffoliSimulator.cpp"
 )
 
 set(includes
   "${public_includes}"
+  "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src"
+  "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src/simulator"
 )
 
 #===============================================================================
