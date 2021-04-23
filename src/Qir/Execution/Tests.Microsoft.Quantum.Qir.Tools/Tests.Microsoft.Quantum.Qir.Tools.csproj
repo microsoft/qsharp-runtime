@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QirController.csproj" />
+    <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Tools.csproj" />
   </ItemGroup>
 
 </Project>
