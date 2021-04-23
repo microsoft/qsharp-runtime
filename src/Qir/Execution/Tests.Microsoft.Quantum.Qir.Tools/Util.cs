@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
-namespace Tests.QirController
+namespace Tests.Microsoft.Quantum.Qir.Tools
 {
     public static class Util
     {

@@ -1,12 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.Qir.Executable
+namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    public interface IQirExecutableGenerator
+    internal interface IQirExecutableGenerator
     {
         /// <summary>
         /// Generates a quantum simulation program executable.
@@ -15,7 +16,8 @@ namespace Microsoft.Quantum.Qir.Executable
         /// <param name="sourceDirectory">Location of the source files.</param>
         /// <param name="libraryDirectory">Location of the libraries that must be linked.</param>
         /// <param name="includeDirectory">Location of the headers that must be included.</param>
+        /// <param name="linkLibraries">Libraries to link.</param>
         /// <returns></returns>
-        public Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory);
+        public Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, IList<string> linkLibraries);
     }
 }

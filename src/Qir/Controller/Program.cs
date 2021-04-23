@@ -4,8 +4,6 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
-using Microsoft.Quantum.Qir.Driver;
-using Microsoft.Quantum.Qir.Executable;
 using Microsoft.Quantum.Qir.Utility;
 
 namespace Microsoft.Quantum.Qir
@@ -15,9 +13,6 @@ namespace Microsoft.Quantum.Qir
         static void Main(string[] args)
         {
             var logger = new Logger(new Clock());
-            var execGenerator = new QirExecutableGenerator(new ClangClient(logger), logger);
-            var driverGenerator = new QirSourceFileGenerator(logger);
-            var execRunner = new QuantumExecutableRunner(logger);
             logger.LogInfo("QIR controller beginning.");
 
             var rootCommand = new RootCommand(
@@ -69,7 +64,7 @@ namespace Microsoft.Quantum.Qir
             // Bind to a handler and invoke.
             rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, DirectoryInfo, DirectoryInfo, FileInfo>(
                 async (input, output, libraryDirectory, includeDirectory, error) =>
-                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, driverGenerator, execGenerator, execRunner, logger));
+                    await Controller.ExecuteAsync(input, output, libraryDirectory, includeDirectory, error, logger));
             rootCommand.Invoke(args);
         }
     }
