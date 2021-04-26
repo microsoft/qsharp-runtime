@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// <summary>
         /// The target ID for the no-op QIR submitter.
         /// </summary>
-        internal const string TargetId = "test.qir.noop";
+        internal const string TargetId = "test.noop";
 
         public string ProviderId => nameof(NoOpQirSubmitter);
 
