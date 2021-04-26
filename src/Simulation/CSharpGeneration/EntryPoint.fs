@@ -107,10 +107,15 @@ let private submitMethod context entryPoint =
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
 
+    let qirResourceStream =
+        ident "global::System.Reflection.Assembly"
+        <.> (ident "GetExecutingAssembly", [])
+        <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
+
     let args =
         [
             ident settingsParamName :> ExpressionSyntax
-            literal DotnetCoreDll.QirResourceName
+            qirResourceStream
             ident callableName <|.|> ident "Info"
             ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
         ]

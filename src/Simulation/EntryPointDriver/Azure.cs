@@ -7,9 +7,10 @@ using static Microsoft.Quantum.EntryPointDriver.Driver;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -26,16 +27,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
         /// <param name="settings">The submission settings.</param>
-        /// <param name="qirResourceName">The name of the QIR bitcode assembly resource.</param>
+        /// <param name="qir">The QIR bitcode stream.</param>
         /// <param name="info">The information about the entry point.</param>
         /// <param name="input">The input argument tuple to the entry point.</param>
         /// <returns>The exit code.</returns>
         public static async Task<int> Submit<TIn, TOut>(
-            AzureSettings settings, string qirResourceName, EntryPointInfo<TIn, TOut> info, TIn input)
+            AzureSettings settings, Stream? qir, EntryPointInfo<TIn, TOut> info, TIn input)
         {
-            // TODO
-            Console.WriteLine($"qirResourceName: {qirResourceName}");
-
             if (settings.Verbose)
             {
                 Console.Write(settings + Environment.NewLine + Environment.NewLine);
