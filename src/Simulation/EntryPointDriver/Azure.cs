@@ -4,6 +4,7 @@
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Azure.Quantum;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
+using Microsoft.Quantum.EntryPointDriver.Mocks;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;
@@ -169,8 +170,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static IQuantumMachine? CreateMachine(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null."),
-            NothingMachine.TargetId => new NothingMachine(),
-            ErrorMachine.TargetId => new ErrorMachine(),
+            NoOpQuantumMachine.TargetId => new NoOpQuantumMachine(),
+            ErrorQuantumMachine.TargetId => new ErrorQuantumMachine(),
             _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
         };
 
