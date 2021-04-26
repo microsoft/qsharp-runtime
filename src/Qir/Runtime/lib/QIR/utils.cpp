@@ -9,11 +9,10 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include "QirTypes.hpp"
 #include "QirRuntime.hpp"
 
-#include "QirTypes.hpp"
-
-std::unordered_set<char*>& UseMemoryTracker()
+static std::unordered_set<char*>& UseMemoryTracker()
 {
     static std::unordered_set<char*> memoryTracker;
     return memoryTracker;
@@ -54,9 +53,7 @@ extern "C"
     // Fail the computation with the given error message.
     void quantum__rt__fail(QirString* msg) // NOLINT
     {
-        std::string str = msg->str;
-        quantum__rt__string_update_reference_count(msg, -1);
-        throw std::runtime_error(str);
+        throw std::runtime_error(msg->str);
     }
 
 }
