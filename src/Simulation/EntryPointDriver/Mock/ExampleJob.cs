@@ -1,9 +1,12 @@
-﻿using Microsoft.Quantum.Runtime;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using Microsoft.Quantum.Runtime;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.EntryPointDriver.Mocks
+namespace Microsoft.Quantum.EntryPointDriver.Mock
 {
     /// <summary>
     /// A quantum machine job with default properties to use as an example.

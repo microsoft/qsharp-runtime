@@ -4,7 +4,7 @@
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Azure.Quantum;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
-using Microsoft.Quantum.EntryPointDriver.Mocks;
+using Microsoft.Quantum.EntryPointDriver.Mock;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;

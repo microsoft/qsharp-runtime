@@ -1,25 +1,25 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Core;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.EntryPointDriver.Mocks
+namespace Microsoft.Quantum.EntryPointDriver.Mock
 {
     /// <summary>
-    /// A quantum machine that does nothing.
+    /// A quantum machine that always has an error.
     /// </summary>
-    internal class NoOpQuantumMachine : IQuantumMachine
+    internal class ErrorQuantumMachine : IQuantumMachine
     {
         /// <summary>
-        /// The target ID for the no-op quantum machine.
+        /// The target ID for the error quantum machine.
         /// </summary>
-        internal const string TargetId = "test.noop";
+        internal const string TargetId = "test.error";
 
-        public string ProviderId => nameof(NoOpQuantumMachine);
+        public string ProviderId => nameof(ErrorQuantumMachine);
 
         public string Target => TargetId;
 
@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mocks
             EntryPointInfo<TInput, TOutput> info,
             TInput input,
             IQuantumMachineSubmissionContext submissionContext,
-            IQuantumMachine.ConfigureJob configureJobCallback) => 
+            IQuantumMachine.ConfigureJob configureJobCallback) =>
             throw new NotSupportedException();
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mocks
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info,
             TInput input,
-            IQuantumMachineExecutionContext executionContext, 
+            IQuantumMachineExecutionContext executionContext,
             IQuantumMachine.ConfigureJob configureJobCallback) =>
             throw new NotSupportedException();
 
@@ -66,21 +66,21 @@ namespace Microsoft.Quantum.EntryPointDriver.Mocks
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>
-            Task.FromResult<IQuantumMachineJob>(new ExampleJob());
+            throw new AzureQuantumException("This quantum machine always has an error.");
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
-            EntryPointInfo<TInput, TOutput> info, TInput input, IQuantumMachineSubmissionContext submissionContext) =>
+            EntryPointInfo<TInput, TOutput> info, TInput input, IQuantumMachineSubmissionContext submissionContext) => 
             SubmitAsync(info, input);
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info,
-            TInput input, 
-            IQuantumMachineSubmissionContext submissionContext, 
+            TInput input,
+            IQuantumMachineSubmissionContext submissionContext,
             IQuantumMachine.ConfigureJob configureJobCallback) =>
             SubmitAsync(info, input);
 
         public (bool IsValid, string Message) Validate<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>
-            (true, string.Empty);
+            (false, "This quantum machine always has an error.");
     }
 }
