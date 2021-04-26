@@ -75,17 +75,20 @@ let private customSimulatorFactory name =
 let private createArgument context entryPoint =
     let inTypeName = SimulationCode.roslynTypeName context entryPoint.Signature.ArgumentType
     let parseResultName = "parseResult"
+
     let valueForArg (name, typeName) =
         ident parseResultName <.> (sprintf "ValueForOption<%s>" typeName |> ident, [optionName name])
+
     let argTuple =
         SimulationCode.mapArgumentTuple
             valueForArg
             context
             entryPoint.ArgumentTuple
             entryPoint.Signature.ArgumentType
+
     arrow_method inTypeName "CreateArgument" ``<<`` [] ``>>``
         ``(`` [param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")] ``)``
-        [``public``]
+        [``private``]
         (Some (``=>`` argTuple))
 
 /// A tuple of the callable's name, argument type name, and return type name.
