@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <Import Project="..\Common\AssemblyCommon.props" />
   <Import Project="..\Common\Simulators.Dev.props" />

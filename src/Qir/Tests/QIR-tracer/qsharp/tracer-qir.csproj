@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <QirGeneration>True</QirGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
 </Project>

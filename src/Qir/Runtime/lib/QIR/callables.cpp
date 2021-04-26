@@ -10,7 +10,6 @@
 
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
-#include "allocationsTracker.hpp"
 #include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
@@ -164,9 +163,9 @@ extern "C"
 ==============================================================================*/
 int QirTupleHeader::AddRef()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAddRef(this);
+        GlobalContext()->OnAddRef(this);
     }
 
     assert(this->refCount > 0);
@@ -175,10 +174,11 @@ int QirTupleHeader::AddRef()
 
 int QirTupleHeader::Release()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnRelease(this);
+        GlobalContext()->OnRelease(this);
     }
+
 
     assert(this->refCount > 0); // doesn't guarantee we catch double releases but better than nothing
     int retVal = --this->refCount;
@@ -195,9 +195,9 @@ QirTupleHeader* QirTupleHeader::Create(int size)
     assert(size >= 0);
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(buffer);
+        GlobalContext()->OnAllocate(buffer);
     }
 
     // at the beginning of the buffer place QirTupleHeader, leave the buffer uninitialized
@@ -214,9 +214,9 @@ QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
     const int size = other->tupleSize;
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(buffer);
+        GlobalContext()->OnAllocate(buffer);
     }
 
     // at the beginning of the buffer place QirTupleHeader
@@ -253,9 +253,9 @@ QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallba
         memcpy(this->captureCallbacks, callbacks, sizeof(this->captureCallbacks));
     }
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(this);
+        GlobalContext()->OnAllocate(this);
     }
 }
 
@@ -268,9 +268,9 @@ QirCallable::QirCallable(const QirCallable& other)
     memcpy(this->functionTable, other.functionTable, sizeof(this->functionTable));
     memcpy(this->captureCallbacks, other.captureCallbacks, sizeof(this->captureCallbacks));
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(this);
+        GlobalContext()->OnAllocate(this);
     }
 }
 
@@ -286,9 +286,9 @@ QirCallable* QirCallable::CloneIfShared()
 
 int QirCallable::AddRef()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAddRef(this);
+        GlobalContext()->OnAddRef(this);
     }
 
     int rc = ++this->refCount;
@@ -298,9 +298,9 @@ int QirCallable::AddRef()
 
 int QirCallable::Release()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnRelease(this);
+        GlobalContext()->OnRelease(this);
     }
     assert(this->refCount > 0);
 

@@ -324,5 +324,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void InternalCallables() =>
             OperationsTestHelper.RunWithMultipleSimulators(s => Circuits.InternalCallablesTest.Run(s).Wait());
+
+        [Fact]
+        public void CreateArrayWithNegativeSize() =>
+            // TODO: This should throw ArgumentOutOfRangeException, but issue #536 causes the wrong exception type to be
+            // thrown: https://github.com/microsoft/qsharp-runtime/issues/536
+            Assert.ThrowsAny<Exception>(() =>
+                OperationsTestHelper.RunWithMultipleSimulators(simulator =>
+                    Circuits.CreateArrayWithNegativeSize.Run(simulator).Wait()));
     }
 }

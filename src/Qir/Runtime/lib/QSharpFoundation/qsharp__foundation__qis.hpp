@@ -3,22 +3,13 @@
 #include <cstdint>
 
 #include "CoreTypes.hpp"
+#include "QirTypes.hpp"
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 struct QirArray;
 struct QirCallable;
-struct QirString;
-struct QirBigInt;
-
-namespace Microsoft
-{
-namespace Quantum
-{
-    struct IQuantumGateSet;
-}
-} // namespace Microsoft
 
 /*
     Methods from __quantum__qis namespace are specific to the target. When QIR is generated it might limit or extend
@@ -49,4 +40,5 @@ extern "C"
         QirArray*,
         QirCallable*,
         QirCallable*);
-}
+
+} // extern "C"
