@@ -468,7 +468,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
                 Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
             });
-        
+
         /// <summary>
         /// A modification of the command-line <see cref="HelpBuilder"/> class.
         /// </summary>
@@ -493,10 +493,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// Struct for housing a command with its validators.
         /// </summary>
-        private struct CommandWithValidators
+        private readonly struct CommandWithValidators
         {
-            public Command Command;
-            public Validators Validators;
+            public Command Command { get; }
+
+            public Validators Validators { get; }
 
             /// <summary>
             /// Basic constructor.

@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The aliases for the simulator command-line option.
         /// </summary>
-        internal IImmutableList<string> SimulatorOptionAliases { get; }
+        internal ImmutableList<string> SimulatorOptionAliases { get; }
 
         /// <summary>
         /// The name of the quantum simulator.
@@ -40,13 +40,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string DefaultExecutionTarget { get; }
 
         /// <summary>
-        /// Creates an instance of the default simulator if it is a custom simulator.
+        /// A function that returns a new instance of the default custom simulator, or throws
+        /// <see cref="InvalidOperationException"/> if the default simulator is not a custom simulator.
         /// </summary>
-        /// <returns>An instance of the default custom simulator.</returns>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if the default simulator is not a custom simulator.
-        /// </exception>
-        internal Func<IOperationFactory> CreateDefaultCustomSimulator;
+        internal Func<IOperationFactory> CreateDefaultCustomSimulator { get; }
 
         /// <summary>
         /// Creates a new driver settings instance.
@@ -57,9 +54,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
-        /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
+        /// <param name="createDefaultCustomSimulator">
+        /// A function that returns a new instance of the default custom simulator, or throws
+        /// <see cref="InvalidOperationException"/> if the default simulator is not a custom simulator.
+        /// </param>
         public DriverSettings(
-            IImmutableList<string> simulatorOptionAliases,
+            ImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,

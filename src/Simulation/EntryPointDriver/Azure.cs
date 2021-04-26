@@ -1,18 +1,20 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
+using Microsoft.Azure.Quantum;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;
-using static Microsoft.Quantum.EntryPointDriver.Driver;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
+    using Environment = System.Environment;
+
     /// <summary>
     /// Provides entry point submission to Azure Quantum.
     /// </summary>
@@ -23,29 +25,33 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
+        /// <param name="settings">The submission settings.</param>
+        /// <param name="qirResourceName">The name of the QIR bitcode assembly resource.</param>
         /// <param name="info">The information about the entry point.</param>
         /// <param name="input">The input argument tuple to the entry point.</param>
-        /// <param name="settings">The submission settings.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> Submit<TIn, TOut>(EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
+        public static async Task<int> Submit<TIn, TOut>(
+            AzureSettings settings, string qirResourceName, EntryPointInfo<TIn, TOut> info, TIn input)
         {
+            // TODO
+            Console.WriteLine($"qirResourceName: {qirResourceName}");
+
             if (settings.Verbose)
             {
-                Console.WriteLine(settings);
-                Console.WriteLine();
+                Console.Write(settings + Environment.NewLine + Environment.NewLine);
             }
 
-            var machine = CreateMachine(settings);
-            if (machine is null)
+            switch (CreateMachine(settings))
             {
-                DisplayWithColor(ConsoleColor.Red, Console.Error,
-                    $"The target '{settings.Target}' was not recognized.");
-                return 1;
+                case null:
+                    DisplayWithColor(
+                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' was not recognized.");
+                    return 1;
+                case var machine:
+                    return settings.DryRun
+                        ? Validate(machine, info, input)
+                        : await SubmitJob(settings, machine, info, input);
             }
-
-            return settings.DryRun
-                ? Validate(machine, info, input)
-                : await SubmitJob(machine, info, input, settings);
         }
 
         /// <summary>
@@ -53,13 +59,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <typeparam name="TIn">The input type.</typeparam>
         /// <typeparam name="TOut">The output type.</typeparam>
+        /// <param name="settings">The submission settings.</param>
         /// <param name="machine">The quantum machine target.</param>
         /// <param name="info">The information about the entry point.</param>
         /// <param name="input">The input argument tuple to the entry point.</param>
-        /// <param name="settings">The submission settings.</param>
         /// <returns>The exit code.</returns>
         private static async Task<int> SubmitJob<TIn, TOut>(
-            IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input, AzureSettings settings)
+            AzureSettings settings, IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input)
         {
             try
             {

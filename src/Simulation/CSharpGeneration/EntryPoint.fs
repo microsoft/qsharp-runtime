@@ -106,12 +106,15 @@ let private submitMethod context entryPoint =
     let callableName, _, _ = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
+
     let args =
         [
+            ident settingsParamName :> ExpressionSyntax
+            literal DotnetCoreDll.QirResourceName
             ident callableName <|.|> ident "Info"
             ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
-            ident settingsParamName :> ExpressionSyntax
         ]
+
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
         ``(``
             [
