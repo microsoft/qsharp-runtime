@@ -9,9 +9,6 @@ macro(target_source_from_qir target_name source_file)
         "-DDEBUG"
         )
     endif()
-    if (WIN32)
-        set(CLANG_ARGS "${CLANG_ARGS}" "-Xclang" "-cfguard")
-    endif()
 
     get_filename_component(file_name ${source_file} NAME_WLE)
 

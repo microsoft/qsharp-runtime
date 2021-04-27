@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 if (WIN32)
-    add_compile_options(-Xclang -cfguard -Xclang -mretpoline)
+    add_link_options("LINKER:/guard:cf")
 endif()
 
 # feel free to customize these flags for your local builds (don't check in)
