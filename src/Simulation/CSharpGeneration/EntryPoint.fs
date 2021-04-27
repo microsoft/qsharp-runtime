@@ -110,18 +110,29 @@ let private submitMethod context entryPoint =
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
 
-    let qirResourceStream =
+    let qsArgs =
+        [
+            ident settingsParamName :> ExpressionSyntax
+            ident callableName <|.|> ident "Info"
+            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
+        ]
+
+    let qirStream =
         ident "global::System.Reflection.Assembly"
         <.> (ident "GetExecutingAssembly", [])
         <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
 
-    let args =
+    let qirArgs =
         [
             ident settingsParamName :> ExpressionSyntax
-            qirResourceStream
-            ident callableName <|.|> ident "Info"
-            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
+            qirStream
+            string entryPoint.FullName |> literal
+            // TODO
+            upcast ident "global::System.Collections.Immutable.ImmutableList<global::Microsoft.Quantum.Runtime.Argument>.Empty"
         ]
+
+    let hasQir = context.assemblyConstants.ContainsKey "QirOutputPath"
+    let submit = if hasQir then ident "SubmitQir", qirArgs else ident "SubmitQSharp", qsArgs
 
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
         ``(``
@@ -131,7 +142,7 @@ let private submitMethod context entryPoint =
             ]
         ``)``
         [``public``]
-        (Some (``=>`` (ident (driverNamespace + ".Azure") <.> (ident "Submit", args))))
+        (Some (``=>`` (ident (driverNamespace + ".Azure") <.> submit)))
 
 /// Generates the Simulate method for an entry point class.
 let private simulateMethod context entryPoint =

@@ -9,6 +9,7 @@ using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,17 +24,16 @@ namespace Microsoft.Quantum.EntryPointDriver
     public static class Azure
     {
         /// <summary>
-        /// Submits the entry point to Azure Quantum.
+        /// Submits a Q# entry point to Azure Quantum.
         /// </summary>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
-        /// <param name="settings">The submission settings.</param>
-        /// <param name="qir">The QIR bitcode stream.</param>
+        /// <param name="settings">The Azure submission settings.</param>
         /// <param name="info">The information about the entry point.</param>
         /// <param name="input">The input argument tuple to the entry point.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> Submit<TIn, TOut>(
-            AzureSettings settings, Stream? qir, EntryPointInfo<TIn, TOut> info, TIn input)
+        public static async Task<int> SubmitQSharp<TIn, TOut>(
+            AzureSettings settings, EntryPointInfo<TIn, TOut> info, TIn input)
         {
             if (settings.Verbose)
             {
@@ -51,6 +51,24 @@ namespace Microsoft.Quantum.EntryPointDriver
                         ? Validate(machine, info, input)
                         : await SubmitJob(settings, machine, info, input);
             }
+        }
+
+        /// <summary>
+        /// Submits a QIR entry point to Azure Quantum. 
+        /// </summary>
+        /// <param name="settings">The Azure submission settings.</param>
+        /// <param name="qir">The QIR bitcode stream.</param>
+        /// <param name="entryPoint">The entry point name.</param>
+        /// <param name="arguments">The arguments to the entry point.</param>
+        /// <returns>The exit code.</returns>
+        public static async Task<int> SubmitQir(
+            AzureSettings settings, Stream qir, string entryPoint, IReadOnlyList<Argument> arguments)
+        {
+            // TODO
+            var submitter = new NoOpQirSubmitter();
+            var job = await submitter.SubmitAsync(qir, entryPoint, arguments);
+            DisplayJob(job, settings.Output);
+            return 0;
         }
 
         /// <summary>
@@ -134,9 +152,9 @@ namespace Microsoft.Quantum.EntryPointDriver
                         DisplayWithColor(
                             ConsoleColor.Yellow,
                             Console.Error,
-                            $"The friendly URI for viewing job results could not be obtained.{System.Environment.NewLine}" +
-                            $"Error details: {ex.Message}" +
-                            $"Showing the job ID instead.");
+                            $"The friendly URI for viewing job results could not be obtained.{Environment.NewLine}" +
+                            $"Error details: {ex.Message}{Environment.NewLine}" +
+                            "Showing the job ID instead.");
 
                         Console.WriteLine(job.Id);
                     }
@@ -238,14 +256,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? AadToken { get; set; }
 
         /// <summary>
-        /// The base URI of the Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// The base URI of the Azure Quantum endpoint. If both <see cref="BaseUri"/> and <see cref="Location"/>
+        /// properties are not null, <see cref="BaseUri"/> is used.
         /// </summary>
         public Uri? BaseUri { get; set; }
 
         /// <summary>
-        /// The location to use with the default Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// The location to use with the default Azure Quantum endpoint. If both <see cref="BaseUri"/> and
+        /// <see cref="Location"/> properties are not null, <see cref="BaseUri"/> is used.
         /// </summary>
         public string? Location { get; set; }
 
@@ -280,28 +298,28 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            if (BaseUri != null)
+            if (!(BaseUri is null))
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
             }
-            else if (Location != null)
+
+            if (!(Location is null))
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, NormalizeLocation(Location));
             }
-            else
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
-            }
+
+            return AadToken is null
+                ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
+                : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
         }
 
         public override string ToString() =>
-            string.Join(System.Environment.NewLine,
+            string.Join(
+                Environment.NewLine,
                 $"Subscription: {Subscription}",
                 $"Resource Group: {ResourceGroup}",
                 $"Workspace: {Workspace}",
