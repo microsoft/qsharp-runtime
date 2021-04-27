@@ -9,8 +9,8 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public interface IQirDriverGenerator
     {
-        Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
+        public Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
 
-        string GetCommandLineArguments(EntryPointOperation entryPoint);
+        public string GetCommandLineArguments(EntryPointOperation entryPoint);
     }
 }
