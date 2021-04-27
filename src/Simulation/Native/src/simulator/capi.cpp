@@ -205,6 +205,11 @@ extern "C"
         Microsoft::Quantum::Simulator::get(id)->dump(callback);
     }
 
+    MICROSOFT_QUANTUM_DECL void DumpToLocation(_In_ unsigned id, _In_ TDumpToLocationCallback callback, _In_ TDumpLocation location)
+    {
+        Microsoft::Quantum::Simulator::get(id)->dump(callback, location);
+    }
+
     // dump the wavefunction of the subset of qubits to the given callback returns false
     MICROSOFT_QUANTUM_DECL bool DumpQubits(
         _In_ unsigned id,
@@ -215,6 +220,18 @@ extern "C"
         std::vector<unsigned> qs(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->dumpQubits(qs, callback);
     }
+
+    MICROSOFT_QUANTUM_DECL bool DumpQubitsToLocation(
+        _In_ unsigned id,
+        _In_ unsigned n,
+        _In_reads_(n) unsigned* q,
+        _In_ TDumpToLocationCallback callback, 
+        _In_ TDumpLocation location)
+    {
+        std::vector<unsigned> qs(q, q + n);
+        return Microsoft::Quantum::Simulator::get(id)->dumpQubits(qs, callback, location);
+    }
+
 
     // dump the list of logical qubit ids to given callback
     MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void (*callback)(unsigned))

@@ -12,6 +12,7 @@
 #include "QirContext.hpp"
 #include "QirRuntime.hpp"
 #include "SimFactory.hpp"
+#include "OutputStream.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
@@ -133,7 +134,7 @@ int main(int argc, char* argv[])
 
     // Initialize simulator.
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(sim.get(), false /*trackAllocatedObjects*/);
 
     // Add the --simulation-output options.
     // N.B. This option should be present in all standalone drivers.
@@ -261,7 +262,7 @@ int main(int argc, char* argv[])
     if (!simulationOutputFileOpt->empty())
     {
         simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
+        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 

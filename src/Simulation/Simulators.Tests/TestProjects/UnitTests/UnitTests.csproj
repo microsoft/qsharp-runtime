@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,6 +7,7 @@
     <!-- we will provide our own -->
     <CSharpGeneration>false</CSharpGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
