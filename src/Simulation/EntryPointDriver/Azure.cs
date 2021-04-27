@@ -317,22 +317,21 @@ namespace Microsoft.Quantum.EntryPointDriver
                 : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
         }
 
-        public override string ToString() =>
-            string.Join(
-                Environment.NewLine,
-                $"Subscription: {Subscription}",
-                $"Resource Group: {ResourceGroup}",
-                $"Workspace: {Workspace}",
-                $"Target: {Target}",
-                $"Storage: {Storage}",
-                $"AAD Token: {AadToken}",
-                $"Base URI: {BaseUri}",
-                $"Location: {Location}",
-                $"Job Name: {JobName}",
-                $"Shots: {Shots}",
-                $"Output: {Output}",
-                $"Dry Run: {DryRun}",
-                $"Verbose: {Verbose}");
+        public override string ToString() => string.Join(
+            Environment.NewLine,
+            $"Subscription: {Subscription}",
+            $"Resource Group: {ResourceGroup}",
+            $"Workspace: {Workspace}",
+            $"Target: {Target}",
+            $"Storage: {Storage}",
+            $"AAD Token: {AadToken}",
+            $"Base URI: {BaseUri}",
+            $"Location: {Location}",
+            $"Job Name: {JobName}",
+            $"Shots: {Shots}",
+            $"Output: {Output}",
+            $"Dry Run: {DryRun}",
+            $"Verbose: {Verbose}");
 
         internal static string NormalizeLocation(string location) =>
             string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();

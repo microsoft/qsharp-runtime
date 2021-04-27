@@ -12,7 +12,6 @@ open Microsoft.Quantum.QsCompiler.SyntaxTree
 open Microsoft.Quantum.RoslynWrapper
 open System
 
-
 /// An entry point parameter.
 type private Parameter =
     { Name : string
@@ -104,8 +103,65 @@ let private callableTypeNames context (callable : QsCallable) =
 let private entryPointClassFullName (entryPoint : QsCallable) =
     { Namespace = entryPoint.FullName.Namespace; Name = entryPointClassName + entryPoint.FullName.Name }
 
+/// The QIR argument type for the Q# type, or None if the Q# type is not supported in a QIR entry point.
+let rec private qirArgumentType (type_ : ResolvedType) =
+    let case name = "global::Microsoft.Quantum.Runtime.ArgumentType." + name |> ident
+
+    match type_.Resolution with
+    | Bool -> case "Bool" :> ExpressionSyntax |> Some
+    | Int -> case "Int" :> ExpressionSyntax |> Some
+    | Double -> case "Double" :> ExpressionSyntax |> Some
+    | Pauli -> case "Pauli" :> ExpressionSyntax |> Some
+    | Range -> case "Range" :> ExpressionSyntax |> Some
+    | Result -> case "Result" :> ExpressionSyntax |> Some
+    | String -> case "String" :> ExpressionSyntax |> Some
+    | ArrayType itemType ->
+        qirArgumentType itemType |> Option.map (fun itemType -> ``new`` (case "Array") ``(`` [itemType] ``)``)
+    | _ -> None
+
+/// The QIR argument value for the Q# type and value expression, or None if the Q# type is not supported in a QIR entry
+/// point.
+let rec private qirArgumentValue (type_ : ResolvedType) (value : ExpressionSyntax) =
+    let argumentValueName = "global::Microsoft.Quantum.Runtime.ArgumentValue"
+    let case name = sprintf "%s.%s" argumentValueName name |> ident
+
+    let arrayValue itemValue itemType =
+        let values =
+            ident "global::System.Linq.Enumerable"
+            <.> (ident "Select", [value; upcast ``() =>`` ["item"] itemValue])
+
+        let items =
+            ident "global::System.Collections.Immutable.ImmutableArray"
+            <.> (sprintf "CreateRange<%s>" argumentValueName |> ident, [values])
+
+        case "Array" <.> (ident "TryCreate", [items; itemType])
+
+    match type_.Resolution with
+    | Bool -> ``new`` (case "Bool") ``(`` [value] ``)`` |> Some
+    | Int -> ``new`` (case "Int") ``(`` [value] ``)`` |> Some
+    | Double -> ``new`` (case "Double") ``(`` [value] ``)`` |> Some
+    | Pauli -> ``new`` (case "Pauli") ``(`` [value] ``)`` |> Some
+    | Range -> ``new`` (case "Range") ``(`` [value] ``)`` |> Some
+    | Result -> ``new`` (case "Result") ``(`` [value] ``)`` |> Some
+    | String -> ``new`` (case "String") ``(`` [value] ``)`` |> Some
+    | ArrayType itemType ->
+        Option.map2 arrayValue (ident "item" |> qirArgumentValue itemType) (qirArgumentType itemType)
+    | _ -> None
+
+/// The list of QIR arguments for the entry point parameters and the result of parsing the command-line arguments.
+let private qirArguments parameters parseResult =
+    let argument param =
+        let value =
+            parseResult <.> (sprintf "ValueForOption<%s>" param.CSharpTypeName |> ident, [optionName param.Name])
+            |> qirArgumentValue param.QSharpType
+            |> Option.defaultWith (fun () -> failwith "Unsupported parameter type.")
+
+        ``new`` (ident "global::Microsoft.Quantum.Runtime.Argument") ``(`` [literal param.Name; value] ``)``
+
+    ident "global::System.Collections.Immutable.ImmutableList" <.> (ident "Create", parameters |> Seq.map argument)
+
 /// Generates the Submit method for an entry point class.
-let private submitMethod context entryPoint =
+let private submitMethod context entryPoint parameters =
     let callableName, _, _ = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
@@ -127,8 +183,7 @@ let private submitMethod context entryPoint =
             ident settingsParamName :> ExpressionSyntax
             qirStream
             string entryPoint.FullName |> literal
-            // TODO
-            upcast ident "global::System.Collections.Immutable.ImmutableList<global::Microsoft.Quantum.Runtime.Argument>.Empty"
+            qirArguments parameters (ident parseResultParamName)
         ]
 
     let hasQir = context.assemblyConstants.ContainsKey "QirOutputPath"
@@ -172,25 +227,22 @@ let private simulateMethod context entryPoint =
 /// The class that adapts the entry point for use with the command-line parsing library and the driver.
 let private entryPointClass context (entryPoint : QsCallable) =
     let property name typeName value = ``property-arrow_get`` typeName name [``public``] get (``=>`` value)
-    let nameProperty =
-        entryPoint.FullName.ToString()
-        |> literal
-        |> property "Name" "string"
-    let summaryProperty =
-        (PrintSummary entryPoint.Documentation false).Trim ()
-        |> literal
-        |> property "Summary" "string"
+    let nameProperty = string entryPoint.FullName |> literal |> property "Name" "string"
+    let summaryProperty = (PrintSummary entryPoint.Documentation false).Trim() |> literal |> property "Summary" "string"
     let parameters = parameters context entryPoint.Documentation entryPoint.ArgumentTuple
+
     let members : MemberDeclarationSyntax list = [
         nameProperty
         summaryProperty
         parameterOptionsProperty parameters
         createArgument context entryPoint
-        submitMethod context entryPoint
+        submitMethod context entryPoint parameters
         simulateMethod context entryPoint
     ]
+
     let baseName = sprintf "%s.IEntryPoint" driverNamespace
-    ``class`` ((entryPointClassFullName entryPoint).Name) ``<<`` [] ``>>``
+
+    ``class`` (entryPointClassFullName entryPoint).Name ``<<`` [] ``>>``
         ``:`` (Some (simpleBase baseName)) ``,`` []
         [``internal``]
         ``{``

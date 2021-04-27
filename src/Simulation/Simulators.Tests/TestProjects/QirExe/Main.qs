@@ -2,8 +2,8 @@
     open Microsoft.Quantum.Intrinsic;
 
     @EntryPoint()
-    operation Main(x : Int, (y : Int, z : Int)) : Unit {
+    operation Main(xs : Int[], (y : Int, z : Int)) : Unit {
         Message("Hello, world!");
-        Message($"({x}, ({y}, {z}))");
+        Message($"({xs}, ({y}, {z}))");
     }
 }
