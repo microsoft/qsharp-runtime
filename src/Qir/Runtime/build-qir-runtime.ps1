@@ -22,7 +22,7 @@ if (-not (Test-Path $Env:QIR_DROPS)) {
     New-Item -Path $qirDropsBin -ItemType "directory"
     New-Item -Path $qirDropsInclude -ItemType "directory"
 }
-$qirBinaries = (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION bin *)
+$qirBinaries = (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION bin *)
 $qirIncludes = (Join-Path $PSScriptRoot public *)
 Copy-Item $qirBinaries $qirDropsBin -Exclude "*unittests*","*.Tracer.*"
 Copy-Item $qirIncludes $qirDropsInclude -Exclude "*.md","Tracer*"
