@@ -72,7 +72,7 @@ function Build-CMakeProject {
         Write-Host "##vso[task.logissue type=warning;]Failed to identify the OS. Will use default CXX compiler"
     }
 
-    $cmakeBuildFolder = (Join-Path $Path build $Env:BUILD_CONFIGURATION)
+    $cmakeBuildFolder = (Join-Path $Path bin $Env:BUILD_CONFIGURATION)
     if (-not (Test-Path $cmakeBuildFolder)) {
         New-Item -Path $cmakeBuildFolder -ItemType "directory"
     }
@@ -81,7 +81,12 @@ function Build-CMakeProject {
 
     Push-Location $cmakeBuildFolder
 
-    cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ../.. | Write-Host
+    $buildType = $Env:BUILD_CONFIGURATION
+    if ($buildType -eq "Release"){
+        $buildType = "RelWithDebInfo"
+    }
+
+    cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to generate $Name."
         $all_ok = $false
