@@ -3,6 +3,6 @@
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
-if (-not (Test-CTest (Join-Path $PSScriptRoot build $Env:BUILD_CONFIGURATION StandaloneInputReference) "QIR Samples (StandaloneInputReference)")) {
+if (-not (Test-CTest (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION StandaloneInputReference) "QIR Samples (StandaloneInputReference)")) {
     throw "At least one project failed testing. Check the logs."
 }

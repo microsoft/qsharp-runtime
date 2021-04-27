@@ -72,7 +72,7 @@ function Build-CMakeProject {
         Write-Host "##vso[task.logissue type=warning;]Failed to identify the OS. Will use default CXX compiler"
     }
 
-    $cmakeBuildFolder = (Join-Path $Path build $Env:BUILD_CONFIGURATION)
+    $cmakeBuildFolder = (Join-Path $Path bin $Env:BUILD_CONFIGURATION)
     if (-not (Test-Path $cmakeBuildFolder)) {
         New-Item -Path $cmakeBuildFolder -ItemType "directory"
     }

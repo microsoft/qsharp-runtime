@@ -37,7 +37,7 @@ else()
     set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/$ENV{BUILD_CONFIGURATION}")
 endif()
 
-set(TEST_DEPS2 "${PROJECT_SOURCE_DIR}/../Runtime/build/$ENV{BUILD_CONFIGURATION}/bin")
+set(TEST_DEPS2 "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
 set_property(TEST qir-input-reference-standalone PROPERTY ENVIRONMENT
     "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${LD_LIBRARY_PATH}"
     "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${PATH}"

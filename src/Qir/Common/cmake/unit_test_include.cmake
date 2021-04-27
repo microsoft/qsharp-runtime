@@ -13,7 +13,7 @@ macro(add_unit_test target)
     endif()
 
     set(TEST_DEPS2 "${CMAKE_BINARY_DIR}/bin")
-    set(TEST_DEPS3 "${PROJECT_SOURCE_DIR}/../Runtime/build/$ENV{BUILD_CONFIGURATION}/bin")
+    set(TEST_DEPS3 "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
     set_property(TEST ${target} PROPERTY ENVIRONMENT
         "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${TEST_DEPS3}:${LD_LIBRARY_PATH}"
         "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${TEST_DEPS3}\;${PATH}"

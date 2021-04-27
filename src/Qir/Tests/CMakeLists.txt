@@ -22,7 +22,7 @@ set(public_includes "${PROJECT_SOURCE_DIR}/../Runtime/public")
 set(common_includes "${PROJECT_SOURCE_DIR}/../Common/Include")
 set(test_includes "${PROJECT_SOURCE_DIR}/../Common/externals/catch2")
 
-set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../Runtime/build/$ENV{BUILD_CONFIGURATION}/bin")
+set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
 
 include(qir_cmake_include)
 include(unit_test_include)
