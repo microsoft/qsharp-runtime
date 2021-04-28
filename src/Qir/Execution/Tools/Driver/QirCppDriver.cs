@@ -284,7 +284,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  for (int i = 0; i < EntryPoint.Arguments.Count; i++) {
     var arg = EntryPoint.Arguments[i];
     var isLastArg = i == (EntryPoint.Arguments.Count-1); 
-            this.Write("    ");
+            this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
             this.Write(this.ToStringHelper.ToStringWithCulture((isLastArg) ? "" : ","));
             this.Write("\r\n");
