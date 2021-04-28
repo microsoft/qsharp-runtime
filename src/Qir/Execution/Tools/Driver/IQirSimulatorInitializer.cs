@@ -10,6 +10,7 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
     public interface IQirSimulatorInitializer
     {
         public Task GenerateAsync(Stream stream);
+
         public string GenerateString();
 
         public IList<string> Headers { get; }

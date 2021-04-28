@@ -3,21 +3,25 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public class QirFullStateDriverGenerator: IQirDriverGenerator
     {
-        public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream)
+        private readonly QirCppDriverGenerator DriverGenerator;
+        public QirFullStateDriverGenerator()
         {
-            await Task.Run(() => QirDriverGeneration.GenerateQirDriverCpp(entryPoint, stream));
+            DriverGenerator = new QirCppDriverGenerator(new QirFullStateSimulatorInitializer());
         }
 
-        public string GetCommandLineArguments(EntryPointOperation entryPoint)
-        {
-            return QirDriverGeneration.GenerateCommandLineArguments(entryPoint.Arguments);
-        }
+        public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream) =>
+            await DriverGenerator.GenerateAsync(entryPoint, stream);
+
+        public string GenerateString(EntryPointOperation entryPoint) =>
+            DriverGenerator.GenerateString(entryPoint);
+
+        public string GetCommandLineArguments(EntryPointOperation entryPoint) =>
+            DriverGenerator.GetCommandLineArguments(entryPoint);
     }
 }

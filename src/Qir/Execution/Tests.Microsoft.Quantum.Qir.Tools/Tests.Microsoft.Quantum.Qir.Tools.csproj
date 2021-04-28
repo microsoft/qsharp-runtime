@@ -17,4 +17,13 @@
     <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Tools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestCases\FullStateDriverGenerator\UseNoArgs.cpp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestCases\FullStateDriverGenerator\UseResultArg.cpp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
