@@ -1,24 +1,11 @@
 #pragma once
 
-#include <cstdint>
-
-#include "CoreTypes.hpp"
+#include "CoreTypes.hpp"    // QUBIT, PauliId, RESULT
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 struct QirArray;
-struct QirCallable;
-struct QirString;
-struct QirBigInt;
-
-namespace Microsoft
-{
-namespace Quantum
-{
-    struct IQuantumGateSet;
-}
-} // namespace Microsoft
 
 /*
     Methods from __quantum__qis namespace are specific to the target. When QIR is generated it might limit or extend
@@ -54,4 +41,8 @@ extern "C"
     QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
+    // Q# Dump:
+    // Note: The param `location` must be `const void*`, but it is called from .ll, where `const void*` is not supported.
+    QIR_SHARED_API void quantum__qis__dumpmachine__body(uint8_t* location);                 // NOLINT
+    QIR_SHARED_API void quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits);   // NOLINT
 }

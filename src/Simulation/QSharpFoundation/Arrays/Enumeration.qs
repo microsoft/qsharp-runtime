@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Arrays {
     /// The following `for` loops are equivalent:
     /// ```qsharp
     /// for (idx in IndexRange(array)) { ... }
-    /// for (idx in IndexRange(array)) { ... }
+    /// for (idx in 0 .. Length(array) - 1) { ... }
     /// ```
     function IndexRange<'TElement>(array : 'TElement[]) : Range {
        return 0..(Length(array) - 1);
