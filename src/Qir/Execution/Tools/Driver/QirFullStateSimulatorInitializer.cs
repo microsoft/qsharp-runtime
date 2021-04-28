@@ -11,8 +11,16 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public class QirFullStateSimulatorInitializer : IQirSimulatorInitializer
     {
-        // TODO: Implement.
-        public IList<string> GenerateSourceCode() => new List<string>();
+        public IList<string> GenerateSourceCode()
+        {
+            var simulatorInitializer = new QirCppFullStateSimulatorInitializer();
+            var sourceCode = simulatorInitializer.TransformText();
+            var lines = sourceCode.Split(
+                new[] { "\r\n", "\r", "\n" },
+                StringSplitOptions.None);
+
+            return new List<string>(lines);
+        }
 
         public IList<string> Headers => new List<string> {
                 "SimFactory.hpp"

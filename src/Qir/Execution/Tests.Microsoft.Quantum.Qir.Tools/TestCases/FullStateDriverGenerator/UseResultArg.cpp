@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
     CLI::App app("QIR Standalone Entry Point");
 
     // Initialize simulator.
+    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
 
     // Add the --simulation-output option.
     string simulationOutputFile;

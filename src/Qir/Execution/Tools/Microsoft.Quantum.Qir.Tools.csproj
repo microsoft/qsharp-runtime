@@ -19,6 +19,10 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>QirCppDriver.cs</LastGenOutput>
     </None>
+    <None Update="Driver\QirCppFullStateSimulatorInitializer.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>QirCppFullStateSimulatorInitializer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -27,9 +31,14 @@
 
   <ItemGroup>
     <Compile Update="Driver\QirCppDriver.cs">
-      <DesignTime>True</DesignTime>
+      <DesignTime>False</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppDriver.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Driver\QirCppFullStateSimulatorInitializer.cs">
+      <DesignTime>False</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>QirCppFullStateSimulatorInitializer.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
