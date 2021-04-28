@@ -68,73 +68,54 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
                 _ => throw new ArgumentException($"Invalid data type: {dataType}")
             };
     }
-    internal class CppArgument
+
+    internal static class ArgumentCppExtensions
     {
-        private readonly Argument Argument;
+        public static string CliOptionDescription(this Argument @this) =>
+            $"Option to provide a value for the {@this.Name} parameter";
 
-        public CppArgument(Argument argument)
+        public static string CliOptionName(this Argument @this)
         {
-            Argument = argument;
-        }
-
-        public DataType? ArrayType => Argument.ArrayType;
-
-        public string CliOptionDescription() =>
-            $"Option to provide a value for the {Argument.Name} parameter";
-
-        public string CliOptionName()
-        {
-            if (String.IsNullOrEmpty(Argument.Name))
+            if (String.IsNullOrEmpty(@this.Name))
             {
-                throw new InvalidOperationException($"Invalid argument name '{Argument.Name}'");
+                throw new InvalidOperationException($"Invalid argument name '{@this.Name}'");
             }
 
-            return Argument.Name.Length == 1 ? $"-{Argument.Name}" : $"--{Argument.Name}";
+            return @this.Name.Length == 1 ? $"-{@this.Name}" : $"--{@this.Name}";
         }
 
-        public string CliOptionVariableName() => $"{Argument.Name}Cli";
+        public static string CliOptionVariableName(this Argument @this) => $"{@this.Name}Cli";
 
-        public string? CliOptionVariableDefaultValue() => QirCppInterop.CliOptionVariableDefaultValue(Argument.Type);
+        public static string? CliOptionVariableDefaultValue(this Argument @this) => 
+            QirCppInterop.CliOptionVariableDefaultValue(@this.Type);
 
-        public string CliOptionVariableType() =>
-            Argument.Type switch
+        public static string CliOptionVariableType(this Argument @this) =>
+            @this.Type switch
             {
-                DataType.ArrayType => $"vector<{QirCppInterop.CliOptionVariableType(Argument.ArrayType)}>",
-                _ => QirCppInterop.CliOptionVariableType(Argument.Type)
+                DataType.ArrayType => $"vector<{QirCppInterop.CliOptionVariableType(@this.ArrayType)}>",
+                _ => QirCppInterop.CliOptionVariableType(@this.Type)
             };
 
-        public string IntermediateVariableName() => $"{Argument.Name}Intermediate";
+        public static string IntermediateVariableName(this Argument @this) => $"{@this.Name}Intermediate";
 
-        public string InteropVariableName() => $"{Argument.Name}Interop";
+        public static string InteropVariableName(this Argument @this) => $"{@this.Name}Interop";
 
-        public string InteropType() => QirCppInterop.InteropType(Argument.Type);
+        public static string InteropType(this Argument @this) => QirCppInterop.InteropType(@this.Type);
 
-        public string? TransformerMapName() =>
-            Argument.Type switch
+        public static string? TransformerMapName(this Argument @this) =>
+            @this.Type switch
             {
-                DataType.ArrayType => QirCppInterop.TransformerMapName(Argument.ArrayType),
-                _ => QirCppInterop.TransformerMapName(Argument.Type)
+                DataType.ArrayType => QirCppInterop.TransformerMapName(@this.ArrayType),
+                _ => QirCppInterop.TransformerMapName(@this.Type)
             };
-
-        public DataType Type => Argument.Type;
     }
 
-    internal class CppEntryPointOperation
+    internal static class EntryPointOperationCppExtension
     {
-        public List<CppArgument> Arguments;
+        public static bool ContainsArgumentType(this EntryPointOperation @this, DataType type) =>
+            @this.Arguments.Where(arg => arg.Type == type).Any();
 
-        private readonly EntryPointOperation EntryPoint;
-
-        public CppEntryPointOperation(EntryPointOperation entryPointOperation)
-        {
-            EntryPoint = entryPointOperation;
-            Arguments = entryPointOperation.Arguments.Select(arg => new CppArgument(arg)).ToList();
-        }
-
-        public bool ContainsArgumentType(DataType type) => Arguments.Where(arg => arg.Type == type).Any();
-
-        public bool ContainsArrayType(DataType type) => Arguments.Where(arg => arg.ArrayType == type).Any();
-
-        public string Name => EntryPoint.Name;
+        public static bool ContainsArrayType(this EntryPointOperation @this, DataType type) =>
+            @this.Arguments.Where(arg => arg.ArrayType == type).Any();
     }
 }

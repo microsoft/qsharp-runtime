@@ -37,18 +37,28 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 #include ""CLI11.hpp""
 
 #include ""QirRuntime.hpp""
-
 #include ""QirContext.hpp""
+
 #include ""SimFactory.hpp""
 
 using namespace Microsoft::Quantum;
 using namespace std;
 
-int main(int argc, char* argv[])
-{
-    return 0;
-}
-");
+extern ""C"" void ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
+            this.Write("(\r\n");
+ for (int i = 0; i < EntryPoint.Arguments.Count; i++) {
+    var arg = EntryPoint.Arguments[i];
+    var isLastArg = i == (EntryPoint.Arguments.Count-1); 
+            this.Write("    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
+            this.Write(" ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture((isLastArg) ? "" : ","));
+            this.Write("\r\n");
+ } 
+            this.Write("); // QIR interop function.\r\n\r\nint main(int argc, char* argv[])\r\n{\r\n    return 0;" +
+                    "\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
