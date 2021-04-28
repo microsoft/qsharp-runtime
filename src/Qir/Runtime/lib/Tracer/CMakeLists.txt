@@ -27,7 +27,7 @@ target_link_libraries(Microsoft.Quantum.Qir.Tracer
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
 )
-add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
+add_dependencies(Microsoft.Quantum.Qir.Tracer Microsoft.Quantum.Qir.Runtime)
 
 target_include_directories(Microsoft.Quantum.Qir.Tracer PUBLIC ${includes})
 target_compile_definitions(Microsoft.Quantum.Qir.Tracer PRIVATE EXPORT_QIR_API)

@@ -7,6 +7,8 @@
 
 #include "CoreTypes.hpp"
 
+    extern "C" QIR_SHARED_API void InitializeQirContextEx(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
+
 namespace Microsoft
 {
 namespace Quantum
