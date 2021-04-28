@@ -11,8 +11,6 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
     {
         public Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
 
-        public string GenerateString(EntryPointOperation entryPoint);
-
         public string GetCommandLineArguments(EntryPointOperation entryPoint);
     }
 }

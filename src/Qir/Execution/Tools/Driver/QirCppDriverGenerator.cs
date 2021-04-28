@@ -20,16 +20,11 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 
         public async Task GenerateAsync(EntryPointOperation entryPointOperation, Stream stream)
         {
-            var cppSource = GenerateString(entryPointOperation);
+            var qirCppDriver = new QirCppDriver(entryPointOperation, SimulatorInitalizer);
+            var cppSource = qirCppDriver.TransformText();
             await stream.WriteAsync(Encoding.UTF8.GetBytes(cppSource));
             await stream.FlushAsync();
             stream.Position = 0;
-        }
-
-        public string GenerateString(EntryPointOperation entryPointOperation)
-        {
-            var qirCppDriver = new QirCppDriver(entryPointOperation, SimulatorInitalizer);
-            return qirCppDriver.TransformText();
         }
 
         public string GetCommandLineArguments(EntryPointOperation entryPoint) => throw new NotImplementedException();

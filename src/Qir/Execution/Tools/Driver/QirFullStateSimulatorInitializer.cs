@@ -11,21 +11,10 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public class QirFullStateSimulatorInitializer : IQirSimulatorInitializer
     {
-        public async Task GenerateAsync(Stream stream)
-        {
-            var simulatorInitializerSourceCode = this.GenerateString();
-            await stream.WriteAsync(Encoding.UTF8.GetBytes(simulatorInitializerSourceCode));
-            await stream.FlushAsync();
-            stream.Position = 0;
-        }
-        public string GenerateString()
-        {
-            // TODO: Implement.
-            return String.Empty;
-        }
+        // TODO: Implement.
+        public IList<string> GenerateSourceCode() => new List<string>();
 
         public IList<string> Headers => new List<string> {
-                "QirContext.hpp",
                 "SimFactory.hpp"
             };
 

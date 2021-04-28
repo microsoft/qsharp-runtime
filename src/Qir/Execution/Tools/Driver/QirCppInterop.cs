@@ -12,21 +12,21 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     internal static class QirCppInterop
     {
-        public static string? CliOptionVariableDefaultValue(DataType? dataType) =>
+        public static string? CliOptionTransformerMapName(DataType? dataType) =>
             dataType switch
             {
-                DataType.BoolType => "0x0",
-                DataType.IntegerType => "0",
-                DataType.DoubleType => "0.0",
-                DataType.PauliType => "PauliId::PauliId_I",
+                DataType.BoolType => "BoolAsCharMap",
+                DataType.IntegerType => null,
+                DataType.DoubleType => null,
+                DataType.PauliType => "PauliMap",
                 DataType.RangeType => null,
-                DataType.ResultType => "0x0",
+                DataType.ResultType => "ResultAsCharMap",
                 DataType.StringType => null,
                 DataType.ArrayType => null,
                 _ => throw new ArgumentException($"Invalid data type: {dataType}")
             };
 
-        public static string CliOptionVariableType(DataType? dataType) =>
+        public static string CliOptionType(DataType? dataType) =>
             dataType switch
             {
                 DataType.BoolType => "char",
@@ -40,31 +40,45 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
                 _ => throw new ArgumentException($"Invalid data type: {dataType}")
             };
 
-        public static string InteropType(DataType dataType) =>
+        public static string? CliOptionTypeToInteropTypeTranslator(DataType? dataType) =>
+            dataType switch
+            {
+                DataType.BoolType => null,
+                DataType.IntegerType => null,
+                DataType.DoubleType => null,
+                DataType.PauliType => "TranslatePauliToChar",
+                DataType.RangeType => "TranslateRangeTupleToInteropRangePointer",
+                DataType.ResultType => null,
+                DataType.StringType => "TranslateStringToCharBuffer",
+                DataType.ArrayType => throw new NotSupportedException($"{DataType.ArrayType} does not match to a specific CLI option variable type"),
+                _ => throw new ArgumentException($"Invalid data type: {dataType}")
+            };
+
+        public static string? CliOptionVariableDefaultValue(DataType? dataType) =>
+            dataType switch
+            {
+                DataType.BoolType => "InteropFalseAsChar",
+                DataType.IntegerType => "0",
+                DataType.DoubleType => "0.0",
+                DataType.PauliType => "PauliId::PauliId_I",
+                DataType.RangeType => null,
+                DataType.ResultType => "InteropResultZeroAsChar",
+                DataType.StringType => null,
+                DataType.ArrayType => null,
+                _ => throw new ArgumentException($"Invalid data type: {dataType}")
+            };
+
+        public static string InteropType(DataType? dataType) =>
             dataType switch
             {
                 DataType.BoolType => "char",
                 DataType.IntegerType => "int64_t",
-                DataType.DoubleType => "double",
+                DataType.DoubleType => "double_t",
                 DataType.PauliType => "char",
                 DataType.RangeType => "InteropRange*",
                 DataType.ResultType => "char",
                 DataType.StringType => "const char*",
                 DataType.ArrayType => "InteropArray*",
-                _ => throw new ArgumentException($"Invalid data type: {dataType}")
-            };
-
-        public static string? TransformerMapName(DataType? dataType) =>
-            dataType switch
-            {
-                DataType.BoolType => "BoolAsCharMap",
-                DataType.IntegerType => null,
-                DataType.DoubleType => null,
-                DataType.PauliType => "PauliMap",
-                DataType.RangeType => null,
-                DataType.ResultType => "ResultAsCharMap",
-                DataType.StringType => null,
-                DataType.ArrayType => null,
                 _ => throw new ArgumentException($"Invalid data type: {dataType}")
             };
     }
@@ -84,30 +98,30 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
             return @this.Name.Length == 1 ? $"-{@this.Name}" : $"--{@this.Name}";
         }
 
+        public static string? CliOptionTransformerMapName(this Argument @this) =>
+            @this.Type switch
+            {
+                DataType.ArrayType => QirCppInterop.CliOptionTransformerMapName(@this.ArrayType),
+                _ => QirCppInterop.CliOptionTransformerMapName(@this.Type)
+            };
+
+        public static string CliOptionType(this Argument @this) =>
+            @this.Type switch
+            {
+                DataType.ArrayType => $"vector<{QirCppInterop.CliOptionType(@this.ArrayType)}>",
+                _ => QirCppInterop.CliOptionType(@this.Type)
+            };
+
         public static string CliOptionVariableName(this Argument @this) => $"{@this.Name}Cli";
 
         public static string? CliOptionVariableDefaultValue(this Argument @this) => 
             QirCppInterop.CliOptionVariableDefaultValue(@this.Type);
-
-        public static string CliOptionVariableType(this Argument @this) =>
-            @this.Type switch
-            {
-                DataType.ArrayType => $"vector<{QirCppInterop.CliOptionVariableType(@this.ArrayType)}>",
-                _ => QirCppInterop.CliOptionVariableType(@this.Type)
-            };
 
         public static string IntermediateVariableName(this Argument @this) => $"{@this.Name}Intermediate";
 
         public static string InteropVariableName(this Argument @this) => $"{@this.Name}Interop";
 
         public static string InteropType(this Argument @this) => QirCppInterop.InteropType(@this.Type);
-
-        public static string? TransformerMapName(this Argument @this) =>
-            @this.Type switch
-            {
-                DataType.ArrayType => QirCppInterop.TransformerMapName(@this.ArrayType),
-                _ => QirCppInterop.TransformerMapName(@this.Type)
-            };
     }
 
     internal static class EntryPointOperationCppExtension
