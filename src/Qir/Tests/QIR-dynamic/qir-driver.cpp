@@ -20,6 +20,8 @@ extern "C" void Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__body(co
 extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterTest__body(); // NOLINT
 extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__body(const void*); // NOLINT
 
+extern "C" void Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__body(); // NOLINT
+
 using namespace Microsoft::Quantum;
 
 TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
@@ -159,3 +161,11 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     // Remove the file, ignore the failure:
     (void) remove(filePath);
 }
+
+
+TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
+{
+    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+
+    Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__body();
+} // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
