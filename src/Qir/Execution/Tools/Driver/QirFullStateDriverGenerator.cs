@@ -4,7 +4,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
@@ -15,9 +15,9 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
             await Task.Run(() => QirDriverGeneration.GenerateQirDriverCpp(entryPoint, stream));
         }
 
-        public string GetCommandLineArguments(EntryPointOperation entryPoint)
+        public string GetCommandLineArguments(ExecutionInformation executionInformation)
         {
-            return QirDriverGeneration.GenerateCommandLineArguments(entryPoint.Arguments);
+            return QirDriverGeneration.GenerateCommandLineArguments(executionInformation);
         }
     }
 }
