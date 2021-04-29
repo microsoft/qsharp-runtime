@@ -3,7 +3,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
@@ -21,9 +21,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         /// <summary>
         /// Runs the executable.
         /// </summary>
-        /// <param name="entryPoint">Entry point operation.</param>
+        /// <param name="executionInformation">Execution information to run the executable with..</param>
         /// <param name="output">Stream to which output will be written.</param>
         /// <returns></returns>
-        Task RunAsync(EntryPointOperation entryPoint, Stream output);
+        Task RunAsync(ExecutionInformation executionInformation, Stream output);
     }
 }

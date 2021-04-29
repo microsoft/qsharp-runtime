@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools.Driver;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
@@ -80,9 +80,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectory, includeDirectory, LinkLibraries);
         }
 
-        public async Task RunAsync(EntryPointOperation entryPoint, Stream output)
+        public async Task RunAsync(ExecutionInformation executionInformation, Stream output)
         {
-            var stringArguments = driverGenerator.GetCommandLineArguments(entryPoint);
+            var stringArguments = driverGenerator.GetCommandLineArguments(executionInformation);
             await runner.RunExecutableAsync(ExecutableFile, output, stringArguments);
         }
 
