@@ -74,7 +74,7 @@ Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
-Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Qir.Runtime.Experimental.nuspec'
+Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Experimental.Qir.Runtime.nuspec'
 
 if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."
