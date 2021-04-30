@@ -57,6 +57,8 @@ foreach ( $path in $libraryPaths )
 # Go through each input file in the test cases folder.
 Get-ChildItem $testCasesFolder -Filter *.in |
 Foreach-Object {
+Write-Host $_.BaseName
+
     # Get the paths to the output and error files to pass to the QIR controller.
     $outputFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".out"))
     $errorFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".err"))
@@ -80,22 +82,21 @@ Foreach-Object {
         else {
             Write-Host "##[info]Test case '$($_.BaseName)' passed"
         }
-        continue;
-    }
-
-    $expectedError = Get-Content -Path $expectedErrorFile -Raw
-    $actualError = Get-Content -Path $errorFile -Raw
-    if (-not ($expectedError -ceq $actualError)) {
-        Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
-        Write-Host "##[info]Expected error:"
-        Write-Host $expectedError
-        Write-Host "##[info]Actual error:"
-        Write-Host $actualError
-        $script:all_ok = $False
-        continue
     }
     else {
-        Write-Host "##[info]Test case '$($_.BaseName)' passed"
+        $expectedError = Get-Content -Path $expectedErrorFile -Raw
+        $actualError = Get-Content -Path $errorFile -Raw
+        if (-not ($expectedError -ceq $actualError)) {
+            Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
+            Write-Host "##[info]Expected error:"
+            Write-Host $expectedError
+            Write-Host "##[info]Actual error:"
+            Write-Host $actualError
+            $script:all_ok = $False
+        }
+        else {
+            Write-Host "##[info]Test case '$($_.BaseName)' passed"
+        }
     }
 }
 
