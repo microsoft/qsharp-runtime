@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Model;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
-using QirExecutionWrapperSerialization = Microsoft.Quantum.QsCompiler.BondSchemas.QirExecutionWrapper.Protocols;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir
 {
@@ -31,14 +31,17 @@ namespace Microsoft.Quantum.Qir
                 // Step 1: Parse input.
                 logger.LogInfo("Parsing input.");
                 using var inputFileStream = inputFile.OpenRead();
-                var input = QirExecutionWrapperSerialization.DeserializeFromFastBinary(inputFileStream);
+                var input = Protocols.DeserializeQirExecutionWrapperFromFastBinary(inputFileStream);
 
                 // Step 2: Create executable.
                 logger.LogInfo("Creating executable.");
+
+                // For now, only the first execution is used.
+                var executionInfo = input.Executions[0];
                 var bytecodeArray = input.QirBytecode.Array.Skip(input.QirBytecode.Offset).Take(input.QirBytecode.Count).ToList().ToArray();
                 var executableFile = new FileInfo(Path.Combine(BinaryDirectoryPath, ExecutableName));
                 var executable = new QirFullStateExecutable(executableFile, bytecodeArray, logger);
-                await executable.BuildAsync(input.EntryPoint, libraryDirectory, includeDirectory);
+                await executable.BuildAsync(executionInfo.EntryPoint, libraryDirectory, includeDirectory);
 
                 // Step 3: Run executable.
                 if (outputFile.Exists)
@@ -46,7 +49,7 @@ namespace Microsoft.Quantum.Qir
                     outputFile.Delete();
                 }
                 using var outputStream = outputFile.OpenWrite();
-                await executable.RunAsync(input.EntryPoint, outputStream);
+                await executable.RunAsync(executionInfo, outputStream);
             }
             catch (Exception e)
             {
