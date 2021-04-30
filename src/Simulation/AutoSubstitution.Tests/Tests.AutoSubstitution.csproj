@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>Tests.Microsoft.Quantum.AutoEmulation</AssemblyName>
+    <AssemblyName>Tests.Microsoft.Quantum.AutoSubstitution</AssemblyName>
     <IsPackable>false</IsPackable>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\AutoEmulation\Substitution.qs">
+    <None Include="..\AutoSubstitution\Substitution.qs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\Core.qs">
@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AutoEmulation\AutoEmulation.csproj" />
+    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" />
   </ItemGroup>
 
 </Project>

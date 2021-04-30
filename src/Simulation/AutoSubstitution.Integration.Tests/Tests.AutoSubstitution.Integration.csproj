@@ -9,6 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Quantum.Xunit" Version="0.16.2104138281-beta" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <ProjectReference Include="..\AutoEmulation\AutoEmulation.csproj" IsQscReference="true" />
+    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" IsQscReference="true" />
   </ItemGroup>
 </Project>
