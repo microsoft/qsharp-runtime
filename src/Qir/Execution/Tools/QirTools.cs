@@ -28,13 +28,13 @@ namespace Microsoft.Quantum.Qir.Tools
         {
             if (!CompilationLoader.ReadBinary(qsharpDll.FullName, out var syntaxTree))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Unable to read the Q# syntax tree from the given DLL.");
             }
 
             using var qirContentStream = new MemoryStream();
             if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("The given DLL does not contain QIR byte code.");
             }
 
             var tasks = syntaxTree.EntryPoints.Select(entryPoint =>
