@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\Common\AssemblyCommon.props" />
 
@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ProjectUrl>https://docs.microsoft.com/quantum/</ProjectUrl>
-    <PackageReleaseNotes>See: https://docs.microsoft.com/quantum/relnotes/</PackageReleaseNotes>
+    <ProjectUrl>https://docs.microsoft.com/azure/quantum/</ProjectUrl>
+    <PackageReleaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/qsharp-runtime</PackageProjectUrl>
     <PackageTags>Azure Quantum Q# QSharp</PackageTags>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.0.1" />
-    <PackageReference Include="Azure.Identity" Version="1.1.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.2.0" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.21" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure" Version="3.3.19" />

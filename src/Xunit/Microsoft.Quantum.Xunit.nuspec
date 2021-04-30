@@ -8,13 +8,13 @@
     <owners>QuantumEngineering, Microsoft</owners>
 
     <license type="expression">MIT</license>
-    <projectUrl>https://docs.microsoft.com/en-us/quantum</projectUrl>
+    <projectUrl>https://docs.microsoft.com/azure/quantum</projectUrl>
     <icon>images\qdk-nuget-icon.png</icon>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Library for testing Q# programs and algorithms using the xUnit framework.</description>
 
-    <releaseNotes>See: https://docs.microsoft.com/en-us/quantum/relnotes/</releaseNotes>
+    <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
 
     <copyright>$copyright$</copyright>
     <tags>Quantum Q# QSharp test xunit</tags>
@@ -22,7 +22,7 @@
     <dependencies>
       <dependency id="xunit" version="2.3.1" />
       <dependency id="Microsoft.NET.Test.Sdk" version="15.3.0" />
-      <dependency id="Microsoft.Quantum.Runtime.Core" version="0.15.210222838-alpha" />
+      <dependency id="Microsoft.Quantum.Runtime.Core" version="0.16.2104138281-beta" />
     </dependencies>
   </metadata>
 

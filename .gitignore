@@ -24,7 +24,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Dd]rops/
-**/qir-gen.ll
+[Dd]ocs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

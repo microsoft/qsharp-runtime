@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Random {
     /// interval from `min` to `max` with uniform probability.
     ///
     /// # Remarks
-    /// Fails if `max <= min`.
+    /// Fails if `max < min`.
     ///
     /// # Example
     /// The following Q# snippet randomly draws an angle between $0$ and $2 \pi$:
@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Random {
     function ContinuousUniformDistribution(
         min : Double, max : Double
     ) : ContinuousDistribution {
-        Fact(max > min, $"Max must be larger than min, but {max} <= {min}.");
+        Fact(max >= min, $"Max must be greater than or equal to min, but {max} < {min}.");
         return ContinuousDistribution(Delay(DrawRandomDouble, (min, max), _));
     }
 
@@ -52,7 +52,7 @@ namespace Microsoft.Quantum.Random {
     /// range from `min` to `max` with uniform probability.
     ///
     /// # Remarks
-    /// Fails if `max <= min`.
+    /// Fails if `max < min`.
     ///
     /// # Example
     /// The following Q# snippet randomly rolls a six-sided die:
@@ -64,7 +64,7 @@ namespace Microsoft.Quantum.Random {
     /// # See Also
     /// - Microsoft.Quantum.DrawRandomDouble
     function DiscreteUniformDistribution(min : Int, max : Int) : DiscreteDistribution {
-        Fact(max > min, $"Max must be larger than min, but {max} <= {min}.");
+        Fact(max >= min, $"Max must be greater than or equal to min, but {max} < {min}.");
         return DiscreteDistribution(Delay(DrawRandomInt, (min, max), _));
     }
 

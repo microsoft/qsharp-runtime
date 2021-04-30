@@ -26,6 +26,8 @@ $artifacts = @{
         "Microsoft.Quantum.QSharp.Core",
         "Microsoft.Quantum.Type1.Core",
         "Microsoft.Quantum.Type2.Core",
+        "Microsoft.Quantum.Type3.Core",
+        "Microsoft.Quantum.QSharp.Foundation"
         "Microsoft.Quantum.Runtime.Core",
         "Microsoft.Quantum.Simulators",
         "Microsoft.Quantum.Xunit"
@@ -41,6 +43,7 @@ $artifacts = @{
         ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
         ".\src\Simulation\Type1Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type1.Core.dll",
         ".\src\Simulation\Type2Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type2.Core.dll",
+        ".\src\Simulation\Type3Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type3.Core.dll",
         ".\src\Simulation\QSharpFoundation\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Foundation.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
@@ -49,7 +52,11 @@ $artifacts = @{
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
     
     Native = @(
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulator.Runtime.dll"
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulator.Runtime.dll",
+        ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.QSharp.Core.dll",
+        ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.QSharp.Foundation.dll",
+        ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.Runtime.dll",
+        ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.Tracer.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
 }
 

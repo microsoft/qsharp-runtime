@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.Quantum.Qir.Runtime</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Microsoft</authors>
+    <owners>QuantumEngineering, Microsoft</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://docs.microsoft.com/azure/quantum</projectUrl>
+    <icon>images\qdk-nuget-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Native libraries for linking and executing Quantum Intermediate Representation.</description>
+    <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Quantum Q# QSharp QIR native</tags>
+  </metadata>
+  <files>
+    <file src="..\drops\bin\**\*" target="runtimes" />
+    <file src="..\drops\include\*" target="runtimes/any/native/include" />
+    <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
+  </files>
+</package>
