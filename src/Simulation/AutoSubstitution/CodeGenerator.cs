@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
         ///         if (sim0 != null) alternative0 = __Factory__.Get&lt;Microsoft.Quantum.Intrinsic.CCNOT&gt;(typeof(Microsoft.Quantum.Intrinsic.CCNOT));
         ///       }
         ///
-        ///       public override Func<(Qubit, Qubit, Qubit), QVoid> __Body__ => args => {
+        ///       public override Func&lt;(Qubit, Qubit, Qubit), QVoid&gt; __Body__ =&gt; args =&gt; {
         ///         if (sim0 != null) return alternative0.__Body__(args);
         ///         else return base.__Body__(args);
         ///       }

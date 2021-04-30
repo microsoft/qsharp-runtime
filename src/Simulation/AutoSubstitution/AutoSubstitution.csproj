@@ -1,4 +1,6 @@
 <Project Sdk="Microsoft.Quantum.Sdk/0.16.2104138281-beta">
+  <Import Project="..\Common\AssemblyCommon.props" />
+  <Import Project="..\Common\DebugSymbols.props" />
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -6,17 +8,7 @@
     <Nullable>Enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageId>Microsoft.Quantum.AutoSubstitution</PackageId>
-    <Authors>Microsoft</Authors>
-    <Description>Code generation for target substitution.</Description>
-    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
-    <EmbedAllSources>true</EmbedAllSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb;.xml</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <AssemblyName>Microsoft.Quantum.AutoSubstitution</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
