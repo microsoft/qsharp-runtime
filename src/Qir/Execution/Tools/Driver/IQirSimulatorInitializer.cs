@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public interface IQirSimulatorInitializer
     {
-        public IList<string> GenerateSourceCode();
+        public string Generate();
 
         public IList<string> Headers { get; }
 

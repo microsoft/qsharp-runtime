@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <Compile Update="Driver\QirCppDriver.cs">
-      <DesignTime>False</DesignTime>
+      <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppDriver.tt</DependentUpon>
     </Compile>

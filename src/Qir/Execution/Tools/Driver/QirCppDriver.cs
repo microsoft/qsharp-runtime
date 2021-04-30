@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
+    using System.IO;
     using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
     using System;
     
@@ -155,7 +156,9 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  } 
             this.Write("); // QIR interop function.\r\n\r\nint main(int argc, char* argv[])\r\n{\r\n    CLI::App " +
                     "app(\"QIR Standalone Entry Point\");\r\n\r\n    // Initialize simulator.\r\n");
- foreach (var line in SimulatorInitializer.GenerateSourceCode()) { 
+ var initializerReader = new StringReader(SimulatorInitializer.Generate());
+   string line;
+   while((line = initializerReader.ReadLine()) != null) { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(line));
             this.Write("\r\n");
