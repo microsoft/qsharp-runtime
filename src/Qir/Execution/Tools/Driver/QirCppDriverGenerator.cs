@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
@@ -27,6 +27,6 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
             stream.Position = 0;
         }
 
-        public string GetCommandLineArguments(EntryPointOperation entryPoint) => throw new NotImplementedException();
+        public string GetCommandLineArguments(ExecutionInformation executionInformation) => throw new NotImplementedException();
     }
 }

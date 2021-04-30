@@ -8,7 +8,7 @@ using System.Text;
 using Xunit;
 
 using Microsoft.Quantum.Qir.Tools.Driver;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Tests.Microsoft.Quantum.Qir.Tools
 {
@@ -28,7 +28,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
                     new EntryPointOperation
                     {
                         Name = "UseResultArg",
-                        Arguments = new List<Argument>{new Argument{ Name = "ResultArg", Type = DataType.ResultType}}
+                        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArg", Type = DataType.ResultType}}
                     }
                 }
             };

@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
         public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream) =>
             await DriverGenerator.GenerateAsync(entryPoint, stream);
 
-        public string GetCommandLineArguments(EntryPointOperation entryPoint) =>
-            DriverGenerator.GetCommandLineArguments(entryPoint);
+        public string GetCommandLineArguments(ExecutionInformation executionInformation) =>
+            DriverGenerator.GetCommandLineArguments(executionInformation);
     }
 }

@@ -10,7 +10,7 @@
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     using System.IO;
-    using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+    using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
     using System;
     
     /// <summary>
@@ -144,9 +144,9 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("\r\nextern \"C\" void ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
- for (int i = 0; i < EntryPoint.Arguments.Count; i++) {
-    var arg = EntryPoint.Arguments[i];
-    var isLastArg = i == (EntryPoint.Arguments.Count-1); 
+ for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
+    var arg = EntryPoint.Parameters[i];
+    var isLastArg = i == (EntryPoint.Parameters.Count-1); 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
             this.Write(" ");
@@ -172,10 +172,10 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
         ""File where the output produced during the simulation is written"");
 
 ");
- if (EntryPoint.Arguments.Count > 0) { 
-            this.Write("    // Add a command line option for each entry-point argument.\r\n");
+ if (EntryPoint.Parameters.Count > 0) { 
+            this.Write("    // Add a command line option for each entry-point parameter.\r\n");
  } 
- foreach (var arg in EntryPoint.Arguments) { 
+ foreach (var arg in EntryPoint.Parameters) { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionType()));
             this.Write(" ");
@@ -206,10 +206,10 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  } 
             this.Write("    // After all the options have been added, parse arguments from the command li" +
                     "ne.\r\n    CLI11_PARSE(app, argc, argv);\r\n\r\n");
- if (EntryPoint.Arguments.Count > 0) { 
+ if (EntryPoint.Parameters.Count > 0) { 
             this.Write("    // Cast parsed arguments to its interop types.\r\n");
  } 
- foreach (var arg in EntryPoint.Arguments) { 
+ foreach (var arg in EntryPoint.Parameters) { 
     var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type);
  if (arg.Type == DataType.ArrayType) { 
     var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); 
@@ -284,9 +284,9 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
     ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
- for (int i = 0; i < EntryPoint.Arguments.Count; i++) {
-    var arg = EntryPoint.Arguments[i];
-    var isLastArg = i == (EntryPoint.Arguments.Count-1); 
+ for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
+    var arg = EntryPoint.Parameters[i];
+    var isLastArg = i == (EntryPoint.Parameters.Count-1); 
             this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
             this.Write(this.ToStringHelper.ToStringWithCulture((isLastArg) ? "" : ","));

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 #nullable enable
 
@@ -85,51 +85,51 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 
     internal static class ArgumentCppExtensions
     {
-        public static string CliOptionDescription(this Argument @this) =>
+        public static string CliOptionDescription(this Parameter @this) =>
             $"Option to provide a value for the {@this.Name} parameter";
 
-        public static string CliOptionName(this Argument @this)
+        public static string CliOptionName(this Parameter @this)
         {
             if (String.IsNullOrEmpty(@this.Name))
             {
-                throw new InvalidOperationException($"Invalid argument name '{@this.Name}'");
+                throw new InvalidOperationException($"Invalid parameter name '{@this.Name}'");
             }
 
             return @this.Name.Length == 1 ? $"-{@this.Name}" : $"--{@this.Name}";
         }
 
-        public static string? CliOptionTransformerMapName(this Argument @this) =>
+        public static string? CliOptionTransformerMapName(this Parameter @this) =>
             @this.Type switch
             {
                 DataType.ArrayType => QirCppInterop.CliOptionTransformerMapName(@this.ArrayType),
                 _ => QirCppInterop.CliOptionTransformerMapName(@this.Type)
             };
 
-        public static string CliOptionType(this Argument @this) =>
+        public static string CliOptionType(this Parameter @this) =>
             @this.Type switch
             {
                 DataType.ArrayType => $"vector<{QirCppInterop.CliOptionType(@this.ArrayType)}>",
                 _ => QirCppInterop.CliOptionType(@this.Type)
             };
 
-        public static string CliOptionVariableName(this Argument @this) => $"{@this.Name}Cli";
+        public static string CliOptionVariableName(this Parameter @this) => $"{@this.Name}Cli";
 
-        public static string? CliOptionVariableDefaultValue(this Argument @this) => 
+        public static string? CliOptionVariableDefaultValue(this Parameter @this) => 
             QirCppInterop.CliOptionVariableDefaultValue(@this.Type);
 
-        public static string IntermediateVariableName(this Argument @this) => $"{@this.Name}Intermediate";
+        public static string IntermediateVariableName(this Parameter @this) => $"{@this.Name}Intermediate";
 
-        public static string InteropVariableName(this Argument @this) => $"{@this.Name}Interop";
+        public static string InteropVariableName(this Parameter @this) => $"{@this.Name}Interop";
 
-        public static string InteropType(this Argument @this) => QirCppInterop.InteropType(@this.Type);
+        public static string InteropType(this Parameter @this) => QirCppInterop.InteropType(@this.Type);
     }
 
     internal static class EntryPointOperationCppExtension
     {
         public static bool ContainsArgumentType(this EntryPointOperation @this, DataType type) =>
-            @this.Arguments.Where(arg => arg.Type == type).Any();
+            @this.Parameters.Where(arg => arg.Type == type).Any();
 
         public static bool ContainsArrayType(this EntryPointOperation @this, DataType type) =>
-            @this.Arguments.Where(arg => arg.ArrayType == type).Any();
+            @this.Parameters.Where(arg => arg.ArrayType == type).Any();
     }
 }
