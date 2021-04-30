@@ -3,7 +3,7 @@
 
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 using System;
 using System.IO;
 using System.Linq;
@@ -31,9 +31,8 @@ namespace Microsoft.Quantum.Qir.Tools
                 throw new ArgumentException();
             }
 
-            using var stream = File.OpenRead(qsharpDll.FullName);
-            using var assemblyFile = new PEReader(stream);
-            if (!AssemblyLoader.LoadQirByteCode(assemblyFile, out var qirByteCode))
+            using var qirContentStream = new MemoryStream();
+            if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
             {
                 throw new ArgumentException();
             }
@@ -45,7 +44,7 @@ namespace Microsoft.Quantum.Qir.Tools
                     Name = entryPoint.ToString()
                 };
                 var exeFileInfo = new FileInfo(entryPoint.ToString());
-                var exe = new QirFullStateExecutable(exeFileInfo, qirByteCode);
+                var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
                 return exe.BuildAsync(ep, libraryDirectory, includeDirectory);
             });
 
