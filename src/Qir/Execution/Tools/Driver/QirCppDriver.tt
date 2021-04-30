@@ -190,14 +190,13 @@ int main(int argc, char* argv[])
 <# if (EntryPoint.Parameters.Count > 0) { #>
     // Cast parsed arguments to its interop types.
 <# } #>
-<# foreach (var arg in EntryPoint.Parameters) { 
-    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type);#>
+<# foreach (var arg in EntryPoint.Parameters) { #>
 <# if (arg.Type == DataType.ArrayType) { 
     var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); #>
 <# if (arrayInteropTranslator == null) { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = CreateInteropArray(<#= arg.CliOptionVariableName() #>).get();
 <# } #>
-<# else { 
+<# else {
     var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
     var arrayInteropType = QirCppInterop.InteropType(arg.ArrayType); #>
     vector<<#= arrayInteropType #>> <#= arg.IntermediateVariableName() #>;
@@ -205,11 +204,14 @@ int main(int argc, char* argv[])
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = CreateInteropArray(<#= arg.IntermediateVariableName() #>).get();
 <# } #>
 <# } #>
-<# else if (interopTranslator == null) { #>
+<# else { 
+    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); #>
+<# if (interopTranslator == null) { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= arg.CliOptionVariableName() #>;
 <# } #>
-<# else if (interopTranslator != null) { #>
+<# else { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= interopTranslator #>(<#= arg.CliOptionVariableName() #>);
+<# } #>
 <# } #>
 
 <# } #>
@@ -219,7 +221,7 @@ int main(int argc, char* argv[])
     if (!simulationOutputFileOpt->empty())
     {
         simulationOutputFileStream.open(simulationOutputFile);
-        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
+        SetOutputStream(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 

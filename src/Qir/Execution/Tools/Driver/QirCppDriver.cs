@@ -210,7 +210,6 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("    // Cast parsed arguments to its interop types.\r\n");
  } 
  foreach (var arg in EntryPoint.Parameters) { 
-    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type);
  if (arg.Type == DataType.ArrayType) { 
     var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); 
  if (arrayInteropTranslator == null) { 
@@ -222,7 +221,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(").get();\r\n");
  } 
- else { 
+ else {
     var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
     var arrayInteropType = QirCppInterop.InteropType(arg.ArrayType); 
             this.Write("    vector<");
@@ -248,7 +247,9 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(").get();\r\n");
  } 
  } 
- else if (interopTranslator == null) { 
+ else { 
+    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); 
+ if (interopTranslator == null) { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
             this.Write(" ");
@@ -257,7 +258,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(";\r\n");
  } 
- else if (interopTranslator != null) { 
+ else { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
             this.Write(" ");
@@ -268,6 +269,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(");\r\n");
  } 
+ } 
             this.Write("\r\n");
  } 
             this.Write(@"    // Redirect the simulator output from std::cout if the --simulation-output option is present.
@@ -276,7 +278,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
     if (!simulationOutputFileOpt->empty())
     {
         simulationOutputFileStream.open(simulationOutputFile);
-        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
+        SetOutputStream(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 

@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     if (!simulationOutputFileOpt->empty())
     {
         simulationOutputFileStream.open(simulationOutputFile);
-        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
+        SetOutputStream(simulationOutputFileStream);
         simulatorOutputStream = &simulationOutputFileStream;
     }
 
