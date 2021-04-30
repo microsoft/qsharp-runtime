@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
     ///
     /// <para>
     /// This rewrite step creates custom emulators for operations that have the
-    /// `EmulateWith` attribute.  This attribute holds an alternative operation,
+    /// `SubstitutableOnTarget` attribute.  This attribute holds an alternative operation,
     /// with the same signature, as its first argument, and a simulator, for which
     /// the alternative operation should be used, as its second argument.
     /// </para>
@@ -51,13 +51,13 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
 
             // collect all callables that have an emulation attribute
             var globals = globalCallables.Where(p => p.Value.Source.CodeFile.EndsWith(".qs"))
-                                         .Where(p => p.Value.Attributes.Any(HasEmulationAttribute));
+                                         .Where(p => p.Value.Attributes.Any(HasSubstitutionAttribute));
 
             if (!globals.Any())
             {
                 diagnostics.Add(new IRewriteStep.Diagnostic {
                     Severity = DiagnosticSeverity.Info,
-                    Message = "AutoEmulation: no operations have @EmulateWith attribute",
+                    Message = "AutoEmulation: no operations have @SubstitutableOnTarget attribute",
                     Stage = IRewriteStep.Stage.Transformation
                 });
                 return true;
@@ -86,7 +86,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             var generator = new CodeGenerator(context);
             foreach (var (key, callable) in globals)
             {
-                var attributeArguments = callable.Attributes.Where(HasEmulationAttribute).Select(GetEmulationAttributeArguments);
+                var attributeArguments = callable.Attributes.Where(HasSubstitutionAttribute).Select(GetEmulationAttributeArguments);
                 foreach (var (alternativeOperation, _) in attributeArguments)
                 {
                     var period = alternativeOperation.LastIndexOf('.');
@@ -142,8 +142,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             return true;
         }
 
-        private static bool HasEmulationAttribute(QsDeclarationAttribute attribute) =>
-            attribute.TypeId.IsValue && attribute.TypeId.Item.Namespace == "Microsoft.Quantum.Core" && attribute.TypeId.Item.Name == "EmulateWith";
+        private static bool HasSubstitutionAttribute(QsDeclarationAttribute attribute) =>
+            attribute.TypeId.IsValue && attribute.TypeId.Item.Namespace == "Microsoft.Quantum.Targeting" && attribute.TypeId.Item.Name == "SubstitutableOnTarget";
 
         private static (string AlternativeOperation, string InSimulator) GetEmulationAttributeArguments(QsDeclarationAttribute attribute) =>
             attribute.Argument.Expression switch

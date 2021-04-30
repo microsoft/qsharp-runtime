@@ -2,8 +2,9 @@ namespace Microsoft.Quantum.AutoEmulation.Testing {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Measurement;
+    open Microsoft.Quantum.Targeting;
 
-    @EmulateWith("Microsoft.Quantum.Intrinsic.SWAP", "ToffoliSimulator")
+    @SubstitutableOnTarget("Microsoft.Quantum.Intrinsic.SWAP", "ToffoliSimulator")
     operation QuantumSwap(a : Qubit, b : Qubit) : Unit {
         within {
             CNOT(a, b);

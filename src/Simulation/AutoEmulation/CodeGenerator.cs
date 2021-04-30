@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// 
         /// <param name="name">Namespace and name of the callable</param>
         /// <param name="callable">Q# Callable</param>
-        /// <param name="emulationAttributes">All attribute values from @EmulateWith attributes of that callable</param>
+        /// <param name="emulationAttributes">All attribute values from @HasSubstitutionAttribute attributes of that callable</param>
         public void AddCallable(QsQualifiedName name, QsCallable callable, IEnumerable<(string AlternativeOperation, string InSimulator)> emulationAttributes)
         {
             var attributes = emulationAttributes.Select((attr, idx) => new EmulationAttribute(

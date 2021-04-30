@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             var path = CreateNewTemporaryPath();
             step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
 
-            var compilation = CreateCompilation("Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
+            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
 
             Assert.True(step.Transformation(compilation, out var transformed));
             var generatedFileName = Path.Combine(path, "__AutoEmulation__.g.cs");
@@ -56,7 +56,7 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             var path = CreateNewTemporaryPath();
             step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
 
-            var compilation = CreateCompilation("Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
+            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
 
             Assert.False(step.Transformation(compilation, out var transformed));
             Assert.Equal(2, step.GeneratedDiagnostics.Count());
