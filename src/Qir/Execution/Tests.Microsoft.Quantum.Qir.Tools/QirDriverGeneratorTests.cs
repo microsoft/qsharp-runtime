@@ -24,6 +24,14 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
                     new EntryPointOperation{Name = "UseNoArgs"}
                 },
                 {
+                    "UseBoolArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseBoolArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArg", Type = DataType.BoolType}}
+                    }
+                },
+                {
                     "UseResultArg",
                     new EntryPointOperation
                     {
@@ -35,6 +43,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
 
         [Theory]
         [InlineData("UseNoArgs")]
+        [InlineData("UseBoolArg")]
         [InlineData("UseResultArg")]
         public void GenerateFullStateSimulatorDriver(string testCase)
         {
@@ -51,7 +60,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             driverGenerator.GenerateAsync(entryPointOperation, generatedStream).Wait();
             var generatedStreamReader = new StreamReader(generatedStream, Encoding.UTF8);
             var generatedCppSourceCode = generatedStreamReader.ReadToEnd();
-            // TODO: Compare strings.
+            Assert.Equal(verificationCppSourceCode, generatedCppSourceCode);
             generatedStream.Close();
 
         }

@@ -19,18 +19,18 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-// Auxiliary functions for interop with Q# Result type.
-const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> ResultAsCharMap{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
+// Auxiliary functions for interop with Q# Bool type.
+const char InteropFalseAsChar = 0x0;
+const char InteropTrueAsChar = 0x1;
+map<string, bool> BoolAsCharMap{
+    {"0", InteropFalseAsChar},
+    {"false", InteropFalseAsChar},
+    {"1", InteropTrueAsChar},
+    {"true", InteropTrueAsChar}
 };
 
-extern "C" void UseResultArg(
-    char ResultArg
+extern "C" void UseBoolArg(
+    char BoolArg
 ); // QIR interop function.
 
 int main(int argc, char* argv[])
@@ -49,17 +49,17 @@ int main(int argc, char* argv[])
         "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
-    char ResultArgCli;
-    ResultArgCli = InteropResultZeroAsChar;
-    app.add_option("--ResultArg", ResultArgCli, "Option to provide a value for the ResultArg parameter")
+    char BoolArgCli;
+    BoolArgCli = InteropFalseAsChar;
+    app.add_option("--BoolArg", BoolArgCli, "Option to provide a value for the BoolArg parameter")
         ->required()
-        ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(BoolAsCharMap, CLI::ignore_case));
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
 
     // Cast parsed arguments to its interop types.
-    char ResultArgInterop = ResultArgCli;
+    char BoolArgInterop = BoolArgCli;
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseResultArg(
-        ResultArgInterop
+    UseBoolArg(
+        BoolArgInterop
     );
 
     // Flush the output of the simulation.
