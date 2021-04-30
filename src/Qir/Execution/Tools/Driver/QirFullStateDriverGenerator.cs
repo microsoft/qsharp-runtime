@@ -3,7 +3,8 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {

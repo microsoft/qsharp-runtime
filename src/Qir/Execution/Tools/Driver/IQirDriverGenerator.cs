@@ -3,14 +3,14 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public interface IQirDriverGenerator
     {
-        public Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
+        Task GenerateAsync(EntryPointOperation entryPoint, Stream stream);
 
-        public string GetCommandLineArguments(EntryPointOperation entryPoint);
+        string GetCommandLineArguments(ExecutionInformation executionInformation);
     }
 }

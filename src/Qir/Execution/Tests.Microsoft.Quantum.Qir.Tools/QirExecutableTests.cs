@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools.Driver;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.EntryPoint;
+using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 using Moq;
 using Xunit;
 
@@ -98,12 +98,12 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
         {
             // Set up.
             using var outputStream = new MemoryStream();
-            var entryPoint = new EntryPointOperation();
+            var execInfo = new ExecutionInformation();
             var arguments = "arguments";
-            driverGeneratorMock.Setup(obj => obj.GetCommandLineArguments(entryPoint)).Returns(arguments);
+            driverGeneratorMock.Setup(obj => obj.GetCommandLineArguments(execInfo)).Returns(arguments);
 
             // Run executable.
-            await qirExecutable.Object.RunAsync(entryPoint, outputStream);
+            await qirExecutable.Object.RunAsync(execInfo, outputStream);
 
             // Verify runner was invoked properly.
             runnerMock.Verify(obj => obj.RunExecutableAsync(executableFile, outputStream, arguments));
