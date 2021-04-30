@@ -1,4 +1,4 @@
-namespace Microsoft.Quantum.AutoEmulation.Testing {
+namespace Microsoft.Quantum.AutoSubstitution.Testing {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Measurement;

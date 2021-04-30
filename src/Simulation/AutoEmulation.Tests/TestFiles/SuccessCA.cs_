@@ -2,7 +2,7 @@ using System;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
 
-namespace AutoEmulationTests
+namespace AutoSubstitutionTests
 {
     public partial class Success
     {
@@ -18,7 +18,7 @@ namespace AutoEmulationTests
                 base.__Init__();
                 if ((sim0) != (null))
                 {
-                    alternative0 = (__Factory__.Get<AutoEmulationTests.SuccessClassical>(typeof(AutoEmulationTests.SuccessClassical)));
+                    alternative0 = (__Factory__.Get<AutoSubstitutionTests.SuccessClassical>(typeof(AutoSubstitutionTests.SuccessClassical)));
                 }
             }
 
@@ -102,7 +102,7 @@ namespace AutoEmulationTests
                 }
             }
 
-            private AutoEmulationTests.SuccessClassical alternative0 = null;
+            private AutoSubstitutionTests.SuccessClassical alternative0 = null;
             private ToffoliSimulator sim0 = null;
         }
     }

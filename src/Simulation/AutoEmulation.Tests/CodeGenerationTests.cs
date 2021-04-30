@@ -2,18 +2,18 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using Microsoft.Quantum.QsCompiler.AutoEmulation;
+using Microsoft.Quantum.QsCompiler.AutoSubstitution;
 using Microsoft.Quantum.QsCompiler.CompilationBuilder;
 using Microsoft.Quantum.QsCompiler.ReservedKeywords;
 using Microsoft.Quantum.QsCompiler.SyntaxTree;
 using Xunit;
 
-namespace Microsoft.Quantum.AutoEmulation.Testing
+namespace Microsoft.Quantum.AutoSubstitution.Testing
 {
     public class CodeGenerationTests
     {
         [Fact]
-        public void CanGenerateAutoEmulationCode()
+        public void CanGenerateAutoSubstitutionCode()
         {
             TestOneSuccessfulFile("Success");
             TestOneSuccessfulFile("SuccessA");
@@ -36,10 +36,10 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             var path = CreateNewTemporaryPath();
             step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
 
-            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
+            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Substitution.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
 
             Assert.True(step.Transformation(compilation, out var transformed));
-            var generatedFileName = Path.Combine(path, "__AutoEmulation__.g.cs");
+            var generatedFileName = Path.Combine(path, "__AutoSubstitution__.g.cs");
             Assert.True(File.Exists(generatedFileName));
 
             // uncomment, when creating files with expected content
@@ -56,7 +56,7 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
             var path = CreateNewTemporaryPath();
             step.AssemblyConstants[AssemblyConstants.OutputPath] = path;
 
-            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Emulation.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
+            var compilation = CreateCompilation(Path.Combine("TestFiles", "Core.qs"), "Substitution.qs", Path.Combine("TestFiles", $"{fileName}.qs"));
 
             Assert.False(step.Transformation(compilation, out var transformed));
             Assert.Equal(2, step.GeneratedDiagnostics.Count());
@@ -81,6 +81,6 @@ namespace Microsoft.Quantum.AutoEmulation.Testing
 
         private readonly System.Random random = new System.Random();
         private string CreateNewTemporaryPath() =>
-            Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"emulation-test-{random.Next(Int32.MaxValue)}")).FullName;
+            Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"substitution-test-{random.Next(Int32.MaxValue)}")).FullName;
     }
 }

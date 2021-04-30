@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Editing;
 using Microsoft.Quantum.QsCompiler.CsharpGeneration;
 using Microsoft.Quantum.QsCompiler.SyntaxTree;
 
-namespace Microsoft.Quantum.QsCompiler.AutoEmulation
+namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
 {
     public class CodeGenerator
     {
@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         }
 
         /// <summary>
-        /// Generates an emulation class for a given callable with a given name
+        /// Generates an substitution class for a given callable with a given name
         /// </summary>
         ///
         /// <para>
@@ -60,10 +60,10 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// 
         /// <param name="name">Namespace and name of the callable</param>
         /// <param name="callable">Q# Callable</param>
-        /// <param name="emulationAttributes">All attribute values from @HasSubstitutionAttribute attributes of that callable</param>
-        public void AddCallable(QsQualifiedName name, QsCallable callable, IEnumerable<(string AlternativeOperation, string InSimulator)> emulationAttributes)
+        /// <param name="substitutionAttributes">All attribute values from @HasSubstitutionAttribute attributes of that callable</param>
+        public void AddCallable(QsQualifiedName name, QsCallable callable, IEnumerable<(string AlternativeOperation, string InSimulator)> substitutionAttributes)
         {
-            var attributes = emulationAttributes.Select((attr, idx) => new EmulationAttribute(
+            var attributes = substitutionAttributes.Select((attr, idx) => new SubstitutionAttribute(
                 SyntaxFactory.ParseTypeName(attr.AlternativeOperation),
                 gen.IdentifierName($"alternative{idx}"),
                 SyntaxFactory.ParseTypeName(attr.InSimulator),
@@ -134,7 +134,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// <summary>
         /// Creates a syntax node for field declarations for the alternative operations
         /// </summary>
-        private SyntaxNode CreateOperationField(EmulationAttribute attr) =>
+        private SyntaxNode CreateOperationField(SubstitutionAttribute attr) =>
             gen.FieldDeclaration(
                 attr.OperationName.ToFullString(),
                 type: attr.OperationType,
@@ -144,7 +144,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// <summary>
         /// Creates a syntax node for operation field assignments in the Init() method
         /// </summary>
-        private SyntaxNode CreateOperationAssignment(EmulationAttribute attr) =>
+        private SyntaxNode CreateOperationAssignment(SubstitutionAttribute attr) =>
             gen.IfStatement(
                 condition: gen.ValueNotEqualsExpression(attr.SimulatorName, gen.NullLiteralExpression()),
                 trueStatements: new[]
@@ -170,7 +170,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// </summary>
         /// <param name="attr"></param>
         /// <returns></returns>
-        private SyntaxNode CreateSimulatorField(EmulationAttribute attr) =>
+        private SyntaxNode CreateSimulatorField(SubstitutionAttribute attr) =>
             gen.FieldDeclaration(
                 attr.SimulatorName.ToFullString(),
                 type: attr.SimulatorType,
@@ -182,7 +182,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// </summary>
         /// <param name="attr"></param>
         /// <returns></returns>
-        private SyntaxNode CreateSimulatorCast(EmulationAttribute attr) =>
+        private SyntaxNode CreateSimulatorCast(SubstitutionAttribute attr) =>
             gen.AssignmentStatement(
                 left: attr.SimulatorName,
                 right: gen.TryCastExpression(gen.IdentifierName("m"), attr.SimulatorType)
@@ -191,7 +191,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// <summary>
         /// Creates a syntax node for one specialization property
         /// </summary>
-        private SyntaxNode CreateSpecializationProperty(string specializationName, IEnumerable<EmulationAttribute> attributes, string argumentType, string returnType) =>
+        private SyntaxNode CreateSpecializationProperty(string specializationName, IEnumerable<SubstitutionAttribute> attributes, string argumentType, string returnType) =>
             gen.PropertyDeclaration(
                 specializationName,
                 type: SyntaxFactory.ParseTypeName($"Func<{argumentType}, {returnType}>"),
@@ -203,7 +203,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// Creates a syntax node for the lambda expression, returned in the
         /// `get` accessor of a specialization property
         /// </summary>
-        private SyntaxNode CreateSpecializationLambda(string specializationName, IEnumerable<EmulationAttribute> attrs) =>
+        private SyntaxNode CreateSpecializationLambda(string specializationName, IEnumerable<SubstitutionAttribute> attrs) =>
             gen.ValueReturningLambdaExpression(
                 "args",
                 new[]
@@ -215,7 +215,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
         /// Creates a syntax node for a nested if-statement for all possible
         /// operation alternatives
         /// </summary>
-        private SyntaxNode CreateSpecializationBody(string specializationName, IEnumerable<EmulationAttribute> attrs) =>
+        private SyntaxNode CreateSpecializationBody(string specializationName, IEnumerable<SubstitutionAttribute> attrs) =>
             attrs.Count() switch
             {
                 0 => gen.ReturnStatement(
@@ -265,11 +265,11 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
             ).NormalizeWhitespace().WriteTo(writer);
 
         /// <summary>
-        /// Helper struct to prepare syntax nodes for @EmulationWith attribute values
+        /// Helper struct to prepare syntax nodes for @SubstitutableOnTarget attribute values
         /// </summary>
-        private class EmulationAttribute
+        private class SubstitutionAttribute
         {
-            public EmulationAttribute(SyntaxNode operationType, SyntaxNode operationName, SyntaxNode simulatorType, SyntaxNode simulatorName)
+            public SubstitutionAttribute(SyntaxNode operationType, SyntaxNode operationName, SyntaxNode simulatorType, SyntaxNode simulatorName)
             {
                 OperationType = operationType;
                 OperationName = operationName;

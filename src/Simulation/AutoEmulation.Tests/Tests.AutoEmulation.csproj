@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\AutoEmulation\Emulation.qs">
+    <None Include="..\AutoEmulation\Substitution.qs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\Core.qs">

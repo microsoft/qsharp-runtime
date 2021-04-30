@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Microsoft.Quantum.AutoEmulation</PackageId>
+    <PackageId>Microsoft.Quantum.AutoSubstitution</PackageId>
     <Authors>Microsoft</Authors>
-    <Description>Code generation for simulator emulation.</Description>
+    <Description>Code generation for target substitution.</Description>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <EmbedAllSources>true</EmbedAllSources>
     <IncludeSymbols>true</IncludeSymbols>

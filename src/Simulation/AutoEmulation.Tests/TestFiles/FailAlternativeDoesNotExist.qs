@@ -1,4 +1,4 @@
-namespace AutoEmulationTests {
+namespace AutoSubstitutionTests {
     open Microsoft.Quantum.Targeting;
 
     @SubstitutableOnTarget("Namespace.NotExisting", "ToffoliSimulator")

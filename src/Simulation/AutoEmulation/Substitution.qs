@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Targeting
     ///
     /// # Named Items
     /// ## AlternativeOperation
-    /// Fully qualified name of alternative operation to emulate operation with.
+    /// Fully qualified name of alternative operation to substitute operation with.
     ///
     /// ## TargetName
     /// One of `QuantumSimulator`, `ToffoliSimulator`, or `ResourcesEstimator`, or a fully qualified name

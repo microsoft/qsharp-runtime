@@ -1,7 +1,7 @@
-namespace AutoEmulationTests {
+namespace AutoSubstitutionTests {
     open Microsoft.Quantum.Targeting;
 
-    @SubstitutableOnTarget("AutoEmulationTests.FailClassical", "ToffoliSimulator")
+    @SubstitutableOnTarget("AutoSubstitutionTests.FailClassical", "ToffoliSimulator")
     operation Fail(a : Int) : Unit {}
 
     operation FailClassical(a : Double) : Unit {}
