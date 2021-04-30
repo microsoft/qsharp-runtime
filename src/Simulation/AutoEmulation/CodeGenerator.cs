@@ -99,7 +99,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoEmulation
 
             var cls = gen.ClassDeclaration(
                 name.Name,
-                accessibility: callable.Modifiers.Access.IsInternal ? Accessibility.Internal : Accessibility.Public,
+                accessibility: callable.Access.IsInternal ? Accessibility.Internal : Accessibility.Public,
                 modifiers: DeclarationModifiers.Partial,
                 members: new[] { innerClass });
 
