@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.AutoSubstitution.Testing
             // uncomment, when creating files with expected content
             //File.Copy(generatedFileName, $"{fileName}.cs_", true);
 
-            Assert.Equal(File.ReadAllText(Path.Combine("TestFiles", $"{fileName}.cs_")), File.ReadAllText(generatedFileName).Replace("\r\n", "\n"));
+            Assert.Equal(File.ReadAllText(Path.Combine("TestFiles", $"{fileName}.cs_")).Replace("\r\n", "\n"), File.ReadAllText(generatedFileName).Replace("\r\n", "\n"));
 
             Directory.Delete(path, true);
         }
