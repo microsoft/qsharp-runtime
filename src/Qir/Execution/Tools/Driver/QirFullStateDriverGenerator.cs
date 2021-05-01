@@ -10,14 +10,16 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public class QirFullStateDriverGenerator: IQirDriverGenerator
     {
-        public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream)
+        private readonly QirCppDriverGenerator DriverGenerator;
+        public QirFullStateDriverGenerator()
         {
-            await Task.Run(() => QirDriverGeneration.GenerateQirDriverCpp(entryPoint, stream));
+            DriverGenerator = new QirCppDriverGenerator(new QirFullStateSimulatorInitializer());
         }
 
-        public string GetCommandLineArguments(ExecutionInformation executionInformation)
-        {
-            return QirDriverGeneration.GenerateCommandLineArguments(executionInformation);
-        }
+        public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream) =>
+            await DriverGenerator.GenerateAsync(entryPoint, stream);
+
+        public string GetCommandLineArguments(ExecutionInformation executionInformation) =>
+            DriverGenerator.GetCommandLineArguments(executionInformation);
     }
 }
