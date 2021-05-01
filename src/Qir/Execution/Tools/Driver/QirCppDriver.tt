@@ -194,15 +194,16 @@ int main(int argc, char* argv[])
 <# if (arg.Type == DataType.ArrayType) { 
     var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); #>
 <# if (arrayInteropTranslator == null) { #>
-    <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = CreateInteropArray(<#= arg.CliOptionVariableName() #>).get();
+    unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.CliOptionVariableName() #>);
 <# } #>
 <# else {
     var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
     var arrayInteropType = QirCppInterop.InteropType(arg.ArrayType); #>
     vector<<#= arrayInteropType #>> <#= arg.IntermediateVariableName() #>;
     TranslateVector<<#= arrayCliOptionType #>, <#= arrayInteropType #>>(<#= arg.CliOptionVariableName() #>, <#= arg.IntermediateVariableName() #>, <#= arrayInteropTranslator #>);
-    <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = CreateInteropArray(<#= arg.IntermediateVariableName() #>).get();
+    unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.IntermediateVariableName() #>);
 <# } #>
+    InteropArray* <#= arg.InteropVariableName() #> = <#= arg.UniquePtrVariableName() #>.get();
 <# } #>
 <# else { 
     var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); #>

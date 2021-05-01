@@ -122,6 +122,8 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
         public static string InteropVariableName(this Parameter @this) => $"{@this.Name}Interop";
 
         public static string InteropType(this Parameter @this) => QirCppInterop.InteropType(@this.Type);
+
+        public static string UniquePtrVariableName(this Parameter @this) => $"{@this.Name}UniquePtr";
     }
 
     internal static class EntryPointOperationCppExtension

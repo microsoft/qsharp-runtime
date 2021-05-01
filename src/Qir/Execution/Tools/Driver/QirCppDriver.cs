@@ -213,13 +213,11 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  if (arg.Type == DataType.ArrayType) { 
     var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); 
  if (arrayInteropTranslator == null) { 
-            this.Write("    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
-            this.Write(" ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
+            this.Write("    unique_ptr<InteropArray> ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
             this.Write(" = CreateInteropArray(");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
-            this.Write(").get();\r\n");
+            this.Write(");\r\n");
  } 
  else {
     var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
@@ -238,14 +236,17 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.IntermediateVariableName()));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayInteropTranslator));
-            this.Write(");\r\n    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
-            this.Write(" ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
+            this.Write(");\r\n    unique_ptr<InteropArray> ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
             this.Write(" = CreateInteropArray(");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.IntermediateVariableName()));
-            this.Write(").get();\r\n");
+            this.Write(");\r\n");
  } 
+            this.Write("    InteropArray* ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
+            this.Write(" = ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
+            this.Write(".get();\r\n");
  } 
  else { 
     var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); 
