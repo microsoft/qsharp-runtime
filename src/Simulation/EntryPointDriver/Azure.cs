@@ -78,12 +78,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                         ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
                     return 1;
                 case var submitter:
-                    if (settings.DryRun)
-                    {
-                        // TODO
-                        Console.WriteLine("Dry run is not supported for QIR submissions.");
-                    }
-
                     var job = await submitter.SubmitAsync(qir, entryPoint, arguments);
                     DisplayJob(job, settings.Output);
                     return 0;
