@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Azure.Quantum;
+using Microsoft.Azure.Quantum.Exceptions;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
 using Microsoft.Quantum.EntryPointDriver.Mock;
 using Microsoft.Quantum.Runtime;
@@ -37,14 +37,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             if (settings.Verbose)
             {
+                Console.WriteLine("Submitting Q# entry point.");
                 Console.Write(settings + Environment.NewLine + Environment.NewLine);
             }
 
-            switch (CreateMachine(settings))
+            switch (QSharpMachine(settings))
             {
                 case null:
                     DisplayWithColor(
-                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' was not recognized.");
+                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
                     return 1;
                 case var machine:
                     return settings.DryRun
@@ -64,11 +65,29 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> SubmitQir(
             AzureSettings settings, Stream qir, string entryPoint, IReadOnlyList<Argument> arguments)
         {
-            // TODO
-            var submitter = new NoOpQirSubmitter();
-            var job = await submitter.SubmitAsync(qir, entryPoint, arguments);
-            DisplayJob(job, settings.Output);
-            return 0;
+            if (settings.Verbose)
+            {
+                Console.WriteLine("Submitting QIR entry point.");
+                Console.Write(settings + Environment.NewLine + Environment.NewLine);
+            }
+
+            switch (QirSubmitter(settings))
+            {
+                case null:
+                    DisplayWithColor(
+                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
+                    return 1;
+                case var submitter:
+                    if (settings.DryRun)
+                    {
+                        // TODO
+                        Console.WriteLine("Dry run is not supported for QIR submissions.");
+                    }
+
+                    var job = await submitter.SubmitAsync(qir, entryPoint, arguments);
+                    DisplayJob(job, settings.Output);
+                    return 0;
+            }
         }
 
         /// <summary>
@@ -86,26 +105,25 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             try
             {
-                var job = await machine.SubmitAsync(info, input, new SubmissionContext
-                {
-                    FriendlyName = settings.JobName,
-                    Shots = settings.Shots
-                });
+                var job = await machine.SubmitAsync(
+                    info,
+                    input,
+                    new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
+
                 DisplayJob(job, settings.Output);
                 return 0;
             }
             catch (AzureQuantumException ex)
             {
                 DisplayError(
-                    "Something went wrong when submitting the program to the Azure Quantum service.", 
+                    "Something went wrong when submitting the program to the Azure Quantum service.",
                     ex.Message);
                 return 1;
             }
             catch (QuantumProcessorTranslationException ex)
             {
                 DisplayError(
-                    "Something went wrong when performing translation to the intermediate representation used by the " +
-                    "target quantum machine.",
+                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
                     ex.Message);
                 return 1;
             }
@@ -126,8 +144,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
             if (!string.IsNullOrWhiteSpace(message))
             {
-                Console.WriteLine();
-                Console.WriteLine(message);
+                Console.WriteLine(Environment.NewLine + message);
             }
             return isValid ? 0 : 1;
         }
@@ -175,22 +192,34 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static void DisplayError(string summary, string message)
         {
             DisplayWithColor(ConsoleColor.Red, Console.Error, summary);
-            Console.Error.WriteLine();
-            Console.Error.WriteLine(message);
+            Console.Error.WriteLine(Environment.NewLine + message);
         }
 
         /// <summary>
-        /// Creates a quantum machine based on the Azure Quantum submission settings.
+        /// Returns a Q# machine.
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/>.Target is null.</exception>
         /// <returns>A quantum machine.</returns>
-        private static IQuantumMachine? CreateMachine(AzureSettings settings) => settings.Target switch
+        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
+        private static IQuantumMachine? QSharpMachine(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null."),
             NoOpQuantumMachine.TargetId => new NoOpQuantumMachine(),
             ErrorQuantumMachine.TargetId => new ErrorQuantumMachine(),
             _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
+        };
+
+        /// <summary>
+        /// Returns a QIR submitter.
+        /// </summary>
+        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <returns>A QIR submitter.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
+        private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
+        {
+            null => throw new ArgumentNullException(nameof(settings), "Target is null"),
+            NoOpQirSubmitter.TargetId => new NoOpQirSubmitter(),
+            _ => null // TODO
         };
 
         /// <summary>
