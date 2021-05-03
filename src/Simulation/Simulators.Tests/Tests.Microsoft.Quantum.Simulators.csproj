@@ -10,15 +10,23 @@
   <ItemGroup>
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj" />
-    <ProjectReference Include="TestProjects\QirExe\QirExe.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="TestProjects\QirExe\QirExe.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <ItemGroup>
+      <QSharpExeOutput Include="TestProjects\QSharpExe\bin\$(Configuration)\$(TargetFramework)\*" />
+      <QirExeOutput Include="TestProjects\QirExe\bin\$(Configuration)\$(TargetFramework)\*" />
       <TargetedExeOutput Include="TestProjects\TargetedExe\bin\$(Configuration)\$(TargetFramework)\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(TargetedExeOutput)" DestinationFolder="$(OutputPath)\TestTargetedExe" ContinueOnError="false" />
+
+    <Copy SourceFiles="@(QSharpExeOutput)" DestinationFolder="$(OutputPath)\TestProjects\QSharpExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(QirExeOutput)" DestinationFolder="$(OutputPath)\TestProjects\QirExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(TargetedExeOutput)" DestinationFolder="$(OutputPath)\TestProjects\TargetedExe" ContinueOnError="false" />
   </Target>
 </Project>
