@@ -557,7 +557,9 @@ let ``Submit can show only the ID`` () =
 let ``Submit uses default values`` () =
     let given = test "Returns Unit"
     given (submitWithNoOpTarget @ ["--verbose"])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -577,7 +579,9 @@ let ``Submit uses default values`` () =
 let ``Submit uses default values with default target`` () =
     let given = testWithTarget "test.noop" "Returns Unit"
     given (submitWithoutTarget @ ["--verbose"])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -609,7 +613,9 @@ let ``Submit allows overriding default values`` () =
         "--shots"
         "750"
     ])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -641,7 +647,9 @@ let ``Submit allows overriding default values with default target`` () =
         "--shots"
         "750"
     ])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -676,7 +684,9 @@ let ``Submit allows to include --base-uri option when --location is not present`
         "--base-uri"
         "myBaseUri"
     ])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -700,7 +710,9 @@ let ``Submit allows to include --location option when --base-uri is not present`
         "--location"
         "myLocation"
     ])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -724,7 +736,9 @@ let ``Submit allows spaces for the --location option`` () =
         "--location"
         "My Location"
     ])
-    |> yields "Subscription: mySubscription
+    |> yields "Submitting Q# entry point.
+
+               Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -760,7 +774,7 @@ let ``Submit requires a positive number of shots`` () =
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test "Returns Unit"
-    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' is not recognized."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
