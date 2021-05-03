@@ -57,9 +57,9 @@ foreach ( $path in $libraryPaths )
 # Go through each input file in the test cases folder.
 Get-ChildItem $testCasesFolder -Filter *.in |
 Foreach-Object {
-Write-Host $_.BaseName
 
     # Get the paths to the output and error files to pass to the QIR controller.
+    $testPassed = $True
     $outputFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".out"))
     $errorFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".err"))
     dotnet run --project $controllerProject -- --input $_.FullName --output $outputFile --error $errorFile --includeDirectory $includeDirectory --libraryDirectory $libraryDirectory
@@ -77,13 +77,10 @@ Write-Host $_.BaseName
             Write-Host $expectedOutput
             Write-Host "##[info]Actual output:"
             Write-Host $actualOutput
-            $script:all_ok = $False
-        }
-        else {
-            Write-Host "##[info]Test case '$($_.BaseName)' passed"
+            $testPassed = $False
         }
     }
-    else {
+    if ((Test-Path $expectedErrorFile)) {
         $expectedError = Get-Content -Path $expectedErrorFile -Raw
         $actualError = Get-Content -Path $errorFile -Raw
         if (-not ($expectedError -ceq $actualError)) {
@@ -92,11 +89,15 @@ Write-Host $_.BaseName
             Write-Host $expectedError
             Write-Host "##[info]Actual error:"
             Write-Host $actualError
-            $script:all_ok = $False
+            $testPassed = $False
         }
-        else {
-            Write-Host "##[info]Test case '$($_.BaseName)' passed"
-        }
+    }
+
+    if ($testPassed) {
+        Write-Host "##[info]Test case '$($_.BaseName)' passed"
+    }
+    else {
+        $script:all_ok = $False
     }
 }
 
