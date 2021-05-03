@@ -7,7 +7,6 @@ using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools
