@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void BasicExecutionTargetedExe()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var exe = Path.Combine(asmPath!, "TargetedExe", "TargetedExe.dll");
+            var exe = Path.Combine(asmPath, "TestTargetedExe", "TargetedExe.dll");
 
             ProcessRunner.Run("dotnet", exe, out StringBuilder output, out StringBuilder error, out int exitCode, out Exception ex);
 

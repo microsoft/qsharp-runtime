@@ -19,6 +19,6 @@
     <ItemGroup>
       <TargetedExeOutput Include="TestProjects\TargetedExe\bin\$(Configuration)\$(TargetFramework)\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(TargetedExeOutput)" DestinationFolder="$(OutputPath)\TargetedExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(TargetedExeOutput)" DestinationFolder="$(OutputPath)\TestTargetedExe" ContinueOnError="false" />
   </Target>
 </Project>
