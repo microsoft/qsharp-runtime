@@ -1,7 +1,7 @@
 add_executable(fullstate-simulator-tests
   FullstateSimulatorTests.cpp)
 
-target_source_from_qir(fullstate-simulator-tests qsharp/qir/qir-test-simulator.ll)
+target_source_from_qir(fullstate-simulator-tests qsharp/obj/qsharp/qir-test-simulator.bc)
 
 target_link_libraries(fullstate-simulator-tests PUBLIC
   "-L${runtime_lib_path}"

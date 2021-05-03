@@ -9,16 +9,13 @@ namespace Microsoft.Quantum.Testing.QIR
     operation QuantumRandomNumberGenerator() : Int {
        mutable randomNumber = 0;
 
-       for (i in 1 .. 64)
-       {
-           using(q = Qubit())
-           {
-               H(q);
-               set randomNumber = randomNumber <<< 1;
-               if (M(q) == One) {
-                   set randomNumber += 1;
-               }
-           }
+       for i in 1 .. 64 {
+            use q = Qubit();
+            H(q);
+            set randomNumber = randomNumber <<< 1;
+            if M(q) == One {
+                set randomNumber += 1;
+            }
        }
        return randomNumber;
    } 
