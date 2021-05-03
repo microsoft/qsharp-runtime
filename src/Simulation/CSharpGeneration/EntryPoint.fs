@@ -167,6 +167,7 @@ let private submitMethod context entryPoint parameters =
     let settingsParamName = "settings"
 
     let qsArgs =
+        lazy
         [
             ident settingsParamName :> ExpressionSyntax
             ident callableName <|.|> ident "Info"
@@ -174,20 +175,22 @@ let private submitMethod context entryPoint parameters =
         ]
 
     let qirStream =
+        lazy
         ident "global::System.Reflection.Assembly"
         <.> (ident "GetExecutingAssembly", [])
         <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
 
     let qirArgs =
+        lazy
         [
             ident settingsParamName :> ExpressionSyntax
-            qirStream
+            qirStream.Value
             string entryPoint.FullName |> literal
             qirArguments parameters (ident parseResultParamName)
         ]
 
     let hasQir = context.assemblyConstants.ContainsKey "QirOutputPath"
-    let submit = if hasQir then ident "SubmitQir", qirArgs else ident "SubmitQSharp", qsArgs
+    let submit = if hasQir then ident "SubmitQir", qirArgs.Value else ident "SubmitQSharp", qsArgs.Value
 
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
         ``(``
