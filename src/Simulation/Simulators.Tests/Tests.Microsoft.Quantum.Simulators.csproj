@@ -17,6 +17,7 @@
     <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="TestProjects\QirExe\QirExe.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

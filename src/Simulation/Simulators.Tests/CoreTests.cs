@@ -1,23 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using Microsoft.Quantum.Core;
 using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 using Microsoft.Quantum.Tests.CoreOperations;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
+    using Environment = System.Environment;
+
     public class CoreTests
     {
         private readonly ITestOutputHelper output;
@@ -56,6 +57,62 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
             Assert.Equal("TargetedExe", output.ToString().Trim());
+        }
+
+        [Fact]
+        public void SubmitsQir()
+        {
+            var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assembly = Path.Combine(directory!, "QirExe.dll");
+            var args = string.Join(
+                ' ',
+                assembly,
+                "submit",
+                "--xs",
+                "0",
+                "1",
+                "2",
+                "-y",
+                "3",
+                "-z",
+                "4",
+                "--subscription",
+                "foo",
+                "--resource-group",
+                "bar",
+                "--workspace",
+                "baz",
+                "--target",
+                "test.noop",
+                "--verbose");
+
+            ProcessRunner.Run("dotnet", args, out var output, out var error, out var status, out var ex);
+
+            Assert.Null(ex);
+            Assert.Equal(0, status);
+            Assert.Empty(error.ToString());
+            Assert.Equal(
+                string.Join(
+                    Environment.NewLine,
+                    "Submitting QIR entry point.",
+                    "",
+                    "Subscription: foo",
+                    "Resource Group: bar",
+                    "Workspace: baz",
+                    "Target: test.noop",
+                    "Storage: ",
+                    "AAD Token: ",
+                    "Base URI: ",
+                    "Location: ",
+                    "Job Name: ",
+                    "Shots: 500",
+                    "Output: FriendlyUri",
+                    "Dry Run: False",
+                    "Verbose: True",
+                    "",
+                    "https://www.example.com/00000000-0000-0000-0000-0000000000000",
+                    ""),
+            output.ToString());
         }
 
         [Fact]
