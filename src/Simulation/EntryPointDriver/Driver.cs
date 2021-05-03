@@ -493,11 +493,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// Struct for housing a command with its validators.
         /// </summary>
-        private readonly struct CommandWithValidators
+        private struct CommandWithValidators
         {
-            public Command Command { get; }
-
-            public Validators Validators { get; }
+            public Command Command;
+            public Validators Validators;
 
             /// <summary>
             /// Basic constructor.

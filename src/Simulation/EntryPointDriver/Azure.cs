@@ -117,7 +117,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             catch (QuantumProcessorTranslationException ex)
             {
                 DisplayError(
-                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
+                    "Something went wrong when performing translation to the intermediate representation used by the " +
+                    "target quantum machine.",
                     ex.Message);
                 return 1;
             }
@@ -279,14 +280,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? AadToken { get; set; }
 
         /// <summary>
-        /// The base URI of the Azure Quantum endpoint. If both <see cref="BaseUri"/> and <see cref="Location"/>
-        /// properties are not null, <see cref="BaseUri"/> is used.
+        /// The base URI of the Azure Quantum endpoint.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
         /// </summary>
         public Uri? BaseUri { get; set; }
 
         /// <summary>
-        /// The location to use with the default Azure Quantum endpoint. If both <see cref="BaseUri"/> and
-        /// <see cref="Location"/> properties are not null, <see cref="BaseUri"/> is used.
+        /// The location to use with the default Azure Quantum endpoint.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
         /// </summary>
         public string? Location { get; set; }
 
@@ -321,23 +322,24 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            if (!(BaseUri is null))
+            if (BaseUri != null)
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
             }
-
-            if (!(Location is null))
+            else if (Location != null)
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, NormalizeLocation(Location));
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
             }
-
-            return AadToken is null
-                ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
-                : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
+            else
+            {
+                return AadToken is null
+                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
+                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
+            }
         }
 
         public override string ToString() => string.Join(
