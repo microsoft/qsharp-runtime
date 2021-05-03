@@ -37,8 +37,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             if (settings.Verbose)
             {
-                Console.WriteLine("Submitting Q# entry point.");
-                Console.Write(settings + Environment.NewLine + Environment.NewLine);
+                Console.WriteLine("Submitting Q# entry point." + Environment.NewLine);
+                Console.WriteLine(settings + Environment.NewLine);
             }
 
             switch (QSharpMachine(settings))
@@ -67,8 +67,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             if (settings.Verbose)
             {
-                Console.WriteLine("Submitting QIR entry point.");
-                Console.Write(settings + Environment.NewLine + Environment.NewLine);
+                Console.WriteLine("Submitting QIR entry point." + Environment.NewLine);
+                Console.WriteLine(settings + Environment.NewLine);
             }
 
             switch (QirSubmitter(settings))
