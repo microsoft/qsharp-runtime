@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.Quantum.Sdk">
-
   <Import Project="..\Common\Simulators.Test.props" />
 
   <ItemGroup>
@@ -9,30 +8,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="TestProjects\QSharpExe\QSharpExe.csproj" />
     <ProjectReference Include="TestProjects\QirExe\QirExe.csproj" />
+    <ProjectReference Include="TestProjects\TargetedExe\TargetedExe.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <PropertyGroup>
-      <_ExeDir>$(MSBuildThisFileDirectory)TestProjects\QSharpExe\built\</_ExeDir>
-      <_TargetedExeDir>$(MSBuildThisFileDirectory)TestProjects\TargetedExe\built\</_TargetedExeDir>
-    </PropertyGroup>
     <ItemGroup>
-      <_ExeFiles Include="$(_ExeDir)*" />
-      <_TargetedExeFiles Include="$(_TargetedExeDir)*" />
+      <TargetedExeOutput Include="TestProjects\TargetedExe\bin\$(Configuration)\$(TargetFramework)\*" />
     </ItemGroup>
-    <MakeDir Directories="$(OutputPath)TestExe" />
-    <MakeDir Directories="$(OutputPath)TestTargetedExe" />
-    <Copy SourceFiles="@(_ExeFiles)" DestinationFolder="$(OutputPath)TestExe" ContinueOnError="false" />
-    <Copy SourceFiles="@(_TargetedExeFiles)" DestinationFolder="$(OutputPath)TestTargetedExe" ContinueOnError="false" />
+    <Copy SourceFiles="@(TargetedExeOutput)" DestinationFolder="$(OutputPath)\TargetedExe" ContinueOnError="false" />
   </Target>
-
 </Project>
