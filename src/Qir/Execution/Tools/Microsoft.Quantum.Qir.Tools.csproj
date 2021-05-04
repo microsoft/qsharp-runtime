@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Driver\CppHeaders\CLI11.hpp" Pack="true">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Driver\QirCppDriver.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>QirCppDriver.cs</LastGenOutput>
