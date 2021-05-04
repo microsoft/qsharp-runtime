@@ -7,6 +7,8 @@ using System.Linq;
 
 namespace Microsoft.Quantum.EntryPointDriver.Azure
 {
+    using Environment = System.Environment;
+
     /// <summary>
     /// Settings for a submission to Azure Quantum.
     /// </summary>
@@ -85,14 +87,14 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            if (BaseUri != null)
+            if (!(BaseUri is null))
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
                     : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, BaseUri);
             }
 
-            if (Location != null)
+            if (!(Location is null))
             {
                 return AadToken is null
                     ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
@@ -105,7 +107,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         }
 
         public override string ToString() => string.Join(
-            System.Environment.NewLine,
+            Environment.NewLine,
             $"Subscription: {Subscription}",
             $"Resource Group: {ResourceGroup}",
             $"Workspace: {Workspace}",
