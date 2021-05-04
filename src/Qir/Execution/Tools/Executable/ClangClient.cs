@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             using var process = new Process();
             process.StartInfo = new ProcessStartInfo
             {
-                FileName = "clang",
+                FileName = "clang++",
                 Arguments = arguments,
             };
             process.EnableRaisingEvents = true;
