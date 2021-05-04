@@ -17,11 +17,24 @@ popd
 
 
 function Pack-One() {
-    Param($project, $option1 = "", $option2 = "", $option3 = "")
+    Param(
+        $project, 
+        $option1 = "",
+        $option2 = "",
+        $option3 = "",
+        [switch]$ForcePrerelease
+    )
+
+    if ($ForcePrerelease) {
+        $version = ($Env:NUGET_VERSION -split "-")[0] + "-alpha"
+    } else {
+        $version = $Env:NUGET_VERSION
+    }
+
     nuget pack $project `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
-        -Version $Env:NUGET_VERSION `
+        -Version $version `
         -Verbosity detailed `
         -SymbolPackageFormat snupkg `
         $option1 `
@@ -35,20 +48,34 @@ function Pack-One() {
 }
 
 function Pack-Dotnet() {
-    Param($project, $option1 = "", $option2 = "", $option3 = "")
+    Param(
+        $project, 
+        $option1 = "",
+        $option2 = "",
+        $option3 = "",
+        [switch]$ForcePrerelease
+    )
+
     if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
-        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
+        $props = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
     }  else {
-        $args = @();
+        $props = @();
     }
+
+    if ($ForcePrerelease) {
+        $version = ($Env:NUGET_VERSION -split "-")[0] + "-alpha"
+    } else {
+        $version = $Env:NUGET_VERSION
+    }
+
     dotnet pack $project `
         -o $Env:NUGET_OUTDIR `
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
         --no-build `
-        @args `
+        @props `
         /property:Version=$Env:ASSEMBLY_VERSION `
-        /property:PackageVersion=$Env:NUGET_VERSION `
+        /property:PackageVersion=$version `
         $option1 `
         $option2 `
         $option3
@@ -74,6 +101,7 @@ Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
+Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Qir.Runtime.nuspec' -ForcePrerelease
 
 if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."

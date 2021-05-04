@@ -19,8 +19,6 @@
 #include "SimFactory.hpp"
 #include "OutputStream.hpp"
 
-using namespace std;
-
 #ifdef _WIN32
 #include <windows.h>
 typedef HMODULE QUANTUM_SIMULATOR;
@@ -117,9 +115,9 @@ namespace Quantum
             return static_cast<unsigned>(reinterpret_cast<size_t>(qubit));
         }
 
-        vector<unsigned> GetQubitIds(long num, Qubit* qubits) const
+        std::vector<unsigned> GetQubitIds(long num, Qubit* qubits) const
         {
-            vector<unsigned> ids;
+            std::vector<unsigned> ids;
             ids.reserve(num);
             for (long i = 0; i < num; i++)
             {
@@ -217,7 +215,7 @@ namespace Quantum
             assert(numBases == numTargets);
             typedef unsigned (*TMeasure)(unsigned, unsigned, unsigned*, unsigned*);
             static TMeasure m = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
-            vector<unsigned> ids = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             return reinterpret_cast<Result>(
                 m(this->simulatorId, numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
         }
@@ -255,7 +253,7 @@ namespace Quantum
         void ControlledX(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCX"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -268,7 +266,7 @@ namespace Quantum
         void ControlledY(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCY"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -281,7 +279,7 @@ namespace Quantum
         void ControlledZ(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCZ"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -294,7 +292,7 @@ namespace Quantum
         void ControlledH(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCH"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -307,7 +305,7 @@ namespace Quantum
         void ControlledS(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCS"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -321,7 +319,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjS"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -334,7 +332,7 @@ namespace Quantum
         void ControlledT(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCT"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -348,7 +346,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjT"));
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -365,7 +363,7 @@ namespace Quantum
             typedef unsigned (*TMCR)(unsigned, unsigned, double, unsigned, unsigned*, unsigned);
             static TMCR cr = reinterpret_cast<TMCR>(this->GetProc("MCR"));
 
-            vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
             cr(this->simulatorId, GetBasis(axis), theta, numControls, ids.data(), GetQubitId(target));
         }
 
@@ -373,7 +371,7 @@ namespace Quantum
         {
             typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
             static TExp exp = reinterpret_cast<TExp>(this->GetProc("Exp"));
-            vector<unsigned> ids = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             exp(this->simulatorId, numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
         }
 
@@ -387,8 +385,8 @@ namespace Quantum
         {
             typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
             static TMCExp cexp = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
-            vector<unsigned> idsTargets = GetQubitIds(numTargets, targets);
-            vector<unsigned> idsControls = GetQubitIds(numControls, controls);
+            std::vector<unsigned> idsTargets = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
             cexp(
                 this->simulatorId, numTargets, reinterpret_cast<unsigned*>(paulis), theta, numControls,
                 idsControls.data(), idsTargets.data());
@@ -411,7 +409,7 @@ namespace Quantum
             typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
-            vector<unsigned> ids = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             double actualProbability =
                 1.0 -
                 jointEnsembleProbability(this->simulatorId, numTargets, reinterpret_cast<int*>(bases), ids.data());

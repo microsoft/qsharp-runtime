@@ -10,12 +10,11 @@
 #include "CoreTypes.hpp"
 #include "tracer.hpp"
 
-using namespace std;
 using namespace Microsoft::Quantum;
 
 TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -31,7 +30,7 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
     CHECK(2 == tr->TraceSingleQubitOp(8, 4, q3)); // long op! but fits into existing L(6,4)
     CHECK(3 == tr->TraceSingleQubitOp(9, 5, q1)); // long op! add the op into L(10,5)
 
-    const vector<Layer>& layers = tr->UseLayers();
+    const std::vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 4);
     CHECK(layers[0].startTime == 0);
     CHECK(layers[0].operations.size() == 4);
@@ -45,7 +44,7 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
 
 TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -58,14 +57,14 @@ TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
     CHECK(INVALID == tr->TraceSingleQubitOp(5, 0, q2)); // another pending zero op
     CHECK(0 == tr->TraceSingleQubitOp(6, 1, q2));       // add the op into L(0,3) together with the pending ones
 
-    const vector<Layer>& layers = tr->UseLayers();
+    const std::vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 1);
     CHECK(layers[0].operations.size() == 5);
 }
 
 TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -98,7 +97,7 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     CHECK(1 == tr->TraceMultiQubitOp(10, 1, 2 /*nFirst*/, qs46 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
     // because of the controls, should be added into the second layer
 
-    const vector<Layer>& layers = tr->UseLayers();
+    const std::vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 2);
 
     CHECK(layers[0].operations.size() == 5);
@@ -121,7 +120,7 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
 // TODO: add multi-qubit ops
 TEST_CASE("Operations with same id are counted together", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -135,7 +134,7 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
     tr->TraceSingleQubitOp(1, 1, q2);
     tr->TraceSingleQubitOp(3, 2, q3);
 
-    const vector<Layer>& layers = tr->UseLayers();
+    const std::vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 1);
     CHECK(layers[0].operations.size() == 3);
     const auto& ops = layers[0].operations;
@@ -146,7 +145,7 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
 
 TEST_CASE("Global barrier", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(2 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(2 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -172,7 +171,7 @@ TEST_CASE("Global barrier", "[tracer]")
     CHECK(3 == tr->TraceSingleQubitOp(7, 3, q4));
     // long op but can be added into L(8,3), which is post the barrier
 
-    const vector<Layer>& layers = tr->UseLayers();
+    const std::vector<Layer>& layers = tr->UseLayers();
     REQUIRE(layers.size() == 4);
     CHECK(layers[0].operations.size() == 2);
     CHECK(layers[1].operations.size() == 0);
@@ -198,7 +197,7 @@ TEST_CASE("Global barrier", "[tracer]")
 // For layering purposes, measurements behave pretty much the same as other operations
 TEST_CASE("Layering measurements", "[tracer]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -217,7 +216,7 @@ TEST_CASE("Layering measurements", "[tracer]")
 
 TEST_CASE("Conditionals: noops", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -241,7 +240,7 @@ TEST_CASE("Conditionals: noops", "[tracer][tracer.conditionals]")
 
 TEST_CASE("Conditionals: a new layer because of the fence", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -261,7 +260,7 @@ TEST_CASE("Conditionals: a new layer because of the fence", "[tracer][tracer.con
 
 TEST_CASE("Conditionals: single fence", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -286,7 +285,7 @@ TEST_CASE("Conditionals: single fence", "[tracer][tracer.conditionals]")
 
 TEST_CASE("Conditionals: fence from two result arrays", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -310,7 +309,7 @@ TEST_CASE("Conditionals: fence from two result arrays", "[tracer][tracer.conditi
 
 TEST_CASE("Conditionals: nested fence is later than parent", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -341,7 +340,7 @@ TEST_CASE("Conditionals: nested fence is later than parent", "[tracer][tracer.co
 
 TEST_CASE("Conditionals: nested fence is earlier than parent", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -371,7 +370,7 @@ TEST_CASE("Conditionals: nested fence is earlier than parent", "[tracer][tracer.
 
 TEST_CASE("Conditionals: fences and barriers", "[tracer][tracer.conditionals]")
 {
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
     Qubit q1 = tr->AllocateQubit();
     Qubit q2 = tr->AllocateQubit();
@@ -402,7 +401,7 @@ TEST_CASE("Conditionals: fences and barriers", "[tracer][tracer.conditionals]")
 TEST_CASE("Output: to string", "[tracer]")
 {
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
 
     Qubit q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
@@ -449,7 +448,7 @@ TEST_CASE("Output: to string", "[tracer]")
 TEST_CASE("Output: to file", "[tracer]")
 {
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
-    shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
 
     Qubit q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
@@ -465,7 +464,7 @@ TEST_CASE("Output: to file", "[tracer]")
     out.close();
 
     std::ifstream in(fileName);
-    string line;
+    std::string line;
     REQUIRE(in.is_open());
     std::string metrics(std::istreambuf_iterator<char>{in}, {});
     in.close();
