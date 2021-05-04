@@ -23,7 +23,7 @@ type private Parameter =
 let entryPointClassName = "__QsEntryPoint__"
 
 /// The namespace containing the non-generated parts of the entry point driver.
-let private driverNamespace = "Microsoft.Quantum.EntryPointDriver"
+let private driverNamespace = "global::Microsoft.Quantum.EntryPointDriver"
 
 /// A sequence of all of the named parameters in the argument tuple and their respective C# and Q# types.
 let rec private parameters context doc = function
@@ -87,7 +87,7 @@ let private createArgument context entryPoint =
 
     arrow_method inTypeName "CreateArgument" ``<<`` [] ``>>``
         ``(`` [param parseResultName ``of`` (``type`` "System.CommandLine.Parsing.ParseResult")] ``)``
-        [``private``]
+        [``private``; ``static``]
         (Some (``=>`` argTuple))
 
 /// A tuple of the callable's name, argument type name, and return type name.
@@ -162,35 +162,42 @@ let private qirArguments parameters parseResult =
 
 /// Generates the Submit method for an entry point class.
 let private submitMethod context entryPoint parameters =
-    let callableName, _, _ = callableTypeNames context entryPoint
+    let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
 
-    let qsArgs =
-        lazy
-        [
-            ident settingsParamName :> ExpressionSyntax
-            ident callableName <|.|> ident "Info"
-            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
-        ]
+    let qsSubmission =
+        ``new`` (generic (driverNamespace + ".QSharpSubmission") ``<<`` [argTypeName; returnTypeName] ``>>``)
+            ``(``
+                [
+                    ident callableName <|.|> ident "Info"
+                    invoke (ident "CreateArgument") ``(`` [ident parseResultParamName] ``)``
+                ]
+            ``)``
 
     let qirStream =
         lazy
-        ident "global::System.Reflection.Assembly"
-        <.> (ident "GetExecutingAssembly", [])
-        <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
+            ident "global::System.Reflection.Assembly"
+            <.> (ident "GetExecutingAssembly", [])
+            <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
 
-    let qirArgs =
+    let qirSubmission =
         lazy
+            ``new`` (driverNamespace + ".QirSubmission" |> ``type``)
+                ``(``
+                    [
+                        qirStream.Value
+                        string entryPoint.FullName |> literal
+                        ident parseResultParamName |> qirArguments parameters
+                    ]
+                ``)``
+
+    let args =
         [
             ident settingsParamName :> ExpressionSyntax
-            qirStream.Value
-            string entryPoint.FullName |> literal
-            qirArguments parameters (ident parseResultParamName)
+            qsSubmission
+            if context.assemblyConstants.ContainsKey "QirOutputPath" then qirSubmission.Value else ``null``
         ]
-
-    let hasQir = context.assemblyConstants.ContainsKey "QirOutputPath"
-    let submit = if hasQir then ident "SubmitQir", qirArgs.Value else ident "SubmitQSharp", qsArgs.Value
 
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
         ``(``
@@ -200,7 +207,7 @@ let private submitMethod context entryPoint parameters =
             ]
         ``)``
         [``public``]
-        (Some (``=>`` (ident (driverNamespace + ".Azure") <.> submit)))
+        (Some (``=>`` (ident (driverNamespace + ".Azure") <.> (ident "Submit", args))))
 
 /// Generates the Simulate method for an entry point class.
 let private simulateMethod context entryPoint =
@@ -209,13 +216,15 @@ let private simulateMethod context entryPoint =
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
     let simulatorParamName = "simulator"
+
     let args =
         [
             ident "this" :> ExpressionSyntax
-            ident "this" <.> (ident "CreateArgument", [ident parseResultParamName])
+            invoke (ident "CreateArgument") ``(`` [ident parseResultParamName] ``)``
             ident settingsParamName :> ExpressionSyntax
             ident simulatorParamName :> ExpressionSyntax
         ]
+
     arrow_method "System.Threading.Tasks.Task<int>" "Simulate" ``<<`` [] ``>>``
         ``(``
             [

@@ -9,7 +9,7 @@ using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using Microsoft.Quantum.Simulation.Core;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,16 +24,44 @@ namespace Microsoft.Quantum.EntryPointDriver
     public static class Azure
     {
         /// <summary>
+        /// Submits an entry point to Azure Quantum. If <paramref name="qirSubmission"/> is non-null and a QIR submitter
+        /// is available for the target in <paramref name="settings"/>, the QIR entry point is submitted. Otherwise, the
+        /// Q# entry point is submitted.
+        /// </summary>
+        /// <param name="settings">The Azure submission settings.</param>
+        /// <param name="qsSubmission">A Q# entry point submission.</param>
+        /// <param name="qirSubmission">A QIR entry point submission.</param>
+        /// <typeparam name="TIn">The entry point argument type.</typeparam>
+        /// <typeparam name="TOut">The entry point return type.</typeparam>
+        /// <returns>The exit code.</returns>
+        public static Task<int> Submit<TIn, TOut>(
+            AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
+        {
+            if (!(qirSubmission is null) && QirSubmitter(settings) is { } submitter)
+            {
+                return SubmitQir(settings, submitter, qirSubmission);
+            }
+
+            if (QSharpMachine(settings) is { } machine)
+            {
+                return SubmitQSharp(settings, machine, qsSubmission);
+            }
+
+            DisplayWithColor(ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
+            return Task.FromResult(1);
+        }
+
+        /// <summary>
         /// Submits a Q# entry point to Azure Quantum.
         /// </summary>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
         /// <param name="settings">The Azure submission settings.</param>
-        /// <param name="info">The information about the entry point.</param>
-        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="machine">The quantum machine used for submission.</param>
+        /// <param name="submission">The Q# entry point submission.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> SubmitQSharp<TIn, TOut>(
-            AzureSettings settings, EntryPointInfo<TIn, TOut> info, TIn input)
+        private static async Task<int> SubmitQSharp<TIn, TOut>(
+            AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
             if (settings.Verbose)
             {
@@ -41,29 +69,18 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Console.WriteLine(settings + Environment.NewLine);
             }
 
-            switch (QSharpMachine(settings))
-            {
-                case null:
-                    DisplayWithColor(
-                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
-                    return 1;
-                case var machine:
-                    return settings.DryRun
-                        ? Validate(machine, info, input)
-                        : await SubmitJob(settings, machine, info, input);
-            }
+            return settings.DryRun ? Validate(machine, submission) : await SubmitJob(settings, machine, submission);
         }
 
         /// <summary>
         /// Submits a QIR entry point to Azure Quantum. 
         /// </summary>
         /// <param name="settings">The Azure submission settings.</param>
-        /// <param name="qir">The QIR bitcode stream.</param>
-        /// <param name="entryPoint">The entry point name.</param>
-        /// <param name="arguments">The arguments to the entry point.</param>
+        /// <param name="submitter">The QIR entry point submitter.</param>
+        /// <param name="submission">The QIR entry point submission.</param>
         /// <returns>The exit code.</returns>
-        public static async Task<int> SubmitQir(
-            AzureSettings settings, Stream qir, string entryPoint, IReadOnlyList<Argument> arguments)
+        private static async Task<int> SubmitQir(
+            AzureSettings settings, IQirSubmitter submitter, QirSubmission submission)
         {
             if (settings.Verbose)
             {
@@ -71,17 +88,9 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Console.WriteLine(settings + Environment.NewLine);
             }
 
-            switch (QirSubmitter(settings))
-            {
-                case null:
-                    DisplayWithColor(
-                        ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
-                    return 1;
-                case var submitter:
-                    var job = await submitter.SubmitAsync(qir, entryPoint, arguments);
-                    DisplayJob(job, settings.Output);
-                    return 0;
-            }
+            var job = await submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments);
+            DisplayJob(job, settings.Output);
+            return 0;
         }
 
         /// <summary>
@@ -91,17 +100,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <typeparam name="TOut">The output type.</typeparam>
         /// <param name="settings">The submission settings.</param>
         /// <param name="machine">The quantum machine target.</param>
-        /// <param name="info">The information about the entry point.</param>
-        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="submission">The entry point submission.</param>
         /// <returns>The exit code.</returns>
         private static async Task<int> SubmitJob<TIn, TOut>(
-            AzureSettings settings, IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input)
+            AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
             try
             {
                 var job = await machine.SubmitAsync(
-                    info,
-                    input,
+                    submission.EntryPointInfo,
+                    submission.Argument,
                     new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
 
                 DisplayJob(job, settings.Output);
@@ -130,12 +138,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <typeparam name="TIn">The input type.</typeparam>
         /// <typeparam name="TOut">The output type.</typeparam>
         /// <param name="machine">The quantum machine target.</param>
-        /// <param name="info">The information about the entry point.</param>
-        /// <param name="input">The input argument tuple to the entry point.</param>
+        /// <param name="submission">The entry point submission.</param>
         /// <returns>The exit code.</returns>
-        private static int Validate<TIn, TOut>(IQuantumMachine machine, EntryPointInfo<TIn, TOut> info, TIn input)
+        private static int Validate<TIn, TOut>(IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
-            var (isValid, message) = machine.Validate(info, input);
+            var (isValid, message) = machine.Validate(submission.EntryPointInfo, submission.Argument);
             Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
             if (!string.IsNullOrWhiteSpace(message))
             {
@@ -226,6 +233,62 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             public int Shots { get; set; }
         }
+    }
+
+    /// <summary>
+    /// A Q# entry point submission.
+    /// </summary>
+    /// <typeparam name="TIn">The entry point argument type.</typeparam>
+    /// <typeparam name="TOut">The entry point return type.</typeparam>
+    public sealed class QSharpSubmission<TIn, TOut>
+    {
+        /// <summary>
+        /// The entry point info.
+        /// </summary>
+        internal EntryPointInfo<TIn, TOut> EntryPointInfo { get; }
+
+        /// <summary>
+        /// The entry point argument.
+        /// </summary>
+        internal TIn Argument { get; }
+
+        /// <summary>
+        /// Creates a Q# entry point submission.
+        /// </summary>
+        /// <param name="entryPointInfo">The entry point info.</param>
+        /// <param name="argument">The entry point argument.</param>
+        public QSharpSubmission(EntryPointInfo<TIn, TOut> entryPointInfo, TIn argument) =>
+            (this.EntryPointInfo, this.Argument) = (entryPointInfo, argument);
+    }
+
+    /// <summary>
+    /// A QIR entry point submission.
+    /// </summary>
+    public sealed class QirSubmission
+    {
+        /// <summary>
+        /// The QIR bitcode stream.
+        /// </summary>
+        internal Stream QirStream { get; }
+
+        /// <summary>
+        /// The entry point name.
+        /// </summary>
+        internal string EntryPointName { get; }
+
+        /// <summary>
+        /// The entry point arguments.
+        /// </summary>
+        internal ImmutableList<Argument> Arguments { get; }
+
+        /// <summary>
+        /// Creates a QIR entry point submission.
+        /// </summary>
+        /// <param name="qirStream">The QIR bitcode stream.</param>
+        /// <param name="entryPointName">The entry point name.</param>
+        /// <param name="arguments">The entry point arguments.</param>
+        public QirSubmission(Stream qirStream, string entryPointName, ImmutableList<Argument> arguments) =>
+            (this.QirStream, this.EntryPointName, this.Arguments) = (qirStream, entryPointName, arguments);
     }
 
     /// <summary>
