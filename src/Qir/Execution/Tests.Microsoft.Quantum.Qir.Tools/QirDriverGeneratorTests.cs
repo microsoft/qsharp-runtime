@@ -142,6 +142,9 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
                 }
             };
 
+        private static string RemoveLineEndings(string str) =>
+            str.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+
         [Theory]
         [InlineData("UseNoArgs")]
         [InlineData("UseBoolArg")]
@@ -163,7 +166,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var entryPointOperation = TestCases[testCase];
             var driverGenerator = new QirFullStateDriverGenerator();
             var driverFileName = $"{testCase}.cpp";
-            var verificationCppSourceCode = File.ReadAllText(Path.Combine(TestCasesDirectory, driverFileName));
+            var verificationCppSourceCode = RemoveLineEndings(File.ReadAllText(Path.Combine(TestCasesDirectory, driverFileName)));
             if (!Directory.Exists(TestArtifactsDirectory))
             {
                 Directory.CreateDirectory(TestArtifactsDirectory);
@@ -172,7 +175,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var generatedStream = File.Create(Path.Combine(TestArtifactsDirectory, driverFileName));
             driverGenerator.GenerateAsync(entryPointOperation, generatedStream).Wait();
             var generatedStreamReader = new StreamReader(generatedStream, Encoding.UTF8);
-            var generatedCppSourceCode = generatedStreamReader.ReadToEnd();
+            var generatedCppSourceCode = RemoveLineEndings(generatedStreamReader.ReadToEnd());
             Assert.Equal(verificationCppSourceCode, generatedCppSourceCode);
             generatedStream.Close();
 
