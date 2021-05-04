@@ -228,3 +228,67 @@ define dllexport void @__quantum__qis__applyconditionallyintrinsic__body(
     %struct.QirCallable* %clb_on_equal, %struct.QirCallable* %clb_on_different)
   ret void
 }
+
+;===============================================================================
+; quantum.qis AssertMeasurement functions/operations implementation
+;
+;    operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
+;    is Adj + Ctl {
+;        body intrinsic;
+;    }
+;    operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
+;    is Adj + Ctl {
+;        body intrinsic;
+;    }
+define dllexport void @__quantum__qis__assertmeasurementprobability__body(
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurementprobability__adj(
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurementprobability__ctl(
+  %Array*,
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurementprobability__ctladj(
+  %Array*,
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
+  ; Empty.
+  ret void
+}
+
+
+define dllexport void @__quantum__qis__assertmeasurement__body(
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurement__adj(
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurement__ctl(
+  %Array*,
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
+  ; Empty.
+  ret void
+}
+
+define dllexport void @__quantum__qis__assertmeasurement__ctladj(
+  %Array*,
+  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
+  ; Empty.
+  ret void
+}

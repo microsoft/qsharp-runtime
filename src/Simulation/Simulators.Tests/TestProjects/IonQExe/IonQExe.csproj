@@ -9,6 +9,7 @@
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <NoEntryPoint>true</NoEntryPoint>
     <ExecutionTarget>ionq.qpu</ExecutionTarget>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
