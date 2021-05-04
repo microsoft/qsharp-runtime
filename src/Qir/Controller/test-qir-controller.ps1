@@ -18,9 +18,6 @@ $libraryDirectory = (Join-Path $testArtifactsFolder "library")
 if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
 {
     Write-Host "On Windows build using Clang"
-    $env:CC = "clang.exe"
-    $env:CXX = "clang++.exe"
-    $env:RC = "clang++.exe"
 
     if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
         # LLVM was installed by Chocolatey, so add the install location to the path.
@@ -40,7 +37,7 @@ foreach ( $path in $headerPaths )
 {
     Get-ChildItem $path -File |
     Foreach-Object {
-        Copy-Item $_ -Destination (Join-Path $includeDirectory $_.Name)
+        Copy-Item $_.FullName -Destination (Join-Path $includeDirectory $_.Name)
     }
 }
 
@@ -50,7 +47,7 @@ foreach ( $path in $libraryPaths )
 {
     Get-ChildItem $path -File |
     Foreach-Object {
-        Copy-Item $_ -Destination (Join-Path $libraryDirectory $_.Name)
+        Copy-Item $_.FullName -Destination (Join-Path $libraryDirectory $_.Name)
     }
 }
 
