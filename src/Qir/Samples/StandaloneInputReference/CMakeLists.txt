@@ -6,7 +6,7 @@ add_executable(qir-input-reference-standalone
 )
 
 # This is where the generated QIR file is specified.
-target_source_from_qir(qir-input-reference-standalone qsharp/qir/qir-standalone-input-reference.ll)
+target_source_from_qir(qir-input-reference-standalone qsharp/obj/qsharp/qir-standalone-input-reference.bc)
 
 target_link_libraries(qir-input-reference-standalone PUBLIC
   "-L${runtime_lib_path}"

@@ -50,8 +50,7 @@ struct Array {
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop( // NOLINT
     Array* array,
     int64_t index,
-    int64_t val,
-    bool compilerDecoy);
+    int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
@@ -60,11 +59,11 @@ TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
     int64_t values[n] = {0, 1, 2, 3, 4};
     auto array = Array{5, values};
 
-    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop(&array, 2, 42, false);
+    int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop(&array, 2, 42);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
 }
 
-extern "C" void Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__Interop(); // NOLINT
 struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     // no intelligent reuse, we just want to check that QIR releases all qubits
@@ -151,7 +150,7 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__body());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__Interop());
 
     // check that all qubits have been released
     for (size_t id = 0; id < sim->qubits.size(); id++)
@@ -205,19 +204,17 @@ TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
     REQUIRE(failed);
 }
 
-#if 0 // TODO: Q# compiler crashes generating QIR for TestPartials
 // TestPartials subtracts the second argument from the first and returns the result.
-extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__body(int64_t, int64_t); // NOLINT
+extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__Interop(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 {
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
 
-    const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__body(42, 17);
+    const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__Interop(42, 17);
     REQUIRE(res == 42 - 17);
 }
-#endif
 
-// The Microsoft__Quantum__Testing__QIR__TestFunctors__body tests needs proper semantics of X and M, and nothing else.
+// The Microsoft__Quantum__Testing__QIR__TestFunctors__Interop tests needs proper semantics of X and M, and nothing else.
 // The validation is done inside the test and it would throw in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
@@ -295,8 +292,8 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 FunctorsTestSimulator* g_ctrqapi = nullptr;
 static int g_cKCalls = 0;
 static int g_cKCallsControlled = 0;
-extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__body();       // NOLINT
-extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop(); // NOLINT
 extern "C" void __quantum__qis__k__body(Qubit q)                              // NOLINT
 {
     g_cKCalls++;
@@ -313,11 +310,11 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
     QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__Interop());
 
     const int cKCalls = g_cKCalls;
     const int cKCallsControlled = g_cKCallsControlled;
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop());
     CHECK(g_cKCalls - cKCalls == 3);
     CHECK(g_cKCallsControlled - cKCallsControlled == 5);
 
