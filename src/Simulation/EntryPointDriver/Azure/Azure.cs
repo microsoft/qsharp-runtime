@@ -84,8 +84,17 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
                 Console.WriteLine(settings + Environment.NewLine);
             }
 
-            var job = await submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments);
-            DisplayJob(job, settings.Output);
+            if (settings.DryRun)
+            {
+                DisplayError("Dry run is not supported with QIR submission.", null);
+            }
+            else
+            {
+                var job =
+                    await submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments);
+                DisplayJob(job, settings.Output);
+            }
+
             return 0;
         }
 
@@ -187,10 +196,13 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// </summary>
         /// <param name="summary">A summary of the error.</param>
         /// <param name="message">The full error message.</param>
-        private static void DisplayError(string summary, string message)
+        private static void DisplayError(string summary, string? message)
         {
             DisplayWithColor(ConsoleColor.Red, Console.Error, summary);
-            Console.Error.WriteLine(Environment.NewLine + message);
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Console.Error.WriteLine(Environment.NewLine + message);
+            }
         }
 
         /// <summary>
