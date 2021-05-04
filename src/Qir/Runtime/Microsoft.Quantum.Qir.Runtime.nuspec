@@ -1,32 +1,23 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>$id$</id>
+    <id>Microsoft.Quantum.Qir.Runtime</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>Microsoft</authors>
     <owners>QuantumEngineering, Microsoft</owners>
-
     <license type="expression">MIT</license>
     <projectUrl>https://docs.microsoft.com/azure/quantum</projectUrl>
     <icon>images\qdk-nuget-icon.png</icon>
-
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Library for testing Q# programs and algorithms using the xUnit framework.</description>
-
+    <description>Native libraries for linking and executing Quantum Intermediate Representation.</description>
     <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
-
-    <copyright>$copyright$</copyright>
-    <tags>Quantum Q# QSharp test xunit</tags>
-
-    <dependencies>
-      <dependency id="xunit" version="2.3.1" />
-      <dependency id="Microsoft.NET.Test.Sdk" version="15.3.0" />
-      <dependency id="Microsoft.Quantum.Runtime.Core" version="0.16.2104138281-beta" />
-    </dependencies>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Quantum Q# QSharp QIR native</tags>
   </metadata>
-
   <files>
-    <file src="..\..\build\assets\qdk-nuget-icon.png" target="images" />
+    <file src="..\drops\bin\**\*" target="runtimes" />
+    <file src="..\drops\include\*" target="runtimes/any/native/include" />
+    <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>
