@@ -11,7 +11,7 @@ $testCasesFolder = (Join-Path $PSScriptRoot "test-cases")
 $testArtifactsFolder = (Join-Path $PSScriptRoot "test-artifacts")
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $headerPaths = @((Join-Path $PSScriptRoot "..\..\Qir\Common\externals\CLI11"), (Join-Path $PSScriptRoot "..\..\Qir\Runtime\public"))
-$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\bin\$buildConfiguration\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\$buildConfiguration\netstandard2.1"))
+$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\bin\$buildConfiguration\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\$buildConfiguration\netstandard2.1"), $Env:NATIVE_SIMULATOR)
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $libraryDirectory = (Join-Path $testArtifactsFolder "library")
 
