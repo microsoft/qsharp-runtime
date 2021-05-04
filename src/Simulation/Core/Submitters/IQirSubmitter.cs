@@ -20,7 +20,9 @@ namespace Microsoft.Quantum.Runtime
         /// <param name="qir">The QIR program as a byte stream.</param>
         /// <param name="entryPoint">The fully-qualified name of the entry point to execute.</param>
         /// <param name="arguments">The arguments to the entry point in the order in which they are declared.</param>
+        /// <param name="options">Additional options for the submission.</param>
         /// <returns>The submitted job.</returns>
-        Task<IQuantumMachineJob> SubmitAsync(Stream qir, string entryPoint, IReadOnlyList<Argument> arguments);
+        Task<IQuantumMachineJob> SubmitAsync(
+            Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options);
     }
 }
