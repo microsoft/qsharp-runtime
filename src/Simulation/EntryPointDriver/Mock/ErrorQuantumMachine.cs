@@ -66,7 +66,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>
-            throw new AzureQuantumException("This quantum machine always has an error.");
+            Task.FromException<IQuantumMachineJob>(new AzureQuantumException("This machine always has an error."));
 
         public Task<IQuantumMachineJob> SubmitAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input, IQuantumMachineSubmissionContext submissionContext) => 

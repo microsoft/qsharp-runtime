@@ -59,13 +59,18 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static async Task<int> SubmitQSharp<TIn, TOut>(
             AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
+            Task<IQuantumMachineJob> SubmitJob() => machine.SubmitAsync(
+                submission.EntryPointInfo,
+                submission.Argument,
+                new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
+
             if (settings.Verbose)
             {
                 Console.WriteLine("Submitting Q# entry point." + Environment.NewLine);
                 Console.WriteLine(settings + Environment.NewLine);
             }
 
-            return settings.DryRun ? Validate(machine, submission) : await SubmitJob(settings, machine, submission);
+            return settings.DryRun ? Validate(machine, submission) : await DisplayJobOrError(settings, SubmitJob());
         }
 
         /// <summary>
@@ -87,37 +92,25 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             if (settings.DryRun)
             {
                 DisplayError("Dry run is not supported with QIR submission.", null);
-            }
-            else
-            {
-                var job =
-                    await submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments);
-                DisplayJob(job, settings.Output);
+                return 1;
             }
 
-            return 0;
+            return await DisplayJobOrError(
+                settings,
+                submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments));
         }
 
         /// <summary>
-        /// Submits a job to Azure Quantum.
+        /// Displays the submitted job information or an error message.
         /// </summary>
-        /// <typeparam name="TIn">The input type.</typeparam>
-        /// <typeparam name="TOut">The output type.</typeparam>
         /// <param name="settings">The submission settings.</param>
-        /// <param name="machine">The quantum machine target.</param>
-        /// <param name="submission">The entry point submission.</param>
+        /// <param name="job">The submitted job task.</param>
         /// <returns>The exit code.</returns>
-        private static async Task<int> SubmitJob<TIn, TOut>(
-            AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
+        private static async Task<int> DisplayJobOrError(AzureSettings settings, Task<IQuantumMachineJob> job)
         {
             try
             {
-                var job = await machine.SubmitAsync(
-                    submission.EntryPointInfo,
-                    submission.Argument,
-                    new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
-
-                DisplayJob(job, settings.Output);
+                DisplayJob(await job, settings.Output);
                 return 0;
             }
             catch (AzureQuantumException ex)
@@ -130,8 +123,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             catch (QuantumProcessorTranslationException ex)
             {
                 DisplayError(
-                    "Something went wrong when performing translation to the intermediate representation used by the " +
-                    "target quantum machine.",
+                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
                     ex.Message);
                 return 1;
             }

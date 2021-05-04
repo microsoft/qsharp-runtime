@@ -811,7 +811,7 @@ let ``Submit catches exceptions`` () =
     given submitWithErrorTarget
     |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
 
-                  This quantum machine always has an error."
+                  This machine always has an error."
 
 // Help
 
