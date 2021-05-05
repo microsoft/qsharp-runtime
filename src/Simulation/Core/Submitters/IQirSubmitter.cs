@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.Runtime
+namespace Microsoft.Quantum.Runtime.Submitters
 {
     /// <summary>
     /// An interface for submitting QIR programs to Azure.

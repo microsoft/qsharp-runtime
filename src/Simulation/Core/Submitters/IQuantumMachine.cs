@@ -1,14 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Threading.Tasks;
+using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Core;
+using System;
+using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
     /// An interface for submitting Q# programs to Azure.
     /// </summary>
+    [Obsolete("Replaced by IQSharpSubmitter.")]
     public interface IQuantumMachine : IAzureSubmitter
     {
         /// <summary>
