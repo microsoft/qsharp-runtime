@@ -23,15 +23,15 @@ extern "C"
    
     void Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__Interop(); // NOLINT
    
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasAlloc1OKTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasAlloc1ExcTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasProbAlloc1ExcTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasProbAlloc1HalfProbTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasProbAllocPlusMinusTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasSPlusMinusTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeas0011__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeas4qubits__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AsrtMeasBellTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1ExcTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1ExcTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1HalfProbTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasSPlusMinusTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasBellTest__Interop(); // NOLINT
 } // extern "C"
 
 using namespace Microsoft::Quantum;
@@ -175,16 +175,16 @@ TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
 {
     QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeasAlloc1OKTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop());
 
-    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AsrtMeasAlloc1ExcTest__Interop());
-    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AsrtMeasProbAlloc1ExcTest__Interop());
+    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1ExcTest__Interop());
+    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1ExcTest__Interop());
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeasProbAlloc1HalfProbTest__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeasProbAllocPlusMinusTest__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeasSPlusMinusTest__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeas0011__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeas4qubits__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AsrtMeasBellTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1HalfProbTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasSPlusMinusTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasBellTest__Interop());
 
 } // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")

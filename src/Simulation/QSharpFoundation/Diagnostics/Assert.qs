@@ -28,9 +28,7 @@ namespace Microsoft.Quantum.Diagnostics {
         body (...) {
             AssertMeasurementProbability(bases, qubits, result, 1.0, msg, 1e-10);
         }
-        adjoint (...) {
-            // Empty.
-        }
+        adjoint self;
         controlled (controllingQubits, ...) {
             // Empty.
         }

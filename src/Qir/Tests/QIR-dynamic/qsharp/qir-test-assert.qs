@@ -9,9 +9,9 @@ namespace Microsoft.Quantum.Testing.QIR  {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
 
-    // |0> -> |1>
+    // |0> -> |1> 
     @EntryPoint()
-    operation AsrtMeasAlloc1OKTest() : Unit {
+    operation AssertMeasAlloc1OKTest() : Unit {
         use qubit = Qubit();    // |0>
 
         AssertMeasurement(           [PauliZ], [qubit], Zero,      "0: Newly allocated qubit must be in the |0> state.");
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     // Fail: Expecting |1>, should have expected |0>
     @EntryPoint()
-    operation AsrtMeasAlloc1ExcTest() : Unit {
+    operation AssertMeasAlloc1ExcTest() : Unit {
         use qubit = Qubit();    // |0>
 
         // Must fail:
@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     // Fail: Expecting |1>, should have expected |0>
     @EntryPoint()
-    operation AsrtMeasProbAlloc1ExcTest() : Unit {
+    operation AssertMeasProbAlloc1ExcTest() : Unit {
         use qubit = Qubit();    // |0>
 
         // Must fail:
@@ -42,7 +42,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     }
 
     @EntryPoint()
-    operation AsrtMeasProbAlloc1HalfProbTest() : Unit {     //!
+    operation AssertMeasProbAlloc1HalfProbTest() : Unit {
         use qubit = Qubit();    // |0>
 
         // Measuring in PauliX: 50% |0>, 50% |1>
@@ -55,20 +55,23 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     // |+>, |->
     @EntryPoint()
-    operation AsrtMeasProbAllocPlusMinusTest() : Unit {
-        let str = "Newly allocated qubit after H() must be in the |+> state";
-
+    operation AssertMeasProbAllocPlusMinusTest() : Unit {
         use qubit = Qubit();    // |0>
-        H(qubit);               // |+>
-        AssertMeasurement(           [PauliX], [qubit], Zero, str);
-        // 50% probability in other Pauli bases:
-        AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, str, 1e-10);
-        AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, str, 1e-10);
-        AssertMeasurementProbability([PauliY], [qubit], Zero, 0.5, str, 1e-10);
-        AssertMeasurementProbability([PauliY], [qubit],  One, 0.5, str, 1e-10);
+
+        within {
+            H(qubit);               // |+>
+        } apply {
+            let str = "Newly allocated qubit after H() must be in the |+> state";
+
+            AssertMeasurement(           [PauliX], [qubit], Zero, str);
+            // 50% probability in other Pauli bases:
+            AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, str, 1e-10);
+            AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, str, 1e-10);
+            AssertMeasurementProbability([PauliY], [qubit], Zero, 0.5, str, 1e-10);
+            AssertMeasurementProbability([PauliY], [qubit],  One, 0.5, str, 1e-10);
+        }  //H(qubit);   // Back to |0>
 
         let str2 = "Newly allocated qubit after x() followed by H() must be in the |-> state";
-        H(qubit);   // Back to |0>
         X(qubit);   // |1>
         H(qubit);   // |->
         AssertMeasurement(           [PauliX], [qubit], One, str2);
@@ -82,19 +85,20 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // (|0> + i|1>) / SQRT(2) = SH|0> = S|+> 
     // (|0> - i|1>) / SQRT(2) = SH|1> = S|->
     @EntryPoint()
-    operation AsrtMeasSPlusMinusTest() : Unit {
+    operation AssertMeasSPlusMinusTest() : Unit {
         use qubit = Qubit();    // |0>
-        H(qubit);               // |+>
-        S(qubit);               // (|0> + i|1>) / SQRT(2)
-        AssertMeasurement(           [PauliY], [qubit], Zero,      "0: Call failed");
-        // 50% probability in other Pauli bases:
-        AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, "1: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, "2: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliX], [qubit], Zero, 0.5, "3: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliX], [qubit],  One, 0.5, "4: Call failed", 1e-10);
+        within {
+            H(qubit);               // |+>
+            S(qubit);               // (|0> + i|1>) / SQRT(2)
+        } apply {
+            AssertMeasurement(           [PauliY], [qubit], Zero,      "0: Call failed");
+            // 50% probability in other Pauli bases:
+            AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, "1: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, "2: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliX], [qubit], Zero, 0.5, "3: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliX], [qubit],  One, 0.5, "4: Call failed", 1e-10);
+        } // Adjoint S(qubit);   // Back to |+>    // H(qubit);   // Back to |0>
 
-        Adjoint S(qubit);   // Back to |+>
-        H(qubit);   // Back to |0>
         X(qubit);   // |1>
         H(qubit);   // |->
         S(qubit);   // (|0> - i|1>) / SQRT(2)
@@ -116,7 +120,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     //  Task 2. Parity measurement
     // |0>, |1>, |->
     @EntryPoint()
-    operation AsrtMeas0011() : Unit {
+    operation AssertMeas0011() : Unit {
         use left = Qubit();
         use right = Qubit();
 
@@ -124,17 +128,18 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [left, right], Zero, 1.0, "1: Call failed", 1E-05);
         AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.0, "2: Call failed", 1E-05);
 
-        H(left);        // |+>
-        H(right);       // |+>
-        AssertMeasurement(           [PauliX, PauliX], [left, right],  Zero,     "B: Call failed");
-        // 50% probability in other Pauli bases:
-        AssertMeasurementProbability([PauliZ, PauliZ], [left, right], Zero, 0.5, "C: Call failed", 1E-05);
-        AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.5, "D: Call failed", 1E-05);
-        AssertMeasurementProbability([PauliY, PauliY], [left, right], Zero, 0.5, "E: Call failed", 1E-05);
-        AssertMeasurementProbability([PauliY, PauliY], [left, right],  One, 0.5, "F: Call failed", 1E-05);
-        
-        H(left);        // Back to |0>
-        H(right);       // Back to |0>
+        within {
+            H(left);        // |+>
+            H(right);       // |+>
+        } apply {
+            AssertMeasurement(           [PauliX, PauliX], [left, right],  Zero,     "B: Call failed");
+            // 50% probability in other Pauli bases:
+            AssertMeasurementProbability([PauliZ, PauliZ], [left, right], Zero, 0.5, "C: Call failed", 1E-05);
+            AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.5, "D: Call failed", 1E-05);
+            AssertMeasurementProbability([PauliY, PauliY], [left, right], Zero, 0.5, "E: Call failed", 1E-05);
+            AssertMeasurementProbability([PauliY, PauliY], [left, right],  One, 0.5, "F: Call failed", 1E-05);
+        } // H(right); // Back to |0>     // H(left); // Back to |0>   
+
         X(left);        // |1>
         X(right);       // |1>
         AssertMeasurement(           [PauliZ, PauliZ], [left, right], Zero,      "3: Call failed");    // |11>  (+1 eigenstate)
@@ -164,7 +169,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     // Task 3.  |0000>+|1111>  or  |0011>+|1100> ?
     @EntryPoint()
-    operation AsrtMeas4qubits() : Unit {
+    operation AssertMeas4qubits() : Unit {
         use qubitIds = Qubit[4];        // |0000>
 
         H(qubitIds[0]);                 // |+>, equally probable |0> and |1> in PauliZ basis.
@@ -190,7 +195,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // https://github.com/microsoft/Quantum/blob/0ec53c6efe09c0f725aae01648cd92377e2fcc99/samples/getting-started/measurement/Measurement.qs#L89
     // "Quantum Computing : A Gentle Introduction", Example 3.2.1.  http://mmrc.amss.cas.cn/tlb/201702/W020170224608150244118.pdf
     @EntryPoint()
-    operation AsrtMeasBellTest() : Unit {
+    operation AssertMeasBellTest() : Unit {
         // The following using block allocates a pair of fresh qubits, which
         // start off in the |00> state by convention.
         use left = Qubit();
