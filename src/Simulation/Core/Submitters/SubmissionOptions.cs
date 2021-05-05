@@ -21,11 +21,20 @@ namespace Microsoft.Quantum.Runtime.Submitters
         public int Shots { get; }
 
         /// <summary>
-        /// Creates a new set of submission options.
+        /// The default submission options.
         /// </summary>
-        /// <param name="friendlyName">A name describing the job.</param>
-        /// <param name="shots">The number of times the program will be executed.</param>
-        public SubmissionOptions(string friendlyName, int shots) =>
+        public static SubmissionOptions Default { get; } = new SubmissionOptions("", 500);
+
+        private SubmissionOptions(string friendlyName, int shots) => 
             (this.FriendlyName, this.Shots) = (friendlyName, shots);
+
+        /// <summary>
+        /// Updates the submission options with the provided values.
+        /// </summary>
+        /// <param name="friendlyName">The new friendly name, or <c>null</c> to leave unchanged.</param>
+        /// <param name="shots">The new number of shots, or <c>null</c> to leave unchanged.</param>
+        /// <returns>The updated submission options.</returns>
+        public SubmissionOptions With(string? friendlyName = null, int? shots = null) =>
+            new SubmissionOptions(friendlyName ?? this.FriendlyName, shots ?? this.Shots);
     }
 }
