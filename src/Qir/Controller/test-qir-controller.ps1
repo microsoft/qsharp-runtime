@@ -11,16 +11,13 @@ $testCasesFolder = (Join-Path $PSScriptRoot "test-cases")
 $testArtifactsFolder = (Join-Path $PSScriptRoot "test-artifacts")
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $headerPaths = @((Join-Path $PSScriptRoot "..\..\Qir\Common\externals\CLI11"), (Join-Path $PSScriptRoot "..\..\Qir\Runtime\public"))
-$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\bin\$buildConfiguration\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\$buildConfiguration\netstandard2.1"))
+$libraryPaths =  @((Join-Path $PSScriptRoot "..\..\Qir\Runtime\bin\$buildConfiguration\bin"), (Join-Path $PSScriptRoot "..\..\Simulation\Simulators\bin\$buildConfiguration\netstandard2.1"), $Env:NATIVE_SIMULATOR)
 $includeDirectory = (Join-Path $testArtifactsFolder "include")
 $libraryDirectory = (Join-Path $testArtifactsFolder "library")
 
 if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
 {
     Write-Host "On Windows build using Clang"
-    $env:CC = "clang.exe"
-    $env:CXX = "clang++.exe"
-    $env:RC = "clang++.exe"
 
     if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
         # LLVM was installed by Chocolatey, so add the install location to the path.
@@ -40,7 +37,7 @@ foreach ( $path in $headerPaths )
 {
     Get-ChildItem $path -File |
     Foreach-Object {
-        Copy-Item $_ -Destination (Join-Path $includeDirectory $_.Name)
+        Copy-Item $_.FullName -Destination (Join-Path $includeDirectory $_.Name)
     }
 }
 
@@ -50,14 +47,16 @@ foreach ( $path in $libraryPaths )
 {
     Get-ChildItem $path -File |
     Foreach-Object {
-        Copy-Item $_ -Destination (Join-Path $libraryDirectory $_.Name)
+        Copy-Item $_.FullName -Destination (Join-Path $libraryDirectory $_.Name)
     }
 }
 
 # Go through each input file in the test cases folder.
 Get-ChildItem $testCasesFolder -Filter *.in |
 Foreach-Object {
+
     # Get the paths to the output and error files to pass to the QIR controller.
+    $testPassed = $True
     $outputFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".out"))
     $errorFile = (Join-Path $testArtifactsFolder ($_.BaseName + ".err"))
     dotnet run --project $controllerProject -- --input $_.FullName --output $outputFile --error $errorFile --includeDirectory $includeDirectory --libraryDirectory $libraryDirectory
@@ -75,27 +74,27 @@ Foreach-Object {
             Write-Host $expectedOutput
             Write-Host "##[info]Actual output:"
             Write-Host $actualOutput
-            $script:all_ok = $False
+            $testPassed = $False
         }
-        else {
-            Write-Host "##[info]Test case '$($_.BaseName)' passed"
+    }
+    if ((Test-Path $expectedErrorFile)) {
+        $expectedError = Get-Content -Path $expectedErrorFile -Raw
+        $actualError = Get-Content -Path $errorFile -Raw
+        if (-not ($expectedError -ceq $actualError)) {
+            Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
+            Write-Host "##[info]Expected error:"
+            Write-Host $expectedError
+            Write-Host "##[info]Actual error:"
+            Write-Host $actualError
+            $testPassed = $False
         }
-        continue;
     }
 
-    $expectedError = Get-Content -Path $expectedErrorFile -Raw
-    $actualError = Get-Content -Path $errorFile -Raw
-    if (-not ($expectedError -ceq $actualError)) {
-        Write-Host "##vso[task.logissue type=error;]Failed QIR Controller test case: $($_.BaseName)"
-        Write-Host "##[info]Expected error:"
-        Write-Host $expectedError
-        Write-Host "##[info]Actual error:"
-        Write-Host $actualError
-        $script:all_ok = $False
-        continue
+    if ($testPassed) {
+        Write-Host "##[info]Test case '$($_.BaseName)' passed"
     }
     else {
-        Write-Host "##[info]Test case '$($_.BaseName)' passed"
+        $script:all_ok = $False
     }
 }
 
