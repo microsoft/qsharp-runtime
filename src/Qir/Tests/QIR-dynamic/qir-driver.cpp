@@ -8,17 +8,18 @@
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "QirTypes.hpp"
 #include "SimFactory.hpp"
 #include "QirContext.hpp"
 #include "OutputStream.hpp"
 
-extern "C" int64_t Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body(); // NOLINT
+extern "C" int64_t Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop(); // NOLINT
 
-extern "C" void Microsoft__Quantum__Testing__QIR__DumpMachineTest__body(); // NOLINT
-extern "C" void Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__body(const void*); // NOLINT
-extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterTest__body(); // NOLINT
-extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__body(const void*); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__DumpMachineTest__Interop(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__Interop(const char[]); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterTest__Interop(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__Interop(const char[]); // NOLINT
+
+extern "C" void Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__Interop(); // NOLINT
 
 using namespace Microsoft::Quantum;
 
@@ -26,9 +27,9 @@ TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
 {
     QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
 
-    const int ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
-    const int ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
-    const int ret3 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__body();
+    const int ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
+    const int ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
+    const int ret3 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
     INFO(
         std::string("Three random numbers: ") + std::to_string(ret1) + ", " + std::to_string(ret2) + ", " +
         std::to_string(ret3));
@@ -56,7 +57,7 @@ TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
             // Redirect the output from std::cout to outStrStream:
             OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
 
-            Microsoft__Quantum__Testing__QIR__DumpMachineTest__body();
+            Microsoft__Quantum__Testing__QIR__DumpMachineTest__Interop();
         } // qOStreamRedirector goes out of scope.
 
         REQUIRE(outStrStream.str().size() != 0);
@@ -66,12 +67,11 @@ TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
     // Dump to empty string location (std::cout):
     {
         std::ostringstream      outStrStream;
-        const QirString         qstrEmpty{std::string("")};
         {
             // Redirect the output from std::cout to outStrStream:
             OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
 
-            Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__body(&qstrEmpty);
+            Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__Interop("");
         } // qOStreamRedirector goes out of scope.
 
         REQUIRE(outStrStream.str().size() != 0);
@@ -90,8 +90,7 @@ TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
     REQUIRE(!FileExists(filePath));
 
     // Dump the machine state to that `filePath`:
-    const QirString qstr{std::string(filePath)};
-    Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__body(&qstr);
+    Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__Interop(filePath);
 
     // Make sure the file has been created.
     REQUIRE(FileExists(filePath));
@@ -114,7 +113,7 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
             // Redirect the output from std::cout to outStrStream:
             OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
 
-            Microsoft__Quantum__Testing__QIR__DumpRegisterTest__body();
+            Microsoft__Quantum__Testing__QIR__DumpRegisterTest__Interop();
         } // qOStreamRedirector goes out of scope.
 
         REQUIRE(outStrStream.str().size() != 0);
@@ -124,12 +123,11 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     // Dump to empty string location (std::cout):
     {
         std::ostringstream      outStrStream;
-        const QirString         qstrEmpty{""};
         {
             // Redirect the output from std::cout to outStrStream:
             OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
 
-            Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__body(&qstrEmpty);
+            Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__Interop("");
         } // qOStreamRedirector goes out of scope.
 
         REQUIRE(outStrStream.str().size() != 0);
@@ -148,8 +146,7 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     REQUIRE(!FileExists(filePath));
 
     // Dump to that `filePath`:
-    const QirString qstr{filePath};
-    Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__body(&qstr);
+    Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__Interop(filePath);
 
     // Make sure the file has been created.
     REQUIRE(FileExists(filePath));
@@ -159,3 +156,11 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     // Remove the file, ignore the failure:
     (void) remove(filePath);
 }
+
+
+TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
+{
+    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+
+    Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__Interop();
+} // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")

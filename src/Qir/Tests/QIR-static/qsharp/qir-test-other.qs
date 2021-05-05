@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.Testing.QIR.Other {
     open Microsoft.Quantum.Bitwise;
     open Microsoft.Quantum.Convert;
 
+    @EntryPoint()
     function PauliArrayAsIntTest() : Int {
         if 0 != PauliArrayAsInt([PauliI]) { return  1; }   // The return value indicates which test case has failed.
         if 1 != PauliArrayAsInt([PauliX]) { return  2; }
@@ -23,10 +24,12 @@ namespace Microsoft.Quantum.Testing.QIR.Other {
         return 0;
     }
 
+    @EntryPoint()
     function PauliArrayAsIntFailTest() : Int {
         return PauliArrayAsInt(new Pauli[32]);   // Must fail/throw.
     }
 
+    @EntryPoint()
     function ParityTest() : Int {
         //function Parity (a : Int) : Int
         if 0 != Parity(0)                       { return  1; }  // The return value indicates which test case has failed.

@@ -8,8 +8,6 @@
 
 #include "tracer.hpp"
 
-using namespace std;
-
 namespace Microsoft
 {
 namespace Quantum
@@ -57,7 +55,7 @@ namespace Quantum
         size_t qubitIndex = reinterpret_cast<size_t>(q);
         const QubitState& qstate = this->UseQubit(q);
 
-        stringstream str(std::to_string(qubitIndex));
+        std::stringstream str(std::to_string(qubitIndex));
         str << " last used in layer " << qstate.layer << "(pending zero ops: " << qstate.pendingZeroDurationOps.size()
             << ")";
         return str.str();
@@ -93,7 +91,7 @@ namespace Quantum
             layerStartTime = lastLayer.startTime + lastLayer.duration;
         }
         this->metricsByLayer.emplace_back(
-            Layer{layerStartTime, max(this->preferredLayerDuration, minRequiredDuration)});
+            Layer{layerStartTime, std::max(this->preferredLayerDuration, minRequiredDuration)});
 
         return this->metricsByLayer.size() - 1;
     }
@@ -127,7 +125,7 @@ namespace Quantum
         {
             // Find the earliest layer that the operation fits in by duration
             const Layer& candidateLayer = this->metricsByLayer[candidate];
-            const Time lastUsedTime = max(qstate.lastUsedTime, candidateLayer.startTime);
+            const Time lastUsedTime = std::max(qstate.lastUsedTime, candidateLayer.startTime);
             if (lastUsedTime + opDuration <= candidateLayer.startTime + candidateLayer.duration)
             {
                 layerToInsertInto = candidate;
@@ -173,7 +171,7 @@ namespace Quantum
         // Update the qubit state.
         qstate.layer = layer;
         const Time layerStart = this->metricsByLayer[layer].startTime;
-        qstate.lastUsedTime = max(layerStart, qstate.lastUsedTime) + opDuration;
+        qstate.lastUsedTime = std::max(layerStart, qstate.lastUsedTime) + opDuration;
         qstate.pendingZeroDurationOps.clear();
     }
 
@@ -235,11 +233,11 @@ namespace Quantum
         for (long i = 1; i < nSecondGroup && layerToInsertInto != REQUESTNEW; i++)
         {
             layerToInsertInto =
-                max(layerToInsertInto, this->FindLayerToInsertOperationInto(secondGroup[i], opDuration));
+                std::max(layerToInsertInto, this->FindLayerToInsertOperationInto(secondGroup[i], opDuration));
         }
         for (long i = 0; i < nFirstGroup && layerToInsertInto != REQUESTNEW; i++)
         {
-            layerToInsertInto = max(layerToInsertInto, this->FindLayerToInsertOperationInto(firstGroup[i], opDuration));
+            layerToInsertInto = std::max(layerToInsertInto, this->FindLayerToInsertOperationInto(firstGroup[i], opDuration));
         }
         if (layerToInsertInto == REQUESTNEW)
         {
@@ -333,7 +331,7 @@ namespace Quantum
             return;
         }
 
-        vector<LayerId>& fences = this->tracer->conditionalFences;
+        std::vector<LayerId>& fences = this->tracer->conditionalFences;
         assert(!fences.empty());
         this->tracer->conditionalFences.pop_back();
 
