@@ -13,11 +13,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.16.2104138873-alpha" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <None Include="Driver\CppHeaders\CLI11.hpp" Pack="true">
+    <Content Include="Externals\CLI11\*">
+      <Pack>true</Pack>
+      <PackagePath>Externals\CLI11</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
