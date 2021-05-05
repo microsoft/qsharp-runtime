@@ -28,8 +28,8 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             logger.LogInfo($"Invoking clang with the following arguments: {arguments}");
             var taskCompletionSource = new TaskCompletionSource<bool>();
             using var process = new Process();
-            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPath);
-            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", libraryPath);
+            //Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPath);
+            //Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", libraryPath);
             process.StartInfo = new ProcessStartInfo
             {
                 FileName = "clang++",
