@@ -6,17 +6,13 @@ message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 project(qirruntime)
 
 # specify the C++ standard, compiler and other tools
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
-if(WIN32)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_DLL -D_MT -Xclang --dependent-lib=msvcrt")
-    endif()
+if (WIN32)
+    add_link_options("LINKER:/guard:cf")
 endif()
 
 # feel free to customize these flags for your local builds (don't check in)

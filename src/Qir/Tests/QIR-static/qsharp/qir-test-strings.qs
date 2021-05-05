@@ -5,6 +5,7 @@ namespace Microsoft.Quantum.Testing.QIR.Str {
 
     open Microsoft.Quantum.Intrinsic;
 
+    @EntryPoint()
     function PauliToStringTest() : Int {
 
         if "Pauli value: PauliI" != 

@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.Testing.QIR {
         return from - what;
     }
 
+    @EntryPoint()
     function TestPartials(x : Int, y : Int) : Int {
         let subtractor = Subtract(x, _);
         return subtractor(y);

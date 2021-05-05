@@ -18,7 +18,7 @@ schedules:
 
 variables:
   Build.Major: 0
-  Build.Minor: 14
+  Build.Minor: 16
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
   CI: "true"
