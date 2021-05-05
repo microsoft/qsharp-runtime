@@ -17,7 +17,6 @@
   <ItemGroup>
     <Content Include="Externals\CLI11\*">
       <Pack>true</Pack>
-      <PackagePath>Externals\CLI11</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
