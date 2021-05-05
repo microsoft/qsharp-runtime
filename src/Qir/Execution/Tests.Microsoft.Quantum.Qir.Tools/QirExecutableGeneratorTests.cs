@@ -69,8 +69,8 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
 
             // Verify invocation of clang.
             clangClientMock.Verify(obj => obj.CreateExecutableAsync(
-                It.Is<string[]>(s => s.SequenceEqual(sourceFiles.Select(fileInfo => fileInfo.FullName))),
-                It.Is<string[]>(s => s.SequenceEqual(linkLibraries)),
+                It.Is<string[]>(s => s.OrderBy(val => val).SequenceEqual(sourceFiles.OrderBy(val => val.FullName).Select(fileInfo => fileInfo.FullName))),
+                It.Is<string[]>(s => s.OrderBy(val => val).SequenceEqual(linkLibraries.OrderBy(val => val))),
                 libraryDirectory.FullName,
                 includeDirectory.FullName,
                 executableFile.FullName));
