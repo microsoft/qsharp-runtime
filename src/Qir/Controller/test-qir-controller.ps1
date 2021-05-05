@@ -25,38 +25,38 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     }
 }
 
-$osDir = "win-x64"
-if ($IsLinux) {
-    $osDir = "linux-x64"
-} elseif ($IsMacOS) {
-    $osDir = "osx-x64"
-}
+##$osDir = "win-x64"
+##if ($IsLinux) {
+##    $osDir = "linux-x64"
+##} elseif ($IsMacOS) {
+##    $osDir = "osx-x64"
+##}
+##
+##$qirDropsBin = (Join-Path $Env:QIR_DROPS bin $osDir native)
+##if ($Env:LD_LIBRARY_PATH -eq $null) {
+##    $Env:LD_LIBRARY_PATH = "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+##}
+##else
+##{
+##    $Env:LD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+##}
+##
+##if ($Env:DYLD_LIBRARY_PATH -eq $null) {
+##    $Env:DYLD_LIBRARY_PATH = "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+##}
+##else {
+##    $Env:DYLD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+##}
 
-$qirDropsBin = (Join-Path $Env:QIR_DROPS bin $osDir native)
-if ($Env:LD_LIBRARY_PATH -eq $null) {
-    $Env:LD_LIBRARY_PATH = "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
-}
-else
-{
-    $Env:LD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
-}
 
-if ($Env:DYLD_LIBRARY_PATH -eq $null) {
-    $Env:DYLD_LIBRARY_PATH = "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
-}
-else {
-    $Env:DYLD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
-}
-
-
-Write-Host "LD_LIBRARY_PATH"
-Write-Host $Env:LD_LIBRARY_PATH
-Write-Host "DYLD_LIBRARY_PATH"
-Write-Host $Env:DYLD_LIBRARY_PATH
-Write-Host "NATIVE_SIMULATOR"
-Get-ChildItem $Env:NATIVE_SIMULATOR
-Write-Host "QIR_DROPS_BIN"
-Get-ChildItem $qirDropsBin
+#Write-Host "LD_LIBRARY_PATH"
+#Write-Host $Env:LD_LIBRARY_PATH
+#Write-Host "DYLD_LIBRARY_PATH"
+#Write-Host $Env:DYLD_LIBRARY_PATH
+#Write-Host "NATIVE_SIMULATOR"
+#Get-ChildItem $Env:NATIVE_SIMULATOR
+#Write-Host "QIR_DROPS_BIN"
+#Get-ChildItem $qirDropsBin
 
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
@@ -82,6 +82,14 @@ foreach ( $path in $libraryPaths )
         Copy-Item $_.FullName -Destination (Join-Path $libraryDirectory $_.Name)
     }
 }
+
+$Env:LD_LIBRARY_PATH = "$($libraryDirectory)"
+Write-Host "LD_LIBRARY_PATH"
+Write-Host $Env:LD_LIBRARY_PATH
+
+$Env:DYLD_LIBRARY_PATH = "$($libraryDirectory)"
+Write-Host "DYLD_LIBRARY_PATH"
+Write-Host $Env:DYLD_LIBRARY_PATH
 
 # Go through each input file in the test cases folder.
 Get-ChildItem $testCasesFolder -Filter *.in |
