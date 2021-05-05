@@ -29,12 +29,20 @@ extern "C"
         }
 
         IRuntimeDriver *driver = GlobalContext()->GetDriver();
-        if(driver->AreEqualResults(result, driver->UseZero()))
+        if(driver->AreEqualResults(result, driver->UseOne()))
         {
             prob = 1.0 - prob;
         }
+
+        // Convert paulis from sequence of bytes to sequence of PauliId:
+        std::vector<PauliId> paulis(bases->count);
+        for(size_t i = 0; i < bases->count; ++i)
+        {
+            paulis[i] = (PauliId)(bases->buffer[i]);
+        }
+
         if(!GetDiagnostics()->AssertProbability(
-            (long)qubits->count, (PauliId*)(bases->buffer), (Qubit*)(qubits->buffer), prob, tol, nullptr))
+            (long)qubits->count, paulis.data(), (Qubit*)(qubits->buffer), prob, tol, nullptr))
         {
             quantum__rt__fail(msg);
         }
