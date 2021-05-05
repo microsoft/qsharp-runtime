@@ -235,24 +235,8 @@ define dllexport void @__quantum__qis__applyconditionallyintrinsic__body(
 }
 
 ;===============================================================================
-; quantum.qis AssertMeasurement functions/operations implementation
+; quantum.qis AssertMeasurementProbability functions/operations implementation
 ;
-;    operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
-;    is Adj + Ctl {
-;        body intrinsic;
-;    }
-;    operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
-;    is Adj + Ctl {
-;        body (...) {
-;            AssertMeasurementProbability(bases, qubits, result, 1.0, msg, 1e-10);
-;        }
-;        adjoint (...) { 
-;            // Empty.
-;        }
-;        controlled (controllingQubits, ...) { 
-;            // Empty.
-;        }
-;    }
 define dllexport void @__quantum__qis__assertmeasurementprobability__body(
   %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
   
@@ -286,49 +270,3 @@ define dllexport void @__quantum__qis__assertmeasurementprobability__ctladj(
   ; Empty.
   ret void
 }
-
-
-;define dllexport void @__quantum__qis__assertmeasurement__body(
-;  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-;  ; Empty.
-;  ret void
-;}
-;
-;define dllexport void @__quantum__qis__assertmeasurement__adj(
-;  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-;  ; Empty.
-;  ret void
-;}
-;
-;define dllexport void @__quantum__qis__assertmeasurement__ctl(
-;  %Array* %.ctrlQubits,
-;  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-;  ; Empty.
-;  ret void
-;}
-;
-;define dllexport void @__quantum__qis__assertmeasurement__ctladj(
-;  %Array* %.ctrlQubits,
-;  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-;  ; Empty.
-;  ret void
-;}
-
-;define dllexport void @__quantum__qis__assertmeasurement__body(
-;  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-;  ; TODO: Consider calling @__quantum__qis__assertmeasurementprobability__body() instead:
-;
-;  call void @__quantum__qis__assertmeasurementprobability__body(
-;    %Array* %.bases, %Array* %.qubits, %Result* %.result, double 1.0, %String* %.msg, double 1e-10) {
-;
-;
-;  ;%bases  = bitcast %Array*  %.bases  to %struct.QirArray*
-;  ;%qubits = bitcast %Array*  %.qubits to %struct.QirArray*
-;  ;%result = bitcast %Result* %.result to %class.RESULT*
-;  ;%msg    = bitcast %String* %.msg    to %struct.QirString*
-;
-;  ;call void @quantum__qis__assertmeasurement__body(
-;  ;  %struct.QirArray* %bases, %struct.QirArray* %qubits, %class.RESULT* %result, %struct.QirString* %msg)
-;
-;  ret void
-;}

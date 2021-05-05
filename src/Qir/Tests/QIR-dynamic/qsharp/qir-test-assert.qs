@@ -210,7 +210,26 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.0, "Error: 01 or 10 should never occur as an outcome", 1E-05);
     }
 
-    // TODO: mixed bases (e.g.: (|0+> + |1->) / SQRT(2) returns Zero when measuring in the [PauliZ, PauliX] basis)
-    // TODO: https://teams.microsoft.com/l/message/19:a2559fdb51aa4b0c9904f06afd36a230@thread.skype/1620178597780?tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&groupId=e6e22ac8-e11f-44d0-b599-46e9bea42c53&parentMessageId=1620169396986&teamName=Quantum%20Systems&channelName=QDK%20Release&createdTime=1620178597780
+    // TODO: Chris: mixed bases (e.g.: (|0+> + |1->) / SQRT(2) returns Zero when measuring in the [PauliZ, PauliX] basis)
+    // TODO: Chris: I haven't tested that the code below is correct yet, will package up in a notebook next.
+    //     * You should always be able to pad the basis argument with PauliI while keeping the result the same. For example:
+    //     use left = Qubit();
+    //     use right = Qubit();
+    //     use aux = Qubit();
+    //     H(left);
+    //     CNOT(left, right);
+    //     // The following two assertions are identical.
+    //     AssertMeasurement([PauliX, PauliX], [left, right], Zero, "𝑋-basis parity was incorrect.");
+    //     AssertMeasurement([PauliI, PauliX, PauliX], [aux, left, right], Zero, "𝑋-basis parity was incorrect.");    
+    // 
+    //     * Multi-qubit entangled states, e.g.: (|000> + |111>) / SQRT(2), as prepared and tested by the program below.
+    //     use qs = Qubit[n];
+    //     H(Head(qs));
+    //     ApplyToEachCA(CNOT(Head(qs), _), Rest(qs));
+    //     AssertMeasurement(ConstantArray(PauliX, n), qs, Zero, "Full register must be in even 𝑋-basis parity.");
+    //     for pair in Zipped(Most(qs), Rest(qs)) {
+    //         AssertMeasurement([PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero, "Pairr must be in even 𝑍-basis parity.");
+    //     }
+    //     Let me get on that notebook, in any case!
 
 } // namespace Microsoft.Quantum.Testing.QIR
