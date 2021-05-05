@@ -26,6 +26,15 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     }
 }
 
+if ($Env:LD_LIBRARY_PATH -eq $null) {
+    $Env:LD_LIBRARY_PATH = "$Env:NATIVE_SIMULATOR:$Env:QIR_DROPS"
+}
+else
+{
+    $Env:LD_LIBRARY_PATH += "$Env:NATIVE_SIMULATOR:$Env:QIR_DROPS"
+}
+
+
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
 }
