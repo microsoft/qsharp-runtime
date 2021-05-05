@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Runtime.Submitters
         /// </summary>
         public static SubmissionOptions Default { get; } = new SubmissionOptions("", 500);
 
-        private SubmissionOptions(string friendlyName, int shots) => 
+        private SubmissionOptions(string friendlyName, int shots) =>
             (this.FriendlyName, this.Shots) = (friendlyName, shots);
 
         /// <summary>
