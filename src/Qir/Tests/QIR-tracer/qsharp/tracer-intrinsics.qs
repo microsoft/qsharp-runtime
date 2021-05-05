@@ -5,6 +5,7 @@ namespace Microsoft.Quantum.Testing.Tracer {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Tracer;
 
+    @EntryPoint()
     operation TestCoreIntrinsics() : Unit {
         use qs = Qubit[3];
 
