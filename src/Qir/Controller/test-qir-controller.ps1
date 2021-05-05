@@ -4,7 +4,6 @@
 $all_ok = $True
 
 Write-Host "##[info]Test QIR Controller"
-
 $buildConfiguration = $Env:BUILD_CONFIGURATION
 $controllerProject = (Join-Path $PSScriptRoot QirController.csproj)
 $testCasesFolder = (Join-Path $PSScriptRoot "test-cases")
@@ -42,8 +41,22 @@ else
     $Env:LD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
 }
 
+if ($Env:DYLD_LIBRARY_PATH -eq $null) {
+    $Env:DYLD_LIBRARY_PATH = "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+}
+else {
+    $Env:DYLD_LIBRARY_PATH += "$($Env:NATIVE_SIMULATOR):$($qirDropsBin)"
+}
+
+
 Write-Host "LD_LIBRARY_PATH"
 Write-Host $Env:LD_LIBRARY_PATH
+Write-Host "DYLD_LIBRARY_PATH"
+Write-Host $Env:DYLD_LIBRARY_PATH
+Write-Host "NATIVE_SIMULATOR"
+Get-ChildItem $Env:NATIVE_SIMULATOR
+Write-Host "QIR_DROPS_BIN"
+Get-ChildItem $qirDropsBin
 
 if (!(Test-Path $testArtifactsFolder -PathType Container)) {
     New-Item -ItemType Directory -Force -Path $testArtifactsFolder
