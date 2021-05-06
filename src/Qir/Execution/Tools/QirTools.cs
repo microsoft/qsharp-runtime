@@ -4,6 +4,7 @@
 using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.QsCompiler;
+using Microsoft.Quantum.QsCompiler.QIR;
 using System;
 using System.IO;
 using System.Linq;
@@ -25,26 +26,17 @@ namespace Microsoft.Quantum.Qir.Tools
         /// <param name="includeDirectory">Directory where the headers needed for compilation are located.</param>
         public static async Task BuildFromQSharpDll(FileInfo qsharpDll, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
         {
-            if (!CompilationLoader.ReadBinary(qsharpDll.FullName, out var syntaxTree))
-            {
-                throw new ArgumentException("Unable to read the Q# syntax tree from the given DLL.");
-            }
-
             using var qirContentStream = new MemoryStream();
             if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
             {
                 throw new ArgumentException("The given DLL does not contain QIR byte code.");
             }
 
-            var tasks = syntaxTree.EntryPoints.Select(entryPoint =>
+            var tasks = EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
             {
-                var ep = new EntryPointOperation()
-                {
-                    Name = entryPoint.ToString()
-                };
-                var exeFileInfo = new FileInfo(entryPoint.ToString());
+                var exeFileInfo = new FileInfo(entryPointOp.Name);
                 var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
-                return exe.BuildAsync(ep, libraryDirectory, includeDirectory);
+                return exe.BuildAsync(entryPointOp, libraryDirectory, includeDirectory);
             });
 
             await Task.WhenAll(tasks);
