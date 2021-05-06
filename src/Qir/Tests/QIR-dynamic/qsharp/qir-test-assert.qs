@@ -215,7 +215,25 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.0, "Error: 01 or 10 should never occur as an outcome", 1E-05);
     }
 
-    // TODO: Chris: mixed bases (e.g.: (|0+> + |1->) / SQRT(2) returns Zero when measuring in the [PauliZ, PauliX] basis)
+    // Chris: mixed bases (e.g.: (|0+> + |1->) / SQRT(2) returns Zero when measuring in the [PauliZ, PauliX] basis)
+    @EntryPoint()
+    operation AssertMeasMixedBasesTest() : Unit {
+        use left = Qubit();
+        use right = Qubit();
+
+        H(left);                // (|0>  + |1> )/SQRT(2)
+        CNOT(left, right);      // (|00> + |11>)/SQRT(2)    Bell pair.
+        H(right);               // (|0+> + |1->)/SQRT(2)
+        // Chris: The trick there is to keep in mind that |+⟩ = 𝐻|0⟩ and |−⟩ = 𝐻|1⟩ (that's actually sufficient to define 𝐻). 
+        // From there, everything proceeds by linearity. 
+        // In particular, (|0+⟩ + |1−⟩) / √2 = ([𝟙 ⊗ 𝐻] |00⟩ + [𝟙 ⊗ 𝐻] |11⟩) / √2, 
+        // so that we can factor out [𝟙 ⊗ 𝐻] to get that you need to apply H(right) to a register in a Bell pair.
+
+        AssertMeasurement(           [PauliZ, PauliX], [left, right], Zero,      "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero");
+        AssertMeasurementProbability([PauliZ, PauliX], [left, right], Zero, 1.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero always", 1E-05);
+        AssertMeasurementProbability([PauliZ, PauliX], [left, right],  One, 0.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must not return One"    , 1E-05);
+    }
+
     // TODO: Chris: I haven't tested that the code below is correct yet, will package up in a notebook next.
     //     * You should always be able to pad the basis argument with PauliI while keeping the result the same. For example:
     //     use left = Qubit();

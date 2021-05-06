@@ -32,6 +32,7 @@ extern "C"
     void Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasBellTest__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop(); // NOLINT
 } // extern "C"
 
 using namespace Microsoft::Quantum;
@@ -186,5 +187,6 @@ TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasBellTest__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop());
 
 } // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
