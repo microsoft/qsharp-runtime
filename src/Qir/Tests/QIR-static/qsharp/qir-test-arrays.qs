@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Testing.QIR.Out;
 
     @EntryPoint()
-    operation Test_Arrays(array : Int[], index : Int, val : Int, compilerDecoy : Bool) : Int {
+    operation Test_Arrays(array : Int[], index : Int, val : Int) : Int {
         // exercise __quantum__rt__array_copy
         mutable local = array;
 
@@ -31,40 +31,6 @@ namespace Microsoft.Quantum.Testing.QIR {
             set sum += result[i];
         }
 
-        // The purpose of this block is to keep the Q# compiler from optimizing away other tests when generating QIR
-        if (compilerDecoy) {
-            let res1_1 = TestFunctors();
-            let res1_2 = TestFunctorsNoArgs();
-            let res2 = TestPartials(17, 42);
-            TestQubitResultManagement();
-
-            // Math tests:
-            let res4 = SqrtTest();
-            let res5 = LogTest();
-            let res6 = ArcTan2Test();
-            let res7 = PauliToStringTest();
-            let res8 = TestDrawRandomInt(0, 1);
-            let res9 = SinTest();
-            let res10 = CosTest();
-            let res11 = TanTest();
-            let res12 = SinhTest();
-            let res13 = CoshTest();
-            let res14 = TanhTest();
-            let res15 = IeeeRemainderTest();
-            let res16 = ArcSinTest();
-            let res17 = ArcCosTest();
-            let res18 = ArcTanTest();
-            let res19 = ParityTest();
-            let res20 = PauliArrayAsIntTest();
-            let res21 = PauliArrayAsIntFailTest();
-            let res22 = TestDrawRandomDouble(0.0, 1.0);
-            MessageTest("Test");
-
-            // Conditionals:
-            TestApplyIf();
-            TestApplyIfWithFunctors();
-            TestApplyConditionally();
-        }
         return sum;
     }
 }

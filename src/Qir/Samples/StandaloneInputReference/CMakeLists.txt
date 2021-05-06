@@ -6,7 +6,7 @@ add_executable(qir-input-reference-standalone
 )
 
 # This is where the generated QIR file is specified.
-target_source_from_qir(qir-input-reference-standalone qsharp/qir/qir-standalone-input-reference.ll)
+target_source_from_qir(qir-input-reference-standalone qsharp/obj/qsharp/qir-standalone-input-reference.bc)
 
 target_link_libraries(qir-input-reference-standalone PUBLIC
   "-L${runtime_lib_path}"
@@ -34,10 +34,10 @@ add_test(
 if(DEFINED ENV{NATIVE_SIMULATOR})
     set(TEST_DEPS1 $ENV{NATIVE_SIMULATOR})
 else()
-    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/${CMAKE_BUILD_TYPE}")
+    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/$ENV{BUILD_CONFIGURATION}")
 endif()
 
-set(TEST_DEPS2 "${PROJECT_SOURCE_DIR}/../Runtime/build/${CMAKE_BUILD_TYPE}/bin")
+set(TEST_DEPS2 "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
 set_property(TEST qir-input-reference-standalone PROPERTY ENVIRONMENT
     "LD_LIBRARY_PATH=${TEST_DEPS1}:${TEST_DEPS2}:${LD_LIBRARY_PATH}"
     "PATH=${TEST_DEPS1}\;${TEST_DEPS2}\;${PATH}"

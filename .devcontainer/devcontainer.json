@@ -1,5 +1,13 @@
 {
-    "build": {
-        "dockerfile": "Dockerfile"
+    "dockerFile": "./Dockerfile",
+    "extensions": [
+        "ms-dotnettools.csharp",
+        "Ionide.Ionide-fsharp",
+        "ms-vscode.powershell",
+        "quantum.quantum-devkit-vscode",
+        "ms-vscode.cpptools"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/usr/bin/pwsh"
     }
 }
