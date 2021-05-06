@@ -6,8 +6,10 @@
 
 namespace Microsoft.Quantum.Testing.QIR  {
 
+    open Microsoft.Quantum.Arrays;
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Canon;
 
     // |0> -> |1> 
     @EntryPoint()
@@ -191,28 +193,50 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [qubitIds[2], qubitIds[3]], Zero, 1.0, "5: Call failed", 1E-05);   // |00> or |11>
     }
 
-    // Bell state:
+    // Bell states (equal superposition of |00> and |11>, `(|10> + |01>) / SQRT(2)`):
     // https://github.com/microsoft/Quantum/blob/0ec53c6efe09c0f725aae01648cd92377e2fcc99/samples/getting-started/measurement/Measurement.qs#L89
     // "Quantum Computing : A Gentle Introduction", Example 3.2.1.  http://mmrc.amss.cas.cn/tlb/201702/W020170224608150244118.pdf
-    @EntryPoint()
-    operation AssertMeasBellTest() : Unit {
-        // The following using block allocates a pair of fresh qubits, which
-        // start off in the |00> state by convention.
-        use left = Qubit();
-        use right = Qubit();
-        // By applying the Hadamard and controlled-NOT (CNOT) operations,
-        // we can prepare our qubits in an equal superposition of |00> and
-        // |11>. This state is sometimes known as a Bell state.
-        H(left);
-        CNOT(left, right);
 
-        // The following two assertions ascertain that the created state is indeed
-        // invariant under both, the XX and the ZZ operations, i.e., it projects
-        // into the +1 eigenstate of these two Pauli operators.
-        AssertMeasurement(           [PauliZ, PauliZ], [left, right], Zero,      "Error: Bell state must be eigenstate of ZZ");
-        AssertMeasurement(           [PauliX, PauliX], [left, right], Zero,      "Error: Bell state must be eigenstate of XX");
-        AssertMeasurementProbability([PauliZ, PauliZ], [left, right], Zero, 1.0, "Error: Bell state must be eigenstate of ZZ", 1E-05);
-        AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.0, "Error: 01 or 10 should never occur as an outcome", 1E-05);
+    // States based on Bell state:
+    operation PrepareBellPair((applyX : Bool, applyZ : Bool), (left : Qubit, right : Qubit))  : Unit is Adj + Ctl {
+                            // Expects: |00>
+        H(left);            // Equally probable |0>  or |1>.  `(|0>  + |1> ) / SQRT(2)`
+        CNOT(left, right);  // Equally probable |00> or |11>. `(|00> + |11>) / SQRT(2)`
+
+        if applyX { 
+            X(left);        // Equally probable |10> or |01>. `(|10> + |01>) / SQRT(2)`. Left qubit is `*`.
+        }
+        if applyZ {
+            Z(left);        // Equally probable |*0> or |*(-1)>. `(|*0> - |*1>) / SQRT(2)`. Note: the `-` sign. 
+        }
+    }
+
+    @EntryPoint()
+    operation AssertBellPairMeasurementsAreCorrectTest() : Unit {
+        for applyX in [false, true ] {
+            for applyZ in [false, true] {
+                use left  = Qubit();
+                use right = Qubit();
+
+                within {
+                    PrepareBellPair((applyX, applyZ), (left, right));
+                } apply {
+                    AssertMeasurement(           [PauliZ, PauliZ], [left, right], applyX ?  One | Zero,      "0: 𝑍-basis parity was wrong");
+                    AssertMeasurementProbability([PauliZ, PauliZ], [left, right], applyX ?  One | Zero, 1.0, "1: 𝑍-basis parity was wrong", 1E-05);
+                    AssertMeasurementProbability([PauliZ, PauliZ], [left, right], applyX ? Zero |  One, 0.0, "2: 𝑍-basis parity was wrong", 1E-05);
+                    AssertMeasurement(           [PauliX, PauliX], [left, right], applyZ ?  One | Zero,      "0: 𝑋-basis parity was wrong");
+                    AssertMeasurementProbability([PauliX, PauliX], [left, right], applyZ ?  One | Zero, 1.0, "1: 𝑋-basis parity was wrong", 1E-05);
+                    AssertMeasurementProbability([PauliX, PauliX], [left, right], applyZ ? Zero |  One, 0.0, "2: 𝑋-basis parity was wrong", 1E-05);
+
+                    // Padding:
+                    use aux = Qubit();
+                    AssertMeasurement([PauliI, PauliZ, PauliZ], [aux, left, right], applyX ? One | Zero, "3: 𝑍-basis parity was wrong.");
+                    AssertMeasurement([PauliZ, PauliZ, PauliI], [left, right, aux], applyX ? One | Zero, "4: 𝑍-basis parity was wrong.");
+                    AssertMeasurement([PauliI, PauliX, PauliX], [aux, left, right], applyZ ? One | Zero, "3: 𝑋-basis parity was wrong.");
+                    AssertMeasurement([PauliX, PauliX, PauliI], [left, right, aux], applyZ ? One | Zero, "4: 𝑋-basis parity was wrong.");                    
+                }
+            }
+        }
     }
 
     // Chris: mixed bases (e.g.: (|0+> + |1->) / SQRT(2) returns Zero when measuring in the [PauliZ, PauliX] basis)
@@ -229,30 +253,49 @@ namespace Microsoft.Quantum.Testing.QIR  {
         // In particular, (|0+⟩ + |1−⟩) / √2 = ([𝟙 ⊗ 𝐻] |00⟩ + [𝟙 ⊗ 𝐻] |11⟩) / √2, 
         // so that we can factor out [𝟙 ⊗ 𝐻] to get that you need to apply H(right) to a register in a Bell pair.
 
-        AssertMeasurement(           [PauliZ, PauliX], [left, right], Zero,      "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero");
-        AssertMeasurementProbability([PauliZ, PauliX], [left, right], Zero, 1.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero always", 1E-05);
-        AssertMeasurementProbability([PauliZ, PauliX], [left, right],  One, 0.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must not return One"    , 1E-05);
+        AssertMeasurement(           [PauliZ, PauliX], [left, right], Zero,      "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero in 𝑍𝑋-basis"              );
+        AssertMeasurementProbability([PauliZ, PauliX], [left, right], Zero, 1.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero always in 𝑍𝑋-basis", 1E-05);
+        AssertMeasurementProbability([PauliZ, PauliX], [left, right],  One, 0.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must not return One in 𝑍𝑋-basis"    , 1E-05);
+
+        AssertMeasurement(           [PauliX, PauliZ], [left, right], Zero,      "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero in 𝑋𝑍-basis"              );
+        AssertMeasurementProbability([PauliX, PauliZ], [left, right], Zero, 1.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero always in 𝑋𝑍-basis", 1E-05);
+        AssertMeasurementProbability([PauliX, PauliZ], [left, right],  One, 0.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must not return One in 𝑋𝑍-basis"    , 1E-05);
     }
 
-    // TODO: Chris: I haven't tested that the code below is correct yet, will package up in a notebook next.
-    //     * You should always be able to pad the basis argument with PauliI while keeping the result the same. For example:
-    //     use left = Qubit();
-    //     use right = Qubit();
-    //     use aux = Qubit();
-    //     H(left);
-    //     CNOT(left, right);
-    //     // The following two assertions are identical.
-    //     AssertMeasurement([PauliX, PauliX], [left, right], Zero, "𝑋-basis parity was incorrect.");
-    //     AssertMeasurement([PauliI, PauliX, PauliX], [aux, left, right], Zero, "𝑋-basis parity was incorrect.");    
-    // 
-    //     * Multi-qubit entangled states, e.g.: (|000> + |111>) / SQRT(2), as prepared and tested by the program below.
-    //     use qs = Qubit[n];
-    //     H(Head(qs));
-    //     ApplyToEachCA(CNOT(Head(qs), _), Rest(qs));
-    //     AssertMeasurement(ConstantArray(PauliX, n), qs, Zero, "Full register must be in even 𝑋-basis parity.");
-    //     for pair in Zipped(Most(qs), Rest(qs)) {
-    //         AssertMeasurement([PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero, "Pairr must be in even 𝑍-basis parity.");
-    //     }
-    //     Let me get on that notebook, in any case!
+
+    // Multi-qubit entangled states, e.g.: (|000> + |111>) / SQRT(2) - GHZ States:
+    operation PrepareGHZState(qs : Qubit[]) : Unit is Adj + Ctl {
+        H(Head(qs));
+        ApplyToEachCA(CNOT(Head(qs), _), Rest(qs));
+    }
+
+    operation AssertGHZMeasurementsAreCorrect(n : Int) : Unit {
+        use qs = Qubit[n];
+        within {
+            PrepareGHZState(qs);
+        } apply {
+            AssertMeasurement(           ConstantArray(n, PauliZ), qs, Zero,      "0: Z-basis parity was wrong");
+            AssertMeasurementProbability(ConstantArray(n, PauliZ), qs, Zero, 1.0, "1: Z-basis parity was wrong", 1E-05);
+            AssertMeasurementProbability(ConstantArray(n, PauliZ), qs,  One, 0.0, "2: Z-basis parity was wrong", 1E-05);
+            AssertMeasurement(           ConstantArray(n, PauliX), qs, Zero,      "0: X-basis parity was wrong");
+            AssertMeasurementProbability(ConstantArray(n, PauliX), qs, Zero, 1.0, "1: X-basis parity was wrong", 1E-05);
+            AssertMeasurementProbability(ConstantArray(n, PauliX), qs,  One, 0.0, "2: X-basis parity was wrong", 1E-05);
+            for pair in Zipped(Most(qs), Rest(qs)) {
+                AssertMeasurement(           [PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero,      "3: Z-basis parity was wrong");
+                AssertMeasurementProbability([PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero, 1.0, "4: Z-basis parity was wrong", 1E-05);
+                AssertMeasurementProbability([PauliZ, PauliZ], [Fst(pair), Snd(pair)],  One, 0.0, "5: Z-basis parity was wrong", 1E-05);
+                AssertMeasurement(           [PauliX, PauliX], [Fst(pair), Snd(pair)], Zero,      "1: X-basis parity was wrong");
+                AssertMeasurementProbability([PauliX, PauliX], [Fst(pair), Snd(pair)], Zero, 1.0, "4: X-basis parity was wrong", 1E-05);
+                AssertMeasurementProbability([PauliX, PauliX], [Fst(pair), Snd(pair)],  One, 0.0, "5: X-basis parity was wrong", 1E-05);
+            }
+        }
+    }
+
+    @EntryPoint()
+    operation AssertGHZMeasurementsTest() : Unit {
+        for qnum in 3 .. 6 {
+            AssertGHZMeasurementsAreCorrect(qnum);
+        }
+    }
 
 } // namespace Microsoft.Quantum.Testing.QIR
