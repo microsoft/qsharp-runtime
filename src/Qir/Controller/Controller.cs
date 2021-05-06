@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Model;
+using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Microsoft.Quantum.Qir
 {

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 using System;
 using System.IO;
 using System.Linq;

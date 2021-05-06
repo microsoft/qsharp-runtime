@@ -3,7 +3,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
+using Microsoft.Quantum.Qir.Serialization;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
