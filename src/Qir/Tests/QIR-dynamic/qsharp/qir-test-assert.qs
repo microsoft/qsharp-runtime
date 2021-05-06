@@ -6,10 +6,73 @@
 
 namespace Microsoft.Quantum.Testing.QIR  {
 
-    open Microsoft.Quantum.Arrays;
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Canon;
+
+    // To avoid the potentially circular dependency on QuantumLibraries repo we redefine the following {
+    // Identifiers from Microsoft.Quantum.Arrays:
+    // QuantumLibraries\Standard\src\Arrays\Arrays.qs:
+    function Head<'A> (array : 'A[]) : 'A {
+        //EqualityFactB(Length(array) > 0, true, $"Array must be of the length at least 1");
+        if Length(array) == 0 {
+            fail "Array must be of the length at least 1";
+        }
+        return array[0];
+    }
+    function Rest<'T> (array : 'T[]) : 'T[] {
+        return array[1 .. Length(array) - 1];
+    }
+    function ConstantArray<'T> (length : Int, value : 'T) : 'T[] {
+        mutable arr = new 'T[length];
+
+        for i in 0 .. length - 1 {
+            set arr w/= i <- value;
+        }
+
+        return arr;
+    }
+    function Most<'T> (array : 'T[]) : 'T[] {
+        return array[0 .. Length(array) - 2];
+    }
+
+    // QuantumLibraries\Standard\src\Arrays\Zip.qs:
+    function Zipped<'T, 'U>(left : 'T[], right : 'U[]) : ('T, 'U)[] {
+        let nElements = Length(left) < Length(right)
+                        ? Length(left)
+                        | Length(right);
+        mutable output = new ('T, 'U)[nElements];
+
+        for idxElement in 0 .. nElements - 1 {
+            set output w/= idxElement <- (left[idxElement], right[idxElement]);
+        }
+
+        return output;
+    }
+
+    // qsharp-runtime\src\Simulation\QSharpFoundation\Arrays\Enumeration.qs:
+    function IndexRange<'TElement>(array : 'TElement[]) : Range {
+       return 0..(Length(array) - 1);
+    }
+
+    // Identifiers from open Microsoft.Quantum.Canon:
+    // QuantumLibraries\Standard\src\Canon\Combinators\ApplyToEach.qs:
+    operation ApplyToEachCA<'T> (singleElementOperation : ('T => Unit is Adj + Ctl), register : 'T[])
+    : Unit is Adj + Ctl {
+        for idxQubit in IndexRange(register) {
+            singleElementOperation(register[idxQubit]);
+        }
+    }
+    // QuantumLibraries\Standard\src\Canon\DataStructures\Pairs.qs:
+    function Fst<'T, 'U> (pair : ('T, 'U)) : 'T {
+        let (fst, snd) = pair;
+        return fst;
+    }
+    function Snd<'T, 'U> (pair : ('T, 'U)) : 'U {
+        let (fst, snd) = pair;
+        return snd;
+    }
+    // } To avoid the potentially circular dependency on QuantumLibraries repo we redefine the following.
+
 
     // |0> -> |1> 
     @EntryPoint()
