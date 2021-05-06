@@ -5,15 +5,13 @@
 
 #include "QirRuntime.hpp"
 
-using namespace std;
-
 namespace Microsoft
 {
 namespace Quantum
 {
     void AllocationsTracker::OnAllocate(void* object)
     {
-        auto inserted = this->allocatedObjects.insert(make_pair(object, 1));
+        auto inserted = this->allocatedObjects.insert(std::make_pair(object, 1));
         if (inserted.second)
         {
             // first time we are allocating an object at this address, nothing to do

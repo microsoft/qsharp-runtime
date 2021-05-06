@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
@@ -23,13 +24,15 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
             // string.Join does not automatically prepend the delimiter, so it is included again in the string here.
             var librariesArg = $"{LinkFlag} {string.Join(LinkFlag, libraries)}";
-            var arguments = $"{inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath}";
+            var arguments = $"{inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath} -std=c++17 -v";
             logger.LogInfo($"Invoking clang with the following arguments: {arguments}");
             var taskCompletionSource = new TaskCompletionSource<bool>();
             using var process = new Process();
+            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPath);
+            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", libraryPath);
             process.StartInfo = new ProcessStartInfo
             {
-                FileName = "clang",
+                FileName = "clang++",
                 Arguments = arguments,
             };
             process.EnableRaisingEvents = true;
