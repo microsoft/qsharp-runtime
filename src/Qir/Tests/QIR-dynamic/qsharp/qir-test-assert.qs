@@ -274,19 +274,18 @@ namespace Microsoft.Quantum.Testing.QIR  {
         within {
             PrepareGHZState(qs);
         } apply {
-            AssertMeasurement(           ConstantArray(n, PauliZ), qs, Zero,      "0: Z-basis parity was wrong");
-            AssertMeasurementProbability(ConstantArray(n, PauliZ), qs, Zero, 1.0, "1: Z-basis parity was wrong", 1E-05);
-            AssertMeasurementProbability(ConstantArray(n, PauliZ), qs,  One, 0.0, "2: Z-basis parity was wrong", 1E-05);
-            AssertMeasurement(           ConstantArray(n, PauliX), qs, Zero,      "0: X-basis parity was wrong");
-            AssertMeasurementProbability(ConstantArray(n, PauliX), qs, Zero, 1.0, "1: X-basis parity was wrong", 1E-05);
-            AssertMeasurementProbability(ConstantArray(n, PauliX), qs,  One, 0.0, "2: X-basis parity was wrong", 1E-05);
+            if (n &&& 1) == 0 {   // Even number of qubits.
+                AssertMeasurement(           ConstantArray(n, PauliZ), qs, Zero,      "0: Z-basis parity was wrong. n: {n}");
+                AssertMeasurementProbability(ConstantArray(n, PauliZ), qs, Zero, 1.0, "1: Z-basis parity was wrong. n: {n}", 1E-05);
+                AssertMeasurementProbability(ConstantArray(n, PauliZ), qs,  One, 0.0, "2: Z-basis parity was wrong. n: {n}", 1E-05);
+            }
+            AssertMeasurement(           ConstantArray(n, PauliX), qs, Zero,      "0: X-basis parity was wrong. n: {n}");
+            AssertMeasurementProbability(ConstantArray(n, PauliX), qs, Zero, 1.0, "1: X-basis parity was wrong. n: {n}", 1E-05);
+            AssertMeasurementProbability(ConstantArray(n, PauliX), qs,  One, 0.0, "2: X-basis parity was wrong. n: {n}", 1E-05);
             for pair in Zipped(Most(qs), Rest(qs)) {
                 AssertMeasurement(           [PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero,      "3: Z-basis parity was wrong");
                 AssertMeasurementProbability([PauliZ, PauliZ], [Fst(pair), Snd(pair)], Zero, 1.0, "4: Z-basis parity was wrong", 1E-05);
                 AssertMeasurementProbability([PauliZ, PauliZ], [Fst(pair), Snd(pair)],  One, 0.0, "5: Z-basis parity was wrong", 1E-05);
-                AssertMeasurement(           [PauliX, PauliX], [Fst(pair), Snd(pair)], Zero,      "1: X-basis parity was wrong");
-                AssertMeasurementProbability([PauliX, PauliX], [Fst(pair), Snd(pair)], Zero, 1.0, "4: X-basis parity was wrong", 1E-05);
-                AssertMeasurementProbability([PauliX, PauliX], [Fst(pair), Snd(pair)],  One, 0.0, "5: X-basis parity was wrong", 1E-05);
             }
         }
     }
