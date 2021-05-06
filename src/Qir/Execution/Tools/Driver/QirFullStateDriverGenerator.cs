@@ -4,7 +4,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
-using Microsoft.Quantum.QsCompiler;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {

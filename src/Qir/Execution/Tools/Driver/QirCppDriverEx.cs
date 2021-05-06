@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
+using Microsoft.Quantum.Qir.Serialization;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {

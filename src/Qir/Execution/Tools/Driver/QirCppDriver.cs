@@ -10,7 +10,7 @@
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     using System.IO;
-    using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
+    using Microsoft.Quantum.Qir.Serialization;
     using System;
     
     /// <summary>

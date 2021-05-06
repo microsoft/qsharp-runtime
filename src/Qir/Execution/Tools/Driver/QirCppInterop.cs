@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
+using Microsoft.Quantum.Qir.Serialization;
 
 #nullable enable
 
