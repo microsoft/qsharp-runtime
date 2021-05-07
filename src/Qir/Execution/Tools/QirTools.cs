@@ -40,10 +40,9 @@ namespace Microsoft.Quantum.Qir.Tools
                 executablesDirectory.Create();
             }
 
-            var dirStr = executablesDirectory.FullName + Path.DirectorySeparatorChar;
             var tasks = EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
             {
-                var exeFileInfo = new FileInfo(dirStr + entryPointOp.Name);
+                var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, entryPointOp.Name));
                 var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
                 return exe.BuildAsync(entryPointOp, libraryDirectory, includeDirectory);
             });
