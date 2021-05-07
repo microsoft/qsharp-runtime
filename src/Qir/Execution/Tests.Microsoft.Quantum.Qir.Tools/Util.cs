@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO;
-using System.Reflection;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 
 namespace Tests.Microsoft.Quantum.Qir.Tools
 {

@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Driver;
 using Microsoft.Quantum.Qir.Tools.Executable;
 using Microsoft.Quantum.Qir.Utility;
-using Microsoft.Quantum.QsCompiler.BondSchemas.Execution;
 using Moq;
 using Xunit;
 
