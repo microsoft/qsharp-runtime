@@ -3,7 +3,7 @@
 https://github.com/microsoft/qsharp-runtime/pull/476
 
 Q# defines the set of basic gate operations in the Microsoft.Quantum.Intrinsic namespace, 
-where the fundamental operations are implemented as body intrinsic 
+where the fundamental operations are implemented as `body intrinsic`
 and other operations are expressed as decompositions onto these body-intrinsic operations. 
 These effectively represent a specific quantum gate set that the current version of the simulator implements. 
 To facilitate experimentation, testing, and eventually targeting of simulators and hardware with a different quantum gate set,
@@ -22,4 +22,4 @@ QSharpCore is built on top of QSharpFoundation.
 
 
 # See Also
-[TargetDefinitions/README.md](TargetDefinitions/README.md )
+[TargetDefinitions/README.md](TargetDefinitions/README.md)

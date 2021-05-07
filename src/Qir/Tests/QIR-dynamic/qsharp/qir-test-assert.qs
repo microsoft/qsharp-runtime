@@ -12,17 +12,17 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // To avoid the potentially circular dependency on QuantumLibraries repo we redefine the following {
     // Identifiers from Microsoft.Quantum.Arrays:
     // QuantumLibraries\Standard\src\Arrays\Arrays.qs:
-    function Head<'A> (array : 'A[]) : 'A {
+    internal function Head<'A> (array : 'A[]) : 'A {
         //EqualityFactB(Length(array) > 0, true, $"Array must be of the length at least 1");
         if Length(array) == 0 {
             fail "Array must be of the length at least 1";
         }
         return array[0];
     }
-    function Rest<'T> (array : 'T[]) : 'T[] {
+    internal function Rest<'T> (array : 'T[]) : 'T[] {
         return array[1 .. Length(array) - 1];
     }
-    function ConstantArray<'T> (length : Int, value : 'T) : 'T[] {
+    internal function ConstantArray<'T> (length : Int, value : 'T) : 'T[] {
         mutable arr = new 'T[length];
 
         for i in 0 .. length - 1 {
@@ -31,12 +31,12 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
         return arr;
     }
-    function Most<'T> (array : 'T[]) : 'T[] {
+    internal function Most<'T> (array : 'T[]) : 'T[] {
         return array[0 .. Length(array) - 2];
     }
 
     // QuantumLibraries\Standard\src\Arrays\Zip.qs:
-    function Zipped<'T, 'U>(left : 'T[], right : 'U[]) : ('T, 'U)[] {
+    internal function Zipped<'T, 'U>(left : 'T[], right : 'U[]) : ('T, 'U)[] {
         let nElements = Length(left) < Length(right)
                         ? Length(left)
                         | Length(right);
@@ -50,24 +50,24 @@ namespace Microsoft.Quantum.Testing.QIR  {
     }
 
     // qsharp-runtime\src\Simulation\QSharpFoundation\Arrays\Enumeration.qs:
-    function IndexRange<'TElement>(array : 'TElement[]) : Range {
+    internal function IndexRange<'TElement>(array : 'TElement[]) : Range {
        return 0..(Length(array) - 1);
     }
 
     // Identifiers from open Microsoft.Quantum.Canon:
     // QuantumLibraries\Standard\src\Canon\Combinators\ApplyToEach.qs:
-    operation ApplyToEachCA<'T> (singleElementOperation : ('T => Unit is Adj + Ctl), register : 'T[])
+    internal operation ApplyToEachCA<'T> (singleElementOperation : ('T => Unit is Adj + Ctl), register : 'T[])
     : Unit is Adj + Ctl {
         for idxQubit in IndexRange(register) {
             singleElementOperation(register[idxQubit]);
         }
     }
     // QuantumLibraries\Standard\src\Canon\DataStructures\Pairs.qs:
-    function Fst<'T, 'U> (pair : ('T, 'U)) : 'T {
+    internal function Fst<'T, 'U> (pair : ('T, 'U)) : 'T {
         let (fst, snd) = pair;
         return fst;
     }
-    function Snd<'T, 'U> (pair : ('T, 'U)) : 'U {
+    internal function Snd<'T, 'U> (pair : ('T, 'U)) : 'U {
         let (fst, snd) = pair;
         return snd;
     }
@@ -179,7 +179,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // Multiple qubits:
 
     // Quantum Katas, Joint Measurement Workbook,
-    //  https://hub.gke2.mybinder.org/user/microsoft-quantumkatas-jv0pu1ej/notebooks/JointMeasurements/Workbook_JointMeasurements.ipynb#Task-1.-Single-qubit-measurement
+    //  https://github.com/microsoft/QuantumKatas/blob/main/JointMeasurements/Workbook_JointMeasurements.ipynb
 
     //  Task 1. Single-qubit measurement
     //  Task 2. Parity measurement
@@ -234,7 +234,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     // Task 3.  |0000>+|1111>  or  |0011>+|1100> ?
     @EntryPoint()
-    operation AssertMeas4qubits() : Unit {
+    operation AssertMeas4Qubits() : Unit {
         use qubitIds = Qubit[4];        // |0000>
 
         H(qubitIds[0]);                 // |+>, equally probable |0> and |1> in PauliZ basis.
@@ -246,7 +246,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
             X(qubitIds[3]);             //      |0011>
         }
 
-        // Equally probable |1100> or |0011>.
+        // Equally probable |1100> or |0011> in PauliZ basis.
 
         AssertMeasurement(           [PauliZ, PauliZ], [qubitIds[0], qubitIds[1]], Zero,      "0: Call failed");  // |00> or |11>
         AssertMeasurement(           [PauliZ, PauliZ], [qubitIds[1], qubitIds[2]],  One,      "1: Call failed");  // |01> or |10>
@@ -256,13 +256,13 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [qubitIds[2], qubitIds[3]], Zero, 1.0, "5: Call failed", 1E-05);   // |00> or |11>
     }
 
-    // Bell states (equal superposition of |00> and |11>, `(|10> + |01>) / SQRT(2)`):
+    // Bell states (superposition of |00> and |11>, `(|10> + |01>) / SQRT(2)`):
     // https://github.com/microsoft/Quantum/blob/0ec53c6efe09c0f725aae01648cd92377e2fcc99/samples/getting-started/measurement/Measurement.qs#L89
-    // "Quantum Computing : A Gentle Introduction", Example 3.2.1.  http://mmrc.amss.cas.cn/tlb/201702/W020170224608150244118.pdf
+    // "Quantum Computing : A Gentle Introduction", Example 3.2.1. https://mitpress.mit.edu/books/quantum-computing
 
     // States based on Bell state:
-    operation PrepareBellPair((applyX : Bool, applyZ : Bool), (left : Qubit, right : Qubit))  : Unit is Adj + Ctl {
-                            // Expects: |00>
+    internal operation PrepareBellPair((applyX : Bool, applyZ : Bool), (left : Qubit, right : Qubit))  : Unit is Adj + Ctl {
+                            // Expects: |00>. Comments below are in Z-basis.
         H(left);            // Equally probable |0>  or |1>.  `(|0>  + |1> ) / SQRT(2)`
         CNOT(left, right);  // Equally probable |00> or |11>. `(|00> + |11>) / SQRT(2)`
 
@@ -276,7 +276,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     @EntryPoint()
     operation AssertBellPairMeasurementsAreCorrectTest() : Unit {
-        for applyX in [false, true ] {
+        for applyX in [false, true] {
             for applyZ in [false, true] {
                 use left  = Qubit();
                 use right = Qubit();
@@ -327,12 +327,12 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
 
     // Multi-qubit entangled states, e.g.: (|000> + |111>) / SQRT(2) - GHZ States:
-    operation PrepareGHZState(qs : Qubit[]) : Unit is Adj + Ctl {
+    internal operation PrepareGHZState(qs : Qubit[]) : Unit is Adj + Ctl {
         H(Head(qs));
         ApplyToEachCA(CNOT(Head(qs), _), Rest(qs));
     }
 
-    operation AssertGHZMeasurementsAreCorrect(n : Int) : Unit {
+    internal operation AssertGHZMeasurementsAreCorrect(n : Int) : Unit {
         use qs = Qubit[n];
         within {
             PrepareGHZState(qs);
@@ -355,8 +355,8 @@ namespace Microsoft.Quantum.Testing.QIR  {
 
     @EntryPoint()
     operation AssertGHZMeasurementsTest() : Unit {
-        for qnum in 3 .. 6 {
-            AssertGHZMeasurementsAreCorrect(qnum);
+        for nQubits in 3 .. 6 {
+            AssertGHZMeasurementsAreCorrect(nQubits);
         }
     }
 

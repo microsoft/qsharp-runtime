@@ -30,7 +30,7 @@ extern "C"
     void Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasSPlusMinusTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop(); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeas4Qubits__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertBellPairMeasurementsAreCorrectTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertGHZMeasurementsTest__Interop(); // NOLINT
@@ -186,7 +186,7 @@ TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasSPlusMinusTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas0011__Interop());
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas4qubits__Interop());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeas4Qubits__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertBellPairMeasurementsAreCorrectTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertGHZMeasurementsTest__Interop());
