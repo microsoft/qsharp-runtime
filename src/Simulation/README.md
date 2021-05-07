@@ -18,7 +18,7 @@ is expected to be overridden/replaced with alternative implementation defined in
 Contains common implementations shared across all target packages.
 
 ## **QSharpCore**
-QSharpCore is build on top of QSharpFoundation.
+QSharpCore is built on top of QSharpFoundation.
 
 
 # See Also
