@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
 
-    // To avoid the potentially circular dependency on QuantumLibraries repo we redefine the following {
+    // To avoid the potential circular dependency on QuantumLibraries repo we redefine the following {
     // Identifiers from Microsoft.Quantum.Arrays:
     // QuantumLibraries\Standard\src\Arrays\Arrays.qs:
     internal function Head<'A> (array : 'A[]) : 'A {
@@ -71,7 +71,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
         let (fst, snd) = pair;
         return snd;
     }
-    // } To avoid the potentially circular dependency on QuantumLibraries repo we redefine the following.
+    // } To avoid the potential circular dependency...
 
 
     // |0> -> |1> 
@@ -179,7 +179,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // Multiple qubits:
 
     // Quantum Katas, Joint Measurement Workbook,
-    //  https://github.com/microsoft/QuantumKatas/blob/main/JointMeasurements/Workbook_JointMeasurements.ipynb
+    //  https://mybinder.org/v2/gh/microsoft/QuantumKatas/HEAD?filepath=JointMeasurements%2FWorkbook_JointMeasurements.ipynb
 
     //  Task 1. Single-qubit measurement
     //  Task 2. Parity measurement
