@@ -34,18 +34,55 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         public static Task<int> Submit<TIn, TOut>(
             AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
         {
-            if (!(qirSubmission is null) && QirSubmitter(settings) is { } submitter)
+            if (!(qirSubmission is null) && QirSubmitter(settings) is { } qirSubmitter)
             {
-                return SubmitQir(settings, submitter, qirSubmission);
+                return SubmitQir(settings, qirSubmitter, qirSubmission);
+            }
+
+            if (QSharpSubmitter(settings) is { } qsSubmitter)
+            {
+                return SubmitQSharp(settings, qsSubmitter, qsSubmission);
             }
 
             if (QSharpMachine(settings) is { } machine)
             {
-                return SubmitQSharp(settings, machine, qsSubmission);
+                return SubmitQSharpMachine(settings, machine, qsSubmission);
             }
 
             DisplayWithColor(ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
             return Task.FromResult(1);
+        }
+
+        /// <summary>
+        /// Submits a Q# entry point to Azure Quantum using a quantum machine.
+        /// </summary>
+        /// <typeparam name="TIn">The entry point's argument type.</typeparam>
+        /// <typeparam name="TOut">The entry point's return type.</typeparam>
+        /// <param name="settings">The Azure submission settings.</param>
+        /// <param name="machine">The quantum machine used for submission.</param>
+        /// <param name="submission">The Q# entry point submission.</param>
+        /// <returns>The exit code.</returns>
+        private static async Task<int> SubmitQSharpMachine<TIn, TOut>(
+            AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
+        {
+            if (settings.Verbose)
+            {
+                Console.WriteLine("Submitting Q# entry point using a quantum machine." + Environment.NewLine);
+                Console.WriteLine(settings + Environment.NewLine);
+            }
+
+            if (settings.DryRun)
+            {
+                var (valid, message) = machine.Validate(submission.EntryPointInfo, submission.Argument);
+                return DisplayValidation(valid ? null : message);
+            }
+
+            var job = machine.SubmitAsync(
+                submission.EntryPointInfo,
+                submission.Argument,
+                new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
+
+            return await DisplayJobOrError(settings, job);
         }
 
         /// <summary>
@@ -54,24 +91,29 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
         /// <typeparam name="TOut">The entry point's return type.</typeparam>
         /// <param name="settings">The Azure submission settings.</param>
-        /// <param name="machine">The quantum machine used for submission.</param>
+        /// <param name="submitter">The Q# submitter.</param>
         /// <param name="submission">The Q# entry point submission.</param>
         /// <returns>The exit code.</returns>
         private static async Task<int> SubmitQSharp<TIn, TOut>(
-            AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
+            AzureSettings settings, IQSharpSubmitter submitter, QSharpSubmission<TIn, TOut> submission)
         {
-            Task<IQuantumMachineJob> SubmitJob() => machine.SubmitAsync(
-                submission.EntryPointInfo,
-                submission.Argument,
-                new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
-
             if (settings.Verbose)
             {
                 Console.WriteLine("Submitting Q# entry point." + Environment.NewLine);
                 Console.WriteLine(settings + Environment.NewLine);
             }
 
-            return settings.DryRun ? Validate(machine, submission) : await DisplayJobOrError(settings, SubmitJob());
+            if (settings.DryRun)
+            {
+                return DisplayValidation(submitter.Validate(submission.EntryPointInfo, submission.Argument));
+            }
+
+            var job = submitter.SubmitAsync(
+                submission.EntryPointInfo,
+                submission.Argument,
+                SubmissionOptions.Default.With(settings.JobName, settings.Shots));
+
+            return await DisplayJobOrError(settings, job);
         }
 
         /// <summary>
@@ -135,22 +177,21 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         }
 
         /// <summary>
-        /// Validates the program for the quantum machine target.
+        /// Displays a validation message for a program.
         /// </summary>
-        /// <typeparam name="TIn">The input type.</typeparam>
-        /// <typeparam name="TOut">The output type.</typeparam>
-        /// <param name="machine">The quantum machine target.</param>
-        /// <param name="submission">The entry point submission.</param>
+        /// <param name="message">The validation error message, or null if the program is valid.</param>
         /// <returns>The exit code.</returns>
-        private static int Validate<TIn, TOut>(IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
+        private static int DisplayValidation(string? message)
         {
-            var (isValid, message) = machine.Validate(submission.EntryPointInfo, submission.Argument);
-            Console.WriteLine(isValid ? "✔️  The program is valid!" : "❌  The program is invalid.");
-            if (!string.IsNullOrWhiteSpace(message))
+            if (message is null)
             {
-                Console.WriteLine(Environment.NewLine + message);
+                Console.WriteLine("✔️  The program is valid!");
+                return 0;
             }
-            return isValid ? 0 : 1;
+
+            Console.WriteLine("❌  The program is invalid." + Environment.NewLine);
+            Console.WriteLine(message);
+            return 1;
         }
 
         /// <summary>
@@ -217,6 +258,18 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         };
 
         /// <summary>
+        /// Returns a Q# submitter.
+        /// </summary>
+        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <returns>A Q# submitter.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
+        private static IQSharpSubmitter? QSharpSubmitter(AzureSettings settings) => settings.Target switch
+        {
+            null => throw new ArgumentNullException(nameof(settings), "Target is null."),
+            _ => null // TODO: Factory.
+        };
+
+        /// <summary>
         /// Returns a QIR submitter.
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
@@ -226,7 +279,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null"),
             NoOpQirSubmitter.TargetId => new NoOpQirSubmitter(),
-            _ => null // TODO
+            _ => null // TODO: Factory.
         };
 
         /// <summary>
