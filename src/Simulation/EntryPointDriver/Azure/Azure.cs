@@ -34,6 +34,8 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         public static Task<int> Submit<TIn, TOut>(
             AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
         {
+            Log(settings, settings.ToString());
+
             if (!(qirSubmission is null) && QirSubmitter(settings) is { } qirSubmitter)
             {
                 return SubmitQir(settings, qirSubmitter, qirSubmission);
@@ -65,11 +67,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static async Task<int> SubmitQSharpMachine<TIn, TOut>(
             AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
-            if (settings.Verbose)
-            {
-                Console.WriteLine("Submitting Q# entry point using a quantum machine." + Environment.NewLine);
-                Console.WriteLine(settings + Environment.NewLine);
-            }
+            Log(settings, "Submitting Q# entry point using a quantum machine.");
 
             if (settings.DryRun)
             {
@@ -97,11 +95,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static async Task<int> SubmitQSharp<TIn, TOut>(
             AzureSettings settings, IQSharpSubmitter submitter, QSharpSubmission<TIn, TOut> submission)
         {
-            if (settings.Verbose)
-            {
-                Console.WriteLine("Submitting Q# entry point." + Environment.NewLine);
-                Console.WriteLine(settings + Environment.NewLine);
-            }
+            Log(settings, "Submitting Q# entry point.");
 
             if (settings.DryRun)
             {
@@ -123,11 +117,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static async Task<int> SubmitQir(
             AzureSettings settings, IQirSubmitter submitter, QirSubmission submission)
         {
-            if (settings.Verbose)
-            {
-                Console.WriteLine("Submitting QIR entry point." + Environment.NewLine);
-                Console.WriteLine(settings + Environment.NewLine);
-            }
+            Log(settings, "Submitting QIR entry point.");
 
             if (settings.DryRun)
             {
@@ -233,6 +223,20 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             if (!string.IsNullOrWhiteSpace(message))
             {
                 Console.Error.WriteLine(Environment.NewLine + message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a message if the verbose setting is enabled.
+        /// </summary>
+        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <param name="message">The message.</param>
+        private static void Log(AzureSettings settings, string message)
+        {
+            if (settings.Verbose)
+            {
+                Console.WriteLine(message);
+                Console.WriteLine();
             }
         }
 
