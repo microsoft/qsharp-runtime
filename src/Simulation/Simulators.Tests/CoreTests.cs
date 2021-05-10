@@ -94,8 +94,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(
                 string.Join(
                     Environment.NewLine,
-                    "Submitting QIR entry point.",
-                    "",
                     "Subscription: foo",
                     "Resource Group: bar",
                     "Workspace: baz",
@@ -109,6 +107,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Output: FriendlyUri",
                     "Dry Run: False",
                     "Verbose: True",
+                    "",
+                    "Submitting QIR entry point.",
                     "",
                     "https://www.example.com/00000000-0000-0000-0000-0000000000000",
                     ""),
