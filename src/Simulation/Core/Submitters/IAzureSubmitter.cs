@@ -3,7 +3,7 @@
 
 #nullable enable
 
-namespace Microsoft.Quantum.Runtime
+namespace Microsoft.Quantum.Runtime.Submitters
 {
     /// <summary>
     /// An interface for submitting quantum programs to Azure.
