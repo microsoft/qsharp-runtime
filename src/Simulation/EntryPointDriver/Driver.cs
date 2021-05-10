@@ -84,8 +84,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The job name option.
         /// </summary>
-        private static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
+        private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
+            ImmutableList.Create("--job-name"), "", "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.

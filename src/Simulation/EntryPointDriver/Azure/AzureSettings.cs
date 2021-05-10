@@ -59,7 +59,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// <summary>
         /// The name of the submitted job.
         /// </summary>
-        public string? JobName { get; set; }
+        public string JobName { get; set; } = "";
 
         /// <summary>
         /// The number of times the program is executed on the target machine.

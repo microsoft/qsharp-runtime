@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Runtime;
+using Microsoft.Quantum.Runtime.Submitters;
 
 namespace Microsoft.Quantum.EntryPointDriver.Mock
 {
@@ -22,7 +23,8 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
 
         public string Target => TargetId;
 
-        public Task<IQuantumMachineJob> SubmitAsync(Stream qir, string entryPoint, IReadOnlyList<Argument> arguments) =>
+        public Task<IQuantumMachineJob> SubmitAsync(
+            Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options) =>
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
     }
 }

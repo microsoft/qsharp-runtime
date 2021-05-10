@@ -6,6 +6,7 @@ using Microsoft.Azure.Quantum.Exceptions;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
 using Microsoft.Quantum.EntryPointDriver.Mock;
 using Microsoft.Quantum.Runtime;
+using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using System;
 using System.Threading.Tasks;
@@ -95,9 +96,13 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
                 return 1;
             }
 
-            return await DisplayJobOrError(
-                settings,
-                submitter.SubmitAsync(submission.QirStream, submission.EntryPointName, submission.Arguments));
+            var job = submitter.SubmitAsync(
+                submission.QirStream,
+                submission.EntryPointName,
+                submission.Arguments,
+                SubmissionOptions.Default.With(settings.JobName, settings.Shots));
+
+            return await DisplayJobOrError(settings, job);
         }
 
         /// <summary>
