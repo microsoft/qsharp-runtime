@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Azure.Quantum;
+using Microsoft.Quantum.Runtime.Submitters;
 using System;
 using System.Linq;
 
@@ -82,6 +83,11 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         public bool Verbose { get; set; }
 
         /// <summary>
+        /// The submission options corresponding to these settings.
+        /// </summary>
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots);
+
+        /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
@@ -122,6 +128,11 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             $"Dry Run: {DryRun}",
             $"Verbose: {Verbose}");
 
+        /// <summary>
+        /// Normalizes an Azure location string.
+        /// </summary>
+        /// <param name="location">The location string.</param>
+        /// <returns>The normalized location string.</returns>
         internal static string NormalizeLocation(string location) =>
             string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
     }

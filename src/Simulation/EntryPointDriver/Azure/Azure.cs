@@ -109,10 +109,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             }
 
             var job = submitter.SubmitAsync(
-                submission.EntryPointInfo,
-                submission.Argument,
-                SubmissionOptions.Default.With(settings.JobName, settings.Shots));
-
+                submission.EntryPointInfo, submission.Argument, settings.SubmissionOptions);
             return await DisplayJobOrError(settings, job);
         }
 
@@ -139,11 +136,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             }
 
             var job = submitter.SubmitAsync(
-                submission.QirStream,
-                submission.EntryPointName,
-                submission.Arguments,
-                SubmissionOptions.Default.With(settings.JobName, settings.Shots));
-
+                submission.QirStream, submission.EntryPointName, submission.Arguments, settings.SubmissionOptions);
             return await DisplayJobOrError(settings, job);
         }
 
