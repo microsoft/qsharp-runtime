@@ -361,3 +361,4 @@ namespace Microsoft.Quantum.Testing.QIR  {
     }
 
 } // namespace Microsoft.Quantum.Testing.QIR
+
