@@ -35,7 +35,7 @@ let rec private parameters context doc = function
                             CSharpTypeName = SimulationCode.roslynTypeName context variable.Type
                             Description = ParameterDescription doc name }
         | InvalidName -> Seq.empty
-    | QsTuple items -> items |> Seq.map (parameters context doc) |> Seq.concat
+    | QsTuple items -> items |> Seq.collect (parameters context doc)
 
 /// An expression representing the name of an entry point option given its parameter name.
 let private optionName (paramName : string) =
