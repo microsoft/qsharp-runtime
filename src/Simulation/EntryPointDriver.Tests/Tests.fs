@@ -557,9 +557,7 @@ let ``Submit can show only the ID`` () =
 let ``Submit uses default values`` () =
     let given = test "Returns Unit"
     given (submitWithNoOpTarget @ ["--verbose"])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -572,6 +570,8 @@ let ``Submit uses default values`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
@@ -579,9 +579,7 @@ let ``Submit uses default values`` () =
 let ``Submit uses default values with default target`` () =
     let given = testWithTarget "test.noop" "Returns Unit"
     given (submitWithoutTarget @ ["--verbose"])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -594,6 +592,8 @@ let ``Submit uses default values with default target`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
@@ -613,9 +613,7 @@ let ``Submit allows overriding default values`` () =
         "--shots"
         "750"
     ])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -628,6 +626,8 @@ let ``Submit allows overriding default values`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
@@ -647,9 +647,7 @@ let ``Submit allows overriding default values with default target`` () =
         "--shots"
         "750"
     ])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -662,6 +660,8 @@ let ``Submit allows overriding default values with default target`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
@@ -684,9 +684,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
         "--base-uri"
         "myBaseUri"
     ])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -700,6 +698,8 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
@@ -710,9 +710,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
         "--location"
         "myLocation"
     ])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -726,6 +724,8 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
@@ -736,9 +736,7 @@ let ``Submit allows spaces for the --location option`` () =
         "--location"
         "My Location"
     ])
-    |> yields "Submitting Q# entry point.
-
-               Subscription: mySubscription
+    |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.noop
@@ -751,6 +749,8 @@ let ``Submit allows spaces for the --location option`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
