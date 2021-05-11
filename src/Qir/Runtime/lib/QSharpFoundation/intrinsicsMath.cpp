@@ -75,7 +75,7 @@ int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
 {
     if(minimum > maximum)
     {
-        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal)); // TODO: Consider `quantum__rt__fail_cstr(const char *)`.
+        quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
     }
 
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
