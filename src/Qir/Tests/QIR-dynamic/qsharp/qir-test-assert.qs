@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// https://docs.microsoft.com/en-us/azure/quantum/concepts-the-qubit#single-qubit-operations    Qubit and Operations
-// https://docs.microsoft.com/en-us/azure/quantum/user-guide/libraries/standard/prelude         Operation Details, Multi-Qubit Operations
+// https://docs.microsoft.com/azure/quantum/concepts-the-qubit#single-qubit-operations    Qubit and Operations
+// https://docs.microsoft.com/azure/quantum/user-guide/libraries/standard/prelude         Operation Details, Multi-Qubit Operations
 
 namespace Microsoft.Quantum.Testing.QIR  {
 
@@ -267,10 +267,10 @@ namespace Microsoft.Quantum.Testing.QIR  {
         CNOT(left, right);  // Equally probable |00> or |11>. `(|00> + |11>) / SQRT(2)`
 
         if applyX { 
-            X(left);        // Equally probable |10> or |01>. `(|10> + |01>) / SQRT(2)`. Left qubit is `*`.
+            X(left);        // Equally probable |10> or |01>. `(|10> + |01>) / SQRT(2)`.
         }
         if applyZ {
-            Z(left);        // Equally probable |*0> or |*(-1)>. `(|*0> - |*1>) / SQRT(2)`. Note: the `-` sign. 
+            Z(left);        // Left qubit is `*` (0 or 1). Equally probable |*0> or -|*1>. `(|*0> - |*1>) / SQRT(2)`.
         }
     }
 
@@ -308,7 +308,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
         use left = Qubit();
         use right = Qubit();
 
-        H(left);                // (|0>  + |1> )/SQRT(2)
+        H(left);                // Op Result: (|0>  + |1> )/SQRT(2). Total: (|00> + |10>) / SQRT(2).
         CNOT(left, right);      // (|00> + |11>)/SQRT(2)    Bell pair.
         H(right);               // (|0+> + |1->)/SQRT(2)
         // Chris: The trick there is to keep in mind that |+⟩ = 𝐻|0⟩ and |−⟩ = 𝐻|1⟩ (that's actually sufficient to define 𝐻). 
