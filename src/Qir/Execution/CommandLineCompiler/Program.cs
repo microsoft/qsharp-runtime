@@ -8,6 +8,7 @@ using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools;
@@ -33,6 +34,29 @@ namespace CommandLineCompiler
                 .InvokeAsync(args);
         }
 
+        private static async Task<int> Foo(
+            FileInfo qsharpDll,
+            DirectoryInfo[] libraryDirectory,
+            DirectoryInfo includeDirectory,
+            DirectoryInfo executablesDirectory)
+        {
+            //Console.WriteLine("From BuildFromQSharpDll!");
+
+            Console.WriteLine("QsharpDll:");
+            Console.WriteLine($"\t{qsharpDll}");
+            Console.WriteLine("LibraryDirectory:");
+            foreach (var item in libraryDirectory)
+            {
+                Console.WriteLine($"\t{item}");
+            }
+            Console.WriteLine("IncludeDirectory:");
+            Console.WriteLine($"\t{includeDirectory}");
+            Console.WriteLine("ExecutablesDirectory:");
+            Console.WriteLine($"\t{executablesDirectory}");
+
+            return 0;
+        }
+
         /// <summary>
         /// Creates the Build command for the command line compiler, which is used to
         /// compile the executables from a given QIR DLL.
@@ -48,7 +72,8 @@ namespace CommandLineCompiler
                     {
                         throw new ArgumentException("The '--libraryDirectories' option requires at least one argument.");
                     }
-                    return QirTools.BuildFromQSharpDll(settings.QsharpDll, settings.LibraryDirectories[0], settings.IncludeDirectory, settings.ExecutablesDirectory);
+                    return Foo(settings.QsharpDll, settings.LibraryDirectories, settings.IncludeDirectory, settings.ExecutablesDirectory);
+                    //return QirTools.BuildFromQSharpDll(settings.QsharpDll, settings.LibraryDirectories[0], settings.IncludeDirectory, settings.ExecutablesDirectory);
                 })
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;
@@ -67,6 +92,14 @@ namespace CommandLineCompiler
             {
                 Required = true
             };
+            libraryDirectories.AddValidator(result =>
+            {
+                if (result.Tokens.Any(arg => arg.Value == string.Empty))
+                {
+                    return "Empty strings are not valid paths.";
+                }
+                return default;
+            });
             buildCommand.AddOption(libraryDirectories);
 
             Option<DirectoryInfo> includeDirectory = new Option<DirectoryInfo>(
