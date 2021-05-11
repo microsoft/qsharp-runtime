@@ -92,7 +92,7 @@ double quantum__qis__drawrandomdouble__body(double minimum, double maximum)
 {
     if(minimum > maximum)
     {
-        quantum__rt__fail(quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal)); // TODO: Consider `quantum__rt__fail_cstr(const char *)`.
+        quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
     }
 
     // For testing purposes we need separate generators for Int and Double:
