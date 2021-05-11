@@ -165,6 +165,7 @@ let private submitMethod context entryPoint parameters =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
+    let hasQir = context.assemblyConstants.ContainsKey AssemblyConstants.QirOutputPath
 
     let qsSubmission =
         ``new`` (generic (driverNamespace + ".Azure.QSharpSubmission") ``<<`` [argTypeName; returnTypeName] ``>>``)
@@ -196,7 +197,7 @@ let private submitMethod context entryPoint parameters =
         [
             ident settingsParamName :> ExpressionSyntax
             qsSubmission
-            if context.assemblyConstants.ContainsKey "QirOutputPath" then qirSubmission.Value else ``null``
+            if hasQir then qirSubmission.Value else ``null``
         ]
 
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
