@@ -14,7 +14,25 @@ crate-type = ["rlib", "staticlib", "cdylib"]
 
 [features]
 default = []
-web-sys-log = ["web-sys"]
+wasm = ["web-sys"]
+
+# We use an empty feature to enable documentation generation, as is required
+# until https://github.com/rust-lang/rust/pull/83366 is completed.
+# See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
+# for discussion.
+doc = []
+
+# To make sure docs are enabled on docs.rs, we need to also pass the "doc"
+# feature in our metadata.
+[package.metadata.docs.rs]
+
+# Features to pass to Cargo (default: [])
+features = ["doc"]
+
+# Enable LaTeX on docs.rs.
+# See https://stackoverflow.com/a/54573800/267841 for why this works.
+rustdoc-args = [ "--html-in-header", "docs/header.html" ]
+
 
 [profile.release]
 opt-level = 3
@@ -39,7 +57,7 @@ lazy_static = "1.4.0"
 #    by rand and rand_core.
 getrandom = { version = "0.1.15", features = ["wasm-bindgen"] }
 
-# We only need web-sys when compiling with the web-sys-log feature.
+# We only need web-sys when compiling with the wasm feature.
 web-sys = { version = "0.3.4",  features = ['console'], optional = true }
 
 [dev-dependencies]

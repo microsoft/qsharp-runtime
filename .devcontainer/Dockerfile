@@ -1,8 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:3.1-focal
 RUN apt update \
     && apt-get install -y cmake \
-    && apt-get install -y ninja-build \
-    && apt-get install -y clang-11 \
-    && apt-get install -y clang-tidy-11
-RUN apt-get install -y build-essential
+                          ninja-build \
+                          clang-11 \
+                          clang-tidy-11 \
+                          build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 CMD [ "pwsh" ]

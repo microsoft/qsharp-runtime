@@ -9,7 +9,7 @@
 //! performance in user code.
 
 use criterion::{criterion_group, criterion_main, Criterion};
-use opensim::{common_matrices, linalg::Tensor, linalg::{extend_one_to_n, extend_two_to_n}, nq_eye};
+use opensim::{common_matrices, Tensor, linalg::{extend_one_to_n, extend_two_to_n}, common_matrices::nq_eye};
 
 fn linalg(c: &mut Criterion) {
     let mut group = c.benchmark_group("linalg");

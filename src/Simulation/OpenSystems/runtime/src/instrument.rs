@@ -12,7 +12,12 @@ use crate::State;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+/// Represents a quantum instrument; that is, a process that accepts a quantum
+/// state and returns the new state of a system and classical data extracted
+/// from that system.
 pub struct Instrument {
+    /// The effects of the instrument, represented as completely positive
+    /// trace non-increasing (CPTNI) processes.
     pub effects: Vec<Channel>,
 }
 

@@ -1,14 +1,24 @@
-# Testing strategy
+This **experimental** crate contains simulation functionality for the Quantum Development Kit, including:
 
-Tests for the open systems simulator consist of five distinct parts:
+- Open systems simulation
+- Stabilizer simulation
 
-- Rust-language unit tests for the Rust library.
-  These tests are defined in `#[cfg(test)]` submodules of each module in `./src/`.
-- Rust-language integration tests for the Rust library.
-  These tests are defined in modules under the `./tests/` folder.
-- C++-language unit tests in the QIR runtime.
-  These tests ensure that the binding of the Rust library as a QIR simulator work as expected, and are defined in `qsharp-runtime/src/QirRuntime/test/OpenSystemsSimulator/*.cpp`.
-- Q#-language unit tests in the C#-based simulation runtime.
-  These tests ensure that the binding of the Rust library works as expected when included into the C#-based runtime, and are defined in operations marked with `@Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")` under the `qsharp-runtime/src/Simulation/Simulators.Tests/QuantumTestSuite` folder.
-- C#-language unit tests in the IQ# kernel.
-  These tests ensure that noise models and noisy simulation can be correctly exposed to Python and Q# notebook users; please see the `microsoft/iqsharp` repo for more details.
+The [`c_api`] module allows for using the simulation functionality in this crate from C, or from other languages with a C FFI (e.g.: C++ or C#), while Rust callers can take advantage of the structs and methods in this crate directly.
+
+## Cargo Features
+
+- **`doc`**: Required to build documentation.
+- **`python`**: Enables Python bindings for this crate.
+- **`wasm`**: Ensures that the crate is compatible with usage from WebAssembly.
+
+## Representing open quantum systems
+
+This crate provides several different data structures for representing open quantum systems in a variety of different conventions:
+
+- [`State`]\: Represents pure or mixed states of a register of qubits.
+- [`Channel`]\: Represents processes that map states to states.
+- [`Instrument`]\: Represents quantum instruments, the most general form of measurement.
+
+## Noise model serialization
+
+TODO

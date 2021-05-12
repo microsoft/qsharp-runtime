@@ -10,7 +10,7 @@ pub const ONE_C: C64 = Complex::new(1f64, 0f64);
 pub const ZERO_C: C64 = Complex::new(0f64, 0f64);
 pub const I_C: C64 = Complex::new(0f64, 1f64);
 
-pub fn c<T: Clone + Num>(re: T, im: T) -> Complex<T> {
+fn c<T: Clone + Num>(re: T, im: T) -> Complex<T> {
     Complex::new(re, im)
 }
 

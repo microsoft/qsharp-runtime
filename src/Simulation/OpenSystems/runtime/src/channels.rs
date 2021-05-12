@@ -3,9 +3,8 @@
 
 use crate::channels::ChannelData::{KrausDecomposition, Unitary};
 use crate::linalg::ConjBy;
-use crate::linalg::{extend_one_to_n, extend_two_to_n};
+use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::states::StateData::{Mixed, Pure};
-use crate::zeros_like;
 use crate::NoiseModel;
 use crate::QubitSized;
 use crate::State;
@@ -19,6 +18,7 @@ use std::convert::TryInto;
 use std::ops::Add;
 use std::ops::Mul;
 
+// TODO: Rename to something that doesn't imply it's already CPTP.
 pub type Channel = QubitSized<ChannelData>;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
