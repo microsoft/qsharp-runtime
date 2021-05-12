@@ -3,6 +3,7 @@
 
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
+using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Core;
 using System;
 using System.Threading.Tasks;
@@ -15,13 +16,13 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
     internal class ErrorQuantumMachine : IQuantumMachine
     {
         /// <summary>
-        /// The target ID for the error quantum machine.
+        /// The target for the error quantum machine.
         /// </summary>
-        internal const string TargetId = "test.error";
+        internal const string Target = "test.error";
 
         public string ProviderId => nameof(ErrorQuantumMachine);
 
-        public string Target => TargetId;
+        string IAzureSubmitter.Target => Target;
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>

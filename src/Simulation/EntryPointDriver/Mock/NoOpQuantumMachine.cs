@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Runtime;
+using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Core;
 using System;
 using System.Threading.Tasks;
@@ -14,13 +15,13 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
     internal class NoOpQuantumMachine : IQuantumMachine
     {
         /// <summary>
-        /// The target ID for the no-op quantum machine.
+        /// The target for the no-op quantum machine.
         /// </summary>
-        internal const string TargetId = "test.noop";
+        internal const string Target = "test.noop";
 
         public string ProviderId => nameof(NoOpQuantumMachine);
 
-        public string Target => TargetId;
+        string IAzureSubmitter.Target => Target;
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>

@@ -203,6 +203,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
 
                         Console.WriteLine(job.Id);
                     }
+
                     break;
                 case OutputFormat.Id:
                     Console.WriteLine(job.Id);
@@ -249,8 +250,8 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static IQuantumMachine? QSharpMachine(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null."),
-            NoOpQuantumMachine.TargetId => new NoOpQuantumMachine(),
-            ErrorQuantumMachine.TargetId => new ErrorQuantumMachine(),
+            NoOpQuantumMachine.Target => new NoOpQuantumMachine(),
+            ErrorQuantumMachine.Target => new ErrorQuantumMachine(),
             _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
         };
 
@@ -275,7 +276,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null"),
-            NoOpQirSubmitter.TargetId => new NoOpQirSubmitter(),
+            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
         };
 
