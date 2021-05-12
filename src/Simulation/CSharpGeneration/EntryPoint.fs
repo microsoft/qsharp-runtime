@@ -148,21 +148,25 @@ let rec private qirArgumentValue (type_ : ResolvedType) (value : ExpressionSynta
         Option.map2 arrayValue (ident "item" |> qirArgumentValue itemType) (qirArgumentType itemType)
     | _ -> None
 
-/// The list of QIR arguments for the entry point parameters and the result of parsing the command-line arguments.
+/// The list of QIR arguments for the entry point parameters and the result of parsing the command-line arguments, or
+/// None if not all parameters are supported in a QIR entry point.
 let private qirArguments parameters parseResult =
+    let argumentType = "global::Microsoft.Quantum.Runtime.Argument"
+    let listType = "global::System.Collections.Immutable.ImmutableList"
+
     let argument param =
-        let value =
-            parseResult <.> (sprintf "ValueForOption<%s>" param.CSharpTypeName |> ident, [optionName param.Name])
-            |> qirArgumentValue param.QSharpType
-            |> Option.defaultWith (fun () -> failwith "Unsupported parameter type.")
+        parseResult <.> (sprintf "ValueForOption<%s>" param.CSharpTypeName |> ident, [optionName param.Name])
+        |> qirArgumentValue param.QSharpType
+        |> Option.map (fun value -> ``new`` (ident argumentType) ``(`` [literal param.Name; value] ``)``)
 
-        ``new`` (ident "global::Microsoft.Quantum.Runtime.Argument") ``(`` [literal param.Name; value] ``)``
-
-    ident "global::System.Collections.Immutable.ImmutableList"
-    <.> (ident "Create<global::Microsoft.Quantum.Runtime.Argument>", parameters |> Seq.map argument)
+    parameters
+    |> Seq.fold
+        (fun state param -> Option.map2 (fun xs x -> x :: xs) state (argument param))
+        (Some [])
+    |> Option.map (fun args -> ident listType <.> (sprintf "Create<%s>" argumentType |> ident, args))
 
 /// The QIR submission for the given entry point, parameters, and parsed arguments. Returns null if the QIR stream
-/// resource does not exist.
+/// resource does not exist, or the entry point contains unsupported parameter types.
 let private qirSubmission (entryPoint: QsCallable) parameters parseResult =
     let stream =
         ident "global::System.Reflection.Assembly"
@@ -171,17 +175,15 @@ let private qirSubmission (entryPoint: QsCallable) parameters parseResult =
 
     let streamVar = ident "qirStream"
 
-    let submission =
+    let submission args =
         ``new`` (driverNamespace + ".Azure.QirSubmission" |> ``type``)
             ``(``
-                [
-                    streamVar :> ExpressionSyntax
-                    string entryPoint.FullName |> literal
-                    qirArguments parameters parseResult
-                ]
+                [streamVar :> ExpressionSyntax; string entryPoint.FullName |> literal; args]
             ``)``
 
-    ``?`` (stream |> ``is assign`` "{ }" streamVar) (submission, ``null``)
+    match qirArguments parameters parseResult with
+    | Some args -> ``?`` (stream |> ``is assign`` "{ }" streamVar) (submission args, ``null``)
+    | None -> upcast ``null``
 
 /// Generates the Submit method for an entry point class.
 let private submitMethod context entryPoint parameters =
