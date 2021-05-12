@@ -51,7 +51,18 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
                 return SubmitQSharpMachine(settings, machine, qsSubmission);
             }
 
-            DisplayWithColor(ConsoleColor.Red, Console.Error, $"The target '{settings.Target}' is not recognized.");
+            if (qirSubmission is null && !(QirSubmitter(settings) is null))
+            {
+                DisplayError(
+                    $"The target {settings.Target} requires QIR submission, but the project was built without QIR. "
+                    + "Please enable QIR generation in the project settings.",
+                    null);
+            }
+            else
+            {
+                DisplayError($"No submitters were found for the target {settings.Target}.", null);
+            }
+
             return Task.FromResult(1);
         }
 
@@ -242,9 +253,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         }
 
         /// <summary>
-        /// Returns a Q# machine.
+        /// Returns a Q# machine for the target in the given Azure settings.
         /// </summary>
-        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <param name="settings">The Azure settings.</param>
         /// <returns>A quantum machine.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQuantumMachine? QSharpMachine(AzureSettings settings) => settings.Target switch
@@ -256,9 +267,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         };
 
         /// <summary>
-        /// Returns a Q# submitter.
+        /// Returns a Q# submitter for the target in the given Azure settings.
         /// </summary>
-        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <param name="settings">The Azure settings.</param>
         /// <returns>A Q# submitter.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQSharpSubmitter? QSharpSubmitter(AzureSettings settings) => settings.Target switch
@@ -269,14 +280,15 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         };
 
         /// <summary>
-        /// Returns a QIR submitter.
+        /// Returns a QIR submitter for the target in the given Azure settings.
         /// </summary>
-        /// <param name="settings">The Azure Quantum submission settings.</param>
+        /// <param name="settings">The Azure settings.</param>
         /// <returns>A QIR submitter.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null"),
+            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
         };

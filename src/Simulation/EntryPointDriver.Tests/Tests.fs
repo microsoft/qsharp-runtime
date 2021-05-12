@@ -774,7 +774,7 @@ let ``Submit requires a positive number of shots`` () =
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test "Returns Unit"
-    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' is not recognized."
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target foo."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
@@ -812,6 +812,15 @@ let ``Submit catches exceptions`` () =
     |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
 
                   This machine always has an error."
+
+[<Fact>]
+let ``Submit shows specific error message when QIR stream is unavailable`` () =
+    let given = testWithTarget "test.submitter.qir.noop" "Returns Unit"
+
+    given submitWithoutTarget
+    |> failsWith
+        ("The target test.submitter.qir.noop requires QIR submission, but the project was built without QIR. "
+         + "Please enable QIR generation in the project settings.")
 
 // Help
 
