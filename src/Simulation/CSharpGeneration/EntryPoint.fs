@@ -158,14 +158,36 @@ let private qirArguments parameters parseResult =
 
         ``new`` (ident "global::Microsoft.Quantum.Runtime.Argument") ``(`` [literal param.Name; value] ``)``
 
-    ident "global::System.Collections.Immutable.ImmutableList" <.> (ident "Create", parameters |> Seq.map argument)
+    ident "global::System.Collections.Immutable.ImmutableList"
+    <.> (ident "Create<global::Microsoft.Quantum.Runtime.Argument>", parameters |> Seq.map argument)
+
+/// The QIR submission for the given entry point, parameters, and parsed arguments. Returns null if the QIR stream
+/// resource does not exist.
+let private qirSubmission (entryPoint: QsCallable) parameters parseResult =
+    let stream =
+        ident "global::System.Reflection.Assembly"
+        <.> (ident "GetExecutingAssembly", [])
+        <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
+
+    let streamVar = ident "qirStream"
+
+    let submission =
+        ``new`` (driverNamespace + ".Azure.QirSubmission" |> ``type``)
+            ``(``
+                [
+                    streamVar :> ExpressionSyntax
+                    string entryPoint.FullName |> literal
+                    qirArguments parameters parseResult
+                ]
+            ``)``
+
+    ``?`` (stream |> ``is assign`` "{ }" streamVar) (submission, ``null``)
 
 /// Generates the Submit method for an entry point class.
 let private submitMethod context entryPoint parameters =
     let callableName, argTypeName, returnTypeName = callableTypeNames context entryPoint
     let parseResultParamName = "parseResult"
     let settingsParamName = "settings"
-    let hasQir = context.assemblyConstants.ContainsKey AssemblyConstants.QirOutputPath
 
     let qsSubmission =
         ``new`` (generic (driverNamespace + ".Azure.QSharpSubmission") ``<<`` [argTypeName; returnTypeName] ``>>``)
@@ -176,28 +198,11 @@ let private submitMethod context entryPoint parameters =
                 ]
             ``)``
 
-    let qirStream =
-        lazy
-            ident "global::System.Reflection.Assembly"
-            <.> (ident "GetExecutingAssembly", [])
-            <.> (ident "GetManifestResourceStream", [literal DotnetCoreDll.QirResourceName])
-
-    let qirSubmission =
-        lazy
-            ``new`` (driverNamespace + ".Azure.QirSubmission" |> ``type``)
-                ``(``
-                    [
-                        qirStream.Value
-                        string entryPoint.FullName |> literal
-                        ident parseResultParamName |> qirArguments parameters
-                    ]
-                ``)``
-
     let args =
         [
             ident settingsParamName :> ExpressionSyntax
             qsSubmission
-            if hasQir then qirSubmission.Value else ``null``
+            ident parseResultParamName |> qirSubmission entryPoint parameters
         ]
 
     arrow_method "System.Threading.Tasks.Task<int>" "Submit" ``<<`` [] ``>>``
