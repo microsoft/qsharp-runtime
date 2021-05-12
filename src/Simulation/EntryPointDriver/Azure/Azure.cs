@@ -264,6 +264,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static IQSharpSubmitter? QSharpSubmitter(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null."),
+            NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
         };
 
@@ -276,7 +277,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
         {
             null => throw new ArgumentNullException(nameof(settings), "Target is null"),
-            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
+            NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
         };
 

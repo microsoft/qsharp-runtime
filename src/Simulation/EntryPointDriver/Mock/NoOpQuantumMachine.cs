@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// <summary>
         /// The target for the no-op quantum machine.
         /// </summary>
-        internal const string Target = "test.noop";
+        internal const string Target = "test.machine.noop";
 
         public string ProviderId => nameof(NoOpQuantumMachine);
 

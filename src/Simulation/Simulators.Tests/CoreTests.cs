@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 "--workspace",
                 "baz",
                 "--target",
-                "test.noop",
+                "test.submitter.noop",
                 "--verbose");
 
             ProcessRunner.Run("dotnet", args, out var output, out var error, out var status, out var ex);
@@ -97,7 +97,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Subscription: foo",
                     "Resource Group: bar",
                     "Workspace: baz",
-                    "Target: test.noop",
+                    "Target: test.submitter.noop",
                     "Storage: ",
                     "AAD Token: ",
                     "Base URI: ",

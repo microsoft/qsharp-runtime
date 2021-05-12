@@ -201,11 +201,11 @@ let private submitWithoutTarget =
       "--workspace"
       "myWorkspace" ]
 
-/// Standard command-line arguments for the "submit" command using the "test.noop" target.
-let private submitWithNoOpTarget = submitWithoutTarget @ ["--target"; "test.noop"]
+/// Standard command-line arguments for the "submit" command using the "test.machine.noop" target.
+let private submitWithNoOpTarget = submitWithoutTarget @ ["--target"; "test.machine.noop"]
 
-/// Standard command-line arguments for the "submit" command using the "test.error" target.
-let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
+/// Standard command-line arguments for the "submit" command using the "test.machine.error" target.
+let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.machine.error"]
 
 // No Option
 
@@ -560,7 +560,7 @@ let ``Submit uses default values`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -577,12 +577,12 @@ let ``Submit uses default values`` () =
 
 [<Fact>]
 let ``Submit uses default values with default target`` () =
-    let given = testWithTarget "test.noop" "Returns Unit"
+    let given = testWithTarget "test.machine.noop" "Returns Unit"
     given (submitWithoutTarget @ ["--verbose"])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -616,7 +616,7 @@ let ``Submit allows overriding default values`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
@@ -650,7 +650,7 @@ let ``Submit allows overriding default values with default target`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
@@ -687,7 +687,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI: myBaseUri
@@ -713,7 +713,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -739,7 +739,7 @@ let ``Submit allows spaces for the --location option`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.noop
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -945,7 +945,7 @@ let ``Supports submitting multiple entry points`` () =
             "--workspace"
             "myWorkspace"
             "--target"
-            "test.noop"
+            "test.machine.noop"
         ]
     let given = test "Multiple entry points"
     let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -966,7 +966,7 @@ let ``Supports submitting multiple entry points with different parameters`` () =
             "--workspace"
             "myWorkspace"
             "--target"
-            "test.noop"
+            "test.machine.noop"
         ]
     let entryPoint1Args = ["-n"; "42.5"]
     let entryPoint2Args = ["-s"; "Hello, World!"]

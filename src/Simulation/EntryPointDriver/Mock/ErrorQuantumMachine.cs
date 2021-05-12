@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// <summary>
         /// The target for the error quantum machine.
         /// </summary>
-        internal const string Target = "test.error";
+        internal const string Target = "test.machine.error";
 
         public string ProviderId => nameof(ErrorQuantumMachine);
 
