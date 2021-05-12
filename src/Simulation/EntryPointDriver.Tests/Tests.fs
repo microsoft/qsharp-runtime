@@ -822,6 +822,30 @@ let ``Submit shows specific error message when QIR stream is unavailable`` () =
         ("The target test.submitter.qir.noop requires QIR submission, but the project was built without QIR. "
          + "Please enable QIR generation in the project settings.")
 
+[<Fact>]
+let ``Submit supports Q# submitters`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--verbose"])
+    |> yields
+        "Subscription: mySubscription
+         Resource Group: myResourceGroup
+         Workspace: myWorkspace
+         Target: test.submitter.noop
+         Storage:
+         AAD Token:
+         Base URI:
+         Location:
+         Job Name:
+         Shots: 500
+         Output: FriendlyUri
+         Dry Run: False
+         Verbose: True
+
+         Submitting Q# entry point.
+
+         https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
 // Help
 
 [<Fact>]
