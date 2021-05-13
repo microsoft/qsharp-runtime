@@ -107,4 +107,33 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
+    operation ReuseInBlockOrdered() : Unit {
+        body (...) {
+            use a = Qubit[8] {
+                CNOT(a[0], a[1]);
+                CNOT(a[0], a[2]);
+                CNOT(a[0], a[3]);
+                CNOT(a[0], a[4]);
+                CNOT(a[0], a[5]);
+                CNOT(a[0], a[6]);
+                CNOT(a[0], a[7]);
+            }
+        }
+    }
+
+    operation ReuseInBlockMixed() : Unit {
+        body (...) {
+            use a = Qubit[8] {
+                CNOT(a[0], a[1]);
+                CNOT(a[0], a[3]);
+                CNOT(a[0], a[5]);
+                CNOT(a[0], a[7]);
+                CNOT(a[0], a[6]);
+                CNOT(a[0], a[4]);
+                CNOT(a[0], a[2]);
+            }
+        }
+    }
+
+
 }
