@@ -54,6 +54,7 @@ extern "C"
 
     // Fail the computation with the given error message.
     [[noreturn]] QIR_SHARED_API void quantum__rt__fail(QirString* msg); // NOLINT
+    [[noreturn]] QIR_SHARED_API void quantum__rt__fail_cstr(const char* msg); // NOLINT
 
     // Include the given message in the computation's execution log or equivalent.
     QIR_SHARED_API void quantum__rt__message(QirString* msg); // NOLINT
@@ -291,12 +292,12 @@ extern "C"
     // TODO QIR_SHARED_API bool quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
 
-
+// TODO: Consider separating the `extern "C"` exports and C++ exports.
 namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
 namespace Quantum
 {
-    // Deprecated, use `Microsoft::Quantum::OutputStream::Set()` instead.
+    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()` instead.
     QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
 } // namespace Microsoft
 } // namespace Quantum

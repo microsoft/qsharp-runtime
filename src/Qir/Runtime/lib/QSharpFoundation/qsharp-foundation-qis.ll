@@ -63,6 +63,11 @@ declare void @quantum__qis__applyifelseintrinsic__body(%class.RESULT*, %struct.Q
 declare void @quantum__qis__applyconditionallyintrinsic__body(
   %struct.QirArray*, %struct.QirArray*, %struct.QirCallable*, %struct.QirCallable*)
 
+;===============================================================================
+; quantum.qis Assert Measurement functions/operations declarations
+;
+declare void @quantum__qis__assertmeasurementprobability__body(
+    %struct.QirArray* %bases, %struct.QirArray* %qubits, %class.RESULT* %result, double %prob, %struct.QirString* %msg, double %tol)
 
 ;===============================================================================
 ; quantum.qis math functions implementation
@@ -230,19 +235,19 @@ define dllexport void @__quantum__qis__applyconditionallyintrinsic__body(
 }
 
 ;===============================================================================
-; quantum.qis AssertMeasurement functions/operations implementation
+; quantum.qis AssertMeasurementProbability functions/operations implementation
 ;
-;    operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
-;    is Adj + Ctl {
-;        body intrinsic;
-;    }
-;    operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
-;    is Adj + Ctl {
-;        body intrinsic;
-;    }
 define dllexport void @__quantum__qis__assertmeasurementprobability__body(
   %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
-  ; Empty.
+  
+  %bases  = bitcast %Array*  %.bases  to %struct.QirArray*
+  %qubits = bitcast %Array*  %.qubits to %struct.QirArray*
+  %result = bitcast %Result* %.result to %class.RESULT*
+  %msg    = bitcast %String* %.msg    to %struct.QirString*
+
+  call void @quantum__qis__assertmeasurementprobability__body(
+    %struct.QirArray* %bases, %struct.QirArray* %qubits, %class.RESULT* %result, double %prob, %struct.QirString* %msg, double %tol)
+
   ret void
 }
 
@@ -253,42 +258,15 @@ define dllexport void @__quantum__qis__assertmeasurementprobability__adj(
 }
 
 define dllexport void @__quantum__qis__assertmeasurementprobability__ctl(
-  %Array*,
+  %Array* %.ctrlQubits,
   %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
   ; Empty.
   ret void
 }
 
 define dllexport void @__quantum__qis__assertmeasurementprobability__ctladj(
-  %Array*,
+  %Array* %.ctrlQubits,
   %Array* %.bases, %Array* %.qubits, %Result* %.result, double %prob, %String* %.msg, double %tol) {
-  ; Empty.
-  ret void
-}
-
-
-define dllexport void @__quantum__qis__assertmeasurement__body(
-  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-  ; Empty.
-  ret void
-}
-
-define dllexport void @__quantum__qis__assertmeasurement__adj(
-  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-  ; Empty.
-  ret void
-}
-
-define dllexport void @__quantum__qis__assertmeasurement__ctl(
-  %Array*,
-  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
-  ; Empty.
-  ret void
-}
-
-define dllexport void @__quantum__qis__assertmeasurement__ctladj(
-  %Array*,
-  %Array* %.bases, %Array* %.qubits, %Result* %.result, %String* %.msg) {
   ; Empty.
   ret void
 }
