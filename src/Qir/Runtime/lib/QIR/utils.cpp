@@ -53,7 +53,11 @@ extern "C"
     // Fail the computation with the given error message.
     void quantum__rt__fail(QirString* msg) // NOLINT
     {
-        throw std::runtime_error(msg->str);
+        quantum__rt__fail_cstr(msg->str.c_str());
     }
 
+    void quantum__rt__fail_cstr(const char* cstr)
+    {
+        throw std::runtime_error(cstr);
+    }
 }

@@ -6,6 +6,7 @@
 # create qsharp-foundation-qis-support lib from the C++ sources
 #
 set(qsharp_foundation_sup_source_files
+  AssertMeasurement.cpp
   intrinsicsMath.cpp
   conditionals.cpp
 )
