@@ -48,7 +48,11 @@ namespace CommandLineCompiler
                     {
                         throw new ArgumentException("The '--libraryDirectories' option requires at least one argument.");
                     }
-                    return QirTools.BuildFromQSharpDll(settings.QsharpDll, settings.LibraryDirectories[0], settings.IncludeDirectory, settings.ExecutablesDirectory);
+                    if (settings.IncludeDirectories.Length < 1)
+                    {
+                        throw new ArgumentException("The '--includeDirectories' option requires at least one argument.");
+                    }
+                    return QirTools.BuildFromQSharpDll(settings.QsharpDll, settings.LibraryDirectories[0], settings.IncludeDirectories[0], settings.ExecutablesDirectory);
                 })
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;
@@ -69,13 +73,13 @@ namespace CommandLineCompiler
             };
             buildCommand.AddOption(libraryDirectories);
 
-            Option<DirectoryInfo> includeDirectory = new Option<DirectoryInfo>(
-                aliases: new string[] { "--includeDirectory", "--include" },
+            Option<DirectoryInfo[]> includeDirectories = new Option<DirectoryInfo[]>(
+                aliases: new string[] { "--includeDirectories", "--include" },
                 description: "The path to the directory containing the headers required for compilation.")
             {
                 Required = true
             };
-            buildCommand.AddOption(includeDirectory);
+            buildCommand.AddOption(includeDirectories);
 
             Option<DirectoryInfo> executablesDirectory = new Option<DirectoryInfo>(
                 aliases: new string[] { "--executablesDirectory", "--exe" },
@@ -139,9 +143,9 @@ namespace CommandLineCompiler
             public DirectoryInfo[] LibraryDirectories { get; set; }
 
             /// <summary>
-            /// The path to the directory containing the headers required for compilation.
+            /// One or more paths to the directories containing the headers required for compilation.
             /// </summary>
-            public DirectoryInfo IncludeDirectory { get; set; }
+            public DirectoryInfo[] IncludeDirectories { get; set; }
 
             /// <summary>
             /// The path to the output directory where the created executables will be placed.
