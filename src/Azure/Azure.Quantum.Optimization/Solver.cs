@@ -55,20 +55,22 @@ namespace Microsoft.Azure.Quantum.Optimization
             string intermediaryFile = Path.GetTempFileName();
 
             // Save to the intermediary file
-            using var intermediaryWriter = File.Create(intermediaryFile);
-            using var compressionStream = new GZipStream(intermediaryWriter, CompressionLevel.Fastest);
-                
-            await problem.SerializeAsync(compressionStream);
-                //                problem.SerializeTo(intermediaryWriter);
+            using (var intermediaryWriter = File.Create(intermediaryFile)) {
+                using (var compressionStream = new GZipStream(intermediaryWriter, CompressionLevel.Fastest))
+                {
+                    await problem.SerializeAsync(compressionStream);
+                    //                problem.SerializeTo(intermediaryWriter);
+                }
+            }
 
-            using var intermediaryReader = File.OpenRead(intermediaryFile);
-            var jobStorageHelper = new LinkedStorageJobHelper(workspace);
+            using (var intermediaryReader = File.OpenRead(intermediaryFile))
+            {
+                var jobStorageHelper = new LinkedStorageJobHelper(workspace);
+                var jobId = Guid.NewGuid().ToString();
+                var (containerUri, inputUri) = await jobStorageHelper.UploadJobInputAsync(jobId, intermediaryReader);
 
-            var jobId = Guid.NewGuid().ToString();
-
-            var (containerUri, inputUri) = await jobStorageHelper.UploadJobInputAsync(jobId, intermediaryReader);
-
-            return await SubmitAsync(jobId, problem.Name, containerUri, inputUri);
+                return await SubmitAsync(jobId, problem.Name, containerUri, inputUri);
+            }
         }
 
         public async Task<CloudJob> SubmitAsync(string problemUri)
