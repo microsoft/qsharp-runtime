@@ -31,43 +31,35 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Returns a QIR submitter.
         /// </summary>
-        /// <param name="providerId">The ID of the execution target provider.</param>
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
-        /// <param name="storageConnectionString">The connection string for the storage account.</param>
+        /// <param name="storageConnection">The connection string for the storage account.</param>
         /// <returns>A QIR submitter.</returns>
-        public static IQirSubmitter? QirSubmitter(
-            string providerId, string target, IWorkspace workspace, string? storageConnectionString) =>
-            Submitter<IQirSubmitter>(QirSubmitters, providerId, target, workspace, storageConnectionString);
+        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection) =>
+            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
 
         /// <summary>
         /// Returns a Q# submitter.
         /// </summary>
-        /// <param name="providerId">The ID of the execution target provider.</param>
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
-        /// <param name="storageConnectionString">The connection string for the storage account.</param>
+        /// <param name="storageConnection">The connection string for the storage account.</param>
         /// <returns>A Q# submitter.</returns>
         public static IQSharpSubmitter? QSharpSubmitter(
-            string providerId, string target, IWorkspace workspace, string? storageConnectionString) =>
-            Submitter<IQSharpSubmitter>(QSharpSubmitters, providerId, target, workspace, storageConnectionString);
+            string target, IWorkspace workspace, string? storageConnection) =>
+            Submitter<IQSharpSubmitter>(QSharpSubmitters, target, workspace, storageConnection);
 
         /// <summary>
         /// Returns an instance of a submitter from the given list that matches the target.
         /// </summary>
         /// <param name="submitters">Information about each submitter.</param>
-        /// <param name="providerId">The ID of the execution target provider.</param>
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
-        /// <param name="storageConnectionString">The connection string for the storage account.</param>
+        /// <param name="storageConnection">The connection string for the storage account.</param>
         /// <typeparam name="T">The type of the submitter interface.</typeparam>
         /// <returns>The submitter instance.</returns>
         private static T? Submitter<T>(
-            IEnumerable<SubmitterInfo> submitters,
-            string providerId,
-            string target,
-            IWorkspace workspace,
-            string? storageConnectionString)
+            IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
             where T : class
         {
             var submitter = submitters.FirstOrDefault(s => target.StartsWith(s.TargetPrefix + "."));
@@ -77,7 +69,7 @@ namespace Microsoft.Azure.Quantum
             }
 
             var type = QdkType(submitter.TypeName);
-            return (T)Activator.CreateInstance(type, providerId, target, workspace, storageConnectionString);
+            return (T)Activator.CreateInstance(type, target, workspace, storageConnection);
         }
 
         /// <summary>

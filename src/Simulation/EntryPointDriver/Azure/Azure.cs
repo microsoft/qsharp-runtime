@@ -274,7 +274,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         {
             null => null,
             NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => SubmitterFactory.QSharpSubmitter("TODO", settings.Target, settings.CreateWorkspace(), settings.Storage)
+            _ => SubmitterFactory.QSharpSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             null => null,
             NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => SubmitterFactory.QirSubmitter("TODO", settings.Target, settings.CreateWorkspace(), settings.Storage)
+            _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
         /// <summary>
