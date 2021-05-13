@@ -201,11 +201,11 @@ let private submitWithoutTarget =
       "--workspace"
       "myWorkspace" ]
 
-/// Standard command-line arguments for the "submit" command using the "test.nothing" target.
-let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
+/// Standard command-line arguments for the "submit" command using the "test.machine.noop" target.
+let private submitWithNoOpTarget = submitWithoutTarget @ ["--target"; "test.machine.noop"]
 
-/// Standard command-line arguments for the "submit" command using the "test.error" target.
-let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.error"]
+/// Standard command-line arguments for the "submit" command using the "test.machine.error" target.
+let private submitWithErrorTarget = submitWithoutTarget @ ["--target"; "test.machine.error"]
 
 // No Option
 
@@ -471,14 +471,14 @@ let ``Shadows --version`` () =
 let ``Shadows --target`` () =
     let given = test "Shadows --target"
     given ["--target"; "foo"] |> yields "foo"
-    given submitWithNothingTarget
+    given submitWithNoOpTarget
     |> failsWith "The required option --target conflicts with an entry point parameter name."
 
 [<Fact>]
 let ``Shadows --shots`` () =
     let given = test "Shadows --shots"
     given ["--shots"; "7"] |> yields "7"
-    given (submitWithNothingTarget @ ["--shots"; "7"])
+    given (submitWithNoOpTarget @ ["--shots"; "7"])
     |> yields "Warning: Option --shots is overridden by an entry point parameter name. Using default value 500.
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
@@ -545,22 +545,22 @@ let ``Supports default custom simulator`` () =
 [<Fact>]
 let ``Submit can submit a job`` () =
     let given = test "Returns Unit"
-    given submitWithNothingTarget
+    given submitWithNoOpTarget
     |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit can show only the ID`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
+    given (submitWithNoOpTarget @ ["--output"; "id"]) |> yields "00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ ["--verbose"])
+    given (submitWithNoOpTarget @ ["--verbose"])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -570,17 +570,19 @@ let ``Submit uses default values`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit uses default values with default target`` () =
-    let given = testWithTarget "test.nothing" "Returns Unit"
+    let given = testWithTarget "test.machine.noop" "Returns Unit"
     given (submitWithoutTarget @ ["--verbose"])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -590,13 +592,15 @@ let ``Submit uses default values with default target`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--verbose"
         "--storage"
         "myStorage"
@@ -612,7 +616,7 @@ let ``Submit allows overriding default values`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
@@ -622,13 +626,15 @@ let ``Submit allows overriding default values`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows overriding default values with default target`` () =
     let given = testWithTarget "foo.target" "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--verbose"
         "--storage"
         "myStorage"
@@ -644,7 +650,7 @@ let ``Submit allows overriding default values with default target`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage: myStorage
                AAD Token: myToken
                Base URI: myBaseUri
@@ -655,12 +661,14 @@ let ``Submit allows overriding default values with default target`` () =
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit does not allow to include mutually exclusive options`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--base-uri"
         "myBaseUri"
         "--location"
@@ -671,7 +679,7 @@ let ``Submit does not allow to include mutually exclusive options`` () =
 [<Fact>]
 let ``Submit allows to include --base-uri option when --location is not present`` () =
     let given = testWithTarget "foo.target" "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--verbose"
         "--base-uri"
         "myBaseUri"
@@ -679,7 +687,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI: myBaseUri
@@ -690,12 +698,14 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows to include --location option when --base-uri is not present`` () =
     let given = testWithTarget "foo.target" "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--verbose"
         "--location"
         "myLocation"
@@ -703,7 +713,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -714,12 +724,14 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit allows spaces for the --location option`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--verbose"
         "--location"
         "My Location"
@@ -727,7 +739,7 @@ let ``Submit allows spaces for the --location option`` () =
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
-               Target: test.nothing
+               Target: test.machine.noop
                Storage:
                AAD Token:
                Base URI:
@@ -738,12 +750,14 @@ let ``Submit allows spaces for the --location option`` () =
                Dry Run: False
                Verbose: True
 
+               Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 [<Fact>]
 let ``Submit does not allow an invalid value for the --location option`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithNoOpTarget @ [
         "--location"
         "my!nv@lidLocation"
     ])
@@ -752,20 +766,20 @@ let ``Submit does not allow an invalid value for the --location option`` () =
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ ["--shots"; "1"])
+    given (submitWithNoOpTarget @ ["--shots"; "1"])
     |> yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
-    given (submitWithNothingTarget @ ["--shots"; "0"]) |> fails
-    given (submitWithNothingTarget @ ["--shots"; "-1"]) |> fails
+    given (submitWithNoOpTarget @ ["--shots"; "0"]) |> fails
+    given (submitWithNoOpTarget @ ["--shots"; "-1"]) |> fails
 
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test "Returns Unit"
-    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "The target 'foo' was not recognized."
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target foo."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ ["--dry-run"]) |> yields "✔️  The program is valid!"
+    given (submitWithNoOpTarget @ ["--dry-run"]) |> yields "✔️  The program is valid!"
     given (submitWithErrorTarget @ ["--dry-run"])
     |> failsWith "❌  The program is invalid.
 
@@ -783,8 +797,8 @@ let ``Submit has required options`` () =
 
     // Try every possible combination of arguments. The command should succeed only when all of the arguments are
     // included.
-    let commandName = List.head submitWithNothingTarget
-    let allArgs = submitWithNothingTarget |> List.tail |> List.chunkBySize 2
+    let commandName = List.head submitWithNoOpTarget
+    let allArgs = submitWithNoOpTarget |> List.tail |> List.chunkBySize 2
     for args in powerSet allArgs do
         given (commandName :: List.concat args)
         |> if List.length args = List.length allArgs
@@ -797,7 +811,40 @@ let ``Submit catches exceptions`` () =
     given submitWithErrorTarget
     |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
 
-                  This quantum machine always has an error."
+                  This machine always has an error."
+
+[<Fact>]
+let ``Submit shows specific error message when QIR stream is unavailable`` () =
+    let given = testWithTarget "test.submitter.qir.noop" "Returns Unit"
+
+    given submitWithoutTarget
+    |> failsWith
+        ("The target test.submitter.qir.noop requires QIR submission, but the project was built without QIR. "
+         + "Please enable QIR generation in the project settings.")
+
+[<Fact>]
+let ``Submit supports Q# submitters`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--verbose"])
+    |> yields
+        "Subscription: mySubscription
+         Resource Group: myResourceGroup
+         Workspace: myWorkspace
+         Target: test.submitter.noop
+         Storage:
+         AAD Token:
+         Base URI:
+         Location:
+         Job Name:
+         Shots: 500
+         Output: FriendlyUri
+         Dry Run: False
+         Verbose: True
+
+         Submitting Q# entry point.
+
+         https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 // Help
 
@@ -931,7 +978,7 @@ let ``Supports submitting multiple entry points`` () =
             "--workspace"
             "myWorkspace"
             "--target"
-            "test.nothing"
+            "test.machine.noop"
         ]
     let given = test "Multiple entry points"
     let succeeds = yields "https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -952,7 +999,7 @@ let ``Supports submitting multiple entry points with different parameters`` () =
             "--workspace"
             "myWorkspace"
             "--target"
-            "test.nothing"
+            "test.machine.noop"
         ]
     let entryPoint1Args = ["-n"; "42.5"]
     let entryPoint2Args = ["-s"; "Hello, World!"]
@@ -975,5 +1022,5 @@ let ``Supports submitting multiple entry points with different parameters`` () =
     given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ entryPoint3Args @ options) |> succeeds
     given (["submit"; "EntryPointTest3.MultipleEntryPoints3"] @ options) |> fails
 
-    given submitWithNothingTarget |> fails
+    given submitWithNoOpTarget |> fails
     given [] |> fails
