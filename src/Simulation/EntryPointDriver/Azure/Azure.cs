@@ -257,10 +257,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
         /// <returns>A quantum machine.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQuantumMachine? QSharpMachine(AzureSettings settings) => settings.Target switch
         {
-            null => throw new ArgumentNullException(nameof(settings), "Target is null."),
+            null => null,
             NoOpQuantumMachine.Target => new NoOpQuantumMachine(),
             ErrorQuantumMachine.Target => new ErrorQuantumMachine(),
             _ => QuantumMachineFactory.CreateMachine(settings.CreateWorkspace(), settings.Target, settings.Storage)
@@ -271,12 +270,11 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
         /// <returns>A Q# submitter.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQSharpSubmitter? QSharpSubmitter(AzureSettings settings) => settings.Target switch
         {
-            null => throw new ArgumentNullException(nameof(settings), "Target is null."),
+            null => null,
             NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
+            _ => SubmitterFactory.QSharpSubmitter("TODO", settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
         /// <summary>
@@ -284,13 +282,12 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
         /// <returns>A QIR submitter.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="settings"/>.Target is null.</exception>
         private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
         {
-            null => throw new ArgumentNullException(nameof(settings), "Target is null"),
+            null => null,
             NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => null // TODO: Add a factory to Microsoft.Azure.Quantum.Client.
+            _ => SubmitterFactory.QirSubmitter("TODO", settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
         /// <summary>
