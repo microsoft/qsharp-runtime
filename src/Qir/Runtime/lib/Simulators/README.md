@@ -48,5 +48,4 @@ Same-level entities are independent of each other (unless specified otherwise). 
 **FullstateSimulator.cpp**  Defines the `FullstateSimulator` - QIR wrapper around the **[lib]Microsoft.Quantum.Simulator.Runtime.{dll|dylib|so}**, `CreateFullstateSimulator()`.  
                             Depends on **[lib]Microsoft.Quantum.Simulator.Runtime.{dll|dylib|so}**, **src\Simulation\Native\src\simulator\capi.hpp**,
                             `IRuntimeDriver`, `IQuantumGateSet`, `IDiagnostics`.  
-                            `CFullstateSimulator::GetOutStream()` depends on `quantum__rt__fail()` - the only dependency on the `public\QirRuntime.hpp`.  
                             Consider breaking up into **FullstateSimulator.hpp** and **FullstateSimulator.cpp**.

@@ -10,7 +10,6 @@
 #include "CLI11.hpp"
 
 #include "QirContext.hpp"
-#include "QirRuntime.hpp"
 #include "SimFactory.hpp"
 #include "OutputStream.hpp"
 
