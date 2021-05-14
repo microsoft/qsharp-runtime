@@ -48,3 +48,8 @@ impl<T> QubitSized<T> {
         self.n_qubits
     }
 }
+
+/// Metadata about how this crate was built.
+pub mod built_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}

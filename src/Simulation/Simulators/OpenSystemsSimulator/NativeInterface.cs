@@ -7,13 +7,14 @@ using System.Reflection;
 using System.Text.Json;
 using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
+using Newtonsoft.Json.Linq;
 
 #nullable enable
 
 namespace Microsoft.Quantum.Experimental
 {
     /// <summary>
-    ///     Abstracts away calls to and from libopensim.
+    ///     Abstracts away calls to and from the experimental simulators DLL.
     /// </summary>
     internal static class NativeInterface
     {
@@ -37,16 +38,21 @@ namespace Microsoft.Quantum.Experimental
         private static extern string _LastError();
 
 
-        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_name")]
-        private static extern string _GetName();
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_simulator_info")]
+        private static extern string _GetSimulatorInfo();
+
+        private static readonly JToken SimulatorInfo;
+
+        static NativeInterface()
+        {
+            SimulatorInfo = JToken.Parse(_GetSimulatorInfo());
+        }
 
         public static string Name
         {
             get
             {
-                // TODO: Add get_name to c_api and uncomment this.
-                LogCall("get_name");
-                return _GetName();;
+                return SimulatorInfo.Value<string>("name");
             }
         }
 

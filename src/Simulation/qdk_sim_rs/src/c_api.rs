@@ -12,8 +12,9 @@
 //! Please pay attention to any listed safety notes when calling into this C
 //! API.
 
-use crate::{Process, NoiseModel, State};
+use crate::{NoiseModel, Process, State, built_info};
 use lazy_static::lazy_static;
+use serde_json::json;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
@@ -67,13 +68,20 @@ fn apply<F: Fn(&NoiseModel) -> &Process>(
 
 // C API FUNCTIONS //
 
-// TODO: deprecate and replace with something that returns a JSON object
-//       with current version of the crate, target, etc. See the `built` crate.
-/// Returns the name of this library; useful for debugging in the host
-/// language.
+/// Returns information about how this simulator was built, serialized as a
+/// JSON object.
 #[no_mangle]
-pub extern "C" fn get_name() -> *const c_char {
-    CString::new("open_sim").unwrap().into_raw()
+pub extern "C" fn get_simulator_info() -> *const c_char {
+    let build_info = json!({
+        "name": "Microsoft.Quantum.Experimental.Simulators",
+        "version": built_info::PKG_VERSION,
+        "opt_level": built_info::OPT_LEVEL,
+        "features": built_info::FEATURES,
+        "target": built_info::TARGET
+    });
+    CString::new(serde_json::to_string(&build_info).unwrap().as_str())
+        .unwrap()
+        .into_raw()
 }
 
 /// Returns the last error message raised by a call to a C function.
@@ -82,9 +90,7 @@ pub extern "C" fn get_name() -> *const c_char {
 pub extern "C" fn lasterr() -> *const c_char {
     match &*LAST_ERROR.lock().unwrap() {
         None => ptr::null(),
-        Some(msg) => {
-            CString::new(msg.as_str()).unwrap().into_raw()
-        }
+        Some(msg) => CString::new(msg.as_str()).unwrap().into_raw(),
     }
 }
 
