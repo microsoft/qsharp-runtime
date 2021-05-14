@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Microsoft.Azure.Quantum.Client;
-using Microsoft.Azure.Quantum.Client.Models;
+
+using Azure.Quantum.Jobs.Models;
+
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Quantum.Test
@@ -150,10 +152,11 @@ namespace Microsoft.Azure.Quantum.Test
         public void ListJobsTest()
         {
             // Craft response
-            JobDetails jobDetails = new JobDetails
-            {
-                ProviderId = TestConstants.ProviderId,
-            };
+            JobDetails jobDetails = new JobDetails(
+                containerUri: string.Empty,
+                inputDataFormat: string.Empty,
+                providerId: TestConstants.ProviderId,
+                target: string.Empty);
 
             dynamic page = new
             {
@@ -189,16 +192,17 @@ namespace Microsoft.Azure.Quantum.Test
             return new Workspace(
                 subscriptionId: TestConstants.SubscriptionId,
                 resourceGroupName: TestConstants.ResourceGroupName,
-                workspaceName: TestConstants.WorkspaceName)
+                workspaceName: TestConstants.WorkspaceName,
+                location: TestConstants.Location)
             {
                 // Mock jobs client (only needed for unit tests)
-                QuantumClient = new MockHelper.MockQuantumClient(httpMock)
-                {
-                    SubscriptionId = TestConstants.SubscriptionId,
-                    ResourceGroupName = TestConstants.ResourceGroupName,
-                    WorkspaceName = TestConstants.WorkspaceName,
-                    BaseUri = new Uri(TestConstants.Endpoint),
-                },
+                QuantumClient = new MockHelper.MockQuantumClient(httpMock),
+                //{
+                //    SubscriptionId = TestConstants.SubscriptionId,
+                //    ResourceGroupName = TestConstants.ResourceGroupName,
+                //    WorkspaceName = TestConstants.WorkspaceName,
+                //    Loca = new Uri(TestConstants.Endpoint),
+                //},
             };
         }
 
@@ -213,11 +217,13 @@ namespace Microsoft.Azure.Quantum.Test
         private static JobDetails CreateJobDetails(string jobId)
         {
             return new JobDetails(
-                id: jobId,
                 containerUri: "https://uri",
                 inputDataFormat: "format1",
                 providerId: TestConstants.ProviderId,
-                target: "target");
+                target: "target")
+            {
+                Id = jobId,
+            };
         }
 
         private void ValidateJobRequestMessage(

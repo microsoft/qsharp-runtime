@@ -10,5 +10,6 @@ namespace Microsoft.Azure.Quantum.Test
         public const string WorkspaceName = "ws1";
         public const string ProviderId = "provider1";
         public const string Endpoint = "https://test";
+        public const string Location = "westus";
     }
 }

@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Azure.Quantum.Client;
+using Azure.Quantum.Jobs;
 
 using Moq;
 using Moq.Protected;
@@ -41,10 +41,9 @@ namespace Microsoft.Azure.Quantum.Test
             return new HttpClient(mock.Object);
         }
 
-        public class MockQuantumClient : QuantumClient
+        public class MockQuantumClient : QuantumJobClient
         {
             public MockQuantumClient(MockHelper mock)
-                : base(mock.GetHttpClientMock(), true)
             {
             }
         }
