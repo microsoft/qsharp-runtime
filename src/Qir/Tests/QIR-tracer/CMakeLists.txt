@@ -1,5 +1,5 @@
 set(TEST_FILES
-  qsharp/qir/tracer-qir.ll
+  qsharp/obj/qsharp/tracer-qir.bc
 )
 
 #==============================================================================

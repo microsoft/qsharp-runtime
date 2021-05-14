@@ -8,85 +8,85 @@
 
 #include "qsharp__foundation_internal.hpp"
 
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__body();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__body();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__body();                               // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__body();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__body();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__body();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__body();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__body();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__body();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__body();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__body();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__body();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__body();                         // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(int64_t min, int64_t max); // NOLINT
-extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(double min, double max);  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop();                                  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__Interop();                               // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__Interop();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__Interop();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__Interop();                                   // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__Interop();                                // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__Interop();                                // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__Interop();                                // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop();                                  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop();                                  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop();                                  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop();                         // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(int64_t min, int64_t max); // NOLINT
+extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(double min, double max);  // NOLINT
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SqrtTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Log", "[qir.math][qir.Math.Log]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__LogTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop());
 }
 
 TEST_CASE("QIR: Math.ArcTan2", "[qir.math][qir.Math.ArcTan2]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__Interop());
 }
 
 TEST_CASE("QIR: Math.Sin", "[qir.math][qir.Math.Sin]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SinTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SinTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Cos", "[qir.math][qir.Math.Cos]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__CosTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__CosTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Tan", "[qir.math][qir.Math.Tan]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanTest__Interop());
 }
 
 TEST_CASE("QIR: Math.ArcSin", "[qir.math][qir.Math.ArcSin]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__Interop());
 }
 
 TEST_CASE("QIR: Math.ArcCos", "[qir.math][qir.Math.ArcCos]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__Interop());
 }
 
 TEST_CASE("QIR: Math.ArcTan", "[qir.math][qir.Math.ArcTan]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Sinh", "[qir.math][qir.Math.Sinh]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SinhTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Cosh", "[qir.math][qir.Math.Cosh]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__CoshTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop());
 }
 
 TEST_CASE("QIR: Math.Tanh", "[qir.math][qir.Math.Tanh]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanhTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop());
 }
 
 TEST_CASE("QIR: Math.IeeeRemainder", "[qir.math][qir.Math.IeeeRemainder]")
 {
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop());
 }
 
 TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
@@ -96,20 +96,20 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     while(--times)
     {
         const uint64_t qsRndNum = 
-            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(std::numeric_limits<int64_t>::min(),
+            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(std::numeric_limits<int64_t>::min(),
                                                                             std::numeric_limits<int64_t>::max());
         const uint64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomI64();  // This call must be done 
-            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body().
+            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
         REQUIRE(qsRndNum == cppRndNum);
     }
 
     // Make sure the correct exception is thrown if min > max:
-    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5), std::runtime_error);
+    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5), std::runtime_error);
 
     // Check the exception string:
     try
     {
-        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(10, 5);
+        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5);
     }
     catch (std::runtime_error const& exc)
     {
@@ -119,7 +119,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     // Test equal minimum and maximum:
     for(uint64_t num: { -5, 0, 3 } )
     {
-        REQUIRE(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(num, num) == num);
+        REQUIRE(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(num, num) == num);
     }
 
     // There is a strong difference in the opinions about how the random number generator must be tested.
@@ -180,7 +180,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     //     actualNumbers.reserve(times);
     //     while (times--)
     //     {
-    //         actualNumbers.emplace_back(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(-10, 10));
+    //         actualNumbers.emplace_back(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(-10, 10));
     //     }
 
     //     // Compare the actual numbers with the expected ones:
@@ -197,7 +197,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     //     while (times--)
     //     {
     //         actualNumbers.emplace_back(
-    //             Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__body(std::numeric_limits<int64_t>::min(),
+    //             Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(std::numeric_limits<int64_t>::min(),
     //                                                                             std::numeric_limits<int64_t>::max()));
     //     }
 
@@ -216,20 +216,20 @@ TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
     while(--times)
     {
         const double qsRndNum = 
-            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(std::numeric_limits<double>::min(),
+            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(std::numeric_limits<double>::min(),
                                                                                std::numeric_limits<double>::max());
         const double cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomDouble();  // This call must be done 
-            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body().
+            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
         REQUIRE(qsRndNum == cppRndNum);
     }
 
     // Make sure the correct exception is thrown if min > max:
-    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(10.0, 5.0), std::runtime_error);
+    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0), std::runtime_error);
 
     // Check the exception string:
     try
     {
-        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__body(10.0, 5.0);
+        (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0);
     }
     catch (std::runtime_error const& exc)
     {

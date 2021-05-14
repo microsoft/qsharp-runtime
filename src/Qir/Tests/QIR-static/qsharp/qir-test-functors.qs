@@ -32,6 +32,7 @@ namespace Microsoft.Quantum.Testing.QIR {
     // BasicMeasurementFeedback, which in turn doesn't allow updating mutables inside measurement conditionals.
     // this means, we cannot easily get detailed failure information back from Q#, but the test driver can mock
     // the simulator to track the point of failure.
+    @EntryPoint()
     operation TestFunctors() : Unit {
         let qop = Qop(_, 1);
         let adj_qop = Adjoint qop;
@@ -80,6 +81,7 @@ namespace Microsoft.Quantum.Testing.QIR {
         }
     }
 
+    @EntryPoint()
     operation TestFunctorsNoArgs() : Unit {
         NoArgs();
         let qop = NoArgs;
