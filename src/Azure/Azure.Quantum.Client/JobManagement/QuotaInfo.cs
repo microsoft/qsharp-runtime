@@ -3,7 +3,8 @@
 
 namespace Microsoft.Azure.Quantum
 {
-    using Microsoft.Azure.Quantum.Client.Models;
+    using global::Azure.Quantum.Jobs.Models;
+
     using Microsoft.Azure.Quantum.Utility;
 
     /// <summary>
@@ -16,7 +17,7 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         /// <param name="workspace">The workspace.</param>
         /// <param name="quota">The job details.</param>
-        public QuotaInfo(IWorkspace workspace, Quota quota)
+        public QuotaInfo(IWorkspace workspace, QuantumJobQuota quota)
         {
             Ensure.NotNull(workspace, nameof(workspace));
             Ensure.NotNull(quota, nameof(quota));
@@ -33,6 +34,6 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the quota information.
         /// </summary>
-        public Quota Quota { get; private set; }
+        public QuantumJobQuota Quota { get; private set; }
     }
 }

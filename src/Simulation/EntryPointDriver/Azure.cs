@@ -4,6 +4,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Azure.Core;
+
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
@@ -208,12 +211,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? Subscription { get; set; }
 
         /// <summary>
-        /// The resource group name.
+        /// The Azure Quantum Workspace's resource group name.
         /// </summary>
         public string? ResourceGroup { get; set; }
 
         /// <summary>
-        /// The workspace name.
+        /// The Azure Quantum Workspace's name.
         /// </summary>
         public string? Workspace { get; set; }
 
@@ -233,14 +236,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? AadToken { get; set; }
 
         /// <summary>
-        /// The base URI of the Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
-        /// </summary>
-        public Uri? BaseUri { get; set; }
-
-        /// <summary>
-        /// The location to use with the default Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// The Azure Quantum Workspace's location (region).
         /// </summary>
         public string? Location { get; set; }
 
@@ -270,29 +266,46 @@ namespace Microsoft.Quantum.EntryPointDriver
         public bool Verbose { get; set; }
 
         /// <summary>
+        /// Print a warning about passing an AAD token. Using this is not supported anymore but we keep 
+        /// the parameter to break any existing clients, like the az cli.
+        /// Once the known clients are updated we should remove the parameter too.
+        /// </summary>
+        internal void PrintAadWarning()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            if (!(AadToken is null))
+            {
+                try
+                {
+                    Console.Error.WriteLine("----------------------------------------------------------------------------");
+                    Console.Error.WriteLine(" [Warning]");
+                    Console.Error.WriteLine(" The AadToken parameter is not supported anymore.");
+                    Console.Error.WriteLine(" Take a look at the Azure Identity client library at");
+                    Console.Error.WriteLine(" https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme");
+                    Console.Error.WriteLine(" for new authentication options.");
+                    Console.Error.WriteLine("----------------------------------------------------------------------------");
+                }
+                finally
+                {
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            if (BaseUri != null)
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
-            }
-            else if (Location != null)
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
-            }
-            else
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
-            }
+            PrintAadWarning();
+
+            return new Workspace(
+                subscriptionId: Subscription, 
+                resourceGroupName: ResourceGroup,
+                workspaceName: Workspace, 
+                location: NormalizeLocation(Location));
         }
 
         public override string ToString() =>
@@ -302,8 +315,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Workspace: {Workspace}",
                 $"Target: {Target}",
                 $"Storage: {Storage}",
-                $"AAD Token: {AadToken}",
-                $"Base URI: {BaseUri}",
                 $"Location: {Location}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
@@ -311,7 +322,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
 
-        internal static string NormalizeLocation(string location) =>
-            string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
+        internal static string NormalizeLocation(string? location) =>
+            string.Concat(location?.Where(c => !char.IsWhiteSpace(c)) ?? "").ToLower();
     }
 }

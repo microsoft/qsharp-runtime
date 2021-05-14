@@ -6,7 +6,9 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.Quantum.Client.Models;
+
+    using global::Azure.Quantum.Jobs.Models;
+
     using Microsoft.Azure.Quantum.Utility;
     using Microsoft.Quantum.Runtime;
 
@@ -50,7 +52,7 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the status of the submitted job.
         /// </summary>
-        public string Status => Details.Status;
+        public string Status => Details.Status?.ToString();
 
         /// <summary>
         /// Gets whether the job execution completed successfully.
