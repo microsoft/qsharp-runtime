@@ -23,9 +23,16 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
+    /// - Microsoft.Quantum.Intrinsic.Measure
     operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
     is Adj + Ctl {
-        body intrinsic;
+        body (...) {
+            AssertMeasurementProbability(bases, qubits, result, 1.0, msg, 1e-10);
+        }
+        adjoint self;
+        controlled (controllingQubits, ...) {
+            // Empty.
+        }
     }
     
     
@@ -45,6 +52,8 @@ namespace Microsoft.Quantum.Diagnostics {
     /// The probability with which the given result is expected.
     /// ## msg
     /// A message to be reported if the assertion fails.
+    /// ## tolerance
+    /// Tolerance of the measurement probability.
     ///
     /// # Example
     /// ```qsharp
@@ -61,7 +70,8 @@ namespace Microsoft.Quantum.Diagnostics {
     ///
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.AssertMeasurement
-    operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tol : Double) : Unit
+    /// - Microsoft.Quantum.Intrinsic.Measure
+    operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tolerance : Double) : Unit
     is Adj + Ctl {
         body intrinsic;
     }

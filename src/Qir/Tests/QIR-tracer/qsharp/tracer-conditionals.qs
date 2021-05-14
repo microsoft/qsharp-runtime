@@ -9,6 +9,7 @@ namespace Microsoft.Quantum.Testing.Tracer {
         op(arg);
     }
 
+    @EntryPoint()
     operation TestMeasurements() : Unit {
         use qs = Qubit[6];
         T(qs[0]); // layer 0

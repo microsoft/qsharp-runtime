@@ -47,7 +47,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 // The following assumes that Assert is on Q# stack.
                 Assert.Equal(2, stackFrames!.Length);
 
-                Assert.Equal("Microsoft.Quantum.Diagnostics.AssertMeasurement", stackFrames[0].Callable.FullName);
+                Assert.Equal("Microsoft.Quantum.Diagnostics.AssertMeasurementProbability", stackFrames[0].Callable.FullName);
                 Assert.Equal(namespacePrefix + "AllocateQubit2", stackFrames[1].Callable.FullName);
 
                 Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);

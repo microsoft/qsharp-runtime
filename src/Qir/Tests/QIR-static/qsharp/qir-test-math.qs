@@ -8,6 +8,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
     open Microsoft.Quantum.Random;
     open Microsoft.Quantum.Convert;     // DoubleAsString()
 
+    @EntryPoint()
     function SqrtTest() : Int {
         if  2.0 != Sqrt(  4.0)          { return 1; }           // The return value indicates which test case has failed.
         if  3.0 != Sqrt(  9.0)          { return 2; }     
@@ -20,6 +21,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function LogTest() : Int {
         if 1.0 != Log(E())                          { return 1; }       // ln(e)   -> 1     // The return value indicates which test case has failed.
         if 2.0 != Log(E() * E())                    { return 2; }       // ln(e^2) -> 2
@@ -32,6 +34,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function ArcTan2Test() : Int {
 
         // function ArcTan2(y : Double, x : Double) : Double 
@@ -62,14 +65,17 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     operation TestDrawRandomInt(min : Int, max : Int) : Int {
         return DrawRandomInt(min, max);
     }
 
+    @EntryPoint()
     operation TestDrawRandomDouble(min : Double, max : Double) : Double {
         return DrawRandomDouble(min, max);
     }
 
+    @EntryPoint()
     function Close(expected : Double, actual : Double) : Bool {
         let neighbourhood = 0.0000001;  // On x86-64 + Win the error is in 16th digit after the decimal point. 
                                         // E.g. enstead of 0.0 there can be 0.00000000000000012.
@@ -78,6 +84,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return ((expected - neighbourhood) < actual) and (actual < (expected + neighbourhood));
     }
 
+    @EntryPoint()
     function SinTest() : Int {
 
         // function Sin (theta : Double) : Double
@@ -101,6 +108,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function CosTest() : Int {
 
         // function Cos (theta : Double) : Double
@@ -124,6 +132,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function TanTest() : Int {
         // function Tan (theta : Double) : Double
         if not Close( 0.0, Tan(0.0))                            { return  1; }    // The return value indicates which test case has failed.
@@ -148,6 +157,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function ArcSinTest() : Int {
 
         // function ArcSin (theta : Double) : Double
@@ -175,6 +185,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function ArcCosTest() : Int {
 
         // function ArcCos (theta : Double) : Double
@@ -200,6 +211,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function ArcTanTest() : Int {
 
         // function ArcTan (theta : Double) : Double
@@ -226,6 +238,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function SinhTest() : Int {
 
         // function Sinh (theta : Double) : Double
@@ -243,6 +256,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function CoshTest() : Int {
 
         // function Cosh (theta : Double) : Double
@@ -260,6 +274,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function TanhTest() : Int {
 
         // function Tanh (theta : Double) : Double
@@ -277,6 +292,7 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
     function IeeeRemainderTest() : Int {
 
         // function IeeeRemainder(x : Double, y : Double) : Double
