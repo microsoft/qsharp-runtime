@@ -1,5 +1,5 @@
 set(TEST_FILES
-  qsharp/qir/qir-test-random.ll
+  qsharp/obj/qsharp/qir-test-random.bc
 )
 
 #==============================================================================

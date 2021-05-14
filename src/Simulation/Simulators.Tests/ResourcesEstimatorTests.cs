@@ -232,5 +232,34 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(2.0 + 3.0 + 3.0, data3.Rows.Find("QubitCount")["Sum"]);
             Assert.Equal(3.0, data3.Rows.Find("QubitCount")["Max"]);
         }
+
+
+        [Fact]
+        public void ReuseInBlockOrderedTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            ReuseInBlockOrdered.Run(sim).Wait();
+
+            Assert.Equal(8.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(0.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
+        [Fact]
+        public void ReuseInBlockMixedTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = true;
+            var sim = new ResourcesEstimator(config);
+
+            ReuseInBlockMixed.Run(sim).Wait();
+
+            Assert.Equal(8.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(0.0, sim.Data.Rows.Find("Depth")["Sum"]);
+        }
+
+
     }
 }

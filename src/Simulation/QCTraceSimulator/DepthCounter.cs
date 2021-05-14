@@ -244,19 +244,28 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
 
             if (optimizeDepth)
             {
-                // Doing width reuse heuristics and width computation.
+                // Performing width computation and applying reuse heuristics.
+                // First we fix busy time periods for all qubits involved.
+                foreach (QubitTimeMetrics q in qubitsTraceData.Cast<QubitTimeMetrics>())
+                {
+                    // If qubit is not fixed in time we fix it at zero.
+                    if (q.StartTime.IsEqualTo(ComplexTime.MinValue)) {
+                        q.StartTime = ComplexTime.Zero;
+                    }
+                }
+
+                // Then we sort qubits ascending by the start of busy time. This would result in optimal reuse if:
+                // (1) We were not allowed to move gates in time.
+                // (2) We were sorting all qubits of the cirquit, not just this block.
+                // In reality these statements aren't true, so this is only a heuristic rather than the optimal reuse of qubits.
+                Array.Sort(qubitsTraceData, CompareAsQubitTimeMetricsByStartTime);
+
+                // Reuse qubits if possible or increase count of qubits used.
                 foreach (QubitTimeMetrics q in qubitsTraceData.Cast<QubitTimeMetrics>())
                 {
                     // If qubit wasn't used in any gate. We don't allocate it.
-                    if (q.EndTime.IsEqualTo(ComplexTime.Zero))
-                    {
+                    if (q.EndTime.IsEqualTo(ComplexTime.Zero)) {
                         continue;
-                    }
-
-                    // If qubit is not fixed in time we fix it at zero.
-                    if (q.StartTime.IsEqualTo(ComplexTime.MinValue))
-                    {
-                        q.StartTime = ComplexTime.Zero;
                     }
 
                     // Then we find if we can reuse existing qubits.
@@ -297,6 +306,13 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Compare objects assuming they are QubitTimeMetrics. Compare by StartTime.
+        /// </summary>
+        private static int CompareAsQubitTimeMetricsByStartTime(object x, object y) {
+            return ComplexTime.Compare(((QubitTimeMetrics)x).StartTime, ((QubitTimeMetrics)y).StartTime);
         }
 
         public void OnReturn(object[] qubitsTraceData, long qubitReleased)

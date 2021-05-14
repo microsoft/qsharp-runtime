@@ -4,6 +4,7 @@ namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
 
+    @EntryPoint()
     operation TestApplyIf() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();
@@ -23,6 +24,7 @@ namespace Microsoft.Quantum.Testing.QIR {
         ApplyIfZero(r1, (X, q1));
     }
 
+    @EntryPoint()
     operation TestApplyIfWithFunctors() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();
@@ -44,6 +46,7 @@ namespace Microsoft.Quantum.Testing.QIR {
         Adjoint Controlled ApplyIfZeroCA([q2], (r1, (X, q1)));
     }
 
+    @EntryPoint()
     operation TestApplyConditionally() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();

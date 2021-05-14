@@ -3,6 +3,7 @@
 namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Intrinsic;
 
+    @EntryPoint()
     operation TestQubitResultManagement() : Unit {
         // exercise __quantum__rt__qubit_allocate_array
         use qs = Qubit[2] {
