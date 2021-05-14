@@ -57,6 +57,17 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
 }
 
+
+if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
+    $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+    & "$expSim/test-qdk-sim-rs.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping test of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+}
+
 if (-not $all_ok) {
     throw "At least one project failed during testing. Check the logs."
 }

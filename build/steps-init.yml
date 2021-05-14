@@ -26,6 +26,12 @@ steps:
   displayName: Windows install rust
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
+- script: |
+    rustup install nightly
+    rustup component add rustfmt
+    rustup component add rustfmt --toolchain nightly
+  displayName: Enable Rust formatting and nightly options.
+
 ##
 # Custom pre-reqs
 ##

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use num_traits::Num;
 use num_complex::Complex;
+use num_traits::Num;
 
 pub type C64 = Complex<f64>;
 

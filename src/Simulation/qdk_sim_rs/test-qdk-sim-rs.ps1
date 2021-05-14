@@ -1,6 +1,10 @@
 & (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
 
 Push-Location $PSScriptRoot
+    # Start with the quick check first and make sure that Rust sources
+    # meet formatting and style guide rules.
+    cargo fmt -- --check
+
     # If running in CI, use cargo2junit to expose unit tests to the
     # PublishTestResults task.
     if ("$Env:TF_BUILD" -ne "") {

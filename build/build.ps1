@@ -28,12 +28,12 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
 
 if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
     $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
-    & "$openSimulator/build-qdk-sim-rs.ps1"
+    & "$expSim/build-qdk-sim-rs.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
 } else {
-    Write-Host "Skipping build of native simulator because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+    Write-Host "Skipping build of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
 }
 
 function Build-One {

@@ -7,49 +7,34 @@
 use core::f64::consts::FRAC_1_SQRT_2;
 use std::convert::TryInto;
 
-use ndarray::{ Array, Array1, Array2 };
-use num_traits::{ Zero, One };
+use ndarray::{Array, Array1, Array2};
+use num_traits::{One, Zero};
 
 use crate::utils::*;
 
 /// Returns a copy of the single-qubit identity matrix.
 pub fn i() -> Array2<C64> {
-    array![
-        [ONE_C, ZERO_C],
-        [ZERO_C, ONE_C]
-    ]
+    array![[ONE_C, ZERO_C], [ZERO_C, ONE_C]]
 }
 
 /// Returns a copy of the Pauli 𝑋 operator.
 pub fn x() -> Array2<C64> {
-    array![
-        [ZERO_C, ONE_C],
-        [ONE_C, ZERO_C]
-    ]
+    array![[ZERO_C, ONE_C], [ONE_C, ZERO_C]]
 }
 
 /// Returns a copy of the Pauli 𝑌 operator.
 pub fn y() -> Array2<C64> {
-    array![
-        [ZERO_C, I_C],
-        [-I_C, ZERO_C]
-    ]
+    array![[ZERO_C, I_C], [-I_C, ZERO_C]]
 }
 
 /// Returns a copy of the Pauli 𝑍 operator.
 pub fn z() -> Array2<C64> {
-    array![
-        [ONE_C, ZERO_C],
-        [ZERO_C, -ONE_C]
-    ]
+    array![[ONE_C, ZERO_C], [ZERO_C, -ONE_C]]
 }
 
 /// Returns a copy of the single-qubit Hadamard transformation.
 pub fn h() -> Array2<C64> {
-    array![
-        [ONE_C, ONE_C],
-        [ONE_C, -ONE_C]
-    ] * FRAC_1_SQRT_2
+    array![[ONE_C, ONE_C], [ONE_C, -ONE_C]] * FRAC_1_SQRT_2
 }
 
 pub fn t() -> Array2<C64> {
@@ -60,10 +45,7 @@ pub fn t() -> Array2<C64> {
 }
 
 pub fn s() -> Array2<C64> {
-    array![
-        [ONE_C, ZERO_C],
-        [ZERO_C, C64::new(0.0_f64, 1.0_f64)]
-    ]
+    array![[ONE_C, ZERO_C], [ZERO_C, C64::new(0.0_f64, 1.0_f64)]]
 }
 
 pub fn cnot() -> Array2<C64> {
@@ -82,7 +64,7 @@ pub fn cnot() -> Array2<C64> {
 /// The following are equivalent:
 /// ```
 /// # #[macro_use] extern crate ndarray;
-/// # use opensim::common_matrices::elementary_vec;
+/// # use qdk_sim::common_matrices::elementary_vec;
 /// let vec = elementary_vec::<i64>(2, 4);
 /// ```
 /// and:
@@ -91,25 +73,30 @@ pub fn cnot() -> Array2<C64> {
 /// let vec = array![0i64, 0i64, 1i64, 0i64];
 /// ```
 pub fn elementary_vec<T: Zero + One>(idx: usize, n: usize) -> Array1<T> {
-    Array::from_shape_fn(n, |i| if i == idx {T::one()} else {T::zero()})
+    Array::from_shape_fn(n, |i| if i == idx { T::one() } else { T::zero() })
 }
 
-pub fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (usize, usize)) -> Array2<T> {
-    Array::from_shape_fn((n, m), |(i, j)| if i == idx0 && j == idx1 {
-        T::one()
-    } else {
-        T::zero()
+pub fn elementary_matrix<T: Zero + One>(
+    (idx0, idx1): (usize, usize),
+    (n, m): (usize, usize),
+) -> Array2<T> {
+    Array::from_shape_fn((n, m), |(i, j)| {
+        if i == idx0 && j == idx1 {
+            T::one()
+        } else {
+            T::zero()
+        }
     })
 }
 
 /// Returns an identity matrix that acts on state vectors of registers of
 /// qubits with a given size.
-/// 
+///
 /// # Example
 /// The following snippet defines a two-qubit identity matrix:
 /// ```
 /// # #[macro_use] extern crate ndarray;
-/// # use opensim::common_matrices::nq_eye;
+/// # use qdk_sim::common_matrices::nq_eye;
 /// use num_complex::Complex;
 /// let eye = nq_eye(2usize);
 /// assert_eq!(eye, array![

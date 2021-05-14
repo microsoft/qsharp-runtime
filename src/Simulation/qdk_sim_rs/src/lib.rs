@@ -16,10 +16,10 @@ extern crate serde;
 use serde::{Deserialize, Serialize};
 
 pub mod c_api;
-pub mod common_matrices;
-pub mod linalg;
 mod channels;
+pub mod common_matrices;
 mod instrument;
+pub mod linalg;
 mod noise_model;
 mod states;
 mod utils;

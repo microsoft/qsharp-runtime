@@ -1,14 +1,14 @@
-use num_traits::{ Zero, One };
-use crate::C64;
-use crate::common_matrices;
-use crate::states::StateData::Mixed;
-use crate::states::State;
 use crate::channels::Channel;
-use crate::channels::ChannelData::{ Unitary, KrausDecomposition };
+use crate::channels::ChannelData::{KrausDecomposition, Unitary};
+use crate::common_matrices;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
+use crate::states::State;
+use crate::states::StateData::Mixed;
+use crate::C64;
+use num_traits::{One, Zero};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NoiseModel {
@@ -23,81 +23,77 @@ pub struct NoiseModel {
     pub t: Channel,
     pub t_adj: Channel,
     pub cnot: Channel,
-    pub z_meas: Instrument
+    pub z_meas: Instrument,
 }
 
 impl NoiseModel {
     pub fn ideal() -> NoiseModel {
         let i = Channel {
             n_qubits: 1,
-            data: Unitary(common_matrices::i())
+            data: Unitary(common_matrices::i()),
         };
         let z = Channel {
             n_qubits: 1,
-            data: Unitary(common_matrices::z())
+            data: Unitary(common_matrices::z()),
         };
         let z_meas = Instrument {
             effects: vec![
                 Channel {
                     n_qubits: 1,
-                    data: KrausDecomposition(array![
-                        [
-                            [C64::one(), C64::zero()],
-                            [C64::zero(), C64::zero()]
-                        ]
-                    ])
+                    data: KrausDecomposition(array![[
+                        [C64::one(), C64::zero()],
+                        [C64::zero(), C64::zero()]
+                    ]]),
                 },
                 Channel {
                     n_qubits: 1,
-                    data: KrausDecomposition(array![
-                        [
-                            [C64::zero(), C64::zero()],
-                            [C64::zero(), C64::one()]
-                        ]
-                    ])
+                    data: KrausDecomposition(array![[
+                        [C64::zero(), C64::zero()],
+                        [C64::zero(), C64::one()]
+                    ]]),
                 },
-            ]
+            ],
         };
         NoiseModel {
             initial_state: State {
                 n_qubits: 1,
-                data: Mixed((common_matrices::i() + common_matrices::z()) / 2.0)
+                data: Mixed((common_matrices::i() + common_matrices::z()) / 2.0),
             },
             i: i,
             x: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::x())
+                data: Unitary(common_matrices::x()),
             },
             y: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::y())
+                data: Unitary(common_matrices::y()),
             },
             z: z,
             h: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::h())
+                data: Unitary(common_matrices::h()),
             },
             t: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::t())
+                data: Unitary(common_matrices::t()),
             },
             t_adj: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::t().dag())
+                data: Unitary(common_matrices::t().dag()),
             },
             s: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::s())
+                data: Unitary(common_matrices::s()),
             },
             s_adj: Channel {
                 n_qubits: 1,
-                data: Unitary(common_matrices::s().dag())
+                data: Unitary(common_matrices::s().dag()),
             },
             cnot: Channel {
                 n_qubits: 2,
-                data: Unitary(common_matrices::cnot())
+                data: Unitary(common_matrices::cnot()),
             },
-            z_meas: z_meas
+            z_meas: z_meas,
         }
     }
 }
