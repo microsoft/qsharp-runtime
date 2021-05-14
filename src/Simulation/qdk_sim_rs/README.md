@@ -16,7 +16,7 @@ The [`c_api`] module allows for using the simulation functionality in this crate
 This crate provides several different data structures for representing open quantum systems in a variety of different conventions:
 
 - [`State`]\: Represents pure or mixed states of a register of qubits.
-- [`Channel`]\: Represents processes that map states to states.
+- [`Process`]\: Represents processes that map states to states.
 - [`Instrument`]\: Represents quantum instruments, the most general form of measurement.
 
 ## Noise model serialization

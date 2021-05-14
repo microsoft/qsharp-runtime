@@ -1,4 +1,12 @@
-# Testing strategy
+## Code quality checks
+
+The build for this crate enforces the following mandatory code quality checks:
+
+- `rustfmt`: Check code style and formatting rules.
+- `clippy`: Check for common programming errors and linter violations.
+- `#[deny(missing_docs)]`: Require API documentation for all public crates, modules, traits, functions, and types.
+
+## Testing strategy
 
 Tests for the open systems simulator consist of five distinct parts:
 

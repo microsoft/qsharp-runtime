@@ -10,6 +10,7 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use qdk_sim::{
+    common_matrices,
     common_matrices::nq_eye,
     linalg::{extend_one_to_n, extend_two_to_n, Tensor},
 };

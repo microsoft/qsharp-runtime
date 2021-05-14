@@ -5,6 +5,12 @@ Push-Location $PSScriptRoot
     # meet formatting and style guide rules.
     cargo fmt -- --check
 
+    # Check linting rules defined by clippy.
+    # If there's a false positive, that check should be explicitly disabled
+    # at the point where the false positive occurs with an explanation as to
+    # why it's OK.
+    cargo clippy -- -D warnings
+
     # If running in CI, use cargo2junit to expose unit tests to the
     # PublishTestResults task.
     if ("$Env:TF_BUILD" -ne "") {

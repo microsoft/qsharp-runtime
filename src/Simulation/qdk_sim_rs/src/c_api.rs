@@ -1,7 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::{Channel, NoiseModel, State};
+//! Exposes a C API for this crate, useful for embedding into simulation
+//! runtimes.
+//!
+//! # Safety
+//! As this is a foreign-function interface, many of the functions exposed here
+//! are unsafe, representing that the caller is required to ensure that safety
+//! conditions in the host language are upheld.
+//!
+//! Please pay attention to any listed safety notes when calling into this C
+//! API.
+
+use crate::{Process, NoiseModel, State};
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::ffi::CStr;
@@ -34,7 +45,7 @@ fn as_capi_err(result: Result<(), String>) -> i64 {
     }
 }
 
-fn apply<F: Fn(&NoiseModel) -> &Channel>(
+fn apply<F: Fn(&NoiseModel) -> &Process>(
     sim_id: usize,
     idxs: &[usize],
     channel_fn: F,
@@ -56,11 +67,17 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(
 
 // C API FUNCTIONS //
 
+// TODO: deprecate and replace with something that returns a JSON object
+//       with current version of the crate, target, etc. See the `built` crate.
+/// Returns the name of this library; useful for debugging in the host
+/// language.
 #[no_mangle]
 pub extern "C" fn get_name() -> *const c_char {
     CString::new("open_sim").unwrap().into_raw()
 }
 
+/// Returns the last error message raised by a call to a C function.
+/// If no error message has been raised, returns a null pointer.
 #[no_mangle]
 pub extern "C" fn lasterr() -> *const c_char {
     match &*LAST_ERROR.lock().unwrap() {
@@ -71,6 +88,9 @@ pub extern "C" fn lasterr() -> *const c_char {
     }
 }
 
+/// Allocate a new simulator with a given capacity, measured in the number of
+/// qubits supported by that simulator. Returns an id that can be used to refer
+/// to the new simulator in future function calls.
 #[no_mangle]
 pub extern "C" fn init(initial_capacity: usize) -> usize {
     let state = &mut *STATE.lock().unwrap();
@@ -85,6 +105,8 @@ pub extern "C" fn init(initial_capacity: usize) -> usize {
     id
 }
 
+/// Deallocates the simulator with the given id, releasing any resources owned
+/// by that simulator.
 #[no_mangle]
 pub extern "C" fn destroy(sim_id: usize) -> i64 {
     as_capi_err({
@@ -98,46 +120,66 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
     })
 }
 
+// TODO[code quality]: refactor the following several functions into a macro.
+
+/// Applies the `X` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.x))
 }
 
+/// Applies the `Y` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.y))
 }
 
+/// Applies the `Z` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.z))
 }
 
+/// Applies the `H` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.h))
 }
 
+/// Applies the `S` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub fn s(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.s))
 }
 
+/// Applies the `Adjoint S` operation acting on a given qubit to a given
+/// simulator, using the currently set noise model.
 #[no_mangle]
 pub fn s_adj(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.s_adj))
 }
 
+/// Applies the `T` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub fn t(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.t))
 }
 
+/// Applies the `Adjoint T` operation acting on a given qubit to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx], |model| &model.t_adj))
 }
 
+/// Applies the `CNOT` operation acting on two given qubits to a given simulator,
+/// using the currently set noise model.
 #[no_mangle]
 pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
     as_capi_err(apply(sim_id, &[idx_control, idx_target], |model| {
@@ -248,6 +290,7 @@ pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char
     })
 }
 
+/// Returns the state of a given simulator, serialized as a JSON object.
 #[no_mangle]
 pub extern "C" fn get_current_state(sim_id: usize) -> *const c_char {
     let state = &mut *STATE.lock().unwrap();

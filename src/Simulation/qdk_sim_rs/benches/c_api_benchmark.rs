@@ -35,7 +35,10 @@ fn with_test_suite<T: criterion::measurement::Measurement>(
     group.bench_function("measure", |b| {
         b.iter(|| {
             let mut result: usize = 0;
-            c_api::m(sim_id, 0, &mut result);
+            // NB: The C API is not in general safe.
+            unsafe {
+                c_api::m(sim_id, 0, &mut result);
+            }
         })
     });
 }
@@ -50,10 +53,13 @@ fn ideal(c: &mut Criterion) {
 
 fn noisy(c: &mut Criterion) {
     let sim_id = c_api::init(3);
-    c_api::set_noise_model(
-        sim_id,
-        CString::new(BENCHMARK_NOISE_MODEL_JSON).unwrap().as_ptr(),
-    );
+    // NB: The C API is not in general safe.
+    unsafe {
+        c_api::set_noise_model(
+            sim_id,
+            CString::new(BENCHMARK_NOISE_MODEL_JSON).unwrap().as_ptr(),
+        );
+    }
     let mut group = c.benchmark_group("noisy");
     with_test_suite(sim_id, &mut group);
     group.finish();

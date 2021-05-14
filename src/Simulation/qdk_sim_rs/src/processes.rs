@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::channels::ChannelData::{KrausDecomposition, Unitary};
+use crate::{log, processes::ProcessData::{KrausDecomposition, Unitary}};
 use crate::linalg::ConjBy;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::states::StateData::{Mixed, Pure};
@@ -9,7 +9,7 @@ use crate::NoiseModel;
 use crate::QubitSized;
 use crate::State;
 use crate::C64;
-use crate::{log_as_err, log_message};
+use crate::{log_as_err};
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use num_traits::{One, Zero};
@@ -19,16 +19,32 @@ use std::ops::Add;
 use std::ops::Mul;
 
 // TODO: Rename to something that doesn't imply it's already CPTP.
-pub type Channel = QubitSized<ChannelData>;
 
+/// A linear function from quantum states to quantum states.
+///
+/// # Remarks
+/// A process that is completely positive and trace preserving is a channel.
+pub type Process = QubitSized<ProcessData>;
+
+/// Data used to represent a given process.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum ChannelData {
+pub enum ProcessData {
+    /// Representation of the process by a unitary matrix.
     Unitary(Array2<C64>),
+
+    /// Representation of the process by the singular vectors of its Choi
+    /// representation (colloquially, the Kraus decomposition).
+    ///
+    /// The first index denotes each Kraus operator, with the second and third
+    /// indices representing the indices of each operator.
     KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
 }
 
-impl Channel {
+impl Process {
     // TODO: methods to forcibly convert representations.
+
+    /// Applies this process to a quantum register with a given
+    /// state, returning the new state of that register.
     pub fn apply(&self, state: &State) -> Result<State, String> {
         if state.n_qubits == self.n_qubits {
             Ok(State {
@@ -71,6 +87,8 @@ impl Channel {
         }
     }
 
+    /// Applies this process to the given qubits in a register with a given
+    /// state, returning the new state of that register.
     pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
         // Fail if there's not enough qubits.
         if state.n_qubits < self.n_qubits {
@@ -122,7 +140,7 @@ impl Channel {
                 .extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)
                 .apply(state),
             _ => {
-                log_message(&format!(
+                log(&format!(
                     "Expanding {}-qubit channels is not yet implemented.",
                     self.n_qubits
                 ));
@@ -131,9 +149,11 @@ impl Channel {
         }
     }
 
-    pub fn extend_one_to_n(&self, idx_qubit: usize, n_qubits: usize) -> Channel {
+    /// Returns a copy of this process that applies to registers of a given
+    /// size.
+    pub fn extend_one_to_n(&self, idx_qubit: usize, n_qubits: usize) -> Process {
         assert_eq!(self.n_qubits, 1);
-        Channel {
+        Process {
             n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_one_to_n(u.view(), idx_qubit, n_qubits)),
@@ -152,14 +172,16 @@ impl Channel {
         }
     }
 
+    /// Returns a copy of this process that applies to registers of a given
+    /// size.
     pub fn extend_two_to_n(
         &self,
         idx_qubit1: usize,
         idx_qubit2: usize,
         n_qubits: usize,
-    ) -> Channel {
+    ) -> Process {
         assert_eq!(self.n_qubits, 2);
-        Channel {
+        Process {
             n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)),
@@ -180,11 +202,11 @@ impl Channel {
     }
 }
 
-impl Mul<&Channel> for C64 {
-    type Output = Channel;
+impl Mul<&Process> for C64 {
+    type Output = Process;
 
-    fn mul(self, channel: &Channel) -> Self::Output {
-        Channel {
+    fn mul(self, channel: &Process) -> Self::Output {
+        Process {
             n_qubits: channel.n_qubits,
             data: match &channel.data {
                 // Note that we need to multiply by the square root in
@@ -202,34 +224,34 @@ impl Mul<&Channel> for C64 {
     }
 }
 
-impl Mul<Channel> for C64 {
-    type Output = Channel;
-    fn mul(self, channel: Channel) -> Self::Output {
+impl Mul<Process> for C64 {
+    type Output = Process;
+    fn mul(self, channel: Process) -> Self::Output {
         self * (&channel)
     }
 }
 
-impl Mul<&Channel> for f64 {
-    type Output = Channel;
-    fn mul(self, chanel: &Channel) -> Self::Output {
+impl Mul<&Process> for f64 {
+    type Output = Process;
+    fn mul(self, chanel: &Process) -> Self::Output {
         C64::new(self, 0f64) * chanel
     }
 }
 
-impl Mul<Channel> for f64 {
-    type Output = Channel;
-    fn mul(self, channel: Channel) -> Self::Output {
+impl Mul<Process> for f64 {
+    type Output = Process;
+    fn mul(self, channel: Process) -> Self::Output {
         self * (&channel)
     }
 }
 
 // Base case: both channels that we're composing are borrowed.
-impl Mul<&Channel> for &Channel {
-    type Output = Channel;
+impl Mul<&Process> for &Process {
+    type Output = Process;
 
-    fn mul(self, rhs: &Channel) -> Self::Output {
+    fn mul(self, rhs: &Process) -> Self::Output {
         assert_eq!(self.n_qubits, rhs.n_qubits);
-        Channel {
+        Process {
             n_qubits: self.n_qubits,
             data: match (&self.data, &rhs.data) {
                 (Unitary(u), Unitary(v)) => Unitary(u.dot(v)),
@@ -250,12 +272,12 @@ impl Mul<&Channel> for &Channel {
     }
 }
 
-impl Add<&Channel> for &Channel {
-    type Output = Channel;
+impl Add<&Process> for &Process {
+    type Output = Process;
 
-    fn add(self, rhs: &Channel) -> Self::Output {
+    fn add(self, rhs: &Process) -> Self::Output {
         assert_eq!(self.n_qubits, rhs.n_qubits);
-        Channel {
+        Process {
             n_qubits: self.n_qubits,
             data: match (&self.data, &rhs.data) {
                 (KrausDecomposition(ks1), KrausDecomposition(ks2)) => {
@@ -279,61 +301,66 @@ impl Add<&Channel> for &Channel {
     }
 }
 
-impl Mul<Channel> for &Channel {
-    type Output = Channel;
+impl Mul<Process> for &Process {
+    type Output = Process;
 
-    fn mul(self, rhs: Channel) -> Self::Output {
+    fn mul(self, rhs: Process) -> Self::Output {
         self * &rhs
     }
 }
 
-impl Mul<&Channel> for Channel {
-    type Output = Channel;
+impl Mul<&Process> for Process {
+    type Output = Process;
 
-    fn mul(self, rhs: &Channel) -> Self::Output {
+    fn mul(self, rhs: &Process) -> Self::Output {
         &self * rhs
     }
 }
 
-impl Mul<Channel> for Channel {
-    type Output = Channel;
+impl Mul<Process> for Process {
+    type Output = Process;
 
-    fn mul(self, rhs: Channel) -> Self::Output {
+    fn mul(self, rhs: Process) -> Self::Output {
         &self * &rhs
     }
 }
 
-impl Add<Channel> for &Channel {
-    type Output = Channel;
+impl Add<Process> for &Process {
+    type Output = Process;
 
-    fn add(self, rhs: Channel) -> Self::Output {
+    fn add(self, rhs: Process) -> Self::Output {
         self + &rhs
     }
 }
 
-impl Add<&Channel> for Channel {
-    type Output = Channel;
+impl Add<&Process> for Process {
+    type Output = Process;
 
-    fn add(self, rhs: &Channel) -> Self::Output {
+    fn add(self, rhs: &Process) -> Self::Output {
         &self + rhs
     }
 }
 
-impl Add<Channel> for Channel {
-    type Output = Channel;
+impl Add<Process> for Process {
+    type Output = Process;
 
-    fn add(self, rhs: Channel) -> Self::Output {
+    fn add(self, rhs: Process) -> Self::Output {
         &self + &rhs
     }
 }
 
-pub fn depolarizing_channel(p: f64) -> Channel {
+/// Returns a copy of a depolarizing channel of a given strength (that is, a
+/// channel representing relaxation to the maximally mixed state).
+pub fn depolarizing_channel(p: f64) -> Process {
     let ideal = NoiseModel::ideal();
     (1.0 - p) * ideal.i + p / 3.0 * ideal.x + p / 3.0 * ideal.y + p / 3.0 * ideal.z
 }
 
-pub fn amplitude_damping_channel(gamma: f64) -> Channel {
-    Channel {
+/// Returns a copy of an amplitude damping channel of a given strength (that is,
+/// a channel representing relaxation to the $\ket{0}$ state in a
+/// characteristic time given by $1 / \gamma$).
+pub fn amplitude_damping_channel(gamma: f64) -> Process {
+    Process {
         n_qubits: 1,
         data: KrausDecomposition(array![
             [

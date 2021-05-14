@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 use crate::states::StateData::Mixed;
-use crate::Channel;
+use crate::Process;
 use rand::Rng;
 use std::iter::Iterator;
 
@@ -18,10 +18,12 @@ use serde::{Deserialize, Serialize};
 pub struct Instrument {
     /// The effects of the instrument, represented as completely positive
     /// trace non-increasing (CPTNI) processes.
-    pub effects: Vec<Channel>,
+    pub effects: Vec<Process>,
 }
 
 impl Instrument {
+    /// Samples from this instrument, returning the measurement result and
+    /// the new state of the system conditioned on that measurement result.
     pub fn sample(&self, idx_qubits: &[usize], state: &State) -> (usize, State) {
         let mut possible_outcomes = self
             .effects

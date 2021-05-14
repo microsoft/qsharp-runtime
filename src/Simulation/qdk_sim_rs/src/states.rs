@@ -20,6 +20,7 @@ pub enum StateData {
     Mixed(Array2<C64>),
 }
 
+/// The state of a quantum system.
 pub type State = QubitSized<StateData>;
 
 impl Display for State {
@@ -47,6 +48,17 @@ impl Display for StateData {
 }
 
 impl State {
+    /// Extends this state to be a state on `n_qubits` additional qubits.
+    /// New qubits are added "to the right," e.g.: $\left|\psi\right\rangle$
+    /// is extended to $\left|\psi 0\right\rangle$.
+    ///
+    /// # Example
+    /// 
+    /// ```
+    /// # use qdk_sim::State;
+    /// let rho = State::new_mixed(2);
+    /// assert_eq!(5, rho.extend(3).get_n_qubits());
+    /// ```
     pub fn extend(&self, n_qubits: usize) -> State {
         let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
         State {
@@ -61,6 +73,9 @@ impl State {
         }
     }
 
+    /// Returns a new mixed state on a given number of qubits.
+    /// By convention, new mixed states start off in the "all-zeros" state,
+    /// $\rho = \ket{00\cdots 0}\bra{00\cdots 0}.
     pub fn new_mixed(n_qubits: usize) -> State {
         let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
         State {

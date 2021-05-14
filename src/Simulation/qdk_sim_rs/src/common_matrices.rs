@@ -17,26 +17,27 @@ pub fn i() -> Array2<C64> {
     array![[ONE_C, ZERO_C], [ZERO_C, ONE_C]]
 }
 
-/// Returns a copy of the Pauli 𝑋 operator.
+/// Returns a unitary matrix representing the `X` operation.
 pub fn x() -> Array2<C64> {
     array![[ZERO_C, ONE_C], [ONE_C, ZERO_C]]
 }
 
-/// Returns a copy of the Pauli 𝑌 operator.
+/// Returns a unitary matrix representing the `Y` operation.
 pub fn y() -> Array2<C64> {
     array![[ZERO_C, I_C], [-I_C, ZERO_C]]
 }
 
-/// Returns a copy of the Pauli 𝑍 operator.
+/// Returns a unitary matrix representing the `Z` operation.
 pub fn z() -> Array2<C64> {
     array![[ONE_C, ZERO_C], [ZERO_C, -ONE_C]]
 }
 
-/// Returns a copy of the single-qubit Hadamard transformation.
+/// Returns a unitary matrix representing the single-qubit Hadamard transformation.
 pub fn h() -> Array2<C64> {
     array![[ONE_C, ONE_C], [ONE_C, -ONE_C]] * FRAC_1_SQRT_2
 }
 
+/// Returns a unitary matrix representing the `T` operation.
 pub fn t() -> Array2<C64> {
     array![
         [ONE_C, ZERO_C],
@@ -44,10 +45,12 @@ pub fn t() -> Array2<C64> {
     ]
 }
 
+/// Returns a unitary matrix representing the `S` operation.
 pub fn s() -> Array2<C64> {
     array![[ONE_C, ZERO_C], [ZERO_C, C64::new(0.0_f64, 1.0_f64)]]
 }
 
+/// Returns a unitary matrix representing the `CNOT` operation.
 pub fn cnot() -> Array2<C64> {
     array![
         [ONE_C, ZERO_C, ZERO_C, ZERO_C],
@@ -76,6 +79,8 @@ pub fn elementary_vec<T: Zero + One>(idx: usize, n: usize) -> Array1<T> {
     Array::from_shape_fn(n, |i| if i == idx { T::one() } else { T::zero() })
 }
 
+/// Returns an elementary matrix; that is, a matrix with a one at a given index
+/// and zeros everywhere else.
 pub fn elementary_matrix<T: Zero + One>(
     (idx0, idx1): (usize, usize),
     (n, m): (usize, usize),

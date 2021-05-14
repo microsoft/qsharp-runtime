@@ -40,7 +40,10 @@ impl HasDagger for ArrayView2<'_, C64> {
     }
 }
 
+/// Represent types that can be conjugated by 2-dimensional arrays; that is,
+/// as $UXU^{\dagger}$.
 pub trait ConjBy {
+    /// Conjugates this value by a given matrix, returning a copy.
     fn conjugate_by(&self, op: &ArrayView2<C64>) -> Self;
 }
 
@@ -177,6 +180,8 @@ pub fn extend_one_to_n(
     }
 }
 
+/// Given a view of an array representing a matrix acting on two-qubit states,
+/// extends that array to act on $n$ qubits.
 pub fn extend_two_to_n(
     data: ArrayView2<C64>,
     idx_qubit1: usize,
@@ -242,6 +247,8 @@ pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
     permuted.reshape([n_rows, n_rows]).into_owned()
 }
 
+/// Returns a new array of the same type and shape as a given array, but
+/// containing only zeros.
 pub fn zeros_like<T: Clone + Zero, Ix: ndarray::Dimension>(data: &Array<T, Ix>) -> Array<T, Ix> {
     Array::zeros(data.dim())
 }

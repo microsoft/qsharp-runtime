@@ -424,6 +424,7 @@ name = "qdk_sim"
 version = "0.1.0"
 dependencies = [
  "assert-json-diff",
+ "cfg-if 1.0.0",
  "criterion",
  "derive_more",
  "getrandom",
