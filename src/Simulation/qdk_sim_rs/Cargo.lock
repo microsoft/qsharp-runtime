@@ -377,25 +377,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ab1bc2a289d34bd04a330323ac98a1b4bc82c9d9fcb1e66b63caa84da26b575"
 
 [[package]]
-name = "opensim"
-version = "0.1.0"
-dependencies = [
- "assert-json-diff",
- "criterion",
- "derive_more",
- "getrandom",
- "itertools 0.9.0",
- "lazy_static",
- "ndarray",
- "num-complex",
- "num-traits",
- "rand",
- "serde",
- "serde_json",
- "web-sys",
-]
-
-[[package]]
 name = "plotters"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -436,6 +417,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e0704ee1a7e00d7bb417d0770ea303c1bccbabf0ef1667dae92b5967f5f8a71"
 dependencies = [
  "unicode-xid",
+]
+
+[[package]]
+name = "qdk_sim"
+version = "0.1.0"
+dependencies = [
+ "assert-json-diff",
+ "criterion",
+ "derive_more",
+ "getrandom",
+ "itertools 0.9.0",
+ "lazy_static",
+ "ndarray",
+ "num-complex",
+ "num-traits",
+ "rand",
+ "serde",
+ "serde_json",
+ "web-sys",
 ]
 
 [[package]]

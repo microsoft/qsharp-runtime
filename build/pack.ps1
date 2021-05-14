@@ -7,34 +7,26 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..");
-$DropNative = "$Env:DROP_NATIVE" -eq "" ? $RepoRoot : $Env:DROP_NATIVE;
 
 Write-Host "##[info]Copy Native simulator xplat binaries"
 pushd (Join-Path $PSScriptRoot ../src/Simulation/Native)
     If (-not (Test-Path 'osx')) { mkdir 'osx' }
     If (-not (Test-Path 'linux')) { mkdir 'linux' }
-    $DROP = "$DropNative/src/Simulation/Native/build/drop"
+    If (-not (Test-Path 'win10')) { mkdir 'win10' }
+
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
-popd
 
-Write-Host "##[info]Copy open systems simulator xplat binaries"
-Push-Location (Join-Path $PSScriptRoot ../src/Simulation/OpenSystems/runtime)
-    If (-not (Test-Path 'osx')) { mkdir 'osx' }
-    If (-not (Test-Path 'linux')) { mkdir 'linux' }
-    If (-not (Test-Path 'win10')) { mkdir 'win10' }
-    $DROP = Join-Path `
-                "$DropNative" "src" "Simulation" "OpenSystems" `
-                "runtime" "target" `
-                $Env:BUILD_CONFIGURATION.ToLowerInvariant();
-    if (Test-Path "$DROP/libopensim.dylib") {
-        Copy-Item "$DROP/libopensim.dylib" "osx/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    $DROP = "$Env:DROP_NATIVE/qdk_sim_rs";
+    if (Test-Path "$DROP/libqdk_sim.dylib") {
+        Copy-Item "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
-    if (Test-Path "$DROP/libopensim.so") {
-        Copy-Item "$DROP/libopensim.so" "linux/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    if (Test-Path "$DROP/libqdk_sim.so") {
+        Copy-Item "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
-    if (Test-Path "$DROP/opensim.dll") {
-        Copy-Item "$DROP/opensim.dll"  "win10/Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll"
+    if (Test-Path "$DROP/qdk_sim.dll") {
+        Copy-Item "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
 Pop-Location
 

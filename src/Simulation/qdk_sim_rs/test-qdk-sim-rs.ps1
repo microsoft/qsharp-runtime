@@ -1,6 +1,6 @@
 & (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
 
-Push-Location (Join-Path $PSScriptRoot runtime)
+Push-Location $PSScriptRoot
     # If running in CI, use cargo2junit to expose unit tests to the
     # PublishTestResults task.
     if ("$Env:TF_BUILD" -ne "") {
@@ -20,19 +20,14 @@ Push-Location (Join-Path $PSScriptRoot runtime)
 
     # This step isn't required, but we use it to upload run summaries.
     $reportPath = (Join-Path "target" "criterion");
-    $perfDest = (Join-Path $Env:DROPS_DIR "perf" "opensim");
+    $perfDest = (Join-Path $Env:DROPS_DIR "perf" "qdk_sim_rs");
     if (Get-Item -ErrorAction SilentlyContinue $reportPath) {
         New-Item -Type Directory -Force -Path $perfDest;
         Copy-Item -Recurse -Path $reportPath -Destination $perfDest;
     }
 
-    # Free disk space by cleaning up target/${config}/deps.
+    # Free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space, which is
     # exceptionally helpful in CI builds.
-    @("release", "debug") | ForEach-Object {
-        $config = $_;
-        @("deps", "build", "incremental") | ForEach-Object {
-            Remove-Item -Recurse (Join-Path . target $config $_) -ErrorAction Continue -Verbose;
-        }
-    }
+    cargo clean
 Pop-Location

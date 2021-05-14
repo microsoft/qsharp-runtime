@@ -14,8 +14,8 @@ if (-not (Test-Path Env:AGENT_OS)) {
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/Native")
             .\build-native-simulator.ps1
         Pop-Location
-        Push-Location (Join-Path $PSScriptRoot "src/Simulation/OpenSystems")
-            .\build-open-simulator.ps1
+        Push-Location (Join-Path $PSScriptRoot "src/Simulation/qdk_sim")
+            .\build-qdk-sim-rs.ps1
         Pop-Location
         $Env:BUILD_CONFIGURATION = $null
     }

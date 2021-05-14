@@ -82,7 +82,7 @@ pub fn cnot() -> Array2<C64> {
 /// The following are equivalent:
 /// ```
 /// # #[macro_use] extern crate ndarray;
-/// # use opensim::elementary_vec;
+/// # use opensim::common_matrices::elementary_vec;
 /// let vec = elementary_vec::<i64>(2, 4);
 /// ```
 /// and:
@@ -109,7 +109,7 @@ pub fn elementary_matrix<T: Zero + One>((idx0, idx1): (usize, usize), (n, m): (u
 /// The following snippet defines a two-qubit identity matrix:
 /// ```
 /// # #[macro_use] extern crate ndarray;
-/// # use opensim::nq_eye;
+/// # use opensim::common_matrices::nq_eye;
 /// use num_complex::Complex;
 /// let eye = nq_eye(2usize);
 /// assert_eq!(eye, array![

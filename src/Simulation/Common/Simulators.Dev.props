@@ -5,7 +5,7 @@
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
-    <OpenSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/OpenSystems/runtime/target/$(Configuration.ToLowerInvariant())))</OpenSimBuildPath>
+    <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)/xplat/qdk_sim_rs))</ExperimentalSimBuildPath>
   </PropertyGroup>
 
   <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
@@ -32,20 +32,19 @@
     </None>
   </ItemGroup>
 
-  <!-- Copy the experimental open systems simulator from src/Simulation/Native build to where we can see and use it. -->
-  
-  <PropertyGroup Condition="'$(OpenSimDll)' == ''">
-    <OpenSimDllMac>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/libopensim.dylib))</OpenSimDllMac>
-    <OpenSimDllLinux>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/libopensim.so))</OpenSimDllLinux>
-    <OpenSimDllWindows>$([MSBuild]::NormalizePath($(OpenSimBuildPath)/opensim.dll))</OpenSimDllWindows>
-    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(OpenSimDllMac)</OpenSimDll>
-    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(OpenSimDllLinux)</OpenSimDll>
-    <OpenSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(OpenSimDllWindows)</OpenSimDll>
+  <!-- Copy the experimental simulators from xplat/qdk_sim_rs build to where we can see and use it. -->
+  <PropertyGroup Condition="'$(ExperimentalSimDll)' == ''">
+    <ExperimentalSimDllMac>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.dylib))</ExperimentalSimDllMac>
+    <ExperimentalSimDllLinux>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.so))</ExperimentalSimDllLinux>
+    <ExperimentalSimDllWindows>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/qdk_sim.dll))</ExperimentalSimDllWindows>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(ExperimentalSimDllMac)</ExperimentalSimDll>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(ExperimentalSimDllLinux)</ExperimentalSimDll>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(ExperimentalSimDllWindows)</ExperimentalSimDll>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(OpenSimDll)" >
-      <Link>Microsoft.Quantum.Experimental.OpenSystemsSimulator.Runtime.dll</Link>
+    <None Include="$(ExperimentalSim)" >
+      <Link>Microsoft.Quantum.Experimental.Simulators.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>

@@ -26,9 +26,9 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
 }
 
-if ($Env:ENABLE_OPENSIM -ne "false") {
-    $openSimulator = (Join-Path $PSScriptRoot "../src/Simulation/OpenSystems")
-    & "$openSimulator/build-open-simulator.ps1"
+if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
+    $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+    & "$openSimulator/build-qdk-sim-rs.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

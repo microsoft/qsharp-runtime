@@ -2,13 +2,13 @@
 # Licensed under the MIT License.
 
 [package]
-name = "opensim"
+name = "qdk_sim"
 version = "0.1.0"
 authors = ["Christopher Granade <cgranade@cgranade.com>"]
 edition = "2018"
 
 [lib]
-name = "opensim"
+name = "qdk_sim"
 path = "src/lib.rs"
 crate-type = ["rlib", "staticlib", "cdylib"]
 
