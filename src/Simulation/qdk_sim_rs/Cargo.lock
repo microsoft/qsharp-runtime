@@ -484,7 +484,7 @@ dependencies = [
 
 [[package]]
 name = "qdk_sim"
-version = "0.1.0"
+version = "0.0.1-alpha"
 dependencies = [
  "assert-json-diff",
  "built",

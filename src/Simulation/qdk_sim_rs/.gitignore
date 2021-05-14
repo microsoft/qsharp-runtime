@@ -2,3 +2,6 @@ linux
 osx
 win10
 target
+
+# We inject version numbers into Cargo.toml, so don't want them stored in repo.
+Cargo.toml
