@@ -47,7 +47,7 @@ impl Display for StateData {
 }
 
 impl State {
-    pub fn extend(self: &Self, n_qubits: usize) -> State {
+    pub fn extend(&self, n_qubits: usize) -> State {
         let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
         State {
             n_qubits: self.n_qubits + n_qubits,
@@ -64,7 +64,7 @@ impl State {
     pub fn new_mixed(n_qubits: usize) -> State {
         let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
         State {
-            n_qubits: n_qubits,
+            n_qubits,
             data: Mixed(common_matrices::elementary_matrix(
                 (0, 0),
                 (new_dim, new_dim),
@@ -73,7 +73,7 @@ impl State {
     }
 
     /// Returns a copy of this state, represented as a mixed state.
-    pub fn to_mixed(self: &Self) -> State {
+    pub fn to_mixed(&self) -> State {
         State {
             n_qubits: self.n_qubits,
             data: match &self.data {

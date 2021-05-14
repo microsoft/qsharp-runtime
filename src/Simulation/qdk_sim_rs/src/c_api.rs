@@ -50,7 +50,7 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(
             Err(err) => Err(err),
         }
     } else {
-        return Err(format!("No simulator with id {}.", sim_id).to_string());
+        return Err(format!("No simulator with id {}.", sim_id));
     }
 }
 
@@ -58,12 +58,7 @@ fn apply<F: Fn(&NoiseModel) -> &Channel>(
 
 #[no_mangle]
 pub extern "C" fn get_name() -> *const c_char {
-    // There's a whole dance we have to do in order to allow the memory
-    // allocated for a string to be deallocated on the .NET side.
-
-    let serialized = CString::new("open_sim").unwrap().into_raw();
-    std::mem::forget(serialized);
-    serialized
+    CString::new("open_sim").unwrap().into_raw()
 }
 
 #[no_mangle]
@@ -71,9 +66,7 @@ pub extern "C" fn lasterr() -> *const c_char {
     match &*LAST_ERROR.lock().unwrap() {
         None => ptr::null(),
         Some(msg) => {
-            let wrapped_msg = CString::new(msg.as_str()).unwrap().into_raw();
-            std::mem::forget(wrapped_msg);
-            wrapped_msg
+            CString::new(msg.as_str()).unwrap().into_raw()
         }
     }
 }
@@ -100,7 +93,7 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
             state.remove(&sim_id);
             Ok(())
         } else {
-            Err(format!("No simulator with id {} exists.", sim_id).to_string())
+            Err(format!("No simulator with id {} exists.", sim_id))
         }
     })
 }
@@ -152,20 +145,25 @@ pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
     }))
 }
 
+/// Measures a single qubit in the $Z$-basis, returning the result by setting
+/// the value at a given pointer.
+///
+/// # Safety
+/// This function is marked as unsafe as it is the caller's responsibility to
+/// ensure that `result_out` is a valid pointer, and that the memory referenced
+/// by `result_out` can be safely set.
 #[no_mangle]
-pub extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
+pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
     as_capi_err({
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {
             let instrument = &sim_state.noise_model.z_meas;
             let (result, new_state) = instrument.sample(&[idx], &sim_state.register_state);
             sim_state.register_state = new_state;
-            unsafe {
-                *result_out = result;
-            };
+            *result_out = result;
             Ok(())
         } else {
-            Err(format!("No simulator with id {} exists.", sim_id).to_string())
+            Err(format!("No simulator with id {} exists.", sim_id))
         }
     })
 }
@@ -174,17 +172,13 @@ pub extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
 pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
     let state = &*STATE.lock().unwrap();
     if let Some(sim_state) = state.get(&sim_id) {
-        let serialized = CString::new(
+        CString::new(
             serde_json::to_string(&sim_state.noise_model)
                 .unwrap()
                 .as_str(),
         )
         .unwrap()
-        .into_raw();
-        // Need to forget that we hold this reference so that it doesn't
-        // get released after returning to C.
-        std::mem::forget(serialized);
-        serialized
+        .into_raw()
     } else {
         ptr::null()
     }
@@ -194,24 +188,35 @@ pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
 /// that agrees with closed-system simulation).
 #[no_mangle]
 pub extern "C" fn ideal_noise_model() -> *const c_char {
-    let serialized = CString::new(
+    CString::new(
         serde_json::to_string(&NoiseModel::ideal())
             .unwrap()
             .as_str(),
     )
     .unwrap()
-    .into_raw();
-    std::mem::forget(serialized);
-    serialized
+    .into_raw()
 }
 
+/// Sets the noise model used by a given simulator instance, given a string
+/// containing a JSON serialization of that noise model.
+///
+/// # Safety
+/// This function is marked as unsafe as the caller is responsible for ensuring
+/// that `new_model`:
+///
+/// - Is a valid pointer to a null-terminated array of C
+///   characters.
+/// - The pointer remains valid for at least the duration
+///   of the call.
+/// - No other thread may modify the memory referenced by `new_model` for at
+///   least the duration of the call.
 #[no_mangle]
-pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
+pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
     if new_model.is_null() {
         return as_capi_err(Err("set_noise_model called with null pointer".to_string()));
     }
 
-    let c_str = unsafe { CStr::from_ptr(new_model) };
+    let c_str = CStr::from_ptr(new_model);
 
     as_capi_err(match c_str.to_str() {
         Ok(serialized_noise_model) => match serde_json::from_str(serialized_noise_model) {
@@ -221,7 +226,7 @@ pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i6
                     sim_state.noise_model = noise_model;
                     Ok(())
                 } else {
-                    Err(format!("No simulator with id {} exists.", sim_id).to_string())
+                    Err(format!("No simulator with id {} exists.", sim_id))
                 }
             }
             Err(serialization_error) => Err(format!(
@@ -247,15 +252,15 @@ pub extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i6
 pub extern "C" fn get_current_state(sim_id: usize) -> *const c_char {
     let state = &mut *STATE.lock().unwrap();
     if let Some(sim_state) = state.get_mut(&sim_id) {
-        let serialized = CString::new(
+        CString::new(
             serde_json::to_string(&sim_state.register_state)
                 .unwrap()
                 .as_str(),
         )
         .unwrap()
-        .into_raw();
-        std::mem::forget(serialized);
-        serialized
+        // NB: into_raw implies transferring ownership to the C caller,
+        //     and hence moves its self.
+        .into_raw()
     } else {
         ptr::null()
     }

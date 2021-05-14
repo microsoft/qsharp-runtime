@@ -29,7 +29,7 @@ pub enum ChannelData {
 
 impl Channel {
     // TODO: methods to forcibly convert representations.
-    pub fn apply(self: &Self, state: &State) -> Result<State, String> {
+    pub fn apply(&self, state: &State) -> Result<State, String> {
         if state.n_qubits == self.n_qubits {
             Ok(State {
                 n_qubits: self.n_qubits,
@@ -71,7 +71,7 @@ impl Channel {
         }
     }
 
-    pub fn apply_to(self: &Self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
+    pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
         // Fail if there's not enough qubits.
         if state.n_qubits < self.n_qubits {
             return log_as_err(format!(
@@ -81,7 +81,7 @@ impl Channel {
         }
 
         // Fail if any indices are repeated.
-        if idx_qubits.into_iter().unique().count() < idx_qubits.len() {
+        if idx_qubits.iter().unique().count() < idx_qubits.len() {
             return log_as_err(format!(
                 "List of qubit indices {:?} contained repeated elements.",
                 idx_qubits
@@ -131,10 +131,10 @@ impl Channel {
         }
     }
 
-    pub fn extend_one_to_n(self: &Self, idx_qubit: usize, n_qubits: usize) -> Channel {
+    pub fn extend_one_to_n(&self, idx_qubit: usize, n_qubits: usize) -> Channel {
         assert_eq!(self.n_qubits, 1);
         Channel {
-            n_qubits: n_qubits,
+            n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_one_to_n(u.view(), idx_qubit, n_qubits)),
                 KrausDecomposition(ks) => {
@@ -153,14 +153,14 @@ impl Channel {
     }
 
     pub fn extend_two_to_n(
-        self: &Self,
+        &self,
         idx_qubit1: usize,
         idx_qubit2: usize,
         n_qubits: usize,
     ) -> Channel {
         assert_eq!(self.n_qubits, 2);
         Channel {
-            n_qubits: n_qubits,
+            n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)),
                 KrausDecomposition(ks) => {

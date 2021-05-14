@@ -38,7 +38,7 @@ impl Instrument {
         for (idx, cum_pr) in possible_outcomes
             .iter()
             .scan(0.0f64, |acc, (_idx, _, pr)| {
-                *acc = *acc + *pr;
+                *acc += *pr;
                 Some(*acc)
             })
             .enumerate()

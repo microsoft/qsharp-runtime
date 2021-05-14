@@ -59,7 +59,7 @@ impl NoiseModel {
                 n_qubits: 1,
                 data: Mixed((common_matrices::i() + common_matrices::z()) / 2.0),
             },
-            i: i,
+            i,
             x: Channel {
                 n_qubits: 1,
                 data: Unitary(common_matrices::x()),
@@ -68,7 +68,7 @@ impl NoiseModel {
                 n_qubits: 1,
                 data: Unitary(common_matrices::y()),
             },
-            z: z,
+            z,
             h: Channel {
                 n_qubits: 1,
                 data: Unitary(common_matrices::h()),
@@ -93,7 +93,7 @@ impl NoiseModel {
                 n_qubits: 2,
                 data: Unitary(common_matrices::cnot()),
             },
-            z_meas: z_meas,
+            z_meas,
         }
     }
 }

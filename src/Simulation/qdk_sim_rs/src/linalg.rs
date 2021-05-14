@@ -21,13 +21,13 @@ pub trait HasDagger {
     ///
     /// For most types implementing this trait, the hermitian conjugate
     /// is represented by the conjugate transpose.
-    fn dag(self: &Self) -> Self::Output;
+    fn dag(&self) -> Self::Output;
 }
 
 impl HasDagger for Array2<C64> {
     type Output = Self;
 
-    fn dag(self: &Self) -> Self {
+    fn dag(&self) -> Self {
         self.t().map(|element| element.conj())
     }
 }
@@ -35,17 +35,17 @@ impl HasDagger for Array2<C64> {
 impl HasDagger for ArrayView2<'_, C64> {
     type Output = Array2<C64>;
 
-    fn dag(self: &Self) -> Self::Output {
+    fn dag(&self) -> Self::Output {
         self.t().map(|element| element.conj())
     }
 }
 
 pub trait ConjBy {
-    fn conjugate_by(self: &Self, op: &ArrayView2<C64>) -> Self;
+    fn conjugate_by(&self, op: &ArrayView2<C64>) -> Self;
 }
 
 impl ConjBy for Array2<C64> {
-    fn conjugate_by(self: &Self, op: &ArrayView2<C64>) -> Self {
+    fn conjugate_by(&self, op: &ArrayView2<C64>) -> Self {
         op.dot(self).dot(&op.dag())
     }
 }
@@ -61,7 +61,7 @@ pub trait Tensor<Rhs = Self> {
     /// ```
     /// // TODO
     /// ```
-    fn tensor(self: Self, rhs: Rhs) -> Self::Output;
+    fn tensor(self, rhs: Rhs) -> Self::Output;
 }
 
 impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView1<'_, T> {
@@ -80,7 +80,7 @@ impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView1<
 impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array1<T> {
     type Output = Array1<T>;
 
-    fn tensor(self: Self, other: Other) -> Self::Output {
+    fn tensor(self, other: Other) -> Self::Output {
         let other: Self = other.into();
         self.view().tensor(other).to_owned()
     }
@@ -111,7 +111,7 @@ impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView2<
 impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array2<T> {
     type Output = Array2<T>;
 
-    fn tensor(self: Self, other: Other) -> Self::Output {
+    fn tensor(self, other: Other) -> Self::Output {
         let other: Self = other.into();
         self.view().tensor(other).to_owned()
     }
@@ -153,8 +153,8 @@ impl<T: Clone + Zero> Trace for &Array2<T> {
 //              from microbenchmarks on tensor and nq_eye directly.
 /// Given an array representing an operator acting on single-qubit states,
 /// returns a new operator that acts on $n$-qubit states.
-pub fn extend_one_to_n<'a>(
-    data: ArrayView2<'a, C64>,
+pub fn extend_one_to_n(
+    data: ArrayView2<C64>,
     idx_qubit: usize,
     n_qubits: usize,
 ) -> Array2<C64> {
@@ -230,7 +230,7 @@ pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
         .iter()
         .cycle()
         .take(2 * n_qubits)
-        .map(|x| x.clone())
+        .copied()
         .collect();
     // FIXME: make this a result and propagate the result out to the return.
     let tensor = data.clone().into_shared().reshape(new_dims);
