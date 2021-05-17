@@ -1,8 +1,131 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions //ToDo: update namespace to a more appropriate name
-{
+// This namespace is deprecated and will be removed.
+namespace Microsoft.Quantum.Simulation.QuantumProcessor.Extensions {
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsic")
+    operation ApplyIfElseIntrinsic(measurementResult : Result, onResultZeroOp : (Unit => Unit) , onResultOneOp : (Unit => Unit)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsic(measurementResult, onResultZeroOp, onResultOneOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicA")
+    operation ApplyIfElseIntrinsicA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Adj) , onResultOneOp : (Unit => Unit is Adj)) : Unit is Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicA(measurementResult, onResultZeroOp, onResultOneOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicC")
+    operation ApplyIfElseIntrinsicC(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl) , onResultOneOp : (Unit => Unit is Ctl)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicC(measurementResult, onResultZeroOp, onResultOneOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicCA")
+    operation ApplyIfElseIntrinsicCA(measurementResult : Result, onResultZeroOp : (Unit => Unit is Ctl + Adj) , onResultOneOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseIntrinsicCA(measurementResult, onResultZeroOp, onResultOneOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsic")
+    operation ApplyConditionallyIntrinsic(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit) , onNonEqualOp : (Unit => Unit)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsic(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicA")
+    operation ApplyConditionallyIntrinsicA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Adj) , onNonEqualOp : (Unit => Unit is Adj)) : Unit is Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicC")
+    operation ApplyConditionallyIntrinsicC(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl) , onNonEqualOp : (Unit => Unit is Ctl)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicC(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicCA")
+    operation ApplyConditionallyIntrinsicCA(measurementResults : Result[], resultsValues : Result[], onEqualOp : (Unit => Unit is Ctl + Adj) , onNonEqualOp : (Unit => Unit is Ctl + Adj)) : Unit is Ctl + Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyIntrinsicCA(measurementResults, resultsValues, onEqualOp, onNonEqualOp);
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseR")
+    operation ApplyIfElseR<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T) , (onResultOneOp : ('U => Unit), oneArg : 'U)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseR(measurementResult, (onResultZeroOp, zeroArg), (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseRA")
+    operation ApplyIfElseRA<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj), zeroArg : 'T) , (onResultOneOp : ('U => Unit is Adj), oneArg : 'U)) : Unit is Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseRA(measurementResult, (onResultZeroOp, zeroArg), (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseRC")
+    operation ApplyIfElseRC<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Ctl), zeroArg : 'T) , (onResultOneOp : ('U => Unit is Ctl), oneArg : 'U)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseRC(measurementResult, (onResultZeroOp, zeroArg), (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfElseRCA")
+    operation ApplyIfElseRCA<'T,'U>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj + Ctl), zeroArg : 'T) , (onResultOneOp : ('U => Unit is Adj + Ctl), oneArg : 'U)) : Unit is Ctl + Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfElseRCA(measurementResult, (onResultZeroOp, zeroArg), (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfZero")
+    operation ApplyIfZero<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit), zeroArg : 'T)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyIfZero(measurementResult, (onResultZeroOp, zeroArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfZeroA")
+    operation ApplyIfZeroA<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Adj), zeroArg : 'T)) : Unit is Adj{
+        Microsoft.Quantum.ClassicalControl.ApplyIfZeroA(measurementResult, (onResultZeroOp, zeroArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfZeroC")
+    operation ApplyIfZeroC<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Ctl), zeroArg : 'T)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyIfZeroC(measurementResult, (onResultZeroOp, zeroArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfZeroC")
+    operation ApplyIfZeroCA<'T>(measurementResult : Result, (onResultZeroOp : ('T => Unit is Ctl + Adj), zeroArg : 'T)) : Unit is Ctl + Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfZeroCA(measurementResult, (onResultZeroOp, zeroArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfOne")
+    operation ApplyIfOne<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit), oneArg : 'T)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyIfOne(measurementResult, (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfOneA")
+    operation ApplyIfOneA<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Adj), oneArg : 'T)) : Unit is Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfOneA(measurementResult, (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfOneC")
+    operation ApplyIfOneC<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Ctl), oneArg : 'T)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyIfOneC(measurementResult, (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyIfOneCA")
+    operation ApplyIfOneCA<'T>(measurementResult : Result, (onResultOneOp : ('T => Unit is Ctl + Adj), oneArg : 'T)) : Unit is Ctl + Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyIfOneCA(measurementResult, (onResultOneOp, oneArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionally")
+    operation ApplyConditionally<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit), equalArg : 'T) , (onNonEqualOp : ('U => Unit), nonEqualArg : 'U)) : Unit {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionally(measurementResults, resultsValues, (onEqualOp, equalArg), (onNonEqualOp, nonEqualArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyA")
+    operation ApplyConditionallyA<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit is Adj), equalArg : 'T) , (onNonEqualOp : ('U => Unit is Adj), nonEqualArg : 'U)) : Unit is Adj {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyA(measurementResults, resultsValues, (onEqualOp, equalArg), (onNonEqualOp, nonEqualArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyC")
+    operation ApplyConditionallyC<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit is Ctl), equalArg : 'T) , (onNonEqualOp : ('U => Unit is Ctl), nonEqualArg : 'U)) : Unit is Ctl {
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyC(measurementResults, resultsValues, (onEqualOp, equalArg), (onNonEqualOp, nonEqualArg));
+    }
+
+    @Deprecated("Microsoft.Quantum.ClassicalControl.ApplyConditionallyCA")
+    operation ApplyConditionallyCA<'T,'U>(measurementResults : Result[], resultsValues : Result[], (onEqualOp : ('T => Unit is Ctl + Adj), equalArg : 'T) , (onNonEqualOp : ('U => Unit is Ctl + Adj), nonEqualArg : 'U)) : Unit is Ctl + Adj{
+        Microsoft.Quantum.ClassicalControl.ApplyConditionallyCA(measurementResults, resultsValues, (onEqualOp, equalArg), (onNonEqualOp, nonEqualArg));
+    }
+}
+
+namespace Microsoft.Quantum.ClassicalControl {
     open Microsoft.Quantum.Canon;
 
     // Private helper operations.
