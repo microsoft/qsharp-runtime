@@ -34,6 +34,9 @@ pub use crate::noise_model::NoiseModel;
 pub use crate::states::State;
 pub use crate::utils::*;
 
+#[cfg(feature = "python")]
+mod python;
+
 /// Represents that a given type has a size that can be measured in terms
 /// of a number of qubits (e.g.: [`State`]).
 #[derive(Clone, Debug, Serialize, Deserialize)]

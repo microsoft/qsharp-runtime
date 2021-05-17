@@ -23,6 +23,12 @@ if ($Env:DROP_NATIVE -eq $null) {
 If ($Env:NUGET_OUTDIR -eq $null) { $Env:NUGET_OUTDIR =  (Join-Path $Env:DROPS_DIR "nugets") }
 If (-not (Test-Path -Path $Env:NUGET_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:NUGET_OUTDIR) }
 
+If ($Env:CRATE_OUTDIR -eq $null) { $Env:CRATE_OUTDIR =  (Join-Path $Env:DROPS_DIR "crates") }
+If (-not (Test-Path -Path $Env:CRATE_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:CRATE_OUTDIR) }
+
+If ($Env:WHEEL_OUTDIR -eq $null) { $Env:WHEEL_OUTDIR =  (Join-Path $Env:DROPS_DIR "wheels") }
+If (-not (Test-Path -Path $Env:WHEEL_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:WHEEL_OUTDIR) }
+
 If ($Env:DOCS_OUTDIR -eq $null) { $Env:DOCS_OUTDIR =  (Join-Path $Env:DROPS_DIR "docs") }
 If (-not (Test-Path -Path $Env:DOCS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:DOCS_OUTDIR) }
 

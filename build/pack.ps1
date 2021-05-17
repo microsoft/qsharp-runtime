@@ -75,6 +75,51 @@ function Pack-Dotnet() {
 }
 
 
+function Pack-Crate() {
+    param(
+        [string]
+        $PackageDirectory,
+
+        [string]
+        $OutPath
+    );
+
+    "##[info]Packing crate at $PackageDirectory to $OutPath..." | Write-Host
+
+    $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
+
+    # Resolve relative to where the build script is located,
+    # not the PackageDirectory.
+    if (-not [IO.Path]::IsPathRooted($OutPath)) {
+        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
+    }
+    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
+        cargo package @releaseFlag;
+        Copy-Item -Force -Recurse (Join-Path . "target" "package") $OutPath;
+    Pop-Location
+}
+
+function Pack-Wheel() {
+    param(
+        [string]
+        $PackageDirectory,
+
+        [string]
+        $OutPath
+    );
+
+    "##[info]Packing wheel at $PackageDirectory to $OutPath..." | Write-Host
+
+    # Resolve relative to where the build script is located,
+    # not the PackageDirectory.
+    if (-not [IO.Path]::IsPathRooted($OutPath)) {
+        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
+    }
+    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
+        pip wheel --wheel-dir $OutPath .;
+    Pop-Location
+}
+
 Write-Host "##[info]Using nuget to create packages"
 Pack-Dotnet '../src/Azure/Azure.Quantum.Client/Microsoft.Azure.Quantum.Client.csproj'
 Pack-One '../src/Simulation/CSharpGeneration/Microsoft.Quantum.CSharpGeneration.fsproj' '-IncludeReferencedProjects'
@@ -89,6 +134,8 @@ Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
+Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
+Pack-Wheel -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:WHEEL_OUTDIR;
 
 if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."

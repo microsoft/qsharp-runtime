@@ -16,8 +16,14 @@ use std::convert::TryInto;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StateData {
+    /// A pure state, represented as a vector of complex numbers.
     Pure(Array1<C64>),
+
+    /// A mixed state, represented as a density operator.
     Mixed(Array2<C64>),
+
+    // /// A stabilizer state, represented as a stabilizer tableau.
+    // Stabilizer(Tableau)
 }
 
 /// The state of a quantum system.
