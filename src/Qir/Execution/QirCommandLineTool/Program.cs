@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
 
             buildCommand.AddOption(new Option<DirectoryInfo[]>(
                 aliases: new string[] { "--include-directories", "--include" },
-                description: "The path to the directory containing the headers required for compilation.")
+                description: "One or more paths to the directories containing the headers required for compilation.")
             {
                 Required = true
             });
