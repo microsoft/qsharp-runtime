@@ -5,3 +5,8 @@ target
 
 # We inject version numbers into Cargo.toml, so don't want them stored in repo.
 Cargo.toml
+
+# Ignore Python temporaries and build artifacts.
+*.pyd
+*.whl
+*.egg-info
