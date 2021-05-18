@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
+    open Microsoft.Quantum.ClassicalControl;
 
     @EntryPoint()
     operation TestApplyIf() : Unit {

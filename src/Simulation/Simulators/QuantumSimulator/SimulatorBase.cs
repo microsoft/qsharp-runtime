@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Simulation.QuantumProcessor.Extensions;
+using Microsoft.Quantum.ClassicalControl;
 
 #nullable enable
 
