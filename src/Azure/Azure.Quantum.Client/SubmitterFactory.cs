@@ -10,6 +10,7 @@ namespace Microsoft.Azure.Quantum
     using System.Collections.Immutable;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using Microsoft.Quantum.Runtime.Submitters;
 
     /// <summary>
@@ -22,7 +23,7 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static readonly ImmutableList<SubmitterInfo> QirSubmitters = ImmutableList.Create(
             new SubmitterInfo(
-                "microsoft",
+                new Regex(@"^microsoft\.simulator$"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirSubmitter"));
 
@@ -65,7 +66,7 @@ namespace Microsoft.Azure.Quantum
             IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
             where T : class
         {
-            var submitter = submitters.FirstOrDefault(s => target.StartsWith(s.TargetPrefix + "."));
+            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
             if (submitter is null)
             {
                 return null;
@@ -97,16 +98,16 @@ namespace Microsoft.Azure.Quantum
             /// <summary>
             /// Initializes a new instance of the <see cref="SubmitterInfo"/> class.
             /// </summary>
-            /// <param name="targetPrefix">The prefix for targets supported by the submitter.</param>
+            /// <param name="targetPattern">The pattern for targets supported by the submitter.</param>
             /// <param name="typeName">The fully-qualified or assembly-qualified name of the submitter type.</param>
             /// <param name="methodName">The name of the static factory method.</param>
-            public SubmitterInfo(string targetPrefix, string typeName, string methodName) =>
-                (TargetPrefix, TypeName, MethodName) = (targetPrefix, typeName, methodName);
+            public SubmitterInfo(Regex targetPattern, string typeName, string methodName) =>
+                (TargetPattern, TypeName, MethodName) = (targetPattern, typeName, methodName);
 
             /// <summary>
-            /// The prefix for targets supported by the submitter.
+            /// The pattern for targets supported by the submitter.
             /// </summary>
-            public string TargetPrefix { get; }
+            public Regex TargetPattern { get; }
 
             /// <summary>
             /// The fully-qualified or assembly-qualified name of the submitter type.
