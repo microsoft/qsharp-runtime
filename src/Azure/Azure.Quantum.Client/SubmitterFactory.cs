@@ -8,7 +8,6 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
     using Microsoft.Quantum.Runtime.Submitters;
@@ -21,7 +20,11 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Information about each supported QIR submitter.
         /// </summary>
-        private static readonly ImmutableList<SubmitterInfo> QirSubmitters = ImmutableList<SubmitterInfo>.Empty;
+        private static readonly ImmutableList<SubmitterInfo> QirSubmitters = ImmutableList.Create(
+            new SubmitterInfo(
+                "microsoft",
+                "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "Create"));
 
         /// <summary>
         /// Information about each supported Q# submitter.
@@ -69,7 +72,9 @@ namespace Microsoft.Azure.Quantum
             }
 
             var type = QdkType(submitter.TypeName);
-            return (T)Activator.CreateInstance(type, target, workspace, storageConnection);
+            var args = new object?[] { target, workspace, storageConnection };
+            return (T)type.InvokeMember(
+                submitter.MethodName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
         }
 
         /// <summary>
@@ -79,16 +84,9 @@ namespace Microsoft.Azure.Quantum
         /// <returns>The type.</returns>
         private static Type QdkType(string name)
         {
-            try
-            {
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
-                var signedName = $"{name}, Version={version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5";
-                return Type.GetType(signedName, true);
-            }
-            catch (FileLoadException)
-            {
-                return Type.GetType(name, true);
-            }
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var strongName = $"{name}, Version={version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5";
+            return Type.GetType(strongName, true);
         }
 
         /// <summary>
@@ -101,8 +99,9 @@ namespace Microsoft.Azure.Quantum
             /// </summary>
             /// <param name="targetPrefix">The prefix for targets supported by the submitter.</param>
             /// <param name="typeName">The fully-qualified or assembly-qualified name of the submitter type.</param>
-            public SubmitterInfo(string targetPrefix, string typeName) =>
-                (TargetPrefix, TypeName) = (targetPrefix, typeName);
+            /// <param name="methodName">The name of the static factory method.</param>
+            public SubmitterInfo(string targetPrefix, string typeName, string methodName) =>
+                (TargetPrefix, TypeName, MethodName) = (targetPrefix, typeName, methodName);
 
             /// <summary>
             /// The prefix for targets supported by the submitter.
@@ -113,6 +112,11 @@ namespace Microsoft.Azure.Quantum
             /// The fully-qualified or assembly-qualified name of the submitter type.
             /// </summary>
             public string TypeName { get; }
+
+            /// <summary>
+            /// The name of the static factory method.
+            /// </summary>
+            public string MethodName { get; }
         }
     }
 }
