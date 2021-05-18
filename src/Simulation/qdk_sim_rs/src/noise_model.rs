@@ -1,8 +1,8 @@
-use crate::processes::Process;
-use crate::processes::ProcessData::{KrausDecomposition, Unitary};
 use crate::common_matrices;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
+use crate::processes::Process;
+use crate::processes::ProcessData::{KrausDecomposition, Unitary};
 use crate::states::State;
 use crate::states::StateData::Mixed;
 use crate::C64;
@@ -10,8 +10,12 @@ use num_traits::{One, Zero};
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 /// A description of the noise that applies to the state of a quantum system
 /// as the result of applying operations.
+#[cfg_attr(feature = "python", pyclass(name = "NoiseModel"))]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NoiseModel {
     /// The initial state that freshly allocated qubits start off in.
@@ -63,6 +67,11 @@ pub struct NoiseModel {
 }
 
 impl NoiseModel {
+    /// Returns a serialization of this noise model as a JSON object.
+    pub fn as_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+
     /// Returns a copy of the ideal noise model; that is, a noise model
     /// describing the case in which no noise acts on the quantum system.
     pub fn ideal() -> NoiseModel {

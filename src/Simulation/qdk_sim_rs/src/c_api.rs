@@ -12,7 +12,7 @@
 //! Please pay attention to any listed safety notes when calling into this C
 //! API.
 
-use crate::{NoiseModel, Process, State, built_info};
+use crate::{built_info, NoiseModel, Process, State};
 use lazy_static::lazy_static;
 use serde_json::json;
 use std::collections::HashMap;
@@ -220,13 +220,9 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
 pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
     let state = &*STATE.lock().unwrap();
     if let Some(sim_state) = state.get(&sim_id) {
-        CString::new(
-            serde_json::to_string(&sim_state.noise_model)
-                .unwrap()
-                .as_str(),
-        )
-        .unwrap()
-        .into_raw()
+        CString::new(sim_state.noise_model.as_json().as_str())
+            .unwrap()
+            .into_raw()
     } else {
         ptr::null()
     }

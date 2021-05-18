@@ -33,7 +33,7 @@ Push-Location $PSScriptRoot
     $perfDest = (Join-Path $Env:DROPS_DIR "perf" "qdk_sim_rs");
     if (Get-Item -ErrorAction SilentlyContinue $reportPath) {
         New-Item -Type Directory -Force -Path $perfDest;
-        Copy-Item -Recurse -Path $reportPath -Destination $perfDest;
+        Copy-Item -Recurse -Force -Path $reportPath -Destination $perfDest;
     }
 
     # Free disk space by cleaning up.

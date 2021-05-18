@@ -156,11 +156,7 @@ impl<T: Clone + Zero> Trace for &Array2<T> {
 //              from microbenchmarks on tensor and nq_eye directly.
 /// Given an array representing an operator acting on single-qubit states,
 /// returns a new operator that acts on $n$-qubit states.
-pub fn extend_one_to_n(
-    data: ArrayView2<C64>,
-    idx_qubit: usize,
-    n_qubits: usize,
-) -> Array2<C64> {
+pub fn extend_one_to_n(data: ArrayView2<C64>, idx_qubit: usize, n_qubits: usize) -> Array2<C64> {
     let n_left = idx_qubit;
     let n_right = n_qubits - idx_qubit - 1;
     match (n_left, n_right) {

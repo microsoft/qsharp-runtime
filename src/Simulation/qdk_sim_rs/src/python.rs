@@ -1,13 +1,10 @@
-// use crate::tableau::Tableau;
-use crate::built_info;
+use crate::tableau::Tableau;
+use crate::{built_info, Instrument, NoiseModel};
+use pyo3::prelude::*;
 use serde_json::json;
-use pyo3::{
-    prelude::*,
-};
 
 #[pymodule]
 fn _qdk_sim_rs(_py: Python, m: &PyModule) -> PyResult<()> {
-
     /// Returns information about how this simulator was built, serialized as a
     /// JSON object.
     #[pyfn(m, "build_info_json")]
@@ -24,6 +21,8 @@ fn _qdk_sim_rs(_py: Python, m: &PyModule) -> PyResult<()> {
         serde_json::to_string(&build_info).unwrap()
     }
 
-    // m.add_class::<Tableau>()?;
+    m.add_class::<Tableau>()?;
+    m.add_class::<Instrument>()?;
+    m.add_class::<NoiseModel>()?;
     Ok(())
 }

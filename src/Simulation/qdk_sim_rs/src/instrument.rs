@@ -11,6 +11,10 @@ use crate::State;
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg_attr(feature = "python", pyclass(name = "Instrument"))]
 #[derive(Serialize, Deserialize, Debug)]
 /// Represents a quantum instrument; that is, a process that accepts a quantum
 /// state and returns the new state of a system and classical data extracted

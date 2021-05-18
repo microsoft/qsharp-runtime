@@ -1,15 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::{log, processes::ProcessData::{KrausDecomposition, Unitary}};
 use crate::linalg::ConjBy;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
+use crate::log_as_err;
 use crate::states::StateData::{Mixed, Pure};
 use crate::NoiseModel;
 use crate::QubitSized;
 use crate::State;
 use crate::C64;
-use crate::{log_as_err};
+use crate::{
+    log,
+    processes::ProcessData::{KrausDecomposition, Unitary},
+};
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use num_traits::{One, Zero};
@@ -17,8 +20,6 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::ops::Add;
 use std::ops::Mul;
-
-// TODO: Rename to something that doesn't imply it's already CPTP.
 
 /// A linear function from quantum states to quantum states.
 ///
@@ -77,6 +78,7 @@ impl Process {
                             sum
                         }),
                     },
+                    _ => todo!(),
                 },
             })
         } else {

@@ -6,6 +6,7 @@ use crate::linalg::Tensor;
 use crate::linalg::Trace;
 use crate::states::StateData::Mixed;
 use crate::states::StateData::Pure;
+use crate::tableau::Tableau;
 use crate::QubitSized;
 use crate::C64;
 use core::fmt::Display;
@@ -13,6 +14,9 @@ use ndarray::{Array1, Array2, Axis};
 use num_traits::One;
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
+
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StateData {
@@ -22,8 +26,8 @@ pub enum StateData {
     /// A mixed state, represented as a density operator.
     Mixed(Array2<C64>),
 
-    // /// A stabilizer state, represented as a stabilizer tableau.
-    // Stabilizer(Tableau)
+    /// A stabilizer state, represented as a tableau.
+    Stabilizer(Tableau),
 }
 
 /// The state of a quantum system.
@@ -38,6 +42,7 @@ impl Display for State {
             match self.data {
                 Pure(_) => "state vector",
                 Mixed(_) => "density operator",
+                StateData::Stabilizer(_) => "stabilizer tableau",
             },
             self.data
         )
@@ -49,6 +54,7 @@ impl Display for StateData {
         match self {
             Pure(psi) => write!(f, "{}", psi),
             Mixed(rho) => write!(f, "{}", rho),
+            StateData::Stabilizer(tableau) => write!(f, "{}", tableau),
         }
     }
 }
@@ -59,7 +65,7 @@ impl State {
     /// is extended to $\left|\psi 0\right\rangle$.
     ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// # use qdk_sim::State;
     /// let rho = State::new_mixed(2);
@@ -75,6 +81,7 @@ impl State {
                     (0, 0),
                     (new_dim, new_dim),
                 ))),
+                _ => todo!(),
             },
         }
     }
@@ -108,6 +115,7 @@ impl State {
                     let psi = psi.view().insert_axis(Axis(1));
                     psi.t().map(|e| e.conj()) * psi
                 }),
+                _ => todo!(),
             },
         }
     }
@@ -118,7 +126,7 @@ impl Trace for &State {
 
     fn trace(self) -> Self::Output {
         match &self.data {
-            Pure(_) => C64::one(),
+            Pure(_) | StateData::Stabilizer(_) => C64::one(),
             Mixed(ref rho) => (&rho).trace(),
         }
     }

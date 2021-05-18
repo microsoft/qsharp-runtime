@@ -20,17 +20,18 @@ use std::usize;
 use serde::{Deserialize, Serialize};
 
 pub mod c_api;
-mod processes;
 pub mod common_matrices;
 mod instrument;
 pub mod linalg;
 mod noise_model;
+mod processes;
 mod states;
+mod tableau;
 mod utils;
 
-pub use crate::processes::*;
 pub use crate::instrument::*;
 pub use crate::noise_model::NoiseModel;
+pub use crate::processes::*;
 pub use crate::states::State;
 pub use crate::utils::*;
 
@@ -50,6 +51,13 @@ impl<T> QubitSized<T> {
     pub fn get_n_qubits(&self) -> usize {
         self.n_qubits
     }
+}
+
+pub enum Pauli {
+    I = 0,
+    X = 1,
+    Z = 3,
+    Y = 2,
 }
 
 /// Metadata about how this crate was built.
