@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Quantum
             new SubmitterInfo(
                 "microsoft",
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
-                "Create"));
+                "QirSubmitter"));
 
         /// <summary>
         /// Information about each supported Q# submitter.
