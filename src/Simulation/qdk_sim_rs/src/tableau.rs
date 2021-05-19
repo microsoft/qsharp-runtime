@@ -167,6 +167,26 @@ impl Tableau {
         self.apply_cnot_mut(idx_1, idx_2);
     }
 
+    /// Asserts whether a hypothetical single-qubit $Z$-basis measurement
+    /// would agree with an expected result.
+    ///
+    /// If the assertion would pass, `Ok(())` is returned, otherwise an [`Err`]
+    /// describing the assertion failure is returned.
+    pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), String> {
+        let actual = self.determinstic_result(idx_target).ok_or(format!(
+            "Expected {}, but measurement result would be random.",
+            expected
+        ))?;
+        if actual != expected {
+            Err(format!(
+                "Expected {}, but measurement result would actually be {}.",
+                expected, actual
+            ))
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn meas_mut(&mut self, idx_target: usize) -> bool {
         if let Some(result) = self.determinstic_result(idx_target) {
             return result;

@@ -1,21 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::linalg::ConjBy;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::log_as_err;
-use crate::states::StateData::{Mixed, Pure};
+use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::NoiseModel;
 use crate::QubitSized;
 use crate::State;
 use crate::C64;
+use crate::{linalg::ConjBy, AsUnitary, Pauli};
 use crate::{
     log,
-    processes::ProcessData::{KrausDecomposition, Unitary},
+    processes::ProcessData::{KrausDecomposition, PauliChannel, Unitary},
 };
 use itertools::Itertools;
-use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
+use ndarray::{Array, Array2, Array3, ArrayView2, Axis, NewAxis};
+use num_complex::Complex;
 use num_traits::{One, Zero};
+use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::ops::Add;
@@ -30,7 +32,12 @@ pub type Process = QubitSized<ProcessData>;
 /// Data used to represent a given process.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum ProcessData {
-    /// Representation of the process by a unitary matrix.
+    /// Representation of a process as a mixture of Pauli operators
+    /// $\{(p_i, P_i)\}$ such that the channel acts as $\rho \mapsto
+    /// \sum_i p_i P_i \rho P_i^{\dagger}$.
+    PauliChannel(Vec<(f64, Vec<Pauli>)>),
+
+    /// Representation of the process by an arbitrary unitary matrix.
     Unitary(Array2<C64>),
 
     /// Representation of the process by the singular vectors of its Choi
@@ -42,6 +49,17 @@ pub enum ProcessData {
 }
 
 impl Process {
+    pub fn new_pauli_channel<T: IntoPauliMixture>(data: T) -> Self {
+        let data = data.into_pauli_mixture();
+        // How many qubits?
+        // TODO: check that every Pauli is supported on the same number of
+        //       qubits.
+        let n_qubits = data[0].1.len();
+        Process {
+            n_qubits,
+            data: PauliChannel(data),
+        }
+    }
     // TODO: methods to forcibly convert representations.
 
     /// Applies this process to a quantum register with a given
@@ -65,6 +83,11 @@ impl Process {
                             } else {
                                 self.apply(&state.to_mixed())?.data
                             }
+                        },
+                        PauliChannel(paulis) => {
+                            // Promote and recurse.
+                            let promoted = promote_pauli_channel(paulis);
+                            promoted.apply(state)?.data
                         }
                     },
                     Mixed(rho) => match &self.data {
@@ -77,8 +100,37 @@ impl Process {
                             }
                             sum
                         }),
+                        PauliChannel(paulis) => {
+                            // Promote and recurse.
+                            let promoted = promote_pauli_channel(paulis);
+                            promoted.apply(state)?.data
+                        }
                     },
-                    _ => todo!(),
+                    Stabilizer(tableau) => match &self.data {
+                        PauliChannel(paulis) => {
+                            // TODO[perf]: Introduce an apply_mut method to
+                            //             avoid extraneous cloning.
+                            let mut new_tableau = tableau.clone();
+                            // Sample a Pauli and apply it.
+                            let weighted = WeightedIndex::new(
+                                paulis.iter().map(|(pr, _)| pr)
+                            ).unwrap();
+                            let idx = weighted.sample(&mut thread_rng());
+                            let pauli = &(&paulis)[idx].1;
+                            // TODO: Consider moving the following to a method
+                            //       on Tableau itself.
+                            for (idx_qubit, p) in pauli.iter().enumerate() {
+                                match p {
+                                    Pauli::I => (),
+                                    Pauli::X => new_tableau.apply_x_mut(idx_qubit),
+                                    Pauli::Y => new_tableau.apply_y_mut(idx_qubit),
+                                    Pauli::Z => new_tableau.apply_z_mut(idx_qubit)
+                                }
+                            }
+                            Stabilizer(new_tableau)
+                        },
+                        _ => unimplemented!("Promotion of stabilizer tableaus to pure or mixed states is not yet supported.")
+                    },
                 },
             })
         } else {
@@ -169,7 +221,20 @@ impl Process {
                         target.assign(&big_kraus);
                     }
                     KrausDecomposition(extended)
-                }
+                },
+                PauliChannel(paulis) => PauliChannel(
+                    paulis.iter()
+                        .map(|(pr, pauli)| {
+                            if pauli.len() != 1 {
+                                panic!("Pauli channel acts on more than one qubit, cannot extend to 𝑛 qubits.");
+                            }
+                            let p = pauli[0];
+                            let mut extended = std::iter::repeat(Pauli::I).take(n_qubits).collect_vec();
+                            extended[idx_qubit] = p;
+                            (*pr, extended)
+                        })
+                        .collect_vec()
+                )
             },
         }
     }
@@ -198,7 +263,21 @@ impl Process {
                         target.assign(&big_kraus);
                     }
                     KrausDecomposition(extended)
-                }
+                },
+                PauliChannel(paulis) => PauliChannel(
+                    paulis.iter()
+                        .map(|(pr, pauli)| {
+                            if pauli.len() != 2 {
+                                panic!("Pauli channel acts on more than one qubit, cannot extend to 𝑛 qubits.");
+                            }
+                            let p = (pauli[0], pauli[1]);
+                            let mut extended = std::iter::repeat(Pauli::I).take(n_qubits).collect_vec();
+                            extended[idx_qubit1] = p.0;
+                            extended[idx_qubit2] = p.1;
+                            (*pr, extended)
+                        })
+                        .collect_vec()
+                )
             },
         }
     }
@@ -221,6 +300,7 @@ impl Mul<&Process> for C64 {
                     ks
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
+                PauliChannel(paulis) => (self * promote_pauli_channel(paulis)).data,
             },
         }
     }
@@ -374,5 +454,81 @@ pub fn amplitude_damping_channel(gamma: f64) -> Process {
                 [C64::zero(), C64::zero()]
             ]
         ]),
+    }
+}
+
+/// A type that can be converted into a mixture of Pauli operators.
+pub trait IntoPauliMixture {
+    fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)>;
+}
+
+impl IntoPauliMixture for Vec<(f64, Vec<Pauli>)> {
+    fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)> {
+        self
+    }
+}
+
+impl IntoPauliMixture for Vec<Pauli> {
+    fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)> {
+        vec![(1.0, self)]
+    }
+}
+
+impl IntoPauliMixture for Vec<(f64, Pauli)> {
+    fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)> {
+        self.iter().map(|(pr, p)| (*pr, vec![*p])).collect_vec()
+    }
+}
+
+impl IntoPauliMixture for Pauli {
+    fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)> {
+        vec![(1.0, vec![self])]
+    }
+}
+
+/// Given a vector of Paulis and the probability of applying each one, promotes
+/// that vector to a process that acts on state vectors (e.g.: a unitary matrix,
+/// or Kraus decomposition).
+///
+/// This function is a private utility mainly used in handling the case where
+/// a mixed Pauli channel is applied to a pure or mixed state.
+fn promote_pauli_channel(paulis: &Vec<(f64, Vec<Pauli>)>) -> Process {
+    // TODO: Check that there's at least one Pauli... empty vectors aren't
+    //       supported here.
+    if paulis.len() == 1 {
+        // Just one Pauli, so can box it up into a unitary.
+        let (_, pauli) = &paulis[0];
+        // TODO[testing]: check that pr is 1.0.
+        Process {
+            n_qubits: pauli.len(),
+            data: Unitary(pauli.as_unitary()),
+        }
+    } else {
+        // To turn a mixed Pauli channel into a Kraus decomposition, we need
+        // to take the square root of each probability.
+        let matrices = paulis
+            .iter()
+            .map(|p| {
+                p.1.as_unitary()
+                    * Complex {
+                        re: p.0.sqrt(),
+                        im: 0.0f64,
+                    }
+            })
+            .map(|u| {
+                let x = u.slice(s![NewAxis, .., ..]);
+                x.to_owned()
+            })
+            .collect_vec();
+        Process {
+            n_qubits: paulis[0].1.len(),
+            data: KrausDecomposition(
+                ndarray::concatenate(
+                    Axis(0),
+                    matrices.iter().map(|u| u.view()).collect_vec().as_slice(),
+                )
+                .unwrap(),
+            ),
+        }
     }
 }

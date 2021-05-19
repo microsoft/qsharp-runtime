@@ -17,6 +17,8 @@ extern crate derive_more;
 extern crate serde;
 use std::usize;
 
+use linalg::Tensor;
+use ndarray::Array2;
 use serde::{Deserialize, Serialize};
 
 pub mod c_api;
@@ -32,7 +34,8 @@ mod utils;
 pub use crate::instrument::*;
 pub use crate::noise_model::NoiseModel;
 pub use crate::processes::*;
-pub use crate::states::State;
+pub use crate::states::{State, StateData};
+pub use crate::tableau::Tableau;
 pub use crate::utils::*;
 
 #[cfg(feature = "python")]
@@ -53,11 +56,38 @@ impl<T> QubitSized<T> {
     }
 }
 
+/// An element of the single-qubit Pauli group.
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Pauli {
     I = 0,
     X = 1,
-    Z = 3,
-    Y = 2,
+    Y = 3,
+    Z = 2,
+}
+
+/// Types that can be converted to unitary matrices.
+pub trait AsUnitary {
+    /// Returns a representation as a unitary matrix.
+    fn as_unitary(&self) -> Array2<C64>;
+}
+
+impl AsUnitary for Pauli {
+    fn as_unitary(&self) -> Array2<C64> {
+        match self {
+            Pauli::I => common_matrices::nq_eye(1),
+            Pauli::X => common_matrices::x(),
+            Pauli::Y => common_matrices::y(),
+            Pauli::Z => common_matrices::z(),
+        }
+    }
+}
+
+impl AsUnitary for Vec<Pauli> {
+    fn as_unitary(&self) -> Array2<C64> {
+        let sq_unitaries = self.iter().map(|p| p.as_unitary());
+        let result = sq_unitaries.reduce(|p, q| p.tensor(&q));
+        result.unwrap()
+    }
 }
 
 /// Metadata about how this crate was built.

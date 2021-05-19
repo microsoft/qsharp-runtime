@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::common_matrices;
 use crate::linalg::Tensor;
 use crate::linalg::Trace;
-use crate::states::StateData::Mixed;
-use crate::states::StateData::Pure;
+use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::tableau::Tableau;
 use crate::QubitSized;
 use crate::C64;
+use crate::{common_matrices, tableau};
 use core::fmt::Display;
 use ndarray::{Array1, Array2, Axis};
 use num_traits::One;
@@ -60,6 +59,30 @@ impl Display for StateData {
 }
 
 impl State {
+    /// Returns a new mixed state on a given number of qubits.
+    /// By convention, new mixed states start off in the "all-zeros" state,
+    /// $\rho = \ket{00\cdots 0}\bra{00\cdots 0}$.
+    pub fn new_mixed(n_qubits: usize) -> State {
+        let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
+        State {
+            n_qubits,
+            data: Mixed(common_matrices::elementary_matrix(
+                (0, 0),
+                (new_dim, new_dim),
+            )),
+        }
+    }
+
+    /// Returns a new stabilizer state on a given number of qubits.
+    /// By convention, new stabilizer states start off in the "all-zeros" state,
+    /// $\left\langle Z_0, Z_1, \dots, Z_{n - 1} \right\rangle$.
+    pub fn new_stabilizer(n_qubits: usize) -> State {
+        State {
+            n_qubits,
+            data: Stabilizer(Tableau::new(n_qubits)),
+        }
+    }
+
     /// Extends this state to be a state on `n_qubits` additional qubits.
     /// New qubits are added "to the right," e.g.: $\left|\psi\right\rangle$
     /// is extended to $\left|\psi 0\right\rangle$.
@@ -86,20 +109,6 @@ impl State {
         }
     }
 
-    /// Returns a new mixed state on a given number of qubits.
-    /// By convention, new mixed states start off in the "all-zeros" state,
-    /// $\rho = \ket{00\cdots 0}\bra{00\cdots 0}.
-    pub fn new_mixed(n_qubits: usize) -> State {
-        let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
-        State {
-            n_qubits,
-            data: Mixed(common_matrices::elementary_matrix(
-                (0, 0),
-                (new_dim, new_dim),
-            )),
-        }
-    }
-
     /// Returns a copy of this state, represented as a mixed state.
     pub fn to_mixed(&self) -> State {
         State {
@@ -117,6 +126,15 @@ impl State {
                 }),
                 _ => todo!(),
             },
+        }
+    }
+
+    /// If the given state can be represented by a stabilizer tableau, returns
+    /// that tableau.
+    pub fn get_tableau(&self) -> Option<&Tableau> {
+        match self.data {
+            Stabilizer(ref tableau) => Some(tableau),
+            _ => None,
         }
     }
 }

@@ -52,12 +52,12 @@ codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'unwind'
 
 [dependencies]
-ndarray = { version = "0.13.1", features = ["serde"] }
-num-complex = { version = "0.2", features = ["serde"] }
+ndarray = { version = "0.15.2", features = ["serde"] }
+num-complex = { version = "0.4", features = ["serde"] }
 num-traits = "0.2"
 derive_more = "0.99.10"
 itertools = "0.9.0"
-rand = "0.7.3"
+rand = { version = "0.7.3", features = ["alloc"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 lazy_static = "1.4.0"
