@@ -492,7 +492,7 @@ impl IntoPauliMixture for Pauli {
 ///
 /// This function is a private utility mainly used in handling the case where
 /// a mixed Pauli channel is applied to a pure or mixed state.
-fn promote_pauli_channel(paulis: &Vec<(f64, Vec<Pauli>)>) -> Process {
+fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
     // TODO: Check that there's at least one Pauli... empty vectors aren't
     //       supported here.
     if paulis.len() == 1 {

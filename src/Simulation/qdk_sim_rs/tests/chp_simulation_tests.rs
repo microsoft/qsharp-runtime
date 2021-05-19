@@ -1,4 +1,4 @@
-use qdk_sim::{Pauli, Process, ProcessData, State, StateData, Tableau};
+use qdk_sim::{Pauli, Process, State, Tableau};
 
 #[test]
 fn pauli_channel_applies_correctly() -> Result<(), String> {

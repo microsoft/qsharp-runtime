@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::common_matrices;
 use crate::linalg::Tensor;
 use crate::linalg::Trace;
 use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::tableau::Tableau;
 use crate::QubitSized;
 use crate::C64;
-use crate::{common_matrices, tableau};
 use core::fmt::Display;
 use ndarray::{Array1, Array2, Axis};
 use num_traits::One;
