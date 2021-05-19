@@ -2,11 +2,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <!-- we will provide our own -->
+  </PropertyGroup>
+
+  <PropertyGroup>
     <CSharpGeneration>false</CSharpGeneration>
+    <QirGeneration>true</QirGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <DefaultSimulator>ToffoliSimulator</DefaultSimulator>
-    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +16,7 @@
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 
-  <Target Name="BeforeCSharpCompile">
+  <Target Name="CompileGeneratedCSharp" AfterTargets="QSharpCompile" BeforeTargets="PrepareCSharpCompileAfterCSharpGeneration">
     <ItemGroup>
       <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
     </ItemGroup>

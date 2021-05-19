@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <GenerateProgramFile>false</GenerateProgramFile>
     <RootNamespace>Microsoft.Quantum.EntryPointDriver.Tests</RootNamespace>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -19,7 +17,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Tests.fs" />
-    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,5 +31,4 @@
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
   </ItemGroup>
-
 </Project>

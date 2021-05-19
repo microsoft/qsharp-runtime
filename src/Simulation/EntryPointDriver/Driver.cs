@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.EntryPointDriver.Azure;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -83,8 +84,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The job name option.
         /// </summary>
-        private static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
+        private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
+            ImmutableList.Create("--job-name"), "", "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.
@@ -468,7 +469,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
                 Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
             });
-        
+
         /// <summary>
         /// A modification of the command-line <see cref="HelpBuilder"/> class.
         /// </summary>

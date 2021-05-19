@@ -6,6 +6,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Description>Client library for Azure Quantum.</Description>
+    <RootNamespace>Microsoft.Azure.Quantum</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
