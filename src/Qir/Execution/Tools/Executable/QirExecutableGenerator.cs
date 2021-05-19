@@ -26,11 +26,11 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             await Task.Run(async () =>
             {
                 var binDirectory = executableFile.Directory;
-                logger.LogInfo($"Creating binary directory at {binDirectory.FullName}.");
+                logger?.LogInfo($"Creating binary directory at {binDirectory.FullName}.");
                 executableFile.Directory.Create();
 
                 // Copy all library contents to bin.
-                logger.LogInfo("Copying library directory contents into the executable's folder.");
+                logger?.LogInfo("Copying library directory contents into the executable's folder.");
                 var libraryFiles = libraryDirectory.GetFiles();
                 foreach (var file in libraryFiles)
                 {
@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             if (!File.Exists(newPath))
             {
                 var newFile = fileToCopy.CopyTo(newPath);
-                logger.LogInfo($"Copied file {fileToCopy.FullName} to {newFile.FullName}");
+                logger?.LogInfo($"Copied file {fileToCopy.FullName} to {newFile.FullName}");
             }
         }
     }

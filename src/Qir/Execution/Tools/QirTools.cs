@@ -29,49 +29,27 @@ namespace Microsoft.Quantum.Qir.Tools
             DirectoryInfo includeDirectory,
             DirectoryInfo executablesDirectory)
         {
-            await Foo(qsharpDll, libraryDirectory, includeDirectory, executablesDirectory);
-
-            //using var qirContentStream = new MemoryStream();
-            //if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
-            //{
-            //    throw new ArgumentException("The given DLL does not contain QIR byte code.");
-            //}
-            //
-            //if (!executablesDirectory.Exists)
-            //{
-            //    executablesDirectory.Create();
-            //}
-            //
-            //var tasks = EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
-            //{
-            //    var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, entryPointOp.Name));
-            //    var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
-            //    return exe.BuildAsync(entryPointOp, libraryDirectory, includeDirectory);
-            //});
-            //
-            //await Task.WhenAll(tasks);
+            using var qirContentStream = new MemoryStream();
+            if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
+            {
+                throw new ArgumentException("The given DLL does not contain QIR byte code.");
+            }
+            
+            if (!executablesDirectory.Exists)
+            {
+                executablesDirectory.Create();
+            }
+            
+            var tasks = EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
+            {
+                var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
+                var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
+                return exe.BuildAsync(entryPointOp, libraryDirectory, includeDirectory);
+            });
+            
+            await Task.WhenAll(tasks);
 
             // ToDo: Return list of created file names
-        }
-
-        private static async Task<int> Foo(
-            FileInfo qsharpDll,
-            DirectoryInfo libraryDirectory,
-            DirectoryInfo includeDirectory,
-            DirectoryInfo executablesDirectory)
-        {
-            Console.WriteLine("From BuildFromQSharpDll!");
-
-            Console.WriteLine("QsharpDll:");
-            Console.WriteLine($"\t{qsharpDll}");
-            Console.WriteLine("LibraryDirectory:");
-            Console.WriteLine($"\t{libraryDirectory}");
-            Console.WriteLine("IncludeDirectory:");
-            Console.WriteLine($"\t{includeDirectory}");
-            Console.WriteLine("ExecutablesDirectory:");
-            Console.WriteLine($"\t{executablesDirectory}");
-
-            return 0;
         }
     }
 }
