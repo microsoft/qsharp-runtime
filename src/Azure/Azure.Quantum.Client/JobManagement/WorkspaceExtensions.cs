@@ -44,15 +44,5 @@ namespace Microsoft.Azure.Quantum
         {
             return workspace.GetJobAsync(jobId).GetAwaiter().GetResult();
         }
-
-        /// <summary>
-        /// Lists the jobs.
-        /// </summary>
-        /// <param name="workspace">The workspace.</param>
-        /// <returns>List of job identifiers.</returns>
-        public static IEnumerable<CloudJob> ListJobs(this IWorkspace workspace)
-        {
-            return workspace.ListJobsAsync().GetAwaiter().GetResult();
-        }
     }
 }

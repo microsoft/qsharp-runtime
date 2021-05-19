@@ -12,6 +12,10 @@ namespace Microsoft.Azure.Quantum.Exceptions
     {
         private const string BaseMessage = "An exception related to the Azure workspace client occurred";
 
+        public string ErrorCode { get; }
+
+        public int Status { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkspaceClientException"/> class with a default error message.
         /// </summary>
@@ -70,6 +74,12 @@ namespace Microsoft.Azure.Quantum.Exceptions
                   FormatInnerException(inner),
                   inner)
         {
+            // Handle specific types of exceptions for additional data
+            if (inner is global::Azure.RequestFailedException requestException)
+            {
+                this.ErrorCode = requestException.ErrorCode;
+                this.Status = requestException.Status;
+            }
         }
 
         /// <summary>
@@ -86,19 +96,6 @@ namespace Microsoft.Azure.Quantum.Exceptions
             if (ex != null)
             {
                 formattedException += $"Server Error: {ex.Message}{Environment.NewLine}";
-
-                //// Handle specific types of exceptions for additional data
-                //if (ex is RequestFailedException restErrorException)
-                //{
-                //    formattedException += $"Error Code: {restErrorException.ErrorCode}{Environment.NewLine}" +
-                //        $"Server message: {restErrorException}{Environment.NewLine}";
-
-                //    var headers = restErrorException?.Response?.Headers;
-                //    if (headers != null && headers.ContainsKey("x-ms-request-id"))
-                //    {
-                //        formattedException += $"Server Request Id: {headers["x-ms-request-id"]}{Environment.NewLine}";
-                //    }
-                //}
             }
 
             return formattedException;

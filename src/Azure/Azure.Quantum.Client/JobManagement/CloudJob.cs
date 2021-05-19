@@ -94,6 +94,23 @@ namespace Microsoft.Azure.Quantum
             this.Details = job.Details;
         }
 
+        /// <summary>
+        /// Keeps polling the server until the Job status changes to be not in progress.
+        /// </summary>
+        /// <param name="pollIntervalMilliseconds">Time to wait between polls. Defaults to 500.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns></returns>
+        public async Task WaitForCompletion(int pollIntervalMilliseconds = 500, CancellationToken cancellationToken = default)
+        {
+            await this.RefreshAsync(cancellationToken);
+
+            while (this.InProgress)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(pollIntervalMilliseconds));
+                await this.RefreshAsync();
+            }
+        }
+
         private Uri GenerateUri()
         {
             if (!(this.Workspace is Workspace cloudWorkspace))

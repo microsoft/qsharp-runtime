@@ -6,6 +6,7 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
     using global::Azure.Core;
@@ -177,23 +178,13 @@ namespace Microsoft.Azure.Quantum
         /// <returns>
         /// List of jobs.
         /// </returns>
-        public async Task<IEnumerable<CloudJob>> ListJobsAsync(CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<CloudJob> ListJobsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var jobs = this.QuantumClient.GetJobsAsync(cancellationToken);
+            var jobs = this.QuantumClient.GetJobsAsync().WithCancellation(cancellationToken);
 
-                var result = new List<CloudJob>();
-                await foreach (var j in jobs)
-                {
-                    result.Add(new CloudJob(this, j));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
+            await foreach (var j in jobs)
             {
-                throw CreateException(ex, "Could not list jobs");
+                yield return new CloudJob(this, j);
             }
         }
 
