@@ -8,6 +8,7 @@ add_executable(qir-runtime-unittests
   QirRuntimeTests.cpp
   ToffoliTests.cpp
   TracerTests.cpp
+  QubitManagerTests.cpp
   $<TARGET_OBJECTS:qir-rt-support-obj>
   $<TARGET_OBJECTS:qsharp-foundation-qis-support-obj>
   $<TARGET_OBJECTS:qsharp-core-qis-support-obj>
