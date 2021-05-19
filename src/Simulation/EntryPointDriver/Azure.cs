@@ -38,6 +38,13 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Console.WriteLine();
             }
 
+            if ((settings.Location is null) && (settings.BaseUri is null))
+            {
+                DisplayWithColor(ConsoleColor.Red, Console.Error,
+                    $"Either --location or --base-uri must be provided.");
+                return 1;
+            }
+
             var machine = CreateMachine(settings);
             if (machine is null)
             {
@@ -236,7 +243,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? AadToken { get; set; }
 
         /// <summary>
+        /// The base URI of the Azure Quantum endpoint.
+        /// NOTE: This parameter is deprected, please always use <see cref="Location"/>.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="Location"/> takes precedence.
+        /// </summary>
+        public Uri? BaseUri { get; set; }
+
+        /// <summary>
         /// The Azure Quantum Workspace's location (region).
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="Location"/> takes precedence.
         /// </summary>
         public string? Location { get; set; }
 
@@ -301,11 +316,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             PrintAadWarning();
 
+            var location = NormalizeLocation(Location ?? ExtractLocation(BaseUri));
+
             return new Workspace(
                 subscriptionId: Subscription, 
                 resourceGroupName: ResourceGroup,
                 workspaceName: Workspace, 
-                location: NormalizeLocation(Location));
+                location: location);
         }
 
         public override string ToString() =>
@@ -315,14 +332,25 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Workspace: {Workspace}",
                 $"Target: {Target}",
                 $"Storage: {Storage}",
-                $"Location: {Location}",
+                $"Base URI: {BaseUri}",
+                $"Location: {Location ?? ExtractLocation(BaseUri)}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
                 $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
 
-        internal static string NormalizeLocation(string? location) =>
-            string.Concat(location?.Where(c => !char.IsWhiteSpace(c)) ?? "").ToLower();
+        internal static string ExtractLocation(Uri? baseUri)
+        {
+            if (baseUri is null || !baseUri.IsAbsoluteUri)
+            {
+                return "";
+            }
+
+            return baseUri.Host.Substring(0, baseUri.Host.IndexOf('.'));
+        }
+
+        internal static string NormalizeLocation(string location) =>
+            string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();
     }
 }
