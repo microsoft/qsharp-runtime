@@ -12,6 +12,11 @@ namespace Microsoft.Azure.Quantum.Test
         Ising = 1,
     }
 
+    /// <summary>
+    /// This is the data structure that represents a QIO problem payload on the service.
+    /// It's currently not exposed in C#, so we have it here so we can test job submission of
+    /// the client libraries without having to serialize Q# programs.
+    /// </summary>
     public class Problem
     {
         private readonly HashSet<Term> terms = new HashSet<Term>();
