@@ -56,7 +56,7 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>List of jobs</returns>
-        Task<IEnumerable<QuotaInfo>> ListQuotasAsync(
+        IAsyncEnumerable<QuotaInfo> ListQuotasAsync(
             CancellationToken cancellationToken = default);
 
         /// <summary>

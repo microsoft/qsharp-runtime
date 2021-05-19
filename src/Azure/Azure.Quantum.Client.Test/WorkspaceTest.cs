@@ -105,6 +105,31 @@ namespace Microsoft.Azure.Quantum.Test
             Assert.AreEqual(0, max);
         }
 
+        [TestMethod]
+        public async Task ListQuotasTest()
+        {
+            IWorkspace workspace = GetLiveWorkspace();
+            int max = 3;
+
+            // Since this is a live workspace, we don't have much control about what quotas are in there
+            // Just make sure there is more than one.
+            await foreach (var q in workspace.ListQuotasAsync())
+            {
+                Assert.IsNotNull(q);
+                Assert.IsNotNull(q.Quota);
+                Assert.IsNotNull(q.Quota.Dimension);
+
+                max--;
+                if (max <= 0)
+                {
+                    break;
+                }
+            }
+
+            // Make sure we iterated through all the expected jobs:
+            Assert.AreEqual(0, max);
+        }
+
         private static void AssertJob(CloudJob job)
         {
             Assert.IsNotNull(job);

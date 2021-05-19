@@ -195,23 +195,13 @@ namespace Microsoft.Azure.Quantum
         /// <returns>
         /// List of quotas.
         /// </returns>
-        public async Task<IEnumerable<QuotaInfo>> ListQuotasAsync(CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<QuotaInfo> ListQuotasAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var quotas = this.QuantumClient.GetQuotasAsync(cancellationToken);
+            var quotas = this.QuantumClient.GetQuotasAsync(cancellationToken);
 
-                var result = new List<QuotaInfo>();
-                await foreach (var q in quotas)
-                {
-                    result.Add(new QuotaInfo(this, q));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
+            await foreach (var q in quotas)
             {
-                throw CreateException(ex, "Could not list quotas");
+                yield return new QuotaInfo(this, q);
             }
         }
 
