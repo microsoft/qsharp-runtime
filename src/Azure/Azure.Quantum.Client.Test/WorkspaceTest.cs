@@ -22,6 +22,7 @@ namespace Microsoft.Azure.Quantum.Test
     public class WorkspaceTest
     {
         [TestMethod]
+        [Ignore]
         public async Task SubmitJobTest()
         {
             // Create Job
@@ -40,6 +41,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task GetJobTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -59,6 +61,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task CancelJobTest()
         {
             // Create Job
@@ -79,6 +82,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ListJobsTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -106,6 +110,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ListQuotasTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
