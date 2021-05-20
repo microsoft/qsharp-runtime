@@ -24,8 +24,6 @@ extern "C"
     void Microsoft__Quantum__Testing__QIR__AssertMeasurementTest__Interop(); // NOLINT
    
     void Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1ExcTest__Interop(); // NOLINT
-    void Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1ExcTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1HalfProbTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasSPlusMinusTest__Interop(); // NOLINT
@@ -34,6 +32,9 @@ extern "C"
     void Microsoft__Quantum__Testing__QIR__AssertBellPairMeasurementsAreCorrectTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop(); // NOLINT
     void Microsoft__Quantum__Testing__QIR__AssertGHZMeasurementsTest__Interop(); // NOLINT
+
+    void Microsoft__Quantum__Testing__QIR__AssertMeasMessageTest__Interop(const char *); // NOLINT
+    void Microsoft__Quantum__Testing__QIR__AssertMeasProbMessageTest__Interop(const char *); // NOLINT
 } // extern "C"
 
 using namespace Microsoft::Quantum;
@@ -172,15 +173,26 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     (void) remove(filePath);
 }
 
+static void AssertMeasMessageTest(void (*funcPtr)(const char *))
+{
+    const char * const  testStr = "Testing the Assertion Failure Message";
+    std::ostringstream      outStrStream;
+
+    // Redirect the output from std::cout to outStrStream:
+    Microsoft::Quantum::OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
+
+    // Log something (to the redirected output):
+    REQUIRE_THROWS(funcPtr(testStr));
+
+    REQUIRE(outStrStream.str() == (std::string(testStr) + "\n"));
+}
+
 
 TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
 {
     QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
 
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop());
-
-    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1ExcTest__Interop());
-    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1ExcTest__Interop());
 
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasProbAlloc1HalfProbTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasProbAllocPlusMinusTest__Interop());
@@ -190,5 +202,8 @@ TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertBellPairMeasurementsAreCorrectTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertGHZMeasurementsTest__Interop());
+
+    AssertMeasMessageTest(Microsoft__Quantum__Testing__QIR__AssertMeasMessageTest__Interop);
+    AssertMeasMessageTest(Microsoft__Quantum__Testing__QIR__AssertMeasProbMessageTest__Interop);
 
 } // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")

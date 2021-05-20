@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ## msg
     /// A message to be reported if the assertion fails.
     /// ## tolerance
-    /// Tolerance of the measurement probability.
+    /// Tolerance allowed in the measurement probability.
     ///
     /// # Example
     /// ```qsharp
