@@ -42,8 +42,9 @@ doc = []
 features = ["doc"]
 
 # Enable LaTeX on docs.rs.
-# See https://stackoverflow.com/a/54573800/267841 for why this works.
-rustdoc-args = [ "--html-in-header", "docs/header.html" ]
+# See https://stackoverflow.com/a/54573800/267841 and
+# https://github.com/rust-num/num/pull/226/files for why this works.
+rustdoc-args = [ "--html-in-header", "docs-includes/header.html", "--html-after-content", "docs-includes/after.html" ]
 
 
 [profile.release]

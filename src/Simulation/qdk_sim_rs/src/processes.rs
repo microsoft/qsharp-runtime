@@ -49,6 +49,7 @@ pub enum ProcessData {
 }
 
 impl Process {
+    /// Returns a new Pauli channel, given a mixture of Pauli operators.
     pub fn new_pauli_channel<T: IntoPauliMixture>(data: T) -> Self {
         let data = data.into_pauli_mixture();
         // How many qubits?
@@ -459,6 +460,7 @@ pub fn amplitude_damping_channel(gamma: f64) -> Process {
 
 /// A type that can be converted into a mixture of Pauli operators.
 pub trait IntoPauliMixture {
+    /// Convert this value into a mixture of multi-qubit Pauli operators.
     fn into_pauli_mixture(self) -> Vec<(f64, Vec<Pauli>)>;
 }
 

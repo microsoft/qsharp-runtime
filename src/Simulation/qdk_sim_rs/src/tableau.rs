@@ -84,12 +84,14 @@ impl Tableau {
 
 #[cfg_attr(feature = "python", pymethods)]
 impl Tableau {
+    /// Returns a serialization of this stabilizer tableau as a JSON object.
     #[cfg(feature = "python")]
     pub fn as_json(&self) -> PyResult<String> {
         serde_json::to_string(self)
             .map_err(|e| PyErr::from(Error::new(ErrorKind::Other, e.to_string())))
     }
 
+    /// Applies a Hadamard operation in-place to the given qubit.
     pub fn apply_h_mut(&mut self, idx_target: usize) {
         let idxs = (self.idx_x(idx_target), self.idx_z(idx_target));
         swap_columns(&mut self.table, idxs);
@@ -101,6 +103,7 @@ impl Tableau {
         }
     }
 
+    /// Applies a phase operation ($S$) in-place to the given qubit.
     pub fn apply_s_mut(&mut self, idx_target: usize) {
         let idx_phase = self.idx_phase();
         for idx_row in 0..2 * self.n_qubits {
@@ -115,6 +118,8 @@ impl Tableau {
         }
     }
 
+    /// Applies a controlled-NOT operation in-place, given control and target
+    /// qubits.
     pub fn apply_cnot_mut(&mut self, idx_control: usize, idx_target: usize) {
         let idx_phase = self.idx_phase();
         for idx_row in 0..2 * self.n_qubits {
@@ -138,29 +143,35 @@ impl Tableau {
         }
     }
 
+    /// Applies a Pauli $X$ operation in-place to the given qubit.
     pub fn apply_x_mut(&mut self, idx_target: usize) {
         self.apply_h_mut(idx_target);
         self.apply_z_mut(idx_target);
         self.apply_h_mut(idx_target);
     }
 
+    /// Applies an adjoint phase operation ($S^{\dagger}$) in-place to the
+    /// given qubit.
     pub fn apply_s_adj_mut(&mut self, idx_target: usize) {
         self.apply_s_mut(idx_target);
         self.apply_s_mut(idx_target);
         self.apply_s_mut(idx_target);
     }
 
+    /// Applies a Pauli $Y$ operation in-place to the given qubit.
     pub fn apply_y_mut(&mut self, idx_target: usize) {
         self.apply_s_adj_mut(idx_target);
         self.apply_x_mut(idx_target);
         self.apply_s_mut(idx_target);
     }
 
+    /// Applies a Pauli $Z$ operation in-place to the given qubit.
     pub fn apply_z_mut(&mut self, idx_target: usize) {
         self.apply_s_mut(idx_target);
         self.apply_s_mut(idx_target);
     }
 
+    /// Applies a SWAP operation in-place between two qubits.
     pub fn apply_swap_mut(&mut self, idx_1: usize, idx_2: usize) {
         self.apply_cnot_mut(idx_1, idx_2);
         self.apply_cnot_mut(idx_2, idx_1);
@@ -187,6 +198,8 @@ impl Tableau {
         }
     }
 
+    /// Measures a single qubit in the Pauli $Z$-basis, returning the result,
+    /// and updating the stabilizer tableau in-place.
     pub fn meas_mut(&mut self, idx_target: usize) -> bool {
         if let Some(result) = self.determinstic_result(idx_target) {
             return result;

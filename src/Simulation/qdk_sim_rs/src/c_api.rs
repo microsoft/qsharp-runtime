@@ -216,6 +216,8 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
     })
 }
 
+/// Returns the currently configured noise model for a given simulator,
+/// serialized as a string representing a JSON object.
 #[no_mangle]
 pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
     let state = &*STATE.lock().unwrap();

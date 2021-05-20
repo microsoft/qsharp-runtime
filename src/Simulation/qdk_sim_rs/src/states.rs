@@ -17,6 +17,7 @@ use std::convert::TryInto;
 #[cfg(feature = "python")]
 use pyo3::prelude::*;
 
+/// Data used to represent a given state.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StateData {
     /// A pure state, represented as a vector of complex numbers.

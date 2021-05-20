@@ -59,9 +59,13 @@ impl<T> QubitSized<T> {
 /// An element of the single-qubit Pauli group.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Pauli {
+    /// The identity operator.
     I = 0,
+    /// The Pauli $X$ operator.
     X = 1,
+    /// The Pauli $Y$ operator.
     Y = 3,
+    /// The Pauli $Z$ operator.
     Z = 2,
 }
 
