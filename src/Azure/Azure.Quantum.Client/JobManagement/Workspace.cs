@@ -31,14 +31,14 @@ namespace Microsoft.Azure.Quantum
         /// <param name="resourceGroupName">Name of the resource group.</param>
         /// <param name="workspaceName">Name of the workspace.</param>
         /// <param name="location">Azure region where the workspace was created.</param>
-        /// <param name="credentials">The credentials to connect to Azure. If not provided it defaults to DefaultAzureCredentials.</param>
+        /// <param name="credential">The credentials to connect to Azure. If not provided it defaults to an interactive DefaultAzureCredentials.</param>
         /// <param name="options">Options for the client library when communication with Azure Service..</param>
         public Workspace(
             string subscriptionId,
             string resourceGroupName,
             string workspaceName,
             string location,
-            TokenCredential credentials = null,
+            TokenCredential credential = null,
             QuantumJobClientOptions options = default)
         {
             // Required parameters:
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNullOrWhiteSpace(location, nameof(location));
 
             // Optional parameters:
-            credentials ??= new DefaultAzureCredential(includeInteractiveCredentials: true);
+            credential ??= new DefaultAzureCredential(includeInteractiveCredentials: true);
             options ??= new QuantumJobClientOptions();
 
             this.ResourceGroupName = resourceGroupName;
@@ -56,20 +56,13 @@ namespace Microsoft.Azure.Quantum
             this.SubscriptionId = subscriptionId;
             this.Location = location;
 
-            try
-            {
-                this.QuantumClient = new QuantumJobClient(
-                        subscriptionId,
-                        resourceGroupName,
-                        workspaceName,
-                        location,
-                        credentials,
-                        options);
-            }
-            catch (Exception ex)
-            {
-                throw CreateException(ex, "Could not create an Azure Quantum service client");
-            }
+            this.Client = new QuantumJobClient(
+                    subscriptionId,
+                    resourceGroupName,
+                    workspaceName,
+                    location,
+                    credential,
+                    options);
         }
 
         public string ResourceGroupName { get; }
@@ -81,13 +74,9 @@ namespace Microsoft.Azure.Quantum
         public string Location { get; }
 
         /// <summary>
-        /// Gets or sets the jobs client.
-        /// Internal only.
+        /// The client used to communicate with the service.
         /// </summary>
-        /// <value>
-        /// The jobs client.
-        /// </value>
-        internal QuantumJobClient QuantumClient { get; set; }
+        public QuantumJobClient Client { get; }
 
         /// <summary>
         /// Submits the job.
@@ -106,7 +95,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.QuantumClient.CreateJobAsync(
+                JobDetails jobDetails = await this.Client.CreateJobAsync(
                     jobId: jobDefinition.Details.Id,
                     job: jobDefinition.Details,
                     cancellationToken: cancellationToken);
@@ -131,11 +120,11 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                await this.QuantumClient.CancelJobAsync(
+                await this.Client.CancelJobAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
-                JobDetails jobDetails = this.QuantumClient.GetJob(jobId);
+                JobDetails jobDetails = this.Client.GetJob(jobId);
 
                 return new CloudJob(this, jobDetails);
             }
@@ -159,7 +148,7 @@ namespace Microsoft.Azure.Quantum
 
             try
             {
-                JobDetails jobDetails = await this.QuantumClient.GetJobAsync(
+                JobDetails jobDetails = await this.Client.GetJobAsync(
                     jobId: jobId,
                     cancellationToken: cancellationToken);
 
@@ -180,7 +169,7 @@ namespace Microsoft.Azure.Quantum
         /// </returns>
         public async IAsyncEnumerable<CloudJob> ListJobsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            var jobs = this.QuantumClient.GetJobsAsync().WithCancellation(cancellationToken);
+            var jobs = this.Client.GetJobsAsync().WithCancellation(cancellationToken);
 
             await foreach (var j in jobs)
             {
@@ -197,7 +186,7 @@ namespace Microsoft.Azure.Quantum
         /// </returns>
         public async IAsyncEnumerable<QuotaInfo> ListQuotasAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            var quotas = this.QuantumClient.GetQuotasAsync(cancellationToken);
+            var quotas = this.Client.GetQuotasAsync(cancellationToken);
 
             await foreach (var q in quotas)
             {
@@ -221,7 +210,7 @@ namespace Microsoft.Azure.Quantum
                 BlobName = blobName,
             };
 
-            var response = await this.QuantumClient.GetStorageSasUriAsync(details, cancellationToken);
+            var response = await this.Client.GetStorageSasUriAsync(details, cancellationToken);
             return response.Value.SasUri;
         }
 
