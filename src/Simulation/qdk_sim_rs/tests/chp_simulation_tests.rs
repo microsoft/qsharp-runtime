@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 use qdk_sim::{Pauli, Process, State, Tableau};
 
 #[test]
