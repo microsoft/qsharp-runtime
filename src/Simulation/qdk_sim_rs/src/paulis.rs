@@ -2,12 +2,14 @@
 // Licensed under the MIT License.
 
 use ndarray::Array2;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::{Deserialize, Serialize};
 
 use crate::{common_matrices, linalg::Tensor, C64};
 
 /// An element of the single-qubit Pauli group.
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, IntoPrimitive, TryFromPrimitive)]
+#[repr(u8)]
 pub enum Pauli {
     /// The identity operator.
     I = 0,

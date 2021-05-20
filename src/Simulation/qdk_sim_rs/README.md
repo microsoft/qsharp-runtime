@@ -39,3 +39,4 @@ TODO
 - Many parts of the crate do not yet have Python bindings.
 - Stabilizer simulation not yet exposed via C API.
 - Test and microbenchmark coverage still incomplete.
+- Too many APIs `panic!` or `unwrap`, and need replaced with [`std::Result`] returns instead.

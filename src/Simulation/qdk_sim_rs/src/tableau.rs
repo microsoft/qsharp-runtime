@@ -82,6 +82,28 @@ impl Tableau {
     }
 }
 
+impl Tableau {
+    /// Asserts whether a hypothetical single-qubit $Z$-basis measurement
+    /// would agree with an expected result.
+    ///
+    /// If the assertion would pass, `Ok(())` is returned, otherwise an [`Err`]
+    /// describing the assertion failure is returned.
+    pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), String> {
+        let actual = self.determinstic_result(idx_target).ok_or(format!(
+            "Expected {}, but measurement result would be random.",
+            expected
+        ))?;
+        if actual != expected {
+            Err(format!(
+                "Expected {}, but measurement result would actually be {}.",
+                expected, actual
+            ))
+        } else {
+            Ok(())
+        }
+    }
+}
+
 #[cfg_attr(feature = "python", pymethods)]
 impl Tableau {
     /// Returns a serialization of this stabilizer tableau as a JSON object.
@@ -176,26 +198,6 @@ impl Tableau {
         self.apply_cnot_mut(idx_1, idx_2);
         self.apply_cnot_mut(idx_2, idx_1);
         self.apply_cnot_mut(idx_1, idx_2);
-    }
-
-    /// Asserts whether a hypothetical single-qubit $Z$-basis measurement
-    /// would agree with an expected result.
-    ///
-    /// If the assertion would pass, `Ok(())` is returned, otherwise an [`Err`]
-    /// describing the assertion failure is returned.
-    pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), String> {
-        let actual = self.determinstic_result(idx_target).ok_or(format!(
-            "Expected {}, but measurement result would be random.",
-            expected
-        ))?;
-        if actual != expected {
-            Err(format!(
-                "Expected {}, but measurement result would actually be {}.",
-                expected, actual
-            ))
-        } else {
-            Ok(())
-        }
     }
 
     /// Measures a single qubit in the Pauli $Z$-basis, returning the result,

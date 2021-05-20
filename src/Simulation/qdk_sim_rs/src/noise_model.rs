@@ -83,24 +83,22 @@ impl NoiseModel {
             n_qubits: 1,
             data: Unitary(common_matrices::z()),
         };
-        let z_meas = Instrument {
-            effects: vec![
-                Process {
-                    n_qubits: 1,
-                    data: KrausDecomposition(array![[
-                        [C64::one(), C64::zero()],
-                        [C64::zero(), C64::zero()]
-                    ]]),
-                },
-                Process {
-                    n_qubits: 1,
-                    data: KrausDecomposition(array![[
-                        [C64::zero(), C64::zero()],
-                        [C64::zero(), C64::one()]
-                    ]]),
-                },
-            ],
-        };
+        let z_meas = Instrument::Effects(vec![
+            Process {
+                n_qubits: 1,
+                data: KrausDecomposition(array![[
+                    [C64::one(), C64::zero()],
+                    [C64::zero(), C64::zero()]
+                ]]),
+            },
+            Process {
+                n_qubits: 1,
+                data: KrausDecomposition(array![[
+                    [C64::zero(), C64::zero()],
+                    [C64::zero(), C64::one()]
+                ]]),
+            },
+        ]);
         NoiseModel {
             initial_state: State {
                 n_qubits: 1,
