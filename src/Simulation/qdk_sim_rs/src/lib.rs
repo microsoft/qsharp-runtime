@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 // The following two attributes include the README.md for this crate when
-// the "doc" feature is turned on (requires +nightly).
+// building docs (requires +nightly).
 // See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
 // for discussion.
 #![cfg_attr(doc, feature(extended_key_value_attributes))]

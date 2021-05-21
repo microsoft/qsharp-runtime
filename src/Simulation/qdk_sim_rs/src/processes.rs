@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::log_as_err;
 use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::NoiseModel;
@@ -9,6 +8,10 @@ use crate::QubitSized;
 use crate::State;
 use crate::C64;
 use crate::{linalg::ConjBy, AsUnitary, Pauli};
+use crate::{
+    linalg::{extend_one_to_n, extend_two_to_n, zeros_like},
+    StateData,
+};
 use crate::{
     log,
     processes::ProcessData::{KrausDecomposition, PauliChannel, Unitary},
@@ -46,6 +49,10 @@ pub enum ProcessData {
     /// The first index denotes each Kraus operator, with the second and third
     /// indices representing the indices of each operator.
     KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
+
+    /// Represents a process that is not supported by a given noise model,
+    /// and thus always fails when applied.
+    Unsupported,
 }
 
 impl Process {
@@ -66,80 +73,19 @@ impl Process {
     /// Applies this process to a quantum register with a given
     /// state, returning the new state of that register.
     pub fn apply(&self, state: &State) -> Result<State, String> {
-        if state.n_qubits == self.n_qubits {
-            Ok(State {
-                n_qubits: self.n_qubits,
-                data: match &state.data {
-                    Pure(psi) => match &self.data {
-                        Unitary(u) => Pure(u.dot(psi)),
-                        KrausDecomposition(ks) => {
-                            // We can't apply a channel with more than one Kraus operator (Choi rank > 1) to a
-                            // pure state directly, so if the Choi rank is bigger than 1, promote to
-                            // Mixed and recurse.
-                            if ks.shape()[0] == 1 {
-                                Pure({
-                                    let k: ArrayView2<C64> = ks.slice(s![0, .., ..]);
-                                    k.dot(psi)
-                                })
-                            } else {
-                                self.apply(&state.to_mixed())?.data
-                            }
-                        },
-                        PauliChannel(paulis) => {
-                            // Promote and recurse.
-                            let promoted = promote_pauli_channel(paulis);
-                            promoted.apply(state)?.data
-                        }
-                    },
-                    Mixed(rho) => match &self.data {
-                        Unitary(u) => Mixed(rho.conjugate_by(&u.into())),
-                        KrausDecomposition(ks) => Mixed({
-                            let mut sum: Array2<C64> =
-                                Array::zeros((rho.shape()[0], rho.shape()[1]));
-                            for k in ks.axis_iter(Axis(0)) {
-                                sum = sum + rho.conjugate_by(&k);
-                            }
-                            sum
-                        }),
-                        PauliChannel(paulis) => {
-                            // Promote and recurse.
-                            let promoted = promote_pauli_channel(paulis);
-                            promoted.apply(state)?.data
-                        }
-                    },
-                    Stabilizer(tableau) => match &self.data {
-                        PauliChannel(paulis) => {
-                            // TODO[perf]: Introduce an apply_mut method to
-                            //             avoid extraneous cloning.
-                            let mut new_tableau = tableau.clone();
-                            // Sample a Pauli and apply it.
-                            let weighted = WeightedIndex::new(
-                                paulis.iter().map(|(pr, _)| pr)
-                            ).unwrap();
-                            let idx = weighted.sample(&mut thread_rng());
-                            let pauli = &(&paulis)[idx].1;
-                            // TODO: Consider moving the following to a method
-                            //       on Tableau itself.
-                            for (idx_qubit, p) in pauli.iter().enumerate() {
-                                match p {
-                                    Pauli::I => (),
-                                    Pauli::X => new_tableau.apply_x_mut(idx_qubit),
-                                    Pauli::Y => new_tableau.apply_y_mut(idx_qubit),
-                                    Pauli::Z => new_tableau.apply_z_mut(idx_qubit)
-                                }
-                            }
-                            Stabilizer(new_tableau)
-                        },
-                        _ => unimplemented!("Promotion of stabilizer tableaus to pure or mixed states is not yet supported.")
-                    },
-                },
-            })
-        } else {
-            Err(format!(
+        if state.n_qubits != self.n_qubits {
+            return Err(format!(
                 "Channel acts on {} qubits, but was applied to {}-qubit state.",
                 self.n_qubits, state.n_qubits
-            ))
+            ));
         }
+
+        return match &self.data {
+            Unitary(u) => apply_unitary(&u, state),
+            KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
+            PauliChannel(paulis) => apply_pauli_channel(&paulis, state),
+            ProcessData::Unsupported => return Err(format!("Unsupported quantum process.")),
+        };
     }
 
     /// Applies this process to the given qubits in a register with a given
@@ -235,7 +181,8 @@ impl Process {
                             (*pr, extended)
                         })
                         .collect_vec()
-                )
+                ),
+                ProcessData::Unsupported => ProcessData::Unsupported
             },
         }
     }
@@ -278,7 +225,8 @@ impl Process {
                             (*pr, extended)
                         })
                         .collect_vec()
-                )
+                ),
+                ProcessData::Unsupported => ProcessData::Unsupported
             },
         }
     }
@@ -302,6 +250,7 @@ impl Mul<&Process> for C64 {
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
                 PauliChannel(paulis) => (self * promote_pauli_channel(paulis)).data,
+                ProcessData::Unsupported => ProcessData::Unsupported,
             },
         }
     }
@@ -533,4 +482,87 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
             ),
         }
     }
+}
+
+// Private functions for applying processes of each different representation.
+
+fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, String> {
+    Ok(State {
+        n_qubits: state.n_qubits,
+        data: match &state.data {
+            Pure(psi) => Pure(u.dot(psi)),
+            Mixed(rho) => Mixed(rho.conjugate_by(&u.into())),
+            Stabilizer(_tableau) => {
+                return Err(format!(
+                    "TODO: Promote stabilizer state to state vector and recurse."
+                ))
+            }
+        },
+    })
+}
+
+fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Result<State, String> {
+    Ok(State {
+        n_qubits: state.n_qubits,
+        data: match &state.data {
+            Pure(psi) => {
+                // We can't apply a channel with more than one Kraus operator (Choi rank > 1) to a
+                // pure state directly, so if the Choi rank is bigger than 1, promote to
+                // Mixed and recurse.
+                if ks.shape()[0] == 1 {
+                    Pure({
+                        let k: ArrayView2<C64> = ks.slice(s![0, .., ..]);
+                        k.dot(psi)
+                    })
+                } else {
+                    apply_kraus_decomposition(ks, &state.to_mixed())?.data
+                }
+            }
+            Mixed(rho) => Mixed({
+                let mut sum: Array2<C64> = Array::zeros((rho.shape()[0], rho.shape()[1]));
+                for k in ks.axis_iter(Axis(0)) {
+                    sum = sum + rho.conjugate_by(&k);
+                }
+                sum
+            }),
+            Stabilizer(_tableau) => {
+                return Err(format!(
+                    "TODO: Promote stabilizer state to state vector and recurse."
+                ))
+            }
+        },
+    })
+}
+
+fn apply_pauli_channel(paulis: &[(f64, Vec<Pauli>)], state: &State) -> Result<State, String> {
+    Ok(State {
+        n_qubits: state.n_qubits,
+        data: match &state.data {
+            Pure(_) | Mixed(_) => {
+                // Promote and recurse.
+                let promoted = promote_pauli_channel(paulis);
+                return promoted.apply(state);
+            }
+            Stabilizer(tableau) => {
+                // TODO[perf]: Introduce an apply_mut method to
+                //             avoid extraneous cloning.
+                let mut new_tableau = tableau.clone();
+                // Sample a Pauli and apply it.
+                let weighted = WeightedIndex::new(paulis.iter().map(|(pr, _)| pr)).unwrap();
+                let idx = weighted.sample(&mut thread_rng());
+                let pauli = &(&paulis)[idx].1;
+                // TODO: Consider moving the following to a method
+                //       on Tableau itself.
+                for (idx_qubit, p) in pauli.iter().enumerate() {
+                    match p {
+                        Pauli::I => (),
+                        Pauli::X => new_tableau.apply_x_mut(idx_qubit),
+                        Pauli::Y => new_tableau.apply_y_mut(idx_qubit),
+                        Pauli::Z => new_tableau.apply_z_mut(idx_qubit),
+                    }
+                }
+                Stabilizer(new_tableau)
+            }
+        },
+    })
 }

@@ -36,7 +36,8 @@ lazy_static! {
 
 /// Exposes a result to C callers by setting LAST_ERROR in the Error
 /// case, and generating an appropriate error code.
-fn as_capi_err(result: Result<(), String>) -> i64 {
+fn as_capi_err<F: FnOnce() -> Result<(), String>>(result_fn: F) -> i64 {
+    let result = result_fn();
     match result {
         Ok(_) => 0,
         Err(msg) => {
@@ -97,25 +98,64 @@ pub extern "C" fn lasterr() -> *const c_char {
 /// Allocate a new simulator with a given capacity, measured in the number of
 /// qubits supported by that simulator. Returns an id that can be used to refer
 /// to the new simulator in future function calls.
+///
+/// The initial state of the new simulator is populated using the
+/// representation nominated by the `representation` argument:
+///
+/// - **`pure`**: Creates the simulator with an initial state represented by
+///   a state vector.
+/// - **`mixed`**: Creates the simulator with an initial state represented by
+///   a density operat.
+/// - **`stabilizer`**: Creates the simulator with an initial state represented by
+///   a stabilizer tableau.
+///
+/// # Safety
+/// The caller is responsible for ensuring that `sim_id_out` points to valid
+/// memory, and that the lifetime of this pointer extends at least for the
+/// duration of this call.
 #[no_mangle]
-pub extern "C" fn init(initial_capacity: usize) -> usize {
-    let state = &mut *STATE.lock().unwrap();
-    let id = 1 + state.keys().fold(std::usize::MIN, |a, b| a.max(*b));
-    state.insert(
-        id,
-        CApiState {
-            register_state: State::new_mixed(initial_capacity),
-            noise_model: NoiseModel::ideal(),
-        },
-    );
-    id
+pub unsafe extern "C" fn init(
+    initial_capacity: usize,
+    representation: *const c_char,
+    sim_id_out: *mut usize,
+) -> i64 {
+    as_capi_err(|| {
+        if representation.is_null() {
+            return Err("init called with null pointer for representation".to_string());
+        }
+        let representation = CStr::from_ptr(representation)
+            .to_str()
+            .map_err(|e| format!("UTF-8 error decoding representation argument: {}", e))?;
+
+        let state = &mut *STATE.lock().unwrap();
+        let id = 1 + state.keys().fold(std::usize::MIN, |a, b| a.max(*b));
+        state.insert(
+            id,
+            CApiState {
+                register_state: match representation {
+                    "mixed" => State::new_mixed(initial_capacity),
+                    "pure" => State::new_pure(initial_capacity),
+                    "stabilizer" => State::new_stabilizer(initial_capacity),
+                    _ => {
+                        return Err(format!(
+                            "Unknown initial state representation {}.",
+                            representation
+                        ))
+                    }
+                },
+                noise_model: NoiseModel::ideal(),
+            },
+        );
+        *sim_id_out = id;
+        Ok(())
+    })
 }
 
 /// Deallocates the simulator with the given id, releasing any resources owned
 /// by that simulator.
 #[no_mangle]
 pub extern "C" fn destroy(sim_id: usize) -> i64 {
-    as_capi_err({
+    as_capi_err(|| {
         let state = &mut *STATE.lock().unwrap();
         if state.contains_key(&sim_id) {
             state.remove(&sim_id);
@@ -132,65 +172,63 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.x))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.x))
 }
 
 /// Applies the `Y` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.y))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.y))
 }
 
 /// Applies the `Z` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.z))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.z))
 }
 
 /// Applies the `H` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.h))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.h))
 }
 
 /// Applies the `S` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn s(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.s))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.s))
 }
 
 /// Applies the `Adjoint S` operation acting on a given qubit to a given
 /// simulator, using the currently set noise model.
 #[no_mangle]
 pub fn s_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.s_adj))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.s_adj))
 }
 
 /// Applies the `T` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn t(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.t))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.t))
 }
 
 /// Applies the `Adjoint T` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx], |model| &model.t_adj))
+    as_capi_err(|| apply(sim_id, &[idx], |model| &model.t_adj))
 }
 
 /// Applies the `CNOT` operation acting on two given qubits to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
-    as_capi_err(apply(sim_id, &[idx_control, idx_target], |model| {
-        &model.cnot
-    }))
+    as_capi_err(|| apply(sim_id, &[idx_control, idx_target], |model| &model.cnot))
 }
 
 /// Measures a single qubit in the $Z$-basis, returning the result by setting
@@ -202,7 +240,7 @@ pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
 /// by `result_out` can be safely set.
 #[no_mangle]
 pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
-    as_capi_err({
+    as_capi_err(|| {
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {
             let instrument = &sim_state.noise_model.z_meas;
@@ -258,39 +296,40 @@ pub extern "C" fn ideal_noise_model() -> *const c_char {
 ///   least the duration of the call.
 #[no_mangle]
 pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
-    if new_model.is_null() {
-        return as_capi_err(Err("set_noise_model called with null pointer".to_string()));
-    }
+    as_capi_err(|| {
+        if new_model.is_null() {
+            return Err("set_noise_model called with null pointer".to_string());
+        }
 
-    let c_str = CStr::from_ptr(new_model);
-
-    as_capi_err(match c_str.to_str() {
-        Ok(serialized_noise_model) => match serde_json::from_str(serialized_noise_model) {
-            Ok(noise_model) => {
-                let state = &mut *STATE.lock().unwrap();
-                if let Some(sim_state) = state.get_mut(&sim_id) {
-                    sim_state.noise_model = noise_model;
-                    Ok(())
-                } else {
-                    Err(format!("No simulator with id {} exists.", sim_id))
+        let c_str = CStr::from_ptr(new_model);
+        match c_str.to_str() {
+            Ok(serialized_noise_model) => match serde_json::from_str(serialized_noise_model) {
+                Ok(noise_model) => {
+                    let state = &mut *STATE.lock().unwrap();
+                    if let Some(sim_state) = state.get_mut(&sim_id) {
+                        sim_state.noise_model = noise_model;
+                        Ok(())
+                    } else {
+                        Err(format!("No simulator with id {} exists.", sim_id))
+                    }
                 }
-            }
-            Err(serialization_error) => Err(format!(
-                "{} error deserializing noise model at line {}, column {}.",
-                match serialization_error.classify() {
-                    serde_json::error::Category::Data => "Data / schema",
-                    serde_json::error::Category::Eof => "End-of-file",
-                    serde_json::error::Category::Io => "I/O",
-                    serde_json::error::Category::Syntax => "Syntax",
-                },
-                serialization_error.line(),
-                serialization_error.column()
+                Err(serialization_error) => Err(format!(
+                    "{} error deserializing noise model at line {}, column {}.",
+                    match serialization_error.classify() {
+                        serde_json::error::Category::Data => "Data / schema",
+                        serde_json::error::Category::Eof => "End-of-file",
+                        serde_json::error::Category::Io => "I/O",
+                        serde_json::error::Category::Syntax => "Syntax",
+                    },
+                    serialization_error.line(),
+                    serialization_error.column()
+                )),
+            },
+            Err(msg) => Err(format!(
+                "UTF-8 error decoding serialized noise model; was valid until byte {}.",
+                msg.valid_up_to()
             )),
-        },
-        Err(msg) => Err(format!(
-            "UTF-8 error decoding serialized noise model; was valid until byte {}.",
-            msg.valid_up_to()
-        )),
+        }
     })
 }
 

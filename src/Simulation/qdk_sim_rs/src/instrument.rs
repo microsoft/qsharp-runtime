@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use crate::Process;
 use crate::{states::StateData::Mixed, StateData};
+use crate::{Process, ProcessData, C64};
+use num_traits::{One, Zero};
 use rand::Rng;
 use std::iter::Iterator;
 
@@ -46,8 +47,30 @@ impl Instrument {
                 }
                 let idx_target = idx_qubits[0];
                 match state.data {
-                    StateData::Pure(ref _psi) => todo!(),
-                    StateData::Mixed(ref _rho) => todo!(),
+                    StateData::Pure(_) | StateData::Mixed(_) => {
+                        // Get the ideal Z measurement instrument, apply it,
+                        // and then assign a readout error.
+                        // TODO[perf]: Cache this instrument as a lazy static.
+                        let ideal_z_meas = Instrument::Effects(vec![
+                            Process {
+                                n_qubits: 1,
+                                data: ProcessData::KrausDecomposition(array![[
+                                    [C64::one(), C64::zero()],
+                                    [C64::zero(), C64::zero()]
+                                ]]),
+                            },
+                            Process {
+                                n_qubits: 1,
+                                data: ProcessData::KrausDecomposition(array![[
+                                    [C64::zero(), C64::zero()],
+                                    [C64::zero(), C64::one()]
+                                ]]),
+                            },
+                        ]);
+                        let (result, new_state) = ideal_z_meas.sample(idx_qubits, state);
+                        let result = (result == 1) ^ rand::thread_rng().gen_bool(*pr_readout_error);
+                        (if result { 1 } else { 0 }, new_state)
+                    }
                     StateData::Stabilizer(ref tableau) => {
                         // TODO[perf]: allow instruments to sample in-place,
                         //             reducing copying.

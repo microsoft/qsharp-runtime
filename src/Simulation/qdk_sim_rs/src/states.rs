@@ -84,6 +84,17 @@ impl State {
         }
     }
 
+    /// Returns a new pure state on a given number of qubits.
+    /// By convention, new pure states start off in the "all-zeros" state,
+    /// $\ket{\psi} = \ket{00\cdots 0}$.
+    pub fn new_pure(n_qubits: usize) -> State {
+        let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
+        State {
+            n_qubits,
+            data: Pure(common_matrices::elementary_vec(0, new_dim)),
+        }
+    }
+
     /// Extends this state to be a state on `n_qubits` additional qubits.
     /// New qubits are added "to the right," e.g.: $\left|\psi\right\rangle$
     /// is extended to $\left|\psi 0\right\rangle$.

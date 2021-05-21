@@ -57,12 +57,13 @@ namespace Microsoft.Quantum.Experimental
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="init")]
-        private static extern ulong _Init(uint initialCapacity);
+        private static extern Int64 _Init(uint initialCapacity, string representation, out uint simulatorId);
 
-        public static ulong Init(uint initialCapacity)
+        public static ulong Init(uint initialCapacity, string representation = "mixed")
         {
             LogCall("init");
-            return _Init(initialCapacity);
+            CheckCall(_Init(initialCapacity, representation, out var simulatorId));
+            return simulatorId;
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="destroy")]
