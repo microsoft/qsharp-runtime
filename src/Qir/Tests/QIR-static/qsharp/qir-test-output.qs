@@ -10,5 +10,10 @@ namespace Microsoft.Quantum.Testing.QIR.Out {
         Message(msg);
     }
 
+    @EntryPoint()
+    function EmptyMessageTest() : Unit {
+        Message("");
+    }
+
 } // namespace Microsoft.Quantum.Testing.QIR.Out
 

@@ -7,6 +7,7 @@
 #include "OutputStream.hpp"
 
 extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__Interop(const char[]); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__Out__EmptyMessageTest__Interop(); // NOLINT
 
 TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
 {
@@ -22,8 +23,9 @@ TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
         // Log something (to the redirected output):
         Microsoft__Quantum__Testing__QIR__Out__MessageTest__Interop(testStr1.c_str());
         Microsoft__Quantum__Testing__QIR__Out__MessageTest__Interop(testStr2.c_str());
+        Microsoft__Quantum__Testing__QIR__Out__EmptyMessageTest__Interop();
 
     } // Recover the output stream.
 
-    REQUIRE(outStrStream.str() == (testStr1 + "\n" + testStr2 + "\n"));
+    REQUIRE(outStrStream.str() == (testStr1 + "\n" + testStr2 + "\n\n"));
 }
