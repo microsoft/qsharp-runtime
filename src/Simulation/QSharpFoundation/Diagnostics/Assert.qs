@@ -24,6 +24,18 @@ namespace Microsoft.Quantum.Diagnostics {
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
     /// - Microsoft.Quantum.Intrinsic.Measure
+    ///
+    /// # Example
+    /// The following snippet will execute without errors on the full-state
+    /// simulator:
+    /// ```qsharp
+    /// use q = Qubit();
+    /// within {
+    ///     H(q);
+    /// } apply {
+    ///     AssertMeasurement([PauliX], [q], Zero, "Expected |+⟩ state.");
+    /// }
+    /// ```
     operation AssertMeasurement(bases : Pauli[], qubits : Qubit[], result : Result, msg : String) : Unit
     is Adj + Ctl {
         body (...) {
