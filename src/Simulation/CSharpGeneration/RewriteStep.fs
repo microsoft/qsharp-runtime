@@ -79,7 +79,7 @@ type Emitter() =
                 this.WriteFile source dir ".g.cs" content false
             for source in allSources |> Seq.filter (not << context.GenerateCodeForSource) do
                 let content = SimulationCode.loadedViaTestNames source context
-                this.WriteFile source dir ".dll.g.cs" content false
+                if content <> null then this.WriteFile source dir ".dll.g.cs" content false
 
             if not compilation.EntryPoints.IsEmpty then
 

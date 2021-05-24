@@ -88,24 +88,6 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ], [qubit], One, 1.0, "3: Newly allocated qubit after X() must be in the |1> state.", 1e-10);
     }
 
-    // Fail: Expecting |1>, should have expected |0>
-    @EntryPoint()
-    operation AssertMeasAlloc1ExcTest() : Unit {
-        use qubit = Qubit();    // |0>
-
-        // Must fail:
-        AssertMeasurement([PauliZ], [qubit], One, "Newly allocated qubit must be in the |0> state.");
-    }
-
-    // Fail: Expecting |1>, should have expected |0>
-    @EntryPoint()
-    operation AssertMeasProbAlloc1ExcTest() : Unit {
-        use qubit = Qubit();    // |0>
-
-        // Must fail:
-        AssertMeasurementProbability([PauliZ], [qubit], One, 1.0, "Newly allocated qubit must be in the |0> state.", 1e-10);
-    }
-
     @EntryPoint()
     operation AssertMeasProbAlloc1HalfProbTest() : Unit {
         use qubit = Qubit();    // |0>
@@ -358,6 +340,22 @@ namespace Microsoft.Quantum.Testing.QIR  {
         for nQubits in 3 .. 6 {
             AssertGHZMeasurementsAreCorrect(nQubits);
         }
+    }
+
+    @EntryPoint()
+    operation AssertMeasMessageTest(msg : String) : Unit {
+        use qubit = Qubit();    // |0>
+
+        // Must fail:
+        AssertMeasurement([PauliZ], [qubit], One, msg);
+    }
+
+    @EntryPoint()
+    operation AssertMeasProbMessageTest(msg : String) : Unit {
+        use qubit = Qubit();    // |0>
+
+        // Must fail:
+        AssertMeasurementProbability([PauliZ], [qubit], One, 1.0, msg, 1e-10);
     }
 
 } // namespace Microsoft.Quantum.Testing.QIR
