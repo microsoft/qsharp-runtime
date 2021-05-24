@@ -121,15 +121,6 @@ declare void @quantum__rt__message(%"struct.QirString"* %str)
 ;------------------------------------------------------------------------------
 ; classical bridge
 ;
-define dllexport i8* @__quantum__rt__heap_alloc(i64 %size) {
-  %mem = call i8* @quantum__rt__heap_alloc(i64 %size)
-  ret i8* %mem
-}
-
-define dllexport void @__quantum__rt__heap_free(i8* %mem) {
-  call void @quantum__rt__heap_free(i8* %mem)
-  ret void
-}
 
 ; Returns a pointer to the malloc-allocated block.
 define dllexport i8* @__quantum__rt__memory_allocate(i64 %size) {
