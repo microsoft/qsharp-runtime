@@ -336,8 +336,11 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
 /src/Simulation/Simulators.Tests/TestProjects/QSharpExe/built
+/src/Simulation/Simulators.Tests/TestProjects/QirExe/qir
 /src/Simulation/Simulators.Tests/TestProjects/TargetedExe/built
+
 dbw_test
 
 # Controller test artifacts
