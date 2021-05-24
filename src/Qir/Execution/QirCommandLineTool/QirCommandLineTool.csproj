@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
     <ProjectReference Include="..\..\..\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <PackageReference Include="Microsoft.Quantum.Qir.Runtime" Version="0.16.210527056-alpha" />
     <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Tools.csproj" />
   </ItemGroup>
 
