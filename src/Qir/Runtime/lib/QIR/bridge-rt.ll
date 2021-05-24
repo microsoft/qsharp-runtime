@@ -37,8 +37,6 @@
 ;------------------------------------------------------------------------------
 ; classical
 ;
-declare i8* @quantum__rt__heap_alloc(i64)
-declare void @quantum__rt__heap_free(i8*)
 declare i8* @quantum__rt__memory_allocate(i64)
 declare void @quantum__rt__fail(%"struct.QirString"*)
 
