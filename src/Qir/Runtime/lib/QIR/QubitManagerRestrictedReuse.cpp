@@ -5,6 +5,8 @@
 // This code compiles, passes some unit tests, but isn't yet used in the runtime.
 
 #include "QubitManagerRestrictedReuse.hpp"
+#include <cstring>
+
 
 namespace Microsoft
 {
