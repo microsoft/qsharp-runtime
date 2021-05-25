@@ -150,10 +150,10 @@ namespace Microsoft.Azure.Quantum.Test
             options.Diagnostics.ApplicationId = "ClientTests";
 
             return new Workspace(
-                subscriptionId: TestConstants.LiveSubscriptionId,
-                resourceGroupName: TestConstants.LiveResourceGroupName,
-                workspaceName: TestConstants.LiveWorkspaceName,
-                location: TestConstants.LiveLocation,
+                subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID") ?? TestConstants.LiveSubscriptionId,
+                resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG") ?? TestConstants.LiveResourceGroupName,
+                workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME") ?? TestConstants.LiveWorkspaceName,
+                location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION") ?? TestConstants.LiveLocation,
                 options: options);
         }
 
