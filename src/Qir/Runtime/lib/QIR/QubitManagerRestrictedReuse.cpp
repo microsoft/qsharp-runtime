@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This code compiles, but was never executed, be careful!
+// This code compiles, passes some unit tests, but isn't yet used in the runtime.
 
 #include "QubitManagerRestrictedReuse.hpp"
 
@@ -16,27 +16,25 @@ namespace Quantum
 // QubitListInSharedArray
 //
 
-QubitListInSharedArray::QubitListInSharedArray(int minElement, int maxElement, int* sharedQubitStatusArray)
+QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray)
 {
-    // We are not storing pointer to shared array because it can be reallocated.
-    // Indexes and special values remain the same on such reallocations.
-    FailIf(minElement > maxElement || minElement < 0 || maxElement == INT_MAX,
+    FailIf(startId > endId || startId < 0 || endId == std::numeric_limits<QubitIdType>::max(),
         "Incorrect boundaries in the linked list initialization.");
 
-    for (int i = minElement; i < maxElement; i++) {
-        sharedQubitStatusArray[i] = i + 1;
+    for (QubitIdType i = startId; i < endId; i++) {
+        sharedQubitStatusArray[i] = i + 1; // Current element points to the next element.
     }
-    sharedQubitStatusArray[maxElement] = NoneMarker;
-    firstElement = minElement;
-    lastElement = maxElement;
+    sharedQubitStatusArray[endId] = NoneMarker; // Last element ends the chain.
+    firstElement = startId;
+    lastElement = endId;
 }
 
-bool QubitListInSharedArray::IsEmpty()
+bool QubitListInSharedArray::IsEmpty() const
 {
     return firstElement == NoneMarker;
 }
 
-void QubitListInSharedArray::AddQubit(int id, bool addToFront, int* sharedQubitStatusArray)
+void QubitListInSharedArray::AddQubit(QubitIdType id, bool addToFront, QubitIdType* sharedQubitStatusArray)
 {
     FailIf(id == NoneMarker, "Incorrect qubit id, cannot add it to the list.");
 
@@ -45,24 +43,25 @@ void QubitListInSharedArray::AddQubit(int id, bool addToFront, int* sharedQubitS
     {
         firstElement = id;
         lastElement = id;
-        sharedQubitStatusArray[id] = NoneMarker;
+        sharedQubitStatusArray[id] = NoneMarker; // List with a single elemenet in the chain.
         return;
     }
 
     if (addToFront)
     {
-        sharedQubitStatusArray[id] = firstElement;
-        firstElement = id;
+        sharedQubitStatusArray[id] = firstElement; // The new element will point to the former first element.
+        firstElement = id; // The new element is now the first in the chain.
     } else
     {
-        sharedQubitStatusArray[lastElement] = id;
-        sharedQubitStatusArray[id] = NoneMarker;
+        sharedQubitStatusArray[lastElement] = id; // The last element will point to the new element.
+        sharedQubitStatusArray[id] = NoneMarker; // The new element will end the chain.
+        lastElement = id; // The new element will be the last element in the chain.
     }
 }
 
 // TODO: Set status to the taken qubit here. Then counting is reasonable here, but not possible?
 // TODO: Rename 'RemoveQubitFromFront'?
-int QubitListInSharedArray::TakeQubitFromFront(int* sharedQubitStatusArray)
+int QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
 {
     // First element will be returned. It is 'NoneMarker' if the list is empty.
     int result = firstElement;
@@ -70,7 +69,7 @@ int QubitListInSharedArray::TakeQubitFromFront(int* sharedQubitStatusArray)
     // Advance list start to the next element if list is not empty.
     if (!IsEmpty())
     {
-        firstElement = sharedQubitStatusArray[firstElement];
+        firstElement = sharedQubitStatusArray[firstElement]; // The second element will be the first.
     }
 
     // Drop pointer to the last element if list becomes empty.
@@ -82,7 +81,7 @@ int QubitListInSharedArray::TakeQubitFromFront(int* sharedQubitStatusArray)
     return result;
 }
 
-void QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, int* sharedQubitStatusArray)
+void QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray)
 {
     // No need to do anthing if source is empty.
     if (source.IsEmpty())
@@ -97,9 +96,9 @@ void QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, i
     } else
     {
         // Attach source at the beginning of the list if both lists aren't empty.
-        sharedQubitStatusArray[source.lastElement] = firstElement;
+        sharedQubitStatusArray[source.lastElement] = firstElement; // The last element of the source chain will point to the first element of this chain.
     }
-    firstElement = source.firstElement;
+    firstElement = source.firstElement; // The first element from the source chain will be the first element of this chain.
 
     // Remove all elements from source.
     source.firstElement = NoneMarker;
@@ -117,15 +116,16 @@ RestrictedReuseArea::RestrictedReuseArea(QubitListInSharedArray freeQubits)
     FreeQubitsReuseAllowed = freeQubits; // Default shallow copying.
 }
 
-void CRestrictedReuseAreaStack::PushToBack(RestrictedReuseArea area)
-{
-    this->insert(this->end(), area);
-}
-
 
 //
 // CRestrictedReuseAreaStack
 //
+
+void CRestrictedReuseAreaStack::PushToBack(RestrictedReuseArea area)
+{
+    FailIf(Count() >= std::numeric_limits<int>::max(), "Too many nested restricted reuse areas.");
+    this->insert(this->end(), area);
+}
 
 RestrictedReuseArea CRestrictedReuseAreaStack::PopFromBack()
 {
@@ -135,100 +135,45 @@ RestrictedReuseArea CRestrictedReuseAreaStack::PopFromBack()
     return result;
 }
 
-RestrictedReuseArea& CRestrictedReuseAreaStack::PeekBack() {
+RestrictedReuseArea& CRestrictedReuseAreaStack::PeekBack()
+{
     return this->back();
 }
 
-int CRestrictedReuseAreaStack::Count() {
+int CRestrictedReuseAreaStack::Count() const
+{
     return this->size();
 }
 
 //
-// CQubitManagerRestrictedReuse
+// CQubitManager
 //
 
-// Although it is not necessary to pass area IDs to these functions, such support may be added for extra checks.
-void CQubitManagerRestrictedReuse::StartRestrictedReuseArea()
-{
-    RestrictedReuseArea newArea;
-    freeQubitsInAreas.PushToBack(newArea);
-}
-
-void CQubitManagerRestrictedReuse::NextRestrictedReuseSegment()
-{
-    FailIf(freeQubitsInAreas.Count() <= 0, "Internal error! No reuse areas.");
-    FailIf(freeQubitsInAreas.Count() == 1, "NextRestrictedReuseSegment() without an active area.");
-    RestrictedReuseArea& currentArea = freeQubitsInAreas.PeekBack();
-    // When new segment starts, reuse of all free qubits in the current area becomes prohibited.
-    currentArea.FreeQubitsReuseProhibited.MoveAllQubitsFrom(currentArea.FreeQubitsReuseAllowed, sharedQubitStatusArray);
-}
-
-void CQubitManagerRestrictedReuse::EndRestrictedReuseArea()
-{
-    FailIf(freeQubitsInAreas.Count() < 2, "EndRestrictedReuseArea() without an active area.");
-    RestrictedReuseArea areaAboutToEnd = freeQubitsInAreas.PopFromBack();
-    RestrictedReuseArea& containingArea = freeQubitsInAreas.PeekBack();
-    // When area ends, reuse of all free qubits from this area becomes allowed.
-    containingArea.FreeQubitsReuseAllowed.MoveAllQubitsFrom(areaAboutToEnd.FreeQubitsReuseProhibited, sharedQubitStatusArray);
-    containingArea.FreeQubitsReuseAllowed.MoveAllQubitsFrom(areaAboutToEnd.FreeQubitsReuseAllowed, sharedQubitStatusArray);
-}
-
-long CQubitManagerRestrictedReuse::AllocateQubit()
-{
-    if (EncourageReuse) {
-        // When reuse is encouraged, we start with the innermost area
-        for (int i = freeQubitsInAreas.Count() - 1; i >= 0; i--) {
-            long id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
-            if (id != NoneMarker) {
-                return id;
-            }
-        }
-    } else {
-        // When reuse is discouraged, we start with the outermost area
-        for (int i = 0; i < freeQubitsInAreas.Count(); i++) {
-            long id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
-            if (id != NoneMarker) {
-                return id;
-            }
-        }
-    }
-    return NoneMarker;
-}
-
-void CQubitManagerRestrictedReuse::ReleaseQubit(long id)
-{
-    // Released qubits are added to reuse area/segment in which they were released
-    // (rather than area/segment where they are allocated).
-    // Although counterintuitive, this makes code simple.
-    // This is reasonable because we think qubits should be allocated and released in the same segment.
-    freeQubitsInAreas.PeekBack().FreeQubitsReuseAllowed.AddQubit(id, EncourageReuse, sharedQubitStatusArray);
-}
-
-CQubitManagerRestrictedReuse::CQubitManagerRestrictedReuse(
-    int initialQubitCapacity,
+CQubitManager::CQubitManager(
+    QubitIdType initialQubitCapacity,
     bool mayExtendCapacity,
     bool encourageReuse)
 {
+    this->mayExtendCapacity = mayExtendCapacity;
+    this->encourageReuse = encourageReuse;
+
     qubitCapacity = initialQubitCapacity;
     if (qubitCapacity <= 0) {
         qubitCapacity = FallbackQubitCapacity;
     }
     sharedQubitStatusArray = new int[qubitCapacity];
 
-    MayExtendCapacity = mayExtendCapacity;
-    EncourageReuse = encourageReuse;
-
     // These objects are passed by value (copies are created)
     QubitListInSharedArray FreeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
     RestrictedReuseArea outermostArea(FreeQubitsFresh);
     freeQubitsInAreas.PushToBack(outermostArea);
 
-    AllocatedQubitsCount = 0;
-    DisabledQubitsCount = 0;
-    FreeQubitsCount = qubitCapacity;
+    allocatedQubitCount = 0;
+    disabledQubitCount = 0;
+    freeQubitCount = qubitCapacity;
 }
 
-CQubitManagerRestrictedReuse::~CQubitManagerRestrictedReuse()
+CQubitManager::~CQubitManager()
 {
     if (sharedQubitStatusArray != nullptr)
     {
@@ -238,207 +183,149 @@ CQubitManagerRestrictedReuse::~CQubitManagerRestrictedReuse()
     // freeQubitsInAreas - direct member of the class, no need to delete.
 }
 
-void CQubitManagerRestrictedReuse::EnsureCapacity(int requestedCapacity)
+// Although it is not necessary to pass area IDs to these functions, such support may be added for extra checks.
+void CQubitManager::StartRestrictedReuseArea()
 {
-    // No need to adjust existing values (NonMarker or indexes in the array).
-    // TODO: Borrowing/returning are not yet supported.
-    if (requestedCapacity <= qubitCapacity)
+    RestrictedReuseArea newArea;
+    freeQubitsInAreas.PushToBack(newArea);
+}
+
+void CQubitManager::NextRestrictedReuseSegment()
+{
+    FailIf(freeQubitsInAreas.Count() <= 0, "Internal error! No reuse areas.");
+    FailIf(freeQubitsInAreas.Count() == 1, "NextRestrictedReuseSegment() without an active area.");
+    RestrictedReuseArea& currentArea = freeQubitsInAreas.PeekBack();
+    // When new segment starts, reuse of all free qubits in the current area becomes prohibited.
+    currentArea.FreeQubitsReuseProhibited.MoveAllQubitsFrom(currentArea.FreeQubitsReuseAllowed, sharedQubitStatusArray);
+}
+
+void CQubitManager::EndRestrictedReuseArea()
+{
+    FailIf(freeQubitsInAreas.Count() < 2, "EndRestrictedReuseArea() without an active area.");
+    RestrictedReuseArea areaAboutToEnd = freeQubitsInAreas.PopFromBack();
+    RestrictedReuseArea& containingArea = freeQubitsInAreas.PeekBack();
+    // When area ends, reuse of all free qubits from this area becomes allowed.
+    containingArea.FreeQubitsReuseAllowed.MoveAllQubitsFrom(areaAboutToEnd.FreeQubitsReuseProhibited, sharedQubitStatusArray);
+    containingArea.FreeQubitsReuseAllowed.MoveAllQubitsFrom(areaAboutToEnd.FreeQubitsReuseAllowed, sharedQubitStatusArray);
+}
+
+Qubit CQubitManager::Allocate()
+{
+    int newQubitId = AllocateQubitId();
+    if (newQubitId == NoneMarker && mayExtendCapacity)
     {
-        return;
-    }
-
-    // Prepare new shared status array
-    int* newStatusArray = new int[requestedCapacity];
-    memcpy(newStatusArray, sharedQubitStatusArray, qubitCapacity * sizeof(newStatusArray[0]));
-    QubitListInSharedArray newFreeQubits(qubitCapacity, requestedCapacity - 1, newStatusArray);
-
-    // Set new data. All new qubits are added to the free qubits in the outermost area.
-    FreeQubitsCount += requestedCapacity - qubitCapacity;
-    delete[] sharedQubitStatusArray;
-    sharedQubitStatusArray = newStatusArray;
-    qubitCapacity = requestedCapacity;
-    freeQubitsInAreas[0].FreeQubitsReuseAllowed.MoveAllQubitsFrom(newFreeQubits, sharedQubitStatusArray);
-}
-
-bool CQubitManagerRestrictedReuse::IsDisabled(int id)
-{
-    return sharedQubitStatusArray[id] == DisabledMarker;
-}
-
-bool CQubitManagerRestrictedReuse::IsDisabled(Qubit qubit)
-{
-    return IsValid(qubit) && IsDisabled(QubitToId(qubit));
-}
-
-void CQubitManagerRestrictedReuse::Disable(Qubit qubit)
-{
-    FailIf(!IsValid(qubit), "Invalid qubit.");
-    int id = QubitToId(qubit);
-    // We can only disable explicitly allocated qubits that were not borrowed.
-    FailIf(!IsExplicitlyAllocated(id), "Cannot disable qubit that is not explicitly allocated.");
-    sharedQubitStatusArray[id] = DisabledMarker;
-    DisabledQubitsCount++;
-
-    AllocatedQubitsCount--;
-    FailIf(AllocatedQubitsCount < 0, "Incorrect count of allocated qubits.");
-}
-
-void CQubitManagerRestrictedReuse::Disable(Qubit* qubitsToDisable, int qubitCount)
-{
-    FailIf(qubitCount < 0, "Qubit count cannot be negative");
-    if (qubitsToDisable == nullptr || qubitCount == 0)
-    {
-        return;
-    }
-
-    for (int i = 0; i < qubitCount; i++)
-    {
-        Disable(qubitsToDisable[i]);
-    }
-}
-
-bool CQubitManagerRestrictedReuse::IsExplicitlyAllocated(long id)
-{
-    return sharedQubitStatusArray[id] == AllocatedMarker;
-}
-
-void CQubitManagerRestrictedReuse::ChangeStatusToAllocated(long id)
-{
-    FailIf(id >= qubitCapacity, "Internal Error: Cannot change status of an invalid qubit.");
-    sharedQubitStatusArray[id] = AllocatedMarker;
-    AllocatedQubitsCount++;
-    FreeQubitsCount--;
-}
-
-Qubit CQubitManagerRestrictedReuse::Allocate()
-{
-    long newQubitId = AllocateQubit();
-    if (newQubitId == NoneMarker && MayExtendCapacity)
-    {
-        EnsureCapacity(qubitCapacity * 2);
-        newQubitId = AllocateQubit();
+        int newQubitCapacity = qubitCapacity * 2;
+        FailIf(newQubitCapacity <= qubitCapacity, "Cannot extend capacity.");
+        EnsureCapacity(newQubitCapacity);
+        newQubitId = AllocateQubitId();
     }
     FailIf(newQubitId == NoneMarker, "Not enough qubits.");
     ChangeStatusToAllocated(newQubitId);
     return CreateQubitObject(newQubitId);
 }
 
-Qubit* CQubitManagerRestrictedReuse::Allocate(long numToAllocate)
+void CQubitManager::Allocate(Qubit* qubitsToAllocate, int qubitCountToAllocate)
 {
-    FailIf(numToAllocate < 0, "Attempt to allocate negative number of qubits.");
-    if (numToAllocate == 0)
+    FailIf(qubitCountToAllocate < 0, "Attempt to allocate negative number of qubits.");
+    if (qubitCountToAllocate == 0)
     {
-        return new Qubit[0];
+        return;
     }
+    FailIf(qubitsToAllocate == nullptr, "No array provided for qubits to be allocated.");
 
     // Consider optimization for initial allocation of a large array at once
-    Qubit* result = new Qubit[numToAllocate];
-    for (int i = 0; i < numToAllocate; i++)
+    for (int i = 0; i < qubitCountToAllocate; i++)
     {
-        int newQubitId = AllocateQubit();
+        QubitIdType newQubitId = AllocateQubitId();
         if (newQubitId == NoneMarker)
         {
             for (int k = 0; k < i; k++)
             {
-                Release(result[k]);
+                Release(qubitsToAllocate[k]);
             }
-            delete[] result;
-            result = nullptr;
             FailNow("Not enough qubits.");
-            return nullptr;
+            return;
         }
         ChangeStatusToAllocated(newQubitId);
-        result[i] = CreateQubitObject(newQubitId);
+        qubitsToAllocate[i] = CreateQubitObject(newQubitId);
     }
-
-    return result;
 }
 
-bool CQubitManagerRestrictedReuse::IsFree(long id)
-{
-    return sharedQubitStatusArray[id] >= 0;
-}
-
-bool CQubitManagerRestrictedReuse::IsFree(Qubit qubit)
-{
-    return IsValid(qubit) && IsFree(QubitToId(qubit));
-}
-
-void CQubitManagerRestrictedReuse::Release(long id)
-{
-    if (IsDisabled(id))
-    {
-        // Nothing to do. Qubit will stay disabled.
-        return;
-    }
-
-    FailIf(!IsExplicitlyAllocated(id), "Attempt to free qubit that has not been allocated.");
-
-    if (MayExtendCapacity && !EncourageReuse)
-    {
-        // We can extend capcity and don't want reuse => Qubits will never be reused => Discard qubit.
-        // We put it in its own "free" list, this list will never be found again and qubit will not be reused.
-        sharedQubitStatusArray[id] = NoneMarker;
-    } else
-    {
-        ReleaseQubit(id);
-    }
-
-    FreeQubitsCount++;
-    AllocatedQubitsCount--;
-    FailIf(AllocatedQubitsCount < 0, "Incorrect allocated qubit count.");
-}
-
-void CQubitManagerRestrictedReuse::Release(Qubit qubit)
+void CQubitManager::Release(Qubit qubit)
 {
     FailIf(!IsValid(qubit), "Qubit is not valid.");
     Release(QubitToId(qubit));
-    // TODO: should we clean id of released qubit object?
 }
 
-void CQubitManagerRestrictedReuse::Release(Qubit* qubitsToRelease, int qubitCount) {
-    FailIf(qubitCount < 0, "Attempt to release negative number of qubits.");
-    if (qubitsToRelease == nullptr)
+void CQubitManager::Release(Qubit* qubitsToRelease, int qubitCountToRelease) {
+    FailIf(qubitCountToRelease < 0, "Attempt to release negative number of qubits.");
+    if (qubitCountToRelease == 0)
     {
         return;
     }
+    FailIf(qubitsToRelease == nullptr, "No array provided for qubits to be released.");
 
-    for (int i = 0; i < qubitCount; i++)
+    for (int i = 0; i < qubitCountToRelease; i++)
     {
         Release(qubitsToRelease[i]);
         qubitsToRelease[i] = nullptr;
     }
-
-    delete[] qubitsToRelease;
 }
 
-Qubit CQubitManagerRestrictedReuse::Borrow()
+Qubit CQubitManager::Borrow()
 {
     // We don't support true borrowing/returning at the moment.
     return Allocate();
 }
 
-Qubit* CQubitManagerRestrictedReuse::Borrow(long qubitCountToBorrow)
+void CQubitManager::Borrow(Qubit* qubitsToBorrow, int qubitCountToBorrow)
 {
     // We don't support true borrowing/returning at the moment.
-    return Allocate(qubitCountToBorrow);
+    return Allocate(qubitsToBorrow, qubitCountToBorrow);
 }
 
-void CQubitManagerRestrictedReuse::Return(Qubit qubit)
+void CQubitManager::Return(Qubit qubit)
 {
     // We don't support true borrowing/returning at the moment.
     Release(qubit);
 }
 
-void CQubitManagerRestrictedReuse::Return(Qubit* qubitsToReturn, int qubitCountToReturn)
+void CQubitManager::Return(Qubit* qubitsToReturn, int qubitCountToReturn)
 {
     // We don't support true borrowing/returning at the moment.
     Release(qubitsToReturn, qubitCountToReturn);
 }
 
-bool CQubitManagerRestrictedReuse::IsValid(Qubit qubit)
+void CQubitManager::Disable(Qubit qubit)
 {
-    int id = QubitToId(qubit);
+    FailIf(!IsValid(qubit), "Invalid qubit.");
+    QubitIdType id = QubitToId(qubit);
+    // We can only disable explicitly allocated qubits that were not borrowed.
+    FailIf(!IsExplicitlyAllocated(id), "Cannot disable qubit that is not explicitly allocated.");
+    sharedQubitStatusArray[id] = DisabledMarker;
+    disabledQubitCount++;
+
+    allocatedQubitCount--;
+    FailIf(allocatedQubitCount < 0, "Incorrect count of allocated qubits.");
+}
+
+void CQubitManager::Disable(Qubit* qubitsToDisable, int qubitCountToDisable)
+{
+    FailIf(qubitCountToDisable < 0, "Qubit count cannot be negative");
+    if (qubitsToDisable == nullptr || qubitCountToDisable == 0)
+    {
+        return;
+    }
+
+    for (int i = 0; i < qubitCountToDisable; i++)
+    {
+        Disable(qubitsToDisable[i]);
+    }
+}
+
+bool CQubitManager::IsValid(Qubit qubit) const
+{
+    QubitIdType id = QubitToId(qubit);
     if (id >= qubitCapacity)
     {
         return false;
@@ -450,18 +337,129 @@ bool CQubitManagerRestrictedReuse::IsValid(Qubit qubit)
     return true;
 }
 
-Qubit CQubitManagerRestrictedReuse::CreateQubitObject(int id)
+bool CQubitManager::IsDisabled(Qubit qubit) const
 {
-    FailIf(id < 0 || id > INTPTR_MAX, "Qubit id out of range.");
+    return IsValid(qubit) && IsDisabled(QubitToId(qubit));
+}
+
+bool CQubitManager::IsFree(Qubit qubit) const
+{
+    return IsValid(qubit) && IsFree(QubitToId(qubit));
+}
+
+Qubit CQubitManager::CreateQubitObject(QubitIdType id)
+{
+    FailIf(id < 0 || id > INTPTR_MAX, "Qubit id is out of range.");
     intptr_t pointerSizedId = static_cast<intptr_t>(id);
     return reinterpret_cast<Qubit>(pointerSizedId);
 }
 
-int CQubitManagerRestrictedReuse::QubitToId(Qubit qubit)
+QubitIdType CQubitManager::QubitToId(Qubit qubit) const
 {
     intptr_t pointerSizedId = reinterpret_cast<intptr_t>(qubit);
-    FailIf(pointerSizedId < 0 || pointerSizedId > INT_MAX, "Qubit id out of range.");
+    FailIf(pointerSizedId < 0 || pointerSizedId > std::numeric_limits<QubitIdType>::max(), "Qubit id is out of range.");
     return static_cast<int>(pointerSizedId);
+}
+
+void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
+{
+    // No need to adjust existing values (NonMarker or indexes in the array).
+    // TODO: Borrowing/returning are not yet supported.
+    if (requestedCapacity <= qubitCapacity)
+    {
+        return;
+    }
+
+    // Prepare new shared status array
+    QubitIdType* newStatusArray = new int[requestedCapacity];
+    memcpy(newStatusArray, sharedQubitStatusArray, qubitCapacity * sizeof(newStatusArray[0]));
+    QubitListInSharedArray newFreeQubits(qubitCapacity, requestedCapacity - 1, newStatusArray);
+
+    // Set new data. All new qubits are added to the free qubits in the outermost area.
+    freeQubitCount += requestedCapacity - qubitCapacity;
+    delete[] sharedQubitStatusArray;
+    sharedQubitStatusArray = newStatusArray;
+    qubitCapacity = requestedCapacity;
+    freeQubitsInAreas[0].FreeQubitsReuseAllowed.MoveAllQubitsFrom(newFreeQubits, sharedQubitStatusArray);
+}
+
+QubitIdType CQubitManager::AllocateQubitId()
+{
+    if (encourageReuse) {
+        // When reuse is encouraged, we start with the innermost area
+        for (int i = freeQubitsInAreas.Count() - 1; i >= 0; i--) {
+            QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            if (id != NoneMarker) {
+                return id;
+            }
+        }
+    } else {
+        // When reuse is discouraged, we start with the outermost area
+        for (int i = 0; i < freeQubitsInAreas.Count(); i++) {
+            QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            if (id != NoneMarker) {
+                return id;
+            }
+        }
+    }
+    return NoneMarker;
+}
+
+void CQubitManager::ReleaseQubitId(QubitIdType id)
+{
+    // Released qubits are added to reuse area/segment in which they were released
+    // (rather than area/segment where they are allocated).
+    // Although counterintuitive, this makes code simple.
+    // This is reasonable because we think qubits should be allocated and released in the same segment.
+    freeQubitsInAreas.PeekBack().FreeQubitsReuseAllowed.AddQubit(id, encourageReuse, sharedQubitStatusArray);
+}
+
+void CQubitManager::ChangeStatusToAllocated(QubitIdType id)
+{
+    FailIf(id >= qubitCapacity, "Internal Error: Cannot change status of an invalid qubit.");
+    sharedQubitStatusArray[id] = AllocatedMarker;
+    allocatedQubitCount++;
+    freeQubitCount--;
+}
+
+void CQubitManager::Release(QubitIdType id)
+{
+    if (IsDisabled(id))
+    {
+        // Nothing to do. Qubit will stay disabled.
+        return;
+    }
+
+    FailIf(!IsExplicitlyAllocated(id), "Attempt to free qubit that has not been allocated.");
+
+    if (mayExtendCapacity && !encourageReuse)
+    {
+        // We can extend capcity and don't want reuse => Qubits will never be reused => Discard qubit.
+        // We put it in its own "free" list, this list will never be found again and qubit will not be reused.
+        sharedQubitStatusArray[id] = NoneMarker;
+    } else
+    {
+        ReleaseQubitId(id);
+    }
+
+    freeQubitCount++;
+    allocatedQubitCount--;
+    FailIf(allocatedQubitCount < 0, "Incorrect allocated qubit count.");
+}
+
+bool CQubitManager::IsDisabled(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] == DisabledMarker;
+}
+
+bool CQubitManager::IsExplicitlyAllocated(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] == AllocatedMarker;
+}
+
+bool CQubitManager::IsFree(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] >= 0;
 }
 
 }
