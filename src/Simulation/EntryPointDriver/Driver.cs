@@ -459,7 +459,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Workspace = azureSettings.Workspace,
                 Target = DefaultIfShadowed(entryPoint, this.TargetOption, azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
-                AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
                 Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
                 JobName = DefaultIfShadowed(entryPoint, JobNameOption, azureSettings.JobName),

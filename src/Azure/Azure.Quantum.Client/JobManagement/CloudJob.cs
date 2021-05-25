@@ -6,7 +6,9 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.Quantum.Client.Models;
+
+    using global::Azure.Quantum.Jobs.Models;
+
     using Microsoft.Azure.Quantum.Utility;
     using Microsoft.Quantum.Runtime;
 
@@ -38,45 +40,46 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the job id.
         /// </summary>
-        public string Id => Details.Id;
+        public virtual string Id => Details.Id;
 
         /// <summary>
         /// Gets whether the job execution has completed.
         /// </summary>
-        public bool InProgress => Status != "Cancelled" &&
+        public virtual bool InProgress => Status != "Cancelled" &&
                                   Status != "Failed" &&
                                   Status != "Succeeded";
 
         /// <summary>
         /// Gets the status of the submitted job.
         /// </summary>
-        public string Status => Details.Status;
+        public virtual string Status => Details.Status?.ToString();
 
         /// <summary>
         /// Gets whether the job execution completed successfully.
         /// </summary>
-        public bool Succeeded => Status == "Succeeded";
+        public virtual bool Succeeded => Status == "Succeeded";
 
         /// <summary>
         /// Gets an URI to access the job.
         /// </summary>
-        public Uri Uri => GenerateUri();
+        public virtual Uri Uri => GenerateUri();
 
         /// <summary>
         /// Gets the workspace.
         /// </summary>
-        public IWorkspace Workspace { get; private set; }
+        public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
         /// Gets the job details.
         /// </summary>
-        public JobDetails Details { get; private set; }
+        public virtual JobDetails Details { get; private set; }
 
         /// <summary>
         /// Refreshes the job.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public async Task RefreshAsync(CancellationToken cancellationToken = default)
+        /// <returns></returns>
+        public virtual async Task RefreshAsync(CancellationToken cancellationToken = default)
         {
             CloudJob job = (CloudJob)await this.Workspace.GetJobAsync(this.Details.Id, cancellationToken);
             this.Details = job.Details;
@@ -86,10 +89,28 @@ namespace Microsoft.Azure.Quantum
         /// Cancels the job.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public async Task CancelAsync(CancellationToken cancellationToken = default)
+        /// <returns></returns>
+        public virtual async Task CancelAsync(CancellationToken cancellationToken = default)
         {
             CloudJob job = (CloudJob)await this.Workspace.CancelJobAsync(this.Details.Id, cancellationToken);
             this.Details = job.Details;
+        }
+
+        /// <summary>
+        /// Keeps polling the server until the Job status changes to be not in progress.
+        /// </summary>
+        /// <param name="pollIntervalMilliseconds">Time to wait between polls. Defaults to 500.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns></returns>
+        public async Task WaitForCompletion(int pollIntervalMilliseconds = 500, CancellationToken cancellationToken = default)
+        {
+            await this.RefreshAsync(cancellationToken);
+
+            while (this.InProgress)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(pollIntervalMilliseconds));
+                await this.RefreshAsync();
+            }
         }
 
         private Uri GenerateUri()

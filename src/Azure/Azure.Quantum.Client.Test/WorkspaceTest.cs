@@ -3,246 +3,239 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
-using System.Net.Http;
-using Microsoft.Azure.Quantum.Client;
-using Microsoft.Azure.Quantum.Client.Models;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Azure.Quantum;
+using Azure.Quantum.Jobs.Models;
+
 using Microsoft.Azure.Quantum.Exceptions;
+using Microsoft.Azure.Quantum.Storage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Quantum.Test
 {
     [TestClass]
     public class WorkspaceTest
     {
-        private MockHelper httpMock;
-
-        [TestInitialize]
-        public void Init()
-        {
-            this.httpMock = new MockHelper();
-        }
-
         [TestMethod]
-        public void SubmitJobTest()
+        [Ignore]
+        public async Task SubmitJobTest()
         {
-            string jobId = Guid.NewGuid().ToString();
-
-            // Craft response
-            SetJobResponseMessage(jobId);
-
             // Create Job
-            IWorkspace workspace = GetWorkspace();
+            IWorkspace workspace = GetLiveWorkspace();
 
-            JobDetails jobDetails = CreateJobDetails(jobId);
-            CloudJob job = new CloudJob(workspace, jobDetails);
-            CloudJob receivedJob;
+            CancellationTokenSource cts = new CancellationTokenSource();
+            cts.CancelAfter(30000);
 
-            // -ve cases
+            var job = await SubmitTestProblem(workspace);
+            AssertJob(job);
+
+            await job.WaitForCompletion(cancellationToken: cts.Token);
+
+            AssertJob(job);
+            Assert.IsTrue(job.Succeeded);
+        }
+
+        [TestMethod]
+        [Ignore]
+        public async Task GetJobTest()
+        {
+            IWorkspace workspace = GetLiveWorkspace();
+
+            // Since this is a live workspace, we don't have much control about what jobs are in there
+            // Get the jobs, and call Get on the first.
+            await foreach (var job in workspace.ListJobsAsync())
+            {
+                AssertJob(job);
+
+                var current = workspace.GetJob(job.Id);
+                AssertJob(current);
+                Assert.AreEqual(job.Id, current.Id);
+
+                break;
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public async Task CancelJobTest()
+        {
+            // Create Job
+            IWorkspace workspace = GetLiveWorkspace();
+
+            var job = await SubmitTestProblem(workspace);
+            AssertJob(job);
+
             try
             {
-                jobDetails.ContainerUri = null;
-                receivedJob = workspace.SubmitJob(job);
-                Assert.Fail();
+                var result = workspace.CancelJob(job.Id);
+                AssertJob(result);
             }
-            catch (WorkspaceClientException)
+            catch (WorkspaceClientException e)
             {
-                jobDetails.ContainerUri = "https://uri";
+                Assert.AreEqual((int)HttpStatusCode.Conflict, e.Status);
             }
-
-            try
-            {
-                jobDetails.ProviderId = null;
-                receivedJob = workspace.SubmitJob(job);
-                Assert.Fail();
-            }
-            catch (WorkspaceClientException)
-            {
-                jobDetails.ProviderId = TestConstants.ProviderId;
-            }
-
-            // Success
-            receivedJob = workspace.SubmitJob(job);
-
-            // Validate request
-            ValidateJobRequestMessage(jobId, HttpMethod.Put);
-
-            // Validate response
-            Assert.IsNotNull(receivedJob);
-
-            Assert.IsNotNull(receivedJob.Workspace);
-
-            Assert.AreEqual(
-                expected: jobId,
-                actual: receivedJob.Details.Id);
         }
 
         [TestMethod]
-        public void GetJobTest()
+        [Ignore]
+        public async Task ListJobsTest()
         {
-            string jobId = Guid.NewGuid().ToString();
+            IWorkspace workspace = GetLiveWorkspace();
+            int max = 3;
 
-            // Craft response
-            SetJobResponseMessage(jobId);
-
-            // Get Job
-            IWorkspace workspace = GetWorkspace();
-
-            CloudJob receivedJob = workspace.GetJob(jobId);
-
-            // Validate request
-            ValidateJobRequestMessage(jobId, HttpMethod.Get);
-
-            // Validate response
-            Assert.IsNotNull(receivedJob);
-
-            Assert.IsNotNull(receivedJob.Workspace);
-
-            Assert.AreEqual(
-                expected: jobId,
-                actual: receivedJob.Details.Id);
-        }
-
-        [TestMethod]
-        public void CancelJobTest()
-        {
-            string jobId = Guid.NewGuid().ToString();
-
-            // Craft response
-            SetJobResponseMessage(jobId);
-
-            // Cancel Job
-            IWorkspace workspace = GetWorkspace();
-
-            CloudJob receivedJob = workspace.CancelJob(jobId);
-
-            // Validate request
-            ValidateJobRequestMessage(jobId, HttpMethod.Delete, HttpMethod.Get);
-
-            // Validate response
-            Assert.IsNotNull(receivedJob);
-
-            Assert.IsNotNull(receivedJob.Workspace);
-
-            Assert.AreEqual(
-                expected: jobId,
-                actual: receivedJob.Details.Id);
-
-            // Convenience method
-            CloudJob job = new CloudJob(workspace, CreateJobDetails(jobId));
-            string newJobId = Guid.NewGuid().ToString();
-            SetJobResponseMessage(newJobId);
-
-            Assert.AreEqual(
-                jobId,
-                job.Details.Id);
-
-            job.CancelAsync().Wait();
-
-            Assert.AreEqual(
-                newJobId,
-                job.Details.Id);
-        }
-
-        [TestMethod]
-        public void ListJobsTest()
-        {
-            // Craft response
-            JobDetails jobDetails = new JobDetails
+            // Since this is a live workspace, we don't have much control about what jobs are in there
+            // Just make sure there is more than one.
+            await foreach (var job in workspace.ListJobsAsync())
             {
-                ProviderId = TestConstants.ProviderId,
-            };
+                Assert.IsNotNull(job);
+                Assert.IsNotNull(job.Details);
+                Assert.IsNotNull(job.Workspace);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(job.Id));
+                Assert.AreEqual(job.Details.Id, job.Id);
 
-            dynamic page = new
-            {
-                nextLink = (string)null,
-                value = new JobDetails[] { jobDetails },
-            };
-
-            this.httpMock.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(page)),
-            };
-
-            // Cancel Job
-            IWorkspace workspace = GetWorkspace();
-
-            List<CloudJob> receivedJobs = workspace.ListJobs().ToList();
-
-            // Validate request
-            ValidateJobRequestMessage(null, HttpMethod.Get);
-
-            // Validate response
-            Assert.IsNotNull(receivedJobs);
-
-            Assert.IsNotNull(receivedJobs.Single().Workspace);
-
-            Assert.AreEqual(
-                expected: jobDetails.ProviderId,
-                actual: receivedJobs.Single().Details.ProviderId);
-        }
-
-        private IWorkspace GetWorkspace()
-        {
-            return new Workspace(
-                subscriptionId: TestConstants.SubscriptionId,
-                resourceGroupName: TestConstants.ResourceGroupName,
-                workspaceName: TestConstants.WorkspaceName)
-            {
-                // Mock jobs client (only needed for unit tests)
-                QuantumClient = new MockHelper.MockQuantumClient(httpMock)
+                max--;
+                if (max <= 0)
                 {
-                    SubscriptionId = TestConstants.SubscriptionId,
-                    ResourceGroupName = TestConstants.ResourceGroupName,
-                    WorkspaceName = TestConstants.WorkspaceName,
-                    BaseUri = new Uri(TestConstants.Endpoint),
-                },
-            };
+                    break;
+                }
+            }
+
+            // Make sure we iterated through all the expected jobs:
+            Assert.AreEqual(0, max);
         }
 
-        private void SetJobResponseMessage(string jobId)
+        [TestMethod]
+        [Ignore]
+        public async Task ListQuotasTest()
         {
-            this.httpMock.ResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            IWorkspace workspace = GetLiveWorkspace();
+            int max = 3;
+
+            // Since this is a live workspace, we don't have much control about what quotas are in there
+            // Just make sure there is more than one.
+            await foreach (var q in workspace.ListQuotasAsync())
             {
-                Content = new StringContent(JsonConvert.SerializeObject(CreateJobDetails(jobId))),
-            };
+                Assert.IsNotNull(q);
+                Assert.IsNotNull(q.Quota);
+                Assert.IsNotNull(q.Quota.Dimension);
+
+                max--;
+                if (max <= 0)
+                {
+                    break;
+                }
+            }
+
+            // Make sure we iterated through all the expected jobs:
+            Assert.AreEqual(0, max);
         }
 
-        private static JobDetails CreateJobDetails(string jobId)
+        private static void AssertJob(CloudJob job)
+        {
+            Assert.IsNotNull(job);
+            Assert.IsNotNull(job.Details);
+            Assert.IsNotNull(job.Workspace);
+            Assert.IsFalse(string.IsNullOrEmpty(job.Id));
+            Assert.AreEqual(job.Id, job.Details.Id);
+        }
+
+        private IWorkspace GetLiveWorkspace()
+        {
+            var options = new QuantumJobClientOptions();
+            options.Diagnostics.ApplicationId = "ClientTests";
+
+            return new Workspace(
+                subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID") ?? TestConstants.LiveSubscriptionId,
+                resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG") ?? TestConstants.LiveResourceGroupName,
+                workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME") ?? TestConstants.LiveWorkspaceName,
+                location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION") ?? TestConstants.LiveLocation,
+                options: options);
+        }
+
+        private static JobDetails CreateJobDetails(string jobId, string containerUri = null, string inputUri = null)
         {
             return new JobDetails(
-                id: jobId,
-                containerUri: "https://uri",
-                inputDataFormat: "format1",
-                providerId: TestConstants.ProviderId,
-                target: "target");
+                containerUri: containerUri,
+                inputDataFormat: "microsoft.qio.v2",
+                providerId: "Microsoft",
+                target: "microsoft.paralleltempering-parameterfree.cpu")
+            {
+                Id = jobId,
+                Name = "Azure.Quantum.Unittest",
+                OutputDataFormat = "microsoft.qio-results.v2",
+                InputParams = new Dictionary<string, object>()
+                {
+                    { "params", new Dictionary<string, object>() },
+                },
+                InputDataUri = inputUri,
+            };
         }
 
-        private void ValidateJobRequestMessage(
-            string jobId,
-            params HttpMethod[] methods)
+        private static Problem CreateTestProblem()
         {
-            var requestMessages = httpMock.RequestMessages;
-            Assert.AreEqual(requestMessages.Count, methods.Length);
+            // Create an Ising-type problem for shipping-containers
+            var containerWeights = new int[] { 1, 5, 9, 21, 35, 5, 3, 5, 10, 11 };
 
-            for (var i = 0; i < requestMessages.Count; i++)
+            var problem = new Problem(ProblemType.Ising);
+            for (int i = 0; i < containerWeights.Length; i++)
             {
-                var requestMessage = requestMessages[i];
-                var method = methods[i];
-
-                // Url
-                string expectedUri = $"{TestConstants.Endpoint}/v1.0/subscriptions/{TestConstants.SubscriptionId}/resourceGroups/{TestConstants.ResourceGroupName}/providers/Microsoft.Quantum/workspaces/{TestConstants.WorkspaceName}/jobs/{jobId}";
-                Assert.AreEqual(
-                    expected: expectedUri.TrimEnd('/'),
-                    actual: requestMessage.RequestUri.ToString());
-
-                // Method
-                Assert.AreEqual(
-                    expected: method,
-                    actual: requestMessage.Method);
+                for (int j = 0; j < containerWeights.Length; j++)
+                {
+                    if (i != j)
+                    {
+                        problem.Add(i, j, containerWeights[i] * containerWeights[j]);
+                    }
+                }
             }
+
+            return problem;
+        }
+
+        private async Task<(string, string)> UploadProblem(IWorkspace workspace, Problem problem, string jobId)
+        {
+            string intermediaryFile = Path.GetTempFileName();
+
+            // Save to the intermediary file
+            using (var intermediaryWriter = File.Create(intermediaryFile))
+            {
+                using (var compressionStream = new GZipStream(intermediaryWriter, CompressionLevel.Fastest))
+                {
+                    await problem.SerializeAsync(compressionStream);
+                }
+            }
+
+            using (var intermediaryReader = File.OpenRead(intermediaryFile))
+            {
+                var jobStorageHelper = new LinkedStorageJobHelper(workspace);
+                return await jobStorageHelper.UploadJobInputAsync(jobId, intermediaryReader);
+            }
+        }
+
+        private async Task<CloudJob> SubmitTestProblem(IWorkspace workspace)
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            cts.CancelAfter(30000);
+
+            var jobId = Guid.NewGuid().ToString();
+            var problem = CreateTestProblem();
+
+            // Upload problem:
+            var (containerUri, inputUri) = await UploadProblem(workspace, problem, jobId);
+
+            CloudJob src = new CloudJob(workspace, CreateJobDetails(jobId, containerUri, inputUri));
+            AssertJob(src);
+
+            var job = await workspace.SubmitJobAsync(src, cts.Token);
+            AssertJob(job);
+            Assert.AreEqual(jobId, job.Id);
+            Assert.IsFalse(job.Failed);
+
+            return job;
         }
     }
 }

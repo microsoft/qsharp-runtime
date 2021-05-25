@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Azure.Quantum.Client.Models;
 using System;
 
 namespace Microsoft.Azure.Quantum.Exceptions
@@ -12,6 +11,10 @@ namespace Microsoft.Azure.Quantum.Exceptions
     public class WorkspaceClientException : AzureQuantumException
     {
         private const string BaseMessage = "An exception related to the Azure workspace client occurred";
+
+        public string ErrorCode { get; }
+
+        public int Status { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkspaceClientException"/> class with a default error message.
@@ -50,7 +53,7 @@ namespace Microsoft.Azure.Quantum.Exceptions
         /// <param name="subscriptionId">ID of the subscription used by the Azure workspace client.</param>
         /// <param name="resourceGroupName">Name of the resource group used by the Azure workspace client.</param>
         /// <param name="workspaceName">Name of the workspace used by the Azure workspace client.</param>
-        /// <param name="baseUri">URI used by the Azure workspace client.</param>
+        /// <param name="location">Workspace's location (region).</param>
         /// <param name="jobId">ID of the job involved in the operation that caused the exception.</param>
         /// <param name="inner">Exception that is the cause of the current one.</param>
         public WorkspaceClientException(
@@ -58,7 +61,7 @@ namespace Microsoft.Azure.Quantum.Exceptions
             string subscriptionId,
             string resourceGroupName,
             string workspaceName,
-            Uri baseUri,
+            string location,
             string jobId,
             Exception inner)
             : base(
@@ -66,11 +69,17 @@ namespace Microsoft.Azure.Quantum.Exceptions
                   $"SubscriptionId: {subscriptionId}{Environment.NewLine}" +
                   $"ResourceGroupName: {resourceGroupName}{Environment.NewLine}" +
                   $"WorkspaceName: {workspaceName}{Environment.NewLine}" +
-                  $"BaseUri: {baseUri}{Environment.NewLine}" +
+                  $"Location: {location}{Environment.NewLine}" +
                   $"JobId: {jobId}{Environment.NewLine}" +
                   FormatInnerException(inner),
                   inner)
         {
+            // Handle specific types of exceptions for additional data
+            if (inner is global::Azure.RequestFailedException requestException)
+            {
+                this.ErrorCode = requestException.ErrorCode;
+                this.Status = requestException.Status;
+            }
         }
 
         /// <summary>
@@ -87,19 +96,6 @@ namespace Microsoft.Azure.Quantum.Exceptions
             if (ex != null)
             {
                 formattedException += $"Server Error: {ex.Message}{Environment.NewLine}";
-
-                // Handle specific types of exceptions for additional data
-                if (ex is RestErrorException restErrorException)
-                {
-                    formattedException += $"Error Code: {restErrorException?.Body?.Error?.Code}{Environment.NewLine}" +
-                        $"Server message: {restErrorException?.Body?.Error?.Message}{Environment.NewLine}";
-
-                    var headers = restErrorException?.Response?.Headers;
-                    if (headers != null && headers.ContainsKey("x-ms-request-id"))
-                    {
-                        formattedException += $"Server Request Id: {headers["x-ms-request-id"]}{Environment.NewLine}";
-                    }
-                }
             }
 
             return formattedException;
