@@ -52,7 +52,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
                     {
                         throw new ArgumentException("The '--include-directories' option requires at least one argument.");
                     }
-                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories[0], settings.IncludeDirectories[0], settings.ExecutablesDirectory);
+                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory);
                 })
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;

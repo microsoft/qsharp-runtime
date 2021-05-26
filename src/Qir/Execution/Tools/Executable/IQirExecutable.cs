@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
@@ -13,10 +14,10 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         /// Builds the executable.
         /// </summary>
         /// <param name="entryPoint">Entry point operation.</param>
-        /// <param name="libraryDirectory">Directory containing libraries to link.</param>
-        /// <param name="includeDirectory">Directory containing files to include.</param>
+        /// <param name="libraryDirectories">Directories containing libraries to link.</param>
+        /// <param name="includeDirectories">Directories containing files to include.</param>
         /// <returns></returns>
-        Task BuildAsync(EntryPointOperation entryPoint, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory);
+        Task BuildAsync(EntryPointOperation entryPoint, IList<DirectoryInfo> libraryDirectories, IList<DirectoryInfo> includeDirectories);
 
         /// <summary>
         /// Runs the executable.

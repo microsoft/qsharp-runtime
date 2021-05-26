@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             this.logger = logger;
         }
 
-        public async Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory, IList<string> linkLibraries)
+        public async Task GenerateExecutableAsync(FileInfo executableFile, DirectoryInfo sourceDirectory, IList<DirectoryInfo> libraryDirectories, IList<DirectoryInfo> includeDirectories, IList<string> linkLibraries)
         {
             // Wrap in a Task.Run because FileInfo methods are not asynchronous.
             await Task.Run(async () =>
@@ -30,15 +30,15 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                 executableFile.Directory.Create();
 
                 // Copy all library contents to bin.
-                logger?.LogInfo("Copying library directory contents into the executable's folder.");
-                var libraryFiles = libraryDirectory.GetFiles();
-                foreach (var file in libraryFiles)
+                logger?.LogInfo("Copying library directories into the executable's folder.");
+
+                foreach (var dir in libraryDirectories)
                 {
-                    CopyFileIfNotExists(file, binDirectory);
+                    CopyDirectoryIfNotExists(dir, binDirectory);
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
-                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libraryDirectory.FullName, includeDirectory.FullName, executableFile.FullName);
+                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libraryDirectories.Select(dir => dir.FullName).ToArray(), includeDirectories.Select(dir => dir.FullName).ToArray(), executableFile.FullName);
             });
         }
 
@@ -49,6 +49,18 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             {
                 var newFile = fileToCopy.CopyTo(newPath);
                 logger?.LogInfo($"Copied file {fileToCopy.FullName} to {newFile.FullName}");
+            }
+        }
+
+        private void CopyDirectoryIfNotExists(DirectoryInfo directoryToCopy, DirectoryInfo destinationDirectory)
+        {
+            var newPath = Path.Combine(destinationDirectory.FullName, directoryToCopy.Name);
+            var newDir = Directory.CreateDirectory(newPath);
+
+            FileInfo[] files = directoryToCopy.GetFiles();
+            foreach (var file in files)
+            {
+                CopyFileIfNotExists(file, newDir);
             }
         }
     }

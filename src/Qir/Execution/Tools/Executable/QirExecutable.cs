@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             this.executableGenerator = executableGenerator;
         }
 
-        public async Task BuildAsync(EntryPointOperation entryPoint, DirectoryInfo libraryDirectory, DirectoryInfo includeDirectory)
+        public async Task BuildAsync(EntryPointOperation entryPoint, IList<DirectoryInfo> libraryDirectories, IList<DirectoryInfo> includeDirectories)
         {
             var sourceDirectory = new DirectoryInfo(SourceDirectoryPath);
             if (sourceDirectory.Exists)
@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             }
             logger.LogInfo($"Created bytecode file at {bytecodeFile.FullName}.");
 
-            await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectory, includeDirectory, LinkLibraries);
+            await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectories, includeDirectories, LinkLibraries);
         }
 
         public async Task RunAsync(ExecutionInformation executionInformation, Stream output)

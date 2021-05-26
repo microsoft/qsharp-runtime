@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Utility;
 
@@ -11,6 +12,8 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
     internal class ClangClient : IClangClient
     {
         private const string LinkFlag = " -l ";
+        private const string LibraryPathFlag = " -L ";
+        private const string IncludePathFlag = " -I ";
         private readonly ILogger logger;
 
         public ClangClient(ILogger logger)
@@ -18,18 +21,20 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             this.logger = logger;
         }
 
-        public async Task CreateExecutableAsync(string[] inputFiles, string[] libraries, string libraryPath, string includePath, string outputPath)
+        public async Task CreateExecutableAsync(string[] inputFiles, string[] linkedLibraries, string[] libraryPaths, string[] includePaths, string outputPath)
         {
             var inputsArg = string.Join(' ', inputFiles);
 
             // string.Join does not automatically prepend the delimiter, so it is included again in the string here.
-            var librariesArg = $"{LinkFlag} {string.Join(LinkFlag, libraries)}";
-            var arguments = $"{inputsArg} -I {includePath} -L {libraryPath} {librariesArg} -o {outputPath} -std=c++17 -v";
+            var linkedLibrariesArg = $"{LinkFlag} {string.Join(LinkFlag, linkedLibraries)}";
+            var libraryPathsArg = $"{LibraryPathFlag} {string.Join(LibraryPathFlag, libraryPaths)}";
+            var includePathsArg = $"{IncludePathFlag} {string.Join(IncludePathFlag, includePaths)}";
+            var arguments = $"{inputsArg} {includePathsArg} {libraryPathsArg} {linkedLibrariesArg} -o {outputPath} -std=c++17 -v";
             logger?.LogInfo($"Invoking clang with the following arguments: {arguments}");
             var taskCompletionSource = new TaskCompletionSource<bool>();
             using var process = new Process();
-            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPath);
-            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", libraryPath);
+            AddPathsToEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPaths);
+            AddPathsToEnvironmentVariable("LD_LIBRARY_PATH", libraryPaths);
             process.StartInfo = new ProcessStartInfo
             {
                 FileName = "clang++",
@@ -39,6 +44,17 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             process.Exited += (sender, args) => { taskCompletionSource.SetResult(true); };
             process.Start();
             await taskCompletionSource.Task;
+        }
+
+        private static void AddPathsToEnvironmentVariable(string variable, string[] values)
+        {
+            var newValue = string.Join(Path.PathSeparator, values);
+            var oldValue = Environment.GetEnvironmentVariable(variable);
+            if (oldValue != null)
+            {
+                newValue = oldValue + $"{Path.PathSeparator}{newValue}";
+            }
+            Environment.SetEnvironmentVariable(variable, newValue);
         }
     }
 }
