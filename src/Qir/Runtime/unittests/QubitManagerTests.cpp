@@ -5,7 +5,7 @@
 
 #include "catch.hpp"
 
-#include "QubitManagerRestrictedReuse.hpp"
+#include "QubitManager.hpp"
 
 using namespace Microsoft::Quantum;
 
