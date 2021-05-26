@@ -17,6 +17,7 @@
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 #include "OutputStream.hpp"
+#include "QubitManager.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -108,6 +109,7 @@ namespace Quantum
         const QUANTUM_SIMULATOR handle = 0;
         unsigned simulatorId = -1;
         unsigned nextQubitId = 0; // the QuantumSimulator expects contiguous ids, starting from 0
+        //CQubitManager* qubitManager = nullptr;
 
         unsigned GetQubitId(Qubit qubit) const
         {
@@ -156,6 +158,7 @@ namespace Quantum
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
+            CQubitManager* qubitManager = new CQubitManager(4);
             this->simulatorId = initSimulatorInstance();
         }
         ~CFullstateSimulator()
@@ -172,6 +175,10 @@ namespace Quantum
                 // unload it might crash.
                 // UnloadQuantumSimulator(this->handle);
             }
+            //if (qubitManager != nullptr) {
+            //    delete qubitManager;
+            //    qubitManager = nullptr;
+            //}
         }
 
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
