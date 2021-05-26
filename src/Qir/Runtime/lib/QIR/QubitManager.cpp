@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This code compiles, passes some unit tests, but isn't yet used in the runtime.
-
 #include "QubitManager.hpp"
 
 #include <cstring> // For memcpy
