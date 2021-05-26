@@ -14,6 +14,26 @@ namespace Microsoft.Azure.Quantum
     public interface IWorkspace
     {
         /// <summary>
+        /// The Workspace's Azure Subscription.
+        /// </summary>
+        string SubscriptionId { get; }
+
+        /// <summary>
+        /// The Workspace's resource group in Azure.
+        /// </summary>
+        string ResourceGroupName { get; }
+
+        /// <summary>
+        /// The Workspace's location (region) in Azure.
+        /// </summary>
+        string Location { get; }
+
+        /// <summary>
+        /// The Workspace's name.
+        /// </summary>
+        string WorkspaceName { get; }
+
+        /// <summary>
         /// Submits the job.
         /// </summary>
         /// <param name="jobDefinition">The job definition.</param>
