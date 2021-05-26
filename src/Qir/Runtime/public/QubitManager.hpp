@@ -12,6 +12,8 @@
 // Borrowing of qubits is not supported and is currently implemented
 // as plain allocation.
 
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <limits>
@@ -45,8 +47,8 @@ namespace Quantum
     // Disabled qubits are marked with this value.
     constexpr QubitIdType DisabledMarker = -1;
 
-    // We want status array to be reasonably large if initialization for it is wrong (i.e. requested size < 1).
-    constexpr QubitIdType FallbackQubitCapacity = 8;
+    // We want status array to be reasonably large.
+    constexpr QubitIdType DefaultQubitCapacity = 8;
 
     // Indexes in the status array can potentially be in range 0 .. int.MaxValue-1.
     // This gives maximum capacity as int.MaxValue.
@@ -114,12 +116,12 @@ namespace Quantum
         int Count() const;
     };
 
-    class CQubitManager
+    class QIR_SHARED_API CQubitManager
     {
     public:
         CQubitManager(
-            QubitIdType initialQubitCapacity,
-            bool mayExtendCapacity = false,
+            QubitIdType initialQubitCapacity = DefaultQubitCapacity,
+            bool mayExtendCapacity = true,
             bool encourageReuse = true);
 
         // No complex scenarios for now. Don't need to support copying/moving.

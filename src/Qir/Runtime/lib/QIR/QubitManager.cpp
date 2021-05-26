@@ -161,7 +161,7 @@ CQubitManager::CQubitManager(
 
     qubitCapacity = initialQubitCapacity;
     if (qubitCapacity <= 0) {
-        qubitCapacity = FallbackQubitCapacity;
+        qubitCapacity = DefaultQubitCapacity;
     }
     sharedQubitStatusArray = new int[qubitCapacity];
 

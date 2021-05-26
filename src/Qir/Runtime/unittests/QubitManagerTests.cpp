@@ -11,14 +11,14 @@ using namespace Microsoft::Quantum;
 
 TEST_CASE("Simple allocation and release of one qubit", "[QubitManagerBasic]")
 {
-    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1);
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>();
     Qubit q = qm->Allocate();
     qm->Release(q);
 }
 
 TEST_CASE("Allocation and reallocation of one qubit", "[QubitManagerBasic]")
 {
-    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1);
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1, false, true);
     REQUIRE(qm->GetFreeQubitCount() == 1);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     Qubit q = qm->Allocate();
@@ -43,7 +43,7 @@ TEST_CASE("Allocation and reallocation of one qubit", "[QubitManagerBasic]")
 
 TEST_CASE("Allocation of released qubits when reuse is encouraged", "[QubitManagerBasic]")
 {
-    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(2);
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(2, false, true);
     REQUIRE(qm->GetFreeQubitCount() == 2);
     Qubit q0 = qm->Allocate();
     Qubit q1 = qm->Allocate();
@@ -77,7 +77,7 @@ TEST_CASE("Allocation of released qubits when reuse is encouraged", "[QubitManag
 
 TEST_CASE("Extending capacity", "[QubitManager]")
 {
-    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1, true);
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1, true, true);
 
     Qubit q0 = qm->Allocate();
     REQUIRE(qm->QubitToId(q0) == 0);
