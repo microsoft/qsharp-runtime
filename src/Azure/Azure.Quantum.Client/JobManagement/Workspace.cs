@@ -48,7 +48,17 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNullOrWhiteSpace(location, nameof(location));
 
             // Optional parameters:
-            credential ??= new DefaultAzureCredential(includeInteractiveCredentials: true);
+            if (credential == null)
+            {
+                // We have to disable VisualStudio, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
+                var credOptions = new DefaultAzureCredentialOptions()
+                {
+                    ExcludeVisualStudioCredential = true,
+                };
+
+                credential = new DefaultAzureCredential(credOptions);
+            }
+
             options ??= new QuantumJobClientOptions();
 
             this.ResourceGroupName = resourceGroupName;
@@ -191,6 +201,24 @@ namespace Microsoft.Azure.Quantum
             await foreach (var q in quotas)
             {
                 yield return new QuotaInfo(this, q);
+            }
+        }
+
+
+        /// <summary>
+        /// Lists the quotas.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// List of quotas.
+        /// </returns>
+        public async IAsyncEnumerable<ProviderStatusInfo> ListProvidersStatusAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var status = this.Client.GetProviderStatusAsync(cancellationToken);
+
+            await foreach (var s in status)
+            {
+                yield return new ProviderStatusInfo(this, s);
             }
         }
 

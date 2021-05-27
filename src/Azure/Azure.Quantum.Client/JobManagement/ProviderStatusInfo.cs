@@ -3,27 +3,27 @@
 
 namespace Microsoft.Azure.Quantum
 {
-    using global::Azure.Quantum.Jobs.Models;
-
     using Microsoft.Azure.Quantum.Utility;
 
+    using Models = global::Azure.Quantum.Jobs.Models;
+
     /// <summary>
-    /// Wrapper for Azure.Quantum.Jobs.Models.QuantumJobQuota.
+    /// Wrapper for Azure.Quantum.Jobs.Models.ProviderStatus.
     /// </summary>
-    public class QuotaInfo
+    public class ProviderStatusInfo
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="QuotaInfo"/> class.
+        /// Initializes a new instance of the <see cref="ProviderStatusInfo"/> class.
         /// </summary>
         /// <param name="workspace">The workspace.</param>
-        /// <param name="quota">The job details.</param>
-        public QuotaInfo(IWorkspace workspace, QuantumJobQuota quota)
+        /// <param name="status">The provider status details.</param>
+        public ProviderStatusInfo(IWorkspace workspace, Models.ProviderStatus status)
         {
             Ensure.NotNull(workspace, nameof(workspace));
-            Ensure.NotNull(quota, nameof(quota));
+            Ensure.NotNull(status, nameof(status));
 
             Workspace = workspace;
-            Quota = quota;
+            Status = status;
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace Microsoft.Azure.Quantum
         public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
-        /// Gets the quota information.
+        /// Gets the provider status information.
         /// </summary>
-        public virtual QuantumJobQuota Quota { get; private set; }
+        public virtual Models.ProviderStatus Status { get; private set; }
     }
 }

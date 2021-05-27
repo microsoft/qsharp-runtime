@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Quantum.Runtime;
-
 namespace Microsoft.Azure.Quantum
 {
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using global::Azure.Quantum.Jobs;
+
     /// <summary>
     /// IWorkspace interface.
     /// </summary>
@@ -32,6 +33,11 @@ namespace Microsoft.Azure.Quantum
         /// The Workspace's name.
         /// </summary>
         string WorkspaceName { get; }
+
+        /// <summary>
+        /// The low-level client used to communicate with the service.
+        /// </summary>
+        public QuantumJobClient Client { get; }
 
         /// <summary>
         /// Submits the job.
@@ -67,7 +73,7 @@ namespace Microsoft.Azure.Quantum
         /// Lists the jobs.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>List of jobs</returns>
+        /// <returns>List of jobs.</returns>
         IAsyncEnumerable<CloudJob> ListJobsAsync(
             CancellationToken cancellationToken = default);
 
@@ -75,8 +81,16 @@ namespace Microsoft.Azure.Quantum
         /// Returns the list of quotas for a workspace.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>List of jobs</returns>
+        /// <returns>List of quotas.</returns>
         IAsyncEnumerable<QuotaInfo> ListQuotasAsync(
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns a list with the status of each of the Providers in a workspace
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>List of provider status.</returns>
+        IAsyncEnumerable<ProviderStatusInfo> ListProvidersStatusAsync(
             CancellationToken cancellationToken = default);
 
         /// <summary>
