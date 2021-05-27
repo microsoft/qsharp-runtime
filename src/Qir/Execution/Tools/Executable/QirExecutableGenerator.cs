@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
                 foreach (var dir in libraryDirectories)
                 {
-                    CopyDirectoryIfNotExists(dir, binDirectory);
+                    CopyDirectoryContents(dir, binDirectory);
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
@@ -52,15 +52,12 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             }
         }
 
-        private void CopyDirectoryIfNotExists(DirectoryInfo directoryToCopy, DirectoryInfo destinationDirectory)
+        private void CopyDirectoryContents(DirectoryInfo directoryToCopy, DirectoryInfo destinationDirectory)
         {
-            var newPath = Path.Combine(destinationDirectory.FullName, directoryToCopy.Name);
-            var newDir = Directory.CreateDirectory(newPath);
-
             FileInfo[] files = directoryToCopy.GetFiles();
             foreach (var file in files)
             {
-                CopyFileIfNotExists(file, newDir);
+                CopyFileIfNotExists(file, destinationDirectory);
             }
         }
     }
