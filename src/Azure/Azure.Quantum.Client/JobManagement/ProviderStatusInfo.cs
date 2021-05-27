@@ -3,6 +3,8 @@
 
 namespace Microsoft.Azure.Quantum
 {
+    using System.Collections.Generic;
+
     using Microsoft.Azure.Quantum.Utility;
 
     using Models = global::Azure.Quantum.Jobs.Models;
@@ -23,17 +25,41 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNull(status, nameof(status));
 
             Workspace = workspace;
-            Status = status;
+            Details = status;
         }
 
         /// <summary>
         /// Gets the workspace.
         /// </summary>
-        public virtual IWorkspace Workspace { get; private set; }
+        public virtual IWorkspace Workspace { get; }
+
+        /// <summary>
+        ///     Provider id.
+        /// </summary>
+        public virtual string ProviderId => this.Details.Id;
+
+        /// <summary>
+        ///     Provider availability.
+        /// </summary>
+        public virtual Models.ProviderAvailability? CurrentAvailability => this.Details.CurrentAvailability;
+
+        /// <summary>
+        ///     List of all available targets for this provider.
+        /// </summary>
+        public virtual IEnumerable<TargetStatusInfo> Targets
+        {
+            get
+            {
+                foreach (var ps in this.Details.Targets)
+                {
+                    yield return new TargetStatusInfo(ps);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the provider status information.
         /// </summary>
-        public virtual Models.ProviderStatus Status { get; private set; }
+        protected Models.ProviderStatus Details { get; private set; }
     }
 }

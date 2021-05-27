@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNull(quota, nameof(quota));
 
             Workspace = workspace;
-            Quota = quota;
+            Details = quota;
         }
 
         /// <summary>
@@ -31,9 +31,47 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         public virtual IWorkspace Workspace { get; private set; }
 
+
+        /// <summary>
+        ///     The name of the dimension associated with the quota.
+        /// </summary>
+        public virtual string Dimension => Details.Dimension;
+
+        /// <summary>
+        ///    The scope at which the quota is applied.
+        /// </summary>
+        public virtual DimensionScope? Scope => Details.Scope;
+
+        /// <summary>
+        ///    The unique identifier for the provider.
+        /// </summary>
+        public virtual string ProviderId => Details.ProviderId;
+
+        /// <summary>
+        ///    The amount of the usage that has been applied for the current period.
+        /// </summary>
+        public virtual float? Utilization => Details.Utilization;
+
+        /// <summary>
+        ///    The amount of the usage that has been reserved but not applied for the current
+        ///     period.
+        /// </summary>
+        public virtual float? Holds => Details.Holds;
+
+        /// <summary>
+        ///    The maximum amount of usage allowed for the current period.
+        /// </summary>
+        public virtual float? Limit => Details.Limit;
+
+        /// <summary>
+        ///    The time period in which the quota's underlying meter is accumulated. Based on
+        ///     calendar year. 'None' is used for concurrent quotas.
+        /// </summary>
+        public virtual MeterPeriod? Period => Details.Period;
+
         /// <summary>
         /// Gets the quota information.
         /// </summary>
-        public virtual QuantumJobQuota Quota { get; private set; }
+        protected QuantumJobQuota Details { get; private set; }
     }
 }

@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Quantum
         public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
-        /// Gets the job details.
+        /// Gets the underlying job details.
         /// </summary>
         public virtual JobDetails Details { get; private set; }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -121,8 +122,8 @@ namespace Microsoft.Azure.Quantum.Test
             await foreach (var q in workspace.ListQuotasAsync())
             {
                 Assert.IsNotNull(q);
-                Assert.IsNotNull(q.Quota);
-                Assert.IsNotNull(q.Quota.Dimension);
+                Assert.IsNotNull(q.ProviderId);
+                Assert.IsNotNull(q.Dimension);
 
                 max--;
                 if (max <= 0)
@@ -147,8 +148,9 @@ namespace Microsoft.Azure.Quantum.Test
             await foreach (var s in workspace.ListProvidersStatusAsync())
             {
                 Assert.IsNotNull(s);
-                Assert.IsNotNull(s.Status);
-                Assert.IsNotNull(s.Status.Id);
+                Assert.IsNotNull(s.ProviderId);
+                Assert.IsNotNull(s.Targets);
+                Assert.IsTrue(s.Targets.Any());
 
                 max--;
                 if (max <= 0)
