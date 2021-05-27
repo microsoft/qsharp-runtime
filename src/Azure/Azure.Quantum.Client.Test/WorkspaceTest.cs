@@ -136,6 +136,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ListProviderStatusTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
