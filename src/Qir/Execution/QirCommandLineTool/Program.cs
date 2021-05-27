@@ -44,14 +44,6 @@ namespace Microsoft.Quantum.CommandLineCompiler
             {
                 Handler = CommandHandler.Create((BuildOptions settings) =>
                 {
-                    if (settings.LibraryDirectories.Length < 1)
-                    {
-                        throw new ArgumentException("The '--library-directories' option requires at least one argument.");
-                    }
-                    if (settings.IncludeDirectories.Length < 1)
-                    {
-                        throw new ArgumentException("The '--include-directories' option requires at least one argument.");
-                    }
                     return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory);
                 })
             };
