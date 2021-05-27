@@ -68,14 +68,22 @@ namespace Microsoft.Quantum.CommandLineCompiler
                 aliases: new string[] { "--library-directories", "--lib" },
                 description: "One or more paths to the directories containing the libraries to be linked.")
             {
-                Required = true
+                Required = false,
+                Argument = new Argument<DirectoryInfo[]>(() => new DirectoryInfo[] { })
+                {
+                    Arity = ArgumentArity.OneOrMore
+                }
             });
 
             buildCommand.AddOption(new Option<DirectoryInfo[]>(
                 aliases: new string[] { "--include-directories", "--include" },
                 description: "One or more paths to the directories containing the headers required for compilation.")
             {
-                Required = true
+                Required = false,
+                Argument = new Argument<DirectoryInfo[]>(() => new DirectoryInfo[] { })
+                {
+                    Arity = ArgumentArity.OneOrMore
+                }
             });
 
             buildCommand.AddOption(new Option<DirectoryInfo>(
