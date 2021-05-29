@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 #include "QubitManager.hpp"
-
+#include "QirRuntime.hpp" // For quantum__rt__fail_cstr
 #include <cstring> // For memcpy
 
 namespace Microsoft
@@ -10,6 +10,22 @@ namespace Microsoft
 namespace Quantum
 {
 
+//
+// Failing in case of errors
+//
+
+static void FailNow(const char* message)
+{
+     quantum__rt__fail_cstr(message);
+}
+
+static void FailIf(bool condition, const char* message)
+{
+    if (condition)
+    {
+        quantum__rt__fail_cstr(message);
+    }
+}
 
 //
 // QubitListInSharedArray
@@ -60,10 +76,10 @@ void QubitListInSharedArray::AddQubit(QubitIdType id, bool addToFront, QubitIdTy
 
 // TODO: Set status to the taken qubit here. Then counting is reasonable here, but not possible?
 // TODO: Rename 'RemoveQubitFromFront'?
-int QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
+QubitIdType QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
 {
     // First element will be returned. It is 'NoneMarker' if the list is empty.
-    int result = firstElement;
+    QubitIdType result = firstElement;
 
     // Advance list start to the next element if list is not empty.
     if (!IsEmpty())
@@ -160,7 +176,7 @@ CQubitManager::CQubitManager(
     if (qubitCapacity <= 0) {
         qubitCapacity = DefaultQubitCapacity;
     }
-    sharedQubitStatusArray = new int[qubitCapacity];
+    sharedQubitStatusArray = new QubitIdType[qubitCapacity];
 
     // These objects are passed by value (copies are created)
     QubitListInSharedArray FreeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
@@ -210,10 +226,10 @@ void CQubitManager::EndRestrictedReuseArea()
 
 Qubit CQubitManager::Allocate()
 {
-    int newQubitId = AllocateQubitId();
+    QubitIdType newQubitId = AllocateQubitId();
     if (newQubitId == NoneMarker && mayExtendCapacity)
     {
-        int newQubitCapacity = qubitCapacity * 2;
+        QubitIdType newQubitCapacity = qubitCapacity * 2;
         FailIf(newQubitCapacity <= qubitCapacity, "Cannot extend capacity.");
         EnsureCapacity(newQubitCapacity);
         newQubitId = AllocateQubitId();
@@ -370,7 +386,7 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
     }
 
     // Prepare new shared status array
-    QubitIdType* newStatusArray = new int[requestedCapacity];
+    QubitIdType* newStatusArray = new QubitIdType[requestedCapacity];
     memcpy(newStatusArray, sharedQubitStatusArray, qubitCapacity * sizeof(newStatusArray[0]));
     QubitListInSharedArray newFreeQubits(qubitCapacity, requestedCapacity - 1, newStatusArray);
 
@@ -384,19 +400,25 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
 
 QubitIdType CQubitManager::AllocateQubitId()
 {
-    if (encourageReuse) {
+    if (encourageReuse)
+    {
         // When reuse is encouraged, we start with the innermost area
-        for (int i = freeQubitsInAreas.Count() - 1; i >= 0; i--) {
+        for (int i = freeQubitsInAreas.Count() - 1; i >= 0; i--)
+        {
             QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
-            if (id != NoneMarker) {
+            if (id != NoneMarker)
+            {
                 return id;
             }
         }
-    } else {
+    } else
+    {
         // When reuse is discouraged, we start with the outermost area
-        for (int i = 0; i < freeQubitsInAreas.Count(); i++) {
+        for (int i = 0; i < freeQubitsInAreas.Count(); i++)
+        {
             QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
-            if (id != NoneMarker) {
+            if (id != NoneMarker)
+            {
                 return id;
             }
         }

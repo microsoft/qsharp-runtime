@@ -24,25 +24,15 @@ namespace Microsoft
 {
 namespace Quantum
 {
-
-    // TODO: Remove this! Use standard ones.
-    static void FailNow(const char* message) { std::cout << message; throw message; }
-    static void FailIf(bool condition, const char* message) {
-        if (condition) {
-            FailNow(message);
-        }
-    }
-
     using QubitIdType = ::int32_t;
 
     // The end of free lists are marked with NoneMarker value. It is used like null for pointers.
     // This value is non-negative just like other values in the free lists.
     constexpr QubitIdType NoneMarker = std::numeric_limits<QubitIdType>::max();
 
-    // Explicitly allocated qubits are marked with Allocated value.
-    // Qubits implicitly allocated for borrowing are "refcounted" with values [Allocated+1 .. -2].
-    // When refcount needs to be decreased to Allocated value, the qubit is automatically released.
-    constexpr QubitIdType AllocatedMarker = std::numeric_limits<QubitIdType>::max();
+    // Explicitly allocated qubits are marked with AllocatedMarker value.
+    // If borrowing is implemented, negative values may be used for refcounting.
+    constexpr QubitIdType AllocatedMarker = std::numeric_limits<QubitIdType>::min();
 
     // Disabled qubits are marked with this value.
     constexpr QubitIdType DisabledMarker = -1;
@@ -127,7 +117,7 @@ namespace Quantum
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
         CQubitManager& operator = (const CQubitManager&) = delete;
-        ~CQubitManager();
+        virtual ~CQubitManager();
 
         // Restricted reuse area control
         void StartRestrictedReuseArea();
