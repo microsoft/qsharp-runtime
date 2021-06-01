@@ -121,7 +121,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Execution", "Execution", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Qir.Tools", "src\Qir\Execution\Tools\Microsoft.Quantum.Qir.Tools.csproj", "{C60226E3-98DE-4E92-AED4-B4A93D4CA063}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Microsoft.Quantum.Qir.Tools", "src\Qir\Execution\Tests.Microsoft.Quantum.Qir.Tools\Tests.Microsoft.Quantum.Qir.Tools.csproj", "{4794FC80-4594-403F-AFEC-4889EFE87EA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Qir.Tools", "src\Qir\Execution\Tests.Microsoft.Quantum.Qir.Tools\Tests.Microsoft.Quantum.Qir.Tools.csproj", "{4794FC80-4594-403F-AFEC-4889EFE87EA0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QirCommandLineTool", "src\Qir\Execution\QirCommandLineTool\QirCommandLineTool.csproj", "{039D2649-20F6-46C7-8599-C44F3AA2CD4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QirExe", "src\Simulation\Simulators.Tests\TestProjects\QirExe\QirExe.csproj", "{A0B98D0E-FC28-4FD8-8806-4825B9F5489D}"
 EndProject
@@ -809,6 +811,22 @@ Global
 		{4794FC80-4594-403F-AFEC-4889EFE87EA0}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{4794FC80-4594-403F-AFEC-4889EFE87EA0}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{4794FC80-4594-403F-AFEC-4889EFE87EA0}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Debug|x64.Build.0 = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Release|x64.ActiveCfg = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.Release|x64.Build.0 = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 		{A0B98D0E-FC28-4FD8-8806-4825B9F5489D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A0B98D0E-FC28-4FD8-8806-4825B9F5489D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0B98D0E-FC28-4FD8-8806-4825B9F5489D}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -883,6 +901,7 @@ Global
 		{442E66C8-F69F-44E9-9CD9-1F52C37EA41B} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
 		{C60226E3-98DE-4E92-AED4-B4A93D4CA063} = {442E66C8-F69F-44E9-9CD9-1F52C37EA41B}
 		{4794FC80-4594-403F-AFEC-4889EFE87EA0} = {442E66C8-F69F-44E9-9CD9-1F52C37EA41B}
+		{039D2649-20F6-46C7-8599-C44F3AA2CD4C} = {442E66C8-F69F-44E9-9CD9-1F52C37EA41B}
 		{A0B98D0E-FC28-4FD8-8806-4825B9F5489D} = {09C842CB-930C-4C7D-AD5F-E30DE4A55820}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

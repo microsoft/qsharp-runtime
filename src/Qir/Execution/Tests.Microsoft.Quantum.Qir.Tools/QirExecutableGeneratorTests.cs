@@ -65,14 +65,14 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
         public async Task TestGenerateExecutable()
         {
             var executableFile = new FileInfo(Path.Combine(binDirectory.FullName, "executableFile"));
-            await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, libraryDirectory, includeDirectory, linkLibraries);
+            await executableGenerator.GenerateExecutableAsync(executableFile, sourceDirectory, new[] { libraryDirectory }, new[] { includeDirectory }, linkLibraries);
 
             // Verify invocation of clang.
             clangClientMock.Verify(obj => obj.CreateExecutableAsync(
                 It.Is<string[]>(s => s.OrderBy(val => val).SequenceEqual(sourceFiles.OrderBy(val => val.FullName).Select(fileInfo => fileInfo.FullName))),
                 It.Is<string[]>(s => s.OrderBy(val => val).SequenceEqual(linkLibraries.OrderBy(val => val))),
-                libraryDirectory.FullName,
-                includeDirectory.FullName,
+                new[] { libraryDirectory.FullName },
+                new[] { includeDirectory.FullName },
                 executableFile.FullName));
 
             // Verify files were copied.
