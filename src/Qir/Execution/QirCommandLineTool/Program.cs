@@ -8,6 +8,8 @@ using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools;
@@ -44,7 +46,36 @@ namespace Microsoft.Quantum.CommandLineCompiler
             {
                 Handler = CommandHandler.Create((BuildOptions settings) =>
                 {
-                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory);
+                    var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    if (string.IsNullOrWhiteSpace(thisModulePath))
+                    {
+                        throw new InvalidOperationException("TODO");
+                    }
+
+                    var headersPath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", "any", "native", "include"));
+                    var externalsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Externals", "CLI11"));
+                    
+                    var osArch = Environment.OSVersion.Platform;
+                    var osID = "";
+                    switch (osArch)
+                    {
+                        case PlatformID.Win32NT:
+                            osID = "win-x64";
+                            break;
+                        case PlatformID.Unix:
+                            osID = "linux-x64";
+                            break;
+                        case PlatformID.MacOSX:
+                            osID = "osx-x64";
+                            break;
+                        default:
+                            throw new ArgumentException("TODO");
+                    }
+
+                    var runTimePath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native"));
+                    var simulatorsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Simulators", osID));
+
+                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories.Append(runTimePath).Append(simulatorsPath).ToList() , settings.IncludeDirectories.Append(headersPath).Append(externalsPath).ToList(), settings.ExecutablesDirectory);
                 })
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;

@@ -1,5 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\..\Simulation\Common\Simulators.Dev.props" />
+    
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,9 +9,35 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
-    <ProjectReference Include="..\..\..\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" />
-    <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Tools.csproj" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1"/>
+    <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Tools.csproj"/>
+    <PackageReference Include="Microsoft.Quantum.Qir.Runtime" Version="0.16.210526824-alpha"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="$(QSimDll)">
+      <Link>Simulators\win-x64\Microsoft.Quantum.Simulator.Runtime.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Simulation\Native\win10\**\*">
+      <Link>Simulators\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\..\..\Simulation\Native\osx\**\*">
+      <Link>Simulators\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\..\..\Simulation\Native\linux\**\*">
+      <Link>Simulators\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+  
 </Project>
