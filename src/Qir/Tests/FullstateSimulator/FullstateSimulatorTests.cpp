@@ -353,11 +353,11 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     }
 }
 
-extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__body(); // NOLINT
+extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(); // NOLINT
 TEST_CASE("QIR: invoke all standard Q# gates against the fullstate simulator", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__body());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop());
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,6 +9,7 @@
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <NoEntryPoint>true</NoEntryPoint>
     <ExecutionTarget>honeywell.qpu</ExecutionTarget>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>

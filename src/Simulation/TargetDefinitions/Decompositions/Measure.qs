@@ -54,9 +54,9 @@ namespace Microsoft.Quantum.Intrinsic {
             use q = Qubit() {
                 H(q);
                 for k in 0 .. Length(bases) - 1 {
-                    if( bases[k] == PauliX ) { Controlled X ([qubits[k]], q); }
-                    if( bases[k] == PauliZ ) { Controlled Z ([qubits[k]], q); }
-                    if( bases[k] == PauliY ) { Controlled Y ([qubits[k]], q); }
+                    if( bases[k] == PauliX ) { Controlled X ([q], qubits[k]); }
+                    if( bases[k] == PauliZ ) { Controlled Z ([q], qubits[k]); }
+                    if( bases[k] == PauliY ) { Controlled Y ([q], qubits[k]); }
                 }
                 H(q);
                 set res =  M(q);

@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public abstract bool Callback(uint idx, double real, double img);
 
             /// <summary>
-            /// The QuantumSimautor being reported.
+            /// The QuantumSimulator being reported.
             /// </summary>
             public QuantumSimulator Simulator { get; }
 

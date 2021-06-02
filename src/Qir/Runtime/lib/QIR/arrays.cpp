@@ -12,16 +12,15 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
-#include "allocationsTracker.hpp"
 #include "QirRuntime.hpp"
 
 using namespace Microsoft::Quantum;
 
 int QirArray::AddRef()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAddRef(this);
+        GlobalContext()->OnAddRef(this);
     }
 
     assert(this->refCount != 0 && "Cannot resurrect released array!");
@@ -33,9 +32,9 @@ int QirArray::AddRef()
 // should delete it, if allocated from the heap.
 int QirArray::Release()
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnRelease(this);
+        GlobalContext()->OnRelease(this);
     }
 
     assert(this->refCount != 0 && "Cannot release already released array!");
@@ -69,9 +68,9 @@ QirArray::QirArray(int64_t qubits_count)
     }
     this->dimensionSizes.push_back(this->count);
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(this);
+        GlobalContext()->OnAllocate(this);
     }
 }
 
@@ -85,9 +84,9 @@ QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::
 {
     assert(dimCount > 0);
 
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(this);
+        GlobalContext()->OnAllocate(this);
     }
 
     if (dimCount == 1)
@@ -119,9 +118,9 @@ QirArray::QirArray(const QirArray* other)
     , ownsQubits(false)
     , refCount(1)
 {
-    if (g_context != nullptr && g_context->trackAllocatedObjects)
+    if (GlobalContext() != nullptr)
     {
-        g_context->allocationsTracker->OnAllocate(this);
+        GlobalContext()->OnAllocate(this);
     }
 
     const int64_t size = this->count * this->itemSizeInBytes;

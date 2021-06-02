@@ -1,6 +1,5 @@
 set(source_files
   "FullstateSimulator.cpp"
-  "setup.cpp"
   "ToffoliSimulator.cpp"
   # NB: Disabled temporarily until we can build crates into OBJECT CMake
   #     libraries.
@@ -9,6 +8,8 @@ set(source_files
 
 set(includes
   "${public_includes}"
+  "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src"
+  "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src/simulator"
 )
 
 #===============================================================================

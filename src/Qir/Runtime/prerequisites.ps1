@@ -4,11 +4,16 @@
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang -ErrorAction SilentlyContinue)) {
-            choco install llvm
+            choco install llvm --version=11.1.0
+        }
+        if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
             # NB: The chocolatey package for rustup is currently nonfunctional,
             #     so we rely on Rust being installed via Azure Pipelines.
             # choco install rustup.install
+        }
+        if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
+            choco install cmake
         }
     } elseif ($IsMacOS) {
         # temporary workaround for Bintray sunset

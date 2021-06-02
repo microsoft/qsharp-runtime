@@ -37,8 +37,6 @@
 ;------------------------------------------------------------------------------
 ; classical
 ;
-declare i8* @quantum__rt__heap_alloc(i64)
-declare void @quantum__rt__heap_free(i8*)
 declare i8* @quantum__rt__memory_allocate(i64)
 declare void @quantum__rt__fail(%"struct.QirString"*)
 
@@ -80,6 +78,7 @@ declare void @llvm.va_end(i8*)
 declare i8* @quantum__rt__tuple_create(i64)
 declare void @quantum__rt__tuple_update_reference_count(i8*, i32)
 declare void @quantum__rt__tuple_update_alias_count(i8*, i32)
+declare i8* @quantum__rt__tuple_copy(i8*, i1)
 
 declare void @quantum__rt__callable_update_reference_count(%"struct.QirCallable"*, i32)
 declare %"struct.QirCallable"* @quantum__rt__callable_create(void (i8*, i8*, i8*)**, void (i8*, i64)**, i8*)
@@ -120,15 +119,6 @@ declare void @quantum__rt__message(%"struct.QirString"* %str)
 ;------------------------------------------------------------------------------
 ; classical bridge
 ;
-define dllexport i8* @__quantum__rt__heap_alloc(i64 %size) {
-  %mem = call i8* @quantum__rt__heap_alloc(i64 %size)
-  ret i8* %mem
-}
-
-define dllexport void @__quantum__rt__heap_free(i8* %mem) {
-  call void @quantum__rt__heap_free(i8* %mem)
-  ret void
-}
 
 ; Returns a pointer to the malloc-allocated block.
 define dllexport i8* @__quantum__rt__memory_allocate(i64 %size) {
@@ -232,13 +222,11 @@ define dllexport %Array* @__quantum__rt__array_copy(%Array* %.ar, i1 %force) {
 
 ; TODO: This bridge isn't cross-platform!
 ; it works on Windows but on Linux %args ends up not being a valid pointer.
-declare void @DebugLogPtr(i8*)
 define dllexport %Array* @__quantum__rt__array_create(i32 %item_size, i32 %dim_count, ...) {
   %args1 = alloca i8*, align 8
   %args2 = bitcast i8** %args1 to i8*
   call void @llvm.va_start(i8* %args2)
   %args = load i8*, i8** %args1, align 8
-  ;call void @DebugLogPtr(i8* %args)
   %ar = call %"struct.QirArray"* @quantum__rt__array_create_nonvariadic(i32 %item_size, i32 %dim_count, i8* %args)
   call void @llvm.va_end(i8* %args2)
   %.ar = bitcast  %"struct.QirArray"* %ar to %Array*
@@ -339,6 +327,13 @@ define dllexport void @__quantum__rt__tuple_update_alias_count(%Tuple* %.th, i32
   %th = bitcast %Tuple* %.th to i8*
   call void @quantum__rt__tuple_update_alias_count(i8* %th, i32 %c)
   ret void
+}
+
+define dllexport %Tuple* @__quantum__rt__tuple_copy(%Tuple* %.th, i1 %force) {
+  %th = bitcast %Tuple* %.th to i8*
+  %th2 = call i8* @quantum__rt__tuple_copy(i8* %th, i1 %force)
+  %.th2 = bitcast i8* %th2 to %Tuple*
+  ret %Tuple* %.th2
 }
 
 ;------------------------------------------------------------------------------

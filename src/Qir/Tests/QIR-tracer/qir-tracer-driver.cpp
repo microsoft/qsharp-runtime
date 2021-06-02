@@ -20,9 +20,9 @@ namespace TracerUser
 TEST_CASE("Invoke each intrinsic from Q# core once", "[qir-tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, g_operationNames);
-    QirContextScope qirctx(tr.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(tr.get(), true /*trackAllocatedObjects*/);
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestCoreIntrinsics__body());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestCoreIntrinsics__Interop());
     const vector<Layer>& layers = tr->UseLayers();
 
     std::stringstream out;
@@ -37,9 +37,9 @@ TEST_CASE("Invoke each intrinsic from Q# core once", "[qir-tracer]")
 TEST_CASE("Conditional execution on measurement result", "[qir-tracer]")
 {
     shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, g_operationNames);
-    QirContextScope qirctx(tr.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(tr.get(), true /*trackAllocatedObjects*/);
 
-    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestMeasurements__body());
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__Tracer__TestMeasurements__Interop());
 
     std::stringstream out;
     tr->PrintLayerMetrics(out, ",", true /*printZeroMetrics*/);

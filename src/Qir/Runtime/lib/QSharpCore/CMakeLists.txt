@@ -6,6 +6,7 @@
 # create qsharp-core-qis-support lib from the C++ sources
 #
 set(qsharp_core_sup_source_files
+  intrinsicsDump.cpp
   intrinsics.cpp
 )
 

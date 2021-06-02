@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <CSharpGeneration>false</CSharpGeneration>

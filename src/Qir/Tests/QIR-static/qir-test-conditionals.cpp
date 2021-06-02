@@ -114,14 +114,14 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 
-extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIf__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIf__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__Interop());
 
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 8);
@@ -129,14 +129,14 @@ TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
     CHECK(qapi->otherCallbacks.size() == 0);
 }
 
-extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__Interop());
 
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 5);
@@ -144,14 +144,14 @@ TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals]")
     CHECK(qapi->otherCallbacks.size() == 0);
 }
 
-extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body(); // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyConditionally__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
 {
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
-    QirContextScope qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
 
-    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__body());
+    CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__Interop());
 
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 4);

@@ -30,7 +30,7 @@ while on macOS, `prerequisites.ps1` relies on the [`brew` package manager](https
 1. Add all three to your/system `%PATH%`.
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
-1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
+1. Install the same version of dotnet as specified by qsharp-runtime [README](../../../README.md)
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
@@ -67,7 +67,7 @@ pwsh build-qir-runtime.ps1
   
 The script will create the `build/{Debug|Release}` folder and place the build artifacts in it. The configuration `Debug|Release`
 is specified with the `BUILD_CONFIGURATION` environment variable.
-If the variable is not set then the default is specified in [`set-env.ps1`](../../build/set-env.ps1).  
+If the variable is not set then the default is specified in [`set-env.ps1`](../../../build/set-env.ps1).  
 
 ## Tests
 
@@ -145,8 +145,9 @@ There are two ways to compile and run the QIR files against the runtime.
 
 QIR's architecture assumes a single target, whether that be hardware or a particular simulator. As a result, there is no
  provision in the QIR specifications to choose a target dynamically. To connect QIR to the simulators from this runtime,
- we provide `InitializeQirContext` and `ReleaseQirContext` methods. Switching contexts while executing QIR isn't
- supported and would yield undefined behavior.
+ we provide `QirExecutionContext::Init()` (earlier `InitializeQirContext`)
+ and `QirExecutionContext::Deinit()` (earlier `ReleaseQirContext`) methods.
+ Switching contexts while executing QIR isn't supported and would yield undefined behavior.
 
 ### Building from IR files
 
@@ -166,8 +167,6 @@ CMake doesn't support using LLVM's IR files as input so instead we invoke Clang 
 1. Variadic functions (e.g. `__quantum__rt__array_create`) require platform specific bridges. The currently implemented
  bridge is for Windows.
 1. Qubit borrowing NYI (needs both bridge and simulator's support).
-1. `@ResultZero` and `@ResultOne` global variables, used in QIR generated from Q#, cannot be treated in a
- platform-agnostic way when linking against the shared qdk library.
 
 ## Coding style and conventions
 

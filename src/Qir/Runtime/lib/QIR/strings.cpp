@@ -11,7 +11,7 @@
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
 
-std::unordered_map<std::string, QirString*>& AllocatedStrings()
+std::unordered_map<std::string, QirString*>& AllocatedStrings()     // Cannot be static, is called by tests. 
 {
     static std::unordered_map<std::string, QirString*> allocatedStrings;
     return allocatedStrings;
@@ -36,10 +36,15 @@ static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
 }
 
 QirString::QirString(std::string&& str)
-    : refCount(1)
-    , str(std::move(str))
+    : str(std::move(str))
 {
 }
+
+QirString::QirString(const char* cstr)
+    : str(cstr)
+{
+}
+
 
 extern "C"
 {

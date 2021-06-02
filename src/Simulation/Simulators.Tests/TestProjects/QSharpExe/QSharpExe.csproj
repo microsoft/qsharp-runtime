@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,6 +7,7 @@
     <CSharpGeneration>false</CSharpGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <DefaultSimulator>ToffoliSimulator</DefaultSimulator>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>

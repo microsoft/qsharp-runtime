@@ -10,9 +10,6 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ## location
     /// Provides information on where to generate the machine's dump.
     ///
-    /// # Output
-    /// None.
-    ///
     /// # Remarks
     /// This method allows you to dump information about the current status of the
     /// target machine into a file or some other location.
@@ -25,6 +22,20 @@ namespace Microsoft.Quantum.Diagnostics {
     /// the path to a file in which it will write the wave function as a
     /// one-dimensional array of complex numbers, in which each element represents
     /// the amplitudes of the probability of measuring the corresponding state.
+    ///
+    /// # Example
+    /// When run on the full-state simulator, the following snippet dumps
+    /// the Bell state $(\ket{00} + \ket{11}) / \sqrt{2}$ to the console:
+    /// ```qsharp
+    /// use left = Qubit();
+    /// use right = Qubit();
+    /// within {
+    ///     H(left);
+    ///     CNOT(left, right);
+    /// } apply {
+    ///     DumpMachine();
+    /// }
+    /// ```
     function DumpMachine<'T> (location : 'T) : Unit {
         body intrinsic;
     }
@@ -37,9 +48,6 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Provides information on where to generate the state's dump.
     /// ## qubits
     /// The list of qubits to report.
-    ///
-    /// # Output
-    /// None.
     ///
     /// # Remarks
     /// This method allows you to dump the information associated with the state of the
@@ -56,6 +64,22 @@ namespace Microsoft.Quantum.Diagnostics {
     /// the amplitudes of the probability of measuring the corresponding state.
     /// If the given qubits are entangled with some other qubit and their
     /// state can't be separated, it just reports that the qubits are entangled.
+    ///
+    /// # Example
+    /// When run on the full-state simulator, the following snippet dumps
+    /// the Bell state $(\ket{00} + \ket{11}) / \sqrt{2}$ to the console:
+    /// ```qsharp
+    /// use left = Qubit();
+    /// use right = Qubit();
+    /// within {
+    ///     H(left);
+    ///     CNOT(left, right);
+    /// } apply {
+    ///     // The () input here denotes that the state dumped by the
+    ///     // full-state simulator should be reported to the console.
+    ///     DumpRegister((), [left, right]);
+    /// }
+    /// ```
     function DumpRegister<'T> (location : 'T, qubits : Qubit[]) : Unit {
         body intrinsic;
     }
