@@ -31,7 +31,7 @@ static void FailIf(bool condition, const char* message)
 // QubitListInSharedArray
 //
 
-QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray)
+CQubitManager::QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray)
 {
     FailIf(startId > endId || startId < 0 || endId == MaximumQubitCapacity,
         "Incorrect boundaries in the linked list initialization.");
@@ -44,12 +44,12 @@ QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType 
     lastElement = endId;
 }
 
-bool QubitListInSharedArray::IsEmpty() const
+bool CQubitManager::QubitListInSharedArray::IsEmpty() const
 {
     return firstElement == NoneMarker;
 }
 
-void QubitListInSharedArray::AddQubit(QubitIdType id, bool addToFront, QubitIdType* sharedQubitStatusArray)
+void CQubitManager::QubitListInSharedArray::AddQubit(QubitIdType id, bool addToFront, QubitIdType* sharedQubitStatusArray)
 {
     FailIf(id == NoneMarker, "Incorrect qubit id, cannot add it to the list.");
 
@@ -76,7 +76,7 @@ void QubitListInSharedArray::AddQubit(QubitIdType id, bool addToFront, QubitIdTy
 
 // TODO: Set status to the taken qubit here. Then counting is reasonable here, but not possible?
 // TODO: Rename 'RemoveQubitFromFront'?
-QubitIdType QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
+CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
 {
     // First element will be returned. It is 'NoneMarker' if the list is empty.
     QubitIdType result = firstElement;
@@ -96,7 +96,7 @@ QubitIdType QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitS
     return result;
 }
 
-void QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray)
+void CQubitManager::QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray)
 {
     // No need to do anthing if source is empty.
     if (source.IsEmpty())
@@ -125,7 +125,7 @@ void QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, Q
 // RestrictedReuseArea
 //
 
-RestrictedReuseArea::RestrictedReuseArea(QubitListInSharedArray freeQubits)
+CQubitManager::RestrictedReuseArea::RestrictedReuseArea(QubitListInSharedArray freeQubits)
 {
     //FreeQubitsReuseProhibited = QubitListInSharedArray(); // This is initialized by default.
     FreeQubitsReuseAllowed = freeQubits; // Default shallow copying.
@@ -136,13 +136,13 @@ RestrictedReuseArea::RestrictedReuseArea(QubitListInSharedArray freeQubits)
 // CRestrictedReuseAreaStack
 //
 
-void CRestrictedReuseAreaStack::PushToBack(RestrictedReuseArea area)
+void CQubitManager::CRestrictedReuseAreaStack::PushToBack(RestrictedReuseArea area)
 {
     FailIf(Count() >= std::numeric_limits<int>::max(), "Too many nested restricted reuse areas.");
     this->insert(this->end(), area);
 }
 
-RestrictedReuseArea CRestrictedReuseAreaStack::PopFromBack()
+CQubitManager::RestrictedReuseArea CQubitManager::CRestrictedReuseAreaStack::PopFromBack()
 {
     FailIf(this->empty(), "Cannot remove element from empty set.");
     RestrictedReuseArea result = this->back();
@@ -150,12 +150,12 @@ RestrictedReuseArea CRestrictedReuseAreaStack::PopFromBack()
     return result;
 }
 
-RestrictedReuseArea& CRestrictedReuseAreaStack::PeekBack()
+CQubitManager::RestrictedReuseArea& CQubitManager::CRestrictedReuseAreaStack::PeekBack()
 {
     return this->back();
 }
 
-int CRestrictedReuseAreaStack::Count() const
+int CQubitManager::CRestrictedReuseAreaStack::Count() const
 {
     return this->size();
 }
@@ -369,7 +369,7 @@ Qubit CQubitManager::CreateQubitObject(QubitIdType id)
     return reinterpret_cast<Qubit>(pointerSizedId);
 }
 
-QubitIdType CQubitManager::QubitToId(Qubit qubit) const
+CQubitManager::QubitIdType CQubitManager::QubitToId(Qubit qubit) const
 {
     intptr_t pointerSizedId = reinterpret_cast<intptr_t>(qubit);
     FailIf(pointerSizedId < 0 || pointerSizedId > std::numeric_limits<QubitIdType>::max(), "Qubit id is out of range.");
@@ -398,7 +398,7 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
     freeQubitsInAreas[0].FreeQubitsReuseAllowed.MoveAllQubitsFrom(newFreeQubits, sharedQubitStatusArray);
 }
 
-QubitIdType CQubitManager::AllocateQubitId()
+CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
 {
     if (encourageReuse)
     {
