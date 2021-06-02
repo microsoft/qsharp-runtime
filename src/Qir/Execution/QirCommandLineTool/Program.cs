@@ -55,22 +55,13 @@ namespace Microsoft.Quantum.CommandLineCompiler
                     var headersPath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", "any", "native", "include"));
                     var externalsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Externals", "CLI11"));
                     
-                    var osArch = Environment.OSVersion.Platform;
-                    var osID = "";
-                    switch (osArch)
+                    var osID = Environment.OSVersion.Platform switch
                     {
-                        case PlatformID.Win32NT:
-                            osID = "win-x64";
-                            break;
-                        case PlatformID.Unix:
-                            osID = "linux-x64";
-                            break;
-                        case PlatformID.MacOSX:
-                            osID = "osx-x64";
-                            break;
-                        default:
-                            throw new ArgumentException("Unsupported operating system architecture.");
-                    }
+                        PlatformID.Win32NT => "win-x64",
+                        PlatformID.Unix => "linux-x64",
+                        PlatformID.MacOSX => "osx-x64",
+                        _ => throw new ArgumentException("Unsupported operating system architecture."),
+                    };
 
                     var runTimePath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native"));
                     var simulatorsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Simulators", osID));
