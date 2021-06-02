@@ -113,15 +113,13 @@ function Pack-Crate() {
 
     "##[info]Packing crate at $PackageDirectory to $OutPath..." | Write-Host
 
-    $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
-
     # Resolve relative to where the build script is located,
     # not the PackageDirectory.
     if (-not [IO.Path]::IsPathRooted($OutPath)) {
         $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
     }
     Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
-        cargo package @releaseFlag;
+        cargo package;
         Copy-Item -Force -Recurse (Join-Path . "target" "package") $OutPath;
     Pop-Location
 }
