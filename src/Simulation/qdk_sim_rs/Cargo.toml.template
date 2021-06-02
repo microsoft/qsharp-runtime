@@ -28,13 +28,10 @@ wasm = ["web-sys"]
 # When Python bindings are enabled, we also need the pyo3 dependency.
 python = ["pyo3", "numpy"]
 
-# To make sure docs are enabled on docs.rs, we need to also pass the "doc"
-# feature in our metadata.
-[package.metadata.docs.rs]
-
 # Enable LaTeX on docs.rs.
 # See https://stackoverflow.com/a/54573800/267841 and
 # https://github.com/rust-num/num/pull/226/files for why this works.
+[package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "docs-includes/header.html", "--html-after-content", "docs-includes/after.html" ]
 
 

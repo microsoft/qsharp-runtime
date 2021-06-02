@@ -17,12 +17,13 @@ Push-Location $PSScriptRoot
     rustup +nightly component add rust-src;
 
     # Actually run the build.
-    cargo +nightly build -Z unstable-options -Z build-std @releaseFlag --out-dir $DropPath;
+    # TODO: enable "-Z build-std" to fully support CFG.
+    cargo +nightly build -Z unstable-options @releaseFlag --out-dir $DropPath;
 
     # Make sure docs are complete.
     $Env:RUSTDOCFLAGS = "--html-in-header $(Resolve-Path docs-includes/header.html) " + `
                         "--html-after-content $(Resolve-Path docs-includes/after.html)"
-    cargo +nightly doc --features doc;
+    cargo +nightly doc;
 
     # Free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space, which is
