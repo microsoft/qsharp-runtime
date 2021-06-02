@@ -23,6 +23,7 @@ var rootCommand = new RootCommand
 // Note that the parameters of the handler method are matched according to the names of the options
 rootCommand.Handler = CommandHandler.Create<FileInfo, string, string>((template, outPath, version) =>
 {
+    Console.Out.WriteLine($"Injecting version {version} into {template} and writing to {outPath}.");
     using var reader = new StreamReader(File.OpenRead(template.FullName));
     var table = TOML.Parse(reader);
 

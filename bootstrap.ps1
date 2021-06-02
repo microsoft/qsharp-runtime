@@ -7,7 +7,7 @@ Push-Location (Join-Path $PSScriptRoot "build")
     .\prerequisites.ps1
 Pop-Location
 
-Push-Location (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
     # We use dotnet-script to inject the version number into Cargo.toml,
     # so we go on ahead here and restore any missing tools.
     # Since that Cargo.toml is referenced by CMake lists in the QIR
