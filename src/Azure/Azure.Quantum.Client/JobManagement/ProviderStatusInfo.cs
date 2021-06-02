@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 namespace Microsoft.Azure.Quantum
 {
     using System.Collections.Generic;
@@ -29,30 +31,41 @@ namespace Microsoft.Azure.Quantum
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProviderStatusInfo"/> class.
+        /// Use only for testing.
+        /// </summary>
+        protected ProviderStatusInfo()
+        {
+        }
+
+        /// <summary>
         /// Gets the workspace.
         /// </summary>
-        public virtual IWorkspace Workspace { get; }
+        public virtual IWorkspace? Workspace { get; }
 
         /// <summary>
         ///     Provider id.
         /// </summary>
-        public virtual string ProviderId => this.Details.Id;
+        public virtual string? ProviderId => this.Details?.Id;
 
         /// <summary>
         ///     Provider availability.
         /// </summary>
-        public virtual Models.ProviderAvailability? CurrentAvailability => this.Details.CurrentAvailability;
+        public virtual Models.ProviderAvailability? CurrentAvailability => this.Details?.CurrentAvailability;
 
         /// <summary>
         ///     List of all available targets for this provider.
         /// </summary>
-        public virtual IEnumerable<TargetStatusInfo> Targets
+        public virtual IEnumerable<TargetStatusInfo>? Targets
         {
             get
             {
-                foreach (var ps in this.Details.Targets)
+                if (this.Details != null)
                 {
-                    yield return new TargetStatusInfo(ps);
+                    foreach (var ps in this.Details.Targets)
+                    {
+                        yield return new TargetStatusInfo(ps);
+                    }
                 }
             }
         }
@@ -60,6 +73,6 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the provider status information.
         /// </summary>
-        protected Models.ProviderStatus Details { get; private set; }
+        protected Models.ProviderStatus? Details { get; private set; }
     }
 }

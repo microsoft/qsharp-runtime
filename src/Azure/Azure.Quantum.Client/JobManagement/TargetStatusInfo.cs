@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable enable
+
 namespace Microsoft.Azure.Quantum
 {
     using System.Collections.Generic;
@@ -27,28 +29,36 @@ namespace Microsoft.Azure.Quantum
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="TargetStatusInfo"/> class.
+        /// Use only for testing.
+        /// </summary>
+        protected TargetStatusInfo()
+        {
+        }
+
+        /// <summary>
         /// Target id.
         /// </summary>
-        public virtual string TargetId => Details.Id;
+        public virtual string? TargetId => Details?.Id;
 
         /// <summary>
         ///    Target availability.
         /// </summary>
-        public virtual Models.TargetAvailability? CurrentAvailability => Details.CurrentAvailability;
+        public virtual Models.TargetAvailability? CurrentAvailability => Details?.CurrentAvailability;
 
         /// <summary>
         ///    Average queue time in seconds.
         /// </summary>
-        public virtual long? AverageQueueTime => Details.AverageQueueTime;
+        public virtual long? AverageQueueTime => Details?.AverageQueueTime;
 
         /// <summary>
         ///    A page with detailed status of the provider.
         /// </summary>
-        public virtual string StatusPage => Details.StatusPage;
+        public virtual string? StatusPage => Details?.StatusPage;
 
         /// <summary>
         /// Gets the provider status information.
         /// </summary>
-        protected Models.TargetStatus Details { get; private set; }
+        protected Models.TargetStatus? Details { get; private set; }
     }
 }

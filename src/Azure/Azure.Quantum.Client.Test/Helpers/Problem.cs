@@ -54,12 +54,12 @@ namespace Microsoft.Azure.Quantum.Test
 
         public void Add(int i, int j, float c)
         {
-            terms.Add(new Term( new int[] { i, j }, c));
+            terms.Add(new Term(new int[] { i, j }, c));
         }
 
         public void Add(int i, int j, int k, float c)
         {
-            terms.Add(new Term( new int[] { i, j, k }, c));
+            terms.Add(new Term(new int[] { i, j, k }, c));
         }
 
         public void AddRange(IEnumerable<Term> collection)
