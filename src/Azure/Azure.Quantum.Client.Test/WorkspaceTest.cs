@@ -22,8 +22,20 @@ namespace Microsoft.Azure.Quantum.Test
     [TestClass]
     public class WorkspaceTest
     {
+        private const string SETUP = @"
+Live tests require you to configure your environment with these variables:
+  * E2E_WORKSPACE_NAME: the name of an Azure Quantum workspace to use for live testing.
+  * E2E_SUBSCRIPTION_ID: the Azure Quantum workspace's Subscription Id.
+  * E2E_WORKSPACE_RG: the Azure Quantum workspace's resource group.
+  * E2E_WORKSPACE_LOCATION: the Azure Quantum workspace's location (region).
+
+You'll also need to authenticate with Azure using any of the methods listed in:
+https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme#authenticate-the-client
+
+Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
+
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task SubmitJobTest()
         {
             // Create Job
@@ -42,7 +54,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task GetJobTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -62,7 +74,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task CancelJobTest()
         {
             // Create Job
@@ -83,7 +95,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task ListJobsTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -111,7 +123,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task ListQuotasTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -137,7 +149,7 @@ namespace Microsoft.Azure.Quantum.Test
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Live")]
         public async Task ListProviderStatusTest()
         {
             IWorkspace workspace = GetLiveWorkspace();
@@ -174,14 +186,22 @@ namespace Microsoft.Azure.Quantum.Test
 
         private IWorkspace GetLiveWorkspace()
         {
+            if (string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID")))
+            {
+                Assert.Inconclusive(SETUP);
+            }
+
             var options = new QuantumJobClientOptions();
             options.Diagnostics.ApplicationId = "ClientTests";
 
             return new Workspace(
-                subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID") ?? TestConstants.LiveSubscriptionId,
-                resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG") ?? TestConstants.LiveResourceGroupName,
-                workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME") ?? TestConstants.LiveWorkspaceName,
-                location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION") ?? TestConstants.LiveLocation,
+                subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID"),
+                resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG"),
+                workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME"),
+                location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION"),
                 options: options);
         }
 
