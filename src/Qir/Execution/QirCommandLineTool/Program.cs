@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
                     var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     if (string.IsNullOrWhiteSpace(thisModulePath))
                     {
-                        throw new InvalidOperationException("TODO");
+                        throw new InvalidOperationException("Could not get a path for the current assembly location.");
                     }
 
                     var headersPath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", "any", "native", "include"));
@@ -69,7 +69,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
                             osID = "osx-x64";
                             break;
                         default:
-                            throw new ArgumentException("TODO");
+                            throw new ArgumentException("Unsupported operating system architecture.");
                     }
 
                     var runTimePath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native"));
