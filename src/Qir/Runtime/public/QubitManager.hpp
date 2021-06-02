@@ -67,7 +67,7 @@ namespace Quantum
 
         bool IsEmpty() const;
         void AddQubit(QubitIdType id, bool addToFront, QubitIdType* sharedQubitStatusArray);
-        int TakeQubitFromFront(QubitIdType* sharedQubitStatusArray);
+        QubitIdType TakeQubitFromFront(QubitIdType* sharedQubitStatusArray);
         void MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray);
     };
 

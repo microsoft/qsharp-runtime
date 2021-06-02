@@ -109,7 +109,7 @@ namespace Quantum
         const QUANTUM_SIMULATOR handle = 0;
         unsigned simulatorId = -1;
         // the QuantumSimulator expects contiguous ids, starting from 0
-        CQubitManager* qubitManager = nullptr;
+        std::unique_ptr<CQubitManager> qubitManager;
 
         unsigned GetQubitId(Qubit qubit) const
         {
@@ -159,7 +159,7 @@ namespace Quantum
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
-            qubitManager = new CQubitManager();
+            qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
         }
         ~CFullstateSimulator()
@@ -175,10 +175,6 @@ namespace Quantum
                 // TODO: It seems that simulator might still be doing something on background threads so attempting to
                 // unload it might crash.
                 // UnloadQuantumSimulator(this->handle);
-            }
-            if (qubitManager != nullptr) {
-                delete qubitManager;
-                qubitManager = nullptr;
             }
         }
 

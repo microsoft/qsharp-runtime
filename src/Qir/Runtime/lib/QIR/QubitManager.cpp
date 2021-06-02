@@ -33,7 +33,7 @@ static void FailIf(bool condition, const char* message)
 
 QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray)
 {
-    FailIf(startId > endId || startId < 0 || endId == std::numeric_limits<QubitIdType>::max(),
+    FailIf(startId > endId || startId < 0 || endId == MaximumQubitCapacity,
         "Incorrect boundaries in the linked list initialization.");
 
     for (QubitIdType i = startId; i < endId; i++) {
