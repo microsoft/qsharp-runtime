@@ -31,7 +31,6 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         public virtual IWorkspace Workspace { get; private set; }
 
-
         /// <summary>
         ///     The name of the dimension associated with the quota.
         /// </summary>

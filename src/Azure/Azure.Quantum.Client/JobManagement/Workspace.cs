@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Quantum
             // Optional parameters:
             if (credential == null)
             {
-                // We have to disable VisualStudio, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
+                // We have to disable VisualStudio until 16.11 goes out, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
                 var credOptions = new DefaultAzureCredentialOptions()
                 {
                     ExcludeVisualStudioCredential = true,
@@ -101,12 +101,12 @@ namespace Microsoft.Azure.Quantum
             CancellationToken cancellationToken = default)
         {
             Ensure.NotNull(jobDefinition, nameof(jobDefinition));
-            Ensure.NotNullOrWhiteSpace(jobDefinition.Details.Id, nameof(jobDefinition.Details.Id));
+            Ensure.NotNullOrWhiteSpace(jobDefinition.Id, nameof(jobDefinition.Id));
 
             try
             {
                 JobDetails jobDetails = await this.Client.CreateJobAsync(
-                    jobId: jobDefinition.Details.Id,
+                    jobId: jobDefinition.Id,
                     job: jobDefinition.Details,
                     cancellationToken: cancellationToken);
 
@@ -114,7 +114,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "Could not submit job", jobDefinition.Details.Id);
+                throw CreateException(ex, "Could not submit job", jobDefinition.Id);
             }
         }
 
@@ -203,7 +203,6 @@ namespace Microsoft.Azure.Quantum
                 yield return new QuotaInfo(this, q);
             }
         }
-
 
         /// <summary>
         /// Lists the quotas.
