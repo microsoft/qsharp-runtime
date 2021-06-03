@@ -119,9 +119,13 @@ namespace Microsoft.Quantum.Experimental
             {
                 throw new ArgumentException("Could not serialize noise model to JSON, as no suitable serializer was found.", ex);
             }
+            catch (JsonException ex)
+            {
+                throw new Exception($"Could not serialize noise model: {ex.Message}", ex);
+            }
             catch (Exception ex)
             {
-                throw new Exception($"Could not set noise model from JSON:\n{jsonData}", ex);
+                throw new Exception($"Could not set noise model from JSON: {ex.Message}\nJSON data:\n{jsonData}", ex);
             }
         }
 
