@@ -44,7 +44,10 @@ fn with_test_suite<T: criterion::measurement::Measurement>(
 }
 
 fn ideal(c: &mut Criterion) {
-    let sim_id = c_api::init(3);
+    let mut sim_id: usize = 0;
+    unsafe {
+        let _err = c_api::init(3, CString::new("mixed").unwrap().as_ptr(), &mut sim_id);
+    }
     let mut group = c.benchmark_group("ideal");
     with_test_suite(sim_id, &mut group);
     group.finish();
@@ -52,7 +55,10 @@ fn ideal(c: &mut Criterion) {
 }
 
 fn noisy(c: &mut Criterion) {
-    let sim_id = c_api::init(3);
+    let mut sim_id: usize = 0;
+    unsafe {
+        let _err = c_api::init(3, CString::new("mixed").unwrap().as_ptr(), &mut sim_id);
+    }
     // NB: The C API is not in general safe.
     unsafe {
         c_api::set_noise_model(
