@@ -100,6 +100,10 @@ impl PyProcess {
         }
     }
 
+    pub fn as_json(&self) -> String {
+        self.data.as_json()
+    }
+
     pub fn apply(&self, state: PyState) -> PyResult<PyState> {
         let data = self
             .data
@@ -143,6 +147,10 @@ impl PyInstrument {
         PyInstrument {
             data: Instrument::ZMeasurement { pr_readout_error },
         }
+    }
+
+    pub fn as_json(&self) -> String {
+        self.data.as_json()
     }
 }
 

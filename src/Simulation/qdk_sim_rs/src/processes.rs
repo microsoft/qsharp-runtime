@@ -67,6 +67,11 @@ impl Process {
     }
     // TODO: methods to forcibly convert representations.
 
+    /// Returns a serialization of this quantum process as a JSON object.
+    pub fn as_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+
     /// Applies this process to a quantum register with a given
     /// state, returning the new state of that register.
     pub fn apply(&self, state: &State) -> Result<State, String> {

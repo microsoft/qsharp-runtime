@@ -91,6 +91,11 @@ impl Instrument {
     }
 
     // TODO: Add more methods for making new instruments in convenient ways.
+
+    /// Returns a serialization of this instrument as a JSON object.
+    pub fn as_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
 }
 
 fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (usize, State) {
