@@ -10,7 +10,7 @@ Push-Location $PSScriptRoot
     $Env:RUSTFLAGS = "-C control-flow-guard";
 
     # Actually run the build.
-    cargo build @releaseFlag;
+    cargo +nightly build -Z unstable-options @releaseFlag --out-dir "drop";
 
     # Make sure docs are complete.
     $Env:RUSTDOCFLAGS = "--html-in-header $(Resolve-Path docs-includes/header.html) " + `
