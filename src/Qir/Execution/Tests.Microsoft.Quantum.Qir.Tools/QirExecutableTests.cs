@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Driver;
@@ -27,6 +28,8 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
         private readonly FileInfo executableFile;
         private readonly byte[] qirBytecode = { 1, 2, 3, 4, 5 };
         private readonly IList<string> linkLibraries;
+        private readonly IList<DirectoryInfo> headerDirectories;
+        private readonly IList<DirectoryInfo> libraryDirectories;
 
         public QirExecutableTests()
         {
@@ -46,9 +49,13 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             runnerMock = new Mock<IQuantumExecutableRunner>();
             qirExecutable = new Mock<QirExecutable>(executableFile, qirBytecode, Mock.Of<ILogger>(), driverGeneratorMock.Object, executableGeneratorMock.Object, runnerMock.Object) { CallBase = true };
             linkLibraries = new List<string> { "lib1", "lib2" };
+            headerDirectories = new List<DirectoryInfo>();
+            libraryDirectories = new List<DirectoryInfo>();
             qirExecutable.SetupGet(obj => obj.LinkLibraries).Returns(linkLibraries);
             qirExecutable.SetupGet(obj => obj.SourceDirectoryPath).Returns(sourceDirectory.FullName);
             qirExecutable.SetupGet(obj => obj.DriverFileExtension).Returns(".cpp");
+            qirExecutable.SetupGet(obj => obj.HeaderDirectories).Returns(headerDirectories);
+            qirExecutable.SetupGet(obj => obj.LibraryDirectories).Returns(libraryDirectories);
         }
 
         public void Dispose()
@@ -90,7 +97,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             Assert.Equal(driverFileContents, actualDriverContents);
 
             // Verify that the executable was generated.
-            executableGeneratorMock.Verify(obj => obj.GenerateExecutableAsync(executableFile, It.Is<DirectoryInfo>(arg => arg.FullName == sourceDirectory.FullName), new[] { libraryDirectory }, new[] { includeDirectory }, linkLibraries));
+            executableGeneratorMock.Verify(obj => obj.GenerateExecutableAsync(executableFile, It.Is<DirectoryInfo>(arg => arg.FullName == sourceDirectory.FullName), libraryDirectories.Append(libraryDirectory).ToList(), headerDirectories.Append(includeDirectory).ToList(), linkLibraries));
         }
 
         [Fact]
