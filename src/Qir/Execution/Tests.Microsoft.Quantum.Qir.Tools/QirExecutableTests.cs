@@ -97,7 +97,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             Assert.Equal(driverFileContents, actualDriverContents);
 
             // Verify that the executable was generated.
-            executableGeneratorMock.Verify(obj => obj.GenerateExecutableAsync(executableFile, It.Is<DirectoryInfo>(arg => arg.FullName == sourceDirectory.FullName), libraryDirectories.Append(libraryDirectory).ToList(), headerDirectories.Append(includeDirectory).ToList(), linkLibraries));
+            executableGeneratorMock.Verify(obj => obj.GenerateExecutableAsync(executableFile, It.Is<DirectoryInfo>(arg => arg.FullName == sourceDirectory.FullName), new[] { libraryDirectory }, new[] { includeDirectory }, linkLibraries));
         }
 
         [Fact]
