@@ -31,7 +31,12 @@ static void FailIf(bool condition, const char* message)
 // QubitListInSharedArray
 //
 
-CQubitManager::QubitListInSharedArray::QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray)
+CQubitManager::QubitListInSharedArray::QubitListInSharedArray(
+    QubitIdType startId,
+    QubitIdType endId,
+    QubitIdType* sharedQubitStatusArray):
+        firstElement(startId),
+        lastElement(endId)
 {
     FailIf(startId > endId || startId < 0 || endId == MaximumQubitCapacity,
         "Incorrect boundaries in the linked list initialization.");
@@ -40,8 +45,6 @@ CQubitManager::QubitListInSharedArray::QubitListInSharedArray(QubitIdType startI
         sharedQubitStatusArray[i] = i + 1; // Current element points to the next element.
     }
     sharedQubitStatusArray[endId] = NoneMarker; // Last element ends the chain.
-    firstElement = startId;
-    lastElement = endId;
 }
 
 bool CQubitManager::QubitListInSharedArray::IsEmpty() const
@@ -125,10 +128,11 @@ void CQubitManager::QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedA
 // RestrictedReuseArea
 //
 
-CQubitManager::RestrictedReuseArea::RestrictedReuseArea(QubitListInSharedArray freeQubits)
+CQubitManager::RestrictedReuseArea::RestrictedReuseArea(
+    QubitListInSharedArray freeQubits):
+        FreeQubitsReuseProhibited(), // Default costructor
+        FreeQubitsReuseAllowed(freeQubits) // Default shallow copy.
 {
-    //FreeQubitsReuseProhibited = QubitListInSharedArray(); // This is initialized by default.
-    FreeQubitsReuseAllowed = freeQubits; // Default shallow copying.
 }
 
 
@@ -167,11 +171,10 @@ int CQubitManager::CRestrictedReuseAreaStack::Count() const
 CQubitManager::CQubitManager(
     QubitIdType initialQubitCapacity,
     bool mayExtendCapacity,
-    bool encourageReuse)
+    bool encourageReuse):
+        mayExtendCapacity(mayExtendCapacity),
+        encourageReuse(encourageReuse)
 {
-    this->mayExtendCapacity = mayExtendCapacity;
-    this->encourageReuse = encourageReuse;
-
     qubitCapacity = initialQubitCapacity;
     if (qubitCapacity <= 0) {
         qubitCapacity = DefaultQubitCapacity;
@@ -183,8 +186,6 @@ CQubitManager::CQubitManager(
     RestrictedReuseArea outermostArea(FreeQubitsFresh);
     freeQubitsInAreas.PushToBack(outermostArea);
 
-    allocatedQubitCount = 0;
-    disabledQubitCount = 0;
     freeQubitCount = qubitCapacity;
 }
 

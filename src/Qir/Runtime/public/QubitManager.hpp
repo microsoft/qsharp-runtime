@@ -189,18 +189,18 @@ namespace Quantum
         bool IsFree(QubitIdType id) const;
 
         // Configuration Properties
-        bool mayExtendCapacity;
-        bool encourageReuse;
+        bool mayExtendCapacity = true;
+        bool encourageReuse = true;
 
         // State
-        QubitIdType* sharedQubitStatusArray; // Tracks allocation state of all qubits. Stores lists of free qubits.
-        QubitIdType qubitCapacity; // qubitCapacity is always equal to the array size.
+        QubitIdType* sharedQubitStatusArray = nullptr; // Tracks allocation state of all qubits. Stores lists of free qubits.
+        QubitIdType qubitCapacity = 0; // qubitCapacity is always equal to the array size.
         CRestrictedReuseAreaStack freeQubitsInAreas; // Fresh Free Qubits are located in freeQubitsInAreas[0].FreeQubitsReuseAllowed
 
         // Counts
-        int disabledQubitCount;
-        int allocatedQubitCount;
-        int freeQubitCount;
+        int disabledQubitCount = 0;
+        int allocatedQubitCount = 0;
+        int freeQubitCount = 0;
     };
 
 }
