@@ -22,12 +22,14 @@ Push-Location $PSScriptRoot
     # PublishTestResults task.
     if ("$Env:TF_BUILD" -ne "") {
         cargo install cargo2junit
-        cargo test -- -Z unstable-options --format json `
+        $testJson = cargo test -- -Z unstable-options --format json;
+        $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
+
+        $testJson `
             | cargo2junit `
             <# We use this name to match the *_results.xml pattern that is used
                to find test results in steps-wrap-up.yml. #> `
             | Out-File -FilePath opensim_results.xml -Encoding utf8NoBOM
-        $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
     } else {
         # Outside of CI, show human-readable output.
         cargo test
