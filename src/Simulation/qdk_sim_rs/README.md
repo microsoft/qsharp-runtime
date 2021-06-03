@@ -15,7 +15,6 @@ The [`c_api`] module allows for using the simulation functionality in this crate
 
 ## Cargo Features
 
-- **`doc`**: Enables building documentation (requires `+nightly`).
 - **`python`**: Enables Python bindings for this crate.
 - **`wasm`**: Ensures that the crate is compatible with usage from WebAssembly.
 
