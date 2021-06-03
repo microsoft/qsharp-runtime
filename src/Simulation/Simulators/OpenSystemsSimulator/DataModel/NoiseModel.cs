@@ -23,34 +23,34 @@ namespace Microsoft.Quantum.Experimental
         public State? InitialState { get; set; }
 
         [JsonPropertyName("cnot")]
-        public Channel? Cnot { get; set; }
+        public Process? Cnot { get; set; }
 
         [JsonPropertyName("i")]
-        public Channel? I { get; set; }
+        public Process? I { get; set; }
 
         [JsonPropertyName("s")]
-        public Channel? S { get; set; }
+        public Process? S { get; set; }
 
         [JsonPropertyName("s_adj")]
-        public Channel? SAdj { get; set; }
+        public Process? SAdj { get; set; }
 
         [JsonPropertyName("t")]
-        public Channel? T { get; set; }
+        public Process? T { get; set; }
 
         [JsonPropertyName("t_adj")]
-        public Channel? TAdj { get; set; }
+        public Process? TAdj { get; set; }
 
         [JsonPropertyName("h")]
-        public Channel? H { get; set; }
+        public Process? H { get; set; }
 
         [JsonPropertyName("x")]
-        public Channel? X { get; set; }
+        public Process? X { get; set; }
 
         [JsonPropertyName("y")]
-        public Channel? Y { get; set; }
+        public Process? Y { get; set; }
 
         [JsonPropertyName("z")]
-        public Channel? Z { get; set; }
+        public Process? Z { get; set; }
 
         [JsonPropertyName("z_meas")]
         public Instrument? ZMeas { get; set; }

@@ -14,21 +14,21 @@ using static System.Math;
 
 namespace Microsoft.Quantum.Experimental
 {
-    public class ChannelConverter : JsonConverter<Channel>
+    public class ProcessConverter : JsonConverter<Process>
     {
 
-        public override Channel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Process Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var (nQubits, kind, data) = ComplexArrayConverter.ReadQubitSizedArray(ref reader, options);
             return kind switch
             {
-                "Unitary" => new UnitaryChannel(nQubits, data),
-                "KrausDecomposition" => new KrausDecompositionChannel(nQubits, data),
+                "Unitary" => new UnitaryProcess(nQubits, data),
+                "KrausDecomposition" => new KrausDecompositionProcess(nQubits, data),
                 _ => throw new JsonException($"Unknown state kind {kind}.")
             };
         }
 
-        public override void Write(Utf8JsonWriter writer, Channel value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, Process value, JsonSerializerOptions options)
         {
             var arrayConverter = new ComplexArrayConverter();
 
@@ -40,8 +40,8 @@ namespace Microsoft.Quantum.Experimental
                     writer.WritePropertyName(
                         value switch
                         {
-                            UnitaryChannel _ => "Unitary",
-                            KrausDecompositionChannel _ => "KrausDecomposition",
+                            UnitaryProcess _ => "Unitary",
+                            KrausDecompositionProcess _ => "KrausDecomposition",
                             _ => throw new JsonException()
                         }
                     );
@@ -52,8 +52,8 @@ namespace Microsoft.Quantum.Experimental
         }
     }
 
-    [JsonConverter(typeof(ChannelConverter))]
-    public abstract class Channel
+    [JsonConverter(typeof(ProcessConverter))]
+    public abstract class Process
     {
         public int NQubits { get; }
 
@@ -61,16 +61,21 @@ namespace Microsoft.Quantum.Experimental
         //     means that the shape is at least fixed at initialization time.
         public NDArray Data { get; }
 
-        internal Channel(int nQubits, NDArray data)
+        internal Process(int nQubits, NDArray data)
         {
             NQubits = nQubits;
             Data = data;
         }
     }
 
-    public class UnitaryChannel : Channel
+    // TODO: Add class for mixed pauli processes as well.
+    // public class MixedPauliProcess : Process
+    // {
+    // }
+
+    public class UnitaryProcess : Process
     {
-        public UnitaryChannel(int nQubits, NDArray data) : base(nQubits, data)
+        public UnitaryProcess(int nQubits, NDArray data) : base(nQubits, data)
         {
             // Unitary matrices should be of dimension (2^n, 2^n, 2), with the last
             // index indicating real-vs-imag.
@@ -82,11 +87,11 @@ namespace Microsoft.Quantum.Experimental
         }
 
         public override string ToString() =>
-            $@"Unitary channel on {NQubits} qubits: {Data.AsTextMatrixOfComplex(rowSep: " ")}";
+            $@"Unitary process on {NQubits} qubits: {Data.AsTextMatrixOfComplex(rowSep: " ")}";
     }
-    public class KrausDecompositionChannel : Channel
+    public class KrausDecompositionProcess : Process
     {
-        public KrausDecompositionChannel(int nQubits, NDArray data) : base(nQubits, data)
+        public KrausDecompositionProcess(int nQubits, NDArray data) : base(nQubits, data)
         {
             // Kraus decompositions should have between 1 and 4^n operators,
             // each of which should be 2^n by 2^n, for a final dims of
@@ -109,7 +114,7 @@ namespace Microsoft.Quantum.Experimental
                 Data.IterateOverLeftmostIndex()
                     .Select(op => op.AsTextMatrixOfComplex(rowSep: " "))
             );
-            return $@"Kraus decomposition of channel on {NQubits} qubits: {ops}";
+            return $@"Kraus decomposition of process on {NQubits} qubits: {ops}";
         }
     }
 
