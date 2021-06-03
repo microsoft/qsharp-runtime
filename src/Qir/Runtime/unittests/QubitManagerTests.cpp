@@ -22,7 +22,7 @@ TEST_CASE("Allocation and reallocation of one qubit", "[QubitManagerBasic]")
     REQUIRE(qm->GetFreeQubitCount() == 1);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     Qubit q = qm->Allocate();
-    REQUIRE(qm->QubitToId(q) == 0);
+    REQUIRE(qm->GetQubitId(q) == 0);
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE(qm->GetAllocatedQubitCount() == 1);
     REQUIRE_THROWS(qm->Allocate());
@@ -32,7 +32,7 @@ TEST_CASE("Allocation and reallocation of one qubit", "[QubitManagerBasic]")
     REQUIRE(qm->GetFreeQubitCount() == 1);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     Qubit q0 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0) == 0);
+    REQUIRE(qm->GetQubitId(q0) == 0);
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE(qm->GetAllocatedQubitCount() == 1);
     qm->Release(q0);
@@ -47,15 +47,15 @@ TEST_CASE("Allocation of released qubits when reuse is encouraged", "[QubitManag
     REQUIRE(qm->GetFreeQubitCount() == 2);
     Qubit q0 = qm->Allocate();
     Qubit q1 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0) == 0); // Qubit ids should be in order
-    REQUIRE(qm->QubitToId(q1) == 1);
+    REQUIRE(qm->GetQubitId(q0) == 0); // Qubit ids should be in order
+    REQUIRE(qm->GetQubitId(q1) == 1);
     REQUIRE_THROWS(qm->Allocate());
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE(qm->GetAllocatedQubitCount() == 2);
 
     qm->Release(q0);
     Qubit q0a = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0a) == 0); // It was the only one available
+    REQUIRE(qm->GetQubitId(q0a) == 0); // It was the only one available
     REQUIRE_THROWS(qm->Allocate());
 
     qm->Release(q1);
@@ -65,8 +65,8 @@ TEST_CASE("Allocation of released qubits when reuse is encouraged", "[QubitManag
 
     Qubit q0b = qm->Allocate();
     Qubit q1a = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0b) == 0); // By default reuse is encouraged, LIFO is used
-    REQUIRE(qm->QubitToId(q1a) == 1);
+    REQUIRE(qm->GetQubitId(q0b) == 0); // By default reuse is encouraged, LIFO is used
+    REQUIRE(qm->GetQubitId(q1a) == 1);
     REQUIRE_THROWS(qm->Allocate());
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE(qm->GetAllocatedQubitCount() == 2);
@@ -80,17 +80,17 @@ TEST_CASE("Extending capacity", "[QubitManager]")
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1, true, true);
 
     Qubit q0 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0) == 0);
+    REQUIRE(qm->GetQubitId(q0) == 0);
     Qubit q1 = qm->Allocate(); // This should double capacity
-    REQUIRE(qm->QubitToId(q1) == 1);
+    REQUIRE(qm->GetQubitId(q1) == 1);
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE(qm->GetAllocatedQubitCount() == 2);
 
     qm->Release(q0);
     Qubit q0a = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0a) == 0);
+    REQUIRE(qm->GetQubitId(q0a) == 0);
     Qubit q2 = qm->Allocate(); // This should double capacity again
-    REQUIRE(qm->QubitToId(q2) == 2);
+    REQUIRE(qm->GetQubitId(q2) == 2);
     REQUIRE(qm->GetFreeQubitCount() == 1);
     REQUIRE(qm->GetAllocatedQubitCount() == 3);
 
@@ -115,24 +115,24 @@ TEST_CASE("Restricted Area", "[QubitManager]")
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(3, false, true);
 
     Qubit q0 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q0) == 0);
+    REQUIRE(qm->GetQubitId(q0) == 0);
 
     qm->StartRestrictedReuseArea();
 
     // Allocates fresh qubit
     Qubit q1 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q1) == 1);
+    REQUIRE(qm->GetQubitId(q1) == 1);
     qm->Release(q1); // Released, but cannot be used in the next segment.
 
     qm->NextRestrictedReuseSegment();
 
     // Allocates fresh qubit, q1 cannot be reused - it belongs to a differen segment.
     Qubit q2 = qm->Allocate();
-    REQUIRE(qm->QubitToId(q2) == 2);
+    REQUIRE(qm->GetQubitId(q2) == 2);
     qm->Release(q2);
 
     Qubit q2a = qm->Allocate(); // Getting the same one as the one that's just released.
-    REQUIRE(qm->QubitToId(q2a) == 2);
+    REQUIRE(qm->GetQubitId(q2a) == 2);
     qm->Release(q2a); // Released, but cannot be used in the next segment.
 
     qm->NextRestrictedReuseSegment();

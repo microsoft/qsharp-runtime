@@ -81,22 +81,10 @@ namespace Quantum
         // Once a qubit is disabled it can never be "enabled" or reallocated.
         void Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable);
 
-        bool IsValid(Qubit qubit) const;
-        bool IsDisabled(Qubit qubit) const;
-        bool IsFree(Qubit qubit) const;
-
-        // May be overriden to create a custom Qubit object.
-        // When not overriden, it just stores qubit Id in place of a pointer to a qubit.
-        // id: unique qubit id
-        // Returns a newly instantiated qubit.
-        virtual Qubit CreateQubitObject(QubitIdType id);
-
-        // May be overriden to get a qubit id from a custom qubit object.
-        // Must be overriden if CreateQubitObject is overriden.
-        // When not overriden, it just reinterprets pointer to qubit as a qubit id.
-        // qubit: pointer to QUBIT
-        // Returns id of a qubit pointed to by qubit.
-        virtual QubitIdType QubitToId(Qubit qubit) const;
+        bool IsValidQubit(Qubit qubit) const;
+        bool IsDisabledQubit(Qubit qubit) const;
+        bool IsFreeQubit(Qubit qubit) const;
+        QubitIdType GetQubitId(Qubit qubit) const;
 
         // Qubit counts
         int32_t GetDisabledQubitCount() const { return disabledQubitCount; }
@@ -105,6 +93,26 @@ namespace Quantum
 
         bool GetMayExtendCapacity() const { return mayExtendCapacity; }
         bool GetEncourageReuse() const { return encourageReuse; }
+
+    protected:
+        // May be overriden to create a custom Qubit object.
+        // When not overriden, it just stores qubit Id in place of a pointer to a qubit.
+        // id: unique qubit id
+        // Returns a newly instantiated qubit.
+        virtual Qubit CreateQubitObject(QubitIdType id);
+
+        // May be overriden to delete a custom Qubit object.
+        // Must be overriden if CreateQubitObject is overriden.
+        // When not overriden, it does nothing.
+        // qubit: pointer to QUBIT
+        virtual void DeleteQubitObject(Qubit qubit);
+
+        // May be overriden to get a qubit id from a custom qubit object.
+        // Must be overriden if CreateQubitObject is overriden.
+        // When not overriden, it just reinterprets pointer to qubit as a qubit id.
+        // qubit: pointer to QUBIT
+        // Returns id of a qubit pointed to by qubit.
+        virtual QubitIdType QubitToId(Qubit qubit) const;
 
     private:
         // The end of free lists are marked with NoneMarker value. It is used like null for pointers.

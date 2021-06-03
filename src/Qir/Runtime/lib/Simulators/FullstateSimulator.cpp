@@ -114,7 +114,7 @@ namespace Quantum
         unsigned GetQubitId(Qubit qubit) const
         {
             // Qubit manager uses unsigned range of int32_t for qubit ids.
-            return static_cast<unsigned>(qubitManager->QubitToId(qubit));
+            return static_cast<unsigned>(qubitManager->GetQubitId(qubit));
         }
 
         std::vector<unsigned> GetQubitIds(long num, Qubit* qubits) const

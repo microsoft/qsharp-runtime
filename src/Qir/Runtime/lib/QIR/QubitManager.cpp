@@ -271,8 +271,9 @@ void CQubitManager::Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAlloca
 
 void CQubitManager::Release(Qubit qubit)
 {
-    FailIf(!IsValid(qubit), "Qubit is not valid.");
+    FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
     ReleaseQubitId(QubitToId(qubit));
+    DeleteQubitObject(qubit);
 }
 
 void CQubitManager::Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease) {
@@ -316,7 +317,7 @@ void CQubitManager::Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn)
 
 void CQubitManager::Disable(Qubit qubit)
 {
-    FailIf(!IsValid(qubit), "Qubit is not valid.");
+    FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
     QubitIdType id = QubitToId(qubit);
 
     // We can only disable explicitly allocated qubits that were not borrowed.
@@ -344,7 +345,7 @@ void CQubitManager::Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable)
     }
 }
 
-bool CQubitManager::IsValid(Qubit qubit) const
+bool CQubitManager::IsValidQubit(Qubit qubit) const
 {
     QubitIdType id = QubitToId(qubit);
     if (id >= qubitCapacity)
@@ -358,21 +359,33 @@ bool CQubitManager::IsValid(Qubit qubit) const
     return true;
 }
 
-bool CQubitManager::IsDisabled(Qubit qubit) const
+bool CQubitManager::IsDisabledQubit(Qubit qubit) const
 {
-    return IsValid(qubit) && IsDisabled(QubitToId(qubit));
+    return IsValidQubit(qubit) && IsDisabled(QubitToId(qubit));
 }
 
-bool CQubitManager::IsFree(Qubit qubit) const
+bool CQubitManager::IsFreeQubit(Qubit qubit) const
 {
-    return IsValid(qubit) && IsFree(QubitToId(qubit));
+    return IsValidQubit(qubit) && IsFree(QubitToId(qubit));
 }
+
+CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
+{
+    FailIf(!IsValidQubit(qubit), "Not a valid qubit.");
+    return QubitToId(qubit);
+}
+
 
 Qubit CQubitManager::CreateQubitObject(QubitIdType id)
 {
     FailIf(id < 0 || id > INTPTR_MAX, "Qubit id is out of range.");
     intptr_t pointerSizedId = static_cast<intptr_t>(id);
     return reinterpret_cast<Qubit>(pointerSizedId);
+}
+
+void CQubitManager::DeleteQubitObject(Qubit qubit)
+{
+    // Do nothing. By default we store qubit Id in place of a pointer to a qubit.
 }
 
 CQubitManager::QubitIdType CQubitManager::QubitToId(Qubit qubit) const
