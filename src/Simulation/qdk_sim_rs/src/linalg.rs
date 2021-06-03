@@ -85,7 +85,7 @@ impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array1<T> 
 
     fn tensor(self, other: Other) -> Self::Output {
         let other: Self = other.into();
-        self.view().tensor(other).to_owned()
+        self.view().tensor(other)
     }
 }
 
