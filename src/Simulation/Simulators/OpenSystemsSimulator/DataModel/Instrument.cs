@@ -25,12 +25,13 @@ namespace Microsoft.Quantum.Experimental
 
             var variant = reader.GetString();
 
-            var result = variant switch
+            Instrument result = variant switch
             {
                 "Effects" => new EffectsInstrument
                 {
                     Effects = JsonSerializer.Deserialize<List<Process>>(ref reader)
                 },
+                "ZMeasurement" => JsonSerializer.Deserialize<ZMeasurementInstrument>(ref reader),
                 _ => throw new JsonException($"Enum variant {variant} not yet supported.")
             };
 
@@ -41,20 +42,24 @@ namespace Microsoft.Quantum.Experimental
 
         public override void Write(Utf8JsonWriter writer, Instrument value, JsonSerializerOptions options)
         {
-            writer.WriteStartObject();
 
             switch (value)
             {
                 case EffectsInstrument effectsInstrument:
+                    writer.WriteStartObject();
                     writer.WritePropertyName("Effects");
                     JsonSerializer.Serialize(writer, effectsInstrument.Effects);
+                    writer.WriteEndObject();
+                    break;
+
+                case ZMeasurementInstrument zInstrument:
+                    JsonSerializer.Serialize(writer, zInstrument);
                     break;
 
                 default:
                     throw new JsonException($"Enum variant {value.GetType()} not yet supported.");
             }
 
-            writer.WriteEndObject();
         }
     }
 
@@ -71,5 +76,14 @@ namespace Microsoft.Quantum.Experimental
 
         public override string ToString() =>
             $"Instrument {{ Effects = {String.Join(", ", Effects.Select(effect => effect.ToString()))} }}";
+    }
+
+    public class ZMeasurementInstrument : Instrument
+    {
+        [JsonPropertyName("pr_readout_error")]
+        public double PrReadoutError { get; set; } = 0.0;
+
+        public override string ToString() =>
+            $"Instrument {{ Z measurement with readout error = {PrReadoutError} }}";
     }
 }

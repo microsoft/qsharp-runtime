@@ -47,6 +47,7 @@ namespace Microsoft.Quantum.Experimental
             {
                 "Pure" => new PureState(nQubits, data),
                 "Mixed" => new MixedState(nQubits, data),
+                // TODO: read tableaus here.
                 _ => throw new JsonException($"Unknown state kind {kind}.")
             };
         }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Quantum.Simulation.Core;
 using NumSharp;
 using static System.Math;
 
@@ -16,16 +17,26 @@ namespace Microsoft.Quantum.Experimental
 {
     public class ProcessConverter : JsonConverter<Process>
     {
-
         public override Process Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var (nQubits, kind, data) = ComplexArrayConverter.ReadQubitSizedArray(ref reader, options);
-            return kind switch
-            {
-                "Unitary" => new UnitaryProcess(nQubits, data),
-                "KrausDecomposition" => new KrausDecompositionProcess(nQubits, data),
-                _ => throw new JsonException($"Unknown state kind {kind}.")
-            };
+            reader.Require(JsonTokenType.StartObject, read: false);
+
+            var arrayConverter = new ComplexArrayConverter();
+            return reader.ReadQubitSizedData<Process>((ref Utf8JsonReader reader, string kind) =>
+                kind switch
+                {
+                    "Unitary" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                        (int nQubits, NDArray data) => new UnitaryProcess(nQubits, data)
+                    ),
+                    "KrausDecomposition" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                        (int nQubits, NDArray data) => new KrausDecompositionProcess(nQubits, data)
+                    ),
+                    "MixedPauli" => JsonSerializer.Deserialize<IList<(double, IList<Pauli>)>>(ref reader).Bind(
+                        (int nQubits, IList<(double, IList<Pauli>)> data) => new MixedPauliProcess(nQubits, data)
+                    ),
+                    _ => throw new JsonException()
+                }
+            );
         }
 
         public override void Write(Utf8JsonWriter writer, Process value, JsonSerializerOptions options)
@@ -42,11 +53,19 @@ namespace Microsoft.Quantum.Experimental
                         {
                             UnitaryProcess _ => "Unitary",
                             KrausDecompositionProcess _ => "KrausDecomposition",
+                            MixedPauliProcess _ => "MixedPauli",
                             _ => throw new JsonException()
                         }
                     );
 
-                    arrayConverter.Write(writer, value.Data, options);
+                    if (value is ArrayProcess { Data: var data })
+                    {
+                        arrayConverter.Write(writer, data, options);
+                    }
+                    else if (value is MixedPauliProcess mixedPauliProcess)
+                    {
+                        JsonSerializer.Serialize(writer, mixedPauliProcess.Operators);
+                    }
                 writer.WriteEndObject();
             writer.WriteEndObject();
         }
@@ -55,25 +74,38 @@ namespace Microsoft.Quantum.Experimental
     [JsonConverter(typeof(ProcessConverter))]
     public abstract class Process
     {
+        [JsonPropertyName("n_qubits")]
         public int NQubits { get; }
 
-        // NB: NDArray instances are mutable, but marking this as read-only
-        //     means that the shape is at least fixed at initialization time.
-        public NDArray Data { get; }
-
-        internal Process(int nQubits, NDArray data)
+        internal Process(int nQubits)
         {
             NQubits = nQubits;
-            Data = data;
+        }
+    }
+
+    public abstract class ArrayProcess : Process
+    {
+        [JsonPropertyName("data")]
+        public NDArray Data { get; }
+
+        internal ArrayProcess(int nQubits, NDArray data) : base(nQubits)
+        {
+            this.Data = data;
         }
     }
 
     // TODO: Add class for mixed pauli processes as well.
-    // public class MixedPauliProcess : Process
-    // {
-    // }
+    public class MixedPauliProcess : Process
+    {
+        public IList<(double, IList<Pauli>)> Operators;
 
-    public class UnitaryProcess : Process
+        internal MixedPauliProcess(int nQubits, IList<(double, IList<Pauli>)> operators) : base(nQubits)
+        {
+            this.Operators = operators;
+        }
+    }
+
+    public class UnitaryProcess : ArrayProcess
     {
         public UnitaryProcess(int nQubits, NDArray data) : base(nQubits, data)
         {
@@ -89,7 +121,7 @@ namespace Microsoft.Quantum.Experimental
         public override string ToString() =>
             $@"Unitary process on {NQubits} qubits: {Data.AsTextMatrixOfComplex(rowSep: " ")}";
     }
-    public class KrausDecompositionProcess : Process
+    public class KrausDecompositionProcess : ArrayProcess
     {
         public KrausDecompositionProcess(int nQubits, NDArray data) : base(nQubits, data)
         {

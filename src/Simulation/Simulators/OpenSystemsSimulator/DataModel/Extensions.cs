@@ -5,9 +5,11 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using NumSharp;
+using System;
 
 namespace Microsoft.Quantum.Experimental
 {
+    internal delegate Func<TCompletion, TResult> ReaderContinuation<TCompletion, TResult>(ref Utf8JsonReader reader, string variant);
     internal static class Extensions
     {
         internal static bool HasProperty(this JsonElement element, string propertyName) =>
@@ -72,5 +74,66 @@ namespace Microsoft.Quantum.Experimental
         public static bool IsComplexLike(this NDArray array) =>
             array.dtype == typeof(double) &&
             array.shape[^1] == 2;
+
+        public static Func<TCompletion, TResult> Bind<TInput, TCompletion, TResult>(this TInput input, Func<TCompletion, TInput, TResult> action) =>
+            (completion) => action(completion, input);
+
+        internal static TResult ReadQubitSizedData<TResult>(this ref Utf8JsonReader reader, ReaderContinuation<int, TResult> readData)
+        {
+            
+            reader.Require(JsonTokenType.StartObject, read: false);
+
+            int? nQubits = null;
+            Func<int, TResult>? completion = null;
+
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndObject)
+                {
+                    // We're at the end of the object, and can break out of the
+                    // read loop.
+                    break;
+                }
+
+                // If it's not the end of the object, the current token needs
+                // to be a property name.
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    throw new JsonException();
+                }
+
+                var propertyName = reader.GetString();
+
+                switch (propertyName)
+                {
+                    case "n_qubits":
+                        reader.Read();
+                        nQubits = reader.GetInt32();
+                        break;
+
+                    case "data":
+                        // Here, we expect an object with one property indicating
+                        // the kind of data for the object.
+                        reader.Require(JsonTokenType.StartObject);
+                        reader.Require(JsonTokenType.PropertyName);
+                        var kind = reader.GetString();
+
+                        reader.Read();
+                        completion = readData(ref reader, kind);
+
+                        // Finally, require an end to the object.
+                        reader.Require(JsonTokenType.EndObject);
+                        break;
+
+                    default:
+                        throw new JsonException($"Unexpected property name {propertyName}.");
+                }
+            }
+
+            if (nQubits == null) throw new JsonException(nameof(nQubits));
+            if (completion == null) throw new JsonException();
+
+            return completion(nQubits.Value);
+        }
     }
 }

@@ -182,7 +182,6 @@ namespace Microsoft.Quantum.Experimental
 
         public static (int nQubits, string kind, NDArray data) ReadQubitSizedArray(ref Utf8JsonReader reader, JsonSerializerOptions options)
         {
-
             var arrayConverter = new ComplexArrayConverter();
             int? nQubits = null;
             NDArray? data = null;
