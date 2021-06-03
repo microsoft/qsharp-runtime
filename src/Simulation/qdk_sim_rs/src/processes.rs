@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::log_as_err;
 use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::NoiseModel;
@@ -9,12 +10,8 @@ use crate::State;
 use crate::C64;
 use crate::{linalg::ConjBy, AsUnitary, Pauli};
 use crate::{
-    linalg::{extend_one_to_n, extend_two_to_n, zeros_like},
-    StateData,
-};
-use crate::{
     log,
-    processes::ProcessData::{KrausDecomposition, PauliChannel, Unitary},
+    processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary},
 };
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, ArrayView2, Axis, NewAxis};
@@ -38,7 +35,7 @@ pub enum ProcessData {
     /// Representation of a process as a mixture of Pauli operators
     /// $\{(p_i, P_i)\}$ such that the channel acts as $\rho \mapsto
     /// \sum_i p_i P_i \rho P_i^{\dagger}$.
-    PauliChannel(Vec<(f64, Vec<Pauli>)>),
+    MixedPauli(Vec<(f64, Vec<Pauli>)>),
 
     /// Representation of the process by an arbitrary unitary matrix.
     Unitary(Array2<C64>),
@@ -65,7 +62,7 @@ impl Process {
         let n_qubits = data[0].1.len();
         Process {
             n_qubits,
-            data: PauliChannel(data),
+            data: MixedPauli(data),
         }
     }
     // TODO: methods to forcibly convert representations.
@@ -83,7 +80,7 @@ impl Process {
         return match &self.data {
             Unitary(u) => apply_unitary(&u, state),
             KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
-            PauliChannel(paulis) => apply_pauli_channel(&paulis, state),
+            MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
             ProcessData::Unsupported => return Err(format!("Unsupported quantum process.")),
         };
     }
@@ -169,7 +166,7 @@ impl Process {
                     }
                     KrausDecomposition(extended)
                 },
-                PauliChannel(paulis) => PauliChannel(
+                MixedPauli(paulis) => MixedPauli(
                     paulis.iter()
                         .map(|(pr, pauli)| {
                             if pauli.len() != 1 {
@@ -212,7 +209,7 @@ impl Process {
                     }
                     KrausDecomposition(extended)
                 },
-                PauliChannel(paulis) => PauliChannel(
+                MixedPauli(paulis) => MixedPauli(
                     paulis.iter()
                         .map(|(pr, pauli)| {
                             if pauli.len() != 2 {
@@ -249,7 +246,7 @@ impl Mul<&Process> for C64 {
                     ks
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
-                PauliChannel(paulis) => (self * promote_pauli_channel(paulis)).data,
+                MixedPauli(paulis) => (self * promote_pauli_channel(paulis)).data,
                 ProcessData::Unsupported => ProcessData::Unsupported,
             },
         }
