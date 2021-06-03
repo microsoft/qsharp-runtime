@@ -179,7 +179,6 @@ namespace Quantum
 
         QubitIdType AllocateQubitId();
         void ReleaseQubitId(QubitIdType id);
-        void ChangeStatusToAllocated(QubitIdType id);
 
         bool IsDisabled(QubitIdType id) const;
         bool IsExplicitlyAllocated(QubitIdType id) const;

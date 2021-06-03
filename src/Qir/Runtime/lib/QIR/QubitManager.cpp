@@ -241,7 +241,6 @@ Qubit CQubitManager::Allocate()
         newQubitId = AllocateQubitId();
     }
     FailIf(newQubitId == NoneMarker, "Not enough qubits.");
-    ChangeStatusToAllocated(newQubitId);
     return CreateQubitObject(newQubitId);
 }
 
@@ -266,7 +265,6 @@ void CQubitManager::Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAlloca
             }
             FailNow("Not enough qubits.");
         }
-        ChangeStatusToAllocated(newQubitId);
         qubitsToAllocate[i] = CreateQubitObject(newQubitId);
     }
 }
@@ -410,15 +408,16 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
 
 CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
 {
+    QubitIdType id = NoneMarker;
     if (encourageReuse)
     {
         // When reuse is encouraged, we start with the innermost area
         for (CRestrictedReuseAreaStack::reverse_iterator rit = freeQubitsInAreas.rbegin(); rit != freeQubitsInAreas.rend(); ++rit)
         {
-            QubitIdType id = rit->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            id = rit->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
             if (id != NoneMarker)
             {
-                return id;
+                break;
             }
         }
     } else
@@ -426,24 +425,22 @@ CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
         // When reuse is discouraged, we start with the outermost area
         for (CRestrictedReuseAreaStack::iterator it = freeQubitsInAreas.begin(); it != freeQubitsInAreas.end(); ++it)
         {
-            QubitIdType id = it->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            id = it->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
             if (id != NoneMarker)
             {
-                return id;
+                break;
             }
         }
     }
-    return NoneMarker;
-}
-
-void CQubitManager::ChangeStatusToAllocated(QubitIdType id)
-{
-    FailIf(id < 0 || id >= qubitCapacity, "Internal Error: Cannot change status of an invalid qubit.");
-    sharedQubitStatusArray[id] = AllocatedMarker;
-    allocatedQubitCount++;
-    FailIf(allocatedQubitCount <= 0, "Incorrect allocated qubit count.");
-    freeQubitCount--;
-    FailIf(freeQubitCount < 0, "Incorrect free qubit count.");
+    if (id != NoneMarker) {
+        FailIf(id < 0 || id >= qubitCapacity, "Internal Error: Allocated invalid qubit.");
+        sharedQubitStatusArray[id] = AllocatedMarker;
+        allocatedQubitCount++;
+        FailIf(allocatedQubitCount <= 0, "Incorrect allocated qubit count.");
+        freeQubitCount--;
+        FailIf(freeQubitCount < 0, "Incorrect free qubit count.");
+    }
+    return id;
 }
 
 void CQubitManager::ReleaseQubitId(QubitIdType id)
