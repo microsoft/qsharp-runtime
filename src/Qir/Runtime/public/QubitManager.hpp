@@ -20,9 +20,9 @@ namespace Quantum
     // releases a qubit, Qubit Manager tracks it as a free qubit id.
     // Decision to reuse a qubit id is influenced by restricted reuse
     // areas. When a qubit id is freed in one section of a restricted
-    // reuse area, it cannot be reused in other section of the same area.
-    // Borrowing of qubits is not supported and is currently implemented
-    // as plain allocation.
+    // reuse area, it cannot be reused in other sections of the same area.
+    // True borrowing of qubits is not supported and is currently
+    // implemented as a plain allocation.
     class QIR_SHARED_API CQubitManager
     {
     public:
@@ -32,7 +32,7 @@ namespace Quantum
         constexpr static QubitIdType DefaultQubitCapacity = 8;
 
         // Indexes in the status array can potentially be in range 0 .. QubitIdType.MaxValue-1.
-        // This gives maximum capacity as QubitIdType.MaxValue.
+        // This gives maximum capacity as QubitIdType.MaxValue. Actual configured capacity may be less than this.
         // Index equal to QubitIdType.MaxValue doesn't exist and is reserved for 'NoneMarker' - list terminator.
         constexpr static QubitIdType MaximumQubitCapacity = std::numeric_limits<QubitIdType>::max();
 
@@ -116,20 +116,23 @@ namespace Quantum
 
     private:
         // The end of free lists are marked with NoneMarker value. It is used like null for pointers.
-        // This value is non-negative just like other values in the free lists.
+        // This value is non-negative just like other values in the free lists. See sharedQubitStatusArray.
         constexpr static QubitIdType NoneMarker = std::numeric_limits<QubitIdType>::max();
 
         // Explicitly allocated qubits are marked with AllocatedMarker value.
         // If borrowing is implemented, negative values may be used for refcounting.
+        // See sharedQubitStatusArray.
         constexpr static QubitIdType AllocatedMarker = std::numeric_limits<QubitIdType>::min();
 
-        // Disabled qubits are marked with this value.
+        // Disabled qubits are marked with this value. See sharedQubitStatusArray.
         constexpr static QubitIdType DisabledMarker = -1;
 
-        // QubitListInSharedArray implements a singly-linked list with "pointers" to the first and the last element stored.
-        // Pointers are the indexes in a shared array. Shared array isn't sotored in this class because it can be reallocated.
-        // This class maintains status of elements in the list by virtue of linking them as part of this list.
-        // This class sets Allocated status of elementes taken from the list (via TakeQubitFromFront).
+        // QubitListInSharedArray implements a singly-linked list with "pointers"
+        // to the first and the last element stored. Pointers are the indexes
+        // in a single shared array. Shared array isn't sotored in this class
+        // because it can be reallocated. This class maintains status of elements
+        // in the list by virtue of linking them as part of this list. This class
+        // sets Allocated status of elementes taken from the list (via TakeQubitFromFront).
         // This class is small, contains no C++ pointers and relies on default shallow copying/destruction.
         struct QubitListInSharedArray final
         {
@@ -152,9 +155,12 @@ namespace Quantum
             void MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray);
         };
 
-        // Restricted reuse area consists of multiple segments. Qubits released in one segment cannot be reused in another.
-        // One restricted reuse area can be nested in a segment of another restricted reuse area.
-        // This class tracks current segment of an area. Previous segments are tracked collectively (not individually).
+        // Restricted reuse area consists of multiple segments. Qubits released
+        // in one segment cannot be reused in another. One restricted reuse area
+        // can be nested in a segment of another restricted reuse area. This class
+        // tracks current segment of an area by maintaining a list of free qubits
+        // in a shared status array FreeQubitsReuseAllowed. Previous segments are
+        // tracked collectively (not individually) by maintaining FreeQubitsReuseProhibited.
         // This class is small, contains no C++ pointers and relies on default shallow copying/destruction.
         struct RestrictedReuseArea final
         {
@@ -192,16 +198,30 @@ namespace Quantum
         bool IsExplicitlyAllocated(QubitIdType id) const;
         bool IsFree(QubitIdType id) const;
 
-        // Configuration Properties
+        // Configuration Properties:
         bool mayExtendCapacity = true;
         bool encourageReuse = true;
 
-        // State
-        QubitIdType* sharedQubitStatusArray = nullptr; // Tracks allocation state of all qubits. Stores lists of free qubits.
-        QubitIdType qubitCapacity = 0; // qubitCapacity is always equal to the array size.
-        CRestrictedReuseAreaStack freeQubitsInAreas; // Fresh Free Qubits are located in freeQubitsInAreas[0].FreeQubitsReuseAllowed
+        // State:
+        // sharedQubitStatusArray is used to store statuses of all known qubits.
+        // Integer value at the index of the qubit id represents the status of that qubit.
+        // (Ex: sharedQubitStatusArray[4] is the status of qubit with id = 4).
+        // Therefore qubit ids are in the range of [0..qubitCapacity).
+        // Capacity may be extended if MayExtendCapacity = true.
+        // If qubit X is allocated, sharedQubitStatusArray[X] = AllocatedMarker (negative number)
+        // If qubit X is disabled, sharedQubitStatusArray[X] = DisabledMarker (negative number)
+        // If qubit X is free, sharedQubitStatusArray[X] is a non-negative number, denote it Next(X).
+        // Next(X) is either the index of the next element in the list or the list terminator - NoneMarker.
+        // All free qubits form disjoint singly linked lists bound to to respective resricted reuse areas.
+        // Each area has two lists of free qubits - see RestrictedReuseArea.
+        QubitIdType* sharedQubitStatusArray = nullptr;
+        // qubitCapacity is always equal to the array size.
+        QubitIdType qubitCapacity = 0;
+        // All nested restricted reuse areas at the current moment.
+        // Fresh Free Qubits are added to the outermost area: freeQubitsInAreas[0].FreeQubitsReuseAllowed
+        CRestrictedReuseAreaStack freeQubitsInAreas;
 
-        // Counts
+        // Counts:
         int32_t disabledQubitCount = 0;
         int32_t allocatedQubitCount = 0;
         int32_t freeQubitCount = 0;
