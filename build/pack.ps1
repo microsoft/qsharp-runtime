@@ -24,7 +24,7 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
     }
 
 
-    $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/target";
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
     Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
     if (Test-Path "$DROP/libqdk_sim.dylib") {
         Copy-Item -Verbose "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
