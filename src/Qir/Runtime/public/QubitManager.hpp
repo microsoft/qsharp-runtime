@@ -33,7 +33,7 @@ namespace Quantum
 
         // Indexes in the status array can potentially be in range 0 .. QubitIdType.MaxValue-1.
         // This gives maximum capacity as QubitIdType.MaxValue.
-        // Index equal to int.MaxValue doesn't exist and is reserved for 'NoneMarker' - list terminator.
+        // Index equal to QubitIdType.MaxValue doesn't exist and is reserved for 'NoneMarker' - list terminator.
         constexpr static QubitIdType MaximumQubitCapacity = std::numeric_limits<QubitIdType>::max();
 
     public:
@@ -59,27 +59,27 @@ namespace Quantum
         // Allocate qubitCountToAllocate qubits and store them in the provided array. Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
         // Caller is responsible for providing array of sufficient size to hold qubitCountToAllocate.
-        void Allocate(Qubit* qubitsToAllocate, int qubitCountToAllocate);
+        void Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate);
 
         // Releases a given qubit.
         void Release(Qubit qubit);
         // Releases qubitCountToRelease qubits in the provided array.
         // Caller is responsible for managing memory used by the array itself (i.e. delete[] array if it was dynamically allocated).
-        void Release(Qubit* qubitsToRelease, int qubitCountToRelease);
+        void Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease);
 
         // Borrow (We treat borrowing as allocation currently)
         Qubit Borrow();
-        void Borrow(Qubit* qubitsToBorrow, int qubitCountToBorrow);
+        void Borrow(Qubit* qubitsToBorrow, int32_t qubitCountToBorrow);
         // Return (We treat returning as release currently)
         void Return(Qubit qubit);
-        void Return(Qubit* qubitsToReturn, int qubitCountToReturn);
+        void Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn);
 
         // Disables a given qubit.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
         void Disable(Qubit qubit);
         // Disables a set of given qubits.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(Qubit* qubitsToDisable, int qubitCountToDisable);
+        void Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable);
 
         bool IsValid(Qubit qubit) const;
         bool IsDisabled(Qubit qubit) const;
@@ -99,9 +99,9 @@ namespace Quantum
         virtual QubitIdType QubitToId(Qubit qubit) const;
 
         // Qubit counts
-        int GetDisabledQubitCount() const { return disabledQubitCount; }
-        int GetAllocatedQubitCount() const { return allocatedQubitCount; }
-        int GetFreeQubitCount() const { return freeQubitCount; }
+        int32_t GetDisabledQubitCount() const { return disabledQubitCount; }
+        int32_t GetAllocatedQubitCount() const { return allocatedQubitCount; }
+        int32_t GetFreeQubitCount() const { return freeQubitCount; }
 
         bool GetMayExtendCapacity() const { return mayExtendCapacity; }
         bool GetEncourageReuse() const { return encourageReuse; }
@@ -171,7 +171,7 @@ namespace Quantum
             void PushToBack(RestrictedReuseArea area);
             RestrictedReuseArea PopFromBack();
             RestrictedReuseArea& PeekBack();
-            int Count() const;
+            int32_t Count() const;
         };
 
     private:
@@ -180,7 +180,6 @@ namespace Quantum
         QubitIdType AllocateQubitId();
         void ReleaseQubitId(QubitIdType id);
         void ChangeStatusToAllocated(QubitIdType id);
-        void Release(QubitIdType id);
 
         bool IsDisabled(QubitIdType id) const;
         bool IsExplicitlyAllocated(QubitIdType id) const;
@@ -196,9 +195,9 @@ namespace Quantum
         CRestrictedReuseAreaStack freeQubitsInAreas; // Fresh Free Qubits are located in freeQubitsInAreas[0].FreeQubitsReuseAllowed
 
         // Counts
-        int disabledQubitCount = 0;
-        int allocatedQubitCount = 0;
-        int freeQubitCount = 0;
+        int32_t disabledQubitCount = 0;
+        int32_t allocatedQubitCount = 0;
+        int32_t freeQubitCount = 0;
     };
 
 }
