@@ -77,12 +77,12 @@ impl Process {
             ));
         }
 
-        return match &self.data {
+        match &self.data {
             Unitary(u) => apply_unitary(&u, state),
             KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
             MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
-            ProcessData::Unsupported => return Err(format!("Unsupported quantum process.")),
-        };
+            ProcessData::Unsupported => Err("Unsupported quantum process.".to_string()),
+        }
     }
 
     /// Applies this process to the given qubits in a register with a given
@@ -490,9 +490,9 @@ fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, String> {
             Pure(psi) => Pure(u.dot(psi)),
             Mixed(rho) => Mixed(rho.conjugate_by(&u.into())),
             Stabilizer(_tableau) => {
-                return Err(format!(
-                    "TODO: Promote stabilizer state to state vector and recurse."
-                ))
+                return Err(
+                    "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
+                )
             }
         },
     })
@@ -523,9 +523,9 @@ fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Result<State, S
                 sum
             }),
             Stabilizer(_tableau) => {
-                return Err(format!(
-                    "TODO: Promote stabilizer state to state vector and recurse."
-                ))
+                return Err(
+                    "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
+                )
             }
         },
     })

@@ -93,7 +93,7 @@ impl Instrument {
     // TODO: Add more methods for making new instruments in convenient ways.
 }
 
-fn sample_effects(effects: &Vec<Process>, idx_qubits: &[usize], state: &State) -> (usize, State) {
+fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (usize, State) {
     let mut possible_outcomes = effects
         .iter()
         .enumerate()
