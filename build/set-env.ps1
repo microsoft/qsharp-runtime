@@ -36,3 +36,11 @@ If (-not (Test-Path -Path $Env:WHEEL_OUTDIR)) { [IO.Directory]::CreateDirectory(
 If ($Env:DOCS_OUTDIR -eq $null) { $Env:DOCS_OUTDIR =  (Join-Path $Env:DROPS_DIR "docs") }
 If (-not (Test-Path -Path $Env:DOCS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:DOCS_OUTDIR) }
 
+Get-ChildItem @(
+    "Env:\DROPS_DIR",
+    "Env:\DROP_NATIVE",
+    "Env:\NUGET_OUTDIR",
+    "Env:\CRATE_OUTDIR",
+    "Env:\WHEEL_OUTDIR",
+    "Env:\DOCS_OUTDIR"
+ ) | Format-Table
