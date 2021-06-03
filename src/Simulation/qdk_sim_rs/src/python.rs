@@ -38,7 +38,7 @@ fn _qdk_sim_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyState>()?;
     m.add_class::<PyProcess>()?;
     m.add_class::<PyInstrument>()?;
-    m.add_class::<NoiseModel>()?;
+    m.add_class::<PyNoiseModel>()?;
     Ok(())
 }
 
@@ -143,6 +143,26 @@ impl PyInstrument {
         PyInstrument {
             data: Instrument::ZMeasurement { pr_readout_error },
         }
+    }
+}
+
+#[pyclass(name = "NoiseModel")]
+#[derive(Debug)]
+pub struct PyNoiseModel {
+    data: NoiseModel,
+}
+
+#[pymethods]
+impl PyNoiseModel {
+    #[staticmethod]
+    pub fn ideal() -> PyNoiseModel {
+        PyNoiseModel {
+            data: NoiseModel::ideal(),
+        }
+    }
+
+    pub fn as_json(&self) -> String {
+        self.data.as_json()
     }
 }
 

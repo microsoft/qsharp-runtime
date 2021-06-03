@@ -15,7 +15,6 @@ use pyo3::prelude::*;
 
 /// A description of the noise that applies to the state of a quantum system
 /// as the result of applying operations.
-#[cfg_attr(feature = "python", pyclass(name = "NoiseModel"))]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NoiseModel {
     /// The initial state that freshly allocated qubits start off in.
@@ -71,7 +70,9 @@ impl NoiseModel {
     pub fn as_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
     }
+}
 
+impl NoiseModel {
     /// Returns a copy of the ideal noise model; that is, a noise model
     /// describing the case in which no noise acts on the quantum system.
     pub fn ideal() -> NoiseModel {
