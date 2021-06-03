@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
     {
         internal static void AssertTypeAnd<T>(this object obj, Action<T> then)
         {
-            if (obj is not T t)
+            if (!(obj is T t))
             {
                 Assert.IsType<T>(obj);
             }
