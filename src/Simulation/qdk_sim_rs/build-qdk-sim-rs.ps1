@@ -18,6 +18,7 @@ Push-Location $PSScriptRoot
 
     # Actually run the build.
     # TODO: enable "-Z build-std" to fully support CFG.
+    Write-Host "##[info]Building qdk_sim_rs into $DropPath...";
     cargo +nightly build -Z unstable-options @releaseFlag --out-dir $DropPath;
 
     # Make sure docs are complete.
