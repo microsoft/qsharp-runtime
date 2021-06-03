@@ -5,7 +5,7 @@
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
-    <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)/xplat/qdk_sim_rs))</ExperimentalSimBuildPath>
+    <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)/src/Simulation/qdk_sim_rs/target))</ExperimentalSimBuildPath>
   </PropertyGroup>
 
   <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
