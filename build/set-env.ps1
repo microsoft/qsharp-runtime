@@ -21,7 +21,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false" -and $Env:QIR_DROPS -eq $null) {
 
 If ($Env:DROPS_DIR -eq $null) { $Env:DROPS_DIR =  [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\drops")) }
 if ($Env:DROP_NATIVE -eq $null) {
-    $Env:DROP_NATIVE = (Join-Path $PSScriptRoot ".." "xplat")
+    $Env:DROP_NATIVE = (Join-Path $PSScriptRoot "..")
 }
 
 If ($Env:NUGET_OUTDIR -eq $null) { $Env:NUGET_OUTDIR =  (Join-Path $Env:DROPS_DIR "nugets") }
