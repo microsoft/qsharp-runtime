@@ -45,29 +45,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
             var buildCommand = new Command("build", "(default) Build the executables from a QIR DLL.")
             {
                 Handler = CommandHandler.Create((BuildOptions settings) =>
-                {
-                    var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    if (string.IsNullOrWhiteSpace(thisModulePath))
-                    {
-                        throw new InvalidOperationException("Could not get a path for the current assembly location.");
-                    }
-
-                    var headersPath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", "any", "native", "include"));
-                    var externalsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Externals", "CLI11"));
-                    
-                    var osID = Environment.OSVersion.Platform switch
-                    {
-                        PlatformID.Win32NT => "win-x64",
-                        PlatformID.Unix => "linux-x64",
-                        PlatformID.MacOSX => "osx-x64",
-                        _ => throw new ArgumentException("Unsupported operating system architecture."),
-                    };
-
-                    var runTimePath = new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native"));
-                    var simulatorsPath = new DirectoryInfo(Path.Combine(thisModulePath, "Simulators", osID));
-
-                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories.Append(runTimePath).Append(simulatorsPath).ToList() , settings.IncludeDirectories.Append(headersPath).Append(externalsPath).ToList(), settings.ExecutablesDirectory);
-                })
+                    QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory))
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;
 
