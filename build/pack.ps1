@@ -9,24 +9,31 @@ $all_ok = $True
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..");
 
 Write-Host "##[info]Copy Native simulator xplat binaries"
-pushd (Join-Path $PSScriptRoot ../src/Simulation/Native)
+Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
     If (-not (Test-Path 'osx')) { mkdir 'osx' }
     If (-not (Test-Path 'linux')) { mkdir 'linux' }
     If (-not (Test-Path 'win10')) { mkdir 'win10' }
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
-    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
-    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
+    Write-Host "##[info]Copying Microsoft.Quantum.Simulator.Runtime files from $DROP...";
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll"
+    }
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll"
+    }
+
 
     $DROP = "$Env:DROP_NATIVE/qdk_sim_rs";
+    Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
     if (Test-Path "$DROP/libqdk_sim.dylib") {
-        Copy-Item "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
     if (Test-Path "$DROP/libqdk_sim.so") {
-        Copy-Item "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
     if (Test-Path "$DROP/qdk_sim.dll") {
-        Copy-Item "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
     }
 Pop-Location
 
