@@ -43,7 +43,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(ExperimentalSim)" >
+    <None Include="$(ExperimentalSimDll)" >
       <Link>Microsoft.Quantum.Experimental.Simulators.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
