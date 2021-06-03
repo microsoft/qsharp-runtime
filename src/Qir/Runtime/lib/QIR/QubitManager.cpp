@@ -79,8 +79,6 @@ void CQubitManager::QubitListInSharedArray::AddQubit(QubitIdType id, bool addToF
     }
 }
 
-// TODO: Set status to the taken qubit here. Then counting is reasonable here, but not possible?
-// TODO: Rename 'RemoveQubitFromFront'?
 CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
 {
     FailIf(sharedQubitStatusArray == nullptr, "Shared status array is not provided.");
@@ -98,6 +96,11 @@ CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromF
     if (IsEmpty())
     {
         lastElement = NoneMarker;
+    }
+
+    if (result != NoneMarker)
+    {
+        sharedQubitStatusArray[result] = AllocatedMarker;
     }
 
     return result;
@@ -447,7 +450,6 @@ CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
     }
     if (id != NoneMarker) {
         FailIf(id < 0 || id >= qubitCapacity, "Internal Error: Allocated invalid qubit.");
-        sharedQubitStatusArray[id] = AllocatedMarker;
         allocatedQubitCount++;
         FailIf(allocatedQubitCount <= 0, "Incorrect allocated qubit count.");
         freeQubitCount--;

@@ -129,7 +129,7 @@ namespace Quantum
         // QubitListInSharedArray implements a singly-linked list with "pointers" to the first and the last element stored.
         // Pointers are the indexes in a shared array. Shared array isn't sotored in this class because it can be reallocated.
         // This class maintains status of elements in the list by virtue of linking them as part of this list.
-        // This class doesn't update status of elementes excluded from the list.
+        // This class sets Allocated status of elementes taken from the list (via TakeQubitFromFront).
         // This class is small, contains no C++ pointers and relies on default shallow copying/destruction.
         struct QubitListInSharedArray final
         {
