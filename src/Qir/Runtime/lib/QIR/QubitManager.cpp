@@ -148,7 +148,7 @@ void CQubitManager::CRestrictedReuseAreaStack::PushToBack(RestrictedReuseArea ar
 
 CQubitManager::RestrictedReuseArea CQubitManager::CRestrictedReuseAreaStack::PopFromBack()
 {
-    FailIf(this->empty(), "Cannot remove element from empty set.");
+    FailIf(this->empty(), "Cannot remove restricted reuse area from an empty set.");
     RestrictedReuseArea result = this->back();
     this->pop_back();
     return result;
@@ -404,9 +404,9 @@ CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
     if (encourageReuse)
     {
         // When reuse is encouraged, we start with the innermost area
-        for (int i = freeQubitsInAreas.Count() - 1; i >= 0; i--)
+        for (CRestrictedReuseAreaStack::reverse_iterator rit = freeQubitsInAreas.rbegin(); rit != freeQubitsInAreas.rend(); ++rit)
         {
-            QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            QubitIdType id = rit->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
             if (id != NoneMarker)
             {
                 return id;
@@ -415,9 +415,9 @@ CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
     } else
     {
         // When reuse is discouraged, we start with the outermost area
-        for (int i = 0; i < freeQubitsInAreas.Count(); i++)
+        for (CRestrictedReuseAreaStack::iterator it = freeQubitsInAreas.begin(); it != freeQubitsInAreas.end(); ++it)
         {
-            QubitIdType id = freeQubitsInAreas[i].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            QubitIdType id = it->FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
             if (id != NoneMarker)
             {
                 return id;

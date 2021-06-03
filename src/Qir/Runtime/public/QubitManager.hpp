@@ -158,8 +158,7 @@ namespace Quantum
             RestrictedReuseArea(QubitListInSharedArray freeQubits);
         };
 
-        // This is NOT a stack! We modify it only by push/pop, but we also iterate over elements.
-        // TODO: Better name?
+        // This is NOT a pure stack! We modify it only by push/pop, but we also iterate over elements.
         class CRestrictedReuseAreaStack final : public std::vector<RestrictedReuseArea>
         {
         public:
@@ -172,7 +171,6 @@ namespace Quantum
             void PushToBack(RestrictedReuseArea area);
             RestrictedReuseArea PopFromBack();
             RestrictedReuseArea& PeekBack();
-            // TODO: Remove and use size directly?
             int Count() const;
         };
 
