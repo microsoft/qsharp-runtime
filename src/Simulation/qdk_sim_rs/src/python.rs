@@ -169,6 +169,13 @@ impl PyNoiseModel {
         }
     }
 
+    #[staticmethod]
+    pub fn ideal_stabilizer() -> PyNoiseModel {
+        PyNoiseModel {
+            data: NoiseModel::ideal_stabilizer(),
+        }
+    }
+
     pub fn as_json(&self) -> String {
         self.data.as_json()
     }

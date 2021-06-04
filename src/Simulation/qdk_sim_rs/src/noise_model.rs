@@ -1,10 +1,16 @@
+use crate::chp_decompositions::ChpOperation;
 use crate::common_matrices;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
 use crate::processes::Process;
-use crate::processes::ProcessData::{KrausDecomposition, Unitary};
+use crate::processes::{
+    ProcessData,
+    ProcessData::{KrausDecomposition, Unitary},
+};
 use crate::states::State;
 use crate::states::StateData::Mixed;
+use crate::StateData;
+use crate::Tableau;
 use crate::C64;
 use num_traits::{One, Zero};
 
@@ -140,6 +146,77 @@ impl NoiseModel {
                 data: Unitary(common_matrices::cnot()),
             },
             z_meas,
+        }
+    }
+
+    /// Returns a copy of the ideal noise model suitable for use with
+    /// stabilizer simulation; that is, a noise model
+    /// describing the case in which no noise acts on the quantum system, and
+    /// in which all channels can be represented by CHP decompositions.
+    pub fn ideal_stabilizer() -> NoiseModel {
+        NoiseModel {
+            initial_state: State {
+                n_qubits: 1,
+                data: StateData::Stabilizer(Tableau::new(1)),
+            },
+            i: Process {
+                n_qubits: 1,
+                data: ProcessData::Sequence(vec![]),
+            },
+            x: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![
+                    ChpOperation::Hadamard(0),
+                    ChpOperation::Phase(0),
+                    ChpOperation::Phase(0),
+                    ChpOperation::Hadamard(0),
+                ]),
+            },
+            y: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![
+                    ChpOperation::AdjointPhase(0),
+                    ChpOperation::Hadamard(0),
+                    ChpOperation::Phase(0),
+                    ChpOperation::Phase(0),
+                    ChpOperation::Hadamard(0),
+                    ChpOperation::Phase(0),
+                ]),
+            },
+            z: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![
+                    ChpOperation::Phase(0),
+                    ChpOperation::Phase(0),
+                ]),
+            },
+            h: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![ChpOperation::Hadamard(0)]),
+            },
+            s: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![ChpOperation::Phase(0)]),
+            },
+            s_adj: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![ChpOperation::AdjointPhase(0)]),
+            },
+            t: Process {
+                n_qubits: 1,
+                data: ProcessData::Unsupported,
+            },
+            t_adj: Process {
+                n_qubits: 1,
+                data: ProcessData::Unsupported,
+            },
+            cnot: Process {
+                n_qubits: 1,
+                data: ProcessData::ChpDecomposition(vec![ChpOperation::Cnot(0, 1)]),
+            },
+            z_meas: Instrument::ZMeasurement {
+                pr_readout_error: 0.0,
+            },
         }
     }
 }

@@ -1,23 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+mod apply;
+
+use crate::chp_decompositions::ChpOperation;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
-use crate::log_as_err;
-use crate::states::StateData::{Mixed, Pure, Stabilizer};
+use crate::processes::apply::{apply_kraus_decomposition, apply_pauli_channel, apply_unitary};
+use crate::processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary};
 use crate::NoiseModel;
 use crate::QubitSized;
 use crate::State;
 use crate::C64;
-use crate::{linalg::ConjBy, AsUnitary, Pauli};
-use crate::{
-    log,
-    processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary},
-};
+use crate::{AsUnitary, Pauli};
 use itertools::Itertools;
-use ndarray::{Array, Array2, Array3, ArrayView2, Axis, NewAxis};
+use ndarray::{Array, Array2, Array3, Axis, NewAxis};
 use num_complex::Complex;
 use num_traits::{One, Zero};
-use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::ops::Add;
@@ -46,6 +44,13 @@ pub enum ProcessData {
     /// The first index denotes each Kraus operator, with the second and third
     /// indices representing the indices of each operator.
     KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
+
+    /// Representation of a process as a sequence of other processes.
+    Sequence(Vec<Process>),
+
+    /// Representation of a Clifford operation in terms of a decomposition
+    /// into CNOT, Hadamard, and phase operations.
+    ChpDecomposition(Vec<ChpOperation>),
 
     /// Represents a process that is not supported by a given noise model,
     /// and thus always fails when applied.
@@ -86,69 +91,15 @@ impl Process {
             Unitary(u) => apply_unitary(&u, state),
             KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
             MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
-            ProcessData::Unsupported => Err("Unsupported quantum process.".to_string()),
-        }
-    }
-
-    /// Applies this process to the given qubits in a register with a given
-    /// state, returning the new state of that register.
-    pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
-        // Fail if there's not enough qubits.
-        if state.n_qubits < self.n_qubits {
-            return log_as_err(format!(
-                "Channel acts on {} qubits, but a state on only {} qubits was given.",
-                self.n_qubits, state.n_qubits
-            ));
-        }
-
-        // Fail if any indices are repeated.
-        if idx_qubits.iter().unique().count() < idx_qubits.len() {
-            return log_as_err(format!(
-                "List of qubit indices {:?} contained repeated elements.",
-                idx_qubits
-            ));
-        }
-
-        // Make sure that there are only as many indices as qubits that this
-        // channel acts upon.
-        if idx_qubits.len() != self.n_qubits {
-            return log_as_err(format!(
-                "Qubit indices were specified as {:?}, but this channel only acts on {} qubits.",
-                idx_qubits, self.n_qubits
-            ));
-        }
-
-        // At this point we know that idx_qubits has self.n_qubits many unique
-        // indices in ascending order, so we can proceed to make a new channel
-        // that expands this channel to act on the full register and then use
-        // the ordinary apply method.
-        // TODO[perf]: For larger systems, this could be improved by using
-        //             matrix multiplication kernels to avoid extending
-        //             channels to larger Hilbert spaces.
-        //             For smaller systems, extending channels and possibly
-        //             caching them is likely to be more performant; need to
-        //             tune to find crossover point.
-        match self.n_qubits {
-            1 => {
-                if state.n_qubits == 1 {
-                    self.apply(state)
-                } else {
-                    self.extend_one_to_n(idx_qubits[0], state.n_qubits)
-                        .apply(state)
+            ProcessData::Sequence(processes) => {
+                let mut acc_state = state.clone();
+                for process in processes {
+                    acc_state = process.apply(state)?;
                 }
+                Ok(acc_state)
             }
-            // TODO[perf]: If the size of the register matches the size of the
-            //             channel, permute rather than expanding.
-            2 => self
-                .extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)
-                .apply(state),
-            _ => {
-                log(&format!(
-                    "Expanding {}-qubit channels is not yet implemented.",
-                    self.n_qubits
-                ));
-                unimplemented!("");
-            }
+            ProcessData::ChpDecomposition(_operations) => todo!(),
+            ProcessData::Unsupported => Err("Unsupported quantum process.".to_string()),
         }
     }
 
@@ -184,7 +135,11 @@ impl Process {
                         })
                         .collect_vec()
                 ),
-                ProcessData::Unsupported => ProcessData::Unsupported
+                ProcessData::Unsupported => ProcessData::Unsupported,
+                ProcessData::Sequence(processes) => ProcessData::Sequence(
+                    processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).collect()
+                ),
+                ProcessData::ChpDecomposition(_) => todo!(),
             },
         }
     }
@@ -228,7 +183,11 @@ impl Process {
                         })
                         .collect_vec()
                 ),
-                ProcessData::Unsupported => ProcessData::Unsupported
+                ProcessData::Unsupported => ProcessData::Unsupported,
+                ProcessData::Sequence(processes) => ProcessData::Sequence(
+                    processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).collect()
+                ),
+                ProcessData::ChpDecomposition(_) => todo!(),
             },
         }
     }
@@ -253,6 +212,10 @@ impl Mul<&Process> for C64 {
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
                 MixedPauli(paulis) => (self * promote_pauli_channel(paulis)).data,
                 ProcessData::Unsupported => ProcessData::Unsupported,
+                ProcessData::Sequence(processes) => {
+                    ProcessData::Sequence(processes.iter().map(|p| self * p).collect())
+                }
+                ProcessData::ChpDecomposition(_) => todo!(),
             },
         }
     }
@@ -484,87 +447,4 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
             ),
         }
     }
-}
-
-// Private functions for applying processes of each different representation.
-
-fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, String> {
-    Ok(State {
-        n_qubits: state.n_qubits,
-        data: match &state.data {
-            Pure(psi) => Pure(u.dot(psi)),
-            Mixed(rho) => Mixed(rho.conjugate_by(&u.into())),
-            Stabilizer(_tableau) => {
-                return Err(
-                    "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
-                )
-            }
-        },
-    })
-}
-
-fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Result<State, String> {
-    Ok(State {
-        n_qubits: state.n_qubits,
-        data: match &state.data {
-            Pure(psi) => {
-                // We can't apply a channel with more than one Kraus operator (Choi rank > 1) to a
-                // pure state directly, so if the Choi rank is bigger than 1, promote to
-                // Mixed and recurse.
-                if ks.shape()[0] == 1 {
-                    Pure({
-                        let k: ArrayView2<C64> = ks.slice(s![0, .., ..]);
-                        k.dot(psi)
-                    })
-                } else {
-                    apply_kraus_decomposition(ks, &state.to_mixed())?.data
-                }
-            }
-            Mixed(rho) => Mixed({
-                let mut sum: Array2<C64> = Array::zeros((rho.shape()[0], rho.shape()[1]));
-                for k in ks.axis_iter(Axis(0)) {
-                    sum = sum + rho.conjugate_by(&k);
-                }
-                sum
-            }),
-            Stabilizer(_tableau) => {
-                return Err(
-                    "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
-                )
-            }
-        },
-    })
-}
-
-fn apply_pauli_channel(paulis: &[(f64, Vec<Pauli>)], state: &State) -> Result<State, String> {
-    Ok(State {
-        n_qubits: state.n_qubits,
-        data: match &state.data {
-            Pure(_) | Mixed(_) => {
-                // Promote and recurse.
-                let promoted = promote_pauli_channel(paulis);
-                return promoted.apply(state);
-            }
-            Stabilizer(tableau) => {
-                // TODO[perf]: Introduce an apply_mut method to
-                //             avoid extraneous cloning.
-                let mut new_tableau = tableau.clone();
-                // Sample a Pauli and apply it.
-                let weighted = WeightedIndex::new(paulis.iter().map(|(pr, _)| pr)).unwrap();
-                let idx = weighted.sample(&mut thread_rng());
-                let pauli = &(&paulis)[idx].1;
-                // TODO: Consider moving the following to a method
-                //       on Tableau itself.
-                for (idx_qubit, p) in pauli.iter().enumerate() {
-                    match p {
-                        Pauli::I => (),
-                        Pauli::X => new_tableau.apply_x_mut(idx_qubit),
-                        Pauli::Y => new_tableau.apply_y_mut(idx_qubit),
-                        Pauli::Z => new_tableau.apply_z_mut(idx_qubit),
-                    }
-                }
-                Stabilizer(new_tableau)
-            }
-        },
-    })
 }

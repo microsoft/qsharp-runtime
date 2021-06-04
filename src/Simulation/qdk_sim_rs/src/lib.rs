@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::usize;
 
 pub mod c_api;
+mod chp_decompositions;
 pub mod common_matrices;
 mod instrument;
 pub mod linalg;
