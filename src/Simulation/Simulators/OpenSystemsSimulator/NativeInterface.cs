@@ -159,6 +159,16 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="set_noise_model_by_name")]
+        private static extern Int64 _SetNoiseModelByName(ulong simId, string name);
+
+        public static void SetNoiseModelByName(ulong simId, string name)
+        {
+            LogCall("set_noise_model_by_name");
+            CheckCall(_SetNoiseModelByName(simId, name));
+        }
+
+
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="h")]
         private static extern Int64 _H(ulong simId, uint idx);
 

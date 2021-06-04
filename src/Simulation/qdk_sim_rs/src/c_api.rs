@@ -313,7 +313,6 @@ pub extern "C" fn get_noise_model_by_name(
     })
 }
 
-// TODO: convert to as_capi_err call.
 /// Returns the currently configured noise model for a given simulator,
 /// serialized as a string representing a JSON object.
 ///
@@ -401,6 +400,40 @@ pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char
                 "UTF-8 error decoding serialized noise model; was valid until byte {}.",
                 msg.valid_up_to()
             )),
+        }
+    })
+}
+
+/// Sets the noise model used by a given simulator instance, given a string
+/// containing the name of a built-in noise model.
+///
+/// # Safety
+/// This function is marked as unsafe as the caller is responsible for ensuring
+/// that `name`:
+///
+/// - Is a valid pointer to a null-terminated array of C
+///   characters.
+/// - The pointer remains valid for at least the duration
+///   of the call.
+/// - No other thread may modify the memory referenced by `new_model` for at
+///   least the duration of the call.
+#[no_mangle]
+pub unsafe extern "C" fn set_noise_model_by_name(sim_id: usize, name: *const c_char) -> i64 {
+    as_capi_err(|| {
+        if name.is_null() {
+            return Err("set_noise_model_by_name called with null pointer".to_string());
+        }
+
+        let name = CStr::from_ptr(name)
+            .to_str()
+            .map_err(|e| format!("UTF-8 error decoding name: {}", e))?;
+        let noise_model = NoiseModel::get_by_name(name)?;
+        let state = &mut *STATE.lock().unwrap();
+        if let Some(sim_state) = state.get_mut(&sim_id) {
+            sim_state.noise_model = noise_model;
+            Ok(())
+        } else {
+            Err(format!("No simulator with id {} exists.", sim_id))
         }
     })
 }

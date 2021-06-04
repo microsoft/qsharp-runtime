@@ -14,9 +14,15 @@ namespace Microsoft.Quantum.Experimental
     public partial class NativeInterfaceTests
     {
         [Fact]
-        public void GetNoiseModelByNameWorks()
+        public void GetIdealNoiseModelByNameWorks()
         {
             var ideal = NativeInterface.GetNoiseModelByName("ideal");
+            // TODO: Add assertions here to check properties of the above noise model.
+        }
+
+        [Fact(Skip="Deserializing stabilizer tableaus is not yet supported.")]
+        public void GetIdealStabilizerNoiseModelByNameWorks()
+        {
             var idealStabilizer = NativeInterface.GetNoiseModelByName("ideal_stabilizer");
             // TODO: Add assertions here to check properties of each noise model.
         }
