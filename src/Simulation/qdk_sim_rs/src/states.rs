@@ -95,6 +95,11 @@ impl State {
         }
     }
 
+    /// Returns a serialization of this quantum state as a JSON object.
+    pub fn as_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+
     /// Extends this state to be a state on `n_qubits` additional qubits.
     /// New qubits are added "to the right," e.g.: $\left|\psi\right\rangle$
     /// is extended to $\left|\psi 0\right\rangle$.

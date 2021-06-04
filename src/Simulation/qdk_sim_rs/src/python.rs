@@ -76,6 +76,10 @@ impl PyState {
             data: State::new_stabilizer(n_qubits),
         }
     }
+
+    pub fn as_json(&self) -> String {
+        self.data.as_json()
+    }
 }
 
 #[pyclass(name = "Process")]
