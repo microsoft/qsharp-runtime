@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,9 +33,26 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                 // Copy all library contents to bin.
                 logger?.LogInfo("Copying library directories into the executable's folder.");
 
+                if (!sourceDirectory.Exists)
+                {
+                    throw new ArgumentException($"Could not find source directory: {sourceDirectory.FullName}");
+                }
+
                 foreach (var dir in libraryDirectories)
                 {
+                    if (!dir.Exists)
+                    {
+                        throw new ArgumentException($"Could not find given directory: {dir.FullName}");
+                    }
                     CopyDirectoryContents(dir, binDirectory);
+                }
+
+                foreach (var dir in includeDirectories)
+                {
+                    if (!dir.Exists)
+                    {
+                        throw new ArgumentException($"Could not find given directory: {dir.FullName}");
+                    }
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();

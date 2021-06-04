@@ -65,13 +65,13 @@
     </None>
   </ItemGroup>
 
-  <!--ItemGroup>
+  <ItemGroup>
     <None Include="$(QSimDll)">
       <Link>Simulators\win-x64\Microsoft.Quantum.Simulator.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-  </ItemGroup-->
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\..\Simulation\Native\win10\**\*">
