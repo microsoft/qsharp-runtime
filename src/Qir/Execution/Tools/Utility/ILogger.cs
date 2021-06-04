@@ -18,6 +18,12 @@ namespace Microsoft.Quantum.Qir.Utility
         void LogInfo(string message);
 
         /// <summary>
+        /// Logs a message at the "warning" level.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        void LogWarning(string message);
+
+        /// <summary>
         /// Logs a message at the "error" level.
         /// </summary>
         /// <param name="message">Message to log.</param>

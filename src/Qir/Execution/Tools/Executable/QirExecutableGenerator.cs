@@ -35,28 +35,38 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
                 if (!sourceDirectory.Exists)
                 {
-                    throw new ArgumentException($"Could not find source directory: {sourceDirectory.FullName}");
+                    logger?.LogWarning($"Cannot find source directory: {sourceDirectory.FullName}");
                 }
 
+                var libDirs = new List<string>();
                 foreach (var dir in libraryDirectories)
                 {
                     if (!dir.Exists)
                     {
-                        throw new ArgumentException($"Could not find given directory: {dir.FullName}");
+                        logger?.LogWarning($"Cannot find given directory: {dir.FullName}");
                     }
-                    CopyDirectoryContents(dir, binDirectory);
+                    else
+                    {
+                        CopyDirectoryContents(dir, binDirectory);
+                        libDirs.Add(dir.FullName);
+                    }
                 }
 
+                var includeDirs = new List<string>();
                 foreach (var dir in includeDirectories)
                 {
                     if (!dir.Exists)
                     {
-                        throw new ArgumentException($"Could not find given directory: {dir.FullName}");
+                        logger?.LogWarning($"Could not find given directory: {dir.FullName}");
+                    }
+                    else
+                    {
+                        includeDirs.Add(dir.FullName);
                     }
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
-                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libraryDirectories.Select(dir => dir.FullName).ToArray(), includeDirectories.Select(dir => dir.FullName).ToArray(), executableFile.FullName);
+                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libDirs.ToArray(), includeDirs.ToArray(), executableFile.FullName);
             });
         }
 
