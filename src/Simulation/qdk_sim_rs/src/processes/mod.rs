@@ -5,11 +5,9 @@ mod apply;
 
 use crate::chp_decompositions::ChpOperation;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
-use crate::processes::apply::{apply_kraus_decomposition, apply_pauli_channel, apply_unitary};
 use crate::processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary};
 use crate::NoiseModel;
 use crate::QubitSized;
-use crate::State;
 use crate::C64;
 use crate::{AsUnitary, Pauli};
 use itertools::Itertools;
@@ -75,32 +73,6 @@ impl Process {
     /// Returns a serialization of this quantum process as a JSON object.
     pub fn as_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
-    }
-
-    /// Applies this process to a quantum register with a given
-    /// state, returning the new state of that register.
-    pub fn apply(&self, state: &State) -> Result<State, String> {
-        if state.n_qubits != self.n_qubits {
-            return Err(format!(
-                "Channel acts on {} qubits, but was applied to {}-qubit state.",
-                self.n_qubits, state.n_qubits
-            ));
-        }
-
-        match &self.data {
-            Unitary(u) => apply_unitary(&u, state),
-            KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
-            MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
-            ProcessData::Sequence(processes) => {
-                let mut acc_state = state.clone();
-                for process in processes {
-                    acc_state = process.apply(state)?;
-                }
-                Ok(acc_state)
-            }
-            ProcessData::ChpDecomposition(_operations) => todo!(),
-            ProcessData::Unsupported => Err("Unsupported quantum process.".to_string()),
-        }
     }
 
     /// Returns a copy of this process that applies to registers of a given

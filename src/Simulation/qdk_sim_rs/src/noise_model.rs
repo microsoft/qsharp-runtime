@@ -16,9 +16,6 @@ use num_traits::{One, Zero};
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "python")]
-use pyo3::prelude::*;
-
 /// A description of the noise that applies to the state of a quantum system
 /// as the result of applying operations.
 #[derive(Serialize, Deserialize, Debug)]

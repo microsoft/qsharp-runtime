@@ -8,14 +8,54 @@ use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 
-use crate::{linalg::ConjBy, log, log_as_err, Pauli, Process, State, StateData::*, C64};
+use crate::{
+    chp_decompositions::ChpOperation, linalg::ConjBy, log, log_as_err, Pauli, Process,
+    ProcessData::*, State, StateData::*, Tableau, C64,
+};
 
 use super::promote_pauli_channel;
 
 impl Process {
+    /// Applies this process to a quantum register with a given
+    /// state, returning the new state of that register.
+    pub fn apply(&self, state: &State) -> Result<State, String> {
+        if state.n_qubits != self.n_qubits {
+            return Err(format!(
+                "Channel acts on {} qubits, but was applied to {}-qubit state.",
+                self.n_qubits, state.n_qubits
+            ));
+        }
+
+        match &self.data {
+            Unitary(u) => apply_unitary(&u, state),
+            KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
+            MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
+            Sequence(processes) => {
+                // TODO[perf]: eliminate the extraneous clone here.
+                let mut acc_state = state.clone();
+                for process in processes {
+                    acc_state = process.apply(state)?;
+                }
+                Ok(acc_state)
+            }
+            ChpDecomposition(_operations) => todo!(),
+            Unsupported => Err("Unsupported quantum process.".to_string()),
+        }
+    }
+
     /// Applies this process to the given qubits in a register with a given
     /// state, returning the new state of that register.
     pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
+        // If we have a sequence, we can apply each in turn and exit early.
+        if let Sequence(channels) = &self.data {
+            // TODO[perf]: eliminate the extraneous clone here.
+            let mut acc_state = state.clone();
+            for channel in channels {
+                acc_state = channel.apply_to(idx_qubits, &acc_state)?;
+            }
+            return Ok(acc_state);
+        }
+
         // Fail if there's not enough qubits.
         if state.n_qubits < self.n_qubits {
             return log_as_err(format!(
@@ -42,15 +82,31 @@ impl Process {
         }
 
         // At this point we know that idx_qubits has self.n_qubits many unique
-        // indices in ascending order, so we can proceed to make a new channel
+        // indices, such that we can meaningfully apply the channel to the
+        // qubits described by idx_qubits.
+        //
+        // To do so in general, we can proceed to make a new channel
         // that expands this channel to act on the full register and then use
         // the ordinary apply method.
-        // TODO[perf]: For larger systems, this could be improved by using
+        //
+        // In some cases, however, we can do so more efficiently by working
+        // with the small channel directly, so we check for those cases first
+        // before falling through to the general case.
+
+        // TODO[perf]: For larger systems, we could add another "fast path" using
         //             matrix multiplication kernels to avoid extending
         //             channels to larger Hilbert spaces.
         //             For smaller systems, extending channels and possibly
         //             caching them is likely to be more performant; need to
         //             tune to find crossover point.
+        if let ChpDecomposition(operations) = &self.data {
+            if let Stabilizer(tableau) = &state.data {
+                return apply_chp_decomposition_to(operations, self.n_qubits, idx_qubits, tableau);
+            }
+        }
+
+        // Having tried fast paths above, we now fall back to the most general
+        // case.
         match self.n_qubits {
             1 => {
                 if state.n_qubits == 1 {
@@ -74,6 +130,29 @@ impl Process {
             }
         }
     }
+}
+
+fn apply_chp_decomposition_to(
+    operations: &Vec<ChpOperation>,
+    n_qubits: usize,
+    idx_qubits: &[usize],
+    tableau: &Tableau,
+) -> Result<State, String> {
+    let mut new_tableau = tableau.clone();
+    for operation in operations {
+        match operation {
+            &ChpOperation::Phase(idx) => new_tableau.apply_s_mut(idx_qubits[idx]),
+            &ChpOperation::AdjointPhase(idx) => new_tableau.apply_s_adj_mut(idx_qubits[idx]),
+            &ChpOperation::Hadamard(idx) => new_tableau.apply_h_mut(idx_qubits[idx]),
+            &ChpOperation::Cnot(idx_control, idx_target) => {
+                new_tableau.apply_cnot_mut(idx_qubits[idx_control], idx_qubits[idx_target])
+            }
+        };
+    }
+    Ok(State {
+        n_qubits,
+        data: Stabilizer(new_tableau),
+    })
 }
 
 pub(crate) fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, String> {
