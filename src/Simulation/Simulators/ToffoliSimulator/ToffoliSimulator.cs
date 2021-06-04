@@ -390,10 +390,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <param name="q">The qubit to release.</param>
             public override void Apply(Qubit q)
             {
-                if (simulator.State[q.Id])
-                {
-                    throw new ReleasedQubitsAreNotInZeroState();
-                }
                 manager.Release(q);
             }
 
@@ -403,17 +399,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <param name="qubits">The qubits to release.</param>
             public override void Apply(IQArray<Qubit> qubits)
             {
-                // Note that we need to handle null array pointers (as opposed to empty arrays)
-                if (qubits != null)
-                {
-                    foreach (var q in qubits)
-                    {
-                        if (simulator.State[q.Id])
-                        {
-                            throw new ReleasedQubitsAreNotInZeroState();
-                        }
-                    }
-                }
                 manager.Release(qubits);
             }
         }

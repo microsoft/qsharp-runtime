@@ -145,6 +145,48 @@ bool isclassical(
 }
 
 template <class T, class A>
+std::pair<bool, bool> is_classical_or_entangled(
+    std::vector<std::complex<T>, A> const& wfn,
+    std::size_t q,
+    T eps = 100. * std::numeric_limits<T>::epsilon())
+{
+    std::size_t offset = 1ull << q;
+    bool have0 = false;
+    bool have1 = false;
+    bool notentangled = false;
+
+    std::size_t maski = ~(offset - 1);
+#ifndef _MSC_VER
+#pragma omp parallel for schedule(static) reduction(|| : have0, have1, notentangled)
+    for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i += 2 * offset)
+        for (std::intptr_t j = 0; j < static_cast<std::intptr_t>(offset); ++j)
+        {
+            bool has0 = std::norm(wfn[i + j]) >= eps;
+            bool has1 = std::norm(wfn[i + j + offset]) >= eps;
+            have0 = have0 || has0;
+            have1 = have1 || has1;
+            if (has0 && has1)
+                notentangled = notentangled || ((i + j) ^ (i + j + offset)) != 0;
+        }
+#else
+#pragma omp parallel for schedule(static) reduction(|| : have0, have1, notentangled)
+    for (std::intptr_t l = 0; l < static_cast<std::intptr_t>(wfn.size()) / 2; l++)
+    {
+        std::intptr_t j = l % offset;
+        std::intptr_t i = ((l & maski) << 1);
+        bool has0 = std::norm(wfn[i + j]) >= eps;
+        bool has1 = std::norm(wfn[i + j + offset]) >= eps;
+        have0 = have0 || has0;
+        have1 = have1 || has1;
+        if (has0 && has1)
+            notentangled = notentangled || ((i + j) ^ (i + j + offset)) != 0;
+    }
+#endif
+
+    return std::make_pair<bool, bool>(have0 ^ have1, have0 && have1 && !notentangled);
+}
+
+template <class T, class A>
 double jointprobability(std::vector<T, A> const& wfn, std::vector<unsigned> const& qs, bool val = true)
 {
     std::size_t mask = 0;

@@ -71,6 +71,12 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return psi.isclassical(q);
     }
 
+    std::pair<bool, bool> is_classical_or_entangled(logical_qubit_id q)
+    {
+        recursive_lock_type l(mutex());
+        return psi.is_classical_or_entangled(q);
+    }
+
     // allocate and release
     logical_qubit_id allocate()
     {
@@ -108,13 +114,11 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     {
         recursive_lock_type l(mutex());
         flush();
-        bool allok = isclassical(q);
-        if (allok)
-            allok = (psi.getvalue(q) == false);
-        else
+        std::pair<bool, bool> allok = is_classical_or_entangled(q);
+        if (!allok.first)
             M(q);
         psi.release(q);
-        return allok;
+        return !allok.second;
     }
 
     bool release(std::vector<logical_qubit_id> const& qs)

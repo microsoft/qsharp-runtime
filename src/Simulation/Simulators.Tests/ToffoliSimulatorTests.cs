@@ -165,7 +165,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new ToffoliSimulator();
 
-            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
+            await UsingQubitCheck.Run(sim);
         }
 
         [Fact]

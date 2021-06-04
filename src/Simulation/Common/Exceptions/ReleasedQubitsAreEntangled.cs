@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Exceptions
 {
-    public class ReleasedQubitsAreNotInZeroState : Exception
+    public class ReleasedQubitsAreEntangled : Exception
     {
-        public ReleasedQubitsAreNotInZeroState()
-            : base("Released qubits are not in zero state.")
+        public ReleasedQubitsAreEntangled()
+            : base("Released qubits are entangled.")
         {
         }
     }

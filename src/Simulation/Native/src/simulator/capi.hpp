@@ -63,14 +63,14 @@ extern "C"
     MICROSOFT_QUANTUM_DECL bool InjectState(
         _In_ unsigned sid,
         _In_ unsigned n,
-        _In_reads_(n) unsigned* q, // The listed qubits must be unentangled and in state |0>
+        _In_reads_(n) unsigned* q, // The listed qubits must be disentangled and in state |0>
         _In_ double* re, // 2^n real parts of the amplitudes of the superposition the listed qubits should be put into
         _In_ double* im  // 2^n imaginary parts of the amplitudes
     );
 
     // allocate and release
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid); // NOLINT
-    MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q); // NOLINT
+    MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned sid, _In_ unsigned q); // NOLINT
     MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned sid); // NOLINT
 
     // single-qubit gates

@@ -56,10 +56,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 base.Release(qubit, wasUsedOnlyForBorrowing);
                 if (qubit != null)
                 {
-                    bool isReleasedQubitZero = ReleaseOne(this.SimulatorId, (uint)qubit.Id);
-                    if (!(isReleasedQubitZero || qubit.IsMeasured) && throwOnReleasingQubitsNotInZeroState)
+                    bool isReleasedQubitEntangled = !ReleaseOne(this.SimulatorId, (uint)qubit.Id);
+                    if (isReleasedQubitEntangled && throwOnReleasingQubitsNotInZeroState)
                     {
-                        throw new ReleasedQubitsAreNotInZeroState();
+                        throw new ReleasedQubitsAreEntangled();
                     }
                 }
             }

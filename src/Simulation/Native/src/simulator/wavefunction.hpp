@@ -672,6 +672,13 @@ class Wavefunction
         return kernels::isclassical(wfn_, get_qubit_position(q));
     }
 
+    /// checks both if the qubit is in classical state or entangled with any other qubits
+    std::pair<bool, bool> is_classical_or_entangled(logical_qubit_id q) const
+    {
+        flush();
+        return kernels::is_classical_or_entangled(wfn_, get_qubit_position(q));
+    }
+
     /// returns the classical value of a qubit (if classical)
     /// \pre the qubit has to be in a classical state in the computational basis
     bool getvalue(logical_qubit_id q) const

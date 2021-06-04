@@ -569,7 +569,7 @@ TEST_CASE("Should fail to inject state if qubits aren't all |0>", "[local_test]"
 
     std::vector<ComplexType> amplitudes_sub = {{amp, 0.0}, {amp, 0.0}, {amp, 0.0}, {0.0, 0.0}};
 
-    // unentangled but not |0>
+    // not entangled but not |0>
     sim.H(qs[1]);
     REQUIRE_FALSE(sim.InjectState(qs, amplitudes));
     REQUIRE_FALSE(sim.InjectState({qs[0], qs[1]}, amplitudes_sub));
@@ -826,6 +826,82 @@ TEST_CASE("test_multicontrol", "[local_test]")
 
         CHECK(sim.num_qubits() == 0);
     }
+}
+
+TEST_CASE("test_is_classical_or_entangled", "[local_test]")
+{
+    SimulatorType sim;
+    auto qbits = sim.allocate(4);
+
+    CHECK(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.X(qbits[0]);
+    sim.X(qbits[2]);
+    CHECK(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.X(qbits[0]);
+    sim.H(qbits[0]);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.H(qbits[1]);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.H(qbits[1]);
+    sim.CX(qbits[0], qbits[1]);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.CX(qbits[0], qbits[2]);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.CX(qbits[0], qbits[1]);
+    sim.CX(qbits[0], qbits[2]);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.H(qbits[0]);
+    CHECK(sim.is_classical_or_entangled(qbits[0]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[0]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[1]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[1]).second);
+    CHECK(sim.is_classical_or_entangled(qbits[2]).first);
+    CHECK_FALSE(sim.is_classical_or_entangled(qbits[2]).second);
+
+    sim.release(qbits);
+    CHECK(sim.num_qubits() == 0);
 }
 
 void test_extract_qubits_state_simple(int qubits_number)

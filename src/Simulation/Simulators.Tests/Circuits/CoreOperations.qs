@@ -546,7 +546,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         using (q = Qubit())
         {
             X(q);
-            // Should raise an exception
+            // Should not raise an exception
         }
     }
 
@@ -581,7 +581,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         borrowing (q = Qubit())
         {
             X(q);
-            // Should raise an exception
+            // Should not raise an exception
         }
     }
 
