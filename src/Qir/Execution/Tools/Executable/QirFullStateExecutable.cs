@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Quantum.Qir.Tools.Driver;
 using Microsoft.Quantum.Qir.Utility;
 
@@ -41,13 +42,11 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             HeaderDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", "any", "native", "include")));
             HeaderDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "Externals", "CLI11")));
 
-            var osID = Environment.OSVersion.Platform switch
-            {
-                PlatformID.Win32NT => "win-x64",
-                PlatformID.Unix => "linux-x64",
-                PlatformID.MacOSX => "osx-x64",
-                _ => throw new ArgumentException("Unsupported operating system architecture."),
-            };
+            var osID = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win-x64"
+                : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux-x64"
+                : RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "osx-x64"
+                : throw new ArgumentException("Unsupported operating system architecture.");
+
             LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native")));
             LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "Simulators", osID)));
         }
