@@ -67,7 +67,7 @@
 
   <ItemGroup>
     <None Include="$(QSimDll)">
-      <Link>Simulators\win-x64\Microsoft.Quantum.Simulator.Runtime.dll</Link>
+      <Link>Libraries\Microsoft.Quantum.Simulator.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
