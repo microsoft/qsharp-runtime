@@ -133,18 +133,18 @@ impl Process {
 }
 
 fn apply_chp_decomposition_to(
-    operations: &Vec<ChpOperation>,
+    operations: &[ChpOperation],
     n_qubits: usize,
     idx_qubits: &[usize],
     tableau: &Tableau,
 ) -> Result<State, String> {
     let mut new_tableau = tableau.clone();
     for operation in operations {
-        match operation {
-            &ChpOperation::Phase(idx) => new_tableau.apply_s_mut(idx_qubits[idx]),
-            &ChpOperation::AdjointPhase(idx) => new_tableau.apply_s_adj_mut(idx_qubits[idx]),
-            &ChpOperation::Hadamard(idx) => new_tableau.apply_h_mut(idx_qubits[idx]),
-            &ChpOperation::Cnot(idx_control, idx_target) => {
+        match *operation {
+            ChpOperation::Phase(idx) => new_tableau.apply_s_mut(idx_qubits[idx]),
+            ChpOperation::AdjointPhase(idx) => new_tableau.apply_s_adj_mut(idx_qubits[idx]),
+            ChpOperation::Hadamard(idx) => new_tableau.apply_h_mut(idx_qubits[idx]),
+            ChpOperation::Cnot(idx_control, idx_target) => {
                 new_tableau.apply_cnot_mut(idx_qubits[idx_control], idx_qubits[idx_target])
             }
         };
