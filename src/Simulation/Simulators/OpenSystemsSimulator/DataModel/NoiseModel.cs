@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NumSharp;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Quantum.Experimental
 {
@@ -55,6 +56,18 @@ namespace Microsoft.Quantum.Experimental
         [JsonPropertyName("z_meas")]
         public Instrument? ZMeas { get; set; }
 
-        public static NoiseModel Ideal => NativeInterface.IdealNoiseModel();
+        public static bool TryGetByName(string name, [NotNullWhen(true)] out NoiseModel? model)
+        {
+            try
+            {
+                model = NativeInterface.GetNoiseModelByName(name);
+                return true;
+            }
+            catch
+            {
+                model = null;
+                return false;
+            }
+        }
     }
 }

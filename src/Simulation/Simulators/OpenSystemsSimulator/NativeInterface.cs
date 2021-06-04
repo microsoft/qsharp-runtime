@@ -14,6 +14,26 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.Quantum.Experimental
 {
     /// <summary>
+    ///     Represents an exception that is raised by native simulator code.
+    /// </summary>
+    [Serializable()]
+    public class SimulationException : Exception
+    {
+        private readonly string? source;
+
+        /// <summary>
+        ///     The name of the native shared library which raised this
+        ///     exception if known, <c>null</c> otherwise.
+        /// </summary>
+        public string? SourceLibrary => source;
+
+        internal SimulationException(string message, string? source) : base(message)
+        {
+            this.source = source;
+        }
+    }
+
+    /// <summary>
     ///     Abstracts away calls to and from the experimental simulators DLL.
     /// </summary>
     internal static class NativeInterface
@@ -27,7 +47,7 @@ namespace Microsoft.Quantum.Experimental
             if (errorCode != 0)
             {
                 var error = _LastError();
-                throw new Exception($"Exception in native open systems simulator runtime: {error}");
+                throw new SimulationException($"Exception in native open systems simulator runtime: {error}", DLL_NAME);
             }
         }
 
@@ -93,14 +113,24 @@ namespace Microsoft.Quantum.Experimental
             return JsonSerializer.Deserialize<State>(_GetCurrentState(simId));
         }
 
-        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_noise_model")]
-        private static extern string _GetNoiseModel(ulong simId);
+        [DllImport(DLL_NAME, ExactSpelling =true, CallingConvention =CallingConvention.Cdecl, EntryPoint="get_noise_model_by_name")]
+        private static extern Int64 _GetNoiseModelByName(string name, out string noiseModel);
 
+        public static NoiseModel GetNoiseModelByName(string name)
+        {
+            LogCall("get_noise_model_by_name");
+            CheckCall(_GetNoiseModelByName(name, out var noiseModelJson));
+            return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson);
+        }
+
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_noise_model")]
+        private static extern Int64 _GetNoiseModel(ulong simId, out string noiseModel);
 
         public static NoiseModel GetNoiseModel(ulong simId)
         {
             LogCall("get_noise_model");
-            return JsonSerializer.Deserialize<NoiseModel>(_GetNoiseModel(simId));
+            CheckCall(_GetNoiseModel(simId, out var noiseModelJson));
+            return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson);
         }
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="set_noise_model")]
@@ -123,22 +153,11 @@ namespace Microsoft.Quantum.Experimental
             {
                 throw new Exception($"Could not serialize noise model: {ex.Message}", ex);
             }
-            catch (Exception ex)
+            catch (SimulationException ex)
             {
                 throw new Exception($"Could not set noise model from JSON: {ex.Message}\nJSON data:\n{jsonData}", ex);
             }
         }
-
-        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="ideal_noise_model")]
-        private static extern string _IdealNoiseModel();
-
-
-        public static NoiseModel IdealNoiseModel()
-        {
-            LogCall("ideal_noise_model");
-            return JsonSerializer.Deserialize<NoiseModel>(_IdealNoiseModel());
-        }
-
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="h")]
         private static extern Int64 _H(ulong simId, uint idx);

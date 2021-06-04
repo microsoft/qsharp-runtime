@@ -110,9 +110,13 @@ pub extern "C" fn lasterr() -> *const c_char {
 ///   a stabilizer tableau.
 ///
 /// # Safety
-/// The caller is responsible for ensuring that `sim_id_out` points to valid
-/// memory, and that the lifetime of this pointer extends at least for the
-/// duration of this call.
+/// The caller is responsible for:
+///
+/// - Ensuring that `sim_id_out` points to valid
+///   memory, and that the lifetime of this pointer extends at least for the
+///   duration of this call.
+/// - Ensuring that `representation` is a valid pointer to a null-terminated
+///   string of Unicode characters, encoded as UTF-8.
 #[no_mangle]
 pub unsafe extern "C" fn init(
     initial_capacity: usize,
@@ -254,31 +258,99 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
     })
 }
 
-/// Returns the currently configured noise model for a given simulator,
-/// serialized as a string representing a JSON object.
-#[no_mangle]
-pub extern "C" fn get_noise_model(sim_id: usize) -> *const c_char {
-    let state = &*STATE.lock().unwrap();
-    if let Some(sim_state) = state.get(&sim_id) {
-        CString::new(sim_state.noise_model.as_json().as_str())
-            .unwrap()
-            .into_raw()
-    } else {
-        ptr::null()
+impl NoiseModel {
+    /// Private function to help look up common noise models by name.
+    fn get_by_name(name: &str) -> Result<NoiseModel, String> {
+        match name {
+            "ideal" => Ok(NoiseModel::ideal()),
+            "ideal_stabilizer" => Ok(NoiseModel::ideal_stabilizer()),
+            _ => Err(format!("Unrecognized noise model name {}.", name)),
+        }
     }
 }
 
-/// Returns a JSON serialization of the ideal noise model (i.e.: a noise model
-/// that agrees with closed-system simulation).
+/// Gets the noise model corresponding to a particular name, serialized as a
+/// string representing a JSON object.
+///
+/// Currently recognized names:
+/// - `ideal`
+/// - `ideal_stabilizer`
+///
+/// # Safety
+/// As this is a C-language API, the Rust compiler cannot guarantee safety when
+/// calling into this function. The caller is responsible for ensuring that:
+///
+/// - `name` is a pointer to a null-terminated string of Unicode characters,
+///   encoded as UTF-8, and that the pointer remains valid for the lifetime of
+///   this call.
+/// - `noise_model_json` is a valid pointer whose lifetime extends for the
+///    duration of this function call.
+///
+/// After this call completes, this function guarantees that either of the two
+/// conditions below holds:
+///
+/// - The return value is negative, in which case calling `lasterr` will return
+///   an actionable error message, or
+/// - The return value is `0`, and `*noise_model_json` is a valid pointer to a
+///   null-terminated string of Unicode characters, encoded as UTF-8. In this
+///   case, the caller is considered to own the memory allocated for this
+///   string.
 #[no_mangle]
-pub extern "C" fn ideal_noise_model() -> *const c_char {
-    CString::new(
-        serde_json::to_string(&NoiseModel::ideal())
-            .unwrap()
-            .as_str(),
-    )
-    .unwrap()
-    .into_raw()
+pub extern "C" fn get_noise_model_by_name(
+    name: *const c_char,
+    noise_model_json: *mut *const c_char,
+) -> i64 {
+    as_capi_err(|| {
+        let name = unsafe { CStr::from_ptr(name) }
+            .to_str()
+            .map_err(|e| format!("UTF-8 error decoding representation argument: {}", e))?;
+        let noise_model = NoiseModel::get_by_name(name)?;
+        let noise_model = CString::new(noise_model.as_json()).unwrap();
+        unsafe {
+            *noise_model_json = noise_model.into_raw();
+        }
+        Ok(())
+    })
+}
+
+// TODO: convert to as_capi_err call.
+/// Returns the currently configured noise model for a given simulator,
+/// serialized as a string representing a JSON object.
+///
+/// # Safety
+/// As this is a C-language API, the Rust compiler cannot guarantee safety when
+/// calling into this function. The caller is responsible for ensuring that:
+///
+/// - `noise_model_json` is a valid pointer whose lifetime extends for the
+///    duration of this function call.
+///
+/// After this call completes, this function guarantees that either of the two
+/// conditions below holds:
+///
+/// - The return value is negative, in which case calling `lasterr` will return
+///   an actionable error message, or
+/// - The return value is `0`, and `*noise_model_json` is a valid pointer to a
+///   null-terminated string of Unicode characters, encoded as UTF-8. In this
+///   case, the caller is considered to own the memory allocated for this
+///   string.
+#[no_mangle]
+pub extern "C" fn get_noise_model(sim_id: usize, noise_model_json: *mut *const c_char) -> i64 {
+    as_capi_err(|| {
+        let state = &*STATE
+            .lock()
+            .map_err(|e| format!("Lock poisoning error: {}", e))?;
+        if let Some(sim_state) = state.get(&sim_id) {
+            let c_str = CString::new(sim_state.noise_model.as_json().as_str()).map_err(|e| {
+                format!("Null error while converting noise model to C string: {}", e)
+            })?;
+            unsafe {
+                *noise_model_json = c_str.into_raw();
+            }
+        } else {
+            return Err(format!("No simulator with id {} exists.", sim_id));
+        }
+        Ok(())
+    })
 }
 
 /// Sets the noise model used by a given simulator instance, given a string
