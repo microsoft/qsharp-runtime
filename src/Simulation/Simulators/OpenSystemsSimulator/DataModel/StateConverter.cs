@@ -42,14 +42,24 @@ namespace Microsoft.Quantum.Experimental
 
         public override State Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var (nQubits, kind, data) = ComplexArrayConverter.ReadQubitSizedArray(ref reader, options);
-            return kind switch
-            {
-                "Pure" => new PureState(nQubits, data),
-                "Mixed" => new MixedState(nQubits, data),
-                // TODO: read tableaus here.
-                _ => throw new JsonException($"Unknown state kind {kind}.")
-            };
+            reader.Require(JsonTokenType.StartObject, read: false);
+
+            var arrayConverter = new ComplexArrayConverter();
+            return reader.ReadQubitSizedData<State>((ref Utf8JsonReader reader, string kind) =>
+                kind switch
+                {
+                    "Pure" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                        (int nQubits, NDArray data) => new PureState(nQubits, data)
+                    ),
+                    "Mixed" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                        (int nQubits, NDArray data) => new MixedState(nQubits, data)
+                    ),
+                    "Stabilizer" => JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader).Bind(
+                        (int nQubits, StabilizerState.TableArray data) => new StabilizerState(nQubits, data)
+                    ),
+                    _ => throw new JsonException($"Unknown state kind {kind}.")
+                }
+            );
         }
 
         public override void Write(Utf8JsonWriter writer, State value, JsonSerializerOptions options)
@@ -70,7 +80,19 @@ namespace Microsoft.Quantum.Experimental
                         }
                     );
 
-                    arrayConverter.Write(writer, value.Data, options);
+                    if (value is ArrayState { Data: var data })
+                    {
+                        arrayConverter.Write(writer, data, options);
+                    }
+                    else if (value is StabilizerState stabilizerState)
+                    {
+                        var array = new StabilizerState.TableArray
+                        {
+                            Data = stabilizerState.Data.flat.ToArray<bool>().ToList(),
+                            Dimensions = stabilizerState.Data.Shape.Dimensions.ToList()
+                        };
+                        JsonSerializer.Serialize(writer, array);
+                    }
                 writer.WriteEndObject();
             writer.WriteEndObject();
         }

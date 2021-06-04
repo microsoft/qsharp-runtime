@@ -19,16 +19,64 @@ namespace Microsoft.Quantum.Experimental
     {
         public int NQubits { get; }
 
-        public NDArray Data { get; }
-
-        internal State(int nQubits, NDArray data)
+        internal State(int nQubits)
         {
             NQubits = nQubits;
-            Data = data;
         }
     }
 
-    public class PureState : State
+    public class StabilizerState : State
+    {
+        // Design note:
+        // We could use the same array converter as used of complex-like arrays
+        // of floats, but it's a bit easier in this case to directly
+        // deserialize into a type that represents the underlying data that
+        // we need.
+        internal class TableArray
+        {
+            [JsonPropertyName("v")]
+            internal int SchemaVersion { get; set; } = 1;
+
+            [JsonPropertyName("dim")]
+            internal List<int>? Dimensions { get; set; }
+
+            [JsonPropertyName("data")]
+            internal List<bool>? Data { get; set; }
+
+            internal NDArray? AsArray =>
+                Dimensions == null || Data == null
+                ? null
+                : np.ndarray(
+                    new Shape(Dimensions.ToArray()),
+                    typeof(bool),
+                    Data.ToArray()
+                );
+        }
+
+        public NDArray Data { get; }
+
+        internal StabilizerState(int nQubits, TableArray data) : base(nQubits)
+        {
+            var array = data.AsArray;
+            if (array == null)
+            {
+                throw new Exception($"Data deserialized for stabilizer state was null. Dimensions: {data.Dimensions}, data: {data.Data}");
+            }
+            Data = array!;
+        }
+    }
+
+    public abstract class ArrayState : State
+    {
+        public NDArray Data { get; }
+
+        internal ArrayState(int nQubits, NDArray data) : base(nQubits)
+        {
+            this.Data = data;
+        }
+    }
+
+    public class PureState : ArrayState
     {
         public PureState(int nQubits, NDArray data) : base(nQubits, data)
         {
@@ -43,7 +91,7 @@ namespace Microsoft.Quantum.Experimental
         // TODO: Override ToString here!
     }
 
-    public class MixedState : State
+    public class MixedState : ArrayState
     {
         public MixedState(int nQubits, NDArray data) : base(nQubits, data)
         {
