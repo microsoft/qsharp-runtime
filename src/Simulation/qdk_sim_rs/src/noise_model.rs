@@ -87,6 +87,7 @@ impl NoiseModel {
     ///
     /// # Example
     /// ```
+    /// # use qdk_sim::NoiseModel;
     /// let noise_model = NoiseModel::get_by_name("ideal");
     /// ```
     pub fn get_by_name(name: &str) -> Result<NoiseModel, String> {
