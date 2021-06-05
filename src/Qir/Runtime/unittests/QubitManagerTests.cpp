@@ -40,6 +40,108 @@ TEST_CASE("Allocation and reallocation of one qubit", "[QubitManagerBasic]")
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
 }
 
+TEST_CASE("Qubit Status", "[QubitManagerBasic]")
+{
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(2, false, true);
+
+    Qubit q0 = qm->Allocate();
+    CQubitManager::QubitIdType q0id = qm->GetQubitId(q0);
+    REQUIRE(qm->IsValidQubit(q0));
+    REQUIRE(qm->IsExplicitlyAllocatedQubit(q0));
+    REQUIRE(!qm->IsDisabledQubit(q0));
+    REQUIRE(!qm->IsFreeQubitId(q0id));
+    REQUIRE(qm->GetAllocatedQubitCount() == 1);
+
+    qm->Disable(q0);
+    REQUIRE(qm->IsValidQubit(q0));
+    REQUIRE(!qm->IsExplicitlyAllocatedQubit(q0));
+    REQUIRE(qm->IsDisabledQubit(q0));
+    REQUIRE(!qm->IsFreeQubitId(q0id));
+    REQUIRE(qm->GetDisabledQubitCount() == 1);
+
+    qm->Release(q0);
+    REQUIRE(!qm->IsFreeQubitId(q0id));
+    REQUIRE(qm->GetFreeQubitCount() == 1);
+
+    Qubit q1 = qm->Allocate();
+    CQubitManager::QubitIdType q1id = qm->GetQubitId(q1);
+    REQUIRE(q0id != q1id);
+
+    REQUIRE(qm->IsValidQubit(q1));
+    REQUIRE(qm->IsExplicitlyAllocatedQubit(q1));
+    REQUIRE(!qm->IsDisabledQubit(q1));
+    REQUIRE(!qm->IsFreeQubitId(q1id));
+
+    REQUIRE(qm->GetAllocatedQubitCount() == 1);
+    REQUIRE(qm->GetDisabledQubitCount() == 1);
+    REQUIRE(qm->GetFreeQubitCount() == 0);
+
+    qm->Release(q1);
+    REQUIRE(qm->IsFreeQubitId(q1id));
+}
+
+TEST_CASE("Qubit Counts", "[QubitManagerBasic]")
+{
+    constexpr int totalQubitCount = 100;
+    constexpr int disabledQubitCount = 29;
+    constexpr int extraQubitCount = 43;
+    static_assert(extraQubitCount <= totalQubitCount);
+    static_assert(disabledQubitCount <= totalQubitCount);
+    // We don't want capacity to be extended at first...
+    static_assert(extraQubitCount + disabledQubitCount <= totalQubitCount);
+
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(totalQubitCount, true, true);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == 0);
+    REQUIRE(qm->GetDisabledQubitCount() == 0);
+
+    Qubit* qubits = new Qubit[disabledQubitCount];
+    qm->Allocate(qubits, disabledQubitCount);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == disabledQubitCount);
+    REQUIRE(qm->GetDisabledQubitCount() == 0);
+
+    qm->Disable(qubits, disabledQubitCount);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == 0);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+
+    qm->Release(qubits, disabledQubitCount);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == 0);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+    delete[] qubits;
+
+    qubits = new Qubit[extraQubitCount];
+    qm->Allocate(qubits, extraQubitCount);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount-extraQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == extraQubitCount);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+
+    qm->Release(qubits, extraQubitCount);
+    REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == 0);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+    delete[] qubits;
+
+    qubits = new Qubit[totalQubitCount];
+    qm->Allocate(qubits, totalQubitCount);
+    REQUIRE(qm->GetQubitCapacity() > totalQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == totalQubitCount);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+
+    qm->Release(qubits, totalQubitCount);
+    REQUIRE(qm->GetQubitCapacity() > totalQubitCount);
+    REQUIRE(qm->GetAllocatedQubitCount() == 0);
+    REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
+    delete[] qubits;
+}
 
 TEST_CASE("Allocation of released qubits when reuse is encouraged", "[QubitManagerBasic]")
 {
@@ -148,3 +250,4 @@ TEST_CASE("Restricted Area", "[QubitManager]")
     // OK to destruct qubit manager while qubits are still allocated.
     REQUIRE_THROWS(qm->Allocate());
 }
+

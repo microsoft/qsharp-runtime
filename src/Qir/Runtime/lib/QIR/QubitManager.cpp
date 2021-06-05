@@ -236,13 +236,6 @@ void CQubitManager::EndRestrictedReuseArea()
 Qubit CQubitManager::Allocate()
 {
     QubitIdType newQubitId = AllocateQubitId();
-    if (newQubitId == NoneMarker && mayExtendCapacity)
-    {
-        QubitIdType newQubitCapacity = qubitCapacity * 2;
-        FailIf(newQubitCapacity <= qubitCapacity, "Cannot extend capacity.");
-        EnsureCapacity(newQubitCapacity);
-        newQubitId = AllocateQubitId();
-    }
     FailIf(newQubitId == NoneMarker, "Not enough qubits.");
     return CreateQubitObject(newQubitId);
 }
@@ -324,7 +317,7 @@ void CQubitManager::Disable(Qubit qubit)
     QubitIdType id = QubitToId(qubit);
 
     // We can only disable explicitly allocated qubits that were not borrowed.
-    FailIf(!IsExplicitlyAllocated(id), "Cannot disable qubit that is not explicitly allocated.");
+    FailIf(!IsExplicitlyAllocatedId(id), "Cannot disable qubit that is not explicitly allocated.");
     sharedQubitStatusArray[id] = DisabledMarker;
 
     disabledQubitCount++;
@@ -348,28 +341,45 @@ void CQubitManager::Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable)
     }
 }
 
+bool CQubitManager::IsValidId(QubitIdType id) const
+{
+    return (id >= 0) && (id < qubitCapacity);
+}
+
+bool CQubitManager::IsDisabledId(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] == DisabledMarker;
+}
+
+bool CQubitManager::IsExplicitlyAllocatedId(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] == AllocatedMarker;
+}
+
+bool CQubitManager::IsFreeId(QubitIdType id) const
+{
+    return sharedQubitStatusArray[id] >= 0;
+}
+
+
 bool CQubitManager::IsValidQubit(Qubit qubit) const
 {
-    QubitIdType id = QubitToId(qubit);
-    if (id >= qubitCapacity)
-    {
-        return false;
-    }
-    if (id < 0)
-    {
-        return false;
-    }
-    return true;
+    return IsValidId(QubitToId(qubit));
 }
 
 bool CQubitManager::IsDisabledQubit(Qubit qubit) const
 {
-    return IsValidQubit(qubit) && IsDisabled(QubitToId(qubit));
+    return IsValidQubit(qubit) && IsDisabledId(QubitToId(qubit));
 }
 
-bool CQubitManager::IsFreeQubit(Qubit qubit) const
+bool CQubitManager::IsExplicitlyAllocatedQubit(Qubit qubit) const
 {
-    return IsValidQubit(qubit) && IsFree(QubitToId(qubit));
+    return IsValidQubit(qubit) && IsExplicitlyAllocatedId(QubitToId(qubit));
+}
+
+bool CQubitManager::IsFreeQubitId(QubitIdType id) const
+{
+    return IsValidId(id) && IsFreeId(id);
 }
 
 CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
@@ -381,7 +391,8 @@ CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
 
 Qubit CQubitManager::CreateQubitObject(QubitIdType id)
 {
-    FailIf(id < 0 || id > INTPTR_MAX, "Qubit id is out of range.");
+    // Make sure the static_cast won't overflow:
+    FailIf(id < 0 || id > std::numeric_limits<intptr_t>::max(), "Qubit id is out of range.");
     intptr_t pointerSizedId = static_cast<intptr_t>(id);
     return reinterpret_cast<Qubit>(pointerSizedId);
 }
@@ -394,6 +405,7 @@ void CQubitManager::DeleteQubitObject(Qubit qubit)
 CQubitManager::QubitIdType CQubitManager::QubitToId(Qubit qubit) const
 {
     intptr_t pointerSizedId = reinterpret_cast<intptr_t>(qubit);
+    // Make sure the static_cast won't overflow:
     FailIf(pointerSizedId < 0 || pointerSizedId > std::numeric_limits<QubitIdType>::max(), "Qubit id is out of range.");
     return static_cast<QubitIdType>(pointerSizedId);
 }
@@ -422,8 +434,11 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
     freeQubitsInAreas[0].FreeQubitsReuseAllowed.MoveAllQubitsFrom(newFreeQubits, sharedQubitStatusArray);
 }
 
-CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
+CQubitManager::QubitIdType CQubitManager::TakeFreeQubitId()
 {
+    // Possible future optimization: we may store and maintain links to the next
+    // area with non-empty free list. Need to check amortized complexity...
+    
     QubitIdType id = NoneMarker;
     if (encourageReuse)
     {
@@ -458,16 +473,29 @@ CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
     return id;
 }
 
+CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
+{
+    QubitIdType newQubitId = TakeFreeQubitId();
+    if (newQubitId == NoneMarker && mayExtendCapacity)
+    {
+        QubitIdType newQubitCapacity = qubitCapacity * 2;
+        FailIf(newQubitCapacity <= qubitCapacity, "Cannot extend capacity.");
+        EnsureCapacity(newQubitCapacity);
+        newQubitId = TakeFreeQubitId();
+    }
+    return newQubitId;
+}
+
 void CQubitManager::ReleaseQubitId(QubitIdType id)
 {
     FailIf(id < 0 || id >= qubitCapacity, "Internal Error: Cannot release an invalid qubit.");
-    if (IsDisabled(id))
+    if (IsDisabledId(id))
     {
         // Nothing to do. Qubit will stay disabled.
         return;
     }
 
-    FailIf(!IsExplicitlyAllocated(id), "Attempt to free qubit that has not been allocated.");
+    FailIf(!IsExplicitlyAllocatedId(id), "Attempt to free qubit that has not been allocated.");
 
     if (mayExtendCapacity && !encourageReuse)
     {
@@ -489,20 +517,6 @@ void CQubitManager::ReleaseQubitId(QubitIdType id)
     FailIf(allocatedQubitCount < 0, "Incorrect allocated qubit count.");
 }
 
-bool CQubitManager::IsDisabled(QubitIdType id) const
-{
-    return sharedQubitStatusArray[id] == DisabledMarker;
-}
-
-bool CQubitManager::IsExplicitlyAllocated(QubitIdType id) const
-{
-    return sharedQubitStatusArray[id] == AllocatedMarker;
-}
-
-bool CQubitManager::IsFree(QubitIdType id) const
-{
-    return sharedQubitStatusArray[id] >= 0;
-}
 
 }
 }

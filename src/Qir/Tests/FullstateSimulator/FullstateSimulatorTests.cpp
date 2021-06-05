@@ -77,6 +77,36 @@ TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
     sim->ReleaseResult(r2);
 }
 
+TEST_CASE("Fullstate simulator: X, M, reuse, M", "[fullstate_simulator]")
+{
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+
+    Qubit q = sim->AllocateQubit();
+    Result r1 = MZ(iqa, q);
+    REQUIRE(Result_Zero == sim->GetResultValue(r1));
+    REQUIRE(sim->AreEqualResults(r1, sim->UseZero()));
+
+    iqa->X(q);
+    Result r2 = MZ(iqa, q);
+    REQUIRE(Result_One == sim->GetResultValue(r2));
+    REQUIRE(sim->AreEqualResults(r2, sim->UseOne()));
+
+    sim->ReleaseQubit(q);
+    sim->ReleaseResult(r1);
+    sim->ReleaseResult(r2);
+
+    Qubit qq = sim->AllocateQubit();
+    Result r3 = MZ(iqa, qq);
+    // Allocated qubit should always be in |0> state even though we released
+    // q in |1> state, and qq is likely reusing the same underlying qubit as q.
+    REQUIRE(Result_Zero == sim->GetResultValue(r3));
+    REQUIRE(sim->AreEqualResults(r3, sim->UseZero()));
+    
+    sim->ReleaseQubit(qq);
+    sim->ReleaseResult(r3);
+}
+
 TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();

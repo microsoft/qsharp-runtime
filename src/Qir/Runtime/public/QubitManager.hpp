@@ -83,14 +83,32 @@ namespace Quantum
 
         bool IsValidQubit(Qubit qubit) const;
         bool IsDisabledQubit(Qubit qubit) const;
-        bool IsFreeQubit(Qubit qubit) const;
+        bool IsExplicitlyAllocatedQubit(Qubit qubit) const;
+        bool IsFreeQubitId(QubitIdType id) const;
+
         QubitIdType GetQubitId(Qubit qubit) const;
 
-        // Qubit counts
+        // Qubit counts:
+
+        // Number of qubits that are disabled. When an explicitly allocated qubit
+        // gets disabled, it is removed from allocated count and is added to
+        // disabled count immediately. Subsequent Release doesn't affect counts.
         int32_t GetDisabledQubitCount() const { return disabledQubitCount; }
+
+        // Number of qubits that are explicitly allocated. This counter gets
+        // increased on allocation of a qubit and decreased on release of a qubit.
+        // Note that we treat borrowing as allocation now. 
         int32_t GetAllocatedQubitCount() const { return allocatedQubitCount; }
+
+        // Number of free qubits that are currently tracked by this qubit manager.
+        // Note that when qubit manager may extend capacity, this doesn't account
+        // for qubits that may be potentially added in future via capacity extension.
+        // If qubit manager may extend capacity and reuse is discouraged, released
+        // qubits still increase this number even though they cannot be reused.
         int32_t GetFreeQubitCount() const { return freeQubitCount; }
 
+        // Total number of qubits that are currently tracked by this qubit manager.
+        int32_t GetQubitCapacity() const { return qubitCapacity; }
         bool GetMayExtendCapacity() const { return mayExtendCapacity; }
         bool GetEncourageReuse() const { return encourageReuse; }
 
@@ -191,12 +209,18 @@ namespace Quantum
     private:
         void EnsureCapacity(QubitIdType requestedCapacity);
 
+        // Take free qubit id from a free list without extending capacity.
+        // First non-empty free list among nested restricted reuse areas are considered.
+        QubitIdType TakeFreeQubitId();
+        // Allocate free qubit id extending capacity if necessary and possible.
         QubitIdType AllocateQubitId();
+        // Put qubit id back into a free list for the current restricted reuse area.
         void ReleaseQubitId(QubitIdType id);
 
-        bool IsDisabled(QubitIdType id) const;
-        bool IsExplicitlyAllocated(QubitIdType id) const;
-        bool IsFree(QubitIdType id) const;
+        bool IsValidId(QubitIdType id) const;
+        bool IsDisabledId(QubitIdType id) const;
+        bool IsFreeId(QubitIdType id) const;
+        bool IsExplicitlyAllocatedId(QubitIdType id) const;
 
         // Configuration Properties:
         bool mayExtendCapacity = true;
