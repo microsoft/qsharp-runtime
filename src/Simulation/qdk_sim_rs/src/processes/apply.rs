@@ -199,7 +199,8 @@ pub(crate) fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Resu
                 }
                 assert!(
                     ((&sum).trace() - 1.0).norm() <= 1e-10,
-                    "Expected output of applying Kraus decomposition to be trace 1."
+                    "Expected output of applying Kraus decomposition to be trace 1.\nKraus decomposition:\n{}\n\nInput state:\n{}\n\nOutput state:\n{}",
+                    ks, state, sum
                 );
                 sum
             }),
