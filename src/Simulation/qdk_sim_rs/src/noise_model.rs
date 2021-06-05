@@ -73,9 +73,30 @@ impl NoiseModel {
     pub fn as_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
     }
-}
 
-impl NoiseModel {
+    /// Given the name of a built-in noise model, returns either that noise
+    /// model if it exists, or an [`Err`] variant if no such model exists.
+    ///
+    /// Currently accepted noise model names:
+    ///
+    /// - `"ideal"`: A full-state noise model in which all operations are
+    ///   ideal (that is, without errors).
+    /// - `"ideal_stabilizer"`: A noise model in which all operations except
+    ///   [`NoiseModel::t`] and [`NoiseModel::t_adj`] are ideal, and
+    ///   represented in a form compatible with stabilizer simulation.
+    ///
+    /// # Example
+    /// ```
+    /// let noise_model = NoiseModel::get_by_name("ideal");
+    /// ```
+    pub fn get_by_name(name: &str) -> Result<NoiseModel, String> {
+        match name {
+            "ideal" => Ok(NoiseModel::ideal()),
+            "ideal_stabilizer" => Ok(NoiseModel::ideal_stabilizer()),
+            _ => Err(format!("Unrecognized noise model name {}.", name)),
+        }
+    }
+
     /// Returns a copy of the ideal noise model; that is, a noise model
     /// describing the case in which no noise acts on the quantum system.
     pub fn ideal() -> NoiseModel {

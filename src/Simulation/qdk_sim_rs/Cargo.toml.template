@@ -72,6 +72,8 @@ built = "0.5.0"
 
 [build-dependencies]
 built = "0.5.0"
+cbindgen = "0.19.0"
+
 
 [dev-dependencies]
 assert-json-diff = "2.0.1"

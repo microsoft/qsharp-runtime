@@ -1,3 +1,7 @@
+<!-- NB: This README is formatted for use with `cargo doc`, and makes use of
+         rustdoc-specific extensions to Markdown.
+-->
+
 # Quantum Development Kit Experimental Simulators
 
 > ## **⚠** WARNING **⚠**
@@ -12,6 +16,8 @@ This **experimental** crate contains simulation functionality for the Quantum De
 - Stabilizer simulation
 
 The [`c_api`] module allows for using the simulation functionality in this crate from C, or from other languages with a C FFI (e.g.: C++ or C#), while Rust callers can take advantage of the structs and methods in this crate directly.
+
+Similarly, the [`python`] module allows exposing data structures in this crate to Python programs.
 
 ## Cargo Features
 
@@ -28,6 +34,100 @@ This crate provides several different data structures for representing quantum s
 
 ## Noise model serialization
 
+Noise models can be serialized to JSON for interoperability across languages. In particular, each noise model is represented by a JSON object with properties for each operation, for the initial state, and for the instrument used to implement $Z$-basis measurement.
+
+For example:
+
+```json
+{
+    "initial_state": {
+        "n_qubits": 1,
+        "data": {
+            "Mixed": {
+                "v": 1, "dim":[2 ,2],
+                "data": [[1.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+            }
+        }
+    },
+    "i": {
+        "n_qubits": 1,
+        "data": {
+            "Unitary": {
+                "v": 1,"dim": [2, 2],
+                "data": [[1.0, 0.0], [0.0, 0.0], [0.0, 0.0], [1.0, 0.0]]
+            }
+        }
+    },
+    ...
+    "z_meas": {
+        "Effects": [
+            {
+                "n_qubits": 1,
+                "data": {
+                    "KrausDecomposition": {
+                        "v":1, "dim": [1, 2, 2],
+                        "data": [[1.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+                    }
+                }
+            },
+            {
+                "n_qubits": 1,
+                "data": {
+                    "KrausDecomposition": {
+                        "v": 1,"dim": [1, 2, 2],
+                        "data":[[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [1.0, 0.0]]
+                    }
+                }
+            }
+        ]
+    }
+}
+```
+
+The value of the `initial_state` property is a serialized [`State`], the value of each operation property (i.e.: `i`, `x`, `y`, `z`, `h`, `s`, `s_adj`, `t`, `t_adj`, and `cnot`) is a serialized [`Process`], and the value of `z_meas` is a serialized [`Instrument`].
+
+### Representing arrays of complex numbers
+
+Throughout noise model serialization, JSON objects representing $n$-dimensional arrays of complex numbers are used to store various vectors, matrices, and tensors. Such arrays are serialized as JSON objects with three properties:
+
+- `v`: The version number of the JSON schema; must be `"1"`.
+- `dims`: A list of the dimensions of the array being represented.
+- `data`: A list of the elements of the flattened array, each of which is represented as a list with two entries representing the real and complex parts of each element.
+
+For example, consider the serialization of the ideal `y` operation:
+
+```json
+"y": {
+    "n_qubits": 1,
+    "data": {
+        "Unitary": {
+            "v": 1, "dim": [2, 2],
+            "data": [[0.0, 0.0], [0.0, 1.0], [0.0, -1.0], [0.0, 0.0]]
+        }
+    }
+}
+```
+
+### Representing states and processes
+
+Each state and process is represented in JSON by an object with two properties, `n_qubits` and `data`. The value of `data` is itself a JSON object with one property indicating which variant of the [`StateData`] or [`ProcessData`] enum is used to represent that state or process, respectively.
+
+For example, the following JSON object represents the mixed state $\ket{0}\bra{0}$:
+
+```json
+{
+    "n_qubits": 1,
+    "data": {
+        "Mixed": {
+            "v": 1, "dim":[2 ,2],
+            "data": [[1.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+        }
+    }
+}
+```
+
+### Representing instruments
+
 TODO
 
 ## Known issues
@@ -38,4 +138,4 @@ TODO
 - Many parts of the crate do not yet have Python bindings.
 - Stabilizer simulation not yet exposed via C API.
 - Test and microbenchmark coverage still incomplete.
-- Too many APIs `panic!` or `unwrap`, and need replaced with [`std::Result`] returns instead.
+- Too many APIs `panic!` or `unwrap`, and need replaced with `Result` returns instead.

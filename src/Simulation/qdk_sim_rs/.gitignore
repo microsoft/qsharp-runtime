@@ -14,3 +14,9 @@ Cargo.lock
 *.pyd
 *.whl
 *.egg-info
+
+# Ignore generated C/C++ headers.
+include/
+
+# Don't ignore documentation here.
+!docs

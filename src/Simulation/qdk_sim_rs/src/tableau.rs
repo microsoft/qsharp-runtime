@@ -258,6 +258,9 @@ impl Tableau {
 #[cfg(feature = "python")]
 #[pymethods]
 impl Tableau {
+    /// Returns a new stabilizer tableau representing
+    /// the $\ket{00\cdots 0}$ state of an $n$-qubit
+    /// register.
     #[new]
     pub fn new_py(n_qubits: usize) -> Self {
         Self::new(n_qubits)

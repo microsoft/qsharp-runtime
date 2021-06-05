@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// The following two attributes include the README.md for this module when
+// building docs (requires +nightly).
+// See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
+// for discussion.
+#![cfg_attr(doc, feature(extended_key_value_attributes))]
+#![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../docs/python-api.md")))]
 // FIXME: remove when the Python module is documented.
 #![allow(missing_docs)]
 
@@ -164,6 +170,13 @@ pub struct PyNoiseModel {
     data: NoiseModel,
 }
 
+#[pyproto]
+impl PyObjectProtocol for PyNoiseModel {
+    fn __repr__(&self) -> String {
+        format!("<NoiseModel {:?}>", self.data)
+    }
+}
+
 #[pymethods]
 impl PyNoiseModel {
     #[staticmethod]
@@ -178,6 +191,14 @@ impl PyNoiseModel {
         PyNoiseModel {
             data: NoiseModel::ideal_stabilizer(),
         }
+    }
+
+    #[staticmethod]
+    pub fn get_by_name(name: &str) -> PyResult<PyNoiseModel> {
+        Ok(PyNoiseModel {
+            data: NoiseModel::get_by_name(name)
+                .map_err(|e| PyErr::new::<PyRuntimeError, String>(e))?,
+        })
     }
 
     pub fn as_json(&self) -> String {

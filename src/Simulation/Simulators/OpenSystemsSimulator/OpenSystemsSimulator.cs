@@ -65,9 +65,9 @@ namespace Microsoft.Quantum.Experimental
             }
         }
 
-        public OpenSystemsSimulator(uint capacity = 3) : base(new QubitManager((long)capacity))
+        public OpenSystemsSimulator(uint capacity = 3, string representation = "mixed") : base(new QubitManager((long)capacity))
         {
-            this.Id = NativeInterface.Init(capacity);
+            this.Id = NativeInterface.Init(capacity, representation);
         }
 
         void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)

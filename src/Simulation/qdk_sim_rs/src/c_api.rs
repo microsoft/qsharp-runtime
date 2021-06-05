@@ -1,16 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//! Exposes a C API for this crate, useful for embedding into simulation
-//! runtimes.
-//!
-//! # Safety
-//! As this is a foreign-function interface, many of the functions exposed here
-//! are unsafe, representing that the caller is required to ensure that safety
-//! conditions in the host language are upheld.
-//!
-//! Please pay attention to any listed safety notes when calling into this C
-//! API.
+// The following two attributes include the README.md for this crate when
+// building docs (requires +nightly).
+// See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
+// for discussion.
+#![cfg_attr(doc, feature(extended_key_value_attributes))]
+#![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../docs/c-api.md")))]
 
 use crate::{built_info, NoiseModel, Process, State};
 use lazy_static::lazy_static;
@@ -256,17 +252,6 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
             Err(format!("No simulator with id {} exists.", sim_id))
         }
     })
-}
-
-impl NoiseModel {
-    /// Private function to help look up common noise models by name.
-    fn get_by_name(name: &str) -> Result<NoiseModel, String> {
-        match name {
-            "ideal" => Ok(NoiseModel::ideal()),
-            "ideal_stabilizer" => Ok(NoiseModel::ideal_stabilizer()),
-            _ => Err(format!("Unrecognized noise model name {}.", name)),
-        }
-    }
 }
 
 /// Gets the noise model corresponding to a particular name, serialized as a
