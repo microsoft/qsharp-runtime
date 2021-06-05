@@ -251,3 +251,29 @@ TEST_CASE("Restricted Area", "[QubitManager]")
     REQUIRE_THROWS(qm->Allocate());
 }
 
+TEST_CASE("Nested Restricted Areas", "[QubitManager]")
+{
+    constexpr int n = 10;
+    std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(n, false, true);
+    for (int i = 0; i<n; i++) {
+        Qubit q = qm->Allocate(); // Reuse qubit from previous area
+        qm->Release(q); // Put a free qubit in the innermost area
+        qm->StartRestrictedReuseArea();
+    }
+    REQUIRE(qm->GetFreeQubitCount() == n);
+    // At time new allocation will result from the previous area and next allocation
+    // will check entire list up to outermost area. But after that allocation will
+    // jump right into outermost area. So allocation isn't O(1), but is amortized O(1).
+    Qubit* qubits = new Qubit[n];
+    qm->Allocate(qubits, n); // Check that we still can allocate
+    REQUIRE(qm->GetFreeQubitCount() == 0);
+    REQUIRE_THROWS(qm->Allocate()); // Reached capacity
+    qm->Release(qubits, n);
+    for (int i = 0; i<n; i++) {
+        qm->EndRestrictedReuseArea();
+    }
+    qm->Allocate(qubits, n);
+    qm->Release(qubits, n);
+    REQUIRE(qm->GetFreeQubitCount() == n);
+    delete[] qubits;
+}

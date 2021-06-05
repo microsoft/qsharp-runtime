@@ -40,7 +40,7 @@ namespace Quantum
         CQubitManager(
             QubitIdType initialQubitCapacity = DefaultQubitCapacity,
             bool mayExtendCapacity = true,
-            bool encourageReuse = true);
+            bool mayReuseQubits = true);
 
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
@@ -54,7 +54,7 @@ namespace Quantum
 
         // Allocate a qubit. Extend capacity if necessary and possible.
         // Fail if the qubit cannot be allocated.
-        // Computation complexity is O(number of nested restricted reuse areas).
+        // Computation complexity is O(number of nested restricted reuse areas) worst case, O(1) amortized cost.
         Qubit Allocate();
         // Allocate qubitCountToAllocate qubits and store them in the provided array. Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
@@ -110,7 +110,7 @@ namespace Quantum
         // Total number of qubits that are currently tracked by this qubit manager.
         int32_t GetQubitCapacity() const { return qubitCapacity; }
         bool GetMayExtendCapacity() const { return mayExtendCapacity; }
-        bool GetEncourageReuse() const { return encourageReuse; }
+        bool GetMayReuseQubits() const { return mayReuseQubits; }
 
     protected:
         // May be overriden to create a custom Qubit object.
@@ -168,7 +168,7 @@ namespace Quantum
             QubitListInSharedArray(QubitIdType startId, QubitIdType endId, QubitIdType* sharedQubitStatusArray);
 
             bool IsEmpty() const;
-            void AddQubit(QubitIdType id, bool addToFront, QubitIdType* sharedQubitStatusArray);
+            void AddQubit(QubitIdType id, QubitIdType* sharedQubitStatusArray);
             QubitIdType TakeQubitFromFront(QubitIdType* sharedQubitStatusArray);
             void MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray);
         };
@@ -185,6 +185,7 @@ namespace Quantum
         public:
             QubitListInSharedArray FreeQubitsReuseProhibited;
             QubitListInSharedArray FreeQubitsReuseAllowed;
+            int32_t prevAreaWithFreeQubits = 0;
 
             RestrictedReuseArea() = default;
             RestrictedReuseArea(QubitListInSharedArray freeQubits);
@@ -210,7 +211,7 @@ namespace Quantum
         void EnsureCapacity(QubitIdType requestedCapacity);
 
         // Take free qubit id from a free list without extending capacity.
-        // First non-empty free list among nested restricted reuse areas are considered.
+        // Free list to take from is found by amortized O(1) algorithm.
         QubitIdType TakeFreeQubitId();
         // Allocate free qubit id extending capacity if necessary and possible.
         QubitIdType AllocateQubitId();
@@ -224,7 +225,8 @@ namespace Quantum
 
         // Configuration Properties:
         bool mayExtendCapacity = true;
-        bool encourageReuse = true;
+        // TODO: This has no effect at the moment!
+        bool mayReuseQubits = true;
 
         // State:
         // sharedQubitStatusArray is used to store statuses of all known qubits.
