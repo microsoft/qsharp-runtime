@@ -9,13 +9,8 @@ use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 
 use crate::{
-    chp_decompositions::ChpOperation,
-    linalg::{ConjBy, Trace},
-    log, log_as_err, Pauli, Process,
-    ProcessData::*,
-    State,
-    StateData::*,
-    Tableau, C64,
+    chp_decompositions::ChpOperation, linalg::ConjBy, log, log_as_err, Pauli, Process,
+    ProcessData::*, State, StateData::*, Tableau, C64,
 };
 
 use super::promote_pauli_channel;
