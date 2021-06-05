@@ -105,9 +105,14 @@ fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (
         .map(|(idx, effect)| {
             let output_state = effect.apply_to(idx_qubits, state).unwrap();
             let tr = (&output_state).trace();
-            (idx, output_state, tr.re)
+            (idx, output_state, tr.norm())
         })
         .collect::<Vec<_>>();
+    debug_assert!(
+        possible_outcomes.iter().any(|post_state| post_state.1.trace().norm() >= 1e-10),
+        "Expected output of applying instrument to be nonzero trace.\nInstrument effects:\n{:?}\n\nInput state:\n{}\n\nPostselected states:\n{:?}",
+        effects, state, possible_outcomes
+    );
     let mut rng = rand::thread_rng();
     let random_sample: f64 = rng.gen();
     for (idx, cum_pr) in possible_outcomes
