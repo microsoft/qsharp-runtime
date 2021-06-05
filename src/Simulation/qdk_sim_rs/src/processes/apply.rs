@@ -9,8 +9,13 @@ use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 
 use crate::{
-    chp_decompositions::ChpOperation, linalg::ConjBy, log, log_as_err, Pauli, Process,
-    ProcessData::*, State, StateData::*, Tableau, C64,
+    chp_decompositions::ChpOperation,
+    linalg::{ConjBy, Trace},
+    log, log_as_err, Pauli, Process,
+    ProcessData::*,
+    State,
+    StateData::*,
+    Tableau, C64,
 };
 
 use super::promote_pauli_channel;
@@ -192,6 +197,10 @@ pub(crate) fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Resu
                 for k in ks.axis_iter(Axis(0)) {
                     sum = sum + rho.conjugate_by(&k);
                 }
+                assert!(
+                    ((&sum).trace() - 1.0).norm() <= 1e-10,
+                    "Expected output of applying Kraus decomposition to be trace 1."
+                );
                 sum
             }),
             Stabilizer(_tableau) => {

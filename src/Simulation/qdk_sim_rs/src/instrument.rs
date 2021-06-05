@@ -133,6 +133,10 @@ fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (
                     panic!("Couldn't renormalize, expected mixed output from instrument.");
                 }
             }
+            assert!(
+                (output_state.trace() - 1.0).norm() <= 1e-10,
+                "Expected output of instrument to be trace 1."
+            );
             return (idx, output_state);
         }
     }
