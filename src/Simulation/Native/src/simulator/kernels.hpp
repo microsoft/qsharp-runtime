@@ -165,8 +165,7 @@ std::pair<bool, bool> is_classical_or_entangled(
             bool has1 = std::norm(wfn[i + j + offset]) >= eps;
             have0 = have0 || has0;
             have1 = have1 || has1;
-            if (has0 && has1)
-                notentangled = notentangled || ((i + j) ^ (i + j + offset)) != 0;
+            notentangled = notentangled || (has0 && has1);
         }
 #else
 #pragma omp parallel for schedule(static) reduction(|| : have0, have1, notentangled)
@@ -178,8 +177,7 @@ std::pair<bool, bool> is_classical_or_entangled(
         bool has1 = std::norm(wfn[i + j + offset]) >= eps;
         have0 = have0 || has0;
         have1 = have1 || has1;
-        if (has0 && has1)
-            notentangled = notentangled || ((i + j) ^ (i + j + offset)) != 0;
+        notentangled = notentangled || (has0 && has1);
     }
 #endif
 
