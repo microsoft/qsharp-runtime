@@ -1,5 +1,10 @@
 <!-- NB: This README is formatted for use with `cargo doc`, and makes use of
          rustdoc-specific extensions to Markdown.
+
+         To generate and view the documentation for this crate locally, please
+         run:
+
+         $ cargo +nightly doc --features python --open
 -->
 
 # Quantum Development Kit Experimental Simulators
