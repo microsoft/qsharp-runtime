@@ -108,7 +108,9 @@ fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (
             (idx, output_state, tr.norm())
         })
         .collect::<Vec<_>>();
-    debug_assert!(
+    // TODO[perf]: Downgrade this to a debug_assert!, and configure the CI
+    //             build to enable debug_assertions at full_validation.
+    assert!(
         possible_outcomes.iter().any(|post_state| post_state.1.trace().norm() >= 1e-10),
         "Expected output of applying instrument to be nonzero trace.\nInstrument effects:\n{:?}\n\nInput state:\n{}\n\nPostselected states:\n{:?}",
         effects, state, possible_outcomes
