@@ -18,6 +18,7 @@
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 #include "OutputStream.hpp"
+#include "QubitManager.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -108,11 +109,13 @@ namespace Quantum
 
         const QUANTUM_SIMULATOR handle = 0;
         unsigned simulatorId = -1;
-        unsigned nextQubitId = 0; // the QuantumSimulator expects contiguous ids, starting from 0
+        // the QuantumSimulator expects contiguous ids, starting from 0
+        std::unique_ptr<CQubitManager> qubitManager;
 
         unsigned GetQubitId(Qubit qubit) const
         {
-            return static_cast<unsigned>(reinterpret_cast<size_t>(qubit));
+            // Qubit manager uses unsigned range of int32_t for qubit ids.
+            return static_cast<unsigned>(qubitManager->GetQubitId(qubit));
         }
 
         std::vector<unsigned> GetQubitIds(long num, Qubit* qubits) const
@@ -121,7 +124,7 @@ namespace Quantum
             ids.reserve(num);
             for (long i = 0; i < num; i++)
             {
-                ids.push_back(static_cast<unsigned>(reinterpret_cast<size_t>(qubits[i])));
+                ids.push_back(GetQubitId(qubits[i]));
             }
             return ids;
         }
@@ -157,6 +160,7 @@ namespace Quantum
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
+            qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
         }
         ~CFullstateSimulator()
@@ -196,10 +200,10 @@ namespace Quantum
             typedef void (*TAllocateQubit)(unsigned, unsigned);
             static TAllocateQubit allocateQubit = reinterpret_cast<TAllocateQubit>(this->GetProc("allocateQubit"));
 
-            const unsigned id = this->nextQubitId;
-            allocateQubit(this->simulatorId, id);
-            this->nextQubitId++;
-            return reinterpret_cast<Qubit>(id);
+            Qubit q = qubitManager->Allocate(); // Allocate qubit in qubit manager.
+            unsigned id = GetQubitId(q); // Get its id.
+            allocateQubit(this->simulatorId, id); // Allocate it in the simulator.
+            return q;
         }
 
         void ReleaseQubit(Qubit q) override
@@ -207,10 +211,12 @@ namespace Quantum
             typedef bool (*TReleaseQubit)(unsigned, unsigned);
             static TReleaseQubit releaseQubit = reinterpret_cast<TReleaseQubit>(this->GetProc("release"));
 
+            // Release qubit in the simulator.
             if (!releaseQubit(this->simulatorId, GetQubitId(q)))
             {
                 quantum__rt__fail_cstr("Released qubits are entangled.");
             }
+            qubitManager->Release(q); // Release it in the qubit manager.
         }
 
         Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
