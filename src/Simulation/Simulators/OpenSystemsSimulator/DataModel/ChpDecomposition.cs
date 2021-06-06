@@ -71,10 +71,10 @@ namespace Microsoft.Quantum.Experimental
                 writer.WritePropertyName(
                     value switch
                     {
-                        ChpOperation.Cnot => "Cnot",
-                        ChpOperation.Hadamard => "Hadamard",
-                        ChpOperation.Phase => "Phase",
-                        ChpOperation.AdjointPhase => "AdjointPhase",
+                        ChpOperation.Cnot _ => "Cnot",
+                        ChpOperation.Hadamard _ => "Hadamard",
+                        ChpOperation.Phase _ => "Phase",
+                        ChpOperation.AdjointPhase _ => "AdjointPhase",
                         _ => throw new JsonException()
                     }
                 );
