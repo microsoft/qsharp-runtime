@@ -156,8 +156,8 @@ std::pair<bool, bool> is_classical_or_entangled(
     // which must check the whole vector. If the target qubit has a nonzero probability of being measured
     // as |0⟩ (variable "have0") AND nonzero probability of being measured as |1⟩ (variable "have1") then
     // we know it is not classical with regard to the computational basis. Further, if the target qubit
-    // is not classical with regard to the computational basis AND all two states where the only difference
-    // in the states is the target qubit (ie: |101⟩ and |100⟩ for qubit 0) have nonzero probability, then
+    // is not classical with regard to the computational basis AND for any two states where the only difference
+    // in the states is the target qubit (ie: |101⟩ and |100⟩ for qubit 0) those have nonzero probability, then
     // the qubit cannot be entangled.
     std::size_t offset = 1ull << q;
     bool have0 = false;
@@ -196,7 +196,7 @@ std::pair<bool, bool> is_classical_or_entangled(
 #endif
 
     // isclassical = true IFF have0 XOR have1
-    // isentangled = true IFF have0 AND have1 AND for any pair of states where only the target qubit
+    // isentangled = true IFF have0 AND have1 AND for all pairs of states where only the target qubit
     //               differs one of those states has zero probability.
     return std::make_pair<bool, bool>(have0 ^ have1, have0 && have1 && !notentangled);
 }
