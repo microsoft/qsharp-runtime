@@ -22,6 +22,9 @@ use std::io::{Error, ErrorKind};
 #[cfg_attr(feature = "python", pyclass(name = "Tableau"))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Tableau {
+    // TODO[code quality]: This is redundant with the n_qubits field in
+    //                     QubitSized, such that this type should be refactored
+    //                     to only have the table itself.
     n_qubits: usize,
     table: Array2<bool>,
 }

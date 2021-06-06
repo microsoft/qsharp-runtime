@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// The following two attributes include the README.md for this crate when
+// The following two attributes include the README.md for this module when
 // building docs (requires +nightly).
 // See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
 // for discussion.
