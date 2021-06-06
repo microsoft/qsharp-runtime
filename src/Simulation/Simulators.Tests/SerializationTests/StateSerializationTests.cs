@@ -18,14 +18,18 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void StabilizerStateSerializesCorrectly()
         {
-            var state = new StabilizerState(1, new StabilizerState.TableArray
+            var state = new StabilizerState
             {
-                Data = new List<bool>
+                NQubits = 2,
+                Table = new StabilizerState.TableArray
                 {
-                    true, false, false, false, true, false
-                },
-                Dimensions = new List<int> { 2, 3 }
-            });
+                    Data = new List<bool>
+                    {
+                        true, false, false, false, true, false
+                    },
+                    Dimensions = new List<int> { 2, 3 }
+                }
+            };
             var json = JsonSerializer.Serialize(state);
             var expectedJson = @"{
                 ""n_qubits"": 1,
@@ -42,6 +46,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }";
 
             expectedJson.AssertJsonIsEqualTo(json);
+        }
+
+        [Fact]
+        public void StabilizerArrayDeserializesCorrectly()
+        {
+            var expectedJson = @"
+                {
+                    ""v"": 1,
+                    ""dim"": [2, 3],
+                    ""data"": [true,false,false,false,true,false]
+                }
+            ";
+            var reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(expectedJson));
+            var array = JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader);
+            var state = new StabilizerState
+            {
+                NQubits = 2,
+                Table = array
+            };
         }
     }
 }

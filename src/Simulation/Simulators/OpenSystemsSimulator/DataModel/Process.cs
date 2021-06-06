@@ -34,7 +34,16 @@ namespace Microsoft.Quantum.Experimental
                     "MixedPauli" => JsonSerializer.Deserialize<IList<(double, IList<Pauli>)>>(ref reader).Bind(
                         (int nQubits, IList<(double, IList<Pauli>)> data) => new MixedPauliProcess(nQubits, data)
                     ),
-                    _ => throw new JsonException()
+                    "Sequence" => JsonSerializer.Deserialize<IList<Process>>(ref reader).Bind(
+                        (int nQubits, IList<Process> processes) => new SequenceProcess(nQubits, processes)
+                    ),
+                    "ChpDecomposition" => JsonSerializer.Deserialize<IList<ChpOperation>>(ref reader).Bind(
+                        (int nQubits, IList<ChpOperation> operations) => new ChpDecompositionProcess(nQubits, operations)
+                    ),
+                    "Unsupported" => (null as object).Bind(
+                        (int nQubits, object? _) => new UnsupportedProcess(nQubits)
+                    ),
+                    _ => throw new JsonException($"Process kind {kind} not supported for deserialization.")
                 }
             );
         }
@@ -47,26 +56,43 @@ namespace Microsoft.Quantum.Experimental
                 writer.WriteNumber("n_qubits", value.NQubits);
 
                 writer.WritePropertyName("data");
-                writer.WriteStartObject();
-                    writer.WritePropertyName(
-                        value switch
-                        {
-                            UnitaryProcess _ => "Unitary",
-                            KrausDecompositionProcess _ => "KrausDecomposition",
-                            MixedPauliProcess _ => "MixedPauli",
-                            _ => throw new JsonException()
-                        }
-                    );
+                if (value is UnsupportedProcess)
+                {
+                    writer.WriteStringValue("Unsupported");
+                }
+                else
+                {
+                    writer.WriteStartObject();
+                        writer.WritePropertyName(
+                            value switch
+                            {
+                                UnitaryProcess _ => "Unitary",
+                                KrausDecompositionProcess _ => "KrausDecomposition",
+                                MixedPauliProcess _ => "MixedPauli",
+                                SequenceProcess _ => "Sequence",
+                                ChpDecompositionProcess _ => "ChpDecomposition",
+                                _ => throw new JsonException()
+                            }
+                        );
 
-                    if (value is ArrayProcess { Data: var data })
-                    {
-                        arrayConverter.Write(writer, data, options);
-                    }
-                    else if (value is MixedPauliProcess mixedPauliProcess)
-                    {
-                        JsonSerializer.Serialize(writer, mixedPauliProcess.Operators);
-                    }
-                writer.WriteEndObject();
+                        if (value is ArrayProcess { Data: var data })
+                        {
+                            arrayConverter.Write(writer, data, options);
+                        }
+                        else if (value is MixedPauliProcess mixedPauliProcess)
+                        {
+                            JsonSerializer.Serialize(writer, mixedPauliProcess.Operators);
+                        }
+                        else if (value is ChpDecompositionProcess chpDecomposition)
+                        {
+                            JsonSerializer.Serialize(writer, chpDecomposition.Operations);
+                        }
+                        else if (value is SequenceProcess sequence)
+                        {
+                            JsonSerializer.Serialize(writer, sequence.Processes);
+                        }
+                    writer.WriteEndObject();
+                }
             writer.WriteEndObject();
         }
     }
@@ -94,7 +120,6 @@ namespace Microsoft.Quantum.Experimental
         }
     }
 
-    // TODO: Add class for mixed pauli processes as well.
     public class MixedPauliProcess : Process
     {
         public IList<(double, IList<Pauli>)> Operators;
@@ -103,6 +128,32 @@ namespace Microsoft.Quantum.Experimental
         {
             this.Operators = operators;
         }
+    }
+
+       public class ChpDecompositionProcess : Process
+    {
+        public IList<ChpOperation> Operations;
+
+        internal ChpDecompositionProcess(int nQubits, IList<ChpOperation> operations) : base(nQubits)
+        {
+            this.Operations = operations;
+        }
+    }
+
+    public class SequenceProcess : Process
+    {
+        public IList<Process> Processes;
+
+        internal SequenceProcess(int nQubits, IList<Process> processes) : base(nQubits)
+        {
+            this.Processes = processes;
+        }
+    }
+
+    public class UnsupportedProcess : Process
+    {
+        internal UnsupportedProcess(int nQubits) : base(nQubits)
+        { }
     }
 
     public class UnitaryProcess : ArrayProcess

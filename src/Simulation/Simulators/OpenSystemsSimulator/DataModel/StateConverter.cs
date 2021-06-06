@@ -54,8 +54,12 @@ namespace Microsoft.Quantum.Experimental
                     "Mixed" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
                         (int nQubits, NDArray data) => new MixedState(nQubits, data)
                     ),
-                    "Stabilizer" => JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader).Bind(
-                        (int nQubits, StabilizerState.TableArray data) => new StabilizerState(nQubits, data)
+                    "Stabilizer" => JsonSerializer.Deserialize<StabilizerState>(ref reader).Bind(
+                        (int nQubits, StabilizerState state) =>
+                        {
+                            System.Diagnostics.Debug.Assert(nQubits == state.NQubits);
+                            return state;
+                        }
                     ),
                     _ => throw new JsonException($"Unknown state kind {kind}.")
                 }

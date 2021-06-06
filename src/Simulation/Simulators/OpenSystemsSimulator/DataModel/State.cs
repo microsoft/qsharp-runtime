@@ -17,7 +17,11 @@ namespace Microsoft.Quantum.Experimental
     [JsonConverter(typeof(StateConverter))]
     public abstract class State
     {
-        public int NQubits { get; }
+        [JsonPropertyName("n_qubits")]
+        public int NQubits { get; set; } = 1;
+
+        internal State()
+        { }
 
         internal State(int nQubits)
         {
@@ -32,18 +36,18 @@ namespace Microsoft.Quantum.Experimental
         // of floats, but it's a bit easier in this case to directly
         // deserialize into a type that represents the underlying data that
         // we need.
-        internal class TableArray
+        public class TableArray
         {
             [JsonPropertyName("v")]
-            internal int SchemaVersion { get; set; } = 1;
+            public int SchemaVersion { get; set; } = 1;
 
             [JsonPropertyName("dim")]
-            internal List<int>? Dimensions { get; set; }
+            public List<int>? Dimensions { get; set; }
 
             [JsonPropertyName("data")]
-            internal List<bool>? Data { get; set; }
+            public List<bool>? Data { get; set; }
 
-            internal NDArray? AsArray =>
+            public NDArray? AsArray =>
                 Dimensions == null || Data == null
                 ? null
                 : np.ndarray(
@@ -53,17 +57,10 @@ namespace Microsoft.Quantum.Experimental
                 );
         }
 
-        public NDArray Data { get; }
+        [JsonPropertyName("table")]
+        public TableArray? Table { get; set; }
 
-        internal StabilizerState(int nQubits, TableArray data) : base(nQubits)
-        {
-            var array = data.AsArray;
-            if (array == null)
-            {
-                throw new Exception($"Data deserialized for stabilizer state was null. Dimensions: {data.Dimensions}, data: {data.Data}");
-            }
-            Data = array!;
-        }
+        public NDArray Data => Table?.AsArray;
     }
 
     public abstract class ArrayState : State

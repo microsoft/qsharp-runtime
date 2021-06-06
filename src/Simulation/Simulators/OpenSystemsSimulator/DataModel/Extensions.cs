@@ -68,7 +68,18 @@ namespace Microsoft.Quantum.Experimental
             if (read) reader.Read();
             if (reader.TokenType != type)
             {
-                throw new JsonException($"Expected a JSON token of type {type}, got {reader.TokenType} instead.");
+                // Try to read what it actually was.
+                string? value = reader.TokenType switch
+                {
+                    JsonTokenType.String => reader.GetString(),
+                    JsonTokenType.Number => reader.GetDecimal().ToString(),
+                    JsonTokenType.True => "true",
+                    JsonTokenType.False => "false",
+                    JsonTokenType.Null => "null",
+                    JsonTokenType.PropertyName => reader.GetString(),
+                    _ => null
+                };
+                throw new JsonException($"Expected a JSON token of type {type}, got {reader.TokenType} instead.{(value == null ? "" : $"\nValue: {value}")}");
             }
         }
         public static bool IsComplexLike(this NDArray array) =>
@@ -112,17 +123,31 @@ namespace Microsoft.Quantum.Experimental
                         break;
 
                     case "data":
-                        // Here, we expect an object with one property indicating
+                        // In most cases, we expect an object with one property
+                        // indicating
                         // the kind of data for the object.
-                        reader.Require(JsonTokenType.StartObject);
-                        reader.Require(JsonTokenType.PropertyName);
-                        var kind = reader.GetString();
-
+                        // For variants of type unit, it's just the string.
                         reader.Read();
-                        completion = readData(ref reader, kind);
+                        if (reader.TokenType == JsonTokenType.StartObject)
+                        {
+                            reader.Require(JsonTokenType.PropertyName);
+                            var kind = reader.GetString();
 
-                        // Finally, require an end to the object.
-                        reader.Require(JsonTokenType.EndObject);
+                            reader.Read();
+                            completion = readData(ref reader, kind);
+
+                            // Finally, require an end to the object.
+                            reader.Require(JsonTokenType.EndObject);
+                        }
+                        else if (reader.TokenType == JsonTokenType.String)
+                        {
+                            var kind = reader.GetString();
+                            completion = readData(ref reader, kind);
+                        }
+                        else
+                        {
+                            throw new JsonException($"Expected either the start of an object or a string.");
+                        }
                         break;
 
                     default:
