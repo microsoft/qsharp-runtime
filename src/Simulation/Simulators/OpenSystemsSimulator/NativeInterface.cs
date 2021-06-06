@@ -91,7 +91,7 @@ namespace Microsoft.Quantum.Experimental
 
         public static void Destroy(ulong simId)
         {
-            LogCall("init");
+            LogCall("destroy");
             CheckCall(_Destroy(simId));
         }
 
