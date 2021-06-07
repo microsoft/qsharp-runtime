@@ -227,7 +227,7 @@ namespace Microsoft.Quantum.Experimental
             // TODO: pass off to decompositions for more than one control.
             if (controls is { Count: 0 })
             {
-                (this as IIntrinsicY).Body(target);
+                (this as IIntrinsicZ).Body(target);
             }
             else if (controls is { Count: 1 })
             {
