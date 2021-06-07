@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="4.7.2" />
     <PackageReference Include="NumSharp" Version="0.20.5" />
   </ItemGroup>
 
