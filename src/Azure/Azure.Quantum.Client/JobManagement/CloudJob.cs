@@ -70,6 +70,18 @@ namespace Microsoft.Azure.Quantum
         public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
+        /// If available, returns Uri with the results of the execution.
+        /// </summary>
+        public virtual Uri OutputDataUri => (this.Details?.OutputDataUri != null)
+            ? new Uri(this.Details.OutputDataUri)
+            : null;
+
+        /// <summary>
+        /// If available, returns the data format of the execution results.
+        /// </summary>
+        public virtual string OutputDataFormat => this.Details?.OutputDataFormat;
+
+        /// <summary>
         /// Gets the underlying job details.
         /// </summary>
         public virtual JobDetails Details { get; private set; }
