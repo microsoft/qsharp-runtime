@@ -1,4 +1,5 @@
 & (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
+$IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
 $script:allOk = $true;
 
@@ -51,7 +52,11 @@ Push-Location $PSScriptRoot
     # Free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space, which is
     # exceptionally helpful in CI builds.
-    cargo clean
+        # When building in CI, free disk space by cleaning up.
+    # Note that this takes longer, but saves ~1 GB of space.
+    if ($IsCI) {
+        cargo clean;
+    }
 Pop-Location
 
 if (-not $script:allOk) {

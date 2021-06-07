@@ -1,4 +1,5 @@
 & (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
+$IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
 Push-Location $PSScriptRoot
     $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
@@ -17,8 +18,9 @@ Push-Location $PSScriptRoot
                         "--html-after-content $(Resolve-Path docs-includes/after.html)"
     cargo +nightly doc;
 
-    # Free disk space by cleaning up.
-    # Note that this takes longer, but saves ~1 GB of space, which is
-    # exceptionally helpful in CI builds.
-    cargo clean;
+    # When building in CI, free disk space by cleaning up.
+    # Note that this takes longer, but saves ~1 GB of space.
+    if ($IsCI) {
+        cargo clean;
+    }
 Pop-Location
