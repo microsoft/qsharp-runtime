@@ -1,9 +1,6 @@
 set(source_files
   "FullstateSimulator.cpp"
   "ToffoliSimulator.cpp"
-  # NB: Disabled temporarily until we can build crates into OBJECT CMake
-  #     libraries.
-  # "OpenSystemsSimulator.cpp"
 )
 
 set(includes
@@ -11,21 +8,6 @@ set(includes
   "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src"
   "${PROJECT_SOURCE_DIR}/../../Simulation/Native/src/simulator"
 )
-
-#===============================================================================
-# Import Rust crates into CMake.
-
-include(FetchContent)
-
-FetchContent_Declare(
-    Corrosion
-    GIT_REPOSITORY https://github.com/AndrewGaspar/corrosion.git
-    GIT_TAG origin/master # Optionally specify a version tag or branch here
-)
-
-FetchContent_MakeAvailable(Corrosion)
-set(Rust_TOOLCHAIN "nightly" CACHE STRING "Control flow guard support requires nightly option -Z build-std.")
-corrosion_import_crate(MANIFEST_PATH ../../../../Simulation/qdk_sim_rs/Cargo.toml)
 
 #===============================================================================
 # Produce object lib we'll use to create a shared lib (so/dll) later on

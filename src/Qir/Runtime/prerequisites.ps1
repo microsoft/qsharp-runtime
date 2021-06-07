@@ -8,9 +8,6 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
-            # NB: The chocolatey package for rustup is currently nonfunctional,
-            #     so we rely on Rust being installed via Azure Pipelines.
-            # choco install rustup.install
         }
         if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
             choco install cmake
