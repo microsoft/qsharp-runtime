@@ -85,7 +85,7 @@ The more code we write, the more bugs we can introduce, the more care is needed 
 and while porting to a different platform. The higher is the risk of identifier conflict with the other people's code 
 and new features of the language. The more identifiers we use, the less freedom remains for a different use of those identifiers.
 
-### Expose C Only (and IR Wrappers For It)
+### Expose C Only
 Do not expose the C++ identifiers and features (not present in C) - 
 the C++ data types (e.g. `class`), templates, function overloads, namespaces, etc.
 To facilitate that for yourself and for the others, consider strictly separating 
