@@ -13,9 +13,9 @@
 >
 > This crate is **experimental**, and may undergo breaking API changes with no notice, and may not be maintained in future versions of the Quantum Development Kit.
 >
-> As an experimental feature of the Quantum Development Kit, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#504](https://github.com/microsoft/qsharp-runtime/issues/504) for more information.
+> As an experimental feature of the Quantum Development Kit, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#714](https://github.com/microsoft/qsharp-runtime/issues/714) for more information.
 
-This **experimental** crate contains simulation functionality for the Quantum Development Kit, including:
+This **experimental** crate implements simulation functionality for the Quantum Development Kit, including:
 
 - Open systems simulation
 - Stabilizer simulation
