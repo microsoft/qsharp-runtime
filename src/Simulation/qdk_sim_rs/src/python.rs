@@ -228,7 +228,7 @@ impl FromPyObject<'_> for Pauli {
         // We want to support either a primitive type that can extract to u8,
         // or a value of type qdk_sim.Pauli from the root module.
         Python::with_gil(|py| {
-            let root = PyModule::import(py, "qdk_sim").unwrap();
+            let root = PyModule::import(py, "qdk_sim_experimental").unwrap();
             let py_enum: &PyType = root.get("Pauli").unwrap().downcast().unwrap();
             let value: u8 = match py_enum.is_instance(ob) {
                 Ok(true) => ob.getattr("value")?,

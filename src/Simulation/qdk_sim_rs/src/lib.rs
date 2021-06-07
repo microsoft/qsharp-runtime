@@ -13,6 +13,10 @@
 // features that are disabled for the current build.
 #![cfg_attr(all(doc, feature = "python"), deny(rustdoc::broken_intra_doc_links))]
 #![cfg_attr(doc, deny(missing_docs))]
+// This linting rule raises a warning on any documentation comments
+// that are missing an `# Example` section. Currently, that raises a lot of
+// warnings when building docs, but ideally we should make sure to address
+// warnings going forward by adding relevant examples.
 #![cfg_attr(doc, warn(missing_doc_code_examples))]
 
 #[macro_use(array, s)]

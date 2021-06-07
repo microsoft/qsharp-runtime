@@ -148,6 +148,5 @@ fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (
         }
     }
     let (idx, output_state, _) = possible_outcomes.pop().unwrap();
-    drop(possible_outcomes);
     (idx, output_state)
 }
