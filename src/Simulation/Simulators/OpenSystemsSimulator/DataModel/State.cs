@@ -38,6 +38,12 @@ namespace Microsoft.Quantum.Experimental
         // we need.
         public class TableArray
         {
+            // When serializing multidimensional arrays with serde, the
+            // `ndarray` crate for Rust uses the "v" property to denote
+            // serialization schema versions. This property name is hardcoded
+            // at https://github.com/rust-ndarray/ndarray/blob/master/src/array_serde.rs#L96,
+            // such that we follow that property name here to make it easier
+            // to interoperate with `ndarray`.
             [JsonPropertyName("v")]
             public int SchemaVersion { get; set; } = 1;
 
