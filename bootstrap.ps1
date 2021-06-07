@@ -27,7 +27,14 @@ if (-not (Test-Path Env:AGENT_OS)) {
             .\build-native-simulator.ps1
         Pop-Location
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/qdk_sim_rs")
-            .\build-qdk-sim-rs.ps1
+            # Don't run the experimental simulator build if we're local
+            # and prerequisites are missing.
+            $IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
+            if ((Get-Command cargo -ErrorAction SilentlyContinue) -or $IsCI) {
+                .\build-qdk-sim-rs.ps1
+            } else {
+                Write-Verbose "cargo was not installed, skipping qdk_sim_rs build.";
+            }
         Pop-Location
         $Env:BUILD_CONFIGURATION = $null
     }

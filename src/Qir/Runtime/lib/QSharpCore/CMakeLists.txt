@@ -26,6 +26,10 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Core
   ${CMAKE_DL_LIBS}
   qsharp-core-qis-support-obj
   simulators-obj
+  # NB: Experimental simulator support is not yet enabled for QIR integration.
+  #     See https://github.com/microsoft/qsharp-runtime/issues/713.
+  #     Once QIR integration is available, the following line should be
+  #     uncommented.
   # opensim
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime

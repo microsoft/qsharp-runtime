@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
-
   <PropertyGroup Condition="'$(QsimDll)' == ''">
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
     <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>

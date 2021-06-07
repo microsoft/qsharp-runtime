@@ -24,6 +24,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Corrosion)
+set(Rust_TOOLCHAIN "nightly" CACHE STRING "Control flow guard support requires nightly option -Z build-std.")
 corrosion_import_crate(MANIFEST_PATH ../../../../Simulation/qdk_sim_rs/Cargo.toml)
 
 #===============================================================================
