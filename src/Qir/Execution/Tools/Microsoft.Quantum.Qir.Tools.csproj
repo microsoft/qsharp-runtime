@@ -75,17 +75,17 @@
 
   <ItemGroup>
     <None Include="..\..\..\Simulation\Native\win10\**\*">
-      <Link>Simulators\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <Link>Libraries\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
     <None Include="..\..\..\Simulation\Native\osx\**\*">
-      <Link>Simulators\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <Link>Libraries\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
     <None Include="..\..\..\Simulation\Native\linux\**\*">
-      <Link>Simulators\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <Link>Libraries\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
