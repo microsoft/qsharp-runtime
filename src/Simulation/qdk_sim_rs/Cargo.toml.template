@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 [package]
-name = "qdk_sim"
+name = "qdk_sim_experimental"
 version = "0.1.0"
 authors = ["Christopher Granade <cgranade@cgranade.com>"]
 edition = "2018"

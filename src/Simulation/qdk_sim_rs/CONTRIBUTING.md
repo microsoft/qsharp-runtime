@@ -1,3 +1,13 @@
+# Contributing to the QDK Experimental Simulators
+
+## Build prerequisites
+
+The build for the experimental simulators requires the nightly Rust toolchain to be installed, along with support for clippy and rustfmt. These prerequisites can be installed by using the `prerequisites.ps1` script in this folder:
+
+```pwsh
+PS> ./prerequistes.ps1
+```
+
 ## Code quality checks
 
 The build for this crate enforces the following mandatory code quality checks:
@@ -14,8 +24,6 @@ Tests for the open systems simulator consist of five distinct parts:
   These tests are defined in `#[cfg(test)]` submodules of each module in `./src/`.
 - Rust-language integration tests for the Rust library.
   These tests are defined in modules under the `./tests/` folder.
-- C++-language unit tests in the QIR runtime.
-  These tests ensure that the binding of the Rust library as a QIR simulator work as expected, and are defined in `qsharp-runtime/src/QirRuntime/test/OpenSystemsSimulator/*.cpp`.
 - Q#-language unit tests in the C#-based simulation runtime.
   These tests ensure that the binding of the Rust library works as expected when included into the C#-based runtime, and are defined in operations marked with `@Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")` under the `qsharp-runtime/src/Simulation/Simulators.Tests/QuantumTestSuite` folder.
 - C#-language unit tests in the IQ# kernel.
