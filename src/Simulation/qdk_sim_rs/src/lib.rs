@@ -8,8 +8,10 @@
 #![cfg_attr(doc, feature(extended_key_value_attributes))]
 #![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../README.md")))]
 // Set linting rules for documentation. We will stop the build on missing docs,
-// or docs with known broken links.
-#![cfg_attr(doc, deny(rustdoc::broken_intra_doc_links))]
+// or docs with known broken links. We only enable this when all relevant
+// features are enabled, otherwise the docs build will fail on links to
+// features that are disabled for the current build.
+#![cfg_attr(all(doc, feature = "python"), deny(rustdoc::broken_intra_doc_links))]
 #![cfg_attr(doc, deny(missing_docs))]
 #![cfg_attr(doc, warn(missing_doc_code_examples))]
 
