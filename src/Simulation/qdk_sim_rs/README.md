@@ -15,6 +15,10 @@
 >
 > As an experimental feature of the Quantum Development Kit, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#714](https://github.com/microsoft/qsharp-runtime/issues/714) for more information.
 
+> ## **ⓘ** TIP
+>
+> This crate provides low-level APIs for interacting with experimental simulators. If you're interested in using the experimental simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/tree/feature/experimental/opensim/docs/experimental-simulators.md>.
+
 This **experimental** crate implements simulation functionality for the Quantum Development Kit, including:
 
 - Open systems simulation
