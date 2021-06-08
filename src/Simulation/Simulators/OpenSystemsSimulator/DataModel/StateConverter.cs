@@ -80,7 +80,8 @@ namespace Microsoft.Quantum.Experimental
                         {
                             PureState _ => "Pure",
                             MixedState _ => "Mixed",
-                            _ => throw new JsonException()
+                            StabilizerState _ => "Stabilizer",
+                            _ => throw new JsonException($"Unknown state type {value.GetType()}.")
                         }
                     );
 
