@@ -20,11 +20,17 @@ namespace Microsoft.Quantum.Qir.Utility
         // ...{exception type}: {exception message}{Environment.NewLine}{stack trace}.
         private const string ExceptionMessageFormat = "Exception encountered: {0}: {1}{2}{3}";
         private const string InfoLevel = "INFO";
+        private const string WarningLevel = "WARNING";
         private const string ErrorLevel = "ERROR";
 
         public void LogInfo(string message)
         {
             Console.WriteLine(LogFormat, clock.Now, InfoLevel, message);
+        }
+
+        public void LogWarning(string message)
+        {
+            Console.WriteLine(LogFormat, clock.Now, WarningLevel, message);
         }
 
         public void LogError(string message)
