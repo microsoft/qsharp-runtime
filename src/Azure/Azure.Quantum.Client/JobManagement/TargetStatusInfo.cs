@@ -5,8 +5,6 @@
 
 namespace Microsoft.Azure.Quantum
 {
-    using System.Collections.Generic;
-
     using Microsoft.Azure.Quantum.Utility;
 
     using Models = global::Azure.Quantum.Jobs.Models;
