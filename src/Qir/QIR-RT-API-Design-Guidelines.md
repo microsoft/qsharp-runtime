@@ -355,7 +355,7 @@ or [`abort()`](https://www.cplusplus.com/reference/cstdlib/abort) or other alter
 
 On the other hand, exceptions are a natural part of the C++ standard. It is virtually impossible to use
 the standard library (STL, std namespace) and not to use exceptions. All _exceptional_ situations are
-reported by using exceptions (such as out_of_range or invalid_argument to name a few). So it is safe to assume
+reported by using exceptions (such as [`out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) or [`invalid_argument`](https://en.cppreference.com/w/cpp/error/invalid_argument) to name a few). So it is safe to assume
 that the C++ code we are developing will throw exceptions even if they aren't thrown right in the code we write.
 
 Recommendation is to use std namespace and exceptions in C++ code **only where appropriate**. Many recommendations
