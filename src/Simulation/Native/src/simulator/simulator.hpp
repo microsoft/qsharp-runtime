@@ -32,7 +32,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     std::size_t random(std::vector<double> const& d)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         std::discrete_distribution<std::size_t> dist(d.begin(), d.end());
         return dist(psi.rng());
     }
@@ -40,7 +40,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     std::size_t random(std::size_t n, double* d)
     {
         std::discrete_distribution<std::size_t> dist(d, d + n);
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return dist(psi.rng());
     }
 
@@ -52,7 +52,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
             return 0.0;
         }
 
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         changebasis(bs, qs, true);
         double p = psi.jointprobability(qs);
         changebasis(bs, qs, false);
@@ -61,26 +61,26 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool InjectState(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.inject_state(qubits, amplitudes);
     }
 
     bool isclassical(logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.isclassical(q);
     }
 
     std::pair<bool, bool> is_classical_or_entangled(logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.is_classical_or_entangled(q);
     }
 
     // allocate and release
     logical_qubit_id allocate()
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.allocate_qubit();
     }
 
@@ -88,7 +88,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     {
         std::vector<logical_qubit_id> qubits;
         qubits.reserve(n);
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
 
         for (unsigned i = 0; i < n; ++i)
         {
@@ -99,20 +99,20 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void allocateQubit(logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.allocate_qubit(q);
     }
 
     void allocateQubit(std::vector<logical_qubit_id> const& qubits)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         for (auto q : qubits)
             psi.allocate_qubit(q);
     }
 
     bool release(logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         flush();
         std::pair<bool, bool> allok = is_classical_or_entangled(q);
         if (!allok.first)
@@ -123,7 +123,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool release(std::vector<logical_qubit_id> const& qs)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         bool allok = true;
         for (auto q : qs)
             allok = release(q) && allok;
@@ -135,19 +135,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #define GATE1IMPL(OP)                                                                                                  \
     void OP(logical_qubit_id q)                                                                                        \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply(Gates::OP(q));                                                                                       \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
     void C##OP(logical_qubit_id c, logical_qubit_id q)                                                                 \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
     void C##OP(std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                             \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
     }
 #define GATE1(OP) GATE1IMPL(OP) GATE1CIMPL(OP) GATE1MCIMPL(OP)
@@ -171,19 +171,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #define GATE1IMPL(OP)                                                                                                  \
     void OP(double phi, logical_qubit_id q)                                                                            \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply(Gates::OP(phi, q));                                                                                  \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
     void C##OP(double phi, logical_qubit_id c, logical_qubit_id q)                                                     \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
     void C##OP(double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                 \
     {                                                                                                                  \
-        recursive_lock_type l(this->mutex());                                                                                \
+        recursive_lock_type l(getMutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
     }
 #define GATE1(OP) GATE1IMPL(OP) GATE1CIMPL(OP) GATE1MCIMPL(OP)
@@ -200,14 +200,14 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     // rotations
     void R(Gates::Basis b, double phi, logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.apply(Gates::R(b, phi, q));
     }
 
     // multi-controlled rotations
     void CR(Gates::Basis b, double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.apply_controlled(c, Gates::R(b, phi, q));
     }
 
@@ -223,7 +223,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         logical_qubit_id somequbit = qs.front();
         removeIdentities(bs, qs);
 
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         if (bs.size() == 0)
             CR(Gates::PauliI, -2. * phi, cs, somequbit);
         else if (bs.size() == 1)
@@ -234,7 +234,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void Exp(std::vector<Gates::Basis> const& bs, double phi, std::vector<logical_qubit_id> const& qs)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         CExp(bs, phi, std::vector<logical_qubit_id>(), qs);
     }
 
@@ -242,14 +242,14 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool M(logical_qubit_id q)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.measure(q);
     }
 
     std::vector<bool> MultiM(std::vector<logical_qubit_id> const& qs)
     {
         // ***TODO*** optimized implementation
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         std::vector<bool> res;
         for (auto q : qs)
             res.push_back(psi.measure(q));
@@ -258,7 +258,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool Measure(std::vector<Gates::Basis> bs, std::vector<logical_qubit_id> qs)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         removeIdentities(bs, qs);
         // ***TODO*** optimized kernels
         changebasis(bs, qs, true);
@@ -269,34 +269,34 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void seed(unsigned s)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.seed(s);
     }
     void reset()
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.reset();
     }
 
     unsigned num_qubits() const
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.num_qubits();
     }
     void flush()
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.flush();
     }
     ComplexType const* data() const
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         return psi.data().data();
     }
 
     void dump(bool (*callback)(size_t, double, double))
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         flush();
 
         auto wfn = psi.data();
@@ -319,7 +319,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void dumpIds(void (*callback)(logical_qubit_id))
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         flush();
 
         std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
@@ -385,13 +385,13 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         assert(std::accumulate(test.begin(), test.end(), 0u) == table_size);
 #endif
 
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         psi.permute_basis(qs, table_size, permutation_table, adjoint);
     }
 
     bool subsytemwavefunction(std::vector<logical_qubit_id> const& qs, WavefunctionStorage& qubitswfn, double tolerance)
     {
-        recursive_lock_type l(this->mutex());
+        recursive_lock_type l(getMutex());
         flush();
         return psi.subsytemwavefunction(qs, qubitswfn, tolerance);
     }
