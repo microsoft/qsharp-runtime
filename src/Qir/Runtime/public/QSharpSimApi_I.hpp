@@ -72,7 +72,7 @@ namespace Quantum
             PauliId bases[],
             Qubit targets[],
             Result result,
-            const char* failureMessage) = 0;
+            const char* failureMessage) = 0;    // TODO: The `failureMessage` is not used, consider removing. The `bool` is returned.
 
         virtual bool AssertProbability(
             long numTargets,
@@ -80,7 +80,7 @@ namespace Quantum
             Qubit targets[],
             double probabilityOfZero,
             double precision,
-            const char* failureMessage) = 0;
+            const char* failureMessage) = 0;  // TODO: The `failureMessage` is not used, consider removing. The `bool` is returned.
     };
 
 }

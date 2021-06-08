@@ -19,6 +19,7 @@ set(rt_sup_source_files
   delegated.cpp
   strings.cpp
   utils.cpp
+  QubitManager.cpp
 )
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
