@@ -63,7 +63,7 @@ namespace Microsoft.Quantum.Experimental
                 model = NativeInterface.GetNoiseModelByName(name);
                 return true;
             }
-            catch
+            catch (SimulationException)
             {
                 model = null;
                 return false;

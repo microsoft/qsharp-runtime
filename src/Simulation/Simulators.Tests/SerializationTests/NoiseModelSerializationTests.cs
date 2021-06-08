@@ -40,5 +40,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             idealJson.AssertJsonIsEqualTo(roundtripJson);
         }
+
+        [Fact]
+        public void IdealStabilizerNoiseModelRoundTrips()
+        {
+            var idealStabilizerJson = JsonSerializer.Serialize(
+                NoiseModel.TryGetByName("ideal_stabilizer", out var model)
+                ? model
+                : throw new Exception("Could not get noise model by name.")
+            );
+            var idealStabilizerNoiseModel = JsonSerializer.Deserialize<NoiseModel>(idealStabilizerJson);
+            var roundtripJson = JsonSerializer.Serialize(idealStabilizerNoiseModel);
+
+            idealStabilizerJson.AssertJsonIsEqualTo(roundtripJson);
+        }
     }
 }

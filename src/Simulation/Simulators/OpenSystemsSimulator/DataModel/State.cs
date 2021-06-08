@@ -53,6 +53,7 @@ namespace Microsoft.Quantum.Experimental
             [JsonPropertyName("data")]
             public List<bool>? Data { get; set; }
 
+            [JsonIgnore]
             public NDArray? AsArray =>
                 Dimensions == null || Data == null
                 ? null
@@ -66,7 +67,8 @@ namespace Microsoft.Quantum.Experimental
         [JsonPropertyName("table")]
         public TableArray? Table { get; set; }
 
-        public NDArray Data => Table?.AsArray;
+        [JsonIgnore]
+        public NDArray? Data => Table?.AsArray;
     }
 
     public abstract class ArrayState : State

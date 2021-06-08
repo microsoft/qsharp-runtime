@@ -57,6 +57,7 @@ namespace Microsoft.Quantum.Experimental
                     "Stabilizer" => JsonSerializer.Deserialize<StabilizerState>(ref reader).Bind(
                         (int nQubits, StabilizerState state) =>
                         {
+                            System.Diagnostics.Debug.Assert((state?.Data as object) != null);
                             System.Diagnostics.Debug.Assert(nQubits == state.NQubits);
                             return state;
                         }
@@ -96,7 +97,12 @@ namespace Microsoft.Quantum.Experimental
                             Data = stabilizerState.Data.flat.ToArray<bool>().ToList(),
                             Dimensions = stabilizerState.Data.Shape.Dimensions.ToList()
                         };
-                        JsonSerializer.Serialize(writer, array);
+                        writer.WriteStartObject();
+                            writer.WritePropertyName("n_qubits");
+                            writer.WriteNumberValue(stabilizerState.NQubits);
+                            writer.WritePropertyName("table");
+                            JsonSerializer.Serialize(writer, array);
+                        writer.WriteEndObject();
                     }
                 writer.WriteEndObject();
             writer.WriteEndObject();

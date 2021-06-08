@@ -53,7 +53,10 @@ namespace Microsoft.Quantum.Experimental
                     break;
 
                 case ZMeasurementInstrument zInstrument:
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("ZMeasurement");
                     JsonSerializer.Serialize(writer, zInstrument);
+                    writer.WriteEndObject();
                     break;
 
                 default:
