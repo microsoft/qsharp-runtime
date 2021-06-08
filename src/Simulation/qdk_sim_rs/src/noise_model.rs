@@ -230,7 +230,7 @@ impl NoiseModel {
                 data: ProcessData::Unsupported,
             },
             cnot: Process {
-                n_qubits: 1,
+                n_qubits: 2,
                 data: ProcessData::ChpDecomposition(vec![ChpOperation::Cnot(0, 1)]),
             },
             z_meas: Instrument::ZMeasurement {

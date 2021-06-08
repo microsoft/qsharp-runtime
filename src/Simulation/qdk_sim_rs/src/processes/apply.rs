@@ -59,8 +59,8 @@ impl Process {
         // Fail if there's not enough qubits.
         if state.n_qubits < self.n_qubits {
             return log_as_err(format!(
-                "Channel acts on {} qubits, but a state on only {} qubits was given.",
-                self.n_qubits, state.n_qubits
+                "Channel acts on {} qubits, but a state on only {} qubits was given.\n\nChannel:\n{:?}\n\nState:\n{:?}",
+                self.n_qubits, state.n_qubits, self, state
             ));
         }
 
@@ -101,7 +101,7 @@ impl Process {
         //             tune to find crossover point.
         if let ChpDecomposition(operations) = &self.data {
             if let Stabilizer(tableau) = &state.data {
-                return apply_chp_decomposition_to(operations, self.n_qubits, idx_qubits, tableau);
+                return apply_chp_decomposition_to(operations, state.n_qubits, idx_qubits, tableau);
             }
         }
 
