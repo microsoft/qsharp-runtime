@@ -359,7 +359,7 @@ reported by using exceptions (such as [`out_of_range`](https://en.cppreference.c
 that the C++ code we are developing will throw exceptions even if they aren't thrown right in the code we write.
 
 Recommendation is to use std namespace and exceptions in C++ code **only where appropriate**. Many recommendations
-exist on how to use exceptions properly and minimize performace penalties. This section will describe only exceptions
+exist on how to use exceptions properly and minimize performance penalties. This section will describe only exceptions
 with regards to the runtime API.
 
 * Do not handle hardware exceptions and out-of-memory exception
