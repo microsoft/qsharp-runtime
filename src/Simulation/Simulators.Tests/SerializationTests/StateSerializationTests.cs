@@ -30,12 +30,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Dimensions = new List<int> { 2, 3 }
                 }
             };
-            var json = JsonSerializer.Serialize(state);
+            var json = JsonSerializer.Serialize<Microsoft.Quantum.Experimental.State>(state);
             var expectedJson = @"{
-                ""n_qubits"": 1,
+                ""n_qubits"": 2,
                 ""data"": {
                     ""Stabilizer"": {
-                        ""n_qubits"": 1,
+                        ""n_qubits"": 2,
                         ""table"": {
                             ""v"": 1,
                             ""dim"": [2, 3],

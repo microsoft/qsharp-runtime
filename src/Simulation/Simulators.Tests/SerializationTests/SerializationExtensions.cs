@@ -31,7 +31,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var stream = new MemoryStream();
             var writer = new Utf8JsonWriter(stream);
             document.WriteTo(writer);
+            writer.Flush();
             return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        internal static void AssertSerializationRoundTrips<T>(this T obj)
+        {
+            var expected = JsonSerializer.Serialize<T>(obj);
+            var actual = JsonSerializer.Serialize<T>(JsonSerializer.Deserialize<T>(expected));
+            expected.AssertJsonIsEqualTo(actual);
         }
 
         internal static void AssertJsonIsEqualTo(this string expectedJson, string actualJson)
