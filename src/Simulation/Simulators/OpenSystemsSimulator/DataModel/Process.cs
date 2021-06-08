@@ -17,6 +17,38 @@ namespace Microsoft.Quantum.Experimental
 {
     public class ProcessConverter : JsonConverter<Process>
     {
+        private static IList<(double, IList<Pauli>)> ReadMixedPauliData(ref Utf8JsonReader reader)
+        {
+            var results = new List<(double, IList<Pauli>)>();
+            reader.Require(JsonTokenType.StartArray, read: false);
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndArray)
+                {
+                    break;
+                }
+
+                reader.Require(JsonTokenType.StartArray, read: false);
+                reader.Read();
+                var p = reader.GetDouble();
+                var ops = new List<Pauli>();
+                reader.Require(JsonTokenType.StartArray);
+                while (reader.Read())
+                {
+                    if (reader.TokenType == JsonTokenType.EndArray)
+                    {
+                        break;
+                    }
+
+                    ops.Add((Pauli)reader.GetInt64());
+                }
+                reader.Require(JsonTokenType.EndArray);
+
+                results.Add((p, ops));
+            }
+            return results;
+        }
+
         public override Process Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             reader.Require(JsonTokenType.StartObject, read: false);
@@ -31,7 +63,7 @@ namespace Microsoft.Quantum.Experimental
                     "KrausDecomposition" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
                         (int nQubits, NDArray data) => new KrausDecompositionProcess(nQubits, data)
                     ),
-                    "MixedPauli" => JsonSerializer.Deserialize<IList<(double, IList<Pauli>)>>(ref reader).Bind(
+                    "MixedPauli" => ReadMixedPauliData(ref reader).Bind(
                         (int nQubits, IList<(double, IList<Pauli>)> data) => new MixedPauliProcess(nQubits, data)
                     ),
                     "Sequence" => JsonSerializer.Deserialize<IList<Process>>(ref reader).Bind(
@@ -81,7 +113,20 @@ namespace Microsoft.Quantum.Experimental
                         }
                         else if (value is MixedPauliProcess mixedPauliProcess)
                         {
-                            JsonSerializer.Serialize(writer, mixedPauliProcess.Operators);
+                            writer.WriteStartArray();
+                            foreach (var op in mixedPauliProcess.Operators)
+                            {
+                                writer.WriteStartArray();
+                                    writer.WriteNumberValue(op.Item1);
+                                    writer.WriteStartArray();
+                                    foreach (var p in op.Item2)
+                                    {
+                                        writer.WriteNumberValue((int)p);
+                                    }
+                                    writer.WriteEndArray();
+                                writer.WriteEndArray();
+                            }
+                            writer.WriteEndArray();
                         }
                         else if (value is ChpDecompositionProcess chpDecomposition)
                         {
@@ -130,7 +175,7 @@ namespace Microsoft.Quantum.Experimental
         }
     }
 
-       public class ChpDecompositionProcess : Process
+    public class ChpDecompositionProcess : Process
     {
         public IList<ChpOperation> Operations;
 
