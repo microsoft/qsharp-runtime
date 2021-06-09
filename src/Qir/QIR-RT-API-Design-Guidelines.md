@@ -371,7 +371,7 @@ This section will describe only exceptions with regards to the runtime API.
 
 It is not recommended to catch asynchronous harware exceptions, this is sometimes called
 [Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).
-An example of a hardware exception is a segmentation fault. If such exceptional situation arises, application should
+An example of a hardware exception is a segmentation fault. If such exceptional situation arises, the application should
 fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
 regards to the host OS. NOTE: MSVC compiler accepts the [`/EHs`](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160) switch to disable hardware exception handing in catch() blocks.
 
