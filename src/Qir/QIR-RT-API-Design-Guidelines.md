@@ -386,7 +386,7 @@ If you implement an interface function mark it with the [noexcept specifier](htt
 
 > void interface_func() **noexcept**
 
-If exception is thrown (and not caught) within the noexcept function, the application will terminate. Termination will
+If an exception is thrown (and not caught) within the noexcept function, the application will terminate. Termination will
 ensure that exceptions will never cross the API boundaries. An overhead is incurred if a noexcept function
 calls functions that can throw exceptions, so consider marking all functions that shouldn't throw exceptions as noexcept.
 If you are calling functions that can throw exceptions, make sure to handle them properly.
