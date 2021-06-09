@@ -373,7 +373,7 @@ It is not recommended to catch asynchronous harware exceptions, this is sometime
 [Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).
 An example of a hardware exception is a segmentation fault. If such exceptional situation arises, the application should
 fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
-regards to the host OS. NOTE: MSVC compiler accepts the [`/EHs`](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160) switch to disable hardware exception handing in catch() blocks.
+regards to the host OS. NOTE: MSVC compiler accepts the [`/EHs`](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160) switch to disable hardware exception handing in `catch` blocks.
 
 It is also not recommended to handle out-of-memory exception as there's a very little chance of handling it right.
 For such handling to work correctly there shouldn't be any memory allocation from the point of exception, in the stack
