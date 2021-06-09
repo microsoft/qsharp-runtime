@@ -382,7 +382,7 @@ is resolved. Just let the application fail. For the same reason, using non-throw
 
 * Mark interface functions with noexcept
 
-If you implement an interface function mark it with [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec):
+If you implement an interface function mark it with the [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec):
 
 > void interface_func() **noexcept**
 
