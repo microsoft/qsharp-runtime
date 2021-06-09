@@ -11,6 +11,7 @@ using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Quantum.Experimental
 {
@@ -19,6 +20,8 @@ namespace Microsoft.Quantum.Experimental
     //     refers to interfaces, and not to IQ# itself...)
     public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore
     {
+        public static JToken BuildInfo => NativeInterface.SimulatorInfo;
+
         private readonly ulong Id;
 
         public override string Name => NativeInterface.Name;

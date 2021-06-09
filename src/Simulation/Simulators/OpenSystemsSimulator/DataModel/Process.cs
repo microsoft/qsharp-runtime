@@ -40,7 +40,14 @@ namespace Microsoft.Quantum.Experimental
                         break;
                     }
 
-                    ops.Add((Pauli)reader.GetInt64());
+                    ops.Add(reader.GetString() switch
+                    {
+                        "I" => Pauli.PauliI,
+                        "X" => Pauli.PauliX,
+                        "Y" => Pauli.PauliY,
+                        "Z" => Pauli.PauliZ,
+                        var unknown => throw new JsonException($"Expected I, X, Y, or Z for a Pauli value, but got {unknown}.")
+                    });
                 }
                 reader.Require(JsonTokenType.EndArray);
 
@@ -121,7 +128,14 @@ namespace Microsoft.Quantum.Experimental
                                     writer.WriteStartArray();
                                     foreach (var p in op.Item2)
                                     {
-                                        writer.WriteNumberValue((int)p);
+                                        writer.WriteStringValue(p switch
+                                        {
+                                            Pauli.PauliI => "I",
+                                            Pauli.PauliX => "X",
+                                            Pauli.PauliY => "Y",
+                                            Pauli.PauliZ => "Z",
+                                            var unknown => throw new JsonException($"Unexpected Pauli value {unknown}.")
+                                        });
                                     }
                                     writer.WriteEndArray();
                                 writer.WriteEndArray();

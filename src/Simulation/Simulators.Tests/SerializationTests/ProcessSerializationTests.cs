@@ -31,8 +31,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 ""n_qubits"": 1,
                 ""data"": {
                     ""MixedPauli"": [
-                        [0.9, [0]],
-                        [0.1, [1]]
+                        [0.9, [""I""]],
+                        [0.1, [""X""]]
                     ]
                 }
             }".AssertJsonIsEqualTo(actualJson);

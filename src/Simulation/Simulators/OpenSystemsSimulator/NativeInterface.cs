@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Experimental
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_simulator_info")]
         private static extern string _GetSimulatorInfo();
 
-        private static readonly JToken SimulatorInfo;
+        internal static readonly JToken SimulatorInfo;
 
         static NativeInterface()
         {
