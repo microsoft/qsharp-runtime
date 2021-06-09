@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Tests {
     internal function SampleMeanAndVariance(samples : Double[]) : (Double, Double) {
         mutable meanAcc = 0.0;
         mutable varAcc = 0.0;
-        for (idx in 0..Length(samples) - 1) {
+        for idx in 0..Length(samples) - 1 {
             let sample = samples[idx];
             let oldMeanAcc = meanAcc;
             let delta = (sample - meanAcc);
@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Tests {
 
     internal operation EstimateMeanAndVariance(dist : ContinuousDistribution, nSamples : Int) : (Double, Double) {
         mutable samples = new Double[nSamples];
-        for (idx in 0..nSamples - 1) {
+        for idx in 0..nSamples - 1 {
             set samples w/= idx <- dist::Sample();
         }
         return SampleMeanAndVariance(samples);
@@ -60,8 +60,9 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.drawrandomdouble" obeys ranges.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
+    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation CheckDrawRandomDoubleObeysRanges() : Unit {
-        for (j in 0..10000) {
+        for j in 0..10000 {
             let random = DrawRandomDouble(0.0, 1.0);
             if (random < 0.0 or random > 1.0) {
                 fail $"DrawRandomDouble(0.0, 1.0) returned {random}, outside the allowed interval.";
@@ -73,6 +74,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.drawrandomdint" obeys ranges.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
+    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation CheckDrawRandomIntObeysRanges() : Unit {
         mutable randomInt = DrawRandomInt(0, 45);
         if (randomInt > 45 or randomInt < 0) {

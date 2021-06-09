@@ -1,0 +1,88 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+[package]
+name = "qdk_sim_experimental"
+version = "0.1.0"
+authors = ["Christopher Granade <cgranade@cgranade.com>"]
+edition = "2018"
+license = "MIT"
+description = "Experimental simulators for use with the Quantum Development Kit."
+homepage = "https://github.com/microsoft/qsharp-runtime"
+repository = "https://github.com/microsoft/qsharp-runtime"
+
+# Exclude files specific to QDK build pipelines.
+exclude = [
+    "*.template", "*.csx", "*.ps1", "NuGet.Config", "drops"
+]
+
+[lib]
+name = "qdk_sim"
+path = "src/lib.rs"
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+# Optional build-time features: we use this to create Python and WASM bindings.
+[features]
+default = []
+wasm = ["web-sys"]
+# When Python bindings are enabled, we also need the pyo3 dependency.
+python = ["pyo3", "numpy"]
+
+# Enable LaTeX on docs.rs.
+# See https://stackoverflow.com/a/54573800/267841 and
+# https://github.com/rust-num/num/pull/226/files for why this works.
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "docs-includes/header.html", "--html-after-content", "docs-includes/after.html" ]
+
+
+[profile.release]
+opt-level = 3
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+panic = 'unwind'
+
+[dependencies]
+ndarray = { version = "0.15.2", features = ["serde"] }
+num-complex = { version = "0.4", features = ["serde"] }
+num-traits = "0.2"
+derive_more = "0.99.10"
+itertools = "0.9.0"
+rand = { version = "0.7.3", features = ["alloc"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+lazy_static = "1.4.0"
+cfg-if = "1.0.0"
+num_enum = "0.5.1"
+# See https://github.com/rust-random/rand/issues/990
+# and https://docs.rs/getrandom/0.1.15/getrandom/index.html#support-for-webassembly-and-asmjs
+# for why this is needed.
+# NB: We depend on 0.1.15, since that's what gets brought in transitively
+#    by rand and rand_core.
+getrandom = { version = "0.1.15", features = ["wasm-bindgen"] }
+
+# We only need web-sys when compiling with the wasm feature.
+web-sys = { version = "0.3.4",  features = ['console'], optional = true }
+
+# We only need PyO3 when generating Python bindings. 
+pyo3 = { version = "0.13.2", features = ["extension-module"], optional = true }
+numpy = {version = "0.13.1", optional = true}
+
+# We use built to expose compile-time metadata about how this crate
+# was built to C and Rust callers.
+built = "0.5.0"
+
+[build-dependencies]
+built = "0.5.0"
+cbindgen = "0.19.0"
+
+
+[dev-dependencies]
+assert-json-diff = "2.0.1"
+criterion = { version = "0.3", features = ['html_reports', 'csv_output'] }
+
+[[bench]]
+name = "c_api_benchmark"
+harness = false
+
+[[bench]]
+name = "microbenchmark"
+harness = false

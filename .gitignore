@@ -339,3 +339,9 @@ ASALocalRun/
 /src/Simulation/Simulators.Tests/TestProjects/QSharpExe/built
 /src/Simulation/Simulators.Tests/TestProjects/TargetedExe/built
 dbw_test
+
+# Jupyter caches
+.ipynb_checkpoints
+
+# Ignore drops from building native simulators.
+xplat

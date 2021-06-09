@@ -6,14 +6,36 @@ $ErrorActionPreference = 'Stop'
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
+$RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..");
+
 Write-Host "##[info]Copy Native simulator xplat binaries"
-pushd ../src/Simulation/Native
-If (-not (Test-Path 'osx')) { mkdir 'osx' }
-If (-not (Test-Path 'linux')) { mkdir 'linux' }
-$DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
-If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll" }
-If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") { copy "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll" }
-popd
+Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
+    If (-not (Test-Path 'osx')) { mkdir 'osx' }
+    If (-not (Test-Path 'linux')) { mkdir 'linux' }
+    If (-not (Test-Path 'win10')) { mkdir 'win10' }
+
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
+    Write-Host "##[info]Copying Microsoft.Quantum.Simulator.Runtime files from $DROP...";
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll"
+    }
+    If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll"
+    }
+
+
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
+    Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
+    if (Test-Path "$DROP/libqdk_sim.dylib") {
+        Copy-Item -Verbose "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+    }
+    if (Test-Path "$DROP/libqdk_sim.so") {
+        Copy-Item -Verbose "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+    }
+    if (Test-Path "$DROP/qdk_sim.dll") {
+        Copy-Item -Verbose "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+    }
+Pop-Location
 
 
 function Pack-One() {
@@ -31,7 +53,7 @@ function Pack-One() {
         $version = $Env:NUGET_VERSION
     }
 
-    nuget pack $project `
+    nuget pack (Join-Path $PSScriptRoot $project) `
         -OutputDirectory $Env:NUGET_OUTDIR `
         -Properties Configuration=$Env:BUILD_CONFIGURATION `
         -Version $version `
@@ -68,7 +90,7 @@ function Pack-Dotnet() {
         $version = $Env:NUGET_VERSION
     }
 
-    dotnet pack $project `
+    dotnet pack (Join-Path $PSScriptRoot $project) `
         -o $Env:NUGET_OUTDIR `
         -c $Env:BUILD_CONFIGURATION `
         -v detailed `
@@ -87,6 +109,49 @@ function Pack-Dotnet() {
 }
 
 
+function Pack-Crate() {
+    param(
+        [string]
+        $PackageDirectory,
+
+        [string]
+        $OutPath
+    );
+
+    "##[info]Packing crate at $PackageDirectory to $OutPath..." | Write-Host
+
+    # Resolve relative to where the build script is located,
+    # not the PackageDirectory.
+    if (-not [IO.Path]::IsPathRooted($OutPath)) {
+        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
+    }
+    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
+        cargo package;
+        Copy-Item -Force -Recurse (Join-Path . "target" "package") $OutPath;
+    Pop-Location
+}
+
+function Pack-Wheel() {
+    param(
+        [string]
+        $PackageDirectory,
+
+        [string]
+        $OutPath
+    );
+
+    "##[info]Packing wheel at $PackageDirectory to $OutPath..." | Write-Host
+
+    # Resolve relative to where the build script is located,
+    # not the PackageDirectory.
+    if (-not [IO.Path]::IsPathRooted($OutPath)) {
+        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
+    }
+    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
+        pip wheel --wheel-dir $OutPath .;
+    Pop-Location
+}
+
 Write-Host "##[info]Using nuget to create packages"
 Pack-Dotnet '../src/Azure/Azure.Quantum.Client/Microsoft.Azure.Quantum.Client.csproj'
 Pack-One '../src/Simulation/CSharpGeneration/Microsoft.Quantum.CSharpGeneration.fsproj' '-IncludeReferencedProjects'
@@ -101,6 +166,8 @@ Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
+Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
+Pack-Wheel -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:WHEEL_OUTDIR;
 Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Qir.Runtime.nuspec' -ForcePrerelease
 
 if (-not $all_ok) {
