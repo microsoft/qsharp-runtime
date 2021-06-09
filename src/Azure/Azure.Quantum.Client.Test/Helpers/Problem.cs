@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -54,12 +57,12 @@ namespace Microsoft.Azure.Quantum.Test
 
         public void Add(int i, int j, float c)
         {
-            terms.Add(new Term( new int[] { i, j }, c));
+            terms.Add(new Term(new int[] { i, j }, c));
         }
 
         public void Add(int i, int j, int k, float c)
         {
-            terms.Add(new Term( new int[] { i, j, k }, c));
+            terms.Add(new Term(new int[] { i, j, k }, c));
         }
 
         public void AddRange(IEnumerable<Term> collection)

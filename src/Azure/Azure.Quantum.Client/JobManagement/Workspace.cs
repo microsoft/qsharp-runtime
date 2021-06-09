@@ -48,7 +48,17 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNullOrWhiteSpace(location, nameof(location));
 
             // Optional parameters:
-            credential ??= new DefaultAzureCredential(includeInteractiveCredentials: true);
+            if (credential == null)
+            {
+                // We have to disable VisualStudio until 16.11 goes out, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
+                var credOptions = new DefaultAzureCredentialOptions()
+                {
+                    ExcludeVisualStudioCredential = true,
+                };
+
+                credential = new DefaultAzureCredential(credOptions);
+            }
+
             options ??= new QuantumJobClientOptions();
 
             this.ResourceGroupName = resourceGroupName;
@@ -91,12 +101,12 @@ namespace Microsoft.Azure.Quantum
             CancellationToken cancellationToken = default)
         {
             Ensure.NotNull(jobDefinition, nameof(jobDefinition));
-            Ensure.NotNullOrWhiteSpace(jobDefinition.Details.Id, nameof(jobDefinition.Details.Id));
+            Ensure.NotNullOrWhiteSpace(jobDefinition.Id, nameof(jobDefinition.Id));
 
             try
             {
                 JobDetails jobDetails = await this.Client.CreateJobAsync(
-                    jobId: jobDefinition.Details.Id,
+                    jobId: jobDefinition.Id,
                     job: jobDefinition.Details,
                     cancellationToken: cancellationToken);
 
@@ -104,7 +114,7 @@ namespace Microsoft.Azure.Quantum
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "Could not submit job", jobDefinition.Details.Id);
+                throw CreateException(ex, "Could not submit job", jobDefinition.Id);
             }
         }
 
@@ -191,6 +201,23 @@ namespace Microsoft.Azure.Quantum
             await foreach (var q in quotas)
             {
                 yield return new QuotaInfo(this, q);
+            }
+        }
+
+        /// <summary>
+        /// Lists the quotas.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// List of quotas.
+        /// </returns>
+        public async IAsyncEnumerable<ProviderStatusInfo> ListProvidersStatusAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var status = this.Client.GetProviderStatusAsync(cancellationToken);
+
+            await foreach (var s in status)
+            {
+                yield return new ProviderStatusInfo(this, s);
             }
         }
 

@@ -43,6 +43,11 @@ namespace Microsoft.Azure.Quantum
         public virtual string Id => Details.Id;
 
         /// <summary>
+        /// Gets the job id.
+        /// </summary>
+        public virtual string Name => Details.Name;
+
+        /// <summary>
         /// Gets whether the job execution has completed.
         /// </summary>
         public virtual bool InProgress => Status != "Cancelled" &&
@@ -70,7 +75,29 @@ namespace Microsoft.Azure.Quantum
         public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
-        /// Gets the job details.
+        /// Gets or sets the unique identifier for the provider.
+        /// </summary>
+        public virtual string ProviderId => this.Details?.ProviderId;
+
+        /// <summary>
+        /// Gets or sets the target identifier to run the job.
+        /// </summary>
+        public string Target => this.Details.Target;
+
+        /// <summary>
+        /// If available, returns Uri with the results of the execution.
+        /// </summary>>
+        public virtual Uri OutputDataUri => (this.Details?.OutputDataUri != null)
+            ? new Uri(this.Details.OutputDataUri)
+            : null;
+
+        /// <summary>
+        /// If available, returns the data format of the execution results.
+        /// </summary>
+        public virtual string OutputDataFormat => this.Details?.OutputDataFormat;
+
+        /// <summary>
+        /// Gets the underlying job details.
         /// </summary>
         public virtual JobDetails Details { get; private set; }
 
