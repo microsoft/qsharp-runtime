@@ -363,7 +363,7 @@ exist on how to use exceptions properly and minimize performance penalties.
 * As part of [C++ core guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
 * MSVC Documentation: [Modern C++ best practices for exceptions and error handling](https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp?view=msvc-160) and [How to: Design for exception safety](https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety?view=msvc-160).
 * [Exceptions and Error Handling](https://isocpp.org/wiki/faq/exceptions) As part of Modern C++ FAQ.
-* Google guidelines recommend against exceptions, but [allow them in windows code, especially STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
+* Google guidelines recommend against exceptions, but [allow them in Windows code, especially STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
 * [Vishal Chovatiya Guidelines](http://www.vishalchovatiya.com/7-best-practices-for-exception-handling-in-cpp-with-example/), which may be easier to read.
 This section will describe only exceptions with regards to the runtime API.
 
