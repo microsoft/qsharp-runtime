@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Quantum
             string resourceGroupName,
             string workspaceName,
             string location,
-            TokenCredential credential = null,
+            TokenCredential credential,
             QuantumJobClientOptions options = default)
         {
             // Required parameters:
@@ -50,13 +50,7 @@ namespace Microsoft.Azure.Quantum
             // Optional parameters:
             if (credential == null)
             {
-                // We have to disable VisualStudio until 16.11 goes out, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
-                var credOptions = new DefaultAzureCredentialOptions()
-                {
-                    ExcludeVisualStudioCredential = true,
-                };
-
-                credential = new DefaultAzureCredential(credOptions);
+                throw new MissingCredentialException();
             }
 
             options ??= new QuantumJobClientOptions();

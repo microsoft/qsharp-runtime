@@ -3,11 +3,14 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Azure.Core;
+using Azure.Identity;
 
 using Microsoft.Azure.Quantum;
+using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
@@ -212,6 +215,22 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// </summary>
     public sealed class AzureSettings
     {
+        private class AADTokenCredential : TokenCredential
+        {
+            AccessToken Token { get; }
+
+            public AADTokenCredential(string token)
+            {
+                Token = new AccessToken(token, DateTime.Now.AddMinutes(5));
+            }
+
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) =>
+                Token;
+
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) =>
+                new ValueTask<AccessToken>(Token);
+        }
+
         /// <summary>
         /// The subscription ID.
         /// </summary>
@@ -241,6 +260,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The Azure Active Directory authentication token.
         /// </summary>
         public string? AadToken { get; set; }
+
+        /// <summary>
+        /// The type of Credentials to use to authenticate with Azure. For more information
+        /// about authentication with Azure services see: https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme
+        /// NOTE: If both <see cref="AadToken"/> and <see cref="Credential"/> properties are specified, <see cref="AadToken"/> takes precedence.
+        /// If none are provided, then it uses <see cref="CredentialTypes.Default"/>.
+        /// </summary>
+        public CredentialTypes? Credential { get; set; }
 
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
@@ -280,31 +307,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         public bool Verbose { get; set; }
 
-        /// <summary>
-        /// Print a warning about passing an AAD token. Using this is not supported anymore but we keep 
-        /// the parameter to break any existing clients, like the az cli.
-        /// Once the known clients are updated we should remove the parameter too.
-        /// </summary>
-        internal void PrintAadWarning()
+        internal TokenCredential CreateCredentials()
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
             if (!(AadToken is null))
             {
-                try
-                {
-                    Console.Error.WriteLine("----------------------------------------------------------------------------");
-                    Console.Error.WriteLine(" [Warning]");
-                    Console.Error.WriteLine(" The AadToken parameter is not supported anymore.");
-                    Console.Error.WriteLine(" Take a look at the Azure Identity client library at");
-                    Console.Error.WriteLine(" https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme");
-                    Console.Error.WriteLine(" for new authentication options.");
-                    Console.Error.WriteLine("----------------------------------------------------------------------------");
-                }
-                finally
-                {
-                    Console.ResetColor();
-                }
+                return new AADTokenCredential(AadToken);
+            }
+            else
+            {
+                return CredentialFactory.CreateCredential(Credential ?? CredentialTypes.Default);
             }
         }
 
@@ -314,15 +325,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            PrintAadWarning();
-
+            var credentials = CreateCredentials();
             var location = NormalizeLocation(Location ?? ExtractLocation(BaseUri));
 
             return new Workspace(
                 subscriptionId: Subscription, 
                 resourceGroupName: ResourceGroup,
                 workspaceName: Workspace, 
-                location: location);
+                location: location,
+                credential: credentials);
         }
 
         public override string ToString() =>
