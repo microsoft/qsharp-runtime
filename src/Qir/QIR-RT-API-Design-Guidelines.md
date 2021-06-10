@@ -380,7 +380,7 @@ For such handling to work correctly there shouldn't be any memory allocation fro
 unwinding process, till the handling of exception and in the handling of exception until the out-of-memory situation
 is resolved. Just let the application fail. For the same reason, using non-throwing version of operator new is not recommended.
 
-* Mark interface functions with noexcept
+* Mark interface functions with `noexcept`
 
 If you implement an interface function mark it with the [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec):
 
