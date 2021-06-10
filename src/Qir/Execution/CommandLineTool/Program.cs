@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools;
 
-namespace Microsoft.Quantum.CommandLineCompiler
+namespace Microsoft.Quantum.Qir.CommandLineTool
 {
     class Program
     {
