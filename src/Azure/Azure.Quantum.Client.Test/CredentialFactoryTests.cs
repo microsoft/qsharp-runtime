@@ -14,15 +14,15 @@ namespace Microsoft.Azure.Quantum.Test
     public class CredentialFactoryTests
     {
         [DataTestMethod]
-        [DataRow(CredentialTypes.Default, typeof(DefaultAzureCredential))]
-        [DataRow(CredentialTypes.Environment, typeof(EnvironmentCredential))]
-        [DataRow(CredentialTypes.ManagedIdentity, typeof(ManagedIdentityCredential))]
-        [DataRow(CredentialTypes.CLI, typeof(AzureCliCredential))]
-        [DataRow(CredentialTypes.SharedToken, typeof(SharedTokenCacheCredential))]
-        [DataRow(CredentialTypes.VisualStudio, typeof(VisualStudioCredential))]
-        [DataRow(CredentialTypes.VisualStudioCode, typeof(VisualStudioCodeCredential))]
-        [DataRow(CredentialTypes.Interactive, typeof(InteractiveBrowserCredential))]
-        public void TestCreateCredential(CredentialTypes credentialType, Type expectedType)
+        [DataRow(CredentialType.Default, typeof(DefaultAzureCredential))]
+        [DataRow(CredentialType.Environment, typeof(EnvironmentCredential))]
+        [DataRow(CredentialType.ManagedIdentity, typeof(ManagedIdentityCredential))]
+        [DataRow(CredentialType.CLI, typeof(AzureCliCredential))]
+        [DataRow(CredentialType.SharedToken, typeof(SharedTokenCacheCredential))]
+        [DataRow(CredentialType.VisualStudio, typeof(VisualStudioCredential))]
+        [DataRow(CredentialType.VisualStudioCode, typeof(VisualStudioCodeCredential))]
+        [DataRow(CredentialType.Interactive, typeof(InteractiveBrowserCredential))]
+        public void TestCreateCredential(CredentialType credentialType, Type expectedType)
         {
             var actual = CredentialFactory.CreateCredential(credentialType);
 
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Quantum.Test
         [TestMethod]
         public void TestInvalidCredentialType()
         {
-            Assert.ThrowsException<ArgumentException>(() => CredentialFactory.CreateCredential((CredentialTypes)9999));
+            Assert.ThrowsException<ArgumentException>(() => CredentialFactory.CreateCredential((CredentialType)9999));
         }
     }
 }

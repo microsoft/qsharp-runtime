@@ -198,7 +198,7 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
             var options = new QuantumJobClientOptions();
             options.Diagnostics.ApplicationId = "ClientTests";
 
-            var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialTypes.Default);
+            var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialType.Default);
 
             return new Workspace(
                 subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID"),

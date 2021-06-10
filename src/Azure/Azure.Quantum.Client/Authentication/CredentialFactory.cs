@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Quantum.Authentication
     /// about authentication with Azure services and the different Credential types see
     /// https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme.
     /// </summary>
-    public enum CredentialTypes
+    public enum CredentialType
     {
         /// <summary>
         /// Provides a simplified authentication experience to quickly start developing applications run in the Azure cloud.
@@ -38,19 +38,19 @@ namespace Microsoft.Azure.Quantum.Authentication
         ManagedIdentity,
 
         /// <summary>
-        /// Authenticates in a development environment with the Azure CLI.
+        /// Authenticate in a development environment with the Azure CLI.
         /// See https://docs.microsoft.com/en-us/dotnet/api/azure.identity.azureclicredential
         /// </summary>
         CLI,
 
         /// <summary>
-        /// Authenticates using tokens in the local cache shared between Microsoft applications.
+        /// Authenticate using tokens in the local cache shared between Microsoft applications.
         /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.sharedtokencachecredential
         /// </summary>
         SharedToken,
 
         /// <summary>
-        /// Authenticates  using data from Visual Studio.
+        /// Authenticate using data from Visual Studio.
         /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.visualstudiocredential
         /// </summary>
         VisualStudio,
@@ -73,22 +73,22 @@ namespace Microsoft.Azure.Quantum.Authentication
     public static class CredentialFactory
     {
         /// <summary>
-        /// Creates an instance of TokenCredential that corresponds to the given <see cref="CredentialTypes"/>.
+        /// Creates an instance of TokenCredential that corresponds to the given <see cref="CredentialType"/>.
         /// It creates an instance of the Credential Class with default parameters.
         /// </summary>
         /// <param name="credentialType">The type of Credential Class to create.</param>
         /// <returns>An instance of TokenCredential for the corresponding value.</returns>
-        public static TokenCredential CreateCredential(CredentialTypes credentialType) => credentialType switch
+        public static TokenCredential CreateCredential(CredentialType credentialType) => credentialType switch
         {
-            CredentialTypes.Environment => new EnvironmentCredential(),
-            CredentialTypes.ManagedIdentity => new ManagedIdentityCredential(),
-            CredentialTypes.SharedToken => new SharedTokenCacheCredential(),
-            CredentialTypes.VisualStudio => new VisualStudioCredential(),
-            CredentialTypes.VisualStudioCode => new VisualStudioCodeCredential(),
-            CredentialTypes.CLI => new AzureCliCredential(),
-            CredentialTypes.Interactive => new InteractiveBrowserCredential(),
-            CredentialTypes.Default => new DefaultAzureCredential(includeInteractiveCredentials: true),
-            _ => throw new ArgumentException()
+            CredentialType.Environment => new EnvironmentCredential(),
+            CredentialType.ManagedIdentity => new ManagedIdentityCredential(),
+            CredentialType.SharedToken => new SharedTokenCacheCredential(),
+            CredentialType.VisualStudio => new VisualStudioCredential(),
+            CredentialType.VisualStudioCode => new VisualStudioCodeCredential(),
+            CredentialType.CLI => new AzureCliCredential(),
+            CredentialType.Interactive => new InteractiveBrowserCredential(),
+            CredentialType.Default => new DefaultAzureCredential(includeInteractiveCredentials: true),
+            _ => throw new ArgumentException($"Credentials of type {credentialType} are not supported.")
         };
     }
 }

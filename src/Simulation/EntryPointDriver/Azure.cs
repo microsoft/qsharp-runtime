@@ -265,9 +265,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The type of Credentials to use to authenticate with Azure. For more information
         /// about authentication with Azure services see: https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme
         /// NOTE: If both <see cref="AadToken"/> and <see cref="Credential"/> properties are specified, <see cref="AadToken"/> takes precedence.
-        /// If none are provided, then it uses <see cref="CredentialTypes.Default"/>.
+        /// If none are provided, then it uses <see cref="CredentialType.Default"/>.
         /// </summary>
-        public CredentialTypes? Credential { get; set; }
+        public CredentialType? Credential { get; set; }
 
         /// <summary>
         /// The base URI of the Azure Quantum endpoint.
@@ -315,7 +315,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             else
             {
-                return CredentialFactory.CreateCredential(Credential ?? CredentialTypes.Default);
+                return CredentialFactory.CreateCredential(Credential ?? CredentialType.Default);
             }
         }
 
