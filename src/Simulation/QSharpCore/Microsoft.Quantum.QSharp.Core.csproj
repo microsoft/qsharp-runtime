@@ -8,5 +8,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 </Project>

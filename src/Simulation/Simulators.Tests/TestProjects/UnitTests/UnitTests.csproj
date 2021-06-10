@@ -5,13 +5,12 @@
     <IsPackable>false</IsPackable>
     <ExposeReferencesViaTestNames>true</ExposeReferencesViaTestNames>
     <!-- we will provide our own -->
-    <CSharpGeneration>false</CSharpGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
     <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\Library1\Library1.csproj" />
     <ProjectReference Include="..\Library2\Library2.csproj" />

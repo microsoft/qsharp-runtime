@@ -7,7 +7,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <QSharpDocsGeneration>true</QSharpDocsGeneration>
-    <CSharpGeneration>false</CSharpGeneration> <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
@@ -23,7 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
     <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

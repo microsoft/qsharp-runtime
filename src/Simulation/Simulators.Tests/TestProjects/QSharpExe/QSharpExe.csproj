@@ -4,14 +4,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <!-- we will provide our own -->
-    <CSharpGeneration>false</CSharpGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <DefaultSimulator>ToffoliSimulator</DefaultSimulator>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>

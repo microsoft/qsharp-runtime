@@ -51,8 +51,6 @@ function Build-One {
     }
 }
 
-Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
-
 Build-One 'build' '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
