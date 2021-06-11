@@ -17,8 +17,6 @@
     * [`bool`](#bool)
     * [Floating-Point Types](#floating-point-types)
   * [Don't Let the C++ Exceptions Cross the ABI Boundary](#dont-let-the-c-exceptions-cross-the-abi-boundary)
-    * [The `noexcept` Specifier and Exception Specification](#the-noexcept-specifier-and-exception-specification)
-  * [Let the User Decide Whether to Crash or Not](#let-the-user-decide-whether-to-crash-or-not)
 * [Considerations Taken Into Account](#considerations-taken-into-account)
   * [The `bool` Type](#the-bool-type)
   * [The `char` Type](#the-char-type)
@@ -354,16 +352,16 @@ or [`terminate()`](https://www.cplusplus.com/reference/exception/terminate)
 or [`abort()`](https://www.cplusplus.com/reference/cstdlib/abort) or other alternatives.
 
 On the other hand, exceptions are a natural part of the C++ standard. It is virtually impossible to use
-the standard library (STL, std namespace) and not to use exceptions. All _exceptional_ situations are
+the standard library (STL, `std` namespace) and not to use exceptions. All _exceptional_ situations are
 reported by using exceptions (such as [`out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) or [`invalid_argument`](https://en.cppreference.com/w/cpp/error/invalid_argument) to name a few). So it is safe to assume
 that the C++ code we are developing will throw exceptions even if they aren't thrown right in the code we write.
 
-Recommendation is to use std namespace and exceptions in C++ code **only where appropriate**. Many recommendations
+Recommendation is to use `std` namespace and exceptions in C++ code **only where appropriate**. Many recommendations
 exist on how to use exceptions properly and minimize performance penalties.
 * As part of [C++ core guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
 * MSVC Documentation: [Modern C++ best practices for exceptions and error handling](https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp?view=msvc-160) and [How to: Design for exception safety](https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety?view=msvc-160).
 * [Exceptions and Error Handling](https://isocpp.org/wiki/faq/exceptions) As part of Modern C++ FAQ.
-* Google guidelines recommend against exceptions, but [allow them in windows code, especially while using STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
+* Google guidelines recommend against exceptions, but [allow them in Windows code, especially while using STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
 * [Vishal Chovatiya Guidelines](http://www.vishalchovatiya.com/7-best-practices-for-exception-handling-in-cpp-with-example/), which may be easier to read.
 This section will describe only exceptions with regards to the runtime API.
 
@@ -387,9 +385,9 @@ Inside of your binary if you implement a function that should not throw exceptio
 
 > void interface_func() **noexcept**
 
-extern "C" functions aren't considered noexcept by default. Consider marking them noexcept.
+The `extern "C"` functions aren't considered `noexcept` by default. Consider marking them `noexcept`.
 Keep in mind that `noexcept` specifier is a C++ feature. If you need to add `noexcept` specifier
-to a public header or any other header that should be compatible with a pure C compiler
+to a public header or any other header that should be compatible with a C compiler
 make sure to use `__cplusplus` guards. For example:
 
 ```c++
@@ -409,9 +407,9 @@ void f() NOEXCEPT;    // Exposed function. It is `noexcept` if the header is inc
 #endif
 ```
 
-If exception is thrown (and not caught) within the noexcept function, the application will terminate. Termination will
+If exception is thrown (and not caught) within the `noexcept` function, the application will terminate. Termination will
 ensure that exceptions will never cross the API boundaries. An overhead is incurred if a noexcept function
-calls functions that can throw exceptions, so consider marking all functions that shouldn't throw exceptions as noexcept.
+calls functions that can throw exceptions, so consider marking all functions that shouldn't throw exceptions as `noexcept`.
 If you are calling functions that can throw exceptions, make sure to handle them properly.
 
 * If using the [`dynamic_cast<>()`](https://en.cppreference.com/w/cpp/language/dynamic_cast), 
