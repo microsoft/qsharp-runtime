@@ -40,6 +40,8 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
+    $warningFlags = "-Werror"
+
     # -Wall
     #   -Wmisleading-indentation, 
     #   -Wmost, 
@@ -81,10 +83,10 @@ function Build-CMakeProject {
     #   -Wparentheses, 
     #   -Wswitch, 
     #   -Wswitch-bool.
-    $warningFlags = "-Werror"
-
     # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
-    $warningFlags += "-Wall"
+    $warningFlags += " -Wall"
+
+    $warningFlags += " -Wno-error=unused"   # Treat unused entities as warningns rather than errors.  https://clang.llvm.org/docs/DiagnosticsReference.html#wunused
 
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
