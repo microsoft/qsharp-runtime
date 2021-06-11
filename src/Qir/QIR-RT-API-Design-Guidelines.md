@@ -369,9 +369,9 @@ This section will describe only exceptions with regards to the runtime API.
 
 * Do not handle hardware exceptions and out-of-memory exception
 
-It is not recommended to catch asynchronous harware exceptions, this is sometimes called
-[Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).
-Examples of hardware exceptions are the exception thrown when accessing a forbidden memory location as a result of a null pointer access, stack overflow, corrupt pointer dereferencing, unaligned memory access, etc.. If such exceptional situation arises, application should fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
+It is not recommended to catch asynchronous harware exceptions. (MSVC compiler calls this
+[Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).)
+Examples of hardware exceptions are the exceptions thrown when accessing a forbidden memory location as a result of a null pointer access, stack overflow, corrupt pointer dereferencing, unaligned memory access, etc.. If such exceptional situation arises, application should fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
 regards to the host OS. NOTE: The [MSVC's default exception handling behavior](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#default-exception-handling-behavior) does not conform to the C++ standard. Use the `/EHsc` flag to [conform to the standard](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#standard-c-exception-handling).
 
 It is also not recommended to handle out-of-memory exception as there's a very little chance of handling it right.
