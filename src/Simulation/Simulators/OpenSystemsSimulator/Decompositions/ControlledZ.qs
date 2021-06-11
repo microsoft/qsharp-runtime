@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Experimental {
+namespace Microsoft.Quantum.Experimental.Decompositions {
 
     internal operation ApplyCZUsingCNOT(control : Qubit, target : Qubit) : Unit {
         within {
-            ApplyUncontrolledH(target);
+            Microsoft.Quantum.Intrinsic.H(target);
         } apply {
-            ApplySinglyControlledX(control, target);
+            Controlled Microsoft.Quantum.Intrinsic.X([control], target);
         }
     }
+
 }
