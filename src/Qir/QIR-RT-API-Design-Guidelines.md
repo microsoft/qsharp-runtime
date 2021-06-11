@@ -363,7 +363,7 @@ exist on how to use exceptions properly and minimize performance penalties.
 * As part of [C++ core guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
 * MSVC Documentation: [Modern C++ best practices for exceptions and error handling](https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp?view=msvc-160) and [How to: Design for exception safety](https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety?view=msvc-160).
 * [Exceptions and Error Handling](https://isocpp.org/wiki/faq/exceptions) As part of Modern C++ FAQ.
-* Google guidelines recommend against exceptions, but [allow them in windows code, especially STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
+* Google guidelines recommend against exceptions, but [allow them in windows code, especially while using STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
 * [Vishal Chovatiya Guidelines](http://www.vishalchovatiya.com/7-best-practices-for-exception-handling-in-cpp-with-example/), which may be easier to read.
 This section will describe only exceptions with regards to the runtime API.
 
@@ -371,9 +371,8 @@ This section will describe only exceptions with regards to the runtime API.
 
 It is not recommended to catch asynchronous harware exceptions, this is sometimes called
 [Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).
-An example of a hardware exception is a segmentation fault. If such exceptional situation arises, application should
-fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
-regards to the host OS. NOTE: MSVC compiler accepts the [`/EHs`](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160) switch to disable hardware exception handing in catch() blocks.
+Examples of hardware exceptions are the exception thrown when accessing a forbidden memory location as a result of a null pointer access, stack overflow, corrupt pointer dereferencing, unaligned memory access, etc.. If such exceptional situation arises, application should fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
+regards to the host OS. NOTE: The [MSVC's default exception handling behavior](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#default-exception-handling-behavior) does not conform to the C++ standard. Use the `/EHsc` flag to [conform to the standard](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#standard-c-exception-handling).
 
 It is also not recommended to handle out-of-memory exception as there's a very little chance of handling it right.
 For such handling to work correctly there shouldn't be any memory allocation from the point of exception, in the stack
@@ -384,17 +383,36 @@ is resolved. Just let the application fail. For the same reason, using non-throw
 
 If you implement an interface function mark it with [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec):
 
+Inside of your binary if you implement a function that should not throw exceptions, then mark it with the [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec).
+
 > void interface_func() **noexcept**
+
+extern "C" functions aren't considered noexcept by default. Consider marking them noexcept.
+Keep in mind that `noexcept` specifier is a C++ feature. If you need to add `noexcept` specifier
+to a public header or any other header that should be compatible with a pure C compiler
+make sure to use `__cplusplus` guards. For example:
+
+```c++
+#ifdef __cplusplus
+#define NOEXCEPT noexcept     // `noexcept` in C++ only.
+extern "C"
+{
+#else
+#define NOEXCEPT      // In C this macro is empty.
+#endif
+
+.. // `#include`s
+void f() NOEXCEPT;    // Exposed function. It is `noexcept` if the header is included to the C++ source file.
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+```
 
 If exception is thrown (and not caught) within the noexcept function, the application will terminate. Termination will
 ensure that exceptions will never cross the API boundaries. An overhead is incurred if a noexcept function
 calls functions that can throw exceptions, so consider marking all functions that shouldn't throw exceptions as noexcept.
 If you are calling functions that can throw exceptions, make sure to handle them properly.
-
-extern "C" functions aren't considered noexcept by default. Consider marking them noexcept, but only when they are
-compiled by the C++ compiler (and not by a pure C compiler). NOTE: MSVC compiler accepts
-[`/EHsc`](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160)
-flag to treat extern "C" functions as not throwing.
 
 * If using the [`dynamic_cast<>()`](https://en.cppreference.com/w/cpp/language/dynamic_cast), 
 consider casting the _pointers_ rather than _references_, e.g. 
