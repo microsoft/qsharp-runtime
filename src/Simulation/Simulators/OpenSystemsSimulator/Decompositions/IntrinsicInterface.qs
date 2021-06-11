@@ -33,8 +33,15 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 X(target);
             } elif Length(controls) == 1 {
                 Native.CNOT(controls[0], target);
+            } elif Length(controls) == 2 {
+                // Forward to decomposition of CCZ.
+                within {
+                    H(target);
+                } apply {
+                    Controlled Z(controls, target);
+                }
             } else {
-                fail "Not yet implemented.";
+                ApplyWithLessControlsA(Controlled X, (controls, target));
             }
         }
     }
@@ -54,8 +61,19 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 } apply {
                     Native.CNOT(controls[0], target);
                 }
+            } elif Length(controls) == 2 {
+                within {
+                    // TODO: double-check this one...!
+                    within {
+                        H(target);
+                    } apply {
+                        S(target);
+                    }
+                } apply {
+                    Controlled Z(controls, target);
+                }
             } else {
-                fail "Not yet implemented.";
+                ApplyWithLessControlsA(Controlled Y, (controls, target));
             }
         }
     }
@@ -74,9 +92,24 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 } apply {
                     Native.CNOT(controls[0], target);
                 }
+            } elif Length(controls) == 1 {
+                // [Page 15 of arXiv:1206.0758v3](https://arxiv.org/pdf/1206.0758v3.pdf#page=15)
+                Adjoint T(controls[0]);
+                Adjoint T(controls[1]);
+                Controlled X([target], controls[0]);
+                T(controls[0]);
+                Controlled X([controls[1]], target);
+                Controlled X([controls[1]], controls[0]);
+                T(target);
+                Adjoint T(controls[0]);
+                Controlled X([controls[1]], target);
+                Controlled X([target], controls[0]);
+                Adjoint T(target);
+                T(controls[0]);
+                Controlled X([controls[1]], controls[0]);
             } else {
-                fail "Not yet implemented.";
-            }
+                ApplyWithLessControlsA(Controlled Z, (controls, target));
+            } 
         }
     }
 
@@ -86,7 +119,19 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
 
         controlled (controls, ...) {
-            fail "Not yet implemented.";
+            if Length(controls) == 0 {
+                S(target);
+            } elif (Length(controls) == 1) {
+                T(controls[0]);
+                T(target);
+                within {
+                    Controlled X([controls[0]], target);
+                } apply {
+                    Adjoint T(target);
+                }
+            } else {
+                ApplyWithLessControlsA(Controlled S, (controls, target));
+            }
         }
     }
 
@@ -96,7 +141,14 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
 
         controlled (controls, ...) {
-            fail "Not yet implemented.";
+            if Length(controls) == 0 {
+                T(target);
+            } else {
+                // TODO: Decompositions of `Controlled T` currently used in Q#
+                //       target packages rely on R1Frac, which is not yet
+                //       implemented in experimental simulation.
+                fail "Controlled T operations are not yet supported.";
+            }
         }
     }
 
