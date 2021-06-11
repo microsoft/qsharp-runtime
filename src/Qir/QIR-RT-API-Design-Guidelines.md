@@ -353,16 +353,67 @@ The plan was to replace the exception throw with the [`exit()`](https://www.cplu
 or [`terminate()`](https://www.cplusplus.com/reference/exception/terminate)
 or [`abort()`](https://www.cplusplus.com/reference/cstdlib/abort) or other alternatives.
 
-To minimize the risk of getting the C++ exceptions crossing the ABI boundary, minimize the use of the throwing calls.
-Consider the non-throwing versions of the calls that you use.
-E.g. 
-* Consider the _nothrow_ version of the [`operator new()`](https://www.cplusplus.com/reference/new/operator%20new/) 
-(for single elements) and 
-[`operator new[]()`](https://www.cplusplus.com/reference/new/operator%20new[]/) (for arrays), e.g.
+On the other hand, exceptions are a natural part of the C++ standard. It is virtually impossible to use
+the standard library (STL, std namespace) and not to use exceptions. All _exceptional_ situations are
+reported by using exceptions (such as [`out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) or [`invalid_argument`](https://en.cppreference.com/w/cpp/error/invalid_argument) to name a few). So it is safe to assume
+that the C++ code we are developing will throw exceptions even if they aren't thrown right in the code we write.
+
+Recommendation is to use std namespace and exceptions in C++ code **only where appropriate**. Many recommendations
+exist on how to use exceptions properly and minimize performance penalties.
+* As part of [C++ core guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+* MSVC Documentation: [Modern C++ best practices for exceptions and error handling](https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp?view=msvc-160) and [How to: Design for exception safety](https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety?view=msvc-160).
+* [Exceptions and Error Handling](https://isocpp.org/wiki/faq/exceptions) As part of Modern C++ FAQ.
+* Google guidelines recommend against exceptions, but [allow them in windows code, especially while using STL](https://google.github.io/styleguide/cppguide.html#Windows_Code).
+* [Vishal Chovatiya Guidelines](http://www.vishalchovatiya.com/7-best-practices-for-exception-handling-in-cpp-with-example/), which may be easier to read.
+This section will describe only exceptions with regards to the runtime API.
+
+* Do not handle hardware exceptions and out-of-memory exception
+
+It is not recommended to catch asynchronous harware exceptions. (MSVC compiler calls this
+[Structured Exception Handling](https://docs.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-160).)
+Examples of hardware exceptions are the exceptions thrown when accessing a forbidden memory location as a result of a null pointer access, stack overflow, corrupt pointer dereferencing, unaligned memory access, etc.. If such exceptional situation arises, application should fail fast and quit. Typically hardware exceptions are handled in a system level code, and our runtime is an application with
+regards to the host OS. NOTE: The [MSVC's default exception handling behavior](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#default-exception-handling-behavior) does not conform to the C++ standard. Use the `/EHsc` flag to [conform to the standard](https://docs.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model?view=msvc-160#standard-c-exception-handling).
+
+It is also not recommended to handle out-of-memory exception as there's a very little chance of handling it right.
+For such handling to work correctly there shouldn't be any memory allocation from the point of exception, in the stack
+unwinding process, till the handling of exception and in the handling of exception until the out-of-memory situation
+is resolved. Just let the application fail. For the same reason, using non-throwing version of operator new is not recommended.
+
+* Mark interface functions with `noexcept`
+
+If you implement an interface function mark it with the [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec):
+
+Inside of your binary if you implement a function that should not throw exceptions, then mark it with the [noexcept specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec).
+
+> void interface_func() **noexcept**
+
+extern "C" functions aren't considered noexcept by default. Consider marking them noexcept.
+Keep in mind that `noexcept` specifier is a C++ feature. If you need to add `noexcept` specifier
+to a public header or any other header that should be compatible with a pure C compiler
+make sure to use `__cplusplus` guards. For example:
+
 ```c++
-int * myDynamicIntArray = new                int[10]; // In case of allocation failure THROWS! Avoid using this.
-int * myDynamicIntArray = new (std::nothrow) int[10]; // In case of allocation failure returns the nullptr. Consider this first.
+#ifdef __cplusplus
+#define NOEXCEPT noexcept     // `noexcept` in C++ only.
+extern "C"
+{
+#else
+#define NOEXCEPT      // In C this macro is empty.
+#endif
+
+.. // `#include`s
+void f() NOEXCEPT;    // Exposed function. It is `noexcept` if the header is included to the C++ source file.
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 ```
+
+If exception is thrown (and not caught) within the noexcept function, the application will terminate. Termination will
+ensure that exceptions will never cross the API boundaries. An overhead is incurred if a noexcept function
+calls functions that can throw exceptions, so consider marking all functions that shouldn't throw exceptions as noexcept.
+If you are calling functions that can throw exceptions, make sure to handle them properly.
+
 * If using the [`dynamic_cast<>()`](https://en.cppreference.com/w/cpp/language/dynamic_cast), 
 consider casting the _pointers_ rather than _references_, e.g. 
 ```c++
@@ -370,86 +421,7 @@ MyClass myInstance = .. // Create an instance of a class that may or may not imp
 IMyInterface & myItfRef = dynamic_cast<IMyInterface &>( myInstance); // Casts the _reference_, in case of failure THROWS! Avoid using this.
 IMyInterface * myItfPtr = dynamic_cast<IMyInterface *>(&myInstance); // Casts the _pointer_, in case of failure returns the nullptr. Consider this first.
 ```
-
-#### The `noexcept` Specifier and Exception Specification
-
-At the moment of writing there is _no_ recommendation about using or avoiding the 
-[`noexcept` specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec) or 
-[exception specification](https://en.cppreference.com/w/cpp/language/except_spec) 
-(for the C++ code internal to your binary), e.g. 
-> void func() **noexcept**  
-void func2() **throw()**
-
-This absence of recommendation is based on the materials listed below. Parts of them are definitely out-of-date.
-If you have a strong opinion (and, for example, can demonstrate in more details 
-why `noexcept` and/or `throw()` are better than not using them) 
-then you are more than welcome to share your knowledge.
-
-Materials:
-* (Current state) The [`noexcept` specifier](https://en.cppreference.com/w/cpp/language/noexcept_spec), 
-the fragments of a special interest:
-> Non-throwing functions are permitted to call potentially-throwing functions ..  
-> Note that a `noexcept` specification on a function is not a compile-time check ..  
-> `void baz() noexcept { throw 42; }`
-
-* (1996) [[MEC++]](https://github.com/kuzminrobin/code_review_notes/blob/master/book_list.md#mec++) 
-"More Effective C++" by Scott Meyers, Item 14: Use exception specifications judiciously
-* (2002.07) [[pl@es]](https://github.com/kuzminrobin/code_review_notes/blob/master/article_list.md#pl@es)
-Herb Sutter. A Pragmatic Look at Exception Specifications
-* (<=2004) [[eses]](https://github.com/kuzminrobin/code_review_notes/blob/master/article_list.md#eses) 
-Herb Sutter. Exception Safety and Exception Specifications: Are They Worth It?  
-Item 4. When is it worth it to write exception specifications on functions? Why would you choose to write one, or why not?
-* (Current state) 
-[C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#Re-noexcept)
-(search for "noexcept")
-
-### Let the User Decide Whether to Crash or Not
-
-In some scenarios it is reasonable for the application or algorithm to crash upon memory allocation failure. 
-But if the crash is silent then we are not sure what to do, to restart, or to chase and fix a bug, 
-or to run on a different machine with more memory, etc.
-
-We want at least a message in the console, or a pop-up window, telling the reason of a crash,
-and even better providing other actionalble information, like a stack trace, values of the local variables and parameters 
-(and ideally an opportunity to break in the debugger and/or getting a core dump for the subsequent analysis).
-Generating such an information may require from our application some extra memory which is already exhausted.
-To work around this we may want our application to pre-allocate a resonable chunk of memory during the start (the _rescue chunk_), 
-and once our application hits the memory allocation failure, 
-the application will deallocate the rescue chunk and generate the premortal disgnostics. 
-
-In a more strict enviroment we may want our application to run 24 hours a day, 365 days a year (as a part of a cloud service for example).
-During such a lengthy run the memory can get extremely fragmented, but a significant part of it can still be availble in small pieces. 
-The attempt to allocate a resonably large piece can fail because of the fragmentation, but would succeed if the memory was not fragmented. 
-To work around, our application, upon memory allocation failure, may want to run the defragmentation algorithm, e.g.
-* deallocate the rescue chunk,
-* save the data to a file,
-* delete the data from the memory (memory becomes nearly empty),
-* pre-allocate the resue chunk again (for the next run of the defragmentation algorithm),
-* read the data from the file back to the memory (memory becomes defragmented),
-
-Then the application will repeat the failed memory allocation operation, likely succeed, and continue 
-(or save the current state and clearly tell the user to run again (continue) on a machine with more memory).
-
-The same applies to the exhaustion of any other resourse, like a number of qubits, number of file handles, disk space, etc.
-
-To summarize, exhaustion of a resource is not necessarily a bug, and is not as severe as it might look. 
-It is something that can be worked around (or stopped and continued in a better environment).
-And only the user (not runtime) knows the requirements and scenarios. 
-That is why it seems reasonable to let the _user_ decide whether to crash or not.
-
-**Take-away:** In case of resource axhaustion consider returning the failure to the user, rather than crashing.
-
-(From C/C++ runtime we don't expect 
-[`malloc()`](https://man7.org/linux/man-pages/man3/malloc.3.html), 
-[`fopen()`](https://en.cppreference.com/w/c/io/fopen), or 
-[`operator new()`](https://www.cplusplus.com/reference/new/operator%20new/) 
-to crash, right?  
-The users of QIR RT very likely don't expect the resource allocation functions to crash either)
-
-Some more details about handling the memory allocation failure can be found in 
-* [[EC++3]](https://github.com/kuzminrobin/code_review_notes/blob/master/book_list.md#ec++3) 
-Scott Meyers. _Effective C++: 55 Specific Ways to Improve Your Programs and Designs_ (3rd Edition).  
-Chapter 8: Customizing `new` and `delete`.
+This way you can handle the erroneous situation without raising exceptions.
 
 ## Considerations Taken Into Account
 
