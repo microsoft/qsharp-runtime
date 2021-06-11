@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 
+using ExpIntrin = Microsoft.Quantum.Experimental.Intrinsic;
+
 namespace Microsoft.Quantum.Experimental
 {
     // NB: This class should not implement IQSharpCore, but does so temporarily
@@ -46,127 +48,87 @@ namespace Microsoft.Quantum.Experimental
             this.Id = NativeInterface.Init(capacity, representation);
         }
 
+        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets) =>
+            Get<ExpIntrin.Measure, ExpIntrin.Measure>().__Body__((paulis, targets));
+
         void IIntrinsicH.Body(Qubit target)
         {
-            NativeInterface.H(this.Id, target);
+            Get<ExpIntrin.H, ExpIntrin.H>().__Body__(target);
         }
 
         void IIntrinsicH.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            if (controls is { Count: 0 })
-            {
-                (this as IIntrinsicH).Body(target);
-            }
-            else
-            {
-                Get<Decompositions.ApplyControlledH, Decompositions.ApplyControlledH>().__Body__((controls, target));
-            }
-        }
-
-        Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
-        {
-            if (targets is { Count: 1 } && paulis is { Count: 1 } && paulis.Single() == Pauli.PauliZ)
-            {
-                return NativeInterface.M(this.Id, targets.Single());
-            }
-            else
-            {
-                Get<Decompositions.Measure, Decompositions.Measure>().__Body__((paulis, targets));
-            }
+            Get<ExpIntrin.H, ExpIntrin.H>().__ControlledBody__((controls, target));
         }
 
         void IIntrinsicS.Body(Qubit target)
         {
-            NativeInterface.S(this.Id, target);
+            Get<ExpIntrin.S, ExpIntrin.S>().__Body__(target);
         }
 
         void IIntrinsicS.AdjointBody(Qubit target)
         {
-            NativeInterface.SAdj(this.Id, target);
+            Get<ExpIntrin.S, ExpIntrin.S>().__AdjointBody__(target);
         }
 
         void IIntrinsicS.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            Get<ExpIntrin.S, ExpIntrin.S>().__ControlledBody__((controls, target));
         }
 
         void IIntrinsicS.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            Get<ExpIntrin.S, ExpIntrin.S>().__ControlledAdjointBody__((controls, target));
         }
 
         void IIntrinsicT.Body(Qubit target)
         {
-            NativeInterface.T(this.Id, target);
+            Get<ExpIntrin.T, ExpIntrin.T>().__Body__(target);
         }
 
         void IIntrinsicT.AdjointBody(Qubit target)
         {
-            NativeInterface.TAdj(this.Id, target);
+            Get<ExpIntrin.T, ExpIntrin.T>().__AdjointBody__(target);
         }
 
         void IIntrinsicT.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            Get<ExpIntrin.T, ExpIntrin.T>().__ControlledBody__((controls, target));
         }
 
         void IIntrinsicT.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            Get<ExpIntrin.T, ExpIntrin.T>().__ControlledAdjointBody__((controls, target));
         }
 
         void IIntrinsicX.Body(Qubit target)
         {
-            NativeInterface.X(this.Id, target);
+            Get<ExpIntrin.X, ExpIntrin.X>().__Body__(target);
         }
 
         void IIntrinsicX.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            // TODO: pass off to decompositions for more than one control.
-            if (controls is { Count: 0 })
-            {
-                (this as IIntrinsicX).Body(target);
-            }
-            else if (controls is { Count: 1 })
-            {
-                NativeInterface.CNOT(this.Id, controls[0], target);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            Get<ExpIntrin.X, ExpIntrin.X>().__ControlledBody__((controls, target));
         }
 
         void IIntrinsicY.Body(Qubit target)
         {
-            NativeInterface.Y(this.Id, target);
+            Get<ExpIntrin.Y, ExpIntrin.Y>().__Body__(target);
         }
 
         void IIntrinsicY.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            throw new NotImplementedException();
+            Get<ExpIntrin.Y, ExpIntrin.Y>().__ControlledBody__((controls, target));
         }
 
         void IIntrinsicZ.Body(Qubit target)
         {
-            NativeInterface.Z(this.Id, target);
+            Get<ExpIntrin.Z, ExpIntrin.Z>().__Body__(target);
         }
 
         void IIntrinsicZ.ControlledBody(IQArray<Qubit> controls, Qubit target)
         {
-            // TODO: pass off to decompositions for more than one control.
-            if (controls is { Count: 0 })
-            {
-                (this as IIntrinsicZ).Body(target);
-            }
-            else if (controls is { Count: 1 })
-            {
-                Get<Decompositions.ApplyCZUsingCNOT, Decompositions.ApplyCZUsingCNOT>().__Body__((controls[0], target));
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            Get<ExpIntrin.Z, ExpIntrin.Z>().__ControlledBody__((controls, target));
         }
 
         public void Dispose()

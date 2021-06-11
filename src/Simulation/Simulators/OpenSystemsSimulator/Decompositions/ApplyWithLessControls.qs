@@ -3,7 +3,7 @@
 
 // NB: Copied from Utils.qs.
 namespace Microsoft.Quantum.Experimental.Decompositions {
-    open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Experimental.Native as Native;
 
     /// Given a multiply-controlled operation that requires k controls 
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
@@ -25,16 +25,16 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
 
     internal operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         // https://arxiv.org/pdf/1210.0974.pdf#page=2
-        H(target);
-        CNOT(target,control1);
-        CNOT(control1,control2);
-        T(control2);
-        Adjoint T(control1);
-        T(target);
-        CNOT(target,control1);
-        CNOT(control1,control2);
-        Adjoint T(control2);
-        CNOT(target,control2);
-        H(target);
+        Native.H(target);
+        Native.CNOT(target,control1);
+        Native.CNOT(control1,control2);
+        Native.T(control2);
+        Adjoint Native.T(control1);
+        Native.T(target);
+        Native.CNOT(target,control1);
+        Native.CNOT(control1,control2);
+        Adjoint Native.T(control2);
+        Native.CNOT(target,control2);
+        Native.H(target);
     }
 }

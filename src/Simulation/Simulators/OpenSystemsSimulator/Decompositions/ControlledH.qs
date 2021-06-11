@@ -2,17 +2,18 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Experimental.Decompositions {
-    open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Experimental.Native as Native;
+    open Microsoft.Quantum.Experimental.Intrinsic as Intrinsic;
 
     internal operation PauliZFlip(basis : Pauli, target : Qubit) : Unit
     is Adj {
         if basis == PauliI {
             fail $"PauliX cannot be mapped to PauliI using conjugation by Clifford";
         } elif basis == PauliX {
-            H(target);
+            Native.H(target);
         } elif basis == PauliY {
-            Adjoint S(target);
-            Adjoint H(target);
+            Adjoint Native.S(target);
+            Native.H(target);
         } elif basis != PauliZ {
             fail $"PauliZ must be the only remaining case";
         }
@@ -23,7 +24,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         within {
             PauliZFlip(PauliY, target);
         } apply {
-            T(target);
+            Native.T(target);
         }
     }
 
@@ -33,10 +34,10 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
             within {
                 Adjoint Ty(target);
             } apply {
-                Controlled Z([controls[0]], target);
+                Controlled Intrinsic.Z([controls[0]], target);
             }
         } else {
-            ApplyWithLessControlsA(Controlled H, (controls, qubit));
+            ApplyWithLessControlsA(Controlled Intrinsic.H, (controls, target));
         }
     }
 
