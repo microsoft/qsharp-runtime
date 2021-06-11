@@ -13,6 +13,20 @@ cargo +nightly doc --features python --open
 
 For more details on using these simulators from Q# programs called from Python hosts, please see <https://github.com/microsoft/iqsharp>.
 
+## Known limitations
+
+As this feature is currently under development, there are still a number of limitations and missing capabilities.
+
+- Continuous-time rotations (e.g.: `Rx`, `Ry`, `Rz`, and `Exp`) are not yet supported.
+- Fractional rotations (e.g.: `R1Frac`, `ExpFrac`) are not yet supported.
+- The `Controlled Y` operation with more than one control qubit is not yet supported.
+- The `Controlled T` operation is not yet supported.
+- Joint measurement is not yet supported.
+
+Some limitations are inherent to open systems simulation, and may not ever be supported:
+
+- Assertions (e.g.: `AssertMeasurement` and `AssertMeasurementProbability`) are not supported, as these assertions may fail for correct code in the presence of noise. These assertions are no-ops on the experimental simulators.
+
 ## Native interface
 
 The core interoperability boundary between the C# runtime for the Quantum Development Kit and the `qdk_sim` native library is defined in the [`NativeInterface` static class](./NativeInterface.cs). This class provides P/Invoke declarations for each function exposed by the C API for the `qdk_sim` crate, as well as methods that call into these C API methods. The managed methods that correspond to each C API function check error codes reuturned by C API functions and convert them into .NET exceptions, allowing for C API errors to be easily caught by managed code.
