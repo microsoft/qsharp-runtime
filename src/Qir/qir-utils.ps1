@@ -40,7 +40,52 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
+    # -Wall
+    #   -Wmisleading-indentation, 
+    #   -Wmost, 
+    #       -Wcast-of-sel-type, 
+    #       -Wchar-subscripts, 
+    #       -Wcomment, 
+    #       -Wdelete-non-virtual-dtor, 
+    #       -Wextern-c-compat, 
+    #       -Wfor-loop-analysis, 
+    #       -Wformat, 
+    #       -Wframe-address, 
+    #       -Wimplicit, 
+    #       -Winfinite-recursion, 
+    #       -Wint-in-bool-context, 
+    #       -Wmismatched-tags, 
+    #       -Wmissing-braces, 
+    #       -Wmove, 
+    #       -Wmultichar, 
+    #       -Wobjc-designated-initializers, 
+    #       -Wobjc-flexible-array, 
+    #       -Wobjc-missing-super-calls, 
+    #       -Woverloaded-virtual, 
+    #       -Wprivate-extern, 
+    #       -Wrange-loop-construct, 
+    #       -Wreorder, 
+    #       -Wreturn-type, 
+    #       -Wself-assign, 
+    #       -Wself-move, 
+    #       -Wsizeof-array-argument, 
+    #       -Wsizeof-array-decay, 
+    #       -Wstring-plus-int, 
+    #       -Wtautological-compare, 
+    #       -Wtrigraphs, 
+    #       -Wuninitialized, 
+    #       -Wunknown-pragmas, 
+    #       -Wunused, 
+    #       -Wuser-defined-warnings, 
+    #       -Wvolatile-register-var.
+    #   -Wparentheses, 
+    #   -Wswitch, 
+    #   -Wswitch-bool.
     $warningFlags = "-Werror"
+
+    # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
+    $warningFlags += "-Wall"
+
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
 
