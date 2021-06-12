@@ -768,7 +768,7 @@ struct ControlledCallablesTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override {}
+    void ReleaseQubit(Qubit) override {}
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);
@@ -984,7 +984,7 @@ struct AdjointsTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override {}
+    void ReleaseQubit(Qubit) override {}
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);

@@ -45,48 +45,29 @@ function Build-CMakeProject {
     # -Wall
     #   -Wmisleading-indentation, 
     #   -Wmost, 
-    #       -Wcast-of-sel-type, 
-    #       -Wchar-subscripts, 
-    #       -Wcomment, 
-    #       -Wdelete-non-virtual-dtor, 
-    #       -Wextern-c-compat, 
-    #       -Wfor-loop-analysis, 
-    #       -Wformat, 
-    #       -Wframe-address, 
-    #       -Wimplicit, 
-    #       -Winfinite-recursion, 
-    #       -Wint-in-bool-context, 
-    #       -Wmismatched-tags, 
-    #       -Wmissing-braces, 
-    #       -Wmove, 
-    #       -Wmultichar, 
-    #       -Wobjc-designated-initializers, 
-    #       -Wobjc-flexible-array, 
-    #       -Wobjc-missing-super-calls, 
-    #       -Woverloaded-virtual, 
-    #       -Wprivate-extern, 
-    #       -Wrange-loop-construct, 
-    #       -Wreorder, 
-    #       -Wreturn-type, 
-    #       -Wself-assign, 
-    #       -Wself-move, 
-    #       -Wsizeof-array-argument, 
-    #       -Wsizeof-array-decay, 
-    #       -Wstring-plus-int, 
-    #       -Wtautological-compare, 
-    #       -Wtrigraphs, 
-    #       -Wuninitialized, 
-    #       -Wunknown-pragmas, 
-    #       -Wunused, 
-    #       -Wuser-defined-warnings, 
-    #       -Wvolatile-register-var.
+    #       -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
+    #       -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
+    #       -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
+    #       -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
+    #       -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
+    #       -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
+    #       -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
+    #       -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
+    #       -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
     #   -Wparentheses, 
     #   -Wswitch, 
     #   -Wswitch-bool.
-    # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
-    $warningFlags += " -Wall"
+    $warningFlags += " -Wall"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
 
-    $warningFlags += " -Wno-error=unused"   # Treat unused entities as warningns rather than errors.  https://clang.llvm.org/docs/DiagnosticsReference.html#wunused
+    # -Wextra
+    #   -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
+    #   -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
+    #   -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
+    #   -Wunused-parameter.
+    $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
+
+    #$warningFlags += " -Wno-error=unused "   # Treat unused entities as warnings rather than errors.  https://clang.llvm.org/docs/DiagnosticsReference.html#wunused
+    #$warningFlags += " -Wno-error=unused-parameter"
 
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags

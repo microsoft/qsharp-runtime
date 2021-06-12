@@ -148,11 +148,11 @@ namespace Quantum
         std::string QubitToString(Qubit qubit) override;
         void ReleaseResult(Result result) override;
 
-        bool AreEqualResults(Result r1, Result r2) override
+        bool AreEqualResults(Result, Result) override
         {
             throw std::logic_error("Cannot compare results while tracing!");
         }
-        ResultValue GetResultValue(Result result) override
+        ResultValue GetResultValue(Result) override
         {
             throw std::logic_error("Result values aren't available while tracing!");
         }

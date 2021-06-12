@@ -18,14 +18,14 @@ namespace Quantum
 using namespace Microsoft::Quantum;
 extern "C"
 {
-    void quantum__qis__on_operation_start(int64_t id) // NOLINT
+    void quantum__qis__on_operation_start(int64_t /* id */) // NOLINT
     {
     }
-    void quantum__qis__on_operation_end(int64_t id) // NOLINT
+    void quantum__qis__on_operation_end(int64_t /* id */) // NOLINT
     {
     }
 
-    void quantum__qis__swap(Qubit q1, Qubit q2) // NOLINT
+    void quantum__qis__swap(Qubit, Qubit) // NOLINT
     {
     }
 
