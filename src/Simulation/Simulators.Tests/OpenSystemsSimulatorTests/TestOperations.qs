@@ -25,6 +25,7 @@
 
 namespace Microsoft.Quantum.Experimental.Tests {
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Diagnostics;
 
     internal function Fact(expected : Bool, message : String) : Unit {
         if not expected {
