@@ -75,6 +75,7 @@ namespace Quantum
             const long id = GetQubitId(qubit);
             assert(id <= this->lastUsedId);
             assert(!this->states.at(id));
+            (void)id;   // Calm down the "Unused Var" warning in Release build (`assert()` is Debug only).
             this->lastUsedId--;
             this->states.pop_back();
         }
