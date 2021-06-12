@@ -15,7 +15,7 @@ The experimental simulators are not yet supported by:
 - Q# standalone command-line programs
 - QIR-based executables
 
-## Known limitations
+## Known issues and limitations
 
 As this feature is currently under development, there are still a number of limitations and missing capabilities.
 
@@ -24,6 +24,7 @@ As this feature is currently under development, there are still a number of limi
 - The `Controlled Y` operation with more than one control qubit is not yet supported.
 - The `Controlled T` operation is not yet supported.
 - Joint measurement is not yet supported.
+- In some cases, qubits may need to be manually `Reset` before releasing, even if they have been measured.
 
 Some limitations are inherent to open systems simulation, and may not ever be supported:
 

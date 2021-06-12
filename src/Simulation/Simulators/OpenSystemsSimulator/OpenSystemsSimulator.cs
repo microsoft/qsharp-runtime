@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Experimental
 
         public State CurrentState => NativeInterface.GetCurrentState(this.Id);
 
-        public OpenSystemsSimulator(uint capacity = 3, string representation = "mixed") : base(new QubitManager((long)capacity))
+        public OpenSystemsSimulator(uint capacity = 4, string representation = "mixed") : base(new QubitManager((long)capacity))
         {
             this.Id = NativeInterface.Init(capacity, representation);
         }

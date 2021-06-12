@@ -196,10 +196,9 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                     Native.H(target);
                     Native.S(target);
                 } else {
-                    fail "Single-qubit Z case should have been handled by the simulator.";
                 }
             } apply {
-                set result = Measure([PauliZ], [target]);
+                set result = Native.M(target);
             }
             return result;
         } else {

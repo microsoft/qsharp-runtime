@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
 
     internal function Fact(expected : Bool, message : String) : Unit {
         if not expected {
-            fail "Fact was false: {message}.";
+            fail $"Fact was false: {message}";
         }
     }
 
@@ -44,6 +44,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             CNOT(left, right);
 
             Fact(M(left) == M(right), "Z parity in 00 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -51,6 +52,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             CNOT(left, right);
 
             Fact(MX(left) == MX(right), "X parity in 00 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -60,6 +62,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             X(left);
 
             Fact(M(left) != M(right), "Z parity in 10 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -69,6 +72,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             X(left);
 
             Fact(MX(left) == MX(right), "X parity in 10 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -78,6 +82,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             Z(left);
 
             Fact(M(left) == M(right), "Z parity in 01 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -87,6 +92,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             Z(left);
 
             Fact(MX(left) != MX(right), "X parity in 01 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -97,6 +103,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             Z(left);
 
             Fact(M(left) != M(right), "Z parity in 11 case was wrong.");
+            ResetAll([left, right]);
         }
 
         use (left, right) = (Qubit(), Qubit()) {
@@ -107,6 +114,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
             Z(left);
 
             Fact(MX(left) != MX(right), "X parity in 11 case was wrong.");
+            ResetAll([left, right]);
         }
     }
 
@@ -115,6 +123,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
     }
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("QuantumSimulator") // validate against full-state simulator.
     operation CheckToffoliOnComputationalBasisStates() : Unit {
         for in0 in [false, true] {
             for in1 in [false, true] {
@@ -125,7 +134,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
                         if in1 { X(qs[1]); }
                         if output { X(qs[2]); }
 
-                        let expected = Xor(output, in0 and in1);
+                        let expectedOut = Xor(output, in0 and in1);
 
                         if useCcz {
                             within {
@@ -136,9 +145,15 @@ namespace Microsoft.Quantum.Experimental.Tests {
                         } else {
                             Controlled X([qs[0], qs[1]], qs[2]);
                         }
-                        Fact(M(qs[0]) == (in0 ? One | Zero), "in0 was incorrect.");
-                        Fact(M(qs[1]) == (in1 ? One | Zero), "in1 was incorrect.");
-                        Fact(M(qs[2]) == (expected ? One | Zero), "expected was incorrect.");
+
+                        let results = [M(qs[0]), M(qs[1]), M(qs[2])];
+                        let expected = [in0 ? One | Zero, in1 ? One | Zero, expectedOut ? One | Zero];
+
+                        Fact(results[0] == expected[0], $"in0 was incorrect in case: {in0} {in1} {output}. Got {results[0]}, expected {expected[0]}.");
+                        Fact(results[1] == expected[1], $"in1 was incorrect in case: {in0} {in1} {output}. Got {results[1]}, expected {expected[1]}.");
+                        Fact(results[2] == expected[2], $"expected was incorrect in case: {in0} {in1} {output}. Got {results[2]}, expected {expected[2]}.");
+
+                        ResetAll(qs);
                     }
                 }
             }
