@@ -315,7 +315,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             else
             {
-                return CredentialFactory.CreateCredential(Credential ?? CredentialType.Default);
+                return CredentialFactory.CreateCredential(Credential ?? CredentialType.Default, Subscription);
             }
         }
 
