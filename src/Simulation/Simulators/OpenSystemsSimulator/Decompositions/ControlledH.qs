@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
     open Microsoft.Quantum.Experimental.Native as Native;
     open Microsoft.Quantum.Experimental.Intrinsic as Intrinsic;
 
-    internal operation PauliZFlip(basis : Pauli, target : Qubit) : Unit
+    operation PauliZFlip(basis : Pauli, target : Qubit) : Unit
     is Adj {
         if basis == PauliI {
             fail $"PauliX cannot be mapped to PauliI using conjugation by Clifford";
@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         }
     }
 
-    internal operation Ty(target : Qubit) : Unit
+    operation Ty(target : Qubit) : Unit
     is Adj {
         within {
             PauliZFlip(PauliY, target);
@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         }
     }
 
-    internal operation ApplyControlledH(controls : Qubit[], target : Qubit) : Unit
+    operation ApplyControlledH(controls : Qubit[], target : Qubit) : Unit
     is Adj {
         if Length(controls) == 1 {
             within {

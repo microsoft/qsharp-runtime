@@ -4,7 +4,7 @@
 namespace Microsoft.Quantum.Experimental.Decompositions {
     open Microsoft.Quantum.Experimental.Native as Native;
 
-    internal function IsAnyPauliI(bases : Pauli[]) : Bool {
+    function IsAnyPauliI(bases : Pauli[]) : Bool {
         for basis in bases {
             if basis == PauliI {
                 return true;

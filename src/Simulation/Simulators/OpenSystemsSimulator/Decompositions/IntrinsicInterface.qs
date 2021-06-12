@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
     open Microsoft.Quantum.Experimental.Native as Native;
     open Microsoft.Quantum.Experimental.Decompositions;
 
-    internal operation H(target : Qubit) : Unit is Adj + Ctl {
+    operation H(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.H(target);
         }
@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation X(target : Qubit) : Unit is Adj + Ctl {
+    operation X(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.X(target);
         }
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation Y(target : Qubit) : Unit is Adj + Ctl {
+    operation Y(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.Y(target);
         }
@@ -78,7 +78,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation Z(target : Qubit) : Unit is Adj + Ctl {
+    operation Z(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.Z(target);
         }
@@ -113,7 +113,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation S(target : Qubit) : Unit is Adj + Ctl {
+    operation S(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.S(target);
         }
@@ -135,7 +135,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation T(target : Qubit) : Unit is Adj + Ctl {
+    operation T(target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             Native.T(target);
         }
@@ -152,7 +152,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    internal operation Measure(bases : Pauli[], register : Qubit[]) : Result {
+    operation Measure(bases : Pauli[], register : Qubit[]) : Result {
         // If anything is PauliI, strip out and recurse.
         if IsAnyPauliI(bases) {
             mutable newBases = [];

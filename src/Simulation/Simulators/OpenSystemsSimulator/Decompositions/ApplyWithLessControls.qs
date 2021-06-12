@@ -7,7 +7,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
 
     /// Given a multiply-controlled operation that requires k controls 
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
-    internal operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {
+    operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {
         let numControls = Length(controls);
         let numControlPairs = numControls / 2;
         use temps = Qubit[numControlPairs] {
@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         }
     }
 
-    internal operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+    operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         // https://arxiv.org/pdf/1210.0974.pdf#page=2
         Native.H(target);
         Native.CNOT(target,control1);
