@@ -152,25 +152,32 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
+    // NB: We separate out this operation to avoid hardware targeting rewrite
+    //     steps from trying to lift this operation and modifying the C#
+    //     code gen in the process.
+    internal operation MeasureWithoutPauliI(bases : Pauli[], register : Qubit[]) : Result {
+        mutable newBases = [];
+        mutable newQubits = [];
+        // NB: using Zipped would be nice here, but this is built before
+        //     M.Q.Standard...
+        for idxBasis in 0..Length(bases) - 1 {
+            if bases[idxBasis] != PauliI {
+                set newBases += [bases[idxBasis]];
+                set newQubits += [register[idxBasis]];
+            }
+        }
+
+        if Length(newBases) == 0 {
+            return Zero;
+        } else {
+            return Measure(newBases, register);
+        }
+    }
+
     operation Measure(bases : Pauli[], register : Qubit[]) : Result {
         // If anything is PauliI, strip out and recurse.
         if IsAnyPauliI(bases) {
-            mutable newBases = [];
-            mutable newQubits = [];
-            // NB: using Zipped would be nice here, but this is built before
-            //     M.Q.Standard...
-            for idxBasis in 0..Length(bases) - 1 {
-                if bases[idxBasis] != PauliI {
-                    set newBases += [bases[idxBasis]];
-                    set newQubits += [register[idxBasis]];
-                }
-            }
-
-            if Length(newBases) == 0 {
-                return Zero;
-            } else {
-                return Measure(newBases, register);
-            }
+            return MeasureWithoutPauliI(bases, register);
         }
 
         // At this point, we're guaranteed that bases contains no PauliI, and
