@@ -66,9 +66,6 @@ function Build-CMakeProject {
     #   -Wunused-parameter.
     $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
 
-    #$warningFlags += " -Wno-error=unused "   # Treat unused entities as warnings rather than errors.  https://clang.llvm.org/docs/DiagnosticsReference.html#wunused
-    #$warningFlags += " -Wno-error=unused-parameter"
-
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
 
