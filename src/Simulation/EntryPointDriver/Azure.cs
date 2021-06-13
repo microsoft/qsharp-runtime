@@ -345,6 +345,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Storage: {Storage}",
                 $"Base URI: {BaseUri}",
                 $"Location: {Location ?? ExtractLocation(BaseUri)}",
+                $"Credential: {Credential}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
