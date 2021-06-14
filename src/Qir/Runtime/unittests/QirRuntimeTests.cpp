@@ -716,7 +716,7 @@ struct QubitTestQAPI : public SimulatorStub
 
     bool HaveQubitsInFlight() const
     {
-        for (const auto& b : this->allocated)
+        for (const auto b : this->allocated)
         {
             if (b)
             {
