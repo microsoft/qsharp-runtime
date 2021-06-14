@@ -16,6 +16,14 @@ if (-not (Test-Path Env:AGENT_OS)) {
         Pop-Location
         $Env:BUILD_CONFIGURATION = $null
     }
+    if ($Env:ENABLE_QIRRUNTIME -ne "false") {
+        Write-Host "Build release flavor of the QIR Runtime"
+        $Env:BUILD_CONFIGURATION = "Release"
+        Push-Location (Join-Path $PSScriptRoot "src/Qir/Runtime")
+            .\build-qir-runtime.ps1
+        Pop-Location
+        $Env:BUILD_CONFIGURATION = $null
+    }
 
     Write-Host "Build simulation solution"
     dotnet build Simulation.sln
