@@ -29,6 +29,23 @@ namespace Microsoft.Quantum.Experimental
 
             protected override void Release(Qubit qubit, bool wasUsedOnlyForBorrowing)
             {
+                // When a qubit is released, the developer has promised that
+                // either of the following two conditions holds:
+                //
+                //     1. The qubit has been measured immediately before
+                //        releasing, such that its state is known
+                //        determinstically at this point in the program.
+                //     2. The qubit has been coherently unprepared, such that
+                //        the the qubit is known determistically to be in the
+                //        |0⟩ state at this point in the program.
+                //
+                // In either case, noise can cause a correct Q# program to fail
+                // to meet the conditions for releasing a qubit, such that we
+                // want to track the effects of that noise without failing.
+                //
+                // Thus, our strategy will be to always allow the release to
+                // proceed, doing any resets needed to deal with case (1)
+                // above.
                 if (qubit != null && qubit.IsMeasured)
                 {
                     // Try to reset measured qubits.
