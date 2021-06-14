@@ -110,6 +110,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
+        (void)numBases; // Calm down the compiler warning (unused parameter) for Release build.
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
@@ -264,6 +265,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
+        (void)numBases; // Calm down the compiler warning (unused parameter) for Release build.
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);

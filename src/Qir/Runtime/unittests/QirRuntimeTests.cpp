@@ -65,7 +65,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 
     bool HaveResultsInFlight() const
     {
-        for (const auto& b : this->allocated)
+        for (const auto b : this->allocated)
         {
             if (b)
             {
