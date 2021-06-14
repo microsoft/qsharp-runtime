@@ -12,6 +12,14 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// The specific behavior of this function is simulator-dependent,
     /// but in most cases the given message will be written to the console.
+    ///
+    /// # Example
+    /// The following causes `"Hello, world!"` to be reported (typically to
+    /// the console):
+    /// ```qsharp
+    /// let name = "world";
+    /// Message($"Hello, {name}!");
+    /// ```
     function Message (msg : String) : Unit {
         body intrinsic;
     }

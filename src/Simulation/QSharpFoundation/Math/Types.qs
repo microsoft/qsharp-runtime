@@ -11,6 +11,12 @@ namespace Microsoft.Quantum.Math {
     /// # Summary
     /// Represents a complex number by its real and imaginary components.
     /// The first element of the tuple is the real component, the second one - the imaginary component.
+    ///
+    /// # Example
+    /// The following snippet defines the imaginary unit $0 + 1i$:
+    /// ```qsharp
+    /// let imagUnit = Complex(0.0, 1.0);
+    /// ```
     newtype Complex = (Real: Double, Imag: Double);
 
 }

@@ -12,6 +12,14 @@ namespace Microsoft.Quantum.Diagnostics {
     /// The name has to be either one of the known targets, or a fully qualified name.
     /// Known targets are: QuantumSimulator, ToffoliSimulator, ResourcesEstimator.
     ///
+    /// # Example
+    /// The following is a unit test that checks if `2 + 3` is `5`:
+    /// ```qsharp
+    /// @Test("QuantumSimulator")
+    /// function AdditionIsCorrect() : Unit {
+    ///     EqualityFactI(2 + 3, 5, "Addition did not work correctly.");
+    /// }
+    /// ```
     @Attribute()
     newtype Test = (ExecutionTarget : String);
 
