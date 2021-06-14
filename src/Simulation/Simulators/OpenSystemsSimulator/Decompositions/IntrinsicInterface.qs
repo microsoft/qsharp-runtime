@@ -56,18 +56,17 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 Y(target);
             } elif Length(controls) == 1 {
                 within {
-                    H(target);
-                    S(target);
+                    Native.H(target);
+                    Native.S(target);
                 } apply {
                     Native.CNOT(controls[0], target);
                 }
             } elif Length(controls) == 2 {
                 within {
-                    // TODO: double-check this one...!
                     within {
-                        H(target);
+                        Native.H(target);
                     } apply {
-                        S(target);
+                        Native.S(target);
                     }
                 } apply {
                     Controlled Z(controls, target);
@@ -85,28 +84,28 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
 
         controlled (controls, ...) {
             if Length(controls) == 0 {
-                Z(target);
+                Native.Z(target);
             } elif Length(controls) == 1 {
                 within {
                     H(target);
                 } apply {
                     Native.CNOT(controls[0], target);
                 }
-            } elif Length(controls) == 1 {
+            } elif Length(controls) == 2 {
                 // [Page 15 of arXiv:1206.0758v3](https://arxiv.org/pdf/1206.0758v3.pdf#page=15)
-                Adjoint T(controls[0]);
-                Adjoint T(controls[1]);
-                Controlled X([target], controls[0]);
-                T(controls[0]);
-                Controlled X([controls[1]], target);
-                Controlled X([controls[1]], controls[0]);
-                T(target);
-                Adjoint T(controls[0]);
-                Controlled X([controls[1]], target);
-                Controlled X([target], controls[0]);
-                Adjoint T(target);
-                T(controls[0]);
-                Controlled X([controls[1]], controls[0]);
+                Adjoint Native.T(controls[0]);
+                Adjoint Native.T(controls[1]);
+                Controlled Native.X([target], controls[0]);
+                Native.T(controls[0]);
+                Native.CNOT(controls[1], target);
+                Native.CNOT(controls[1], controls[0]);
+                Native.T(target);
+                Adjoint Native.T(controls[0]);
+                Native.CNOT(controls[1], target);
+                Native.CNOT(target, controls[0]);
+                Adjoint Native.T(target);
+                Native.T(controls[0]);
+                Native.CNOT(controls[1], controls[0]);
             } else {
                 ApplyWithLessControlsA(Controlled Z, (controls, target));
             } 
@@ -120,14 +119,14 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
 
         controlled (controls, ...) {
             if Length(controls) == 0 {
-                S(target);
+                Native.S(target);
             } elif (Length(controls) == 1) {
-                T(controls[0]);
-                T(target);
+                Native.T(controls[0]);
+                Native.T(target);
                 within {
                     Controlled X([controls[0]], target);
                 } apply {
-                    Adjoint T(target);
+                    Adjoint Native.T(target);
                 }
             } else {
                 ApplyWithLessControlsA(Controlled S, (controls, target));
@@ -142,7 +141,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
 
         controlled (controls, ...) {
             if Length(controls) == 0 {
-                T(target);
+                Native.T(target);
             } else {
                 // TODO: Decompositions of `Controlled T` currently used in Q#
                 //       target packages rely on R1Frac, which is not yet
@@ -155,6 +154,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
     // NB: We separate out this operation to avoid hardware targeting rewrite
     //     steps from trying to lift this operation and modifying the C#
     //     code gen in the process.
+    //     See https://github.com/microsoft/qsharp-compiler/issues/768.
     internal operation MeasureWithoutPauliI(bases : Pauli[], register : Qubit[]) : Result {
         mutable newBases = [];
         mutable newQubits = [];
@@ -170,7 +170,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         if Length(newBases) == 0 {
             return Zero;
         } else {
-            return Measure(newBases, register);
+            return Measure(newBases, newQubits);
         }
     }
 
@@ -196,6 +196,8 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                     Native.H(target);
                     Native.S(target);
                 } else {
+                    // In the PauliZ case, we don't need to do anything here
+                    // since Native.M is already in the Z basis by definition.
                 }
             } apply {
                 set result = Native.M(target);

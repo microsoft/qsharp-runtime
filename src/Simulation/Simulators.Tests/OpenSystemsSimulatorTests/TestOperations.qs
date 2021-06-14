@@ -161,6 +161,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
     }
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("QuantumSimulator") // validate against full-state simulator.
     operation CheckXHSZSHIsNoOp() : Unit {
         use q = Qubit();
 
@@ -176,6 +177,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
     }
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("QuantumSimulator") // validate against full-state simulator.
     operation CheckControlledHWorks() : Unit {
         use control = Qubit();
         use target = Qubit();
