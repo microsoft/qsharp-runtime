@@ -95,7 +95,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 // [Page 15 of arXiv:1206.0758v3](https://arxiv.org/pdf/1206.0758v3.pdf#page=15)
                 Adjoint Native.T(controls[0]);
                 Adjoint Native.T(controls[1]);
-                Controlled Native.X([target], controls[0]);
+                Native.CNOT(target, controls[0]);
                 Native.T(controls[0]);
                 Native.CNOT(controls[1], target);
                 Native.CNOT(controls[1], controls[0]);
@@ -124,7 +124,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 Native.T(controls[0]);
                 Native.T(target);
                 within {
-                    Controlled X([controls[0]], target);
+                    Native.CNOT(controls[0], target);
                 } apply {
                     Adjoint Native.T(target);
                 }
