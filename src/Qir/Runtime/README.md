@@ -30,7 +30,7 @@ while on macOS, `prerequisites.ps1` relies on the [`brew` package manager](https
 1. Add all three to your/system `%PATH%`.
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
-1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
+1. Install the same version of dotnet as specified by qsharp-runtime [README](../../../README.md)
 
 *Building from Visual Studio and VS Code is **not** supported.
 Running cmake from the editors will likely default to MSVC or clang-cl and fail.*
@@ -67,7 +67,7 @@ pwsh build-qir-runtime.ps1
   
 The script will create the `build/{Debug|Release}` folder and place the build artifacts in it. The configuration `Debug|Release`
 is specified with the `BUILD_CONFIGURATION` environment variable.
-If the variable is not set then the default is specified in [`set-env.ps1`](../../build/set-env.ps1).  
+If the variable is not set then the default is specified in [`set-env.ps1`](../../../build/set-env.ps1).  
 
 ## Tests
 
