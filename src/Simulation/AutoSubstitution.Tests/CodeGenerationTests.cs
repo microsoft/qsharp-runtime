@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -42,7 +45,8 @@ namespace Microsoft.Quantum.AutoSubstitution.Testing
             var generatedFileName = Path.Combine(path, "__AutoSubstitution__.g.cs");
             Assert.True(File.Exists(generatedFileName));
 
-            // uncomment, when creating files with expected content
+            // uncomment this line, when creating new unit tests to
+            // create files with expected content
             //File.Copy(generatedFileName, $"{fileName}.cs_", true);
 
             Assert.Equal(File.ReadAllText(Path.Combine("TestFiles", $"{fileName}.cs_")).Replace("\r\n", "\n"), File.ReadAllText(generatedFileName).Replace("\r\n", "\n"));

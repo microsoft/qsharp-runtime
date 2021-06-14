@@ -1,5 +1,7 @@
-namespace Microsoft.Quantum.Targeting
-{
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.Targeting {
     /// # Summary
     /// Enables to substitute an operation with an alternative operation for a given target
     ///

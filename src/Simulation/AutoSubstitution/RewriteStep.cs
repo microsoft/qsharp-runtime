@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +19,7 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
     ///
     /// <para>
     /// This rewrite step creates custom emulators for operations that have the
-    /// `SubstitutableOnTarget` attribute.  This attribute holds an alternative operation,
+    /// <c>SubstitutableOnTarget</c> attribute.  This attribute holds an alternative operation,
     /// with the same signature, as its first argument, and a simulator, for which
     /// the alternative operation should be used, as its second argument.
     /// </para>
@@ -55,7 +58,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
 
             if (!globals.Any())
             {
-                diagnostics.Add(new IRewriteStep.Diagnostic {
+                diagnostics.Add(new IRewriteStep.Diagnostic
+                {
                     Severity = DiagnosticSeverity.Info,
                     Message = "AutoSubstitution: no operations have @SubstitutableOnTarget attribute",
                     Stage = IRewriteStep.Stage.Transformation
@@ -66,7 +70,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
             // no need to generate any C# file, if there is no substitution attribute, or if we cannot retrieve the output path
             if (!AssemblyConstants.TryGetValue(Microsoft.Quantum.QsCompiler.ReservedKeywords.AssemblyConstants.OutputPath, out var outputPath))
             {
-                diagnostics.Add(new IRewriteStep.Diagnostic {
+                diagnostics.Add(new IRewriteStep.Diagnostic
+                {
                     Severity = DiagnosticSeverity.Error,
                     Message = "AutoSubstitution: cannot determine output path for generated C# code",
                     Stage = IRewriteStep.Stage.Transformation
@@ -74,7 +79,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
                 return false;
             }
 
-            diagnostics.Add(new IRewriteStep.Diagnostic {
+            diagnostics.Add(new IRewriteStep.Diagnostic
+            {
                 Severity = DiagnosticSeverity.Info,
                 Message = $"AutoSubstitution: Generating file __AutoSubstitution__.g.cs in {outputPath}",
                 Stage = IRewriteStep.Stage.Transformation
@@ -92,7 +98,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
                     var period = alternativeOperation.LastIndexOf('.');
                     if (period == -1)
                     {
-                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                        diagnostics.Add(new IRewriteStep.Diagnostic
+                        {
                             Severity = DiagnosticSeverity.Error,
                             Message = $"AutoSubstitution: name of alternative operation in {key.Namespace}.{key.Name} must be completely specified (including namespace)",
                             Stage = IRewriteStep.Stage.Transformation
@@ -103,7 +110,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
                     var qualifiedName = new QsQualifiedName(alternativeOperation.Substring(0, period), alternativeOperation.Substring(period + 1));
                     if (!globalCallables.TryGetValue(qualifiedName, out var alternativeCallable))
                     {
-                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                        diagnostics.Add(new IRewriteStep.Diagnostic
+                        {
                             Severity = DiagnosticSeverity.Error,
                             Message = $"AutoSubstitution: cannot find alternative operation `{alternativeOperation}`",
                             Stage = IRewriteStep.Stage.Transformation
@@ -116,7 +124,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
 
                     if (!callableSignature.ArgumentType.Equals(alternativeSignature.ArgumentType) || !callableSignature.ReturnType.Equals(alternativeSignature.ReturnType))
                     {
-                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                        diagnostics.Add(new IRewriteStep.Diagnostic
+                        {
                             Severity = DiagnosticSeverity.Error,
                             Message = $"AutoSubstitution: signature of `{alternativeOperation}` does not match the one of {key.Namespace}.{key.Name}",
                             Stage = IRewriteStep.Stage.Transformation
@@ -126,7 +135,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
 
                     if (!GetSpecializationKinds(callable).IsSubsetOf(GetSpecializationKinds(alternativeCallable)))
                     {
-                        diagnostics.Add(new IRewriteStep.Diagnostic {
+                        diagnostics.Add(new IRewriteStep.Diagnostic
+                        {
                             Severity = DiagnosticSeverity.Error,
                             Message = $"AutoSubstitution: specializations of `{alternativeOperation}` must be a superset of specializations of {key.Namespace}.{key.Name}",
                             Stage = IRewriteStep.Stage.Transformation

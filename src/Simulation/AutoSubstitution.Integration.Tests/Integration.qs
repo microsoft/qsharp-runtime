@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.AutoSubstitution.Testing {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
