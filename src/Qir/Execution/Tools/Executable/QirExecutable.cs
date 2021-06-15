@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Driver;
@@ -20,6 +21,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         public virtual string SourceDirectoryPath => "src";
         public abstract string DriverFileExtension { get; }
+        public abstract IList<string> LinkLibraries { get; }
+        public abstract IList<DirectoryInfo> HeaderDirectories { get; }
+        public abstract IList<DirectoryInfo> LibraryDirectories { get; }
 
         protected FileInfo ExecutableFile { get; }
 
@@ -76,8 +80,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                 await bytecodeFileStream.WriteAsync(qirBytecode);
             }
             logger.LogInfo($"Created bytecode file at {bytecodeFile.FullName}.");
-
-            await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectories, includeDirectories, LinkLibraries);
+            await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectories.Concat(this.LibraryDirectories).ToList(), includeDirectories.Concat(this.HeaderDirectories).ToList(), LinkLibraries);
         }
 
         public async Task RunAsync(ExecutionInformation executionInformation, Stream output)
@@ -85,7 +88,5 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             var stringArguments = driverGenerator.GetCommandLineArguments(executionInformation);
             await runner.RunExecutableAsync(ExecutableFile, output, stringArguments);
         }
-
-        public abstract IList<string> LinkLibraries { get; }
     }
 }

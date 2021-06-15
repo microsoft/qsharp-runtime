@@ -99,10 +99,13 @@ Pack-Dotnet '../src/Simulation/Type1Core/Microsoft.Quantum.Type1.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type2Core/Microsoft.Quantum.Type2.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-Dotnet '../src/Qir/Execution/Tools/Microsoft.Quantum.Qir.Tools.csproj' -ForcePrerelease
+Pack-Dotnet '../src/Qir/Execution/CommandLineTool/Microsoft.Quantum.Qir.CommandLineTool.csproj' -ForcePrerelease
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Qir.Runtime.nuspec' -ForcePrerelease
+
+Move-Item -Path (Join-Path $Env:NUGET_OUTDIR Microsoft.Quantum.Qir.CommandLineTool.*) -Destination $Env:INTERNAL_TOOLS_OUTDIR
 
 if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."

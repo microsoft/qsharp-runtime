@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools;
 
-namespace Microsoft.Quantum.CommandLineCompiler
+namespace Microsoft.Quantum.Qir.CommandLineTool
 {
     class Program
     {
@@ -43,9 +43,7 @@ namespace Microsoft.Quantum.CommandLineCompiler
             var buildCommand = new Command("build", "(default) Build the executables from a QIR DLL.")
             {
                 Handler = CommandHandler.Create((BuildOptions settings) =>
-                {
-                    return QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory);
-                })
+                    QirTools.BuildFromQSharpDll(settings.QSharpDll, settings.LibraryDirectories, settings.IncludeDirectories, settings.ExecutablesDirectory))
             };
             buildCommand.TreatUnmatchedTokensAsErrors = true;
 

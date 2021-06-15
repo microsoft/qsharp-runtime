@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,13 +33,40 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                 // Copy all library contents to bin.
                 logger?.LogInfo("Copying library directories into the executable's folder.");
 
+                if (!sourceDirectory.Exists)
+                {
+                    logger?.LogWarning($"Cannot find source directory: {sourceDirectory.FullName}");
+                }
+
+                var libDirs = new List<string>();
                 foreach (var dir in libraryDirectories)
                 {
-                    CopyDirectoryContents(dir, binDirectory);
+                    if (!dir.Exists)
+                    {
+                        logger?.LogWarning($"Cannot find given directory: {dir.FullName}");
+                    }
+                    else
+                    {
+                        CopyDirectoryContents(dir, binDirectory);
+                        libDirs.Add(dir.FullName);
+                    }
+                }
+
+                var includeDirs = new List<string>();
+                foreach (var dir in includeDirectories)
+                {
+                    if (!dir.Exists)
+                    {
+                        logger?.LogWarning($"Could not find given directory: {dir.FullName}");
+                    }
+                    else
+                    {
+                        includeDirs.Add(dir.FullName);
+                    }
                 }
 
                 var inputFiles = sourceDirectory.GetFiles().Select(fileInfo => fileInfo.FullName).ToArray();
-                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libraryDirectories.Select(dir => dir.FullName).ToArray(), includeDirectories.Select(dir => dir.FullName).ToArray(), executableFile.FullName);
+                await clangClient.CreateExecutableAsync(inputFiles, linkLibraries.ToArray(), libDirs.ToArray(), includeDirs.ToArray(), executableFile.FullName);
             });
         }
 
