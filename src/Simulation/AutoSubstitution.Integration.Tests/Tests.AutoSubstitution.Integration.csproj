@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk/0.17.2105144881">
+<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -7,8 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.Xunit" Version="0.17.2105144881" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" IsQscReference="true" />
   </ItemGroup>
 </Project>

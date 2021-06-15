@@ -18,7 +18,6 @@ namespace Microsoft.Quantum.AutoSubstitution.Testing {
         }
     }
 
-    @Test("ToffoliSimulator")
     operation TestQuantumSwap() : Unit {
         use a = Qubit();
         use b = Qubit();
