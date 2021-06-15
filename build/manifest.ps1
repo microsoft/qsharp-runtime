@@ -20,7 +20,6 @@ param(
 $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",
-        "Microsoft.Quantum.Development.Kit",
         "Microsoft.Quantum.EntryPointDriver",
         "Microsoft.Quantum.QSharp.Core",
         "Microsoft.Quantum.Type1.Core",
