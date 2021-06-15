@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>QirCommandLineTool</ToolCommandName>
+    <ToolCommandName>qir-cli</ToolCommandName>
     <Description>Command-line tool for interacting with QIR.</Description>
     <PackageTags>Quantum QIR</PackageTags>
   </PropertyGroup>
