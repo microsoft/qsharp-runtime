@@ -35,8 +35,14 @@ function Build-CMakeProject {
     $oldCC = $env:CC
     $oldCXX = $env:CXX
     $oldRC = $env:RC
+    $oldCCFLAGS  = $env:CCFLAGS
+    $oldCXXFLAGS = $env:CXXFLAGS
 
     $clangTidy = ""
+
+    $warningFlags = "-Werror"
+    $env:CFLAGS   += $warningFlags
+    $env:CXXFLAGS += $warningFlags
 
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
@@ -99,6 +105,9 @@ function Build-CMakeProject {
     }
 
     Pop-Location
+
+    $env:CXXFLAGS = $oldCXXFLAGS
+    $env:CCFLAGS  = $oldCCFLAGS
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX

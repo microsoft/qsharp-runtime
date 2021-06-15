@@ -394,7 +394,7 @@ CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
 Qubit CQubitManager::CreateQubitObject(QubitIdType id)
 {
     // Make sure the static_cast won't overflow:
-    FailIf(id < 0 || id > std::numeric_limits<intptr_t>::max(), "Qubit id is out of range.");
+    FailIf(id < 0 || id >= MaximumQubitCapacity, "Qubit id is out of range.");
     intptr_t pointerSizedId = static_cast<intptr_t>(id);
     return reinterpret_cast<Qubit>(pointerSizedId);
 }
