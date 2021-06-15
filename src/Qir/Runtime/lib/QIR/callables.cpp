@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "QirUtils.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
@@ -370,7 +371,8 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 
         QirArray* controls = current->controls;
         const size_t blockSize = qubitSize * controls->count;
-        assert(dst + blockSize <= dstEnd);
+        assert(dst + blockSize <= dstEnd); 
+        UNUSED(dstEnd);
         memcpy(dst, controls->buffer, blockSize);
         dst += blockSize;
         // in the last iteration the innerTuple isn't valid, but we are not going to use it

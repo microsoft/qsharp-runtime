@@ -20,6 +20,7 @@ param(
 $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",
+        "Microsoft.Quantum.AutoSubstitution",
         "Microsoft.Quantum.EntryPointDriver",
         "Microsoft.Quantum.QSharp.Core",
         "Microsoft.Quantum.Type1.Core",
@@ -33,6 +34,7 @@ $artifacts = @{
 
     Assemblies = @(
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
+        ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.AutoSubstitution.dll",
         ".\src\Simulation\RoslynWrapper\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.RoslynWrapper.dll",
         ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
