@@ -4,16 +4,19 @@
 [package]
 name = "qdk_sim_experimental"
 version = "0.1.0"
-authors = ["Christopher Granade <cgranade@cgranade.com>"]
+authors = ["Microsoft"]
 edition = "2018"
 license = "MIT"
 description = "Experimental simulators for use with the Quantum Development Kit."
 homepage = "https://github.com/microsoft/qsharp-runtime"
 repository = "https://github.com/microsoft/qsharp-runtime"
+readme = "README.md"
 
 exclude = [
     # Exclude files specific to QDK build pipelines.
     "*.template", "*.csx", "*.ps1", "NuGet.Config", "drop",
+    # Don't include cbindgen configs and outputs.
+    "include", "cbindgen.toml",
     # Don't include Python sources or build artifacts.
     "*.egg-info", "qdk_sim_experimental", "setup.py", "*.whl", "pyproject.toml"
 ]
