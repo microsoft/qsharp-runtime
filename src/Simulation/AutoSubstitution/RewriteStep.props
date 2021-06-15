@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <QscRef_Microsoft_Quantum_AutoSubstitution>$(MSBuildThisFileDirectory)/../lib/netstandard2.1/Microsoft.Quantum.AutoSubstitution.dll</QscRef_Microsoft_Quantum_AutoSubstitution>
+  </PropertyGroup>
+
+</Project>
