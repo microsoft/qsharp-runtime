@@ -25,7 +25,7 @@ extern "C"
     {
     }
 
-    void quantum__qis__swap(Qubit, Qubit) // NOLINT
+    void quantum__qis__swap(Qubit /*q1*/, Qubit /*q2*/) // NOLINT
     {
     }
 

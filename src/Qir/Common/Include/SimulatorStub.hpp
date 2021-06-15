@@ -93,7 +93,7 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented: ControlledExp");
         }
-        void AdjointS(Qubit) override
+        void AdjointS(Qubit /*target*/) override
         {
             throw std::logic_error("not_implemented: AdjointS");
         }
@@ -113,15 +113,15 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented: Measure");
         }
-        void ReleaseResult(Result) override
+        void ReleaseResult(Result /*result*/) override
         {
             throw std::logic_error("not_implemented: ReleaseResult");
         }
-        bool AreEqualResults(Result, Result) override
+        bool AreEqualResults(Result /*r1*/, Result /*r2*/) override
         {
             throw std::logic_error("not_implemented: AreEqualResults");
         }
-        ResultValue GetResultValue(Result) override
+        ResultValue GetResultValue(Result /*result*/) override
         {
             throw std::logic_error("not_implemented: GetResultValue");
         }

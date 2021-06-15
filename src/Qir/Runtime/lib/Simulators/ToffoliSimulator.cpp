@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+#include "QirUtils.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
@@ -75,7 +76,7 @@ namespace Quantum
             const long id = GetQubitId(qubit);
             assert(id <= this->lastUsedId);
             assert(!this->states.at(id));
-            (void)id;   // Calm down the "Unused Var" warning in Release build (`assert()` is Debug only).
+            UNUSED(id);
             this->lastUsedId--;
             this->states.pop_back();
         }

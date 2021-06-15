@@ -61,7 +61,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         return nullptr;
     }
-    void ReleaseQubit(Qubit) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override {}
 
     void X(Qubit) override
     {
@@ -101,7 +101,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {

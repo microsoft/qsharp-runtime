@@ -59,14 +59,6 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     return handle;
 }
 
-// bool UnloadQuantumSimulator(QUANTUM_SIMULATOR handle)
-// {
-// #ifdef _WIN32
-//     return ::FreeLibrary(handle);
-// #else // not _WIN32
-//     return ::dlclose(handle);
-// #endif
-// }
 
 void* LoadProc(QUANTUM_SIMULATOR handle, const char* procName)
 {
@@ -224,7 +216,7 @@ namespace Quantum
                 m(this->simulatorId, numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
         }
 
-        void ReleaseResult(Result) override {}
+        void ReleaseResult(Result /*r*/) override {}
 
         ResultValue GetResultValue(Result r) override
         {

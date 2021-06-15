@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "QirUtils.hpp"
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
@@ -110,7 +111,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
-        (void)numBases; // Calm down the compiler warning (unused parameter) for Release build.
+        UNUSED(numBases);
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
@@ -265,7 +266,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
-        (void)numBases; // Calm down the compiler warning (unused parameter) for Release build.
+        UNUSED(numBases);
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
@@ -278,7 +279,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {
