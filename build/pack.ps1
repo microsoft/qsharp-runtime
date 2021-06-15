@@ -90,6 +90,7 @@ function Pack-Dotnet() {
 Write-Host "##[info]Using nuget to create packages"
 Pack-Dotnet '../src/Azure/Azure.Quantum.Client/Microsoft.Azure.Quantum.Client.csproj'
 Pack-One '../src/Simulation/CSharpGeneration/Microsoft.Quantum.CSharpGeneration.fsproj' '-IncludeReferencedProjects'
+Pack-One '../src/Simulation/AutoSubstitution/AutoSubstitution.csproj' '-IncludeReferencedProjects'
 Pack-Dotnet '../src/Simulation/EntryPointDriver/Microsoft.Quantum.EntryPointDriver.csproj'
 Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
 Pack-Dotnet '../src/Simulation/TargetDefinitions/Interfaces/Microsoft.Quantum.Targets.Interfaces.csproj'
