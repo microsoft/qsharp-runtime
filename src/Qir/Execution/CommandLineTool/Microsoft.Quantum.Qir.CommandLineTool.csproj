@@ -3,7 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackAsTool>true</PackAsTool>
+    <ToolCommandName>qir-cli</ToolCommandName>
+    <Description>Command-line tool for interacting with QIR.</Description>
+    <PackageTags>Quantum QIR</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
