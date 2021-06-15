@@ -59,14 +59,6 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     return handle;
 }
 
-bool UnloadQuantumSimulator(QUANTUM_SIMULATOR handle)
-{
-#ifdef _WIN32
-    return ::FreeLibrary(handle);
-#else // not _WIN32
-    return ::dlclose(handle);
-#endif
-}
 
 void* LoadProc(QUANTUM_SIMULATOR handle, const char* procName)
 {
@@ -164,7 +156,7 @@ namespace Quantum
         }
         ~CFullstateSimulator()
         {
-            if (this->simulatorId != -1)
+            if (this->simulatorId != (unsigned)-1)
             {
                 typedef unsigned (*TDestroy)(unsigned);
                 static TDestroy destroySimulatorInstance =
@@ -224,7 +216,7 @@ namespace Quantum
                 m(this->simulatorId, numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
         }
 
-        void ReleaseResult(Result r) override {}
+        void ReleaseResult(Result /*r*/) override {}
 
         ResultValue GetResultValue(Result r) override
         {
@@ -408,7 +400,7 @@ namespace Quantum
             Qubit targets[],
             double probabilityOfZero,
             double precision,
-            const char* failureMessage) override
+            const char* /*failureMessage*/) override
         {
             typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
