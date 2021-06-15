@@ -172,10 +172,8 @@ int32_t CQubitManager::CRestrictedReuseAreaStack::Count() const
 
 CQubitManager::CQubitManager(
     QubitIdType initialQubitCapacity,
-    bool mayExtendCapacity,
-    bool mayReuseQubits):
+    bool mayExtendCapacity):
         mayExtendCapacity(mayExtendCapacity),
-        mayReuseQubits(mayReuseQubits),
         qubitCapacity(initialQubitCapacity)
 {
     FailIf(qubitCapacity <= 0, "Qubit capacity must be positive.");

@@ -39,8 +39,7 @@ namespace Quantum
     public:
         CQubitManager(
             QubitIdType initialQubitCapacity = DefaultQubitCapacity,
-            bool mayExtendCapacity = true,
-            bool mayReuseQubits = true);
+            bool mayExtendCapacity = true);
 
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
@@ -110,7 +109,6 @@ namespace Quantum
         // Total number of qubits that are currently tracked by this qubit manager.
         int32_t GetQubitCapacity() const { return qubitCapacity; }
         bool GetMayExtendCapacity() const { return mayExtendCapacity; }
-        bool GetMayReuseQubits() const { return mayReuseQubits; }
 
     protected:
         // May be overriden to create a custom Qubit object.
@@ -225,8 +223,6 @@ namespace Quantum
 
         // Configuration Properties:
         bool mayExtendCapacity = true;
-        // TODO: This has no effect at the moment!
-        bool mayReuseQubits = true;
 
         // State:
         // sharedQubitStatusArray is used to store statuses of all known qubits.
