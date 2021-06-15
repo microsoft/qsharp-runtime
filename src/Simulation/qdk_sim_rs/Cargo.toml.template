@@ -11,9 +11,11 @@ description = "Experimental simulators for use with the Quantum Development Kit.
 homepage = "https://github.com/microsoft/qsharp-runtime"
 repository = "https://github.com/microsoft/qsharp-runtime"
 
-# Exclude files specific to QDK build pipelines.
 exclude = [
-    "*.template", "*.csx", "*.ps1", "NuGet.Config", "drops"
+    # Exclude files specific to QDK build pipelines.
+    "*.template", "*.csx", "*.ps1", "NuGet.Config", "drop",
+    # Don't include Python sources or build artifacts.
+    "*.egg-info", "qdk_sim_experimental", "setup.py", "*.whl", "pyproject.toml"
 ]
 
 [lib]
@@ -72,7 +74,6 @@ built = "0.5.0"
 
 [build-dependencies]
 built = "0.5.0"
-cbindgen = "0.19.0"
 
 
 [dev-dependencies]
