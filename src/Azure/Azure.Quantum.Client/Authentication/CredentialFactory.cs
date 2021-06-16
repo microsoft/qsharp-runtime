@@ -71,6 +71,13 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.interactivebrowsercredential
         /// </summary>
         Interactive,
+
+        /// <summary>
+        /// A TokenCredential implementation which authenticates a user using the device code flow,
+        /// and provides access tokens for that user account. 
+        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.devicecodecredential
+        /// </summary>
+        DeviceCode,
     }
 
     public static class CredentialFactory
@@ -87,6 +94,7 @@ namespace Microsoft.Azure.Quantum.Authentication
             CredentialType.VisualStudio => CreateCredential(credentialType, () => VisualStudioOptions(subscriptionId)),
             CredentialType.VisualStudioCode => CreateCredential(credentialType, () => VisualStudioCodeOptions(subscriptionId)),
             CredentialType.Interactive => CreateCredential(credentialType, () => InteractiveOptions(subscriptionId)),
+            CredentialType.DeviceCode => CreateCredential(credentialType, () => DeviceCodeOptions(subscriptionId)),
             CredentialType.Default => CreateCredential(credentialType, () => DefaultOptions(subscriptionId)),
             _ => CreateCredential(credentialType, () => DefaultOptions(subscriptionId)),
         };
@@ -103,6 +111,7 @@ namespace Microsoft.Azure.Quantum.Authentication
             CredentialType.Environment => new EnvironmentCredential(),
             CredentialType.ManagedIdentity => new ManagedIdentityCredential(),
             CredentialType.CLI => new AzureCliCredential(),
+            CredentialType.DeviceCode => new DeviceCodeCredential(options: options?.Invoke() as DeviceCodeCredentialOptions),
             CredentialType.SharedToken => new SharedTokenCacheCredential(options: options?.Invoke() as SharedTokenCacheCredentialOptions),
             CredentialType.VisualStudio => new VisualStudioCredential(options: options?.Invoke() as VisualStudioCredentialOptions),
             CredentialType.VisualStudioCode => new VisualStudioCodeCredential(options: options?.Invoke() as VisualStudioCodeCredentialOptions),
@@ -174,6 +183,17 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <returns>A new instance of InteractiveBrowserCredentialOptions with the TenantId populated</returns>
         public static SharedTokenCacheCredentialOptions SharedTokenOptions(string? subscriptionid) =>
             new SharedTokenCacheCredentialOptions
+            {
+                TenantId = GetTenantId(subscriptionid),
+            };
+
+        /// <summary>
+        /// Returns an VisualStudioCodeCredentialOptions, populated with the TenantId for the given subscription.
+        /// </summary>
+        /// <param name="subscriptionid">An subscription Id.</param>
+        /// <returns>A new instance of InteractiveBrowserCredentialOptions with the TenantId populated</returns>
+        public static DeviceCodeCredentialOptions DeviceCodeOptions(string? subscriptionid) =>
+            new DeviceCodeCredentialOptions
             {
                 TenantId = GetTenantId(subscriptionid),
             };

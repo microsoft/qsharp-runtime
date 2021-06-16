@@ -24,6 +24,7 @@ namespace Microsoft.Azure.Quantum.Test
         [DataRow(CredentialType.VisualStudio, typeof(VisualStudioCredential))]
         [DataRow(CredentialType.VisualStudioCode, typeof(VisualStudioCodeCredential))]
         [DataRow(CredentialType.Interactive, typeof(InteractiveBrowserCredential))]
+        [DataRow(CredentialType.DeviceCode, typeof(DeviceCodeCredential))]
         public void TestCreateCredential(CredentialType credentialType, Type expectedType)
         {
             var actual = CredentialFactory.CreateCredential(credentialType);
