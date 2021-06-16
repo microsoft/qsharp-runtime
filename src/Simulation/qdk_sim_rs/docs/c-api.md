@@ -17,10 +17,12 @@ API.
 The [`qdk_sim`](..) crate has enabled the use of [`cbindgen`](https://crates.io/crates/cbindgen), such that C-language header files are generated automatically as part of the build for this crate.
 
 ```bash
-cargo build
+cargo install --force cbindgen
+cbindgen --language C --output include/qdk_sim.h
+cbindgen --language C++ --output include/qdk_sim.hpp
 ```
 
-This will generate `include/qdk_sim.h`, which can then be used from C callers:
+This will generate `include/qdk_sim.h` and `include/qdk_sim.hpp, which can then be used from C and C++ callers, respectively. For example, to call from C:
 
 ```c
 #include <stdio.h>
@@ -45,7 +47,7 @@ int main() {
 To build and run the above example using Clang on Windows:
 
 ```bash
-$ clang docs/example.c -Iinclude -Ltarget/debug -lqdk_sim -lws2_32 -lAdvapi32 -lUserenv
+$ clang example.c -Iinclude -Ltarget/debug -lqdk_sim -lws2_32 -lAdvapi32 -lUserenv
 got 1 1
 ```
 
