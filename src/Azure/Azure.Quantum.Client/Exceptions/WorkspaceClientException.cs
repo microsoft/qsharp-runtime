@@ -12,10 +12,6 @@ namespace Microsoft.Azure.Quantum.Exceptions
     {
         private const string BaseMessage = "An exception related to the Azure workspace client occurred";
 
-        public string ErrorCode { get; }
-
-        public int Status { get; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkspaceClientException"/> class with a default error message.
         /// </summary>
@@ -81,6 +77,10 @@ namespace Microsoft.Azure.Quantum.Exceptions
                 this.Status = requestException.Status;
             }
         }
+
+        public string ErrorCode { get; }
+
+        public int Status { get; }
 
         /// <summary>
         /// Formats the contents of the inner exception in <see cref="WorkspaceClientException"/> so it can be included in the

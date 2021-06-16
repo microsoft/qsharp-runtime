@@ -568,6 +568,7 @@ let ``Submit uses default values`` () =
                Storage:
                Base URI:
                Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -587,6 +588,7 @@ let ``Submit uses default values with default target`` () =
                Storage:
                Base URI:
                Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -608,6 +610,8 @@ let ``Submit allows overriding default values`` () =
         "myJobName"
         "--shots"
         "750"
+        "--credential"
+        "cli"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
@@ -616,6 +620,7 @@ let ``Submit allows overriding default values`` () =
                Storage: myStorage
                Base URI:
                Location: myLocation
+               Credential: CLI
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -637,6 +642,8 @@ let ``Submit extracts the location from a quantum endpoint`` () =
         "https://westus.quantum.microsoft.com/"
         "--job-name"
         "myJobName"
+        "--credential"
+        "VisualStudio"
         "--shots"
         "750"
         "--target"
@@ -649,6 +656,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Storage: myStorage
                 Base URI: https://westus.quantum.microsoft.com/
                 Location: westus
+                Credential: VisualStudio
                 Job Name: myJobName
                 Shots: 750
                 Output: FriendlyUri
@@ -664,6 +672,8 @@ let ``Submit allows overriding default values with default target`` () =
         "--verbose"
         "--storage"
         "myStorage"
+        "--credential"
+        "Interactive"
         "--aad-token"
         "myToken"
         "--job-name"
@@ -678,6 +688,7 @@ let ``Submit allows overriding default values with default target`` () =
                Storage: myStorage
                Base URI:
                Location: myLocation
+               Credential: Interactive
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -712,6 +723,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Storage:
                Base URI: http://mybaseuri.foo.com/
                Location: mybaseuri
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -733,6 +745,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Storage:
                Base URI:
                Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -758,6 +771,7 @@ let ``Submit allows spaces for the --location option`` () =
                Storage:
                Base URI:
                Location: My Location
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -870,6 +884,7 @@ let ``Shows help text for submit command`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target> (REQUIRED)                        The target device ID.
+                      --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
@@ -899,6 +914,7 @@ let ``Shows help text for submit command with default target`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target>                                   The target device ID.
+                      --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.

@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Quantum
     using global::Azure.Quantum.Jobs;
     using global::Azure.Quantum.Jobs.Models;
 
+    using Microsoft.Azure.Quantum.Authentication;
     using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
 
@@ -48,17 +49,7 @@ namespace Microsoft.Azure.Quantum
             Ensure.NotNullOrWhiteSpace(location, nameof(location));
 
             // Optional parameters:
-            if (credential == null)
-            {
-                // We have to disable VisualStudio until 16.11 goes out, see: https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071
-                var credOptions = new DefaultAzureCredentialOptions()
-                {
-                    ExcludeVisualStudioCredential = true,
-                };
-
-                credential = new DefaultAzureCredential(credOptions);
-            }
-
+            credential ??= CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId);
             options ??= new QuantumJobClientOptions();
 
             this.ResourceGroupName = resourceGroupName;

@@ -142,12 +142,7 @@ namespace Microsoft.Azure.Quantum
 
         private Uri GenerateUri()
         {
-            if (!(this.Workspace is Workspace cloudWorkspace))
-            {
-                throw new NotSupportedException($"{typeof(CloudJob)}'s Workspace is not of type {typeof(Workspace)} and does not have enough data to generate URI");
-            }
-
-            var uriStr = $"https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource/subscriptions/{cloudWorkspace.SubscriptionId}/resourceGroups/{cloudWorkspace.ResourceGroupName}/providers/Microsoft.Quantum/Workspaces/{cloudWorkspace.WorkspaceName}/job_management?microsoft_azure_quantum_jobid={Id}";
+            var uriStr = $"https://portal.azure.com/#@microsoft.onmicrosoft.com/resource/subscriptions/{Workspace.SubscriptionId}/resourceGroups/{Workspace.ResourceGroupName}/providers/Microsoft.Quantum/Workspaces/{Workspace.WorkspaceName}/job_management?microsoft_azure_quantum_jobid={Id}";
             return new Uri(uriStr);
         }
     }

@@ -29,8 +29,9 @@ Live tests require you to configure your environment with these variables:
   * E2E_WORKSPACE_RG: the Azure Quantum workspace's resource group.
   * E2E_WORKSPACE_LOCATION: the Azure Quantum workspace's location (region).
 
-You'll also need to authenticate with Azure using any of the methods listed in:
+We'll also try to authenticate with Azure using an instance of DefaultCredential. See
 https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme#authenticate-the-client
+for details.
 
 Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
 
@@ -197,12 +198,15 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
             var options = new QuantumJobClientOptions();
             options.Diagnostics.ApplicationId = "ClientTests";
 
+            var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialType.Default);
+
             return new Workspace(
                 subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID"),
                 resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG"),
                 workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME"),
                 location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION"),
-                options: options);
+                options: options,
+                credential: credential);
         }
 
         private static JobDetails CreateJobDetails(string jobId, string containerUri = null, string inputUri = null)
