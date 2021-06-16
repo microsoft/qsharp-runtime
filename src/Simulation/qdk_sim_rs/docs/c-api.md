@@ -48,8 +48,8 @@ To build and run the above example using Clang on Windows:
 
 ```bash
 $ clang example.c -Iinclude -Ltarget/debug -lqdk_sim -lws2_32 -lAdvapi32 -lUserenv
+$ ./a.exe
 got 1 1
-```
 
 ## Error Handling and Return Values
 
