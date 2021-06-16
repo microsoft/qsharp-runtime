@@ -37,8 +37,6 @@ Push-Location $PSScriptRoot
     # Free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space, which is
     # exceptionally helpful in CI builds.
-        # When building in CI, free disk space by cleaning up.
-    # Note that this takes longer, but saves ~1 GB of space.
     if ($IsCI) {
         cargo clean;
     }
