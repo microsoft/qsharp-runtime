@@ -50,6 +50,7 @@ To build and run the above example using Clang on Windows:
 $ clang example.c -Iinclude -Ltarget/debug -lqdk_sim -lws2_32 -lAdvapi32 -lUserenv
 $ ./a.exe
 got 1 1
+```
 
 ## Error Handling and Return Values
 
@@ -65,9 +66,9 @@ int main() {
 
     if (init(2, "invalid", &sim_id) != 0) {
         printf("Got an error message: %s", lasterr());
+    } else {
+        destroy(sim_id);
     }
-
-    destroy(sim_id);
 }
 ```
 
@@ -81,8 +82,9 @@ For example:
 uintptr_t result;
 if (m(sim_id, 0, &result) != 0) {
     printf("Got an error message: %s", lasterr());
+} else {
+    printf("Got a measurement result: %llu", result);
 }
-printf("Got a measurement result: %llu", result);
 ```
 
 ## Initializing, Using, and Destroying Simulators
