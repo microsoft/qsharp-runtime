@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "QirUtils.hpp"
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
@@ -73,7 +74,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
         REQUIRE(id >= 0);
-        REQUIRE(id < this->qubits.size());
+        REQUIRE((size_t)id < this->qubits.size());
 
         return id;
     }
@@ -82,7 +83,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         const int id = static_cast<int>(reinterpret_cast<int64_t>(result));
         REQUIRE(id >= 0);
-        REQUIRE(id < this->results.size());
+        REQUIRE((size_t)id < this->results.size());
 
         return id;
     }
@@ -107,9 +108,10 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
+        UNUSED(numBases);
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
@@ -223,7 +225,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
         REQUIRE(id >= 0);
-        REQUIRE(id < this->qubits.size());
+        REQUIRE((size_t)id < this->qubits.size());
         return id;
     }
 
@@ -261,9 +263,10 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
+        UNUSED(numBases);
 
         const int id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
@@ -276,7 +279,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result result) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {
