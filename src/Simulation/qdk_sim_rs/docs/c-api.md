@@ -22,7 +22,7 @@ cbindgen --language C --output include/qdk_sim.h
 cbindgen --language C++ --output include/qdk_sim.hpp
 ```
 
-This will generate `include/qdk_sim.h` and `include/qdk_sim.hpp, which can then be used from C and C++ callers, respectively. For example, to call from C:
+This will generate `include/qdk_sim.h` and `include/qdk_sim.hpp`, which can then be used from C and C++ callers, respectively. For example, to call from C:
 
 ```c
 #include <stdio.h>
