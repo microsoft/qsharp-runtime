@@ -183,11 +183,12 @@ void QirArray::Append(const QirArray* other)
 // index[112] ~ linear index 18 = 1*3*4 + 1*4 + 2
 static int64_t GetLinearIndex(const std::vector<int64_t>& dimensionSizes, const std::vector<int64_t>& indexes)
 {
-    const int dimensions = dimensionSizes.size();
+    const size_t dimensions = dimensionSizes.size();
     int64_t linearIndex = 0;
     int64_t layerSize = 1;
-    for (int i = dimensions - 1; i >= 0; i--)
+    for (size_t i = dimensions; i > 0; )
     {
+        --i;
         linearIndex += indexes[i] * layerSize;
         layerSize *= dimensionSizes[i];
     }
@@ -520,7 +521,7 @@ extern "C"
             assert(dst < slice->count);
 
             int64_t srcInner = src;
-            for (long index = range.start; index != range.end; index += range.step)
+            for (int64_t index = range.start; index != range.end; index += range.step)
             {
                 memcpy(&slice->buffer[dst * itemSizeInBytes], &array->buffer[srcInner * itemSizeInBytes], chunkSize);
                 srcInner += (singleIndexRunCount * range.step);

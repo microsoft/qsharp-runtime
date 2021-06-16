@@ -304,7 +304,7 @@ extern "C" void __quantum__qis__k__body(Qubit q)                              //
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
     g_cKCallsControlled++;
-    g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
+    g_ctrqapi->ControlledX((long)(controls->count), reinterpret_cast<Qubit*>(controls->buffer), q);
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {

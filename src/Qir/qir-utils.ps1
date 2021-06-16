@@ -40,31 +40,94 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
-    $warningFlags = "-Werror"
+    $warningFlags = "-Werror"   #"-Weverything"   # Work in progress
 
-    # -Wall
-    #   -Wmisleading-indentation, 
-    #   -Wmost, 
-    #       -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
-    #       -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
-    #       -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
-    #       -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
-    #       -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
-    #       -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
-    #       -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
-    #       -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
-    #       -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
-    #   -Wparentheses, 
-    #   -Wswitch, 
-    #   -Wswitch-bool.
+    # -WCL4
+    #     -Wall
+    #       -Wmisleading-indentation, 
+    #       -Wmost, 
+    #           -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
+    #           -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
+    #           -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
+    #           -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
+    #           -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
+    #           -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
+    #           -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
+    #           -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
+    #           -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
+    #       -Wparentheses, 
+    #       -Wswitch, 
+    #       -Wswitch-bool.
     $warningFlags += " -Wall"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
 
-    # -Wextra
-    #   -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
-    #   -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
-    #   -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
-    #   -Wunused-parameter.
+    # -WCL4
+    #     -Wextra
+    #       -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
+    #       -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
+    #       -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
+    #       -Wunused-parameter.
     $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
+
+    # -Wconversion
+    #     -Wbitfield-enum-conversion, -Wbool-conversion, -Wconstant-conversion, -Wenum-conversion, 
+    #     -Wfloat-conversion, -Wimplicit-float-conversion, -Wimplicit-int-conversion, -Wint-conversion, 
+    #     -Wliteral-conversion, -Wnon-literal-null-conversion, -Wnull-conversion, -Wobjc-literal-conversion, 
+    #     -Wshorten-64-to-32, -Wsign-conversion, -Wstring-conversion
+    $warningFlags += " -Wshorten-64-to-32"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion       # Work in progress towards "-Wconversion"
+
+
+    ## -Wshadow-all
+    ##   -Wshadow, -Wshadow-field, -Wshadow-field-in-constructor, -Wshadow-uncaptured-local.
+    #$warningFlags += " -Wshadow-all"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wshadow-all            # Work in progress
+    #                                                                                                                   # Work in progress
+    #$warningFlags += " -Wcast-align"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wcast-align     ../../lib/QSharpFoundation/AssertMeasurement.cpp:45:49: warning: cast from 'char *' to 'Qubit *' (aka 'QUBIT **') increases required alignment from 1 to 8 [-Wcast-align]
+    #
+    #$warningFlags += " -Wmissing-variable-declarations"                                                                # Work in progress
+    #$warningFlags += " -Wmissing-prototypes"                                                                           # Work in progress
+    #$warningFlags += " -Wswitch-enum"                                                                                  # Work in progress
+    #$warningFlags += " -Wzero-as-null-pointer-constant"                                                                # Work in progress
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+
+    ## Under question:
+    #$warningFlags += " -Wold-style-cast"        # https://clang.llvm.org/docs/DiagnosticsReference.html#wold-style-cast
+    #$warningFlags += " -Winconsistent-missing-destructor-override"  # ../../lib/Simulators/ToffoliSimulator.cpp:41:9: warning: '~CToffoliSimulator' overrides a destructor but is not marked 'override' [-Winconsistent-missing-destructor-override]   ~CToffoliSimulator() = default;
+    #$warningFlags += " -Wfloat-equal"       # ../../lib/Simulators/FullstateSimulator.cpp:428:24: warning: comparing floating point with == or != is unsafe [-Wfloat-equal]                if (re != 0 || im != 0)
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+
+
+    ## Disable these warnings:      # Work in progress
+    #$warningFlags += " -Wno-c++98-compat-pedantic"
+    #$warningFlags += " -Wno-double-promotion"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wdouble-promotion
+    ## Even if the `switch` covers all the enumerators, it is still good to have `default` label to cover the potentially added (but not handled) enumerators.
+    #$warningFlags += " -Wno-covered-switch-default"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wcovered-switch-default
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+    $warningFlags += " "
+
+    
+
 
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
