@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 

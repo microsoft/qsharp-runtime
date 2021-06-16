@@ -35,8 +35,39 @@ function Build-CMakeProject {
     $oldCC = $env:CC
     $oldCXX = $env:CXX
     $oldRC = $env:RC
+    $oldCCFLAGS  = $env:CCFLAGS
+    $oldCXXFLAGS = $env:CXXFLAGS
 
     $clangTidy = ""
+
+    $warningFlags = "-Werror"
+
+    # -Wall
+    #   -Wmisleading-indentation, 
+    #   -Wmost, 
+    #       -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
+    #       -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
+    #       -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
+    #       -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
+    #       -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
+    #       -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
+    #       -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
+    #       -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
+    #       -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
+    #   -Wparentheses, 
+    #   -Wswitch, 
+    #   -Wswitch-bool.
+    $warningFlags += " -Wall"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
+
+    # -Wextra
+    #   -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
+    #   -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
+    #   -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
+    #   -Wunused-parameter.
+    $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
+
+    $env:CFLAGS   += $warningFlags
+    $env:CXXFLAGS += $warningFlags
 
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
@@ -99,6 +130,9 @@ function Build-CMakeProject {
     }
 
     Pop-Location
+
+    $env:CXXFLAGS = $oldCXXFLAGS
+    $env:CCFLAGS  = $oldCCFLAGS
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX
