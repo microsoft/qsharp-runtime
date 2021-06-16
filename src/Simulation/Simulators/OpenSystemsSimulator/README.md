@@ -15,7 +15,7 @@ For more details on using these simulators from Q# programs called from Python h
 
 ## Native interface
 
-The core interoperability boundary between the C# runtime for the Quantum Development Kit and the `qdk_sim` native library is defined in the [`NativeInterface` static class](./NativeInterface.cs). This class provides P/Invoke declarations for each function exposed by the C API for the `qdk_sim` crate, as well as methods that call into these C API methods. The managed methods that correspond to each C API function check error codes reuturned by C API functions and convert them into .NET exceptions, allowing for C API errors to be easily caught by managed code.
+The core interoperability boundary between the C# runtime for the Quantum Development Kit and the `qdk_sim` native library is defined in the [`NativeInterface` static class](./NativeInterface.cs). This class provides P/Invoke declarations for each function exposed by the C API for the `qdk_sim` crate, as well as methods that call into these C API methods. The managed methods that correspond to each C API function check error codes returned by C API functions and convert them into .NET exceptions, allowing for C API errors to be easily caught by managed code.
 
 For example, to use the native API to create a new simulator with a mixed-state representation:
 
