@@ -56,19 +56,8 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         ///     List of all available targets for this provider.
         /// </summary>
-        public virtual IEnumerable<TargetStatusInfo>? Targets
-        {
-            get
-            {
-                if (this.Details != null)
-                {
-                    foreach (var ps in this.Details.Targets)
-                    {
-                        yield return new TargetStatusInfo(ps);
-                    }
-                }
-            }
-        }
+        public virtual IEnumerable<TargetStatusInfo>? Targets =>
+            this.Details?.Targets?.Select(ps => new TargetStatusInfo(ps));
 
         /// <summary>
         /// Gets the provider status information.

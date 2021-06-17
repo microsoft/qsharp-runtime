@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Quantum
     using Microsoft.Azure.Quantum.Utility;
 
     /// <summary>
-    /// Wrapper for Azure.Quantum.Jobs.Models.QuantumJobQuota.
+    /// Wrapper for <see cref="Azure.Quantum.Jobs.Models.QuantumJobQuota" />.
     /// </summary>
     public class QuotaInfo
     {
