@@ -192,7 +192,7 @@ let private testWithTarget defaultTarget =
     |> testWithConstants
 
 /// Standard command-line arguments for the "submit" command without specifying a target.
-let private submitWithoutTarget =
+let private submitWithoutTargetAndLocation =
     [ "submit"
       "--subscription"
       "mySubscription"
@@ -200,6 +200,10 @@ let private submitWithoutTarget =
       "myResourceGroup"
       "--workspace"
       "myWorkspace" ]
+
+      
+/// Standard command-line arguments for the "submit" command without specifying a target.
+let private submitWithoutTarget = submitWithoutTargetAndLocation @ ["--location"; "myLocation"]
 
 /// Standard command-line arguments for the "submit" command using the "test.nothing" target.
 let private submitWithNothingTarget = submitWithoutTarget @ ["--target"; "test.nothing"]
@@ -562,9 +566,9 @@ let ``Submit uses default values`` () =
                Workspace: myWorkspace
                Target: test.nothing
                Storage:
-               AAD Token:
                Base URI:
-               Location:
+               Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -582,9 +586,9 @@ let ``Submit uses default values with default target`` () =
                Workspace: myWorkspace
                Target: test.nothing
                Storage:
-               AAD Token:
                Base URI:
-               Location:
+               Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -602,21 +606,21 @@ let ``Submit allows overriding default values`` () =
         "myStorage"
         "--aad-token"
         "myToken"
-        "--base-uri"
-        "myBaseUri"
         "--job-name"
         "myJobName"
         "--shots"
         "750"
+        "--credential"
+        "cli"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
                Storage: myStorage
-               AAD Token: myToken
-               Base URI: myBaseUri
-               Location:
+               Base URI:
+               Location: myLocation
+               Credential: CLI
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -624,7 +628,43 @@ let ``Submit allows overriding default values`` () =
                Verbose: True
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
-
+               
+[<Fact>]
+let ``Submit extracts the location from a quantum endpoint`` () =
+    let given = test "Returns Unit"
+    given (submitWithoutTargetAndLocation @ [
+        "--verbose"
+        "--storage"
+        "myStorage"
+        "--aad-token"
+        "myToken"
+        "--base-uri"
+        "https://westus.quantum.microsoft.com/"
+        "--job-name"
+        "myJobName"
+        "--credential"
+        "VisualStudio"
+        "--shots"
+        "750"
+        "--target"
+        "test.nothing"
+    ])
+    |> yields "Subscription: mySubscription
+                Resource Group: myResourceGroup
+                Workspace: myWorkspace
+                Target: test.nothing
+                Storage: myStorage
+                Base URI: https://westus.quantum.microsoft.com/
+                Location: westus
+                Credential: VisualStudio
+                Job Name: myJobName
+                Shots: 750
+                Output: FriendlyUri
+                Dry Run: False
+                Verbose: True
+               
+                https://www.example.com/00000000-0000-0000-0000-0000000000000"
+               
 [<Fact>]
 let ``Submit allows overriding default values with default target`` () =
     let given = testWithTarget "foo.target" "Returns Unit"
@@ -632,10 +672,10 @@ let ``Submit allows overriding default values with default target`` () =
         "--verbose"
         "--storage"
         "myStorage"
+        "--credential"
+        "Interactive"
         "--aad-token"
         "myToken"
-        "--base-uri"
-        "myBaseUri"
         "--job-name"
         "myJobName"
         "--shots"
@@ -646,9 +686,9 @@ let ``Submit allows overriding default values with default target`` () =
                Workspace: myWorkspace
                Target: test.nothing
                Storage: myStorage
-               AAD Token: myToken
-               Base URI: myBaseUri
-               Location:
+               Base URI:
+               Location: myLocation
+               Credential: Interactive
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -663,27 +703,27 @@ let ``Submit does not allow to include mutually exclusive options`` () =
     given (submitWithNothingTarget @ [
         "--base-uri"
         "myBaseUri"
-        "--location"
-        "myLocation"
     ])
     |> failsWith "Options --base-uri, --location cannot be used together."
-
+    
 [<Fact>]
 let ``Submit allows to include --base-uri option when --location is not present`` () =
     let given = testWithTarget "foo.target" "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithoutTargetAndLocation @ [
         "--verbose"
         "--base-uri"
-        "myBaseUri"
+        "http://myBaseUri.foo.com/"
+        "--target"
+        "test.nothing"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
                Storage:
-               AAD Token:
-               Base URI: myBaseUri
-               Location:
+               Base URI: http://mybaseuri.foo.com/
+               Location: mybaseuri
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -697,17 +737,15 @@ let ``Submit allows to include --location option when --base-uri is not present`
     let given = testWithTarget "foo.target" "Returns Unit"
     given (submitWithNothingTarget @ [
         "--verbose"
-        "--location"
-        "myLocation"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
                Storage:
-               AAD Token:
                Base URI:
                Location: myLocation
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -719,19 +757,21 @@ let ``Submit allows to include --location option when --base-uri is not present`
 [<Fact>]
 let ``Submit allows spaces for the --location option`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
+    given (submitWithoutTargetAndLocation @ [
         "--verbose"
         "--location"
         "My Location"
+        "--target"
+        "test.nothing"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.nothing
                Storage:
-               AAD Token:
                Base URI:
                Location: My Location
+               Credential: Default
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -739,15 +779,15 @@ let ``Submit allows spaces for the --location option`` () =
                Verbose: True
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
-
+    
 [<Fact>]
-let ``Submit does not allow an invalid value for the --location option`` () =
+let ``Submit fails if both --location and --baseUri are missing`` () =
     let given = test "Returns Unit"
-    given (submitWithNothingTarget @ [
-        "--location"
-        "my!nv@lidLocation"
+    given (submitWithoutTargetAndLocation @ [
+        "--target"
+        "test.nothing"
     ])
-    |> failsWith "\"my!nv@lidLocation\" is an invalid value for the --location option."
+    |> failsWith "Either --location or --base-uri must be provided."
 
 [<Fact>]
 let ``Submit requires a positive number of shots`` () =
@@ -783,7 +823,7 @@ let ``Submit has required options`` () =
 
     // Try every possible combination of arguments. The command should succeed only when all of the arguments are
     // included.
-    let commandName = List.head submitWithNothingTarget
+    let commandName = List.head (submitWithoutTargetAndLocation @ ["--target"; "test.nothing"])
     let allArgs = submitWithNothingTarget |> List.tail |> List.chunkBySize 2
     for args in powerSet allArgs do
         given (commandName :: List.concat args)
@@ -844,6 +884,7 @@ let ``Shows help text for submit command`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target> (REQUIRED)                        The target device ID.
+                      --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
@@ -873,6 +914,7 @@ let ``Shows help text for submit command with default target`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target>                                   The target device ID.
+                      --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
@@ -930,6 +972,8 @@ let ``Supports submitting multiple entry points`` () =
             "myResourceGroup"
             "--workspace"
             "myWorkspace"
+            "--location"
+            "location"
             "--target"
             "test.nothing"
         ]
@@ -951,6 +995,8 @@ let ``Supports submitting multiple entry points with different parameters`` () =
             "myResourceGroup"
             "--workspace"
             "myWorkspace"
+            "--location"
+            "location"
             "--target"
             "test.nothing"
         ]
