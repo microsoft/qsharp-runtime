@@ -213,7 +213,7 @@ namespace Quantum
             static TMeasure m = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             return reinterpret_cast<Result>(
-                m(this->simulatorId, numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
+                m(this->simulatorId, (unsigned)numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
         }
 
         void ReleaseResult(Result /*r*/) override {}
@@ -250,7 +250,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCX"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void Y(Qubit q) override
@@ -263,7 +263,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCY"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void Z(Qubit q) override
@@ -276,7 +276,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCZ"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void H(Qubit q) override
@@ -289,7 +289,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCH"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void S(Qubit q) override
@@ -302,7 +302,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCS"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void AdjointS(Qubit q) override
@@ -316,7 +316,7 @@ namespace Quantum
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjS"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void T(Qubit q) override
@@ -329,7 +329,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCT"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void AdjointT(Qubit q) override
@@ -343,7 +343,7 @@ namespace Quantum
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjT"));
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void R(PauliId axis, Qubit target, double theta) override
@@ -360,7 +360,7 @@ namespace Quantum
             static TMCR cr = reinterpret_cast<TMCR>(this->GetProc("MCR"));
 
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            cr(this->simulatorId, GetBasis(axis), theta, numControls, ids.data(), GetQubitId(target));
+            cr(this->simulatorId, GetBasis(axis), theta, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
         void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
@@ -368,7 +368,7 @@ namespace Quantum
             typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
             static TExp exp = reinterpret_cast<TExp>(this->GetProc("Exp"));
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            exp(this->simulatorId, numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
+            exp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
         }
 
         void ControlledExp(
@@ -384,7 +384,7 @@ namespace Quantum
             std::vector<unsigned> idsTargets = GetQubitIds(numTargets, targets);
             std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
             cexp(
-                this->simulatorId, numTargets, reinterpret_cast<unsigned*>(paulis), theta, numControls,
+                this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, (unsigned)numControls,
                 idsControls.data(), idsTargets.data());
         }
 
@@ -408,7 +408,7 @@ namespace Quantum
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             double actualProbability =
                 1.0 -
-                jointEnsembleProbability(this->simulatorId, numTargets, reinterpret_cast<int*>(bases), ids.data());
+                jointEnsembleProbability(this->simulatorId, (unsigned)numTargets, reinterpret_cast<int*>(bases), ids.data());
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
