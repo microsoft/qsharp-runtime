@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
-``` #Pending
 // Licensed under the MIT License.
+
+#nullable enable
 
 using System;
 
@@ -66,7 +67,7 @@ namespace Microsoft.Azure.Quantum.Test
         [DataRow("string=with,invalid=authorization_uri,authorization_uri=http://foo.bar.com/some-random-value", null)]
         [DataRow("string=missing,tenant_id=authorization_uri,authorization_uri=\"http://foo.bar.com/", null)]
         [DataRow("authorization_uri=\"https://login.microsoftonline.com/tenantId\",key1=value1s,etc...", "tenantId")]
-        public void TestExtractTenantIdFromBearer(string bearer, string expected)
+        public void TestExtractTenantIdFromBearer(string? bearer, string? expected)
         {
             var actual = CredentialFactory.ExtractTenantIdFromBearer(bearer);
             Assert.AreEqual(expected, actual);

@@ -18,49 +18,49 @@ namespace Microsoft.Azure.Quantum.Authentication
     /// authentication in Azure Quantum.
     /// NOTE: For more information
     /// about authentication with Azure services and the different Credential types see
-    /// https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme.
+    /// https://docs.microsoft.com/dotnet/api/overview/azure/identity-readme.
     /// </summary>
     public enum CredentialType
     {
         /// <summary>
         /// Provides a simplified authentication experience to quickly start developing applications run in the Azure cloud.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.defaultazurecredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.defaultazurecredential
         /// </summary>
         Default,
 
         /// <summary>
         /// Authenticates a service principal or user via credential information specified in environment variables.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.environmentcredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.environmentcredential
         /// </summary>
         Environment,
 
         /// <summary>
         /// Authenticates the managed identity of an azure resource.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.managedidentitycredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.managedidentitycredential
         /// </summary>
         ManagedIdentity,
 
         /// <summary>
         /// Authenticate in a development environment with the Azure CLI.
-        /// See https://docs.microsoft.com/en-us/dotnet/api/azure.identity.azureclicredential
+        /// See https://docs.microsoft.com/dotnet/api/azure.identity.azureclicredential
         /// </summary>
         CLI,
 
         /// <summary>
         /// Authenticate using tokens in the local cache shared between Microsoft applications.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.sharedtokencachecredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.sharedtokencachecredential
         /// </summary>
         SharedToken,
 
         /// <summary>
         /// Authenticate using data from Visual Studio.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.visualstudiocredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.visualstudiocredential
         /// </summary>
         VisualStudio,
 
         /// <summary>
         /// Authenticate in a development environment with Visual Studio Code.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.visualstudiocodecredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.visualstudiocodecredential
         /// </summary>
         VisualStudioCode,
 
@@ -68,14 +68,14 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// A TokenCredential implementation which launches the system default browser to interactively authenticate a user,
         /// and obtain an access token. The browser will only be launched to authenticate the user once,
         /// then will silently acquire access tokens through the users refresh token as long as it's valid.
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.interactivebrowsercredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.interactivebrowsercredential
         /// </summary>
         Interactive,
 
         /// <summary>
         /// A TokenCredential implementation which authenticates a user using the device code flow,
         /// and provides access tokens for that user account. 
-        /// See: https://docs.microsoft.com/en-us/dotnet/api/azure.identity.devicecodecredential
+        /// See: https://docs.microsoft.com/dotnet/api/azure.identity.devicecodecredential
         /// </summary>
         DeviceCode,
     }

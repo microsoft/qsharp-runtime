@@ -264,7 +264,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The type of Credentials to use to authenticate with Azure. For more information
         /// about authentication with Azure services see: https://docs.microsoft.com/dotnet/api/overview/azure/identity-readme
-``` #Pending
         /// NOTE: If both <see cref="AadToken"/> and <see cref="Credential"/> properties are specified, <see cref="AadToken"/> takes precedence.
         /// If none are provided, then it uses <see cref="CredentialType.Default"/>.
         /// </summary>

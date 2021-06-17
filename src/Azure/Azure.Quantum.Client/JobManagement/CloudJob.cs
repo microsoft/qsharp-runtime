@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Quantum
         /// Initializes a new instance of the <see cref="CloudJob"/> class.
         /// </summary>
         /// <param name="workspace">The workspace.</param>
-        /// <param name="jobDetails">The job details.</param>
+        /// <param name="jobDetails">The job Details?.</param>
         public CloudJob(IWorkspace workspace, JobDetails jobDetails)
         {
             Ensure.NotNull(workspace, nameof(workspace));
@@ -40,12 +40,12 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the job id.
         /// </summary>
-        public virtual string Id => Details.Id;
+        public virtual string Id => Details?.Id;
 
         /// <summary>
         /// Gets the job id.
         /// </summary>
-        public virtual string Name => Details.Name;
+        public virtual string Name => Details?.Name;
 
         /// <summary>
         /// Gets whether the job execution has completed.
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Gets the status of the submitted job.
         /// </summary>
-        public virtual string Status => Details.Status?.ToString();
+        public virtual string Status => Details?.Status?.ToString();
 
         /// <summary>
         /// Gets whether the job execution completed successfully.
@@ -75,20 +75,20 @@ namespace Microsoft.Azure.Quantum
         public virtual IWorkspace Workspace { get; private set; }
 
         /// <summary>
-        /// Gets or sets the unique identifier for the provider.
+        /// Gets the unique identifier for the provider.
         /// </summary>
         public virtual string ProviderId => this.Details?.ProviderId;
 
         /// <summary>
-        /// Gets or sets the target identifier to run the job.
+        /// Gets the target identifier to run the job.
         /// </summary>
-        public string Target => this.Details.Target;
+        public string Target => this.Details?.Target;
 
         /// <summary>
         /// If available, returns Uri with the results of the execution.
         /// </summary>>
         public virtual Uri OutputDataUri => (this.Details?.OutputDataUri != null)
-            ? new Uri(this.Details.OutputDataUri)
+            ? new Uri(this.Details?.OutputDataUri)
             : null;
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Microsoft.Azure.Quantum
         public virtual string OutputDataFormat => this.Details?.OutputDataFormat;
 
         /// <summary>
-        /// Gets the underlying job details.
+        /// Gets the underlying job Details?.
         /// </summary>
         public virtual JobDetails Details { get; private set; }
 
@@ -108,7 +108,7 @@ namespace Microsoft.Azure.Quantum
         /// <returns></returns>
         public virtual async Task RefreshAsync(CancellationToken cancellationToken = default)
         {
-            CloudJob job = (CloudJob)await this.Workspace.GetJobAsync(this.Details.Id, cancellationToken);
+            CloudJob job = (CloudJob)await this.Workspace.GetJobAsync(this.Details?.Id, cancellationToken);
             this.Details = job.Details;
         }
 
@@ -119,7 +119,7 @@ namespace Microsoft.Azure.Quantum
         /// <returns></returns>
         public virtual async Task CancelAsync(CancellationToken cancellationToken = default)
         {
-            CloudJob job = (CloudJob)await this.Workspace.CancelJobAsync(this.Details.Id, cancellationToken);
+            CloudJob job = (CloudJob)await this.Workspace.CancelJobAsync(this.Details?.Id, cancellationToken);
             this.Details = job.Details;
         }
 

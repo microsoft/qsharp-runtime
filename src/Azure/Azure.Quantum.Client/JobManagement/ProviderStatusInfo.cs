@@ -6,6 +6,7 @@
 namespace Microsoft.Azure.Quantum
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.Azure.Quantum.Utility;
 
