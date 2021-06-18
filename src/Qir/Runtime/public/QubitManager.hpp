@@ -183,6 +183,13 @@ namespace Quantum
         public:
             QubitListInSharedArray FreeQubitsReuseProhibited;
             QubitListInSharedArray FreeQubitsReuseAllowed;
+            // When we are looking for free qubits we skip areas that are known not
+            // to have them (to achieve amortized cost O(1)). It is guaranteed that
+            // there're no free qubits available in areas between this one and the
+            // one pointed to by prevAreaWithFreeQubits (bounds non-inclusinve).
+            // This invariant is maintained in all operations. It is NOT guaranteed
+            // that the area pointed to by prevAreaWithFreeQubits actually has
+            // free qubits available, and the search may need to continue.
             int32_t prevAreaWithFreeQubits = 0;
 
             RestrictedReuseArea() = default;
