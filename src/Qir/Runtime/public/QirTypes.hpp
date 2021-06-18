@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "CoreTypes.hpp"
 
@@ -14,8 +15,12 @@
 ======================================================================================================================*/
 struct QIR_SHARED_API QirArray
 {
-    int64_t count = 0; // Overall number of elements in the array across all dimensions
-    const int itemSizeInBytes = 0;
+    using TItemCount    = uint32_t;     // Data type of number of items (potentially can be increased to `uint64_t`).
+    using TItemSize     = uint32_t;     // Data type of item size.
+    using TBufSize      = uint64_t;     // Size of the buffer pointed to by `buffer`. 
+
+    TItemCount count = 0; // Overall number of elements in the array across all dimensions
+    const TItemSize itemSizeInBytes = 0;
 
     const int dimensions = 1;
     std::vector<int64_t> dimensionSizes; // not set for 1D arrays, as `count` is sufficient
@@ -31,13 +36,13 @@ struct QIR_SHARED_API QirArray
     int AddRef();
     int Release();
 
-    QirArray(int64_t cQubits);
-    QirArray(int64_t cItems, int itemSizeInBytes, int dimCount = 1, std::vector<int64_t>&& dimSizes = {});
+    QirArray(TItemCount cQubits);
+    QirArray(TItemCount cItems, TItemSize itemSizeInBytes, int dimCount = 1, std::vector<int64_t>&& dimSizes = {});
     QirArray(const QirArray* other);
 
     ~QirArray();
 
-    char* GetItemPointer(int64_t index);
+    char* GetItemPointer(TItemCount index);
     void Append(const QirArray* other);
 };
 
@@ -63,9 +68,11 @@ struct QIR_SHARED_API QirString
 using PTuple = char*;   // TODO: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
 struct QIR_SHARED_API QirTupleHeader
 {
+    using TBufSize = uint32_t;  // Type of the buffer size (potentially can be increased to `uint64_t`).
+
     int     refCount = 0;
     int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
-    int32_t tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer (in bytes)
+    TBufSize tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer (in bytes)
 
     // flexible array member, must be last in the struct
     char data[];
@@ -78,7 +85,7 @@ struct QIR_SHARED_API QirTupleHeader
     int AddRef();
     int Release();
 
-    static QirTupleHeader* Create(int size);
+    static QirTupleHeader* Create(TBufSize size);
     static QirTupleHeader* CreateWithCopiedData(QirTupleHeader* other);
 
     static QirTupleHeader* GetHeader(PTuple tuple)

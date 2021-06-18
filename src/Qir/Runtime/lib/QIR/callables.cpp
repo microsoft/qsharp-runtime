@@ -20,10 +20,11 @@ using namespace Microsoft::Quantum;
 ==============================================================================*/
 extern "C"
 {
-    PTuple quantum__rt__tuple_create(int64_t size)
+    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use `QirTupleHeader::TBufSize size` (breaking change), 
+                                                    // optionally change `TBufSize` to `uint64_t` (unsigned type) - still breaking change.
     {
-        assert(size >= 0 && size < std::numeric_limits<int>::max());
-        return QirTupleHeader::Create(static_cast<int>(size))->AsTuple();
+        assert(size < std::numeric_limits<QirTupleHeader::TBufSize>::max());
+        return QirTupleHeader::Create(static_cast<QirTupleHeader::TBufSize>(size))->AsTuple();
     }
 
     void quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
@@ -191,9 +192,8 @@ int QirTupleHeader::Release()
     return retVal;
 }
 
-QirTupleHeader* QirTupleHeader::Create(int size)
+QirTupleHeader* QirTupleHeader::Create(TBufSize size)
 {
-    assert(size >= 0);
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
@@ -212,7 +212,7 @@ QirTupleHeader* QirTupleHeader::Create(int size)
 
 QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
 {
-    const int size = other->tupleSize;
+    const TBufSize size = other->tupleSize;
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
@@ -340,12 +340,12 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
 
-    const size_t qubitSize = sizeof(/*Qubit*/ void*);
+    const QirArray::TItemSize qubitSize = sizeof(/*Qubit*/ void*);
 
     TupleWithControls* outer = TupleWithControls::FromTupleHeader(tuple);
 
     // Discover, how many controls there are in total so can allocate a correctly sized array for them.
-    int cControls = 0;
+    QirArray::TItemCount cControls = 0;
     TupleWithControls* current = outer;
     for (int i = 0; i < depth; i++)
     {
@@ -370,7 +370,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
         }
 
         QirArray* controls = current->controls;
-        const size_t blockSize = qubitSize * controls->count;
+        const QirArray::TBufSize blockSize = qubitSize * controls->count;
         assert(dst + blockSize <= dstEnd); 
         UNUSED(dstEnd);
         memcpy(dst, controls->buffer, blockSize);

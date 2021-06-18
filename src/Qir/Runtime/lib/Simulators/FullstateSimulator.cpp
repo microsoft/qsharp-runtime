@@ -443,7 +443,7 @@ namespace Quantum
     void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits)
     {
         outStream << "# wave function for qubits with ids (least to most significant): ";
-        for(int64_t idx = 0; idx < qubits->count; ++idx)
+        for(QirArray::TItemCount idx = 0; idx < qubits->count; ++idx)
         {
             if(idx != 0)
             {

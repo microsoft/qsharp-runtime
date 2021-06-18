@@ -20,10 +20,11 @@
 // {i32} so cannot pass through the buffer and have to allocate a new one instead and copy.
 static std::vector<PauliId> ExtractPauliIds(QirArray* paulis)
 {
-    const int64_t count = paulis->count;
+    const QirArray::TItemCount count = paulis->count;
     std::vector<PauliId> pauliIds;
+    assert(count <= std::numeric_limits<size_t>::max());
     pauliIds.reserve((size_t)count);
-    for (int64_t i = 0; i < count; i++)
+    for (QirArray::TItemCount i = 0; i < count; i++)
     {
         pauliIds.push_back(static_cast<PauliId>(*paulis->GetItemPointer(i)));
     }
@@ -80,7 +81,7 @@ extern "C"
 
     Result quantum__qis__measure__body(QirArray* paulis, QirArray* qubits)
     {
-        const int64_t count = qubits->count;
+        const QirArray::TItemCount count = qubits->count;
         assert(count == paulis->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
