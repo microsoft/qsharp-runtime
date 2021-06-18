@@ -115,7 +115,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qir-standalone-input-refere
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{3CD26906-C7F3-47B8-AF43-FF6BCF1CB3EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSubstitution", "src\Simulation\AutoSubstitution\AutoSubstitution.csproj", "{33D66E90-049F-4A0B-A2B1-79E7E7E0ED0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSubstitution", "src\Simulation\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj", "{33D66E90-049F-4A0B-A2B1-79E7E7E0ED0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.AutoSubstitution", "src\Simulation\AutoSubstitution.Tests\Tests.AutoSubstitution.csproj", "{4EBC65DF-3B5E-419B-8E26-3EEF0B5CD300}"
 EndProject
