@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
-
 namespace Microsoft.Azure.Quantum
 {
     /// <summary>
@@ -43,16 +41,6 @@ namespace Microsoft.Azure.Quantum
         public static CloudJob GetJob(this IWorkspace workspace, string jobId)
         {
             return workspace.GetJobAsync(jobId).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Lists the jobs.
-        /// </summary>
-        /// <param name="workspace">The workspace.</param>
-        /// <returns>List of job identifiers.</returns>
-        public static IEnumerable<CloudJob> ListJobs(this IWorkspace workspace)
-        {
-            return workspace.ListJobsAsync().GetAwaiter().GetResult();
         }
     }
 }

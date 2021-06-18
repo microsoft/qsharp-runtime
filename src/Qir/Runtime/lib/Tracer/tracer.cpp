@@ -116,7 +116,7 @@ namespace Quantum
         const LayerId barrier = this->GetEffectiveFence();
         const LayerId firstLayerAfterBarrier =
             (barrier == INVALID ? (this->metricsByLayer.empty() ? REQUESTNEW : 0)
-                                : ((barrier + 1 == this->metricsByLayer.size()) ? REQUESTNEW : barrier + 1));
+                                : (((size_t)(barrier + 1) == this->metricsByLayer.size()) ? REQUESTNEW : barrier + 1));
 
         LayerId candidate = CTracer::LaterLayerOf(qstate.layer, firstLayerAfterBarrier);
         assert(candidate != INVALID);
@@ -132,7 +132,7 @@ namespace Quantum
             }
             else
             {
-                for (candidate += 1; candidate < this->metricsByLayer.size(); ++candidate)
+                for (candidate += 1; (size_t)candidate < this->metricsByLayer.size(); ++candidate)
                 {
                     if (opDuration <= this->metricsByLayer[candidate].duration)
                     {
@@ -151,7 +151,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     void CTracer::AddOperationToLayer(OpId id, LayerId layer)
     {
-        assert(layer < this->metricsByLayer.size());
+        assert((size_t)layer < this->metricsByLayer.size());
         assert(this->metricsByLayer[layer].barrierId == -1 && "Should not add operations to barriers");
 
         this->metricsByLayer[layer].operations[id] += 1;
@@ -319,7 +319,7 @@ namespace Quantum
         {
             return;
         }
-        assert(this->fence < this->tracer->metricsByLayer.size());
+        assert((size_t)(this->fence) < this->tracer->metricsByLayer.size());
 
         this->tracer->conditionalFences.push_back(this->fence);
         this->tracer->latestConditionalFence = CTracer::LaterLayerOf(this->tracer->latestConditionalFence, this->fence);

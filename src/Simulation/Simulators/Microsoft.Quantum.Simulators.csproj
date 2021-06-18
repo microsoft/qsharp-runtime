@@ -25,6 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="4.7.2" />
+    <PackageReference Include="NumSharp" Version="0.20.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\Native\win10\**\*">
       <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

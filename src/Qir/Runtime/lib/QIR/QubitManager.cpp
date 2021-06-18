@@ -399,7 +399,7 @@ Qubit CQubitManager::CreateQubitObject(QubitIdType id)
     return reinterpret_cast<Qubit>(pointerSizedId);
 }
 
-void CQubitManager::DeleteQubitObject(Qubit qubit)
+void CQubitManager::DeleteQubitObject(Qubit /*qubit*/)
 {
     // Do nothing. By default we store qubit Id in place of a pointer to a qubit.
 }
