@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <cstdint>
 
 #include "QirUtils.hpp"
 #include "CoreTypes.hpp"
@@ -70,20 +71,18 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     vector<int> qubits;           // released, or |0>, or |1> states (no entanglement allowed)
     vector<int> results = {0, 1}; // released, or Zero(0) or One(1)
 
-    int GetQubitId(Qubit qubit) const
+    uint64_t GetQubitId(Qubit qubit) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->qubits.size());
+        const uint64_t id = (uint64_t)qubit;
+        REQUIRE(id < this->qubits.size());
 
         return id;
     }
 
-    int GetResultId(Result result) const
+    uint8_t GetResultId(Result result) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(result));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->results.size());
+        const uint8_t id = (uint8_t)(uintptr_t)result;
+        REQUIRE(id < this->results.size());
 
         return id;
     }
@@ -96,14 +95,14 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // no double-release
         this->qubits[id] = RELEASED;
     }
 
     void X(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->qubits[id] = 1 - this->qubits[id];
     }
@@ -113,7 +112,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
         UNUSED(numBases);
 
-        const int id = GetQubitId(targets[0]);
+        const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->results.push_back(this->qubits[id]);
         return reinterpret_cast<Result>(this->results.size() - 1);
@@ -121,8 +120,8 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     bool AreEqualResults(Result r1, Result r2) override
     {
-        int i1 = GetResultId(r1);
-        int i2 = GetResultId(r2);
+        uint8_t i1 = GetResultId(r1);
+        uint8_t i2 = GetResultId(r2);
         REQUIRE(this->results[i1] != RELEASED);
         REQUIRE(this->results[i2] != RELEASED);
 
@@ -131,7 +130,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseResult(Result result) override
     {
-        int i = GetResultId(result);
+        uint8_t i = GetResultId(result);
         REQUIRE(this->results[i] != RELEASED); // no double release
         this->results[i] = RELEASED;
     }
@@ -221,11 +220,10 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
 
-    int GetQubitId(Qubit qubit) const
+    uint64_t GetQubitId(Qubit qubit) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->qubits.size());
+        const uint64_t id = (uint64_t)qubit;
+        REQUIRE(id < this->qubits.size());
         return id;
     }
 
@@ -237,14 +235,14 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED);
         this->qubits[id] = RELEASED;
     }
 
     void X(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->qubits[id] = 1 - this->qubits[id];
     }
@@ -253,7 +251,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         for (long i = 0; i < numControls; i++)
         {
-            const int id = GetQubitId(controls[i]);
+            const uint64_t id = GetQubitId(controls[i]);
             REQUIRE(this->qubits[id] != RELEASED);
             if (this->qubits[id] == 0)
             {
@@ -268,7 +266,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
         UNUSED(numBases);
 
-        const int id = GetQubitId(targets[0]);
+        const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
         return reinterpret_cast<Result>(this->qubits[id]);
     }

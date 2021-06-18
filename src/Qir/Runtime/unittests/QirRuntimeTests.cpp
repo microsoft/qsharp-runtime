@@ -677,7 +677,7 @@ struct QubitTestQAPI : public SimulatorStub
 
     static uint64_t GetQubitId(Qubit q)
     {
-        return static_cast<uint64_t>((uintptr_t)q);
+        return (uint64_t)q;
     }
 
     QubitTestQAPI(int maxQubits)

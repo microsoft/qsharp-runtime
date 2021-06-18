@@ -35,7 +35,7 @@ namespace Quantum
 
         static uint64_t GetQubitId(Qubit qubit)
         {
-            return static_cast<uint64_t>((uintptr_t)qubit);
+            return (uint64_t)qubit;
         }
 
       public:
