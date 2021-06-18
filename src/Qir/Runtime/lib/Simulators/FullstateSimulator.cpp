@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <fstream>
+#include <climits>
 
 #include "capi.hpp"
 
@@ -99,7 +100,11 @@ namespace Quantum
         }
 
         const QUANTUM_SIMULATOR handle = 0;
-        unsigned simulatorId = -1;
+
+        using TSimulatorId = unsigned;      // TODO: Use `void*` or a fixed-size integer, starting in native simulator (breaking change).
+        static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;  // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.
+        TSimulatorId simulatorId = NULL_SIMULATORID;
+
         // the QuantumSimulator expects contiguous ids, starting from 0
         std::unique_ptr<CQubitManager> qubitManager;
 
@@ -112,7 +117,7 @@ namespace Quantum
         std::vector<unsigned> GetQubitIds(long num, Qubit* qubits) const
         {
             std::vector<unsigned> ids;
-            ids.reserve(num);
+            ids.reserve((size_t)num);
             for (long i = 0; i < num; i++)
             {
                 ids.push_back(GetQubitId(qubits[i]));
@@ -156,7 +161,7 @@ namespace Quantum
         }
         ~CFullstateSimulator()
         {
-            if (this->simulatorId != (unsigned)-1)
+            if (this->simulatorId != NULL_SIMULATORID)
             {
                 typedef unsigned (*TDestroy)(unsigned);
                 static TDestroy destroySimulatorInstance =

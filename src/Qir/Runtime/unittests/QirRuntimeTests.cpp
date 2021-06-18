@@ -22,7 +22,7 @@ using namespace Microsoft::Quantum;
 struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
     int lastId = -1;
-    const int maxResults;
+    const int maxResults;       // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
     static int GetResultId(Result r)
@@ -32,7 +32,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 
     ResultsReferenceCountingTestQAPI(int maxResults)
         : maxResults(maxResults),
-        allocated(maxResults, false)
+        allocated((size_t)maxResults, false)
     {
     }
 
@@ -40,7 +40,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
-        this->allocated.at(this->lastId) = true;;
+        this->allocated.at((size_t)(this->lastId)) = true;;
         return reinterpret_cast<Result>(this->lastId);
     }
     Result UseZero() override
@@ -55,8 +55,8 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         const int id = GetResultId(result);
         INFO(id);
-        REQUIRE(this->allocated.at(id));
-        this->allocated.at(id).flip();
+        REQUIRE(this->allocated.at((size_t)id));
+        this->allocated.at((size_t)id).flip();
     }
     bool AreEqualResults(Result r1, Result r2) override
     {
@@ -136,7 +136,7 @@ TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
     std::vector<int> data(count, 0);
     for (int i = 0; i < count; i++)
     {
-        data[i] = i;
+        data[(size_t)i] = i;
     }
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
     // 100 101 102 103 | 110 111 112 113 | 120 121 122 123 -- [12 - 23]
@@ -327,7 +327,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     std::vector<int> data(count, 0);
     for (int i = 0; i < count; i++)
     {
-        data[i] = i;
+        data[(size_t)i] = i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
@@ -444,7 +444,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     std::vector<int> data(count, 0);
     for (int i = 0; i < count; i++)
     {
-        data[i] = i;
+        data[(size_t)i] = i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
@@ -514,7 +514,7 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     std::vector<int> data(count, 0);
     for (int i = 0; i < count; i++)
     {
-        data[i] = i;
+        data[(size_t)i] = i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
@@ -671,18 +671,18 @@ TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
 
 struct QubitTestQAPI : public SimulatorStub
 {
-    int lastId = -1;
-    const int maxQubits;
+    int lastId = -1;            // TODO: Use unsigned type.
+    const int maxQubits;        // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
-    static int GetQubitId(Qubit q)
+    static uint64_t GetQubitId(Qubit q)
     {
-        return static_cast<int>(reinterpret_cast<int64_t>(q));
+        return static_cast<uint64_t>((uintptr_t)q);
     }
 
     QubitTestQAPI(int maxQubits)
         : maxQubits(maxQubits),
-        allocated(maxQubits, false)
+        allocated((size_t)maxQubits, false)
     {
     }
 
@@ -690,19 +690,19 @@ struct QubitTestQAPI : public SimulatorStub
     {
         assert(this->lastId < this->maxQubits);
         this->lastId++;
-        this->allocated.at(this->lastId) = true;
+        this->allocated.at((size_t)(this->lastId)) = true;
         return reinterpret_cast<Qubit>(this->lastId);
     }
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         INFO(id);
         REQUIRE(this->allocated.at(id));
         this->allocated.at(id).flip();
     }
     std::string QubitToString(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         return std::to_string(id);
     }
     Result UseZero() override

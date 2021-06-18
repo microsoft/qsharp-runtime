@@ -22,8 +22,7 @@ static std::vector<PauliId> ExtractPauliIds(QirArray* paulis)
 {
     const QirArray::TItemCount count = paulis->count;
     std::vector<PauliId> pauliIds;
-    assert(count <= std::numeric_limits<size_t>::max());
-    pauliIds.reserve((size_t)count);
+    pauliIds.reserve(count);
     for (QirArray::TItemCount i = 0; i < count; i++)
     {
         pauliIds.push_back(static_cast<PauliId>(*paulis->GetItemPointer(i)));
