@@ -17,6 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" IsQscReference="true" />
+    <ProjectReference Include="..\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj" IsQscReference="true" />
   </ItemGroup>
 </Project>
