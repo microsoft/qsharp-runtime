@@ -126,7 +126,7 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
 
 TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
 {
-    const int64_t count = 5 * 3 * 4; // 60
+    const size_t count = 5 * 3 * 4; // 60
     QirArray* a = quantum__rt__array_create(sizeof(int), 3, (int64_t)5, (int64_t)3, (int64_t)4);
     REQUIRE(quantum__rt__array_get_dim(a) == 3);
     REQUIRE(quantum__rt__array_get_size(a, 0) == 5);
@@ -134,9 +134,9 @@ TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
     REQUIRE(quantum__rt__array_get_size(a, 2) == 4);
 
     std::vector<int> data(count, 0);
-    for (int i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        data[(size_t)i] = i;
+        data[i] = (int)i;
     }
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
     // 100 101 102 103 | 110 111 112 113 | 120 121 122 123 -- [12 - 23]
@@ -323,11 +323,11 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     QirArray* a = quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* slice = nullptr;
 
-    const int64_t count = dim0 * dim1 * dim2; // 60
+    const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
     std::vector<int> data(count, 0);
-    for (int i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        data[(size_t)i] = i;
+        data[i] = (int)i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
@@ -440,11 +440,11 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     QirArray* a = quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* slice = nullptr;
 
-    const int64_t count = dim0 * dim1 * dim2; // 60
+    const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
     std::vector<int> data(count, 0);
-    for (int i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        data[(size_t)i] = i;
+        data[i] = (int)i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]
@@ -510,11 +510,11 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     QirArray* a = quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* project = nullptr;
 
-    const int64_t count = dim0 * dim1 * dim2; // 60
+    const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
     std::vector<int> data(count, 0);
-    for (int i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        data[(size_t)i] = i;
+        data[i] = (int)i;
     }
     // indexes                                             -- values
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [0 - 11]

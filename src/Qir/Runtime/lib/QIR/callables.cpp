@@ -370,7 +370,10 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
         }
 
         QirArray* controls = current->controls;
+
+        assert(qubitSize * controls->count <= std::numeric_limits<QirArray::TBufSize>::max());
         const QirArray::TBufSize blockSize = qubitSize * controls->count;
+        
         assert(dst + blockSize <= dstEnd); 
         UNUSED(dstEnd);
         memcpy(dst, controls->buffer, blockSize);

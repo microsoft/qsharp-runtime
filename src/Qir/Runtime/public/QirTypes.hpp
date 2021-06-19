@@ -17,7 +17,7 @@ struct QIR_SHARED_API QirArray
 {
     using TItemCount    = uint32_t;     // Data type of number of items (potentially can be increased to `uint64_t`).
     using TItemSize     = uint32_t;     // Data type of item size.
-    using TBufSize      = uint64_t;     // Size of the buffer pointed to by `buffer`. 
+    using TBufSize      = size_t;       // Size of the buffer pointed to by `buffer`. 
     using TDimCount     = uint8_t;      // Data type for number of dimensions (3 for 3D array).
     using TDimContainer = std::vector<TItemCount>;  // Data type for container of dimensions (for array 2x3x5 3 items: 2, 3, 5).
 
@@ -73,7 +73,7 @@ struct QIR_SHARED_API QirString
 using PTuple = char*;   // TODO: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
 struct QIR_SHARED_API QirTupleHeader
 {
-    using TBufSize = uint32_t;  // Type of the buffer size (potentially can be increased to `uint64_t`).
+    using TBufSize = size_t;  // Type of the buffer size.
 
     int     refCount = 0;
     int32_t aliasCount = 0; // used to enable copy elision, see the QIR specifications for details
