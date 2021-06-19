@@ -11,9 +11,20 @@
     <AssemblyName>Microsoft.Quantum.AutoSubstitution</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <CSharpGeneration>false</CSharpGeneration>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.17.2106147878-beta" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" />
+    <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
