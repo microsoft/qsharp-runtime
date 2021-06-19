@@ -42,12 +42,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(ExperimentalSimDll)" >
+    <None Include="$(ExperimentalSimDll)" Condition="Exists('$(ExperimentalSimDll)')">
       <Link>Microsoft.Quantum.Experimental.Simulators.Runtime.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
   </ItemGroup>
+
+  <Target Name="ValidateExperimentalSimDll" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <Warning
+      Text="The experimental simulator DLL was not found at '$(ExperimentalSimDll)'; not including in simulators package."
+      Condition="!Exists('$(ExperimentalSimDll)')"
+    />
+  </Target>
 
   <Target Name="BeforeCSharpCompile">
     <ItemGroup>
