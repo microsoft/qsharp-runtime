@@ -447,8 +447,8 @@ CQubitManager::QubitIdType CQubitManager::TakeFreeQubitId()
         int32_t areaIndex = freeQubitsInAreas.Count() - 1;
         do
         {
-            areaIndex = freeQubitsInAreas[areaIndex].prevAreaWithFreeQubits;
-            id = freeQubitsInAreas[areaIndex].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            areaIndex = freeQubitsInAreas[(size_t)areaIndex].prevAreaWithFreeQubits;
+            id = freeQubitsInAreas[(size_t)areaIndex].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
         } while ((areaIndex != 0) && (id == NoneMarker));
 
         // We remember previous area where a free qubit was found or 0 if none were found.

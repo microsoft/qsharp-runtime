@@ -211,7 +211,7 @@ extern "C"
 {
     QirArray* quantum__rt__qubit_allocate_array(int64_t count)  // TODO: Use `QirArray::TItemCount count` (breaking change).
     {
-        return new QirArray(count);
+        return new QirArray((QirArray::TItemCount)count);
     }
 
     void quantum__rt__qubit_release_array(QirArray* qa)
@@ -239,7 +239,7 @@ extern "C"
     QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)    // TODO: Use `QirArray::TItemSize itemSizeInBytes, QirArray::TItemCount count_items` (breaking change).
     {
         assert(itemSizeInBytes > 0);
-        return new QirArray(count_items, (QirArray::TItemSize)itemSizeInBytes);
+        return new QirArray((QirArray::TItemCount)count_items, (QirArray::TItemSize)itemSizeInBytes);
     }
 
     // Bucketing of addref/release is non-standard so for now we'll keep the more traditional addref/release semantics
@@ -288,7 +288,7 @@ extern "C"
     char* quantum__rt__array_get_element_ptr_1d(QirArray* array, int64_t index)     // TODO: Use `QirArray::TItemCount index` (breaking change).
     {
         assert(array != nullptr);
-        return array->GetItemPointer(index);
+        return array->GetItemPointer((QirArray::TItemCount)index);
     }
 
     // Returns the number of dimensions in the array.
@@ -487,7 +487,7 @@ extern "C"
 
         // Create slice array of appropriate size.
         QirArray::TDimContainer sliceDims = array->dimensionSizes;
-        sliceDims[(size_t)dim] = range.width;
+        sliceDims[(size_t)dim] = (QirArray::TItemCount)(range.width);
         const QirArray::TItemCount sliceItemsCount =
             std::accumulate(sliceDims.begin(), sliceDims.end(), (QirArray::TItemCount)1, std::multiplies<QirArray::TItemCount>());
         QirArray* slice = new QirArray(sliceItemsCount, itemSizeInBytes, dimensions, std::move(sliceDims));
@@ -498,11 +498,11 @@ extern "C"
         // we will copy exactly once.
         if (range.step == 1)
         {
-            const QirArray::TItemCount rangeRunCount = singleIndexRunCount * (range.end - range.start);
+            const QirArray::TItemCount rangeRunCount = (QirArray::TItemCount)(singleIndexRunCount * (range.end - range.start));
             const QirArray::TBufSize rangeChunkSize = rangeRunCount * itemSizeInBytes;
 
             QirArray::TItemCount dst = 0;
-            QirArray::TItemCount src = singleIndexRunCount * range.start;
+            QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
             while (src < array->count)
             {
                 assert(dst < slice->count);
@@ -516,7 +516,7 @@ extern "C"
         // In case of disconnected or reversed range have to copy the data one run at a time.
         const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
         QirArray::TItemCount dst = 0;
-        QirArray::TItemCount src = singleIndexRunCount * range.start;
+        QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
         while (src < array->count)
         {
             assert(dst < slice->count);
@@ -559,7 +559,7 @@ extern "C"
         const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
 
         QirArray::TItemCount dst = 0;
-        QirArray::TItemCount src = singleIndexRunCount * index;
+        QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * index);
         while (src < array->count)
         {
             assert(dst < project->count);
