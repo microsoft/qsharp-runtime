@@ -90,58 +90,17 @@ namespace Microsoft.Azure.Quantum.Authentication
 
         public static TokenCredential CreateCredential(CredentialType credentialType, string? subscriptionId = null) => credentialType switch
         {
-            CredentialType.SharedToken => CreateCredential(credentialType, () => SharedTokenOptions(subscriptionId)),
-            CredentialType.VisualStudio => CreateCredential(credentialType, () => VisualStudioOptions(subscriptionId)),
-            CredentialType.VisualStudioCode => CreateCredential(credentialType, () => VisualStudioCodeOptions(subscriptionId)),
-            CredentialType.Interactive => CreateCredential(credentialType, () => InteractiveOptions(subscriptionId)),
-            CredentialType.DeviceCode => CreateCredential(credentialType, () => DeviceCodeOptions(subscriptionId)),
-            CredentialType.Default => CreateCredential(credentialType, () => DefaultOptions(subscriptionId)),
-            _ => CreateCredential(credentialType, () => DefaultOptions(subscriptionId)),
-        };
-
-        /// <summary>
-        /// Creates an instance of TokenCredential that corresponds to the given <see cref="CredentialType"/>.
-        /// It creates an instance of the Credential Class with default parameters.
-        /// </summary>
-        /// <param name="credentialType">The type of Credential Class to create.</param>
-        /// <param name="options">A configuration method for the corresponding credential options (not used for Environment, ManagedIdentity or CLI credentials).</param>
-        /// <returns>An instance of TokenCredential for the corresponding value.</returns>
-        public static TokenCredential CreateCredential(CredentialType credentialType, Func<TokenCredentialOptions> options) => credentialType switch
-        {
+            CredentialType.Default => CreateDefaultCredential(),
             CredentialType.Environment => new EnvironmentCredential(),
             CredentialType.ManagedIdentity => new ManagedIdentityCredential(),
             CredentialType.CLI => new AzureCliCredential(),
-            CredentialType.DeviceCode => new DeviceCodeCredential(options: options?.Invoke() as DeviceCodeCredentialOptions),
-            CredentialType.SharedToken => new SharedTokenCacheCredential(options: options?.Invoke() as SharedTokenCacheCredentialOptions),
-            CredentialType.VisualStudio => new VisualStudioCredential(options: options?.Invoke() as VisualStudioCredentialOptions),
-            CredentialType.VisualStudioCode => new VisualStudioCodeCredential(options: options?.Invoke() as VisualStudioCodeCredentialOptions),
-            CredentialType.Interactive => new InteractiveBrowserCredential(options: options?.Invoke() as InteractiveBrowserCredentialOptions),
-            CredentialType.Default => new DefaultAzureCredential(options: options?.Invoke() as DefaultAzureCredentialOptions),
+            CredentialType.DeviceCode => new DeviceCodeCredential(options: DeviceCodeOptions(subscriptionId)),
+            CredentialType.SharedToken => new SharedTokenCacheCredential(options: SharedTokenOptions(subscriptionId)),
+            CredentialType.VisualStudio => new VisualStudioCredential(options: VisualStudioOptions(subscriptionId)),
+            CredentialType.VisualStudioCode => new VisualStudioCodeCredential(options: VisualStudioCodeOptions(subscriptionId)),
+            CredentialType.Interactive => new InteractiveBrowserCredential(options: InteractiveOptions(subscriptionId)),
             _ => throw new ArgumentException($"Credentials of type {credentialType} are not supported.")
         };
-
-        /// <summary>
-        /// Returns an DefaultAzureCredentialOptions, populated with the TenantId for the given subscription.
-        /// We als disabilitate VisualStudio credentials, since they don't currently work with Azure Quantum.
-        /// </summary>
-        /// <param name="subscriptionid">An subscription Id.</param>
-        /// <returns>A new instance of InteractiveBrowserCredentialOptions with the TenantId populated</returns>
-        public static DefaultAzureCredentialOptions DefaultOptions(string? subscriptionid)
-        {
-            string? tenantId = GetTenantId(subscriptionid);
-
-            return new DefaultAzureCredentialOptions
-            {
-                // Disable VS credentials until https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071 is fixed:
-                ExcludeVisualStudioCredential = true,
-                ExcludeInteractiveBrowserCredential = false,
-
-                InteractiveBrowserTenantId = tenantId,
-                SharedTokenCacheTenantId = tenantId,
-                VisualStudioCodeTenantId = tenantId,
-                VisualStudioTenantId = tenantId,
-            };
-        }
 
         /// <summary>
         /// Returns an InteractiveBrowserCredentialOptions, populated with the TenantId for the given subscription.
@@ -273,7 +232,28 @@ namespace Microsoft.Azure.Quantum.Authentication
             {
                 return null;
             }
+        }
 
+        /// <summary>
+        /// Generates the credential to use by default. It checks
+        /// </summary>
+        /// <param name="subscriptionId">Th</param>
+        /// <returns>A ChainedTokenCredential with all the default credential types to use.</returns>
+        public static TokenCredential CreateDefaultCredential(string? subscriptionId = null)
+        {
+            var sources = new List<TokenCredential>
+            {
+                CreateCredential(CredentialType.Environment, subscriptionId),
+                CreateCredential(CredentialType.ManagedIdentity, subscriptionId),
+                CreateCredential(CredentialType.CLI, subscriptionId),
+                CreateCredential(CredentialType.SharedToken, subscriptionId),
+                CreateCredential(CredentialType.VisualStudio, subscriptionId),
+                CreateCredential(CredentialType.VisualStudioCode, subscriptionId),
+                CreateCredential(CredentialType.Interactive, subscriptionId),
+                CreateCredential(CredentialType.DeviceCode, subscriptionId),
+            };
+
+            return new ChainedTokenCredential(sources.ToArray());
         }
     }
 }
