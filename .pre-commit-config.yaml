@@ -1,0 +1,19 @@
+# This file configures the pre-commit tool to run an initial
+# suite of lightweight tests on each commit, reducing the
+# probability of failing in CI.
+# For more information on pre-commit, see https://pre-commit.com/.
+repos:
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: ['--manifest-path', 'src/Simulation/qdk_sim_rs/Cargo.toml', '--']
+      - id: cargo-check
+        args: ['--manifest-path', 'src/Simulation/qdk_sim_rs/Cargo.toml', '--']
+      # This step runs cargo-clippy, a linting tool provided with the
+      # Rust toolchain. Please see https://github.com/rust-lang/rust-clippy
+      # and https://rust-lang.github.io/rust-clippy/master/index.html
+      # for more information.
+      - id: clippy
+        args: ['--manifest-path', 'src/Simulation/qdk_sim_rs/Cargo.toml', '--']
+

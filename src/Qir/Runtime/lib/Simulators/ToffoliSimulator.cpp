@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+#include "QirUtils.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
@@ -42,7 +43,7 @@ namespace Quantum
         ///
         /// Implementation of IRuntimeDriver
         ///
-        void ReleaseResult(Result result) override {}
+        void ReleaseResult(Result /* result */) override {}
 
         bool AreEqualResults(Result r1, Result r2) override
         {
@@ -75,6 +76,7 @@ namespace Quantum
             const long id = GetQubitId(qubit);
             assert(id <= this->lastUsedId);
             assert(!this->states.at(id));
+            UNUSED(id);
             this->lastUsedId--;
             this->states.pop_back();
         }
@@ -88,7 +90,7 @@ namespace Quantum
         ///
         /// Implementation of IDiagnostics
         ///
-        bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* failureMessage) override
+        bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* /* failureMessage */) override
         {
             // Measurements in Toffoli simulator don't change the state.
             // TODO: log failureMessage?
@@ -101,7 +103,7 @@ namespace Quantum
             Qubit targets[],
             double probabilityOfZero,
             double precision,
-            const char* failureMessage) override
+            const char* /* failureMessage */) override
         {
             assert(precision >= 0);
 
@@ -111,17 +113,17 @@ namespace Quantum
         }
 
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
-        void GetState(TGetStateCallback callback) override
+        void GetState(TGetStateCallback /* callback */) override
         {
             throw std::logic_error("operation_not_supported");
         }
 
-        void DumpMachine(const void* location) override
+        void DumpMachine(const void* /* location */) override
         {
             std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
         }
 
-        void DumpRegister(const void* location, const QirArray* qubits) override
+        void DumpRegister(const void* /* location */, const QirArray* /* qubits */) override
         {
             std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
         }
@@ -154,7 +156,7 @@ namespace Quantum
         }
 
 
-        Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+        Result Measure(long numBases, PauliId bases[], long /* numTargets */, Qubit targets[]) override
         {
             bool odd = false;
             for (long i = 0; i < numBases; i++)
@@ -175,81 +177,81 @@ namespace Quantum
         //
         // The rest of the gate set Toffoli simulator doesn't support
         //
-        void Y(Qubit target) override
+        void Y(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void Z(Qubit target) override
+        void Z(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void H(Qubit target) override
+        void H(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void S(Qubit target) override
+        void S(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void T(Qubit target) override
+        void T(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void R(PauliId axis, Qubit target, double theta) override
+        void R(PauliId /* axis */, Qubit /*target*/, double /* theta */) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
+        void Exp(long /* numTargets */, PauliId* /* paulis */, Qubit* /*targets*/, double /* theta */) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledY(long numControls, Qubit controls[], Qubit target) override
+        void ControlledY(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledZ(long numControls, Qubit controls[], Qubit target) override
+        void ControlledZ(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledH(long numControls, Qubit controls[], Qubit target) override
+        void ControlledH(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledS(long numControls, Qubit controls[], Qubit target) override
+        void ControlledS(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledT(long numControls, Qubit controls[], Qubit target) override
+        void ControlledT(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledR(long numControls, Qubit controls[], PauliId axis, Qubit target, double theta) override
+        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/, double /*theta*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
         void ControlledExp(
-            long numControls,
-            Qubit controls[],
-            long numTargets,
-            PauliId paulis[],
-            Qubit targets[],
-            double theta) override
+            long /*numControls*/,
+            Qubit* /*controls*/,
+            long /*numTargets*/,
+            PauliId* /*paulis*/,
+            Qubit* /*targets*/,
+            double /* theta */) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void AdjointS(Qubit target) override
+        void AdjointS(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void AdjointT(Qubit target) override
+        void AdjointT(Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledAdjointS(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointS(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledAdjointT(long numControls, Qubit controls[], Qubit target) override
+        void ControlledAdjointT(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
         {
             throw std::logic_error("operation_not_supported");
         }

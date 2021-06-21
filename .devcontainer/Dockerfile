@@ -9,15 +9,14 @@ RUN apt-get -y update && \
     apt-get -y install --no-install-recommends mono-complete nuget && \
     apt-get clean && rm -rf /var/lib/apt/lists/
 
-# Install CMake, Ninja, LLVM/Clang tools
-RUN apt-get -y update && \
-    apt-get install -y cmake && \
-    apt-get install -y ninja-build && \
-    apt-get install -y clang-11 && \
-    apt-get install -y clang-tidy-11 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/
+RUN apt update \
+    && apt-get install -y cmake \
+                          ninja-build \
+                          clang-11 \
+                          clang-tidy-11 \
+                          build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/
 
-# Install C/C++ build tools and libraries
-RUN apt-get -y update && \
-    apt-get install -y build-essential && \
-    apt-get clean && rm -rf /var/lib/apt/lists/
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+CMD [ "pwsh" ]
