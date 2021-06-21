@@ -88,9 +88,17 @@ namespace Microsoft.Azure.Quantum.Authentication
         // Used to catch all the TenantIds:
         private static readonly Dictionary<string, string?> TenantIds = new Dictionary<string, string?>();
 
+        /// <summary>
+        /// Creates a TokenCredential that can be used to authenticate with Azure.
+        /// If a subscriptionId is provided, it will automatically try to identify the corresponding tenantId
+        /// and use that for authorization; otherwise it uses defaults.
+        /// </summary>
+        /// <param name="credentialType">The type of credential to create</param>
+        /// <param name="subscriptionId">The subscriptionId</param>
+        /// <returns>A TokenCredential class to use to fetch an authentication token from AAD.</returns>
         public static TokenCredential CreateCredential(CredentialType credentialType, string? subscriptionId = null) => credentialType switch
         {
-            CredentialType.Default => new DefaultQuantumCredential(),
+            CredentialType.Default => new DefaultQuantumCredential(subscriptionId),
             CredentialType.Environment => new EnvironmentCredential(),
             CredentialType.ManagedIdentity => new ManagedIdentityCredential(),
             CredentialType.CLI => new AzureCliCredential(),
@@ -167,7 +175,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <returns>The tenantId for the given subscription; null if it can be found or for a null subscription.</returns>
         public static string? GetTenantId(string? subscriptionId)
         {
-            if (subscriptionId == null)
+            if (string.IsNullOrWhiteSpace(subscriptionId))
             {
                 return null;
             }

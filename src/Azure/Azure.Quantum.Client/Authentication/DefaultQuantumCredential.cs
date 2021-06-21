@@ -16,23 +16,18 @@ namespace Microsoft.Azure.Quantum.Authentication
     using global::Azure.Identity;
 
     /// <summary>
-    /// Provides a <see cref="TokenCredential"/> implementation which chains multiple <see cref="TokenCredential"/> implementations to be tried in order
-    /// until one of the getToken methods returns a non-default <see cref="AccessToken"/>.
+    /// Provides a simplified authentication for quantum users by checking in order the following type of credentials.
+    /// - Environment
+    /// - ManagedIdentity
+    /// - CLI
+    /// - SharedToken
+    /// - VisualStudio
+    /// - VisualStudioCode
+    /// - Interactive
+    /// - DeviceCode
+    /// It will automatically pick the first credentials it can succesfully to use to login with Azure.
+    /// If not successful to use any of the credentials, it throws a CredentialUnavailableException.
     /// </summary>
-    /// <example>
-    /// <para>
-    /// The ChainedTokenCredential class provides the ability to link together multiple credential instances to be tried sequentially when authenticating.
-    /// The following example demonstrates creating a credential which will attempt to authenticate using managed identity, and fall back to Azure CLI for authentication
-    /// if a managed identity is unavailable in the current environment.
-    /// </para>
-    /// <code snippet="Snippet:CustomChainedTokenCredential">
-    /// // Authenticate using managed identity if it is available; otherwise use the Azure CLI to authenticate.
-    ///
-    /// var credential = new ChainedTokenCredential(new ManagedIdentityCredential(), new AzureCliCredential());
-    ///
-    /// var eventHubProducerClient = new EventHubProducerClient(&quot;myeventhub.eventhubs.windows.net&quot;, &quot;myhubpath&quot;, credential);
-    /// </code>
-    /// </example>
     public class DefaultQuantumCredential : TokenCredential
     {
         private const string AggregateAllUnavailableErrorMessage = "Failed to retrieve a token from the included credentials.";
@@ -42,19 +37,21 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultQuantumCredential"/> class.
         /// </summary>
+        /// <param name="subscriptionId">The subscription id.</param>
         public DefaultQuantumCredential(string? subscriptionId = null)
         {
             this.SubscriptionId = subscriptionId;
         }
 
+        /// <summary>
+        /// The SubscriptionId this credentials are set for.
+        /// </summary>
         public string? SubscriptionId { get; }
 
         /// <summary>
-        /// Generates the credential to use by default. It checks
+        /// The list of sources that will be used, in order, to get credentials
         /// </summary>
-        /// <param name="subscriptionId">Th</param>
-        /// <returns>A ChainedTokenCredential with all the default credential types to use.</returns>
-        public IEnumerable<TokenCredential> Sources
+        public virtual IEnumerable<TokenCredential> Sources
         {
             get
             {
@@ -74,7 +71,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        /// <returns>The first <see cref="AccessToken"/> returned by the specified sources. Any credential which raises a <see cref="CredentialUnavailableException"/> will be skipped.</returns>
+        /// <returns>The first <see cref="AccessToken"/> returned by the specified sources. Any credential which raises an Exception will be skipped.</returns>
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
                 => GetTokenImplAsync(false, requestContext, cancellationToken).GetAwaiter().GetResult();
 
@@ -83,7 +80,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        /// <returns>The first <see cref="AccessToken"/> returned by the specified sources. Any credential which raises a <see cref="CredentialUnavailableException"/> will be skipped.</returns>
+        /// <returns>The first <see cref="AccessToken"/> returned by the specified sources. Any credential which raises an Exception will be skipped.</returns>
         public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
             => await GetTokenImplAsync(true, requestContext, cancellationToken).ConfigureAwait(false);
 
