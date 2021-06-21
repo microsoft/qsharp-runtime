@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.AutoSubstitution.Testing {
-    open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Measurement;
     open Microsoft.Quantum.Targeting;
@@ -26,7 +25,11 @@ namespace Microsoft.Quantum.AutoSubstitution.Testing {
 
         QuantumSwap(a, b);
 
-        EqualityFactR(MResetZ(a), Zero, "unexpected value for a after swap");
-        EqualityFactR(MResetZ(b), One, "unexpected value for b after swap");
+        if MResetZ(a) != Zero {
+            fail "unexpected value for a after swap";
+        }
+        if MResetZ(b) != One {
+            fail "unexpected value for b after swap";
+        }
     }
 }
