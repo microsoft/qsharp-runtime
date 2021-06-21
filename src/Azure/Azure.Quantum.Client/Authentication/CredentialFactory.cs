@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Quantum.Authentication
 
         public static TokenCredential CreateCredential(CredentialType credentialType, string? subscriptionId = null) => credentialType switch
         {
-            CredentialType.Default => CreateDefaultCredential(),
+            CredentialType.Default => new DefaultQuantumCredential(),
             CredentialType.Environment => new EnvironmentCredential(),
             CredentialType.ManagedIdentity => new ManagedIdentityCredential(),
             CredentialType.CLI => new AzureCliCredential(),
@@ -232,28 +232,6 @@ namespace Microsoft.Azure.Quantum.Authentication
             {
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Generates the credential to use by default. It checks
-        /// </summary>
-        /// <param name="subscriptionId">Th</param>
-        /// <returns>A ChainedTokenCredential with all the default credential types to use.</returns>
-        public static TokenCredential CreateDefaultCredential(string? subscriptionId = null)
-        {
-            var sources = new List<TokenCredential>
-            {
-                CreateCredential(CredentialType.Environment, subscriptionId),
-                CreateCredential(CredentialType.ManagedIdentity, subscriptionId),
-                CreateCredential(CredentialType.CLI, subscriptionId),
-                CreateCredential(CredentialType.SharedToken, subscriptionId),
-                CreateCredential(CredentialType.VisualStudio, subscriptionId),
-                CreateCredential(CredentialType.VisualStudioCode, subscriptionId),
-                CreateCredential(CredentialType.Interactive, subscriptionId),
-                CreateCredential(CredentialType.DeviceCode, subscriptionId),
-            };
-
-            return new ChainedTokenCredential(sources.ToArray());
         }
     }
 }

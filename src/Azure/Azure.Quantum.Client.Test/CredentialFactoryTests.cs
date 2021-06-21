@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Quantum.Test
         private const string SUBSCRIPTION = "916dfd6d-030c-4bd9-b579-7bb6d1926e97";
 
         [DataTestMethod]
-        [DataRow(CredentialType.Default, typeof(ChainedTokenCredential))]
+        [DataRow(CredentialType.Default, typeof(DefaultQuantumCredential))]
         [DataRow(CredentialType.Environment, typeof(EnvironmentCredential))]
         [DataRow(CredentialType.ManagedIdentity, typeof(ManagedIdentityCredential))]
         [DataRow(CredentialType.CLI, typeof(AzureCliCredential))]
