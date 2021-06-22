@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" />
+    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

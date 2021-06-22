@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <QscVerbosity>d</QscVerbosity>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" IsQscReference="true" />
+    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />
   </ItemGroup>
 </Project>
