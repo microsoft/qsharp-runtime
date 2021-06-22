@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 
 using Azure.Identity;
 
@@ -18,7 +19,7 @@ namespace Microsoft.Azure.Quantum.Test
         private const string SUBSCRIPTION = "916dfd6d-030c-4bd9-b579-7bb6d1926e97";
 
         [DataTestMethod]
-        [DataRow(CredentialType.Default, typeof(DefaultAzureCredential))]
+        [DataRow(CredentialType.Default, typeof(DefaultQuantumCredential))]
         [DataRow(CredentialType.Environment, typeof(EnvironmentCredential))]
         [DataRow(CredentialType.ManagedIdentity, typeof(ManagedIdentityCredential))]
         [DataRow(CredentialType.CLI, typeof(AzureCliCredential))]
@@ -71,6 +72,30 @@ namespace Microsoft.Azure.Quantum.Test
         {
             var actual = CredentialFactory.ExtractTenantIdFromBearer(bearer);
             Assert.AreEqual(expected, actual);
+        }
+
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow(SUBSCRIPTION)]
+        public void TestDefaultCredentialSources(string? subscriptionId)
+        {
+            var credential = CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId) as DefaultQuantumCredential;
+            Assert.IsNotNull(credential);
+
+            var actual = credential?.Sources.Select(c => c.GetType()).ToArray();
+            var expected = new Type[]
+                {
+                    typeof(EnvironmentCredential),
+                    typeof(ManagedIdentityCredential),
+                    typeof(AzureCliCredential),
+                    typeof(SharedTokenCacheCredential),
+                    typeof(VisualStudioCodeCredential),
+                    typeof(InteractiveBrowserCredential),
+                    typeof(DeviceCodeCredential),
+                };
+
+            CollectionAssert.AreEqual(expected, actual);
         }
     }
 }
