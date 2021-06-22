@@ -177,7 +177,7 @@ CQubitManager::CQubitManager(
         qubitCapacity(initialQubitCapacity)
 {
     FailIf(qubitCapacity <= 0, "Qubit capacity must be positive.");
-    sharedQubitStatusArray = new QubitIdType[qubitCapacity];
+    sharedQubitStatusArray = new QubitIdType[(size_t)qubitCapacity];
 
     // These objects are passed by value (copies are created)
     QubitListInSharedArray FreeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
@@ -423,8 +423,8 @@ void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
     // existing values (NonMarker or indexes in the array).
 
     // Prepare new shared status array
-    QubitIdType* newStatusArray = new QubitIdType[requestedCapacity];
-    memcpy(newStatusArray, sharedQubitStatusArray, qubitCapacity * sizeof(newStatusArray[0]));
+    QubitIdType* newStatusArray = new QubitIdType[(size_t)requestedCapacity];
+    memcpy(newStatusArray, sharedQubitStatusArray, (size_t)qubitCapacity * sizeof(newStatusArray[0]));
     QubitListInSharedArray newFreeQubits(qubitCapacity, requestedCapacity - 1, newStatusArray);
 
     // Set new data. All fresh new qubits are added to the free qubits in the outermost area.
@@ -447,8 +447,8 @@ CQubitManager::QubitIdType CQubitManager::TakeFreeQubitId()
         int32_t areaIndex = freeQubitsInAreas.Count() - 1;
         do
         {
-            areaIndex = freeQubitsInAreas[areaIndex].prevAreaWithFreeQubits;
-            id = freeQubitsInAreas[areaIndex].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
+            areaIndex = freeQubitsInAreas[(size_t)areaIndex].prevAreaWithFreeQubits;
+            id = freeQubitsInAreas[(size_t)areaIndex].FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
         } while ((areaIndex != 0) && (id == NoneMarker));
 
         // We remember previous area where a free qubit was found or 0 if none were found.
