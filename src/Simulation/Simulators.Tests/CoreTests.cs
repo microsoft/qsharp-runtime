@@ -84,6 +84,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 "baz",
                 "--target",
                 "test.submitter.noop",
+                "--location", 
+                "myLocation",
                 "--verbose");
 
             ProcessRunner.Run("dotnet", args, out var output, out var error, out var status, out var ex);
@@ -99,9 +101,9 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Workspace: baz",
                     "Target: test.submitter.noop",
                     "Storage: ",
-                    "AAD Token: ",
                     "Base URI: ",
-                    "Location: ",
+                    "Location: myLocation",
+                    "Credential: Default",
                     "Job Name: ",
                     "Shots: 500",
                     "Output: FriendlyUri",

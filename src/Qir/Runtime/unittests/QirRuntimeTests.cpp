@@ -65,7 +65,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 
     bool HaveResultsInFlight() const
     {
-        for (const auto& b : this->allocated)
+        for (const auto b : this->allocated)
         {
             if (b)
             {
@@ -716,7 +716,7 @@ struct QubitTestQAPI : public SimulatorStub
 
     bool HaveQubitsInFlight() const
     {
-        for (const auto& b : this->allocated)
+        for (const auto b : this->allocated)
         {
             if (b)
             {
@@ -768,7 +768,7 @@ struct ControlledCallablesTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override {}
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);
@@ -984,7 +984,7 @@ struct AdjointsTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override {}
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);

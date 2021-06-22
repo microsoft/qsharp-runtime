@@ -20,6 +20,7 @@ param(
 $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",
+        "Microsoft.Quantum.AutoSubstitution",
         "Microsoft.Quantum.CSharpGeneration",
         "Microsoft.Quantum.Development.Kit",
         "Microsoft.Quantum.EntryPointDriver",
@@ -36,6 +37,7 @@ $artifacts = @{
 
     Assemblies = @(
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
+        ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.AutoSubstitution.dll",
         ".\src\Qir\Execution\Tools\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Qir.Tools.dll",
         ".\src\Simulation\CSharpGeneration\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.CSharpGeneration.dll",
         ".\src\Simulation\CSharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.CSharpGeneration.App.dll",

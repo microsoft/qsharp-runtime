@@ -15,6 +15,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.Azure.Quantum.Authentication;
+
 namespace Microsoft.Quantum.EntryPointDriver
 {
     using Validators = ImmutableList<ValidateSymbol<CommandResult>>;
@@ -47,6 +49,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
             ImmutableList.Create("--storage"), default, "The storage account connection string.");
+
+        /// <summary>
+        /// The credential option.
+        /// </summary>
+        private static readonly OptionInfo<CredentialType?> CredentialOption = new OptionInfo<CredentialType?>(
+            ImmutableList.Create("--credential"),
+            CredentialType.Default,
+            "The type of credential to use to authenticate with Azure.");
 
         /// <summary>
         /// The AAD token option.
@@ -418,7 +428,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             var validators = AddOptionIfAvailable(command, SubscriptionOption)
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
-                .Concat(AddOptionIfAvailable(command, this.TargetOption))
+                .Concat(AddOptionIfAvailable(command, TargetOption))
+                .Concat(AddOptionIfAvailable(command, CredentialOption))
                 .Concat(AddOptionIfAvailable(command, StorageOption))
                 .Concat(AddOptionIfAvailable(command, AadTokenOption))
                 .Concat(AddOptionIfAvailable(command, BaseUriOption))
@@ -458,11 +469,11 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(entryPoint, this.TargetOption, azureSettings.Target),
+                Target = DefaultIfShadowed(entryPoint, TargetOption, azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
-                AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
                 Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
+                Credential = DefaultIfShadowed(entryPoint, CredentialOption, azureSettings.Credential),
                 JobName = DefaultIfShadowed(entryPoint, JobNameOption, azureSettings.JobName),
                 Shots = DefaultIfShadowed(entryPoint, ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(entryPoint, OutputOption, azureSettings.Output),

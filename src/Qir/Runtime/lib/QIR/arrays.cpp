@@ -198,7 +198,7 @@ static int64_t GetLinearIndex(const std::vector<int64_t>& dimensionSizes, const 
 // It's equal to the product of the dimension sizes in higher dimensions.
 static int64_t RunCount(const std::vector<int64_t>& dimensionSizes, int dimension)
 {
-    assert(dimension < dimensionSizes.size());
+    assert((0 <= dimension) && ((size_t)dimension < dimensionSizes.size()));
     return std::accumulate(dimensionSizes.begin() + dimension + 1, dimensionSizes.end(), 1, std::multiplies<int64_t>());
 }
 

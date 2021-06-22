@@ -349,3 +349,9 @@ dbw_test
 
 # out folders
 out/
+
+# Jupyter caches
+.ipynb_checkpoints
+
+# Ignore drops from building native simulators.
+xplat
