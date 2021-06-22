@@ -38,4 +38,12 @@
     </ItemGroup>
   </Target>
 
+  <ItemGroup>
+    <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <Content Include="Microsoft.Quantum.AutoSubstitution.props">
+      <IncludeInPackage>true</IncludeInPackage>
+      <CopyToOutput>true</CopyToOutput>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
 </Project>
