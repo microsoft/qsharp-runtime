@@ -20,10 +20,9 @@ using namespace Microsoft::Quantum;
 ==============================================================================*/
 extern "C"
 {
-    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use `QirTupleHeader::TBufSize size` (breaking change), 
-                                                    // optionally change `TBufSize` to `uint64_t` (unsigned type) - still breaking change.
+    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use unsigned integer type (breaking change).
     {
-        assert(size < std::numeric_limits<QirTupleHeader::TBufSize>::max());
+        assert((uint64_t)size < std::numeric_limits<QirTupleHeader::TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 64-bit arch.
         return QirTupleHeader::Create(static_cast<QirTupleHeader::TBufSize>(size))->AsTuple();
     }
 
@@ -371,7 +370,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 
         QirArray* controls = current->controls;
 
-        assert(qubitSize * controls->count <= std::numeric_limits<QirArray::TBufSize>::max());
+        assert((QirArray::TBufSize)qubitSize * controls->count < std::numeric_limits<QirArray::TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
         const QirArray::TBufSize blockSize = qubitSize * controls->count;
         
         assert(dst + blockSize <= dstEnd); 

@@ -98,7 +98,7 @@ QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount 
         }
     }
 
-    assert(this->count * itemSizeInBytes <= std::numeric_limits<TBufSize>::max());
+    assert(this->count * (TBufSize)itemSizeInBytes < std::numeric_limits<TBufSize>::max()); // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
     const TBufSize buffer_size = this->count * itemSizeInBytes;
     if (buffer_size > 0)
     {
@@ -125,7 +125,7 @@ QirArray::QirArray(const QirArray* other)
         GlobalContext()->OnAllocate(this);
     }
 
-    assert(this->count * this->itemSizeInBytes <= std::numeric_limits<TBufSize>::max());
+    assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
     const TBufSize size = this->count * this->itemSizeInBytes;
     if (this->count > 0)
     {
@@ -161,10 +161,10 @@ void QirArray::Append(const QirArray* other)
         return;
     }
 
-    assert(this->count * this->itemSizeInBytes <= std::numeric_limits<TBufSize>::max());
+    assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
     const TBufSize this_size = this->count * this->itemSizeInBytes;
 
-    assert(other->count * other->itemSizeInBytes <= std::numeric_limits<TBufSize>::max());
+    assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
     const TBufSize other_size = other->count * other->itemSizeInBytes;
 
     char* new_buffer = new char[this_size + other_size];
@@ -352,7 +352,8 @@ extern "C"
             totalCount *= dimSize;
         }
 
-        return new QirArray(totalCount, (QirArray::TItemSize)itemSizeInBytes, countDimensions, std::move(dimSizes));
+        assert(countDimensions < std::numeric_limits<QirArray::TDimCount>::max());  // Using `<` rather than `<=` to calm down the compiler in case `countDimensions` becomes `QirArray::TDimCount`.
+        return new QirArray(totalCount, (QirArray::TItemSize)itemSizeInBytes, (QirArray::TDimCount)countDimensions, std::move(dimSizes));
     }
 
     QirArray* quantum__rt__array_create(int itemSizeInBytes, int countDimensions, ...) // NOLINT
@@ -506,7 +507,7 @@ extern "C"
         {
             const QirArray::TItemCount rangeRunCount = (QirArray::TItemCount)(singleIndexRunCount * (range.end - range.start));
 
-            assert(rangeRunCount * itemSizeInBytes <= std::numeric_limits<QirArray::TBufSize>::max());
+            assert((QirArray::TBufSize)rangeRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());   // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
             const QirArray::TBufSize rangeChunkSize = rangeRunCount * itemSizeInBytes;
 
             QirArray::TItemCount dst = 0;
@@ -522,7 +523,7 @@ extern "C"
         }
 
         // In case of disconnected or reversed range have to copy the data one run at a time.
-        assert(singleIndexRunCount * itemSizeInBytes <= std::numeric_limits<QirArray::TBufSize>::max());
+        assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
         const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
         QirArray::TItemCount dst = 0;
         QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
@@ -566,7 +567,7 @@ extern "C"
         const QirArray::TItemCount singleIndexRunCount = RunCount(array->dimensionSizes, (QirArray::TDimCount)dim);
         const QirArray::TItemCount rowCount = singleIndexRunCount * array->dimensionSizes[(size_t)dim];
         
-        assert(singleIndexRunCount * itemSizeInBytes <= std::numeric_limits<QirArray::TBufSize>::max());
+        assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
         const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
 
         QirArray::TItemCount dst = 0;

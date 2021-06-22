@@ -73,7 +73,7 @@ function Build-CMakeProject {
     #     -Wfloat-conversion, -Wimplicit-float-conversion, -Wimplicit-int-conversion, -Wint-conversion, 
     #     -Wliteral-conversion, -Wnon-literal-null-conversion, -Wnull-conversion, -Wobjc-literal-conversion, 
     #     -Wshorten-64-to-32, -Wsign-conversion, -Wstring-conversion
-    $warningFlags += " -Wsign-conversion -Wshorten-64-to-32"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion       # Work in progress towards "-Wconversion"
+    $warningFlags += " -Wconversion"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion
 
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
