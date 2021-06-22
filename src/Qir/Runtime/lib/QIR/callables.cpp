@@ -239,9 +239,9 @@ QirCallable::~QirCallable()
     assert(refCount == 0);
 }
 
-QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* callbacks, PTuple capture)
+QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* callbacks, PTuple capt)
     : refCount(1)
-    , capture(capture)
+    , capture(capt)
     , appliedFunctor(0)
     , controlledDepth(0)
 {

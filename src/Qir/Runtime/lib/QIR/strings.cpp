@@ -35,8 +35,8 @@ static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
     return qstr;
 }
 
-QirString::QirString(std::string&& str)
-    : str(std::move(str))
+QirString::QirString(std::string&& otherStr)
+    : str(std::move(otherStr))
 {
 }
 

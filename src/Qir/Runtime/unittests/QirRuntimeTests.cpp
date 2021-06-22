@@ -30,9 +30,9 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         return static_cast<int>(reinterpret_cast<int64_t>(r));
     }
 
-    ResultsReferenceCountingTestQAPI(int maxResults)
-        : maxResults(maxResults),
-        allocated((size_t)maxResults, false)
+    ResultsReferenceCountingTestQAPI(int maxRes)
+        : maxResults(maxRes),
+        allocated((size_t)maxRes, false)
     {
     }
 
@@ -680,9 +680,9 @@ struct QubitTestQAPI : public SimulatorStub
         return (uint64_t)q;
     }
 
-    QubitTestQAPI(int maxQubits)
-        : maxQubits(maxQubits),
-        allocated((size_t)maxQubits, false)
+    QubitTestQAPI(int maxQbits)
+        : maxQubits(maxQbits),
+        allocated((size_t)maxQbits, false)
     {
     }
 

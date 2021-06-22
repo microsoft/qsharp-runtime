@@ -75,6 +75,11 @@ function Build-CMakeProject {
     #     -Wshorten-64-to-32, -Wsign-conversion, -Wstring-conversion
     $warningFlags += " -Wconversion"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion
 
+    # -Wshadow-all
+    #   -Wshadow, -Wshadow-field, -Wshadow-field-in-constructor, -Wshadow-uncaptured-local.
+    $warningFlags += " -Wshadow-all"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wshadow-all            # Work in progress
+
+
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
 
