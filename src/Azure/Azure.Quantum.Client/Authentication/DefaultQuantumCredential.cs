@@ -57,7 +57,8 @@ namespace Microsoft.Azure.Quantum.Authentication
                 yield return CredentialFactory.CreateCredential(CredentialType.ManagedIdentity, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.CLI, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.SharedToken, SubscriptionId);
-                yield return CredentialFactory.CreateCredential(CredentialType.VisualStudio, SubscriptionId);
+                // Disable VS credentials until https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071 is fixed:
+                //yield return CredentialFactory.CreateCredential(CredentialType.VisualStudio, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.VisualStudioCode, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.Interactive, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.DeviceCode, SubscriptionId);

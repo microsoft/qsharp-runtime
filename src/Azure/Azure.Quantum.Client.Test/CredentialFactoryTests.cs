@@ -90,7 +90,6 @@ namespace Microsoft.Azure.Quantum.Test
                     typeof(ManagedIdentityCredential),
                     typeof(AzureCliCredential),
                     typeof(SharedTokenCacheCredential),
-                    typeof(VisualStudioCredential),
                     typeof(VisualStudioCodeCredential),
                     typeof(InteractiveBrowserCredential),
                     typeof(DeviceCodeCredential),
