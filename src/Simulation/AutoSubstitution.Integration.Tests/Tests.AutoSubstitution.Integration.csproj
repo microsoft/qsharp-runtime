@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <QscVerbosity>d</QscVerbosity>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" IsQscReference="true" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeProviderPackages>false</IncludeProviderPackages>
+    <CSharpGeneration>false</CSharpGeneration>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
+    <QirGeneration>false</QirGeneration>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\AutoSubstitution\AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+  </ItemGroup>
+
+  <Target Name="BeforeCSharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+
 </Project>
