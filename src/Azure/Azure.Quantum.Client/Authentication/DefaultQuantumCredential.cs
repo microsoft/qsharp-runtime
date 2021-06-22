@@ -30,9 +30,7 @@ namespace Microsoft.Azure.Quantum.Authentication
     /// </summary>
     public class DefaultQuantumCredential : TokenCredential
     {
-        private const string AggregateAllUnavailableErrorMessage = "Failed to retrieve a token from the included credentials.";
-
-        private const string AuthenticationFailedErrorMessage = "The ChainedTokenCredential failed due to an unhandled exception: ";
+        private TokenCredential? _active = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultQuantumCredential"/> class.
@@ -86,6 +84,13 @@ namespace Microsoft.Azure.Quantum.Authentication
 
         private async ValueTask<AccessToken> GetTokenImplAsync(bool async, TokenRequestContext requestContext, CancellationToken cancellationToken)
         {
+            if (_active != null)
+            {
+                return async
+                    ? await _active.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false)
+                    : _active.GetToken(requestContext, cancellationToken);
+            }
+
             List<Exception> exceptions = new List<Exception>();
             foreach (TokenCredential source in Sources)
             {
@@ -94,6 +99,14 @@ namespace Microsoft.Azure.Quantum.Authentication
                     AccessToken token = async
                         ? await source.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false)
                         : source.GetToken(requestContext, cancellationToken);
+
+                    // TODO: find a cleaner method to report the credential used:
+                    if (source.GetType() != typeof(InteractiveBrowserCredential) && source.GetType() != typeof(DeviceCodeCredential))
+                    {
+                        Console.WriteLine($"Authenticated using {source}");
+                    }
+
+                    _active = source;
                     return token;
                 }
                 catch (Exception e) when (cancellationToken.IsCancellationRequested)
