@@ -47,14 +47,14 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
         - $ export CC=/usr/bin/clang-11
         - $ export CXX=/usr/bin/clang++-11
     1. `$ sudo apt install clang-tidy-11` (`$ clang-tidy-11 --version` should return 'LLVM version 11.0.0')
-    1. Install the same version of dotnet as specified by qsharp-runtime [README](../../README.md)
+    1. Install the same version of dotnet as specified by qsharp-runtime [README](../../../README.md)
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.
 
 #### Other Prerequisites
 
 The build depends on `Microsoft.Quantum.Simulator.Runtime` dynamic library built at a higher level of the directory tree.
-To build that library follow the instructions in [`qsharp-runtime/README.md`](../../README.md#building-from-source)
+To build that library follow the instructions in [`qsharp-runtime/README.md`](../../../README.md#building-from-source)
 (up to and including the step `Simulation.sln`).
 
 
