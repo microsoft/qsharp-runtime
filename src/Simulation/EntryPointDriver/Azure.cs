@@ -346,6 +346,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Base URI: {BaseUri}",
                 $"Location: {Location ?? ExtractLocation(BaseUri)}",
                 $"Credential: {Credential}",
+                $"AadToken: {AadToken?.Substring(0, 5)}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",

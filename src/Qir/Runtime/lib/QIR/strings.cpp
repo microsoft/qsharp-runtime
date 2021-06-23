@@ -168,7 +168,7 @@ extern "C"
 
     uint32_t quantum__rt__string_get_length(QirString* str)  // NOLINT
     {
-        return str->str.size();
+        return (uint32_t)(str->str.size());
     }
 
     // Implemented in delegated.cpp:

@@ -7,19 +7,19 @@
          $ cargo +nightly doc --features python --open
 -->
 
-# Quantum Development Kit Experimental Simulators
+# Quantum Development Kit Preview Simulators
 
-> ## **⚠** WARNING **⚠**
+> ## **📝** NOTE
 >
-> This crate is **experimental**, and may undergo breaking API changes with no notice, and may not be maintained in future versions of the Quantum Development Kit.
+> This crate is in **preview**, and may undergo breaking API changes with no notice.
 >
-> As an experimental feature of the Quantum Development Kit, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#714](https://github.com/microsoft/qsharp-runtime/issues/714) for more information.
+> As a preview feature, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#714](https://github.com/microsoft/qsharp-runtime/issues/714) for more information.
 
 > ## **ⓘ** TIP
 >
 > This crate provides low-level APIs for interacting with experimental simulators. If you're interested in using the experimental simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/tree/feature/experimental/opensim/documentation/experimental-simulators.md>.
 
-This **experimental** crate implements simulation functionality for the Quantum Development Kit, including:
+This crate implements simulation functionality for the Quantum Development Kit, including:
 
 - Open systems simulation
 - Stabilizer simulation
