@@ -23,14 +23,10 @@
   <PropertyGroup>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <QirGeneration>false</QirGeneration>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106147878-beta" IsQscReference="true" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />

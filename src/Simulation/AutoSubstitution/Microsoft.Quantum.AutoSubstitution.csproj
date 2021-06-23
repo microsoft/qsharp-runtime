@@ -13,14 +13,13 @@
   <PropertyGroup>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <QirGeneration>false</QirGeneration>    
   </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.17.2106147878-beta" />
-    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106147878-beta" IsQscReference="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" />
   </ItemGroup>
 
