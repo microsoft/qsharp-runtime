@@ -20,11 +20,11 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.17.2106147878-beta" />
+    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106147878-beta" IsQscReference="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
   </ItemGroup>
 

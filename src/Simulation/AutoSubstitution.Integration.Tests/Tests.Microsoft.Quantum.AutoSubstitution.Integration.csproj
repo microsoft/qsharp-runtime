@@ -29,7 +29,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106147878-beta" IsQscReference="true" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
     <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
