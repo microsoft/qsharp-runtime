@@ -3,8 +3,14 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+
+using Azure.Core;
+using Azure.Identity;
+
 using Microsoft.Azure.Quantum;
+using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Azure.Quantum.Exceptions;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
@@ -33,6 +39,13 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 Console.WriteLine(settings);
                 Console.WriteLine();
+            }
+
+            if ((settings.Location is null) && (settings.BaseUri is null))
+            {
+                DisplayWithColor(ConsoleColor.Red, Console.Error,
+                    $"Either --location or --base-uri must be provided.");
+                return 1;
             }
 
             var machine = CreateMachine(settings);
@@ -202,18 +215,34 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// </summary>
     public sealed class AzureSettings
     {
+        private class AADTokenCredential : TokenCredential
+        {
+            AccessToken Token { get; }
+
+            public AADTokenCredential(string token)
+            {
+                Token = new AccessToken(token, DateTime.Now.AddMinutes(5));
+            }
+
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) =>
+                Token;
+
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) =>
+                new ValueTask<AccessToken>(Token);
+        }
+
         /// <summary>
         /// The subscription ID.
         /// </summary>
         public string? Subscription { get; set; }
 
         /// <summary>
-        /// The resource group name.
+        /// The Azure Quantum workspace's resource group name.
         /// </summary>
         public string? ResourceGroup { get; set; }
 
         /// <summary>
-        /// The workspace name.
+        /// The Azure Quantum workspace's name.
         /// </summary>
         public string? Workspace { get; set; }
 
@@ -233,14 +262,23 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? AadToken { get; set; }
 
         /// <summary>
+        /// The type of Credentials to use to authenticate with Azure. For more information
+        /// about authentication with Azure services see: https://docs.microsoft.com/dotnet/api/overview/azure/identity-readme
+        /// NOTE: If both <see cref="AadToken"/> and <see cref="Credential"/> properties are specified, <see cref="AadToken"/> takes precedence.
+        /// If none are provided, then it uses <see cref="CredentialType.Default"/>.
+        /// </summary>
+        public CredentialType? Credential { get; set; }
+
+        /// <summary>
         /// The base URI of the Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// NOTE: This parameter is deprected, please always use <see cref="Location"/>.
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="Location"/> takes precedence.
         /// </summary>
         public Uri? BaseUri { get; set; }
 
         /// <summary>
-        /// The location to use with the default Azure Quantum endpoint.
-        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="BaseUri"/> takes precedence.
+        /// The Azure Quantum Workspace's location (region).
+        /// If both <see cref="BaseUri"/> and <see cref="Location"/> properties are not null, <see cref="Location"/> takes precedence.
         /// </summary>
         public string? Location { get; set; }
 
@@ -269,30 +307,33 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         public bool Verbose { get; set; }
 
+        internal TokenCredential CreateCredentials()
+        {
+            if (!(AadToken is null))
+            {
+                return new AADTokenCredential(AadToken);
+            }
+            else
+            {
+                return CredentialFactory.CreateCredential(Credential ?? CredentialType.Default, Subscription);
+            }
+        }
+
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
         /// </summary>
         /// <returns>The <see cref="Workspace"/> based on the settings.</returns>
         internal Workspace CreateWorkspace()
         {
-            if (BaseUri != null)
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: BaseUri)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: BaseUri);
-            }
-            else if (Location != null)
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, location: NormalizeLocation(Location))
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, location: NormalizeLocation(Location));
-            }
-            else
-            {
-                return AadToken is null
-                    ? new Workspace(Subscription, ResourceGroup, Workspace, baseUri: null)
-                    : new Workspace(Subscription, ResourceGroup, Workspace, AadToken, baseUri: null);
-            }
+            var credentials = CreateCredentials();
+            var location = NormalizeLocation(Location ?? ExtractLocation(BaseUri));
+
+            return new Workspace(
+                subscriptionId: Subscription, 
+                resourceGroupName: ResourceGroup,
+                workspaceName: Workspace, 
+                location: location,
+                credential: credentials);
         }
 
         public override string ToString() =>
@@ -302,14 +343,25 @@ namespace Microsoft.Quantum.EntryPointDriver
                 $"Workspace: {Workspace}",
                 $"Target: {Target}",
                 $"Storage: {Storage}",
-                $"AAD Token: {AadToken}",
                 $"Base URI: {BaseUri}",
-                $"Location: {Location}",
+                $"Location: {Location ?? ExtractLocation(BaseUri)}",
+                $"Credential: {Credential}",
+                $"AadToken: {AadToken?.Substring(0, 5)}",
                 $"Job Name: {JobName}",
                 $"Shots: {Shots}",
                 $"Output: {Output}",
                 $"Dry Run: {DryRun}",
                 $"Verbose: {Verbose}");
+
+        internal static string ExtractLocation(Uri? baseUri)
+        {
+            if (baseUri is null || !baseUri.IsAbsoluteUri)
+            {
+                return "";
+            }
+
+            return baseUri.Host.Substring(0, baseUri.Host.IndexOf('.'));
+        }
 
         internal static string NormalizeLocation(string location) =>
             string.Concat(location.Where(c => !char.IsWhiteSpace(c))).ToLower();

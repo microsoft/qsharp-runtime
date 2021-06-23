@@ -43,9 +43,9 @@ TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
 {
     QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
 
-    const int ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
-    const int ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
-    const int ret3 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
+    const int64_t ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
+    const int64_t ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
+    const int64_t ret3 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
     INFO(
         std::string("Three random numbers: ") + std::to_string(ret1) + ", " + std::to_string(ret2) + ", " +
         std::to_string(ret3));

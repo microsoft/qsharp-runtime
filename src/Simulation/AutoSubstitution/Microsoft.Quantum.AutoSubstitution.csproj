@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+  <Import Project="..\Common\AssemblyCommon.props" />
+  <Import Project="..\Common\DebugSymbols.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>Enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AssemblyName>Microsoft.Quantum.AutoSubstitution</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeProviderPackages>false</IncludeProviderPackages>
+    <CSharpGeneration>false</CSharpGeneration>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
+    <QirGeneration>false</QirGeneration>    
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.17.2106147878-beta" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
+    <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <Target Name="BeforeCSharpCompile">
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <Content Include="Microsoft.Quantum.AutoSubstitution.props">
+      <IncludeInPackage>true</IncludeInPackage>
+      <CopyToOutput>true</CopyToOutput>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+</Project>

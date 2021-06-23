@@ -18,10 +18,10 @@ using namespace std;
 
 struct InteropArray
 {
-    int64_t Size;
+    size_t Size;   // TODO: Never used?
     void* Data;
 
-    InteropArray(int64_t size, void* data) :
+    InteropArray(size_t size, void* data) :
         Size(size),
         Data(data){}
 };

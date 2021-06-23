@@ -248,15 +248,15 @@ namespace Microsoft.Quantum.Simulation.Common
         {
             if (q == null) throw new ArgumentNullException(qubitName, "Trying to perform an intrinsic operation on a null Qubit");
 
-            if (!QubitManager.IsValid(q))
+            if (!(QubitManager?.IsValid(q) ?? true))
             {
                 throw new ArgumentException($"Cannot use qubit {q.Id}. Qubit is invalid.", qubitName);
             }
-            if (QubitManager.IsFree(q))
+            if (QubitManager?.IsFree(q) ?? false)
             {
                 throw new ArgumentException($"Cannot use qubit {q.Id}. Qubit has already been released.", qubitName);
             }
-            if (QubitManager.IsDisabled(q))
+            if (QubitManager?.IsDisabled(q) ?? false)
             {
                 throw new ArgumentException($"Cannot use qubit {q.Id}. Qubit is disabled.", qubitName);
             }
@@ -291,6 +291,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public Allocate(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the Allocate operation.");
+                }
                 this.manager = m.QubitManager;
             }
 
@@ -323,6 +327,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public Release(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the Release operation.");
+                }
                 this.manager = m.QubitManager;
             }
 
@@ -353,6 +361,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public Borrow(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the Borrow operation.");
+                }
                 this.manager = m.QubitManager;
             }
 
@@ -385,6 +397,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public Return(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the Return operation.");
+                }
                 this.manager = m.QubitManager;
             }
 
@@ -414,6 +430,10 @@ namespace Microsoft.Quantum.Simulation.Common
             public GetQubitsAvailableToUse(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the GetQubitsAvailableToUse operation.");
+                }
                 this.manager = m.QubitManager;
             }
 
@@ -432,6 +452,11 @@ namespace Microsoft.Quantum.Simulation.Common
             public GetQubitsAvailableToBorrow(SimulatorBase m) : base(m)
             {
                 this.sim = m;
+
+                if (m.QubitManager == null)
+                {
+                    throw new NullReferenceException($"SimulatorBase {m} has a null-valued qubit manager, but a qubit manager is required to implement the GetQubitsAvailableToBorrow operation.");
+                }
                 this.manager = m.QubitManager;
             }
 

@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106146628-beta" IsQscReference="true" />
+    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.17.2106147878-beta" IsQscReference="true" />
   </ItemGroup>
 
   <ItemGroup>
