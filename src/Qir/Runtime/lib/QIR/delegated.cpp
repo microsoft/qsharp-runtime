@@ -19,7 +19,7 @@
 // qubits, created by the same target, aren't reference counted. To minimize the implementation burden on the target,
 // the runtime will track the reference counts for results. The trade-off is the performance penalty of such external
 // tracking. The design should be evaluated against real user code when we have it.
-std::unordered_map<RESULT*, int>& AllocatedResults()
+static std::unordered_map<RESULT*, int>& AllocatedResults()
 {
     static std::unordered_map<RESULT*, int> allocatedResults;
     return allocatedResults;

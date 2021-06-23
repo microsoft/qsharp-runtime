@@ -28,7 +28,7 @@ bool quantum__qis__isnan__body(double d)
 
 double quantum__qis__infinity__body()
 {
-    return INFINITY;                // https://en.cppreference.com/w/c/numeric/math/INFINITY
+    return (double)INFINITY;                // https://en.cppreference.com/w/c/numeric/math/INFINITY
 }
 
 bool quantum__qis__isinf__body(double d)

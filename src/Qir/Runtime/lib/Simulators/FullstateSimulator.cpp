@@ -21,7 +21,7 @@
 #include "QubitManager.hpp"
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 typedef HMODULE QUANTUM_SIMULATOR;
 #else // not _WIN32
 #include <dlfcn.h>
@@ -40,10 +40,10 @@ const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
 
 QUANTUM_SIMULATOR LoadQuantumSimulator()
 {
-    QUANTUM_SIMULATOR handle = 0;
+    QUANTUM_SIMULATOR handle = nullptr;
 #ifdef _WIN32
     handle = ::LoadLibraryA(FULLSTATESIMULATORLIB);
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         throw std::runtime_error(
             std::string("Failed to load ") + FULLSTATESIMULATORLIB +
@@ -99,7 +99,7 @@ namespace Quantum
             return static_cast<unsigned>(pauli);
         }
 
-        const QUANTUM_SIMULATOR handle = 0;
+        const QUANTUM_SIMULATOR handle = nullptr;
 
         using TSimulatorId = unsigned;      // TODO: Use `void*` or a fixed-size integer, starting in native simulator (breaking change).
         static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;  // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.

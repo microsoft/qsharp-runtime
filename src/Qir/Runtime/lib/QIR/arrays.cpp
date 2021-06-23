@@ -147,7 +147,7 @@ QirArray::~QirArray()
 char* QirArray::GetItemPointer(TItemCount index)
 {
     assert(index < this->count);
-    return &this->buffer[index * this->itemSizeInBytes];
+    return &this->buffer[index * this->itemSizeInBytes];    // TODO: Can return a pointer not aligned properly (e.g. if `itemSizeInBytes == 3`).
 }
 
 void QirArray::Append(const QirArray* other)
@@ -273,7 +273,7 @@ extern "C"
                     delete array;
                     assert(i == -1 && "Attempting to decrement reference count below zero!");
                     break;
-                };
+                }
             }
         }
     }

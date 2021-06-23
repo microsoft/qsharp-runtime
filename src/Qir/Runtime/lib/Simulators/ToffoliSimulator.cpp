@@ -40,7 +40,7 @@ namespace Quantum
 
       public:
         CToffoliSimulator() = default;
-        ~CToffoliSimulator() = default;
+        ~CToffoliSimulator() override = default;
 
         ///
         /// Implementation of IRuntimeDriver

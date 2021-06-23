@@ -40,7 +40,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
-        this->allocated.at((size_t)(this->lastId)) = true;;
+        this->allocated.at((size_t)(this->lastId)) = true;
         return reinterpret_cast<Result>(this->lastId);
     }
     Result UseZero() override
