@@ -27,7 +27,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     vector<int> otherCallbacks;
 
     vector<ResultValue> mockMeasurements;
-    int nextMeasureResult = 0;
+    size_t nextMeasureResult = 0;
 
     explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
         : mockMeasurements(results)
@@ -87,7 +87,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     Result Measure(long /* numBases */, PauliId* /* bases */, long /* numTargets */, Qubit* /* targets */) override
     {
         assert(
-            (size_t)(this->nextMeasureResult) < this->mockMeasurements.size() &&
+            this->nextMeasureResult < this->mockMeasurements.size() &&
             "ConditionalsTestSimulator isn't set up correctly");
 
         Result r = (this->mockMeasurements[this->nextMeasureResult] == Result_Zero) ? UseZero() : UseOne();

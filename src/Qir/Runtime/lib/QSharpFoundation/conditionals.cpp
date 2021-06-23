@@ -17,7 +17,7 @@ static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
 
     RESULT** results1 = reinterpret_cast<RESULT**>(rs1->buffer);
     RESULT** results2 = reinterpret_cast<RESULT**>(rs2->buffer);
-    for (int64_t i = 0; i < rs1->count; i++)
+    for (QirArray::TItemCount i = 0; i < rs1->count; i++)
     {
         if (!quantum__rt__result_equal(results1[i], results2[i]))
         {

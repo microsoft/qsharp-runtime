@@ -26,10 +26,10 @@
   dereferenced in client's code.
 ==============================================================================*/
 class QUBIT;
-typedef QUBIT* Qubit;
+typedef QUBIT* Qubit;   // TODO: Replace with `typedef uint64_t QubitId`. Remove all the `GetQubitId()`, `QUBIT`.
 
 class RESULT;
-typedef RESULT* Result;
+typedef RESULT* Result; // TODO: Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64. Remove all the `RESULT`.
 
 enum ResultValue
 {
