@@ -6,6 +6,7 @@
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
 #include "tracer.hpp"
+#include "tracer-qis.hpp"
 
 namespace Microsoft
 {

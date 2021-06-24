@@ -112,11 +112,11 @@ QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount 
     }
 }
 
-QirArray::QirArray(const QirArray* other)
-    : count(other->count)
-    , itemSizeInBytes(other->itemSizeInBytes)
-    , dimensions(other->dimensions)
-    , dimensionSizes(other->dimensionSizes)
+QirArray::QirArray(const QirArray& other)
+    : count(other.count)
+    , itemSizeInBytes(other.itemSizeInBytes)
+    , dimensions(other.dimensions)
+    , dimensionSizes(other.dimensionSizes)
     , ownsQubits(false)
     , refCount(1)
 {
@@ -131,7 +131,7 @@ QirArray::QirArray(const QirArray* other)
     {
         this->buffer = new char[size];
         assert(size <= std::numeric_limits<size_t>::max());
-        memcpy(this->buffer, other->buffer, (size_t)size);
+        memcpy(this->buffer, other.buffer, (size_t)size);
     }
     else
     {
@@ -320,7 +320,7 @@ extern "C"
         }
         if (forceNewInstance || array->aliasCount > 0)
         {
-            return new QirArray(array);
+            return new QirArray(*array);
         }
         (void)array->AddRef();
         return array;
@@ -331,7 +331,7 @@ extern "C"
         assert(head != nullptr && tail != nullptr);
         assert(head->dimensions == 1 && tail->dimensions == 1);
 
-        QirArray* concatenated = new QirArray(head);
+        QirArray* concatenated = new QirArray(*head);
         concatenated->Append(tail);
         return concatenated;
     }

@@ -9,7 +9,6 @@
 #include <unordered_set>
 #include <cstdint>
 
-#include "QirUtils.hpp"
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
@@ -19,6 +18,10 @@
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
+
+// Identifiers exposed externally:
+extern "C" void __quantum__qis__k__body(Qubit q);                       // NOLINT
+extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q);    // NOLINT
 
 // Used by a couple test simulators. Catch's REQUIRE macro doesn't deal well with static class members so making it
 // into a global constant.
@@ -107,10 +110,9 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
-        UNUSED(numBases);
 
         const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
@@ -261,10 +263,9 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
-        UNUSED(numBases);
 
         const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
@@ -289,7 +290,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 };
-FunctorsTestSimulator* g_ctrqapi = nullptr;
+static FunctorsTestSimulator* g_ctrqapi = nullptr;
 static int g_cKCalls = 0;
 static int g_cKCallsControlled = 0;
 extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT

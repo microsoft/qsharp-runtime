@@ -13,6 +13,7 @@
 
 #include "capi.hpp"
 
+#include "FloatUtils.hpp"
 #include "QirTypes.hpp"         // TODO: Consider removing dependency on this file.
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
@@ -130,7 +131,7 @@ namespace Quantum
         {
             std::cout << "*********************" << std::endl;
             this->GetState([](size_t idx, double re, double im) {
-                if (re != 0 || im != 0)
+                if (!Close(re, 0.0) || !Close(im, 0.0))
                 {
                     std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
                 }
@@ -159,7 +160,7 @@ namespace Quantum
             qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
         }
-        ~CFullstateSimulator()
+        ~CFullstateSimulator() override
         {
             if (this->simulatorId != NULL_SIMULATORID)
             {
@@ -430,7 +431,7 @@ namespace Quantum
             {
                 std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
 
-                if (re != 0 || im != 0)
+                if (!Close(re, 0.0) || !Close(im, 0.0))
                 {
                     outStream << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
                 }

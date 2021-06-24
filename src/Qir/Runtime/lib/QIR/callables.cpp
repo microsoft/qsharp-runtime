@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "QirUtils.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
@@ -358,7 +357,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     // Copy the controls into the new array. This array doesn't own the qubits so must use the generic constructor.
     QirArray* combinedControls = new QirArray(cControls, qubitSize);
     char* dst = combinedControls->buffer;
-    const char* dstEnd = dst + qubitSize * cControls;
+    [[maybe_unused]] const char* dstEnd = dst + qubitSize * cControls;
     current = outer;
     QirTupleHeader* last = nullptr;
     for (int i = 0; i < depth; i++)
@@ -370,11 +369,10 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 
         QirArray* controls = current->controls;
 
-        assert((QirArray::TBufSize)qubitSize * controls->count < std::numeric_limits<QirArray::TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
         const QirArray::TBufSize blockSize = qubitSize * controls->count;
+        assert((blockSize >= qubitSize) && (blockSize >= controls->count)); // Make sure we don't overflow `TBufSize` on 32-bit arch.
         
         assert(dst + blockSize <= dstEnd); 
-        UNUSED(dstEnd);
         memcpy(dst, controls->buffer, blockSize);
         dst += blockSize;
         // in the last iteration the innerTuple isn't valid, but we are not going to use it
