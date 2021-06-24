@@ -15,9 +15,4 @@
     <ProjectReference Include="..\..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 
-  <Target Name="BeforeCSharpCompile">
-    <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
-    </ItemGroup>
-  </Target>
 </Project>

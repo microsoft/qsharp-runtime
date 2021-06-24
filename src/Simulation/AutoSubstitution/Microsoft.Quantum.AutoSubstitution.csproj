@@ -31,12 +31,6 @@
     <Compile Include="..\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
-  <Target Name="BeforeCSharpCompile">
-    <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
-    </ItemGroup>
-  </Target>
-
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
     <Content Include="Microsoft.Quantum.AutoSubstitution.props">
