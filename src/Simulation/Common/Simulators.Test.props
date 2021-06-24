@@ -12,6 +12,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <!-- Don't generate API docs for test cases. -->
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <IsPackable>false</IsPackable>

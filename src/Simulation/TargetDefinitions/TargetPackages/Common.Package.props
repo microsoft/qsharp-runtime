@@ -8,6 +8,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <QSharpDocsGeneration>true</QSharpDocsGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <QscVerbosity>detailed</QscVerbosity>
   </PropertyGroup>
 

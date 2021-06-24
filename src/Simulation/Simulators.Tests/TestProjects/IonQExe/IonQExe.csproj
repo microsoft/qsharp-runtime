@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <NoEntryPoint>true</NoEntryPoint>
     <ExecutionTarget>ionq.qpu</ExecutionTarget>
