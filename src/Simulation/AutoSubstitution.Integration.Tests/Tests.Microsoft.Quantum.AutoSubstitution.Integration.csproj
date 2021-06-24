@@ -31,7 +31,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
 
 </Project>

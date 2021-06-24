@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
   </ItemGroup>
 
 </Project>
