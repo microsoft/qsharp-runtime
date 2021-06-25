@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                   new QirFullStateDriverGenerator(),
                   logger)
         {
-            var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); //ToDo
             if (string.IsNullOrWhiteSpace(thisModulePath))
             {
                 throw new InvalidOperationException("Could not get a path for the current assembly location.");
