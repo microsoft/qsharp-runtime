@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
-using static Microsoft.Quantum.EntryPointDriver.Driver;
 using Microsoft.Quantum.EntryPointDriver.Mock;
 using Microsoft.Quantum.Runtime;
 using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
-using System;
-using System.Threading.Tasks;
+using static Microsoft.Quantum.EntryPointDriver.Driver;
 
 namespace Microsoft.Quantum.EntryPointDriver.Azure
 {
@@ -35,6 +35,11 @@ namespace Microsoft.Quantum.EntryPointDriver.Azure
             AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
         {
             Log(settings, settings.ToString());
+
+            if ((settings.Location is null) && (settings.BaseUri is null))
+            {
+                DisplayError($"Either --location or --base-uri must be provided.", null);
+            }
 
             if (!(qirSubmission is null) && QirSubmitter(settings) is { } qirSubmitter)
             {

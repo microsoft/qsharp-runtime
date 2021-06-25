@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static readonly ImmutableList<SubmitterInfo> QirSubmitters = ImmutableList.Create(
             new SubmitterInfo(
-                new Regex(@"^microsoft\.simulator$"),
+                new Regex(@"^microsoft\.simulator\.([\w]+\.)*[\w]+$"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirSubmitter"));
 
