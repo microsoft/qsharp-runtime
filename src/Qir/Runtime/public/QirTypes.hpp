@@ -47,7 +47,7 @@ struct QIR_SHARED_API QirArray
 
     ~QirArray();
 
-    char* GetItemPointer(TItemCount index);
+    char* GetItemPointer(TItemCount index) const;
     void Append(const QirArray* other);
 };
 

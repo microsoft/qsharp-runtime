@@ -341,7 +341,9 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
 
-    const QirArray::TItemSize qubitSize = sizeof(/*Qubit*/ void*);
+    const QirArray::TItemSize qubitSize = sizeof(/*Qubit*/ void *); // Compiler complains for `sizeof(Qubit)`: 
+        // warning: suspicious usage of 'sizeof(A*)'; pointer to aggregate [bugprone-sizeof-expression].
+        // To be fixed when the `Qubit` is made fixed-size type.
 
     TupleWithControls* outer = TupleWithControls::FromTupleHeader(tuple);
 

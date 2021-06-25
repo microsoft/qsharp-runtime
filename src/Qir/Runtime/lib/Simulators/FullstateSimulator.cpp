@@ -455,7 +455,7 @@ namespace Quantum
             {
                 outStream << "; ";
             }
-            outStream << (uintptr_t)(((void **)(qubits->buffer))[idx]);
+            outStream << (uintptr_t)((reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)))[idx]);
         }
         outStream << ':' << std::endl;
 
@@ -468,7 +468,7 @@ namespace Quantum
 
     bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits)
     {
-        std::vector<unsigned> ids = GetQubitIds((long)(qubits->count), (Qubit*)(qubits->buffer));
+        std::vector<unsigned> ids = GetQubitIds((long)(qubits->count), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)));
 
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));

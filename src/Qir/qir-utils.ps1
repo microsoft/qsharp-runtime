@@ -40,7 +40,7 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
-    $warningFlags = "-Werror"   #"-Weverything"   # Work in progress   # https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
+    $warningFlags = "-Werror"  # https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
 
     # -WCL4
     #     -Wall
@@ -84,6 +84,9 @@ function Build-CMakeProject {
     $warningFlags += " -Wnewline-eof"
     $warningFlags += " -Wfloat-equal"
     $warningFlags += " -Wmissing-prototypes"
+    $warningFlags += " -Wcast-align"
+
+    $warningFlags += " -Weverything"
 
     # Disable these warnings:
 
@@ -125,7 +128,7 @@ function Build-CMakeProject {
     $warningFlags += " -Wno-exit-time-destructors"
 
     # Temporarily disable "-Wextra-semi-stmt" that warns about redundant `;` in the end of `INFO(id);` of Catch tests framework (which looks fixed in the latest Catch version).
-    # Disable until the Catch header "src\Qir\Common\externals\catch2\catch.hpp" is updated (from https://github.com/catchorg/Catch2).
+    # Disable until the Catch header "src\Qir\Common\externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
     $warningFlags += " -Wno-extra-semi-stmt"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
 
 
