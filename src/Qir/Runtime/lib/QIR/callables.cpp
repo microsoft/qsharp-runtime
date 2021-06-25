@@ -12,6 +12,9 @@
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
 
+// Exposed to tests only:
+QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth);
+
 using namespace Microsoft::Quantum;
 
 /*==============================================================================

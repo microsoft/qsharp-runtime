@@ -83,7 +83,7 @@ function Build-CMakeProject {
     $warningFlags += " -Wswitch-enum"
     $warningFlags += " -Wnewline-eof"
     $warningFlags += " -Wfloat-equal"
-
+    $warningFlags += " -Wmissing-prototypes"
 
     # Disable these warnings:
 

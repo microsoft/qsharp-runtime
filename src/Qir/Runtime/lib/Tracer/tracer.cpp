@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "tracer.hpp"
+#include "TracerInternal.hpp"
 
 namespace Microsoft
 {
