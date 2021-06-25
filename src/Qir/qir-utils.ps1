@@ -71,6 +71,8 @@ function Build-CMakeProject {
     #   -Wc99-designator
     #       -Wc++20-designator
     $warningFlags += " -Wno-c99-extensions"
+    # We are OK that the structs are padded to align the fields.
+    $warningFlags += " -Wno-padded"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wpadded
 
 
     # Temporarily disable the following warnings (until QIR RT is refactored to expose C interface).
