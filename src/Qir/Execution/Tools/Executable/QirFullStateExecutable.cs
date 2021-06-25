@@ -35,6 +35,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                   logger)
         {
             var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); //ToDo
+
+            Console.WriteLine($"The root path for library and header directories is: {thisModulePath}");
+
             if (string.IsNullOrWhiteSpace(thisModulePath))
             {
                 throw new InvalidOperationException("Could not get a path for the current assembly location.");
