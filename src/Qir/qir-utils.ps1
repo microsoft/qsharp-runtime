@@ -40,53 +40,11 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
+    # Treat warnings as errors:
     $warningFlags = "-Werror"  # https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
-
-    # -WCL4
-    #     -Wall
-    #       -Wmisleading-indentation, 
-    #       -Wmost, 
-    #           -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
-    #           -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
-    #           -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
-    #           -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
-    #           -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
-    #           -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
-    #           -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
-    #           -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
-    #           -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
-    #       -Wparentheses, 
-    #       -Wswitch, 
-    #       -Wswitch-bool.
-    $warningFlags += " -Wall"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
-
-    # -WCL4
-    #     -Wextra
-    #       -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
-    #       -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
-    #       -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
-    #       -Wunused-parameter.
-    $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
-
-    # -Wconversion
-    #     -Wbitfield-enum-conversion, -Wbool-conversion, -Wconstant-conversion, -Wenum-conversion, 
-    #     -Wfloat-conversion, -Wimplicit-float-conversion, -Wimplicit-int-conversion, -Wint-conversion, 
-    #     -Wliteral-conversion, -Wnon-literal-null-conversion, -Wnull-conversion, -Wobjc-literal-conversion, 
-    #     -Wshorten-64-to-32, -Wsign-conversion, -Wstring-conversion
-    $warningFlags += " -Wconversion"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion
-
-    # -Wshadow-all
-    #   -Wshadow, -Wshadow-field, -Wshadow-field-in-constructor, -Wshadow-uncaptured-local.
-    $warningFlags += " -Wshadow-all"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wshadow-all
-
-    $warningFlags += " -Wzero-as-null-pointer-constant"
-    $warningFlags += " -Wswitch-enum"
-    $warningFlags += " -Wnewline-eof"
-    $warningFlags += " -Wfloat-equal"
-    $warningFlags += " -Wmissing-prototypes"
-    $warningFlags += " -Wcast-align"
-
-    $warningFlags += " -Weverything"
+    # Enable all warnings:
+    $warningFlags += " -Weverything"    # https://clang.llvm.org/docs/UsersManual.html#enabling-all-diagnostics
+                                        # https://clang.llvm.org/docs/DiagnosticsReference.html
 
     # Disable these warnings:
 
