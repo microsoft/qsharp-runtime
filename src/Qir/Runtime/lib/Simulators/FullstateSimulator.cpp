@@ -11,7 +11,12 @@
 #include <fstream>
 #include <climits>
 
-#include "capi.hpp"
+#pragma clang diagnostic push
+    // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
+    #pragma clang diagnostic ignored "-Wreserved-id-macro"
+    #include "capi.hpp"
+#pragma clang diagnostic pop
+
 
 #include "FloatUtils.hpp"
 #include "QirTypes.hpp"         // TODO: Consider removing dependency on this file.
@@ -33,7 +38,7 @@ namespace
 {
 #ifdef _WIN32
 const char* FULLSTATESIMULATORLIB = "Microsoft.Quantum.Simulator.Runtime.dll";
-#elif __APPLE__
+#elif defined __APPLE__
 const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
 #else
 const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
