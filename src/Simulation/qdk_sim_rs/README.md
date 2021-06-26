@@ -17,7 +17,7 @@
 
 > ## **ⓘ** TIP
 >
-> This crate provides low-level APIs for interacting with experimental simulators. If you're interested in using the experimental simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/tree/feature/experimental/opensim/documentation/experimental-simulators.md>.
+> This crate provides low-level APIs for interacting with experimental simulators. If you're interested in using the experimental simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/blob/main/documentation/preview-simulators.md>.
 
 This crate implements simulation functionality for the Quantum Development Kit, including:
 
