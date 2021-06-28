@@ -40,40 +40,59 @@ function Build-CMakeProject {
 
     $clangTidy = ""
 
-    $warningFlags = "-Werror"   #"-Weverything"   # Work in progress
+    # Treat warnings as errors:
+    $warningFlags = "-Werror"  # https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
+    # Enable all warnings:
+    $warningFlags += " -Weverything"    # https://clang.llvm.org/docs/UsersManual.html#enabling-all-diagnostics
+                                        # https://clang.llvm.org/docs/DiagnosticsReference.html
 
-    # -WCL4
-    #     -Wall
-    #       -Wmisleading-indentation, 
-    #       -Wmost, 
-    #           -Wcast-of-sel-type,         -Winfinite-recursion,            -Woverloaded-virtual,       -Wstring-plus-int,      
-    #           -Wchar-subscripts,          -Wint-in-bool-context,           -Wprivate-extern,           -Wtautological-compare, 
-    #           -Wcomment,                  -Wmismatched-tags,               -Wrange-loop-construct,     -Wtrigraphs,            
-    #           -Wdelete-non-virtual-dtor,  -Wmissing-braces,                -Wreorder,                  -Wuninitialized,        
-    #           -Wextern-c-compat,          -Wmove,                          -Wreturn-type,              -Wunknown-pragmas,      
-    #           -Wfor-loop-analysis,        -Wmultichar,                     -Wself-assign,              -Wunused,               
-    #           -Wformat,                   -Wobjc-designated-initializers,  -Wself-move,                -Wuser-defined-warnings,
-    #           -Wframe-address,            -Wobjc-flexible-array,           -Wsizeof-array-argument,    -Wvolatile-register-var.
-    #           -Wimplicit,                 -Wobjc-missing-super-calls,      -Wsizeof-array-decay,       
-    #       -Wparentheses, 
-    #       -Wswitch, 
-    #       -Wswitch-bool.
-    $warningFlags += " -Wall"       # https://clang.llvm.org/docs/DiagnosticsReference.html#wall
+    # Disable these warnings:
 
-    # -WCL4
-    #     -Wextra
-    #       -Wdeprecated-copy, -Wempty-init-stmt, -Wfuse-ld-path, -Wignored-qualifiers, -Winitializer-overrides, 
-    #       -Wmissing-field-initializers, -Wmissing-method-return-type, -Wnull-pointer-arithmetic, 
-    #       -Wsemicolon-before-method-body, -Wsign-compare, -Wstring-concatenation, -Wunused-but-set-parameter, 
-    #       -Wunused-parameter.
-    $warningFlags += " -Wextra"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra
+    # We don't care about keeping compatibility with C++98/03, C++11, C++14. Any new features unknown to our compiler version will be reported as errors.
+    # -Wc++98-compat-pedantic
+    #   -Wc++98-compat, 
+    #       -Wc++98-compat-local-type-template-args, -Wc++98-compat-unnamed-type-template-args, -Wpre-c++14-compat, 
+    #       -Wpre-c++17-compat, -Wpre-c++20-compat, -Wpre-c++2b-compat.
+    #   -Wc++98-compat-bind-to-temporary-copy, -Wc++98-compat-extra-semi, 
+    #   -Wpre-c++14-compat-pedantic, 
+    #       -Wc++98-c++11-compat-binary-literal, -Wpre-c++14-compat.
+    #   -Wpre-c++17-compat-pedantic, 
+    #       -Wpre-c++17-compat.
+    #   -Wpre-c++20-compat-pedantic, 
+    #       -Wpre-c++20-compat.
+    #   -Wpre-c++2b-compat-pedantic (= -Wpre-c++2b-compat).
+    $warningFlags += " -Wno-c++98-compat-pedantic"   # https://clang.llvm.org/docs/DiagnosticsReference.html#wc-98-compat-pedantic
+    # Old-style casts increase readability as opposed to `reinterpret_cast<..>()`. We want to be able to use the old-style casts.
+    $warningFlags += " -Wno-old-style-cast"
+    # Even if the `switch` covers all the enumerators, it is still good to have `default` label to cover the potential newly added (but not handled) enumerators.
+    $warningFlags += " -Wno-covered-switch-default"
+    # We are OK using C99 features.
+    # -Wc99-extension
+    #   -Wc99-designator
+    #       -Wc++20-designator
+    $warningFlags += " -Wno-c99-extensions"
+    # We are OK that the structs are padded to align the fields.
+    $warningFlags += " -Wno-padded"     # https://clang.llvm.org/docs/DiagnosticsReference.html#wpadded
+    # We are OK with abstract classes.
+    $warningFlags += " -Wno-weak-vtables"
 
-    # -Wconversion
-    #     -Wbitfield-enum-conversion, -Wbool-conversion, -Wconstant-conversion, -Wenum-conversion, 
-    #     -Wfloat-conversion, -Wimplicit-float-conversion, -Wimplicit-int-conversion, -Wint-conversion, 
-    #     -Wliteral-conversion, -Wnon-literal-null-conversion, -Wnull-conversion, -Wobjc-literal-conversion, 
-    #     -Wshorten-64-to-32, -Wsign-conversion, -Wstring-conversion
-    $warningFlags += " -Wconversion"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wconversion
+
+    # Temporarily disable the following warnings (until QIR RT is refactored to expose C interface).
+
+    # Looks like the `-Wglobal-constructors` warns that the instance of the `__dllexport` class/struct (or a static member var of such class/struct) 
+    # needs to be constructible by calling a global `__dllexport` function (to guarantee that a single instance is created and the same instance is used 
+    # both inside and outside of the binary (dynamic library or executable)).
+    # Or it warns about the constructor that is invoked for a global (or static member) variable _before_ the `main()` is invoked, thus slowing down the start,
+    # see https://stackoverflow.com/a/15708829/6362941
+    $warningFlags += " -Wno-global-constructors"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wglobal-constructors
+    # Looks like the `-Wexit-time-destructors` warns that the destructor of a global or static member variable will be invoked
+    # _after_ the `main()` returns (thus slowing down the termination/restart).
+    $warningFlags += " -Wno-exit-time-destructors"
+
+    # Temporarily disable "-Wextra-semi-stmt" that warns about redundant `;` in the end of `INFO(id);` of Catch tests framework (which looks fixed in the latest Catch version).
+    # Disable until the Catch header "src\Qir\Common\externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
+    $warningFlags += " -Wno-extra-semi-stmt"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
+
 
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
