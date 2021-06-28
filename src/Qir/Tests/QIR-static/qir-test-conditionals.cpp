@@ -27,7 +27,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     vector<int> otherCallbacks;
 
     vector<ResultValue> mockMeasurements;
-    int nextMeasureResult = 0;
+    size_t nextMeasureResult = 0;
 
     explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
         : mockMeasurements(results)
@@ -61,14 +61,14 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         return nullptr;
     }
-    void ReleaseQubit(Qubit qubit) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override {}
 
     void X(Qubit) override
     {
         this->xCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
-    void ControlledX(long numControls, Qubit controls[], Qubit qubit) override
+    void ControlledX(long /* numControls */, Qubit* /* controls */, Qubit /* qubit */) override
     {
         this->cxCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
@@ -78,13 +78,13 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->otherCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
-    void ControlledY(long numControls, Qubit controls[], Qubit qubit) override
+    void ControlledY(long /* numControls */, Qubit* /* controls */, Qubit /* qubit */) override
     {
         this->otherCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
 
-    Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
+    Result Measure(long /* numBases */, PauliId* /* bases */, long /* numTargets */, Qubit* /* targets */) override
     {
         assert(
             this->nextMeasureResult < this->mockMeasurements.size() &&
@@ -101,7 +101,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result result) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {

@@ -33,9 +33,9 @@ namespace Quantum
         // Optional id, if the layer represents a global barrier.
         OpId barrierId = -1;
 
-        Layer(Time startTime, Duration duration)
-            : startTime(startTime)
-            , duration(duration)
+        Layer(Time startTm, Duration dur)
+            : startTime(startTm)
+            , duration(dur)
         {
         }
     };
@@ -129,14 +129,14 @@ namespace Quantum
         // Returns the later layer of the two. INVALID LayerId is treated as -Infinity, and REQUESTNEW -- as +Infinity.
         static LayerId LaterLayerOf(LayerId l1, LayerId l2);
 
-        explicit CTracer(int preferredLayerDuration)
-            : preferredLayerDuration(preferredLayerDuration)
+        explicit CTracer(int preferredLayerDur)
+            : preferredLayerDuration(preferredLayerDur)
         {
         }
 
-        CTracer(int preferredLayerDuration, const std::unordered_map<OpId, std::string>& opNames)
-            : preferredLayerDuration(preferredLayerDuration)
-            , opNames(opNames)
+        CTracer(int preferredLayerDur, const std::unordered_map<OpId, std::string>& operNames)
+            : preferredLayerDuration(preferredLayerDur)
+            , opNames(operNames)
         {
         }
 
@@ -148,11 +148,11 @@ namespace Quantum
         std::string QubitToString(Qubit qubit) override;
         void ReleaseResult(Result result) override;
 
-        bool AreEqualResults(Result r1, Result r2) override
+        bool AreEqualResults(Result /*r1*/, Result /*r2*/) override
         {
             throw std::logic_error("Cannot compare results while tracing!");
         }
-        ResultValue GetResultValue(Result result) override
+        ResultValue GetResultValue(Result /*result*/) override
         {
             throw std::logic_error("Result values aren't available while tracing!");
         }

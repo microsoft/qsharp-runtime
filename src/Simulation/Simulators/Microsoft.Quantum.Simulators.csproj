@@ -9,7 +9,6 @@
     <Nullable>enable</Nullable>
     <TargetFramework>netstandard2.1</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
@@ -18,10 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
     <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
     <ProjectReference Include="..\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="4.7.2" />
+    <PackageReference Include="NumSharp" Version="0.20.5" />
   </ItemGroup>
 
   <ItemGroup>
