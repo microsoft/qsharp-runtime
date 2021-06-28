@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Targeting;
 
     /// # Summary
     /// Applies the π/8 gate to a single qubit. Note that the Controlled functor is
@@ -19,6 +20,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @TargetInstruction("t")
     internal operation ApplyUncontrolledT (qubit : Qubit) : Unit is Adj {
         body intrinsic;
     }
