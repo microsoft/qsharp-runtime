@@ -32,7 +32,7 @@ namespace
 const char* FULLSTATESIMULATORLIB = "Microsoft.Quantum.Simulator.Runtime.dll";
 #if defined(__APPLE__)
 const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
-#else
+#elif !defined(_WIN32)
 const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
 #endif
 
