@@ -1,10 +1,10 @@
-# Using Experimental Simulators from Python
+# Using Preview Simulators from Python
 
 This module exposes the various data structures from this crate as Python objects, useful for embedding in Python programs.
 
 Note that this module contains Python-specific functionality, and cannot be used directly from Rust.
 
-> **ⓘ NOTE**: The Python API for this crate allows direct and low-level access to simulation data structures. This is distinct from using Python to run Q# programs on the experimental simulators implemented by this library. For details on how to use Python and Q# together with experimental simulators, please see documentation on the <https://github.com/microsoft/iqsharp> repository.
+> **ⓘ NOTE**: The Python API for this crate allows direct and low-level access to simulation data structures. This is distinct from using Python to run Q# programs on the preview simulators implemented by this library. For details on how to use Python and Q# together with preview simulators, please see documentation on the <https://github.com/microsoft/iqsharp> repository.
 
 ## Building the Python API
 

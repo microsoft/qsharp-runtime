@@ -8,10 +8,12 @@
 #include <stdexcept>
 #include <vector>
 
-#include "QirUtils.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
+
+// Exposed to tests only:
+QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth);
 
 using namespace Microsoft::Quantum;
 
@@ -20,10 +22,10 @@ using namespace Microsoft::Quantum;
 ==============================================================================*/
 extern "C"
 {
-    PTuple quantum__rt__tuple_create(int64_t size)
+    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use unsigned integer type (breaking change).
     {
-        assert(size >= 0 && size < std::numeric_limits<int>::max());
-        return QirTupleHeader::Create(static_cast<int>(size))->AsTuple();
+        assert((uint64_t)size < std::numeric_limits<QirTupleHeader::TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 64-bit arch.
+        return QirTupleHeader::Create(static_cast<QirTupleHeader::TBufSize>(size))->AsTuple();
     }
 
     void quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
@@ -191,9 +193,8 @@ int QirTupleHeader::Release()
     return retVal;
 }
 
-QirTupleHeader* QirTupleHeader::Create(int size)
+QirTupleHeader* QirTupleHeader::Create(TBufSize size)
 {
-    assert(size >= 0);
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
@@ -212,7 +213,7 @@ QirTupleHeader* QirTupleHeader::Create(int size)
 
 QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
 {
-    const int size = other->tupleSize;
+    const TBufSize size = other->tupleSize;
     char* buffer = new char[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
@@ -240,9 +241,9 @@ QirCallable::~QirCallable()
     assert(refCount == 0);
 }
 
-QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* callbacks, PTuple capture)
+QirCallable::QirCallable(const t_CallableEntry* ftEntries, const t_CaptureCallback* callbacks, PTuple capt)
     : refCount(1)
-    , capture(capture)
+    , capture(capt)
     , appliedFunctor(0)
     , controlledDepth(0)
 {
@@ -340,12 +341,14 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 {
     assert(depth > 1); // no need to unpack at depth 1, and should avoid allocating unnecessary tuples
 
-    const size_t qubitSize = sizeof(/*Qubit*/ void*);
+    const QirArray::TItemSize qubitSize = sizeof(/*Qubit*/ void *); // Compiler complains for `sizeof(Qubit)`: 
+        // warning: suspicious usage of 'sizeof(A*)'; pointer to aggregate [bugprone-sizeof-expression].
+        // To be fixed when the `Qubit` is made fixed-size type.
 
     TupleWithControls* outer = TupleWithControls::FromTupleHeader(tuple);
 
     // Discover, how many controls there are in total so can allocate a correctly sized array for them.
-    int cControls = 0;
+    QirArray::TItemCount cControls = 0;
     TupleWithControls* current = outer;
     for (int i = 0; i < depth; i++)
     {
@@ -359,7 +362,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     // Copy the controls into the new array. This array doesn't own the qubits so must use the generic constructor.
     QirArray* combinedControls = new QirArray(cControls, qubitSize);
     char* dst = combinedControls->buffer;
-    const char* dstEnd = dst + qubitSize * cControls;
+    [[maybe_unused]] const char* dstEnd = dst + qubitSize * cControls;
     current = outer;
     QirTupleHeader* last = nullptr;
     for (int i = 0; i < depth; i++)
@@ -370,9 +373,11 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
         }
 
         QirArray* controls = current->controls;
-        const size_t blockSize = qubitSize * controls->count;
+
+        const QirArray::TBufSize blockSize = qubitSize * controls->count;
+        assert((blockSize >= qubitSize) && (blockSize >= controls->count)); // Make sure we don't overflow `TBufSize` on 32-bit arch.
+        
         assert(dst + blockSize <= dstEnd); 
-        UNUSED(dstEnd);
         memcpy(dst, controls->buffer, blockSize);
         dst += blockSize;
         // in the last iteration the innerTuple isn't valid, but we are not going to use it

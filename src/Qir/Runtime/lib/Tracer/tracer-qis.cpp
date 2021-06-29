@@ -6,14 +6,9 @@
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
 #include "tracer.hpp"
+#include "tracer-qis.hpp"
+#include "TracerInternal.hpp"
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::shared_ptr<CTracer> tracer;
-}
-} // namespace Microsoft
 
 using namespace Microsoft::Quantum;
 extern "C"
@@ -35,17 +30,17 @@ extern "C"
     }
     void quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, Qubit target) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), 1, &target);
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), 1, &target);
     }
     void quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
         (void)tracer->TraceMultiQubitOp(
-            id, duration, 0, nullptr, targets->count, reinterpret_cast<Qubit*>(targets->buffer));
+            id, duration, 0, nullptr, (long)(targets->count), reinterpret_cast<Qubit*>(targets->buffer));
     }
     void quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
         (void)tracer->TraceMultiQubitOp(
-            id, duration, ctls->count, reinterpret_cast<Qubit*>(ctls->buffer), targets->count,
+            id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), (long)(targets->count),
             reinterpret_cast<Qubit*>(targets->buffer));
     }
 
@@ -61,7 +56,7 @@ extern "C"
 
     RESULT* quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
     {
-        return tracer->TraceMultiQubitMeasurement(id, duration, qs->count, reinterpret_cast<Qubit*>(qs->buffer));
+        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count), reinterpret_cast<Qubit*>(qs->buffer));
     }
 
     void quantum__qis__apply_conditionally( // NOLINT
@@ -71,7 +66,7 @@ extern "C"
         QirCallable* clbOnSomeDifferent)
     {
         CTracer::FenceScope sf(
-            tracer.get(), rs1->count, reinterpret_cast<Result*>(rs1->buffer), rs2->count,
+            tracer.get(), (long)(rs1->count), reinterpret_cast<Result*>(rs1->buffer), (long)(rs2->count),
             reinterpret_cast<Result*>(rs2->buffer));
 
         clbOnAllEqual->Invoke();

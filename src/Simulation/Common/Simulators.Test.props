@@ -12,7 +12,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <!-- Don't generate API docs for test cases. -->
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <IsPackable>false</IsPackable>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)src\Xunit\Microsoft.Quantum.Xunit.csproj" />
   </ItemGroup>
 

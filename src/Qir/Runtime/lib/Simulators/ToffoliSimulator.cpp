@@ -4,8 +4,8 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <cstdint>
 
-#include "QirUtils.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
@@ -20,7 +20,8 @@ namespace Quantum
     ==============================================================================*/
     class CToffoliSimulator final : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
     {
-        long lastUsedId = -1;
+        using QubitId = uint64_t;
+        QubitId nextQubitId = 0;
 
         // State of a qubit is represented by a bit in states indexed by qubit's id,
         // bits 0 and 1 correspond to |0> and |1> states respectively.
@@ -31,14 +32,14 @@ namespace Quantum
         Result zero = reinterpret_cast<Result>(0xface0000);
         Result one = reinterpret_cast<Result>(0xface1000);
 
-        static long GetQubitId(Qubit qubit)
+        static uint64_t GetQubitId(Qubit qubit)
         {
-            return static_cast<long>(reinterpret_cast<int64_t>(qubit));
+            return (uint64_t)qubit;
         }
 
       public:
         CToffoliSimulator() = default;
-        ~CToffoliSimulator() = default;
+        ~CToffoliSimulator() override = default;
 
         ///
         /// Implementation of IRuntimeDriver
@@ -66,24 +67,25 @@ namespace Quantum
 
         Qubit AllocateQubit() override
         {
-            this->lastUsedId++;
+            Qubit retVal = (Qubit)(uintptr_t)(this->nextQubitId);
+            ++(this->nextQubitId);
+            assert(this->nextQubitId < std::numeric_limits<QubitId>::max());    // Check aginast the risk of overflow.
             this->states.emplace_back(false);
-            return reinterpret_cast<Qubit>(this->lastUsedId);
+            return retVal;
         }
 
         void ReleaseQubit(Qubit qubit) override
         {
-            const long id = GetQubitId(qubit);
-            assert(id <= this->lastUsedId);
+            [[maybe_unused]] const uint64_t id = GetQubitId(qubit);
+            assert((id + 1) == this->nextQubitId);
             assert(!this->states.at(id));
-            UNUSED(id);
-            this->lastUsedId--;
+            --(this->nextQubitId);
             this->states.pop_back();
         }
 
         std::string QubitToString(Qubit qubit) override
         {
-            const long id = GetQubitId(qubit);
+            const uint64_t id = GetQubitId(qubit);
             return std::to_string(id) + ":" + (this->states.at(id) ? "1" : "0");
         }
 

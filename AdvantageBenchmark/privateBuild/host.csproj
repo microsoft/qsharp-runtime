@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Simulation\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\..\src\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 

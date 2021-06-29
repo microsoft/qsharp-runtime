@@ -7,6 +7,7 @@
 #include "catch.hpp"
 
 #include "qsharp__foundation_internal.hpp"
+#include "FloatUtils.hpp"
 
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop();                                   // NOLINT
@@ -21,7 +22,7 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop();
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop();                         // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(int64_t min, int64_t max); // NOLINT
+extern "C"  int64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(int64_t min, int64_t max); // NOLINT
 extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(double min, double max);  // NOLINT
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
@@ -95,10 +96,10 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     size_t times = 1000;
     while(--times)
     {
-        const uint64_t qsRndNum = 
+        const int64_t qsRndNum = 
             Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(std::numeric_limits<int64_t>::min(),
                                                                             std::numeric_limits<int64_t>::max());
-        const uint64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomI64();  // This call must be done 
+        const int64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomI64();  // This call must be done 
             // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
         REQUIRE(qsRndNum == cppRndNum);
     }
@@ -117,7 +118,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
 
     // Test equal minimum and maximum:
-    for(uint64_t num: { -5, 0, 3 } )
+    for(int64_t num: { -5, 0, 3 } )
     {
         REQUIRE(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(num, num) == num);
     }
@@ -220,7 +221,7 @@ TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
                                                                                std::numeric_limits<double>::max());
         const double cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomDouble();  // This call must be done 
             // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
-        REQUIRE(qsRndNum == cppRndNum);
+        REQUIRE(Close(qsRndNum, cppRndNum));
     }
 
     // Make sure the correct exception is thrown if min > max:

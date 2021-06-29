@@ -569,6 +569,7 @@ let ``Submit uses default values`` () =
                Base URI:
                Location: myLocation
                Credential: Default
+               AadToken:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -591,6 +592,7 @@ let ``Submit uses default values with default target`` () =
                Base URI:
                Location: myLocation
                Credential: Default
+               AadToken:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -625,6 +627,7 @@ let ``Submit allows overriding default values`` () =
                Base URI:
                Location: myLocation
                Credential: CLI
+               AadToken: myTok
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -663,6 +666,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Base URI: https://westus.quantum.microsoft.com/
                 Location: westus
                 Credential: VisualStudio
+                AadToken: myTok
                 Job Name: myJobName
                 Shots: 750
                 Output: FriendlyUri
@@ -697,6 +701,7 @@ let ``Submit allows overriding default values with default target`` () =
                Base URI:
                Location: myLocation
                Credential: Interactive
+               AadToken: myTok
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -734,6 +739,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Base URI: http://mybaseuri.foo.com/
                Location: mybaseuri
                Credential: Default
+               AadToken:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -758,6 +764,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Base URI:
                Location: myLocation
                Credential: Default
+               AadToken:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -786,6 +793,7 @@ let ``Submit allows spaces for the --location option`` () =
                Base URI:
                Location: My Location
                Credential: Default
+               AadToken:
                Job Name:
                Shots: 500
                Output: FriendlyUri

@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "tracer.hpp"
+#include "TracerInternal.hpp"
 
 namespace Microsoft
 {
@@ -93,7 +94,7 @@ namespace Quantum
         this->metricsByLayer.emplace_back(
             Layer{layerStartTime, std::max(this->preferredLayerDuration, minRequiredDuration)});
 
-        return this->metricsByLayer.size() - 1;
+        return (LayerId)(this->metricsByLayer.size() - 1);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -124,7 +125,7 @@ namespace Quantum
         if (candidate != REQUESTNEW)
         {
             // Find the earliest layer that the operation fits in by duration
-            const Layer& candidateLayer = this->metricsByLayer[candidate];
+            const Layer& candidateLayer = this->metricsByLayer[(size_t)candidate];
             const Time lastUsedTime = std::max(qstate.lastUsedTime, candidateLayer.startTime);
             if (lastUsedTime + opDuration <= candidateLayer.startTime + candidateLayer.duration)
             {
@@ -134,7 +135,7 @@ namespace Quantum
             {
                 for (candidate += 1; (size_t)candidate < this->metricsByLayer.size(); ++candidate)
                 {
-                    if (opDuration <= this->metricsByLayer[candidate].duration)
+                    if (opDuration <= this->metricsByLayer[(size_t)candidate].duration)
                     {
                         layerToInsertInto = candidate;
                         break;
@@ -152,9 +153,9 @@ namespace Quantum
     void CTracer::AddOperationToLayer(OpId id, LayerId layer)
     {
         assert((size_t)layer < this->metricsByLayer.size());
-        assert(this->metricsByLayer[layer].barrierId == -1 && "Should not add operations to barriers");
+        assert(this->metricsByLayer[(size_t)layer].barrierId == -1 && "Should not add operations to barriers");
 
-        this->metricsByLayer[layer].operations[id] += 1;
+        this->metricsByLayer[(size_t)layer].operations[id] += 1;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -170,7 +171,7 @@ namespace Quantum
 
         // Update the qubit state.
         qstate.layer = layer;
-        const Time layerStart = this->metricsByLayer[layer].startTime;
+        const Time layerStart = this->metricsByLayer[(size_t)layer].startTime;
         qstate.lastUsedTime = std::max(layerStart, qstate.lastUsedTime) + opDuration;
         qstate.pendingZeroDurationOps.clear();
     }
@@ -266,7 +267,7 @@ namespace Quantum
     LayerId CTracer::InjectGlobalBarrier(OpId id, Duration duration)
     {
         LayerId layer = this->CreateNewLayer(duration);
-        this->metricsByLayer[layer].barrierId = id;
+        this->metricsByLayer[(size_t)layer].barrierId = id;
         this->globalBarrier = layer;
         return layer;
     }
@@ -306,8 +307,8 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::FenceScope
     //------------------------------------------------------------------------------------------------------------------
-    CTracer::FenceScope::FenceScope(CTracer* tracer, long count1, Result* rs1, long count2, Result* rs2)
-        : tracer(tracer)
+    CTracer::FenceScope::FenceScope(CTracer* trc, long count1, Result* rs1, long count2, Result* rs2)
+        : tracer(trc)
     {
         const LayerId fence1 =
             (rs1 != nullptr && count1 > 0) ? this->tracer->FindLatestMeasurementLayer(count1, rs1) : INVALID;

@@ -11,6 +11,10 @@
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
 
+// Exposed to tests only:
+std::unordered_map<std::string, QirString*>& AllocatedStrings();
+
+
 std::unordered_map<std::string, QirString*>& AllocatedStrings()     // Cannot be static, is called by tests. 
 {
     static std::unordered_map<std::string, QirString*> allocatedStrings;
@@ -35,8 +39,8 @@ static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
     return qstr;
 }
 
-QirString::QirString(std::string&& str)
-    : str(std::move(str))
+QirString::QirString(std::string&& otherStr)
+    : str(std::move(otherStr))
 {
 }
 
@@ -168,7 +172,7 @@ extern "C"
 
     uint32_t quantum__rt__string_get_length(QirString* str)  // NOLINT
     {
-        return str->str.size();
+        return (uint32_t)(str->str.size());
     }
 
     // Implemented in delegated.cpp:

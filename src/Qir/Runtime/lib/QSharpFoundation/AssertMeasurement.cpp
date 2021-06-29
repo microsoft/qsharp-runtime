@@ -36,13 +36,13 @@ extern "C"
 
         // Convert paulis from sequence of bytes to sequence of PauliId:
         std::vector<PauliId> paulis(bases->count);
-        for(int64_t i = 0; i < bases->count; ++i)
+        for(QirArray::TItemCount i = 0; i < bases->count; ++i)
         {
-            paulis[i] = (PauliId)(bases->buffer[i]);
+            paulis[i] = (PauliId)*(bases->GetItemPointer(i));
         }
 
         if(!GetDiagnostics()->AssertProbability(
-            (long)qubits->count, paulis.data(), (Qubit*)(qubits->buffer), prob, tol, nullptr))
+            (long)qubits->count, paulis.data(), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol, nullptr))
         {
             quantum__rt__fail(msg);
         }
