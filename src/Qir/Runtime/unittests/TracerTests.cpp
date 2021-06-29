@@ -329,7 +329,7 @@ TEST_CASE("Conditionals: nested fence is later than parent", "[tracer][tracer.co
         CTracer::FenceScope fs(tr.get(), 1, &r1, 0, nullptr);
         CHECK(2 == tr->TraceSingleQubitOp(1, 1, q3));
         {
-            CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &r2);
+            CTracer::FenceScope fs2(tr.get(), 0, nullptr, 1, &r2);
             CHECK(3 == tr->TraceSingleQubitOp(1, 1, q4));
         }
         CHECK(2 == tr->TraceSingleQubitOp(1, 1, q5));
@@ -360,7 +360,7 @@ TEST_CASE("Conditionals: nested fence is earlier than parent", "[tracer][tracer.
         CTracer::FenceScope fs(tr.get(), 1, &r2, 0, nullptr);
         CHECK(3 == tr->TraceSingleQubitOp(1, 1, q3));
         {
-            CTracer::FenceScope fs(tr.get(), 0, nullptr, 1, &r1);
+            CTracer::FenceScope fs2(tr.get(), 0, nullptr, 1, &r1);
             CHECK(3 == tr->TraceSingleQubitOp(1, 1, q4));
         }
         CHECK(3 == tr->TraceSingleQubitOp(1, 1, q5));

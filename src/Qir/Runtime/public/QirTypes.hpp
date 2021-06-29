@@ -17,7 +17,7 @@ struct QIR_SHARED_API QirArray
 {
     using TItemCount    = uint32_t;     // Data type of number of items (potentially can be increased to `uint64_t`).
     using TItemSize     = uint32_t;     // Data type of item size.
-    using TBufSize      = size_t;       // Size of the buffer pointed to by `buffer`. 
+    using TBufSize      = size_t;       // Size of the buffer pointed to by `buffer` (32 bit on 32-bit arch, 64 bit on 64-bit arch). 
     using TDimCount     = uint8_t;      // Data type for number of dimensions (3 for 3D array).
     using TDimContainer = std::vector<TItemCount>;  // Data type for container of dimensions (for array 2x3x5 3 items: 2, 3, 5).
 
@@ -43,11 +43,11 @@ struct QIR_SHARED_API QirArray
 
     QirArray(TItemCount cQubits);
     QirArray(TItemCount cItems, TItemSize itemSizeInBytes, TDimCount dimCount = 1, TDimContainer&& dimSizes = {});
-    QirArray(const QirArray* other);
+    QirArray(const QirArray& other);
 
     ~QirArray();
 
-    char* GetItemPointer(TItemCount index);
+    char* GetItemPointer(TItemCount index) const;
     void Append(const QirArray* other);
 };
 

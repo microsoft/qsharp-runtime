@@ -30,9 +30,9 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         return static_cast<int>(reinterpret_cast<int64_t>(r));
     }
 
-    ResultsReferenceCountingTestQAPI(int maxResults)
-        : maxResults(maxResults),
-        allocated((size_t)maxResults, false)
+    ResultsReferenceCountingTestQAPI(int maxRes)
+        : maxResults(maxRes),
+        allocated((size_t)maxRes, false)
     {
     }
 
@@ -40,7 +40,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
-        this->allocated.at((size_t)(this->lastId)) = true;;
+        this->allocated.at((size_t)(this->lastId)) = true;
         return reinterpret_cast<Result>(this->lastId);
     }
     Result UseZero() override
@@ -680,9 +680,9 @@ struct QubitTestQAPI : public SimulatorStub
         return (uint64_t)q;
     }
 
-    QubitTestQAPI(int maxQubits)
-        : maxQubits(maxQubits),
-        allocated((size_t)maxQubits, false)
+    QubitTestQAPI(int maxQbits)
+        : maxQubits(maxQbits),
+        allocated((size_t)maxQbits, false)
     {
     }
 
@@ -752,11 +752,9 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     QirArray* copy = quantum__rt__array_copy(qs, true /*force*/);
     REQUIRE(!copy->ownsQubits);
 
-    quantum__rt__qubit_release_array(qs);
+    quantum__rt__qubit_release_array(qs);   // The `qs` is a dangling pointer from now on.
     REQUIRE(!qapi->HaveQubitsInFlight());
 
-    // both arrays now contain dangling pointers to qubits, but we still must release them
-    quantum__rt__array_update_reference_count(qs, -1);
     quantum__rt__array_update_reference_count(copy, -1);
 }
 
@@ -809,10 +807,8 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     quantum__rt__tuple_update_reference_count(inner, -1);
 
     // release the original resources
-    quantum__rt__qubit_release_array(controlsOuter);
-    quantum__rt__array_update_reference_count(controlsOuter, -1);
-    quantum__rt__qubit_release_array(controlsInner);
-    quantum__rt__array_update_reference_count(controlsInner, -1);
+    quantum__rt__qubit_release_array(controlsOuter);    // The `controlsOuter` is a dangling pointer from now on.
+    quantum__rt__qubit_release_array(controlsInner);    // The `controlsInner` is a dangling pointer from now on.
     quantum__rt__qubit_release(target);
 }
 
@@ -856,10 +852,8 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     quantum__rt__tuple_update_reference_count(args, -1);
 
     // release the original resources
-    quantum__rt__qubit_release_array(controlsOuter);
-    quantum__rt__array_update_reference_count(controlsOuter, -1);
-    quantum__rt__qubit_release_array(controlsInner);
-    quantum__rt__array_update_reference_count(controlsInner, -1);
+    quantum__rt__qubit_release_array(controlsOuter);    // The `controlsOuter` is a dangling pointer from now on.
+    quantum__rt__qubit_release_array(controlsInner);    // The `controlsInner` is a dangling pointer from now on.
     quantum__rt__qubit_release(target);
 }
 
@@ -1036,8 +1030,7 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
     quantum__qis__r__ctl(ctrls, PauliId_X, angle, target);
     quantum__qis__r__ctladj(ctrls, PauliId_X, angle, target);
 
-    quantum__rt__qubit_release_array(ctrls);
-    quantum__rt__array_update_reference_count(ctrls, -1);
+    quantum__rt__qubit_release_array(ctrls);        // The `ctrls` is a dangling pointer from now on.
     quantum__rt__qubit_release(target);
 
     REQUIRE(qapi->rotationAngle == Approx(0).epsilon(0.0001));
@@ -1061,10 +1054,8 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     quantum__qis__exp__ctl(ctrls, axes, angle, targets);
     quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
 
-    quantum__rt__qubit_release_array(ctrls);
-    quantum__rt__array_update_reference_count(ctrls, -1);
-    quantum__rt__qubit_release_array(targets);
-    quantum__rt__array_update_reference_count(targets, -1);
+    quantum__rt__qubit_release_array(ctrls);    // The `ctrls` is a dangling pointer from now on.
+    quantum__rt__qubit_release_array(targets);  // The `targets` is a dangling pointer from now on.
 
     REQUIRE(qapi->exponentAngle == Approx(0).epsilon(0.0001));
 }

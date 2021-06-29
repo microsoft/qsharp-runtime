@@ -18,7 +18,7 @@ using namespace std;
 
 // The tests rely on the implementation detail of CFullstateSimulator that the qubits are nothing more but contiguously
 // incremented ids.
-unsigned GetQubitId(Qubit q)
+static unsigned GetQubitId(Qubit q)
 {
     return static_cast<unsigned>(reinterpret_cast<size_t>(q));
 }

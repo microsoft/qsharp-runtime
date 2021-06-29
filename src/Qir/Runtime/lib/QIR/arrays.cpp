@@ -41,7 +41,14 @@ int QirArray::Release()
     const int rc = --this->refCount;
     if (rc == 0)
     {
-        delete[] this->buffer;
+        if(ownsQubits)
+        {
+            delete[] (reinterpret_cast<Qubit*>(this->buffer));
+        }
+        else
+        {
+            delete[] this->buffer;
+        }
         this->buffer = nullptr;
     }
     return rc;
@@ -55,7 +62,7 @@ QirArray::QirArray(TItemCount qubits_count)
 {
     if (this->count > 0)
     {
-        QUBIT** qbuffer = new QUBIT*[count];
+        Qubit* qbuffer = new Qubit[count];
         for (TItemCount i = 0; i < count; i++)
         {
             qbuffer[i] = quantum__rt__qubit_allocate();
@@ -76,12 +83,24 @@ QirArray::QirArray(TItemCount qubits_count)
 
 QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount dimCount, TDimContainer&& dimSizes)
     : count(count_items)
-    , itemSizeInBytes(item_size_bytes)
+
+    // Each array item needs to be properly aligned. Let's align them by correcting the `itemSizeInBytes`.
+    , itemSizeInBytes(
+        (   (item_size_bytes == 1)
+         || (item_size_bytes == 2)
+         || (item_size_bytes == 4)
+         || ((item_size_bytes % sizeof(size_t)) == 0)   // For built-in types or multiples of architecture alignment
+        ) ? item_size_bytes                             // leave their natural alignment.
+                                    // Other types align on the architecture boundary `sizeof(size_t)`: 4 bytes on 32-bit arch, 8 on 64-bit arch.
+          : item_size_bytes + sizeof(size_t) - (item_size_bytes % sizeof(size_t))
+      )
+
     , dimensions(dimCount)
     , dimensionSizes(std::move(dimSizes))
     , ownsQubits(false)
     , refCount(1)
 {
+    assert(item_size_bytes != 0);
     assert(dimCount > 0);
 
     if (GlobalContext() != nullptr)
@@ -112,11 +131,11 @@ QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount 
     }
 }
 
-QirArray::QirArray(const QirArray* other)
-    : count(other->count)
-    , itemSizeInBytes(other->itemSizeInBytes)
-    , dimensions(other->dimensions)
-    , dimensionSizes(other->dimensionSizes)
+QirArray::QirArray(const QirArray& other)
+    : count(other.count)
+    , itemSizeInBytes(other.itemSizeInBytes)
+    , dimensions(other.dimensions)
+    , dimensionSizes(other.dimensionSizes)
     , ownsQubits(false)
     , refCount(1)
 {
@@ -131,7 +150,7 @@ QirArray::QirArray(const QirArray* other)
     {
         this->buffer = new char[size];
         assert(size <= std::numeric_limits<size_t>::max());
-        memcpy(this->buffer, other->buffer, (size_t)size);
+        memcpy(this->buffer, other.buffer, (size_t)size);
     }
     else
     {
@@ -144,7 +163,7 @@ QirArray::~QirArray()
     assert(this->buffer == nullptr);
 }
 
-char* QirArray::GetItemPointer(TItemCount index)
+char* QirArray::GetItemPointer(TItemCount index) const
 {
     assert(index < this->count);
     return &this->buffer[index * this->itemSizeInBytes];
@@ -230,13 +249,11 @@ extern "C"
         assert(qa->ownsQubits);
         if (qa->ownsQubits)
         {
-            QUBIT** qubits = reinterpret_cast<QUBIT**>(qa->buffer);
+            Qubit* qubits = reinterpret_cast<Qubit*>(qa->buffer);
             for (QirArray::TItemCount i = 0; i < qa->count; i++)
             {
                 quantum__rt__qubit_release(qubits[i]);
             }
-
-            qa->ownsQubits = false;
         }
 
         quantum__rt__array_update_reference_count(qa, -1);
@@ -273,7 +290,7 @@ extern "C"
                     delete array;
                     assert(i == -1 && "Attempting to decrement reference count below zero!");
                     break;
-                };
+                }
             }
         }
     }
@@ -320,7 +337,7 @@ extern "C"
         }
         if (forceNewInstance || array->aliasCount > 0)
         {
-            return new QirArray(array);
+            return new QirArray(*array);
         }
         (void)array->AddRef();
         return array;
@@ -331,7 +348,7 @@ extern "C"
         assert(head != nullptr && tail != nullptr);
         assert(head->dimensions == 1 && tail->dimensions == 1);
 
-        QirArray* concatenated = new QirArray(head);
+        QirArray* concatenated = new QirArray(*head);
         concatenated->Append(tail);
         return concatenated;
     }

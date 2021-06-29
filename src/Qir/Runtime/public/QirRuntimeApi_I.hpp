@@ -14,6 +14,7 @@ namespace Quantum
     struct QIR_SHARED_API IRuntimeDriver
     {
         virtual ~IRuntimeDriver() {}
+        IRuntimeDriver() = default;
 
         // Doesn't necessarily provide insight into the state of the qubit (for that look at IDiagnostics)
         virtual std::string QubitToString(Qubit qubit) = 0;
@@ -30,6 +31,10 @@ namespace Quantum
         // it's not required from the runtime to return same Result on subsequent calls.
         virtual Result UseZero() = 0;
         virtual Result UseOne() = 0;
+
+      private:
+        IRuntimeDriver& operator=(const IRuntimeDriver&) = delete;
+        IRuntimeDriver(const IRuntimeDriver&) = delete;
     };
 
 } // namespace Quantum

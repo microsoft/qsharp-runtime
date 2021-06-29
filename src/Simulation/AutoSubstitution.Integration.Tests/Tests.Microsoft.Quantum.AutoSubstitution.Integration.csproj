@@ -23,22 +23,14 @@
   <PropertyGroup>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <CSharpGeneration>false</CSharpGeneration>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <QirGeneration>false</QirGeneration>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
   </ItemGroup>
-
-  <Target Name="BeforeCSharpCompile">
-    <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
-    </ItemGroup>
-  </Target>
 
 </Project>

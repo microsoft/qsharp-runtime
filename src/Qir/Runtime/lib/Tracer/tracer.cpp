@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "tracer.hpp"
+#include "TracerInternal.hpp"
 
 namespace Microsoft
 {
@@ -306,8 +307,8 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::FenceScope
     //------------------------------------------------------------------------------------------------------------------
-    CTracer::FenceScope::FenceScope(CTracer* tracer, long count1, Result* rs1, long count2, Result* rs2)
-        : tracer(tracer)
+    CTracer::FenceScope::FenceScope(CTracer* trc, long count1, Result* rs1, long count2, Result* rs2)
+        : tracer(trc)
     {
         const LayerId fence1 =
             (rs1 != nullptr && count1 > 0) ? this->tracer->FindLatestMeasurementLayer(count1, rs1) : INVALID;

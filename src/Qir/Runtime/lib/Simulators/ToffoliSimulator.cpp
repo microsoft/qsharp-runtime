@@ -6,7 +6,6 @@
 #include <iostream>
 #include <cstdint>
 
-#include "QirUtils.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
@@ -40,7 +39,7 @@ namespace Quantum
 
       public:
         CToffoliSimulator() = default;
-        ~CToffoliSimulator() = default;
+        ~CToffoliSimulator() override = default;
 
         ///
         /// Implementation of IRuntimeDriver
@@ -77,10 +76,9 @@ namespace Quantum
 
         void ReleaseQubit(Qubit qubit) override
         {
-            const uint64_t id = GetQubitId(qubit);
+            [[maybe_unused]] const uint64_t id = GetQubitId(qubit);
             assert((id + 1) == this->nextQubitId);
             assert(!this->states.at(id));
-            UNUSED(id);
             --(this->nextQubitId);
             this->states.pop_back();
         }

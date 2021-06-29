@@ -34,18 +34,18 @@ static void FailIf(bool condition, const char* message)
 CQubitManager::QubitListInSharedArray::QubitListInSharedArray(
     QubitIdType startId,
     QubitIdType endId,
-    QubitIdType* sharedQubitStatusArray):
+    QubitIdType* sharedQbitStatusArray):
         firstElement(startId),
         lastElement(endId)
 {
     FailIf(startId > endId || startId < 0 || endId == MaximumQubitCapacity,
         "Incorrect boundaries in the linked list initialization.");
-    FailIf(sharedQubitStatusArray == nullptr, "Shared status array is not provided.");
+    FailIf(sharedQbitStatusArray == nullptr, "Shared status array is not provided.");
 
     for (QubitIdType i = startId; i < endId; i++) {
-        sharedQubitStatusArray[i] = i + 1; // Current element points to the next element.
+        sharedQbitStatusArray[i] = i + 1; // Current element points to the next element.
     }
-    sharedQubitStatusArray[endId] = NoneMarker; // Last element ends the chain.
+    sharedQbitStatusArray[endId] = NoneMarker; // Last element ends the chain.
 }
 
 bool CQubitManager::QubitListInSharedArray::IsEmpty() const
@@ -53,27 +53,27 @@ bool CQubitManager::QubitListInSharedArray::IsEmpty() const
     return firstElement == NoneMarker;
 }
 
-void CQubitManager::QubitListInSharedArray::AddQubit(QubitIdType id, QubitIdType* sharedQubitStatusArray)
+void CQubitManager::QubitListInSharedArray::AddQubit(QubitIdType id, QubitIdType* sharedQbitStatusArray)
 {
     FailIf(id == NoneMarker, "Incorrect qubit id, cannot add it to the list.");
-    FailIf(sharedQubitStatusArray == nullptr, "Shared status array is not provided.");
+    FailIf(sharedQbitStatusArray == nullptr, "Shared status array is not provided.");
 
     // If the list is empty, we initialize it with the new element.
     if (IsEmpty())
     {
         firstElement = id;
         lastElement = id;
-        sharedQubitStatusArray[id] = NoneMarker; // List with a single elemenet in the chain.
+        sharedQbitStatusArray[id] = NoneMarker; // List with a single elemenet in the chain.
         return;
     }
 
-    sharedQubitStatusArray[id] = firstElement; // The new element will point to the former first element.
+    sharedQbitStatusArray[id] = firstElement; // The new element will point to the former first element.
     firstElement = id; // The new element is now the first in the chain.
 }
 
-CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQubitStatusArray)
+CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQbitStatusArray)
 {
-    FailIf(sharedQubitStatusArray == nullptr, "Shared status array is not provided.");
+    FailIf(sharedQbitStatusArray == nullptr, "Shared status array is not provided.");
 
     // First element will be returned. It is 'NoneMarker' if the list is empty.
     QubitIdType result = firstElement;
@@ -81,7 +81,7 @@ CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromF
     // Advance list start to the next element if list is not empty.
     if (!IsEmpty())
     {
-        firstElement = sharedQubitStatusArray[firstElement]; // The second element will be the first.
+        firstElement = sharedQbitStatusArray[firstElement]; // The second element will be the first.
     }
 
     // Drop pointer to the last element if list becomes empty.
@@ -92,15 +92,15 @@ CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromF
 
     if (result != NoneMarker)
     {
-        sharedQubitStatusArray[result] = AllocatedMarker;
+        sharedQbitStatusArray[result] = AllocatedMarker;
     }
 
     return result;
 }
 
-void CQubitManager::QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQubitStatusArray)
+void CQubitManager::QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedArray& source, QubitIdType* sharedQbitStatusArray)
 {
-    FailIf(sharedQubitStatusArray == nullptr, "Shared status array is not provided.");
+    FailIf(sharedQbitStatusArray == nullptr, "Shared status array is not provided.");
 
     // No need to do anthing if source is empty.
     if (source.IsEmpty())
@@ -115,7 +115,7 @@ void CQubitManager::QubitListInSharedArray::MoveAllQubitsFrom(QubitListInSharedA
     } else
     {
         // Attach source at the beginning of the list if both lists aren't empty.
-        sharedQubitStatusArray[source.lastElement] = firstElement; // The last element of the source chain will point to the first element of this chain.
+        sharedQbitStatusArray[source.lastElement] = firstElement; // The last element of the source chain will point to the first element of this chain.
     }
     firstElement = source.firstElement; // The first element from the source chain will be the first element of this chain.
 
@@ -172,8 +172,8 @@ int32_t CQubitManager::CRestrictedReuseAreaStack::Count() const
 
 CQubitManager::CQubitManager(
     QubitIdType initialQubitCapacity,
-    bool mayExtendCapacity):
-        mayExtendCapacity(mayExtendCapacity),
+    bool mayExtendCap):
+        mayExtendCapacity(mayExtendCap),
         qubitCapacity(initialQubitCapacity)
 {
     FailIf(qubitCapacity <= 0, "Qubit capacity must be positive.");
