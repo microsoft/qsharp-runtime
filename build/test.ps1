@@ -56,9 +56,6 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         $script:all_ok = $False
     }
 
-    $qirController = (Join-Path $PSScriptRoot "../src/Qir/Controller")
-    & "$qirController/test-qir-controller.ps1"
-
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
