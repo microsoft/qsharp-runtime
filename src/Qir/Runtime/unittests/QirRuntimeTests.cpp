@@ -215,6 +215,7 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     quantum__rt__array_update_reference_count(a, -1);
     quantum__rt__array_update_reference_count(ac, -1);
     quantum__rt__array_update_reference_count(ca, -1);
+    quantum__rt__array_update_reference_count(c , -1);
 }
 
 TEST_CASE("Arrays: check the slice range", "[qir_support]")
@@ -498,6 +499,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 1, 0))) == 19);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 57);
     quantum__rt__array_update_reference_count(slice, -1);
+    quantum__rt__array_update_reference_count(a    , -1);
 }
 
 TEST_CASE("Arrays: project of 3D array", "[qir_support]")
@@ -1054,6 +1056,7 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     quantum__qis__exp__ctl(ctrls, axes, angle, targets);
     quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
 
+    quantum__rt__array_update_reference_count(axes, -1);
     quantum__rt__qubit_release_array(ctrls);    // The `ctrls` is a dangling pointer from now on.
     quantum__rt__qubit_release_array(targets);  // The `targets` is a dangling pointer from now on.
 
