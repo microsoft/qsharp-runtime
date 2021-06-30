@@ -2,23 +2,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CSharpGeneration>false</CSharpGeneration>
-    <QirGeneration>true</QirGeneration>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
+    <IncludeProviderPackages>false</IncludeProviderPackages>
+    <QirGeneration>true</QirGeneration>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" PrivateAssets="All" IsQscReference="true" />
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
-
-  <Target Name="CompileGeneratedCSharp" AfterTargets="QSharpCompile" BeforeTargets="PrepareCSharpCompileAfterCSharpGeneration">
-    <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
-    </ItemGroup>
-  </Target>
 </Project>
