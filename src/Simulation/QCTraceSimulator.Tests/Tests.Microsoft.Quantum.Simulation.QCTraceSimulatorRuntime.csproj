@@ -6,15 +6,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
-    <CSharpGeneration>false</CSharpGeneration><!-- we will provide our own -->
     <IsPackable>false</IsPackable>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Xunit\Microsoft.Quantum.Xunit.csproj" />
-    <ProjectReference Include="..\CSharpGeneration\Microsoft.Quantum.CSharpGeneration.fsproj" IsQscReference="true" />
-    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
   </ItemGroup>
 

@@ -4,10 +4,6 @@
 $ErrorActionPreference = 'Stop'
 & "$PSScriptRoot/set-env.ps1"
 
-Push-Location (Join-Path $PSScriptRoot "../src/Simulation/CSharpGeneration")
-    .\FindNuspecReferences.ps1
-Pop-Location
-
 Push-Location (Join-Path $PSScriptRoot "../src/Simulation/Simulators")
     .\FindNuspecReferences.ps1
 Pop-Location

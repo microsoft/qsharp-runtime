@@ -7,8 +7,8 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <cstdint>
 
-#include "QirUtils.hpp"
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
@@ -18,6 +18,10 @@
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
+
+// Identifiers exposed externally:
+extern "C" void __quantum__qis__k__body(Qubit q);                       // NOLINT
+extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q);    // NOLINT
 
 // Used by a couple test simulators. Catch's REQUIRE macro doesn't deal well with static class members so making it
 // into a global constant.
@@ -70,20 +74,18 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
     vector<int> qubits;           // released, or |0>, or |1> states (no entanglement allowed)
     vector<int> results = {0, 1}; // released, or Zero(0) or One(1)
 
-    int GetQubitId(Qubit qubit) const
+    uint64_t GetQubitId(Qubit qubit) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->qubits.size());
+        const uint64_t id = (uint64_t)qubit;
+        REQUIRE(id < this->qubits.size());
 
         return id;
     }
 
-    int GetResultId(Result result) const
+    uint8_t GetResultId(Result result) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(result));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->results.size());
+        const uint8_t id = (uint8_t)(uintptr_t)result;
+        REQUIRE(id < this->results.size());
 
         return id;
     }
@@ -96,24 +98,23 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // no double-release
         this->qubits[id] = RELEASED;
     }
 
     void X(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
-        UNUSED(numBases);
 
-        const int id = GetQubitId(targets[0]);
+        const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->results.push_back(this->qubits[id]);
         return reinterpret_cast<Result>(this->results.size() - 1);
@@ -121,8 +122,8 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     bool AreEqualResults(Result r1, Result r2) override
     {
-        int i1 = GetResultId(r1);
-        int i2 = GetResultId(r2);
+        uint8_t i1 = GetResultId(r1);
+        uint8_t i2 = GetResultId(r2);
         REQUIRE(this->results[i1] != RELEASED);
         REQUIRE(this->results[i2] != RELEASED);
 
@@ -131,7 +132,7 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseResult(Result result) override
     {
-        int i = GetResultId(result);
+        uint8_t i = GetResultId(result);
         REQUIRE(this->results[i] != RELEASED); // no double release
         this->results[i] = RELEASED;
     }
@@ -221,11 +222,10 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
 
-    int GetQubitId(Qubit qubit) const
+    uint64_t GetQubitId(Qubit qubit) const
     {
-        const int id = static_cast<int>(reinterpret_cast<int64_t>(qubit));
-        REQUIRE(id >= 0);
-        REQUIRE((size_t)id < this->qubits.size());
+        const uint64_t id = (uint64_t)qubit;
+        REQUIRE(id < this->qubits.size());
         return id;
     }
 
@@ -237,14 +237,14 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     void ReleaseQubit(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED);
         this->qubits[id] = RELEASED;
     }
 
     void X(Qubit qubit) override
     {
-        const int id = GetQubitId(qubit);
+        const uint64_t id = GetQubitId(qubit);
         REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
         this->qubits[id] = 1 - this->qubits[id];
     }
@@ -253,7 +253,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         for (long i = 0; i < numControls; i++)
         {
-            const int id = GetQubitId(controls[i]);
+            const uint64_t id = GetQubitId(controls[i]);
             REQUIRE(this->qubits[id] != RELEASED);
             if (this->qubits[id] == 0)
             {
@@ -263,12 +263,11 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result Measure(long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
-        UNUSED(numBases);
 
-        const int id = GetQubitId(targets[0]);
+        const uint64_t id = GetQubitId(targets[0]);
         REQUIRE(this->qubits[id] != RELEASED);
         return reinterpret_cast<Result>(this->qubits[id]);
     }
@@ -291,7 +290,7 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 };
-FunctorsTestSimulator* g_ctrqapi = nullptr;
+static FunctorsTestSimulator* g_ctrqapi = nullptr;
 static int g_cKCalls = 0;
 static int g_cKCallsControlled = 0;
 extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
@@ -304,7 +303,7 @@ extern "C" void __quantum__qis__k__body(Qubit q)                              //
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q) // NOLINT
 {
     g_cKCallsControlled++;
-    g_ctrqapi->ControlledX(controls->count, reinterpret_cast<Qubit*>(controls->buffer), q);
+    g_ctrqapi->ControlledX((long)(controls->count), reinterpret_cast<Qubit*>(controls->buffer), q);
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {

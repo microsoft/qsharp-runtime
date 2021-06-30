@@ -41,22 +41,29 @@ int QirArray::Release()
     const int rc = --this->refCount;
     if (rc == 0)
     {
-        delete[] this->buffer;
+        if(ownsQubits)
+        {
+            delete[] (reinterpret_cast<Qubit*>(this->buffer));
+        }
+        else
+        {
+            delete[] this->buffer;
+        }
         this->buffer = nullptr;
     }
     return rc;
 }
 
-QirArray::QirArray(int64_t qubits_count)
+QirArray::QirArray(TItemCount qubits_count)
     : count(qubits_count)
-    , itemSizeInBytes(sizeof(void*))
+    , itemSizeInBytes((TItemSize)sizeof(void*))
     , ownsQubits(true)
     , refCount(1)
 {
     if (this->count > 0)
     {
-        QUBIT** qbuffer = new QUBIT*[count];
-        for (long i = 0; i < count; i++)
+        Qubit* qbuffer = new Qubit[count];
+        for (TItemCount i = 0; i < count; i++)
         {
             qbuffer[i] = quantum__rt__qubit_allocate();
         }
@@ -74,14 +81,26 @@ QirArray::QirArray(int64_t qubits_count)
     }
 }
 
-QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::vector<int64_t>&& dimSizes)
+QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount dimCount, TDimContainer&& dimSizes)
     : count(count_items)
-    , itemSizeInBytes(item_size_bytes)
+
+    // Each array item needs to be properly aligned. Let's align them by correcting the `itemSizeInBytes`.
+    , itemSizeInBytes(
+        (   (item_size_bytes == 1)
+         || (item_size_bytes == 2)
+         || (item_size_bytes == 4)
+         || ((item_size_bytes % sizeof(size_t)) == 0)   // For built-in types or multiples of architecture alignment
+        ) ? item_size_bytes                             // leave their natural alignment.
+                                    // Other types align on the architecture boundary `sizeof(size_t)`: 4 bytes on 32-bit arch, 8 on 64-bit arch.
+          : item_size_bytes + sizeof(size_t) - (item_size_bytes % sizeof(size_t))
+      )
+
     , dimensions(dimCount)
     , dimensionSizes(std::move(dimSizes))
     , ownsQubits(false)
     , refCount(1)
 {
+    assert(item_size_bytes != 0);
     assert(dimCount > 0);
 
     if (GlobalContext() != nullptr)
@@ -98,11 +117,13 @@ QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::
         }
     }
 
-    const int64_t buffer_size = this->count * itemSizeInBytes;
+    assert(this->count * (TBufSize)itemSizeInBytes < std::numeric_limits<TBufSize>::max()); // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+    const TBufSize buffer_size = this->count * itemSizeInBytes;
     if (buffer_size > 0)
     {
         this->buffer = new char[buffer_size];
-        memset(this->buffer, 0, buffer_size);
+        assert(buffer_size <= std::numeric_limits<size_t>::max());
+        memset(this->buffer, 0, (size_t)buffer_size);
     }
     else
     {
@@ -110,11 +131,11 @@ QirArray::QirArray(int64_t count_items, int item_size_bytes, int dimCount, std::
     }
 }
 
-QirArray::QirArray(const QirArray* other)
-    : count(other->count)
-    , itemSizeInBytes(other->itemSizeInBytes)
-    , dimensions(other->dimensions)
-    , dimensionSizes(other->dimensionSizes)
+QirArray::QirArray(const QirArray& other)
+    : count(other.count)
+    , itemSizeInBytes(other.itemSizeInBytes)
+    , dimensions(other.dimensions)
+    , dimensionSizes(other.dimensionSizes)
     , ownsQubits(false)
     , refCount(1)
 {
@@ -123,11 +144,13 @@ QirArray::QirArray(const QirArray* other)
         GlobalContext()->OnAllocate(this);
     }
 
-    const int64_t size = this->count * this->itemSizeInBytes;
+    assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+    const TBufSize size = this->count * this->itemSizeInBytes;
     if (this->count > 0)
     {
         this->buffer = new char[size];
-        memcpy(this->buffer, other->buffer, size);
+        assert(size <= std::numeric_limits<size_t>::max());
+        memcpy(this->buffer, other.buffer, (size_t)size);
     }
     else
     {
@@ -140,9 +163,8 @@ QirArray::~QirArray()
     assert(this->buffer == nullptr);
 }
 
-char* QirArray::GetItemPointer(int64_t index)
+char* QirArray::GetItemPointer(TItemCount index) const
 {
-    assert(index >= 0);
     assert(index < this->count);
     return &this->buffer[index * this->itemSizeInBytes];
 }
@@ -158,8 +180,12 @@ void QirArray::Append(const QirArray* other)
         return;
     }
 
-    const int64_t this_size = this->count * this->itemSizeInBytes;
-    const int64_t other_size = other->count * other->itemSizeInBytes;
+    assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+    const TBufSize this_size = this->count * this->itemSizeInBytes;
+
+    assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+    const TBufSize other_size = other->count * other->itemSizeInBytes;
+
     char* new_buffer = new char[this_size + other_size];
     memcpy(new_buffer, this->buffer, this_size);
     memcpy(&new_buffer[this_size], other->buffer, other_size);
@@ -181,13 +207,14 @@ void QirArray::Append(const QirArray* other)
 // ...                                                    [36 - 47]
 // 400 401 402 403 | 410 411 412 413 | 420 421 422 423 -- [48 - 59]
 // index[112] ~ linear index 18 = 1*3*4 + 1*4 + 2
-static int64_t GetLinearIndex(const std::vector<int64_t>& dimensionSizes, const std::vector<int64_t>& indexes)
+static QirArray::TItemCount GetLinearIndex(const QirArray::TDimContainer& dimensionSizes, const QirArray::TDimContainer& indexes)
 {
-    const int dimensions = dimensionSizes.size();
-    int64_t linearIndex = 0;
-    int64_t layerSize = 1;
-    for (int i = dimensions - 1; i >= 0; i--)
+    const size_t dimensions = dimensionSizes.size();
+    QirArray::TItemCount linearIndex = 0;
+    QirArray::TItemCount layerSize = 1;
+    for (size_t i = dimensions; i > 0; )
     {
+        --i;
         linearIndex += indexes[i] * layerSize;
         layerSize *= dimensionSizes[i];
     }
@@ -196,10 +223,10 @@ static int64_t GetLinearIndex(const std::vector<int64_t>& dimensionSizes, const 
 
 // Calculate the length of the linear run, where the index in given `dimension` doesn't change.
 // It's equal to the product of the dimension sizes in higher dimensions.
-static int64_t RunCount(const std::vector<int64_t>& dimensionSizes, int dimension)
+static QirArray::TItemCount RunCount(const QirArray::TDimContainer& dimensionSizes, QirArray::TDimCount dimension)
 {
     assert((0 <= dimension) && ((size_t)dimension < dimensionSizes.size()));
-    return std::accumulate(dimensionSizes.begin() + dimension + 1, dimensionSizes.end(), 1, std::multiplies<int64_t>());
+    return std::accumulate(dimensionSizes.begin() + dimension + 1, dimensionSizes.end(), (QirArray::TDimCount)1, std::multiplies<QirArray::TItemCount>());
 }
 
 /*==============================================================================
@@ -207,9 +234,9 @@ static int64_t RunCount(const std::vector<int64_t>& dimensionSizes, int dimensio
 ==============================================================================*/
 extern "C"
 {
-    QirArray* quantum__rt__qubit_allocate_array(int64_t count)
+    QirArray* quantum__rt__qubit_allocate_array(int64_t count)  // TODO: Use `QirArray::TItemCount count` (breaking change).
     {
-        return new QirArray(count);
+        return new QirArray((QirArray::TItemCount)count);
     }
 
     void quantum__rt__qubit_release_array(QirArray* qa)
@@ -222,22 +249,20 @@ extern "C"
         assert(qa->ownsQubits);
         if (qa->ownsQubits)
         {
-            QUBIT** qubits = reinterpret_cast<QUBIT**>(qa->buffer);
-            for (long i = 0; i < qa->count; i++)
+            Qubit* qubits = reinterpret_cast<Qubit*>(qa->buffer);
+            for (QirArray::TItemCount i = 0; i < qa->count; i++)
             {
                 quantum__rt__qubit_release(qubits[i]);
             }
-
-            qa->ownsQubits = false;
         }
 
         quantum__rt__array_update_reference_count(qa, -1);
     }
 
-    QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)
+    QirArray* quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)    // TODO: Use `QirArray::TItemSize itemSizeInBytes, QirArray::TItemCount count_items` (breaking change).
     {
         assert(itemSizeInBytes > 0);
-        return new QirArray(count_items, itemSizeInBytes);
+        return new QirArray((QirArray::TItemCount)count_items, (QirArray::TItemSize)itemSizeInBytes);
     }
 
     // Bucketing of addref/release is non-standard so for now we'll keep the more traditional addref/release semantics
@@ -265,7 +290,7 @@ extern "C"
                     delete array;
                     assert(i == -1 && "Attempting to decrement reference count below zero!");
                     break;
-                };
+                }
             }
         }
     }
@@ -283,25 +308,25 @@ extern "C"
         }
     }
 
-    char* quantum__rt__array_get_element_ptr_1d(QirArray* array, int64_t index)
+    char* quantum__rt__array_get_element_ptr_1d(QirArray* array, int64_t index)     // TODO: Use `QirArray::TItemCount index` (breaking change).
     {
         assert(array != nullptr);
-        return array->GetItemPointer(index);
+        return array->GetItemPointer((QirArray::TItemCount)index);
     }
 
     // Returns the number of dimensions in the array.
-    int32_t quantum__rt__array_get_dim(QirArray* array)
+    int32_t quantum__rt__array_get_dim(QirArray* array)     // TODO: Return `QirArray::TDimCount` (breaking change).
     {
         assert(array != nullptr);
         return array->dimensions;
     }
 
-    int64_t quantum__rt__array_get_size(QirArray* array, int32_t dim)
+    int64_t quantum__rt__array_get_size(QirArray* array, int32_t dim)   // TODO: Use `QirArray::TDimCount dim`, return `QirArray::TItemCount` (breaking change).
     {
         assert(array != nullptr);
         assert(dim < array->dimensions);
 
-        return array->dimensionSizes[dim];
+        return array->dimensionSizes[(size_t)dim];
     }
 
     QirArray* quantum__rt__array_copy(QirArray* array, bool forceNewInstance)
@@ -312,7 +337,7 @@ extern "C"
         }
         if (forceNewInstance || array->aliasCount > 0)
         {
-            return new QirArray(array);
+            return new QirArray(*array);
         }
         (void)array->AddRef();
         return array;
@@ -323,7 +348,7 @@ extern "C"
         assert(head != nullptr && tail != nullptr);
         assert(head->dimensions == 1 && tail->dimensions == 1);
 
-        QirArray* concatenated = new QirArray(head);
+        QirArray* concatenated = new QirArray(*head);
         concatenated->Append(tail);
         return concatenated;
     }
@@ -331,20 +356,21 @@ extern "C"
     // Creates a new array. The first int is the size of each element in bytes. The second int is the dimension count.
     // The variable arguments should be a sequence of int64_ts contains the length of each dimension. The bytes of the
     // new array should be set to zero.
-    QirArray* quantum__rt__array_create_nonvariadic(int itemSizeInBytes, int countDimensions, va_list dims)
+    QirArray* quantum__rt__array_create_nonvariadic(int itemSizeInBytes, int countDimensions, va_list dims) // TODO: Use unsigned types (breaking change).
     {
-        std::vector<int64_t> dimSizes;
-        dimSizes.reserve(countDimensions);
-        int64_t totalCount = 1;
+        QirArray::TDimContainer dimSizes;
+        dimSizes.reserve((size_t)countDimensions);
+        QirArray::TItemCount totalCount = 1;
 
         for (int i = 0; i < countDimensions; i++)
         {
-            const int64_t dimSize = va_arg(dims, int64_t);
+            const QirArray::TItemCount dimSize = (QirArray::TItemCount)va_arg(dims, int64_t);   // TODO: Use `va_arg(dims, QirArray::TItemCount)`.
             dimSizes.push_back(dimSize);
             totalCount *= dimSize;
         }
 
-        return new QirArray(totalCount, itemSizeInBytes, countDimensions, std::move(dimSizes));
+        assert(countDimensions < std::numeric_limits<QirArray::TDimCount>::max());  // Using `<` rather than `<=` to calm down the compiler in case `countDimensions` becomes `QirArray::TDimCount`.
+        return new QirArray(totalCount, (QirArray::TItemSize)itemSizeInBytes, (QirArray::TDimCount)countDimensions, std::move(dimSizes));
     }
 
     QirArray* quantum__rt__array_create(int itemSizeInBytes, int countDimensions, ...) // NOLINT
@@ -361,16 +387,16 @@ extern "C"
     {
         assert(array != nullptr);
 
-        std::vector<int64_t> indexes;
+        QirArray::TDimContainer indexes;
         indexes.reserve(array->dimensions);
 
-        for (int i = 0; i < array->dimensions; i++)
+        for (QirArray::TDimCount i = 0; i < array->dimensions; i++)
         {
-            indexes.push_back(va_arg(args, int64_t));
+            indexes.push_back((QirArray::TItemCount)va_arg(args, int64_t));   // TODO: Use `va_arg(args, QirArray::TItemCount)`.
             assert(indexes.back() < array->dimensionSizes[i]);
         }
 
-        const int64_t linearIndex = GetLinearIndex(array->dimensionSizes, indexes);
+        const QirArray::TItemCount linearIndex = GetLinearIndex(array->dimensionSizes, indexes);
         return array->GetItemPointer(linearIndex);
     }
 
@@ -383,7 +409,7 @@ extern "C"
         assert(array != nullptr);
 
         va_list args;
-        va_start(args, array->dimensions);
+        va_start(args, array->dimensions);                                          // TODO: (Bug or hack?) Replace `array->dimensions` with `array`.
         char* ptr = quantum__rt__array_get_element_ptr_nonvariadic(array, args);
         va_end(args);
 
@@ -459,48 +485,50 @@ extern "C"
     // Creates and returns an array that is a slice of an existing array. The int indicates which dimension the slice is
     // on. The %Range specifies the slice. Both ends of the range are inclusive. Negative step means the the order of
     // elements should be reversed.
-    QirArray* quantum__rt__array_slice(QirArray* array, int32_t dim, const QirRange& qirRange) // NOLINT
+    QirArray* quantum__rt__array_slice(QirArray* array, int32_t dim, const QirRange& qirRange) // NOLINT     // TODO: Use `QirArray::TDimCount dim` (breaking change).
     {
         assert(array != nullptr);
         assert(dim >= 0 && dim < array->dimensions);
 
-        const int itemSizeInBytes = array->itemSizeInBytes;
-        const int dimensions = array->dimensions;
+        const QirArray::TItemSize itemSizeInBytes = array->itemSizeInBytes;
+        const QirArray::TDimCount dimensions = array->dimensions;
 
-        const CheckedRange range(qirRange, array->dimensionSizes[dim]);
+        const CheckedRange range(qirRange, array->dimensionSizes[(size_t)dim]);
 
         // If the range is empty, return an empty array of the same type but 0 items in dim dimension.
         if (range.IsEmpty())
         {
-            std::vector<int64_t> dims = array->dimensionSizes;
-            dims[dim] = 0;
+            QirArray::TDimContainer dims = array->dimensionSizes;
+            dims[(size_t)dim] = 0;
             return new QirArray(0, itemSizeInBytes, dimensions, std::move(dims));
         }
 
         // When range covers the whole dimension, can return a copy of the array without doing any math.
-        if (range.step == 1 && range.start == 0 && range.end == array->dimensionSizes[dim])
+        if (range.step == 1 && range.start == 0 && range.end == array->dimensionSizes[(size_t)dim])
         {
             return quantum__rt__array_copy(array, true /*force*/);
         }
 
         // Create slice array of appropriate size.
-        std::vector<int64_t> sliceDims = array->dimensionSizes;
-        sliceDims[dim] = range.width;
-        const int64_t sliceItemsCount =
-            std::accumulate(sliceDims.begin(), sliceDims.end(), 1, std::multiplies<int64_t>());
+        QirArray::TDimContainer sliceDims = array->dimensionSizes;
+        sliceDims[(size_t)dim] = (QirArray::TItemCount)(range.width);
+        const QirArray::TItemCount sliceItemsCount =
+            std::accumulate(sliceDims.begin(), sliceDims.end(), (QirArray::TItemCount)1, std::multiplies<QirArray::TItemCount>());
         QirArray* slice = new QirArray(sliceItemsCount, itemSizeInBytes, dimensions, std::move(sliceDims));
-        const int64_t singleIndexRunCount = RunCount(array->dimensionSizes, dim);
-        const int64_t rowCount = singleIndexRunCount * array->dimensionSizes[dim];
+        const QirArray::TItemCount singleIndexRunCount = RunCount(array->dimensionSizes, (QirArray::TDimCount)dim);
+        const QirArray::TItemCount rowCount = singleIndexRunCount * array->dimensionSizes[(size_t)dim];
 
         // When range is continuous, can copy data in larger chunks. For example, if the slice is on dim = 0,
         // we will copy exactly once.
         if (range.step == 1)
         {
-            const int64_t rangeRunCount = singleIndexRunCount * (range.end - range.start);
-            const int64_t rangeChunkSize = rangeRunCount * itemSizeInBytes;
+            const QirArray::TItemCount rangeRunCount = (QirArray::TItemCount)(singleIndexRunCount * (range.end - range.start));
 
-            int64_t dst = 0;
-            int64_t src = singleIndexRunCount * range.start;
+            assert((QirArray::TBufSize)rangeRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());   // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+            const QirArray::TBufSize rangeChunkSize = rangeRunCount * itemSizeInBytes;
+
+            QirArray::TItemCount dst = 0;
+            QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
             while (src < array->count)
             {
                 assert(dst < slice->count);
@@ -512,15 +540,16 @@ extern "C"
         }
 
         // In case of disconnected or reversed range have to copy the data one run at a time.
-        const int64_t chunkSize = singleIndexRunCount * itemSizeInBytes;
-        int64_t dst = 0;
-        int64_t src = singleIndexRunCount * range.start;
+        assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+        const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
+        QirArray::TItemCount dst = 0;
+        QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
         while (src < array->count)
         {
             assert(dst < slice->count);
 
-            int64_t srcInner = src;
-            for (long index = range.start; index != range.end; index += range.step)
+            QirArray::TItemCount srcInner = src;
+            for (int64_t index = range.start; index != range.end; index += range.step)
             {
                 memcpy(&slice->buffer[dst * itemSizeInBytes], &array->buffer[srcInner * itemSizeInBytes], chunkSize);
                 srcInner += (singleIndexRunCount * range.step);
@@ -534,30 +563,32 @@ extern "C"
     // Creates and returns an array that is a projection of an existing array. The int indicates which dimension the
     // projection is on, and the int64_t specifies the specific index value to project. The returned Array* will have
     // one fewer dimension than the existing array.
-    QirArray* quantum__rt__array_project(QirArray* array, int dim, int64_t index) // NOLINT
+    QirArray* quantum__rt__array_project(QirArray* array, int dim, int64_t index) // NOLINT     // TODO: Use `QirArray::TDimCount dim, QirArray::TItemCount index` (breaking change).
     {
         assert(array != nullptr);
         assert(dim >= 0 && dim < array->dimensions);
         assert(array->dimensions > 1); // cannot project from 1D array into an array
-        assert(index >= 0 && index < array->dimensionSizes[dim]);
+        assert(index >= 0 && index < array->dimensionSizes[(size_t)dim]);
 
-        const int itemSizeInBytes = array->itemSizeInBytes;
-        const int dimensions = array->dimensions;
+        const QirArray::TItemSize itemSizeInBytes = array->itemSizeInBytes;
+        const QirArray::TDimCount dimensions = array->dimensions;
 
         // Create projected array of appropriate size.
-        std::vector<int64_t> projectDims = array->dimensionSizes;
+        QirArray::TDimContainer projectDims = array->dimensionSizes;
         projectDims.erase(projectDims.begin() + dim);
 
-        const int64_t projectItemsCount =
-            std::accumulate(projectDims.begin(), projectDims.end(), 1, std::multiplies<int64_t>());
+        const QirArray::TItemCount projectItemsCount =
+            std::accumulate(projectDims.begin(), projectDims.end(), (QirArray::TItemCount)1, std::multiplies<QirArray::TItemCount>());
         QirArray* project = new QirArray(projectItemsCount, itemSizeInBytes, dimensions - 1, std::move(projectDims));
 
-        const int64_t singleIndexRunCount = RunCount(array->dimensionSizes, dim);
-        const int64_t rowCount = singleIndexRunCount * array->dimensionSizes[dim];
-        const int64_t chunkSize = singleIndexRunCount * itemSizeInBytes;
+        const QirArray::TItemCount singleIndexRunCount = RunCount(array->dimensionSizes, (QirArray::TDimCount)dim);
+        const QirArray::TItemCount rowCount = singleIndexRunCount * array->dimensionSizes[(size_t)dim];
+        
+        assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes < std::numeric_limits<QirArray::TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+        const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
 
-        int64_t dst = 0;
-        int64_t src = singleIndexRunCount * index;
+        QirArray::TItemCount dst = 0;
+        QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * index);
         while (src < array->count)
         {
             assert(dst < project->count);

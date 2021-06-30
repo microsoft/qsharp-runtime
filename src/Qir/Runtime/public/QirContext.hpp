@@ -46,6 +46,8 @@ namespace Quantum
         {
             Scoped(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
             ~Scoped();
+          private:
+            Scoped& operator=(const Scoped&) = delete;
         };
     };
     
@@ -58,6 +60,8 @@ namespace Quantum
     {
         QirContextScope(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
         ~QirContextScope();
+      private:
+        QirContextScope& operator=(const QirContextScope&) = delete;
     };
 } // namespace Quantum
 } // namespace Microsoft
