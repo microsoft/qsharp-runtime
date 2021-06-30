@@ -103,10 +103,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneInputReference", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-standalone-input-reference", "src\Qir\Samples\StandaloneInputReference\qsharp\qir-standalone-input-reference.csproj", "{D7D34736-A719-4B45-A33F-2723F59EC29D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controller", "Controller", "{4E07F247-ED93-4497-8B58-022314308E67}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QirController", "src\Qir\Controller\QirController.csproj", "{A77E6661-D143-4E3E-BCD1-8E321A966829}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Execution", "Execution", "{442E66C8-F69F-44E9-9CD9-1F52C37EA41B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Qir.Tools", "src\Qir\Execution\Tools\Microsoft.Quantum.Qir.Tools.csproj", "{C60226E3-98DE-4E92-AED4-B4A93D4CA063}"
@@ -117,11 +113,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QirExe", "src\Simulation\Si
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Qir.CommandLineTool", "src\Qir\Execution\CommandLineTool\Microsoft.Quantum.Qir.CommandLineTool.csproj", "{EAABB911-02EE-4A05-B566-0084013FC5CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoSubstitution", "src\Simulation\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj", "{33D66E90-049F-4A0B-A2B1-79E7E7E0ED0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.AutoSubstitution", "src\Simulation\AutoSubstitution\Microsoft.Quantum.AutoSubstitution.csproj", "{33D66E90-049F-4A0B-A2B1-79E7E7E0ED0F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.AutoSubstitution", "src\Simulation\AutoSubstitution.Tests\Tests.Microsoft.Quantum.AutoSubstitution.csproj", "{4EBC65DF-3B5E-419B-8E26-3EEF0B5CD300}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.AutoSubstitution", "src\Simulation\AutoSubstitution.Tests\Tests.Microsoft.Quantum.AutoSubstitution.csproj", "{4EBC65DF-3B5E-419B-8E26-3EEF0B5CD300}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.AutoSubstitution.Integration", "src\Simulation\AutoSubstitution.Integration.Tests\Tests.Microsoft.Quantum.AutoSubstitution.Integration.csproj", "{D23480EE-88FC-4DF2-86BD-1C5BDD6CD98C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.AutoSubstitution.Integration", "src\Simulation\AutoSubstitution.Integration.Tests\Tests.Microsoft.Quantum.AutoSubstitution.Integration.csproj", "{D23480EE-88FC-4DF2-86BD-1C5BDD6CD98C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -695,22 +691,6 @@ Global
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{D7D34736-A719-4B45-A33F-2723F59EC29D}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Debug|x64.Build.0 = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.MinSizeRel|x64.Build.0 = Debug|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|x64.ActiveCfg = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.Release|x64.Build.0 = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
-		{A77E6661-D143-4E3E-BCD1-8E321A966829}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 		{C60226E3-98DE-4E92-AED4-B4A93D4CA063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C60226E3-98DE-4E92-AED4-B4A93D4CA063}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C60226E3-98DE-4E92-AED4-B4A93D4CA063}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -871,8 +851,6 @@ Global
 		{AAFB81D3-BC87-404D-BA64-AF40B2D2E45A} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
 		{A7DB7367-9FD6-4164-8263-A05077BE54AB} = {AAFB81D3-BC87-404D-BA64-AF40B2D2E45A}
 		{D7D34736-A719-4B45-A33F-2723F59EC29D} = {A7DB7367-9FD6-4164-8263-A05077BE54AB}
-		{4E07F247-ED93-4497-8B58-022314308E67} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
-		{A77E6661-D143-4E3E-BCD1-8E321A966829} = {4E07F247-ED93-4497-8B58-022314308E67}
 		{442E66C8-F69F-44E9-9CD9-1F52C37EA41B} = {F6C2D4C0-12DC-40E3-9C86-FA5308D9B567}
 		{C60226E3-98DE-4E92-AED4-B4A93D4CA063} = {442E66C8-F69F-44E9-9CD9-1F52C37EA41B}
 		{4794FC80-4594-403F-AFEC-4889EFE87EA0} = {442E66C8-F69F-44E9-9CD9-1F52C37EA41B}

@@ -897,6 +897,7 @@ let ``Submit supports Q# submitters`` () =
          Base URI:
          Location: myLocation
          Credential: Default
+         AadToken:
          Job Name:
          Shots: 500
          Output: FriendlyUri

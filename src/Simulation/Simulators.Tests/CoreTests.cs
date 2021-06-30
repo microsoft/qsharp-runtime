@@ -104,6 +104,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Base URI: ",
                     "Location: myLocation",
                     "Credential: Default",
+                    "AadToken: ",
                     "Job Name: ",
                     "Shots: 500",
                     "Output: FriendlyUri",
