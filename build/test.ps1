@@ -81,7 +81,7 @@ if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
         }
     }
 } else {
-    Write-Host "Skipping test of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+    Write-Host "Skipping test of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
 }
 
 if (-not $all_ok) {

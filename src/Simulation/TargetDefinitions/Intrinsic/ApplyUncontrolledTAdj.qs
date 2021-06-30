@@ -5,23 +5,23 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Targeting;
 
     /// # Summary
-    /// Applies the π/8 gate to a single qubit. Note that the Controlled functor is
+    /// Applies the -π/8 gate to a single qubit. Note that the Controlled functor is
     /// not supported.
     ///
     /// # Description
     /// \begin{align}
-    ///     T \mathrel{:=}
+    ///     TAdj \mathrel{:=}
     ///     \begin{bmatrix}
     ///         1 & 0 \\\\
-    ///         0 & e^{i \pi / 4}
+    ///         0 & e^{i -\pi / 4}
     ///     \end{bmatrix}.
     /// \end{align}
     ///
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    @TargetInstruction("t")
-    internal operation ApplyUncontrolledT (qubit : Qubit) : Unit {
+    @TargetInstruction("tadj")
+    internal operation ApplyUncontrolledTAdj (qubit : Qubit) : Unit {
         body intrinsic;
     }
 }

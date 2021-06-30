@@ -11,7 +11,9 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledTAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />

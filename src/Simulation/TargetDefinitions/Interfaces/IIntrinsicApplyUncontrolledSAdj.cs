@@ -5,7 +5,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
-    public interface IIntrinsicApplyUncontrolledT : IOperationFactory
+    public interface IIntrinsicApplyUncontrolledSAdj : IOperationFactory
     {
         void Body(Qubit target);
     }
