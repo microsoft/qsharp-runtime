@@ -25,7 +25,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CNOTFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />
