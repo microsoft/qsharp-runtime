@@ -35,7 +35,7 @@ function Build-CMakeProject {
     $oldCC = $env:CC
     $oldCXX = $env:CXX
     $oldRC = $env:RC
-    $oldCFLAGS  = $env:CFLAGS
+    $oldCFLAGS   = $env:CFLAGS
     $oldCXXFLAGS = $env:CXXFLAGS
 
     $clangTidy = ""
@@ -189,7 +189,7 @@ function Build-CMakeProject {
     Pop-Location
 
     $env:CXXFLAGS = $oldCXXFLAGS
-    $env:CFLAGS  = $oldCFLAGS
+    $env:CFLAGS   = $oldCFLAGS
 
     $env:CC = $oldCC
     $env:CXX = $oldCXX
