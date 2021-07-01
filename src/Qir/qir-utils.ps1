@@ -93,9 +93,38 @@ function Build-CMakeProject {
     # Disable until the Catch header "src\Qir\Common\externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
     $warningFlags += " -Wno-extra-semi-stmt"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
 
-
     $env:CFLAGS   += $warningFlags
     $env:CXXFLAGS += $warningFlags
+
+
+    # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
+
+    $env:CFLAGS   += " "
+    $env:CXXFLAGS += " "
+
+    # Undefined Behavior Sanitizer (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
+    # WSL:
+    #   unsigned-integer-overflow   Causes error reports in "qir-static-tests" in random number generator standard library (the test still succeeds):
+    #       /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/random.h:552:58: runtime error: unsigned integer overflow: 0 - 1 cannot be represented in type 'unsigned long'
+    #   Likely -fsanitize=implicit-integer-sign-change causes error reports in "qir-static-tests" in random number generator standard library (the test still succeeds):
+    #       /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/uniform_int_dist.h:284:17: runtime error: implicit conversion from type \
+    #           'std::uniform_int_distribution<long>::result_type' (aka 'long') of value -9223372036854775808 (64-bit, signed) to type 'unsigned long' changed the value \
+    #           to 9223372036854775808 (64-bit, unsigned)
+    $sanitizeFlags = "-fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
+    # TODO: 
+    #     Consider "Silencing Unsigned Integer Overflow" (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#silencing-unsigned-integer-overflow)
+    #         for "qir-static-tests".
+    #     Consider extracting into a separate .cpp or binary and compile with no `-fsanitize=unsigned-integer-overflow`. All others compile with `-fsanitize=unsigned-integer-overflow`.
+    #         Issue: `unsigned-integer-overflow` seems to be a part of some other check that is a part of `-fsanitize=undefined`. See https://github.com/google/sanitizers/issues/1421.
+    #             How to enable `-fsanitize=undefined` except `unsigned-integer-overflow`? Issue filed https://github.com/google/sanitizers/issues/1422.
+    #     Consider calming down `-fsanitize=implicit-integer-sign-change` for "qir-static-tests".
+
+    $sanitizeFlags += " -fno-omit-frame-pointer"            # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+    $sanitizeFlags += " -fno-optimize-sibling-calls"        # https://clang.llvm.org/docs/AddressSanitizer.html
+
+    $env:CFLAGS   += $sanitizeFlags
+    $env:CXXFLAGS += $sanitizeFlags
+
 
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
@@ -145,7 +174,7 @@ function Build-CMakeProject {
         $buildType = "RelWithDebInfo"
     }
 
-    cmake -G Ninja $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
+    cmake -G Ninja $clangTidy -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to generate $Name."
         $all_ok = $false
