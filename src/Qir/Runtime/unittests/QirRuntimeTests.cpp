@@ -298,13 +298,15 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
     QirArray* slice = nullptr;
 
     // even if slice results in a single value, it's still an array
-    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});
+    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});   // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
+                                                            // slice == char[1] == { '1' }.
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
-    quantum__rt__array_update_reference_count(slice, -1);
+    quantum__rt__array_update_reference_count(slice, -1);   // slice == dangling pointer.
 
     // reversed slices are alwayes disconnected
-    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});
+    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});   // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
+                                                                // slice == char[3] == {'4', '2', '0'}.
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '4');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 1) == '2');

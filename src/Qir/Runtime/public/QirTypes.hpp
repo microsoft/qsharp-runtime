@@ -190,10 +190,10 @@ struct QIR_SHARED_API QirCallable
 
 struct QIR_SHARED_API QirRange
 {
-    int64_t start;
-    int64_t step;
-    int64_t end;
+    int64_t start   = 0;
+    int64_t step    = 0;
+    int64_t end     = 0;
 
-    QirRange();
+    QirRange() = default;
     QirRange(int64_t start, int64_t step, int64_t end);
 };
