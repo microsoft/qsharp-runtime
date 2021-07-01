@@ -55,10 +55,6 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
-
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
 } else {
     Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
 }

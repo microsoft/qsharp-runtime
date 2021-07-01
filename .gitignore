@@ -343,10 +343,6 @@ ASALocalRun/
 
 dbw_test
 
-# Controller test artifacts
-/src/Qir/Controller/test-artifacts/
-/src/Qir/Controller/src
-
 # out folders
 out/
 
