@@ -41,6 +41,7 @@ namespace Microsoft.Quantum.Simulation.Core
         public virtual object Value => this;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public virtual IEnumerable<Qubit> Qubits => new Qubit[] { this };
 
         public override bool Equals(object obj)
