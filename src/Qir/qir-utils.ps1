@@ -141,6 +141,11 @@ function Build-CMakeProject {
         #     Consider calming down `-fsanitize=implicit-integer-sign-change` for "qir-static-tests".
         #     For Win consider extra build configuration linking all libs staticly, and enable `-fsanitize=undefined`, run the staticly linked tests.
 
+        # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
+        #   No support for Win.
+        #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
+        $sanitizeFlags += " -fsanitize=safe-stack"
+
         $sanitizeFlags += " -fno-omit-frame-pointer"            # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
         $sanitizeFlags += " -fno-optimize-sibling-calls"        # https://clang.llvm.org/docs/AddressSanitizer.html
     }
