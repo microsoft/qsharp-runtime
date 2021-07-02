@@ -31,9 +31,9 @@ namespace Microsoft.Quantum.Qir.Tools
             DirectoryInfo executablesDirectory)
         {
             using var qirContentStream = new MemoryStream();
-            if (!AssemblyLoader.LoadQirByteCode(qsharpDll, qirContentStream))
+            if (!AssemblyLoader.LoadQirBitcode(qsharpDll, qirContentStream))
             {
-                throw new ArgumentException("The given DLL does not contain QIR byte code.");
+                throw new ArgumentException("The given DLL does not contain QIR bitcode.");
             }
             
             if (!executablesDirectory.Exists)
@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Qir.Tools
                 executablesDirectory.Create();
             }
             
-            var tasks = EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
+            var tasks = EntryPointLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
             {
                 var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
                 var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());

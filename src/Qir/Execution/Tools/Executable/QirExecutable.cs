@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
     public abstract class QirExecutable : IQirExecutable
     {
         private const string DriverFileName = "driver";
-        private const string BytecodeFileName = "qir.bc";
+        private const string BitcodeFileName = "qir.bc";
 
         public virtual string SourceDirectoryPath => "src";
         public abstract string DriverFileExtension { get; }
@@ -27,15 +27,15 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         protected FileInfo ExecutableFile { get; }
 
-        private readonly byte[] qirBytecode;
+        private readonly byte[] qirBitcode;
         private readonly ILogger logger;
         private readonly IQuantumExecutableRunner runner;
         private readonly IQirDriverGenerator driverGenerator;
         private readonly IQirExecutableGenerator executableGenerator;
 
-        public QirExecutable(FileInfo executableFile, byte[] qirBytecode, IQirDriverGenerator driverGenerator, ILogger logger = null)
+        public QirExecutable(FileInfo executableFile, byte[] qirBitcode, IQirDriverGenerator driverGenerator, ILogger logger = null)
             : this(executableFile,
-              qirBytecode,
+              qirBitcode,
               logger ?? new Logger(new Clock()),
               driverGenerator,
               new QirExecutableGenerator(new ClangClient(logger), logger),
@@ -43,10 +43,10 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         {
         }
 
-        internal QirExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
+        internal QirExecutable(FileInfo executableFile, byte[] qirBitcode, ILogger logger, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner)
         {
             ExecutableFile = executableFile;
-            this.qirBytecode = qirBytecode;
+            this.qirBitcode = qirBitcode;
             this.logger = logger;
             this.runner = runner;
             this.driverGenerator = driverGenerator;
@@ -73,13 +73,13 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             }
             logger.LogInfo($"Created driver file at {driverFile.FullName}.");
 
-            // Create bytecode file.
-            var bytecodeFile = new FileInfo(Path.Combine(sourceDirectory.FullName, BytecodeFileName));
-            using (var bytecodeFileStream = bytecodeFile.OpenWrite())
+            // Create bitcode file.
+            var bitcodeFile = new FileInfo(Path.Combine(sourceDirectory.FullName, BitcodeFileName));
+            using (var bitcodeFileStream = bitcodeFile.OpenWrite())
             {
-                await bytecodeFileStream.WriteAsync(qirBytecode);
+                await bitcodeFileStream.WriteAsync(qirBitcode);
             }
-            logger.LogInfo($"Created bytecode file at {bytecodeFile.FullName}.");
+            logger.LogInfo($"Created bitcode file at {bitcodeFile.FullName}.");
             await executableGenerator.GenerateExecutableAsync(ExecutableFile, sourceDirectory, libraryDirectories.Concat(this.LibraryDirectories).ToList(), includeDirectories.Concat(this.HeaderDirectories).ToList(), LinkLibraries);
         }
 
