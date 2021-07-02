@@ -5,15 +5,54 @@ using System.IO;
 
 namespace Tests.Microsoft.Quantum.Qir.Tools
 {
-    public static class Util
+    internal static class Util
     {
-        public static void DeleteDirectory(DirectoryInfo directory)
+        public static bool CompareFiles(FileInfo fileA, FileInfo fileB)
         {
-            foreach (var file in directory.GetFiles())
+            if (fileA.FullName == fileB.FullName)
             {
-                file.Delete();
+                return true;
             }
-            directory.Delete();
+
+            using var fileStreamA = fileA.OpenRead();
+            using var fileStreamB = fileB.OpenRead();
+            return CompareStreams(fileStreamA, fileStreamB);
+        }
+
+        public static bool CompareStreams(Stream streamA, Stream streamB)
+        {
+            if (streamA.Length != streamB.Length)
+            {
+                return false;
+            }
+
+            (streamA.Position, streamB.Position) = (0, 0);
+            (int byteA, int byteB) = (0, 0);
+            while ((byteA == byteB) && (byteA != -1))
+            {
+                (byteA, byteB) = (streamA.ReadByte(), streamB.ReadByte());
+            }
+
+            return byteA == byteB;
+        }
+
+        public static FileInfo CreateBinaryFile(DirectoryInfo directory, string fileName, byte[] contents)
+        {
+            var filePath = Path.Combine(directory.FullName, fileName);
+            var fileInfo = new FileInfo(filePath);
+            using var fileStream = fileInfo.OpenWrite();
+            fileStream.Write(contents);
+            return fileInfo;
+        }
+
+        public static FileInfo CreateTextFile(DirectoryInfo directory, string fileName, string contents)
+        {
+            var filePath = Path.Combine(directory.FullName, fileName);
+            var fileInfo = new FileInfo(filePath);
+            using var fileStream = fileInfo.OpenWrite();
+            using var streamWriter = new StreamWriter(fileStream);
+            streamWriter.Write(contents);
+            return fileInfo;
         }
     }
 }

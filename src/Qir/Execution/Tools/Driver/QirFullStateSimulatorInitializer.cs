@@ -13,10 +13,10 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
     {
         public string Generate() => new QirCppFullStateSimulatorInitializer().TransformText();
 
-        public IList<string> Headers => new List<string> {
+        public IEnumerable<string> Headers => new [] {
                 "SimFactory.hpp"
             };
 
-        public IList<string> LinkLibraries => new List<string>();
+        public IEnumerable<string> LinkLibraries => new string[0];
     }
 }

@@ -143,7 +143,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             };
 
         private static string RemoveLineEndings(string str) =>
-            str.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+            str.Replace("\n", string.Empty).Replace("\r", string.Empty);
 
         [Theory]
         [InlineData("UseNoArgs")]
@@ -167,11 +167,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var driverGenerator = new QirFullStateDriverGenerator();
             var driverFileName = $"{testCase}.cpp";
             var verificationCppSourceCode = RemoveLineEndings(File.ReadAllText(Path.Combine(TestCasesDirectory, driverFileName)));
-            if (!Directory.Exists(TestArtifactsDirectory))
-            {
-                Directory.CreateDirectory(TestArtifactsDirectory);
-            }
-
+            Directory.CreateDirectory(TestArtifactsDirectory);
             var generatedStream = File.Create(Path.Combine(TestArtifactsDirectory, driverFileName));
             driverGenerator.GenerateAsync(entryPointOperation, generatedStream).Wait();
             var generatedStreamReader = new StreamReader(generatedStream, Encoding.UTF8);

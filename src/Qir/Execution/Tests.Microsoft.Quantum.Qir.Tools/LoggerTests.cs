@@ -20,6 +20,8 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             logger = new Logger(clockMock.Object);
         }
 
+        // N.B. Since the logger is meant for internal use, these tests do not verify whether the logger produced a
+        //      specific output. Instead it is verified that the produced output contains certain elements.
         [Fact]
         public void TestLogInfo()
         {
@@ -27,11 +29,15 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var message = "some message";
             var time = DateTimeOffset.MinValue;
             clockMock.SetupGet(obj => obj.Now).Returns(time);
-            var expectedLog = $"{time} [INFO]: some message" + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogInfo(message);
             var actualLog = consoleOutput.ToString();
-            Assert.Equal(expectedLog, actualLog);
+
+            // Verify that the expected elements are present in the produced output.
+            Assert.Contains(time.ToString(), actualLog);
+            Assert.Contains("INFO", actualLog);
+            Assert.Contains(message, actualLog);
+            Assert.EndsWith(Environment.NewLine, actualLog);
         }
 
         [Fact]
@@ -41,11 +47,15 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var message = "some message";
             var time = DateTimeOffset.MinValue;
             clockMock.SetupGet(obj => obj.Now).Returns(time);
-            var expectedLog = $"{time} [ERROR]: some message" + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogError(message);
             var actualLog = consoleOutput.ToString();
-            Assert.Equal(expectedLog, actualLog);
+
+            // Verify that the expected elements are present in the produced output.
+            Assert.Contains(time.ToString(), actualLog);
+            Assert.Contains("ERROR", actualLog);
+            Assert.Contains(message, actualLog);
+            Assert.EndsWith(Environment.NewLine, actualLog);
         }
 
         [Fact]
@@ -55,13 +65,15 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             var time = DateTimeOffset.MinValue;
             clockMock.SetupGet(obj => obj.Now).Returns(time);
             var exception = new InvalidOperationException();
-            var expectedLog = $"{time} [ERROR]: " +
-                "Exception encountered: System.InvalidOperationException: " +
-                exception.Message + Environment.NewLine + exception.StackTrace + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogException(exception);
             var actualLog = consoleOutput.ToString();
-            Assert.Equal(expectedLog, actualLog);
+
+            // Verify that the expected elements are present in the produced output.
+            Assert.Contains(time.ToString(), actualLog);
+            Assert.Contains("ERROR", actualLog);
+            Assert.Contains(exception.Message, actualLog);
+            Assert.EndsWith(Environment.NewLine, actualLog);
         }
 
         [Fact]
@@ -81,13 +93,16 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
                 exception = thrownException;
             }
 
-            var expectedLog = $"{time} [ERROR]: " +
-                "Exception encountered: System.InvalidOperationException: " +
-                exception.Message + Environment.NewLine + exception.StackTrace + Environment.NewLine;
             Console.SetOut(consoleOutput);
             logger.LogException(exception);
             var actualLog = consoleOutput.ToString();
-            Assert.Equal(expectedLog, actualLog);
+
+            // Verify that the expected elements are present in the produced output.
+            Assert.Contains(time.ToString(), actualLog);
+            Assert.Contains("ERROR", actualLog);
+            Assert.Contains(exception.Message, actualLog);
+            Assert.Contains(exception.StackTrace, actualLog);
+            Assert.EndsWith(Environment.NewLine, actualLog);
         }
     }
 }

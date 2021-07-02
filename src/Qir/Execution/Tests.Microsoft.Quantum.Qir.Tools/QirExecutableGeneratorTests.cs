@@ -38,8 +38,8 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             libraryDirectory.Create();
             libraryFiles = new List<FileInfo>()
             {
-                CreateFile("lib1", libraryDirectory, "lib1 contents"),
-                CreateFile("lib2", libraryDirectory, "lib2 contents"),
+                Util.CreateBinaryFile(libraryDirectory, "lib1", new byte[]{0x01, 0x23, 0x45, 0x67}),
+                Util.CreateBinaryFile(libraryDirectory, "lib2", new byte[]{0x89, 0xAB, 0xCD, 0xEF}),
             };
             includeDirectory = new DirectoryInfo($"{prefix}-include");
             includeDirectory.Create();
@@ -47,18 +47,18 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             sourceDirectory.Create();
             sourceFiles = new List<FileInfo>()
             {
-                CreateFile("src1.cpp", sourceDirectory, "src1 contents"),
-                CreateFile("src2.bc", sourceDirectory, "src2 contents"),
+                Util.CreateTextFile(sourceDirectory, "src1.cpp", "src1 contents"),
+                Util.CreateBinaryFile(sourceDirectory, "src2.bc", new byte[]{0xFE, 0xDC, 0xBA, 0x98}),
             };
             linkLibraries = new List<string> { "lib1", "lib2" };
         }
 
         public void Dispose()
         {
-            Util.DeleteDirectory(sourceDirectory);
-            Util.DeleteDirectory(includeDirectory);
-            Util.DeleteDirectory(libraryDirectory);
-            Util.DeleteDirectory(binDirectory);
+            sourceDirectory.Delete(true);
+            includeDirectory.Delete(true);
+            libraryDirectory.Delete(true);
+            binDirectory.Delete(true);
         }
 
         [Fact]
@@ -79,35 +79,25 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             Assert.True(FilesWereCopied(libraryFiles.ToArray(), binDirectory));
         }
 
-        private static FileInfo CreateFile(string fileName, DirectoryInfo directory, string contents)
-        {
-            var filePath = Path.Combine(directory.FullName, fileName);
-            var fileInfo = new FileInfo(filePath);
-            using var fileStream = fileInfo.OpenWrite();
-            using var streamWriter = new StreamWriter(fileStream);
-            streamWriter.Write(contents);
-            return fileInfo;
-        }
-
         private static bool FilesWereCopied(FileInfo[] files, DirectoryInfo destinationDirectory)
         {
             var destinationDirectoryFiles = destinationDirectory.GetFiles();
+
+            // N.B. Runtime is (number of FileInfo objects passed in) * (number of files in destination directory).
             foreach (var file in files)
             {
+                // Make sure that the file was copied and that the contents is the same.
                 var copiedFile = destinationDirectoryFiles.FirstOrDefault(fileInfo => fileInfo.Name == file.Name);
                 if (copiedFile == null)
                 {
                     return false;
                 }
 
-                using var originalFileReader = file.OpenText();
-                var originalFileContents = originalFileReader.ReadToEnd();
-                using var copiedFileReader = copiedFile.OpenText();
-                var copiedFileContents = copiedFileReader.ReadToEnd();
-                if (originalFileContents != copiedFileContents)
+                if (!Util.CompareFiles(file, copiedFile))
                 {
                     return false;
                 }
+
             }
 
             return true;

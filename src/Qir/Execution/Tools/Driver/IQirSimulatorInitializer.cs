@@ -11,8 +11,8 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
     {
         public string Generate();
 
-        public IList<string> Headers { get; }
+        public IEnumerable<string> Headers { get; }
 
-        public IList<string> LinkLibraries { get; }
+        public IEnumerable<string> LinkLibraries { get; }
     }
 }

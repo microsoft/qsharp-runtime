@@ -60,10 +60,10 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
 
         public void Dispose()
         {
-            Util.DeleteDirectory(sourceDirectory);
-            Util.DeleteDirectory(includeDirectory);
-            Util.DeleteDirectory(libraryDirectory);
-            Util.DeleteDirectory(binDirectory);
+            sourceDirectory.Delete(true);
+            includeDirectory.Delete(true);
+            libraryDirectory.Delete(true);
+            binDirectory.Delete(true);
         }
 
         [Fact]
@@ -84,11 +84,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             // Verify that the "bytecode" file was created correctly.
             var bytecodeFilePath = new FileInfo(Path.Combine(sourceDirectory.FullName, "qir.bc"));
             using var bytecodeFileStream = bytecodeFilePath.OpenRead();
-            Assert.Equal(bytecodeFileStream.Length, qirBytecode.Length);
-            for (var i = 0; i < bytecodeFileStream.Length; ++i)
-            {
-                Assert.Equal(qirBytecode[i], bytecodeFileStream.ReadByte());
-            }
+            Assert.True(Util.CompareStreams(new MemoryStream(qirBytecode), bytecodeFileStream));
 
             // Verify that the driver was written to the correct file.
             var driver = new FileInfo(Path.Combine(sourceDirectory.FullName, "driver.cpp"));
