@@ -28,9 +28,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         public override IList<DirectoryInfo> LibraryDirectories { get; } = new List<DirectoryInfo>();
 
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBytecode, ILogger logger = null)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, ILogger logger = null)
             : base(executableFile,
-                  qirBytecode,
+                  qirBitcode,
                   new QirFullStateDriverGenerator(),
                   logger)
         {
