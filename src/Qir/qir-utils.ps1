@@ -115,10 +115,14 @@ function Build-CMakeProject {
         # TODO: 
         #     For Win consider extra build configuration linking all libs staticly, enable `-fsanitize=undefined`, run the staticly linked tests.
 
-        # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
-        #   No support for Win.
-        #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
-        $sanitizeFlags += " -fsanitize=safe-stack"
+        if (-not ($IsMacOS))
+        {
+            # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
+            #   No support for Win, Mac.
+            #       clang: error: unsupported option '-fsanitize=safe-stack' for target 'x86_64-apple-darwin19.6.0'
+            #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
+            $sanitizeFlags += " -fsanitize=safe-stack"
+        }
 
         $sanitizeFlags += " -fno-omit-frame-pointer"            # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
         $sanitizeFlags += " -fno-optimize-sibling-calls"        # https://clang.llvm.org/docs/AddressSanitizer.html
