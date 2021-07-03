@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.16.210526594-alpha" />
+    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.210728751-alpha" />
   </ItemGroup>
   
   <ItemGroup>
