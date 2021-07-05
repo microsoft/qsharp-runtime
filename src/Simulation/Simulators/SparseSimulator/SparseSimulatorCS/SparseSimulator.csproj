@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.2101126940">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+<!--From qsharp-runtime /src/Simulation/common/Simulators.Dev.props-->
+  <PropertyGroup Condition="'$(QsimDll)' == ''">
+    <QsimDllMac>..\Native\build\libSparseQuantumSimulator.dylib</QsimDllMac>
+    <QsimDllLinux>..\Native\build\libSparseQuantumSimulator.so</QsimDllLinux>
+    <QsimDllWindows>..\Native\build\$(Configuration)\SparseQuantumSimulator.dll</QsimDllWindows>
+    <QSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(QsimDllMac)</QSimDll>
+    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
+    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindows)</QSimDll>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(QSimDLL)">
+			<Link>SparseQuantumSimulator.dll</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Pack>true</Pack>
+		</None>
+	</ItemGroup>
+
+
+</Project>
