@@ -1,4 +1,7 @@
-﻿namespace Microsoft.Quantum.SparseSimulatorTests {
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+namespace Microsoft.Quantum.SparseSimulatorTests {
 
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;

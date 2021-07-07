@@ -1,4 +1,7 @@
-﻿// Functions that access the internal wavefunction for diagnostic purposes
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+// Functions that access the internal wavefunction for diagnostic purposes
 
 using Microsoft.Quantum.Simulation;
 using Microsoft.Quantum.Simulation.Common;

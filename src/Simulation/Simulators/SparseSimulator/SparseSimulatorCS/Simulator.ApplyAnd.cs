@@ -1,4 +1,7 @@
-﻿// Overrides the basic AND gate for faster execution 
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+// Overrides the basic AND gate for faster execution 
 
 using Microsoft.Quantum.Simulation.Core;
 using System;
