@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
     /// <summary>
     /// A QIR submitter that does nothing.
     /// </summary>
-    public class NoOpQirSubmitter : IQirSubmitter
+    internal class NoOpQirSubmitter : IQirSubmitter
     {
         /// <summary>
         /// The target for the no-op QIR submitter.
