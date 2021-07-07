@@ -43,7 +43,7 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 #include ""QirContext.hpp""
 
 ");
- foreach (var header in SimulatorInitializer.Headers) { 
+ foreach (var header in RuntimeInitializer.Headers) { 
             this.Write("#include \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(header));
             this.Write("\"\r\n");
@@ -157,8 +157,8 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("\r\n");
  } 
             this.Write("); // QIR interop function.\r\n\r\nint main(int argc, char* argv[])\r\n{\r\n    CLI::App " +
-                    "app(\"QIR Standalone Entry Point\");\r\n\r\n    // Initialize simulator.\r\n");
- var initializerReader = new StringReader(SimulatorInitializer.Generate());
+                    "app(\"QIR Standalone Entry Point\");\r\n\r\n    // Initialize runtime.\r\n");
+ var initializerReader = new StringReader(RuntimeInitializer.Generate());
    string line;
    while((line = initializerReader.ReadLine()) != null) { 
             this.Write("    ");

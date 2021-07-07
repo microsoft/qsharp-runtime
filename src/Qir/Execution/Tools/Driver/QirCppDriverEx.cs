@@ -9,12 +9,12 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
     {
         public readonly EntryPointOperation EntryPoint;
 
-        public readonly IQirSimulatorInitializer SimulatorInitializer;
+        public readonly IQirRuntimeInitializer RuntimeInitializer;
 
-        public QirCppDriver(EntryPointOperation entryPoint, IQirSimulatorInitializer simulatorInitializer)
+        public QirCppDriver(EntryPointOperation entryPoint, IQirRuntimeInitializer runtimeInitializer)
         {
             EntryPoint = entryPoint;
-            SimulatorInitializer = simulatorInitializer;
+            RuntimeInitializer = runtimeInitializer;
         }
     }
 }

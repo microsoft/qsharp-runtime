@@ -13,18 +13,18 @@ namespace Microsoft.Quantum.Qir.Tools.Driver
 {
     public class QirCppDriverGenerator : IQirDriverGenerator
     {
-        private readonly IQirSimulatorInitializer SimulatorInitalizer;
+        private readonly IQirRuntimeInitializer RuntimeInitalizer;
 
         private delegate string StringConversion(ArgumentValue value);
 
-        public QirCppDriverGenerator(IQirSimulatorInitializer simulatorInitializer)
+        public QirCppDriverGenerator(IQirRuntimeInitializer runtimeInitializer)
         {
-            SimulatorInitalizer = simulatorInitializer;
+            RuntimeInitalizer = runtimeInitializer;
         }
 
         public async Task GenerateAsync(EntryPointOperation entryPointOperation, Stream stream)
         {
-            var qirCppDriver = new QirCppDriver(entryPointOperation, SimulatorInitalizer);
+            var qirCppDriver = new QirCppDriver(entryPointOperation, RuntimeInitalizer);
             var cppSource = qirCppDriver.TransformText();
             await stream.WriteAsync(Encoding.UTF8.GetBytes(cppSource));
             await stream.FlushAsync();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
-    public interface IQirSimulatorInitializer
+    public interface IQirRuntimeInitializer
     {
         public string Generate();
 

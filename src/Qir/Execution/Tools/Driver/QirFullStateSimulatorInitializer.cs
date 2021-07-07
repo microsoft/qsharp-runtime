@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Tools.Driver
 {
-    public class QirFullStateSimulatorInitializer : IQirSimulatorInitializer
+    public class QirFullStateSimulatorInitializer : IQirRuntimeInitializer
     {
         public string Generate() => new QirCppFullStateSimulatorInitializer().TransformText();
 
