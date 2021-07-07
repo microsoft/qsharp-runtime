@@ -75,7 +75,7 @@ To add a gate to the simulator, you will need to add it to:
 
 Optionally, you may need to add a Q\# and C\# file to the SparseSimulatorCS folder, to create a Q\# operation to call the gate if it does not already exist.
 
-## Quantum State (quantum_state.hpp and basec_quantum_state.hpp)
+## Quantum State (quantum_state.hpp and basic_quantum_state.hpp)
 This code will modify the actual wavefunction data structure. The code for the `H` gate will be a good template. Typically, such a function will create a new wavefunction object, then iterate through the existing wavefunction to compute new (label, amplitude) pairs, which are inserted into the new wavefunction. Finally, it moves the new data into the old wavefunction object. 
 
 Since the hash map does not allow modifications while iterating through it, this is the only way to implement most gates.
@@ -104,7 +104,8 @@ Here `Id` is an internal variable for the simulator's ID, which must be passed t
 If you are implementing a gate that Q\# already expects (i.e., it is initialized in the `QuantumProcessorBase` class) then the previous steps will be enough. However, if you want to create an entirely new gate, you will need to create a Q\# operation to call it.
 
 "Probes.qs" and "Probes.cs" provide a template for how this code will look. In Q\#, declare the operation `YourNewGate` with code `body intrinsic;`. Then in a separate C\# file, use the following template:
-`public partial class YourNewGate
+```C#
+public partial class YourNewGate
 {
     public class Native : YourNewGate
     {
@@ -113,21 +114,24 @@ If you are implementing a gate that Q\# already expects (i.e., it is initialized
         {
             sim = m as SparseSimulator;
         }
-        public override Func<\#input types from Q\#\#, \#output types to Q\#\#> __Body__ => sim == null ? base.__Body__ : (args) => {
+        public override Func<'input types from Q#', 'output types to Q#'> __Body__ => sim == null ? base.__Body__ : (args) => {
             return sim.Your_new_gate(args.Item1, args.Item2,...);
         };
     }
-}`
+}
+```
 
 You will also need to add
-`public partial class SparseSimulator : QuantumProcessorDispatcher, IDisposable
+```c#
+public partial class SparseSimulator : QuantumProcessorDispatcher, IDisposable
 {
-    public \# Q\# return type\# Your_new_gate(\#args\#)
+    public 'Q# return type' Your_new_gate('args')
     {
-        return ((SparseSimulatorProcessor)this.QuantumProcessor).Your_new_gate(\#args\#);
+        return ((SparseSimulatorProcessor)this.QuantumProcessor).Your_new_gate('args');
     }
 }
-`
+```
+
 which tells the `SparseSimulator` class to forward the call to its internal `SparseSimulatorProcessor` class.
 
 
