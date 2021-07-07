@@ -3,11 +3,11 @@ This is a an alternative quantum simulator, compatible with Q\# and Microsoft's 
 
 # Repository Structure
 
-/SparseQuantumSimulator/
-|--/Native/: C++ code for the simulator
-|--/SparseSimulatorCS/: C# library for the simulator 
-|--/SparseSimQSharpTests/: Several Q# tests of the simulator
-|--/SparseSimulatorTests/: C++ tests of the simulator
+/SparseQuantumSimulator/  
+|--/Native/: C++ code for the simulator  
+|--/SparseSimulatorCS/: C# library for the simulator  
+|--/SparseSimQSharpTests/: Several Q# tests of the simulator  
+|--/SparseSimulatorTests/: C++ tests of the simulator  
 
 # Dependencies
  - CMake v1.2.0
