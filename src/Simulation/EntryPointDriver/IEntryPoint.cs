@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.EntryPointDriver.Azure;
+using Microsoft.Quantum.EntryPointDriver;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;

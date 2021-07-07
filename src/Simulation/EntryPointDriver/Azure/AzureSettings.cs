@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.EntryPointDriver.Azure
+namespace Microsoft.Quantum.EntryPointDriver
 {
     using Environment = System.Environment;
 

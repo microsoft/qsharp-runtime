@@ -11,7 +11,7 @@ using Microsoft.Quantum.Runtime.Submitters;
 using Microsoft.Quantum.Simulation.Common.Exceptions;
 using static Microsoft.Quantum.EntryPointDriver.Driver;
 
-namespace Microsoft.Quantum.EntryPointDriver.Azure
+namespace Microsoft.Quantum.EntryPointDriver
 {
     using Environment = System.Environment;
 

@@ -5,7 +5,7 @@ using Microsoft.Quantum.Runtime;
 using System.Collections.Immutable;
 using System.IO;
 
-namespace Microsoft.Quantum.EntryPointDriver.Azure
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// A QIR entry point submission.

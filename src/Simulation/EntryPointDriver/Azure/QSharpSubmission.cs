@@ -3,7 +3,7 @@
 
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.EntryPointDriver.Azure
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// A Q# entry point submission.

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.EntryPointDriver.Azure
+namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// The information to show in the output after the job is submitted.
