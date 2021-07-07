@@ -11,6 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+# Always use available Spectre mitigations
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mspeculative-load-hardening -mretpoline")
+
 if (WIN32)
     add_link_options("LINKER:/guard:cf")
 endif()
