@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#pragma once
-
 #include "../SparseQuantumSimulator/SparseSimulator.h"
 #include "../SparseQuantumSimulator/capi.hpp"
 #include "../SparseQuantumSimulator/capi.cpp" // yes really
