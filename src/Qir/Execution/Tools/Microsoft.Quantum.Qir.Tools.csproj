@@ -68,7 +68,9 @@
 
   <ItemGroup>
     <None Include="$(QSimDll)">
-      <Link>Libraries\%(FileName)%(Extension)</Link>
+      <Link Condition="$([MSBuild]::IsOsPlatform('Windows'))">Libraries\win-x64\%(FileName)%(Extension)</Link>
+      <Link Condition="$([MSBuild]::IsOsPlatform('OSX'))">Libraries\osx-x64\%(FileName)%(Extension)</Link>
+      <Link Condition="$([MSBuild]::IsOsPlatform('Linux'))">Libraries\linux-x64\%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>

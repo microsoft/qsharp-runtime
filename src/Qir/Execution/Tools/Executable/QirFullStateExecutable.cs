@@ -51,7 +51,6 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
             LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native")));
             LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "Libraries", osID)));
-            LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "Libraries")));
         }
     }
 }
