@@ -19,10 +19,10 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         brew update
         brew install ninja
     } else {
-        apt update
-        apt-get install -y ninja-build
-        apt-get install -y clang-11
-        apt-get install -y clang-tidy-11
+        su -c 'apt update'
+        su -c 'apt-get install -y ninja-build'
+        su -c 'apt-get install -y clang-11'
+        su -c 'apt-get install -y clang-tidy-11'
     }
 }
 
