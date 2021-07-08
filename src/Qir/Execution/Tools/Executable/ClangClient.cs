@@ -5,7 +5,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Utility;
+using Microsoft.Extensions.Logging;
+
+#nullable enable
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
@@ -14,9 +16,9 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         private const string LinkFlag = " -l ";
         private const string LibraryPathFlag = " -L ";
         private const string IncludePathFlag = " -I ";
-        private readonly ILogger logger;
+        private readonly ILogger? logger;
 
-        public ClangClient(ILogger logger)
+        public ClangClient(ILogger? logger)
         {
             this.logger = logger;
         }
@@ -30,7 +32,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             var libraryPathsArg = $"{LibraryPathFlag} {string.Join(LibraryPathFlag, libraryPaths)}";
             var includePathsArg = $"{IncludePathFlag} {string.Join(IncludePathFlag, includePaths)}";
             var arguments = $"{inputsArg} {includePathsArg} {libraryPathsArg} {linkedLibrariesArg} -o {outputPath} -std=c++17 -v";
-            logger?.LogInfo($"Invoking clang with the following arguments: {arguments}");
+            logger?.LogInformation($"Invoking clang with the following arguments: {arguments}");
             var taskCompletionSource = new TaskCompletionSource<bool>();
             using var process = new Process();
             AddPathsToEnvironmentVariable("DYLD_LIBRARY_PATH", libraryPaths);

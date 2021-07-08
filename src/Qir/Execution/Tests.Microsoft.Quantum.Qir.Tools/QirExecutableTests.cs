@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
 using Microsoft.Quantum.Qir.Tools.Driver;
 using Microsoft.Quantum.Qir.Tools.Executable;
-using Microsoft.Quantum.Qir.Utility;
 using Moq;
 using Xunit;
 
@@ -47,7 +46,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             driverGeneratorMock = new Mock<IQirDriverGenerator>();
             executableGeneratorMock = new Mock<IQirExecutableGenerator>();
             runnerMock = new Mock<IQuantumExecutableRunner>();
-            qirExecutable = new Mock<QirExecutable>(executableFile, qirBytecode, Mock.Of<ILogger>(), driverGeneratorMock.Object, executableGeneratorMock.Object, runnerMock.Object) { CallBase = true };
+            qirExecutable = new Mock<QirExecutable>(executableFile, qirBytecode, driverGeneratorMock.Object, executableGeneratorMock.Object, runnerMock.Object, null) { CallBase = true };
             linkLibraries = new List<string> { "lib1", "lib2" };
             headerDirectories = new List<DirectoryInfo>();
             libraryDirectories = new List<DirectoryInfo>();

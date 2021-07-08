@@ -4,22 +4,24 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Utility;
+using Microsoft.Extensions.Logging;
+
+#nullable enable
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
     internal class QuantumExecutableRunner : IQuantumExecutableRunner
     {
-        private readonly ILogger logger;
+        private readonly ILogger? logger;
 
-        public QuantumExecutableRunner(ILogger logger)
+        public QuantumExecutableRunner(ILogger? logger)
         {
             this.logger = logger;
         }
 
         public async Task RunExecutableAsync(FileInfo executableFile, Stream stream, string arguments)
         {
-            logger.LogInfo($"Invoking executable {executableFile.FullName} with the following arguments: {arguments}");
+            logger?.LogInformation($"Invoking executable {executableFile.FullName} with the following arguments: {arguments}");
             using var process = new Process();
             process.StartInfo = new ProcessStartInfo
             {
@@ -34,7 +36,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             process.WaitForExit();
             using var streamWriter = new StreamWriter(stream);
             await streamWriter.WriteAsync(output);
-            logger.LogInfo($"Executable has finished running. Result code: {process.ExitCode}");
+            logger?.LogInformation($"Executable has finished running. Result code: {process.ExitCode}");
         }
     }
 }

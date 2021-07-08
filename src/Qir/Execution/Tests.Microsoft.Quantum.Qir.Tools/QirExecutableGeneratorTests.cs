@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Tools.Executable;
-using Microsoft.Quantum.Qir.Utility;
 using Moq;
 using Xunit;
 
@@ -28,7 +27,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
         public QirExecutableGeneratorTests()
         {
             clangClientMock = new Mock<IClangClient>();
-            executableGenerator = new QirExecutableGenerator(clangClientMock.Object, Mock.Of<ILogger>());
+            executableGenerator = new QirExecutableGenerator(clangClientMock.Object, null);
 
             // Set up files.
             var prefix = Guid.NewGuid().ToString();

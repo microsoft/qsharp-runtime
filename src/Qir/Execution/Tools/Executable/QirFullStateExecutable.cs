@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 using Microsoft.Quantum.Qir.Tools.Driver;
-using Microsoft.Quantum.Qir.Utility;
+
+#nullable enable
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
@@ -28,7 +30,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         public override IList<DirectoryInfo> LibraryDirectories { get; } = new List<DirectoryInfo>();
 
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, ILogger logger = null)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, ILogger? logger = null)
             : base(executableFile,
                   qirBitcode,
                   new QirFullStateDriverGenerator(),
