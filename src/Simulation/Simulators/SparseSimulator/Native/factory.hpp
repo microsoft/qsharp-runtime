@@ -7,16 +7,12 @@
 #include "types.h"
 #include "SparseSimulator.h"
 
-namespace Microsoft
+namespace Microsoft::Quantum::SPARSESIMULATOR
 {
-namespace Quantum
-{
-namespace SPARSESIMULATOR
-{
+
 unsigned createSimulator(logical_qubit_id);
 void destroySimulator(unsigned);
 
 std::shared_ptr<SparseSimulator>& getSimulator(unsigned);
-} // namespace Simulator
-} // namespace Quantum
-} // namespace Microsoft
+
+} // namespace Microsoft::Quantum::SPARSESIMULATOR

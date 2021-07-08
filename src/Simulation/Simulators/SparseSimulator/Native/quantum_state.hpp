@@ -25,13 +25,8 @@
 
 using namespace std::literals::complex_literals;
 
-namespace Microsoft
+namespace Microsoft::Quantum::SPARSESIMULATOR
 {
-namespace Quantum
-{
-namespace SPARSESIMULATOR
-{
-
 
 // power of square root of -1
 inline amplitude iExp(int power)
@@ -1509,6 +1504,4 @@ private:
 };
 
 
-} // namespace SPARSESIMULATOR
-} // namespace Quantum
-} // namespace Microsoft
+} // namespace Microsoft::Quantum::SPARSESIMULATOR

@@ -9,13 +9,9 @@
 #include <iostream>
 #include <shared_mutex>
 
+namespace Microsoft::Quantum::SPARSESIMULATOR
+{
 
-namespace Microsoft
-{
-namespace Quantum
-{
-namespace SPARSESIMULATOR
-{
 // Ensures exclusive access to _simulators, the vector of simulators
 std::shared_mutex _mutex;
 std::vector<std::shared_ptr<SparseSimulator>> _simulators;
@@ -63,6 +59,4 @@ std::shared_ptr<SparseSimulator>& getSimulator(unsigned id)
     return _simulators[id];
 }
 
-} // namespace Simulator
-} // namespace Quantum
-} // namespace Microsoft
+} // namespace Microsoft::Quantum::SPARSESIMULATOR
