@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
                     }
                     else
                     {
-                        CopyDirectoryContents(dir, binDirectory);
+                        CopyDirectoryFilesIfNotExist(dir, binDirectory);
                         libDirs.Add(dir.FullName);
                     }
                 }
@@ -82,7 +82,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
             }
         }
 
-        private void CopyDirectoryContents(DirectoryInfo directoryToCopy, DirectoryInfo destinationDirectory)
+        private void CopyDirectoryFilesIfNotExist(DirectoryInfo directoryToCopy, DirectoryInfo destinationDirectory)
         {
             FileInfo[] files = directoryToCopy.GetFiles();
             foreach (var file in files)

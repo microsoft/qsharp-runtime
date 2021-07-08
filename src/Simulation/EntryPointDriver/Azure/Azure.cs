@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static Task<int> Submit<TIn, TOut>(
             AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
         {
-            Log(settings, settings.ToString());
+            LogIfVerbose(settings, settings.ToString());
 
             if ((settings.Location is null) && (settings.BaseUri is null))
             {
@@ -83,7 +83,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static async Task<int> SubmitQSharpMachine<TIn, TOut>(
             AzureSettings settings, IQuantumMachine machine, QSharpSubmission<TIn, TOut> submission)
         {
-            Log(settings, "Submitting Q# entry point using a quantum machine.");
+            LogIfVerbose(settings, "Submitting Q# entry point using a quantum machine.");
 
             if (settings.DryRun)
             {
@@ -111,7 +111,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static async Task<int> SubmitQSharp<TIn, TOut>(
             AzureSettings settings, IQSharpSubmitter submitter, QSharpSubmission<TIn, TOut> submission)
         {
-            Log(settings, "Submitting Q# entry point.");
+            LogIfVerbose(settings, "Submitting Q# entry point.");
 
             if (settings.DryRun)
             {
@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static async Task<int> SubmitQir(
             AzureSettings settings, IQirSubmitter submitter, QirSubmission submission)
         {
-            Log(settings, "Submitting QIR entry point.");
+            LogIfVerbose(settings, "Submitting QIR entry point.");
 
             if (settings.DryRun)
             {
@@ -248,7 +248,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="settings">The Azure Quantum submission settings.</param>
         /// <param name="message">The message.</param>
-        private static void Log(AzureSettings settings, string message)
+        private static void LogIfVerbose(AzureSettings settings, string message)
         {
             if (settings.Verbose)
             {

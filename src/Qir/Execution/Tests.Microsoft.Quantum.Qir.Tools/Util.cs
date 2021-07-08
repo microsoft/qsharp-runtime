@@ -38,20 +38,15 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
 
         public static FileInfo CreateBinaryFile(DirectoryInfo directory, string fileName, byte[] contents)
         {
-            var filePath = Path.Combine(directory.FullName, fileName);
-            var fileInfo = new FileInfo(filePath);
-            using var fileStream = fileInfo.OpenWrite();
-            fileStream.Write(contents);
+            var fileInfo = new FileInfo(Path.Combine(directory.FullName, fileName));
+            File.WriteAllBytes(fileInfo.FullName, contents);
             return fileInfo;
         }
 
         public static FileInfo CreateTextFile(DirectoryInfo directory, string fileName, string contents)
         {
-            var filePath = Path.Combine(directory.FullName, fileName);
-            var fileInfo = new FileInfo(filePath);
-            using var fileStream = fileInfo.OpenWrite();
-            using var streamWriter = new StreamWriter(fileStream);
-            streamWriter.Write(contents);
+            var fileInfo = new FileInfo(Path.Combine(directory.FullName, fileName));
+            File.WriteAllText(fileInfo.FullName, contents);
             return fileInfo;
         }
     }
