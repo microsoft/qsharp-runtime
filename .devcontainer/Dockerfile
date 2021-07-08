@@ -7,19 +7,16 @@ RUN apt-get -y update \
     && sh -c 'echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" > /etc/apt/sources.list.d/mono-official-stable.list' \
     && apt-get -y update \
     && apt-get -y install --no-install-recommends mono-complete nuget \
-    && apt-get -y install jq \
-                          cmake \
+    && apt-get -y install cmake \
                           ninja-build \
                           clang-11 \
                           clang-tidy-11 \
                           build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/
 
-# Install latest CMake (required since apt-get uses 3.16 and repo requires 3.20)
-RUN json=$(curl -s "https://api.github.com/repos/Kitware/CMake/releases") \
-    && latest_tag=$(echo $json | jq -r '.[] | select(.prerelease==false).tag_name' | sort --unique --version-sort | grep -v "rc" | tail -1) \
-    && sh_url=$(echo $json | jq -r ".[] | select(.tag_name==\"${latest_tag}\").assets[].browser_download_url | select(endswith(\"inux-x86_64.sh\"))") \
-    && curl -sL ${sh_url} -o cmakeinstall.sh \
+# Install CMake 3.20 (required since apt-get uses 3.16 and repo requires 3.20)
+RUN curl -SsL https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -o cmakeinstall.sh \
+    && echo "f582e02696ceee81818dc3378531804b2213ed41c2a8bc566253d16d894cefab cmakeinstall.sh" | sha256sum -c --strict - \
     && chmod +x cmakeinstall.sh \
     && ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir \
     && rm cmakeinstall.sh
