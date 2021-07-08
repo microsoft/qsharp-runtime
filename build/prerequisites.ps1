@@ -20,3 +20,11 @@ if ($Env:ENABLE_NATIVE -ne "false") {
 Push-Location (Join-Path $PSScriptRoot "../src/Qir/Runtime")
     .\prerequisites.ps1
 Pop-Location
+
+if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
+    Push-Location (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+        .\prerequisites.ps1
+    Pop-Location
+} else {
+    Write-Host "Skipping test of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
+}
