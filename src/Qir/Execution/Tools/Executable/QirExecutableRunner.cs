@@ -10,11 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Quantum.Qir.Tools.Executable
 {
-    internal class QuantumExecutableRunner : IQuantumExecutableRunner
+    internal class QirExecutableRunner : IQirExecutableRunner
     {
         private readonly ILogger? logger;
 
-        public QuantumExecutableRunner(ILogger? logger)
+        public QirExecutableRunner(ILogger? logger)
         {
             this.logger = logger;
         }

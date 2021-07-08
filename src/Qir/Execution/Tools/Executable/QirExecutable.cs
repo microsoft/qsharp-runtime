@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
 
         private readonly byte[] qirBitcode;
         private readonly ILogger? logger;
-        private readonly IQuantumExecutableRunner runner;
+        private readonly IQirExecutableRunner runner;
         private readonly IQirDriverGenerator driverGenerator;
         private readonly IQirExecutableGenerator executableGenerator;
 
@@ -40,12 +40,12 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
               qirBitcode,
               driverGenerator,
               new QirExecutableGenerator(new ClangClient(logger), logger),
-              new QuantumExecutableRunner(logger),
+              new QirExecutableRunner(logger),
               logger)
         {
         }
 
-        internal QirExecutable(FileInfo executableFile, byte[] qirBitcode, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQuantumExecutableRunner runner, ILogger? logger)
+        internal QirExecutable(FileInfo executableFile, byte[] qirBitcode, IQirDriverGenerator driverGenerator, IQirExecutableGenerator executableGenerator, IQirExecutableRunner runner, ILogger? logger)
         {
             ExecutableFile = executableFile;
             this.qirBitcode = qirBitcode;

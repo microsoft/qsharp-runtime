@@ -22,7 +22,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
         private readonly DirectoryInfo binDirectory;
         private readonly Mock<IQirDriverGenerator> driverGeneratorMock;
         private readonly Mock<IQirExecutableGenerator> executableGeneratorMock;
-        private readonly Mock<IQuantumExecutableRunner> runnerMock;
+        private readonly Mock<IQirExecutableRunner> runnerMock;
         private readonly Mock<QirExecutable> qirExecutable;
         private readonly FileInfo executableFile;
         private readonly byte[] qirBytecode = { 1, 2, 3, 4, 5 };
@@ -45,7 +45,7 @@ namespace Tests.Microsoft.Quantum.Qir.Tools
             executableFile = new FileInfo(Path.Combine(binDirectory.FullName, "executable"));
             driverGeneratorMock = new Mock<IQirDriverGenerator>();
             executableGeneratorMock = new Mock<IQirExecutableGenerator>();
-            runnerMock = new Mock<IQuantumExecutableRunner>();
+            runnerMock = new Mock<IQirExecutableRunner>();
             qirExecutable = new Mock<QirExecutable>(executableFile, qirBytecode, driverGeneratorMock.Object, executableGeneratorMock.Object, runnerMock.Object, null) { CallBase = true };
             linkLibraries = new List<string> { "lib1", "lib2" };
             headerDirectories = new List<DirectoryInfo>();
