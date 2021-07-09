@@ -1,3 +1,5 @@
+#Requires -PSEdition Core
+
 & (Join-Path $PSScriptRoot .. .. build set-env.ps1)
 
 function Build-QirProject {
