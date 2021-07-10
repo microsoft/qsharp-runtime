@@ -19,7 +19,7 @@ std::vector<std::shared_ptr<SparseSimulator>> _simulators;
 unsigned createSimulator(logical_qubit_id num_qubits)
 {
     if (num_qubits > MAX_QUBITS)
-        throw std::runtime_error("Max number of qubits is 1024!");
+        throw std::runtime_error("Max number of qubits is exceeded!");
     std::lock_guard<std::shared_mutex> lock(_mutex);
     size_t emptySlot = -1;
     for (auto const& s : _simulators)
