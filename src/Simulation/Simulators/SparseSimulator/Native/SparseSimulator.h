@@ -17,14 +17,13 @@
 
 #include <set>
 
-
-#define MAX_QUBITS 1024
-#define MIN_QUBITS 64
-
 using namespace std::literals::complex_literals;
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
+
+constexpr logical_qubit_id MAX_QUBITS = 1024;
+constexpr logical_qubit_id MIN_QUBITS = 64;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
