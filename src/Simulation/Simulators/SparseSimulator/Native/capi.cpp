@@ -6,17 +6,16 @@
 // index into the vector of simulators,
 // then call a member function
 
+#include <iostream>
+#include <string>
+#include <chrono>
+#include <thread>
+
 #include "capi.hpp"
 #include "SparseSimulator.h"
 #include "factory.hpp"
-#include <iostream>
-#include <string>
 
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
-
-
-#include<chrono>
-#include<thread>
 
 std::string sample_string;
 

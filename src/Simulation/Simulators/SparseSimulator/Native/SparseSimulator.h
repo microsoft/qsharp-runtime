@@ -4,19 +4,19 @@
 #pragma once
 
 #include <string>
-#include "types.h"
-#include "gates.h"
 #include <random>
 #include <cmath>
 #include <functional>
-#include "quantum_state.hpp"
-#include "basic_quantum_state.hpp"
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <list>
-
 #include <set>
+
+#include "quantum_state.hpp"
+#include "basic_quantum_state.hpp"
+#include "types.h"
+#include "gates.h"
 
 using namespace std::literals::complex_literals;
 

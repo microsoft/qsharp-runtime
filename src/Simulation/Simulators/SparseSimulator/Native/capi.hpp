@@ -3,9 +3,8 @@
 
 #pragma once
 
-
-
 #include <complex>
+
 #include "types.h"
 
 // SAL only defined in windows.

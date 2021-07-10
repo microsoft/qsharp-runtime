@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 #pragma once
-#include "types.h"
-#include "gates.h"
+
 #include <list>
 
+#include "types.h"
+#include "gates.h"
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {

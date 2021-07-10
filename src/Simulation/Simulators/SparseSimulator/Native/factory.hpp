@@ -4,6 +4,7 @@
 // Manages simulators in a vector of pointers to simulators
 
 #pragma once
+
 #include "types.h"
 #include "SparseSimulator.h"
 

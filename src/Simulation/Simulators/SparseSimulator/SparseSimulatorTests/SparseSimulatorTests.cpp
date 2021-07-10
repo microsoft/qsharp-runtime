@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../SparseQuantumSimulator/SparseSimulator.h"
+#include "../Native/SparseSimulator.h"
 #include "TestHelpers.hpp"
 #include <cmath>
 #include <iostream>

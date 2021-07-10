@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include "../SparseQuantumSimulator/SparseSimulator.h"
-#include "../SparseQuantumSimulator/capi.hpp"
-#include "../SparseQuantumSimulator/capi.cpp" // yes really
-#include "../SparseQuantumSimulator/factory.hpp"
-#include "../SparseQuantumSimulator/factory.cpp"
+#include "../Native/SparseSimulator.h"
+#include "../Native/capi.hpp"
+#include "../Native/capi.cpp" // yes really
+#include "../Native/factory.hpp"
+#include "../Native/factory.cpp"
 #include "TestHelpers.hpp"
 
 #include "CppUnitTest.h"

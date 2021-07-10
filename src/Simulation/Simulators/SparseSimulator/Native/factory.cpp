@@ -3,11 +3,12 @@
 
 // Manages simulators in a vector of pointers to simulators
 
+#include <iostream>
+#include <shared_mutex>
+
 #include "factory.hpp"
 #include "SparseSimulator.h"
 #include "types.h"
-#include <iostream>
-#include <shared_mutex>
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {

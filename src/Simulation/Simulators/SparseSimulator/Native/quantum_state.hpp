@@ -2,26 +2,25 @@
 // Licensed under the MIT License.
 
 #pragma once
+
 #include <string>
 #include <unordered_map>
-#include "types.h"
-#include "gates.h"
 #include <random>
 #include <cmath>
 #include <functional>
-#include "basic_quantum_state.hpp"
-#include "quantum_hash_map.hpp"
 #include <algorithm>
 #include <list>
 #include <iostream>
-
 #include <atomic>
 #include <thread>
-
 #ifdef _OPENMP
     #include <omp.h>
 #endif
 
+#include "basic_quantum_state.hpp"
+#include "quantum_hash_map.hpp"
+#include "types.h"
+#include "gates.h"
 
 using namespace std::literals::complex_literals;
 

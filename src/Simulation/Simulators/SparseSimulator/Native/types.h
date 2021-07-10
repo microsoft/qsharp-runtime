@@ -7,9 +7,10 @@
 #include <complex>
 #include <unordered_map>
 #include <bitset>
-#include "quantum_hash_map.hpp"
 #include <shared_mutex>
 #include <mutex>
+
+#include "quantum_hash_map.hpp"
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
