@@ -20,9 +20,9 @@ using lock_type = std::lock_guard<mutex_type>;
 using recursive_lock_type = std::lock_guard<recursive_mutex_type>;
 
 #ifndef USE_SINGLE_PRECISION
-	using RealType = double;
+    using RealType = double;
 #else
-	using RealType = float;
+    using RealType = float;
 #endif
 
 // Logical qubit id is visible to the clients and is immutable during the lifetime of the qubit.

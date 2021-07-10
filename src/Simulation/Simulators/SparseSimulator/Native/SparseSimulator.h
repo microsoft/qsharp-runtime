@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #pragma once
+
 #include <string>
 #include "types.h"
 #include "gates.h"
@@ -33,17 +34,17 @@ constexpr logical_qubit_id MIN_QUBITS = 64;
 // qubits large, growing by powers of 2
 template<size_t max_num_bits>
 std::shared_ptr<BasicQuantumState> construct_wfn_helper(logical_qubit_id nqubits) {
-    return (nqubits > max_num_bits / 2) ?
-        std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>())
-        : (nqubits > MIN_QUBITS ? construct_wfn_helper<max_num_bits / 2>(nqubits) :
-            std::shared_ptr<BasicQuantumState>(new QuantumState<MIN_QUBITS>()));
+	return (nqubits > max_num_bits / 2) ?
+		std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>())
+		: (nqubits > MIN_QUBITS ? construct_wfn_helper<max_num_bits / 2>(nqubits) :
+			std::shared_ptr<BasicQuantumState>(new QuantumState<MIN_QUBITS>()));
 }
 
 // Constructs a new quantum state, templated to use enough qubits to hold `nqubits`,
 // with the same state as `old_sim`
 template<size_t max_num_bits>
 std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantumState> old_sim, logical_qubit_id nqubits) {
-    return (nqubits > max_num_bits / 2) ? std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim)): expand_wfn_helper<max_num_bits / 2>(old_sim, nqubits);
+	return (nqubits > max_num_bits / 2) ? std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim)): expand_wfn_helper<max_num_bits / 2>(old_sim, nqubits);
 }
 
 class SparseSimulator
