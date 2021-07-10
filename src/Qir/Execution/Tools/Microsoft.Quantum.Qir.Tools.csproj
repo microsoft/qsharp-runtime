@@ -12,7 +12,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Quantum.Qir.Runtime" Version="0.18.2107150698-alpha" />
     <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2107150698-alpha" />
+    <PackageReference Include="Microsoft.Quantum.Simulators" Version="0.18.2107150698-alpha" />
   </ItemGroup>
   
   <ItemGroup>
@@ -49,47 +51,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppFullStateSimulatorInitializer.tt</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\..\Qir\drops\bin\**\*">
-      <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\..\Qir\drops\include\**\*">
-      <Link>runtimes\any\native\include\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(QSimDll)">
-      <Link Condition="$([MSBuild]::IsOsPlatform('Windows'))">Libraries\win-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('OSX'))">Libraries\osx-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('Linux'))">Libraries\linux-x64\%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\..\Simulation\Native\win10\**\*">
-      <Link>Libraries\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\..\Simulation\Native\osx\**\*">
-      <Link>Libraries\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\..\Simulation\Native\linux\**\*">
-      <Link>Libraries\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
   </ItemGroup>
 
 </Project>

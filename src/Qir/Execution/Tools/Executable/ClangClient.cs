@@ -51,12 +51,12 @@ namespace Microsoft.Quantum.Qir.Tools.Executable
         private static void AddPathsToEnvironmentVariable(string variable, string[] values)
         {
             var newValue = string.Join(Path.PathSeparator, values);
-            var oldValue = Environment.GetEnvironmentVariable(variable);
+            var oldValue = System.Environment.GetEnvironmentVariable(variable);
             if (oldValue != null)
             {
                 newValue = oldValue + $"{Path.PathSeparator}{newValue}";
             }
-            Environment.SetEnvironmentVariable(variable, newValue);
+            System.Environment.SetEnvironmentVariable(variable, newValue);
         }
     }
 }
