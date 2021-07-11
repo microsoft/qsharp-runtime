@@ -1,21 +1,18 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 // Manages simulators in a vector of pointers to simulators
 
-#include "factory.hpp"
-#include "SparseSimulator.h"
-#include "types.h"
 #include <iostream>
 #include <shared_mutex>
 
+#include "factory.hpp"
+#include "SparseSimulator.h"
+#include "types.h"
 
-namespace Microsoft
+namespace Microsoft::Quantum::SPARSESIMULATOR
 {
-namespace Quantum
-{
-namespace SPARSESIMULATOR
-{
+
 // Ensures exclusive access to _simulators, the vector of simulators
 std::shared_mutex _mutex;
 std::vector<std::shared_ptr<SparseSimulator>> _simulators;
@@ -23,7 +20,7 @@ std::vector<std::shared_ptr<SparseSimulator>> _simulators;
 unsigned createSimulator(logical_qubit_id num_qubits)
 {
     if (num_qubits > MAX_QUBITS)
-        throw std::runtime_error("Max number of qubits is 1024!");
+        throw std::runtime_error("Max number of qubits is exceeded!");
     std::lock_guard<std::shared_mutex> lock(_mutex);
     size_t emptySlot = -1;
     for (auto const& s : _simulators)
@@ -63,6 +60,4 @@ std::shared_ptr<SparseSimulator>& getSimulator(unsigned id)
     return _simulators[id];
 }
 
-} // namespace Simulator
-} // namespace Quantum
-} // namespace Microsoft
+} // namespace Microsoft::Quantum::SPARSESIMULATOR
