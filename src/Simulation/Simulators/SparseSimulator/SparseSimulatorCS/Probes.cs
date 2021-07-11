@@ -321,6 +321,7 @@ namespace Microsoft.Quantum.SparseSimulation
         }
 
         [DllImport(simulator_dll)]
+        [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
         private static extern bool DumpQubits_cpp(uint sim, int length, int[] qubit_ids, DumpCallback callback);
 
         [DllImport(simulator_dll)]
