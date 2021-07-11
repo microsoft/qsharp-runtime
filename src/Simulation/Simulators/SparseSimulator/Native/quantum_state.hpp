@@ -49,7 +49,7 @@ inline amplitude iExp(int power)
 }
 
 template<size_t num_qubits>
-bool poppar(std::bitset<num_qubits> bitstring){
+bool get_parity(std::bitset<num_qubits> bitstring){
     return bitstring.count() % 2;
 }
 
@@ -225,14 +225,14 @@ public:
                 if (std::norm(id_coeff) > _rotation_precision_squared){
                     // If both coefficients are non-zero, we can just modify the state in-place
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-                        current_state->second *= (poppar(current_state->first & YZs) ? id_coeff : pauli_coeff);
+                        current_state->second *= (get_parity(current_state->first & YZs) ? id_coeff : pauli_coeff);
                     }
                 } else {
                     // If id_coeff = 0, then we make a new wavefunction and only add in those that will be multiplied
                     // by the pauli_coeff
                     wavefunction new_qubit_data = make_wavefunction(_qubit_data.size());
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-                        if (!poppar(current_state->first & YZs)){
+                        if (!get_parity(current_state->first & YZs)){
                             new_qubit_data.emplace(current_state->first, current_state->second * pauli_coeff);
                         }
                     }
@@ -242,7 +242,7 @@ public:
                 // If pauli_coeff=0, don't add states multiplied by the pauli_coeff
                 wavefunction new_qubit_data = make_wavefunction(_qubit_data.size());
                 for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-                    if (poppar(current_state->first & YZs)){
+                    if (get_parity(current_state->first & YZs)){
                         new_qubit_data.emplace(current_state->first, current_state->second * id_coeff);
                     }
                 }
@@ -279,11 +279,11 @@ public:
                 auto alt_state = _qubit_data.find(current_state->first ^ XYs);
                 if (alt_state == _qubit_data.end()) { // no matching value
                     new_qubit_data.emplace(current_state->first, current_state->second * id_coeff);
-                    new_qubit_data.emplace(current_state->first ^ XYs, current_state->second * (poppar(current_state->first & YZs) ? -pauli_coeff : pauli_coeff));
+                    new_qubit_data.emplace(current_state->first ^ XYs, current_state->second * (get_parity(current_state->first & YZs) ? -pauli_coeff : pauli_coeff));
                 }
                 else if (current_state->first < alt_state->first) {
                     // Each Y and Z gate adds a phase (since Y=iXZ)
-                    bool parity = poppar(current_state->first & YZs);
+                    bool parity = get_parity(current_state->first & YZs);
                     new_state = current_state->second * id_coeff + alt_state->second * (parity ? -pauli_coeff_alt : pauli_coeff_alt);
                     if (std::norm(new_state) > _rotation_precision_squared) {
                         new_qubit_data.emplace(current_state->first, new_state);
@@ -350,7 +350,7 @@ public:
                     // If both coefficients are non-zero, we can just modify the state in-place
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                         if ((current_state->first & cmask)==cmask) {
-                            current_state->second *= (poppar(current_state->first & YZs) ? id_coeff : pauli_coeff);
+                            current_state->second *= (get_parity(current_state->first & YZs) ? id_coeff : pauli_coeff);
                         }
                     }
                 } else {
@@ -358,7 +358,7 @@ public:
                     // by the pauli_coeff
                     wavefunction new_qubit_data = make_wavefunction(_qubit_data.size());
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-                        if (!poppar(current_state->first & YZs) && (current_state->first & cmask)==cmask){
+                        if (!get_parity(current_state->first & YZs) && (current_state->first & cmask)==cmask){
                             new_qubit_data.emplace(current_state->first, current_state->second * pauli_coeff);
                         }
                     }
@@ -368,7 +368,7 @@ public:
                 // If pauli_coeff=0, don't add states multiplied by the pauli_coeff
                 wavefunction new_qubit_data = make_wavefunction(_qubit_data.size());
                 for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-                    if (poppar(current_state->first & YZs) && (current_state->first & cmask)==cmask){
+                    if (get_parity(current_state->first & YZs) && (current_state->first & cmask)==cmask){
                         new_qubit_data.emplace(current_state->first, current_state->second * id_coeff);
                     }
                 }
@@ -405,11 +405,11 @@ public:
                     auto alt_state = _qubit_data.find(current_state->first ^ XYs);
                     if (alt_state == _qubit_data.end()) { // no matching value
                         new_qubit_data.emplace(current_state->first, current_state->second * id_coeff);
-                        new_qubit_data.emplace(current_state->first ^ XYs, current_state->second * (poppar(current_state->first & YZs) ? -pauli_coeff : pauli_coeff));
+                        new_qubit_data.emplace(current_state->first ^ XYs, current_state->second * (get_parity(current_state->first & YZs) ? -pauli_coeff : pauli_coeff));
                     }
                     else if (current_state->first < alt_state->first) { //current_state->first[any_xy]){//
                         // Each Y and Z gate adds a phase (since Y=iXZ)
-                        bool parity = poppar(current_state->first & YZs);
+                        bool parity = get_parity(current_state->first & YZs);
                         new_state = current_state->second * id_coeff + alt_state->second * (parity ? -pauli_coeff_alt : pauli_coeff_alt);
                         if (std::norm(new_state) > _rotation_precision_squared) {
                             new_qubit_data.emplace(current_state->first, new_state);
@@ -567,11 +567,11 @@ public:
             break;
         }
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-            if (std::norm(_qubit_data.find(current_state->first ^ XYs)->second -  current_state->second * (poppar(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
+            if (std::norm(_qubit_data.find(current_state->first ^ XYs)->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
                 qubit_label label = current_state->first;
                 amplitude val = current_state->second;
                 std::cout << "Problematic state: " << label << "\n";
-                std::cout << "Expected " << val * (poppar(label & YZs) ? -phaseShift : phaseShift);
+                std::cout << "Expected " << val * (get_parity(label & YZs) ? -phaseShift : phaseShift);
                 std::cout << ", got " << _qubit_data.find(label ^ XYs)->second << "\n";
                 std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
                 throw std::runtime_error("Not an eigenstate");
@@ -636,7 +636,7 @@ public:
         auto flipped_state = _qubit_data.end();
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
             flipped_state = _qubit_data.find(current_state->first ^ XYs); // no match returns _qubit_data.end()
-            projection += current_state->second * (flipped_state == _qubit_data.end() ? 0 : std::conj(flipped_state->second)) * (poppar(current_state->first & YZs) ? -phaseShift : phaseShift);
+            projection += current_state->second * (flipped_state == _qubit_data.end() ? 0 : std::conj(flipped_state->second)) * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift);
         }
         // The projector onto the -1 eigenspace (a result of "One") is 0.5 * (I - P)
         // So <psi| 0.5*(I - P)|psi> = 0.5 - 0.5*<psi|P|psi>
@@ -799,7 +799,7 @@ public:
                             } 
                             break;
                         case OP::Assert:
-                            if (poppar(label & op.controls) != op.result && std::norm(val) > _precision_squared){
+                            if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
                                 std::cout << "Problematic state: " << label << "\n";
                                 std::cout << "Amplitude: " << val << "\n";
                                 std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
@@ -901,7 +901,7 @@ public:
                                                 } 
                                                 break;
                                             case OP::Assert:
-                                                if (poppar(label & op.controls) != op.result && std::norm(val) > _precision_squared){
+                                                if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
                                                     std::cout << "Problematic state: " << label << "\n";
                                                     std::cout << "Amplitude: " << val << "\n";
                                                     std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
@@ -1376,7 +1376,7 @@ private:
                                 } 
                                 break;
                             case OP::Assert:
-                                if (poppar(label & op.controls) != op.result && std::norm(val) > _precision_squared){
+                                if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
                                     std::cout << "Problematic state: " << label << "\n";
                                     std::cout << "Amplitude: " << val << "\n";
                                     std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
