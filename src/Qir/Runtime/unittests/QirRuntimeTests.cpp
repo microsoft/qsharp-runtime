@@ -789,12 +789,12 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
 
-    PTuple inner = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*Qubit*/ void*));
+    PTuple inner = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Qubit*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
     innerWithControls->controls = controlsInner;
-    *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/*QirArrray*/ void*)) = target;
+    *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = target;
 
-    PTuple outer = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    PTuple outer = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
     outerWithControls->controls = controlsOuter;
     outerWithControls->innerTuple = innerWithControls;
@@ -825,16 +825,16 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
 
-    PTuple args = quantum__rt__tuple_create(+sizeof(/*Qubit*/ void*) + sizeof(int));
+    PTuple args = quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
     *reinterpret_cast<Qubit*>(args) = target;
     *reinterpret_cast<int*>(args + sizeof(/*Qubit*/ void*)) = 42;
 
-    PTuple inner = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*Tuple*/ void*));
+    PTuple inner = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Tuple*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
     innerWithControls->controls = controlsInner;
-    *reinterpret_cast<PTuple*>(innerWithControls->AsTuple() + sizeof(/*QirArrray*/ void*)) = args;
+    *reinterpret_cast<PTuple*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = args;
 
-    PTuple outer = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    PTuple outer = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
     outerWithControls->controls = controlsOuter;
     outerWithControls->innerTuple = innerWithControls;
@@ -845,7 +845,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     REQUIRE(!combined->ownsQubits);
 
     QirTupleHeader* unpackedArgs =
-        QirTupleHeader::GetHeader(*reinterpret_cast<PTuple*>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
+        QirTupleHeader::GetHeader(*reinterpret_cast<PTuple*>(unpacked->AsTuple() + sizeof(/* QirArray* */ void*)));
     REQUIRE(target == *reinterpret_cast<Qubit*>(unpackedArgs->AsTuple()));
     REQUIRE(42 == *reinterpret_cast<int*>(unpackedArgs->AsTuple() + sizeof(/*Qubit*/ void*)));
 

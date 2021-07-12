@@ -138,6 +138,35 @@ function Build-CMakeProject {
             ##      Instrumenting libstdc++ during CI builds seems impractical (https://stackoverflow.com/a/22301584/6362941).
             #$sanitizeFlags += " -fsanitize=memory -fsanitize-memory-track-origins=2"
 
+            # Address Sanitizer (https://clang.llvm.org/docs/AddressSanitizer.html)
+            # WSL: 
+            #   Running the QIR RT test like this `pwsh Runtime/test-qir-runtime.ps1`, during initialization of global variables 
+            #       complains for "heap-buffer-overflow" in a stacktrace containing 
+            #       "Common/externals/catch2/catch.hpp" and standard lib (basic_string.h, char_traits.h). After which the test is terminated (fails). 
+            #       Looks like false alarm.
+            #       TODO: We need to resolve this in order to enable address sanitizing in CI builds,
+            #   Running the same test as a stand-alone "src/Qir/Runtime/bin/Debug/unittests/qir-runtime-unittests" was reporting leaks in the beginning, but after the fix 
+            #       runs clean. 
+            #       Unfortunately, after reporting the leaks (in the end of the test), the sanitizer did not fail the test (the test succeeded), 
+            #       which will likely not let us catch the leaks during the CI builds/test-runs.
+            #   TODO:
+            #       * Consider updating Catch2.
+            #       * If updating Catch2 does not help, then investigate why stand-alone test runs successfully but as a .ps1 - not.
+            #       * Some tests verify the failure behavior, i.e. they cause Fail() to be called and return to the caller with the exception. 
+            #         Any allocations made between the call and the exception throw are leaking.
+            #         Extract such tests to a separate .cpp file or executable and compile with leak check off.
+            #       * Enable "-fsanitize=address" for Linux and Mac, QIR RT, tests, samples, and make them all work and run clean.
+            # Win:
+            #   [19/35] Linking CXX shared library lib\QIR\Microsoft.Quantum.Qir.Runtime.dll
+            #   FAILED: lib/QIR/Microsoft.Quantum.Qir.Runtime.dll lib/QIR/Microsoft.Quantum.Qir.Runtime.lib
+            #   cmd.exe /C "cd . && C:\PROGRA~1\LLVM12\bin\CLANG_~1.EXE -fuse-ld=lld-link -nostartfiles -nostdlib -Werror -Weverything -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-covered-switch-default -Wno-c99-extensions -Wno-padded -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-extra-semi-stmt -fsanitize=address -g -Xclang -gcodeview -O0 -DDEBUG -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd  -Xlinker /guard:cf -shared -o lib\QIR\Microsoft.Quantum.Qir.Runtime.dll  -Xlinker /implib:lib\QIR\Microsoft.Quantum.Qir.Runtime.lib -Xlinker /pdb:lib\QIR\Microsoft.Quantum.Qir.Runtime.pdb -Xlinker /version:0.0 lib/QIR/bridge-rt.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QirRange.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/OutputStream.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/Output.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/allocationsTracker.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/arrays.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/callables.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/context.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/delegated.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/strings.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/utils.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QubitManager.cpp.obj  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -loldnames && cd ."
+            #   lld-link: error: duplicate symbol: malloc
+            #   >>> defined at C:\src\llvm_package_6923b0a7\llvm-project\compiler-rt\lib\asan\asan_win_dll_thunk.cpp:34
+            #   >>>            clang_rt.asan_dll_thunk-x86_64.lib(asan_win_dll_thunk.cpp.obj)
+            #   >>> defined at ucrtbased.dll
+            #   clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+            $sanitizeFlags = " -fsanitize=address"   # https://clang.llvm.org/docs/AddressSanitizer.html
+
             # Common for all sanitizers:
             $sanitizeFlags += " -fsanitize-blacklist="      # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
                                                             # https://releases.llvm.org/11.0.1/tools/clang/docs/SanitizerSpecialCaseList.html
