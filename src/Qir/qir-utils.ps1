@@ -99,54 +99,57 @@ function Build-CMakeProject {
     $env:CXXFLAGS += $warningFlags
 
 
-    # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
+    if ($Env:BUILD_CONFIGURATION -eq "Debug") 
+    { 
+        # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
 
-    $sanitizeFlags = "" 
-    if (-not ($IsWindows))
-    {
-        # Undefined Behavior Sanitizer (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
-        # Win:
-        #   FAILED: lib/QIR/Microsoft.Quantum.Qir.Runtime.dll lib/QIR/Microsoft.Quantum.Qir.Runtime.lib
-        #   lld-link: error: /failifmismatch: mismatch detected for 'RuntimeLibrary':
-        #   >>> lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QubitManager.cpp.obj has value MD_DynamicRelease
-        #   >>> clang_rt.ubsan_standalone_cxx-x86_64.lib(ubsan_type_hash_win.cc.obj) has value MT_StaticRelease
-        #   clang++: error: linker command failed with exit code 1 (use -v to see invocation)
-        $sanitizeFlags += " -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
-        # TODO: 
-        #     For Win consider extra build configuration linking all libs staticly, enable `-fsanitize=undefined`, run the staticly linked tests.
-
-        if (-not ($IsMacOS))
+        $sanitizeFlags = "" 
+        if (-not ($IsWindows))
         {
-            # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
-            #   No support for Win, Mac.
-            #       clang: error: unsupported option '-fsanitize=safe-stack' for target 'x86_64-apple-darwin19.6.0'
-            #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
-            $sanitizeFlags += " -fsanitize=safe-stack"
-        }
+            # Undefined Behavior Sanitizer (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
+            # Win:
+            #   FAILED: lib/QIR/Microsoft.Quantum.Qir.Runtime.dll lib/QIR/Microsoft.Quantum.Qir.Runtime.lib
+            #   lld-link: error: /failifmismatch: mismatch detected for 'RuntimeLibrary':
+            #   >>> lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QubitManager.cpp.obj has value MD_DynamicRelease
+            #   >>> clang_rt.ubsan_standalone_cxx-x86_64.lib(ubsan_type_hash_win.cc.obj) has value MT_StaticRelease
+            #   clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+            $sanitizeFlags += " -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
+            # TODO: 
+            #     For Win consider extra build configuration linking all libs staticly, enable `-fsanitize=undefined`, run the staticly linked tests.
 
-        ## Memory Sanitizer (https://clang.llvm.org/docs/MemorySanitizer.html)
-        ## Win: Not supported.
-        ##      clang: error: unsupported option '-fsanitize=memory' for target 'x86_64-pc-windows-msvc'
-        ## WSL: Complains for use-of-uninitialized-value in `catch2/catch.hpp` during initialization of global vars 
-        ##      (if run both as `pwsh Runtime/test-qir-runtime.ps1` (or Tests/test-qir-tests.ps1) and as standalone). 
-        ##      An update of `catch2/catch.hpp` to 2.13.6 (search for "go to the v2.x branch" at https://github.com/catchorg/Catch2) didn't help.
-        ##      Suppressing of the errors in the updated `catch2/catch.hpp` and standard library headers eventually bumps into errors reported in `memcmp`,
-        ##      suppressing of which does not work (https://github.com/google/sanitizers/issues/1429#issuecomment-876799463).
-        ##      Looks like MSan will not work until the libstdc++ is recompiled to be instrumented (https://clang.llvm.org/docs/MemorySanitizer.html#handling-external-code).
-        ##      Instrumenting libstdc++ during CI builds seems impractical (https://stackoverflow.com/a/22301584/6362941).
-        #$sanitizeFlags += " -fsanitize=memory -fsanitize-memory-track-origins=2"
+            if (-not ($IsMacOS))
+            {
+                # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
+                #   No support for Win, Mac.
+                #       clang: error: unsupported option '-fsanitize=safe-stack' for target 'x86_64-apple-darwin19.6.0'
+                #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
+                $sanitizeFlags += " -fsanitize=safe-stack"
+            }
 
-        # Common for all sanitizers:
-        $sanitizeFlags += " -fsanitize-blacklist="      # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
-                                                        # https://releases.llvm.org/11.0.1/tools/clang/docs/SanitizerSpecialCaseList.html
-        $sanitizeFlags += (Join-Path $Path .. UBSan.ignore)
+            ## Memory Sanitizer (https://clang.llvm.org/docs/MemorySanitizer.html)
+            ## Win: Not supported.
+            ##      clang: error: unsupported option '-fsanitize=memory' for target 'x86_64-pc-windows-msvc'
+            ## WSL: Complains for use-of-uninitialized-value in `catch2/catch.hpp` during initialization of global vars 
+            ##      (if run both as `pwsh Runtime/test-qir-runtime.ps1` (or Tests/test-qir-tests.ps1) and as standalone). 
+            ##      An update of `catch2/catch.hpp` to 2.13.6 (search for "go to the v2.x branch" at https://github.com/catchorg/Catch2) didn't help.
+            ##      Suppressing of the errors in the updated `catch2/catch.hpp` and standard library headers eventually bumps into errors reported in `memcmp`,
+            ##      suppressing of which does not work (https://github.com/google/sanitizers/issues/1429#issuecomment-876799463).
+            ##      Looks like MSan will not work until the libstdc++ is recompiled to be instrumented (https://clang.llvm.org/docs/MemorySanitizer.html#handling-external-code).
+            ##      Instrumenting libstdc++ during CI builds seems impractical (https://stackoverflow.com/a/22301584/6362941).
+            #$sanitizeFlags += " -fsanitize=memory -fsanitize-memory-track-origins=2"
 
-        $sanitizeFlags += " -fno-omit-frame-pointer"            # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
-        $sanitizeFlags += " -fno-optimize-sibling-calls"        # https://clang.llvm.org/docs/AddressSanitizer.html
-    }
+            # Common for all sanitizers:
+            $sanitizeFlags += " -fsanitize-blacklist="      # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
+                                                            # https://releases.llvm.org/11.0.1/tools/clang/docs/SanitizerSpecialCaseList.html
+            $sanitizeFlags += (Join-Path $Path .. UBSan.ignore)
 
-    $env:CFLAGS   += $sanitizeFlags
-    $env:CXXFLAGS += $sanitizeFlags
+            $sanitizeFlags += " -fno-omit-frame-pointer"            # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+            $sanitizeFlags += " -fno-optimize-sibling-calls"        # https://clang.llvm.org/docs/AddressSanitizer.html
+        } # if (-not ($IsWindows))
+
+        $env:CFLAGS   += $sanitizeFlags
+        $env:CXXFLAGS += $sanitizeFlags
+    } # if ($Env:BUILD_CONFIGURATION -eq "Debug") 
 
 
     if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
