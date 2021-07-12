@@ -103,7 +103,7 @@ function Build-CMakeProject {
     { 
         # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
 
-        $sanitizeFlags = "" 
+        $sanitizeFlags = ""
         if (-not ($IsWindows))
         {
             # Undefined Behavior Sanitizer (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
@@ -115,16 +115,16 @@ function Build-CMakeProject {
             #   clang++: error: linker command failed with exit code 1 (use -v to see invocation)
             $sanitizeFlags += " -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
             # TODO: 
-            #     For Win consider extra build configuration linking all libs staticly, enable `-fsanitize=undefined`, run the staticly linked tests.
+            #     For Win consider extra build configuration linking all libs statically, enable `-fsanitize=undefined`, run the statically linked tests.
 
-            if (-not ($IsMacOS))
-            {
-                # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
-                #   No support for Win, Mac.
-                #       clang: error: unsupported option '-fsanitize=safe-stack' for target 'x86_64-apple-darwin19.6.0'
-                #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
-                $sanitizeFlags += " -fsanitize=safe-stack"
-            }
+            #if (-not ($IsMacOS))   # Cannot be combined with `-fsanitize=address`.
+            #{
+            #    # Safe Stack instrumentation (https://clang.llvm.org/docs/SafeStack.html):
+            #    #   No support for Win, Mac.
+            #    #       clang: error: unsupported option '-fsanitize=safe-stack' for target 'x86_64-apple-darwin19.6.0'
+            #    #   Linking a DSO with SafeStack is not currently supported. But compilation, linking, and test runs all succeed.
+            #    $sanitizeFlags += " -fsanitize=safe-stack"
+            #}
 
             ## Memory Sanitizer (https://clang.llvm.org/docs/MemorySanitizer.html)
             ## Win: Not supported.
@@ -139,33 +139,25 @@ function Build-CMakeProject {
             #$sanitizeFlags += " -fsanitize=memory -fsanitize-memory-track-origins=2"
 
             # Address Sanitizer (https://clang.llvm.org/docs/AddressSanitizer.html)
-            # WSL: 
-            #   Running the QIR RT test like this `pwsh Runtime/test-qir-runtime.ps1`, during initialization of global variables 
-            #       complains for "heap-buffer-overflow" in a stacktrace containing 
-            #       "Common/externals/catch2/catch.hpp" and standard lib (basic_string.h, char_traits.h). After which the test is terminated (fails). 
-            #       Looks like false alarm.
-            #       TODO: We need to resolve this in order to enable address sanitizing in CI builds,
-            #   Running the same test as a stand-alone "src/Qir/Runtime/bin/Debug/unittests/qir-runtime-unittests" was reporting leaks in the beginning, but after the fix 
-            #       runs clean. 
-            #       Unfortunately, after reporting the leaks (in the end of the test), the sanitizer did not fail the test (the test succeeded), 
-            #       which will likely not let us catch the leaks during the CI builds/test-runs.
-            #   TODO:
-            #       * Consider updating Catch2.
-            #       * If updating Catch2 does not help, then investigate why stand-alone test runs successfully but as a .ps1 - not.
-            #       * Some tests verify the failure behavior, i.e. they cause Fail() to be called and return to the caller with the exception. 
-            #         Any allocations made between the call and the exception throw are leaking.
-            #         Extract such tests to a separate .cpp file or executable and compile with leak check off.
-            #       * Enable "-fsanitize=address" for Linux and Mac, QIR RT, tests, samples, and make them all work and run clean.
-            # Win:
+            # Win: (Conflict between the ASan library and MSVC library)
             #   [19/35] Linking CXX shared library lib\QIR\Microsoft.Quantum.Qir.Runtime.dll
             #   FAILED: lib/QIR/Microsoft.Quantum.Qir.Runtime.dll lib/QIR/Microsoft.Quantum.Qir.Runtime.lib
-            #   cmd.exe /C "cd . && C:\PROGRA~1\LLVM12\bin\CLANG_~1.EXE -fuse-ld=lld-link -nostartfiles -nostdlib -Werror -Weverything -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-covered-switch-default -Wno-c99-extensions -Wno-padded -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-extra-semi-stmt -fsanitize=address -g -Xclang -gcodeview -O0 -DDEBUG -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd  -Xlinker /guard:cf -shared -o lib\QIR\Microsoft.Quantum.Qir.Runtime.dll  -Xlinker /implib:lib\QIR\Microsoft.Quantum.Qir.Runtime.lib -Xlinker /pdb:lib\QIR\Microsoft.Quantum.Qir.Runtime.pdb -Xlinker /version:0.0 lib/QIR/bridge-rt.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QirRange.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/OutputStream.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/Output.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/allocationsTracker.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/arrays.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/callables.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/context.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/delegated.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/strings.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/utils.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QubitManager.cpp.obj  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -loldnames && cd ."
+            #   cmd.exe /C "cd . && C:\PROGRA~1\LLVM12\bin\CLANG_~1.EXE -fuse-ld=lld-link -nostartfiles -nostdlib -Werror -Weverything .... \
+            #       -fsanitize=address -g -Xclang -gcodeview -O0 -DDEBUG -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd  \
+            #       -Xlinker /guard:cf -shared -o lib\QIR\Microsoft.Quantum.Qir.Runtime.dll  -Xlinker /implib:lib\QIR\Microsoft.Quantum.Qir.Runtime.lib \
+            #       -Xlinker /pdb:lib\QIR\Microsoft.Quantum.Qir.Runtime.pdb -Xlinker /version:0.0 lib/QIR/bridge-rt.obj \
+            #       lib/QIR/CMakeFiles/qir-rt-support-obj.dir/QirRange.cpp.obj lib/QIR/CMakeFiles/qir-rt-support-obj.dir/OutputStream.cpp.obj ....\
+            #       -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -loldnames && cd ."
             #   lld-link: error: duplicate symbol: malloc
             #   >>> defined at C:\src\llvm_package_6923b0a7\llvm-project\compiler-rt\lib\asan\asan_win_dll_thunk.cpp:34
             #   >>>            clang_rt.asan_dll_thunk-x86_64.lib(asan_win_dll_thunk.cpp.obj)
             #   >>> defined at ucrtbased.dll
             #   clang++: error: linker command failed with exit code 1 (use -v to see invocation)
-            $sanitizeFlags = " -fsanitize=address"   # https://clang.llvm.org/docs/AddressSanitizer.html
+            $sanitizeFlags += " -fsanitize=address"   # https://clang.llvm.org/docs/AddressSanitizer.html
+            #   TODO:
+            #       * Some tests verify the failure behavior, i.e. they cause `Fail()` to be called and return to the caller with the exception. 
+            #         Any allocations made between the call and the exception throw (caught by `REQUIRE_THROWS()`) are leaking.
+            #         Extract such tests to a separate .cpp file or executable and compile with leak check off (or suppress leaks in that .cpp or executable only).
 
             # Common for all sanitizers:
             $sanitizeFlags += " -fsanitize-blacklist="      # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
