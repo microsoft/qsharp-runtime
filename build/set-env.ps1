@@ -25,6 +25,8 @@ if ($Env:DROP_NATIVE -eq $null) {
     $Env:DROP_NATIVE = (Join-Path $PSScriptRoot "..")
 }
 
+If ($Env:INTERNAL_TOOLS_OUTDIR -eq $null) { $Env:INTERNAL_TOOLS_OUTDIR =  (Join-Path $Env:DROPS_DIR "internal_tools") }
+If (-not (Test-Path -Path $Env:INTERNAL_TOOLS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:INTERNAL_TOOLS_OUTDIR) }
 If ($Env:NUGET_OUTDIR -eq $null) { $Env:NUGET_OUTDIR =  (Join-Path $Env:DROPS_DIR "nugets") }
 If (-not (Test-Path -Path $Env:NUGET_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:NUGET_OUTDIR) }
 

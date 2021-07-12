@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="targetName">The execution target for job submission.</param>
         /// <param name="storageConnectionString">The connection string for the Azure storage account.</param>
         /// <returns>A quantum machine for job submission targeting <c>targetName</c>.</returns>
+        [Obsolete("Use SubmitterFactory.QSharpSubmitter.")]
         public static IQuantumMachine? CreateMachine(
             IWorkspace workspace, string targetName, string? storageConnectionString = null)
         {
