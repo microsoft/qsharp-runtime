@@ -25,7 +25,10 @@ set(rt_sup_source_files
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
 target_source_from_qir(qir-rt-support-obj bridge-rt.ll)
-target_include_directories(qir-rt-support-obj PUBLIC ${public_includes})
+target_include_directories(qir-rt-support-obj PUBLIC 
+    ${public_includes}   
+    ${common_includes}
+)
 set_property(TARGET qir-rt-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(qir-rt-support-obj PRIVATE EXPORT_QIR_API)
 

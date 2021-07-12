@@ -26,6 +26,33 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
 }
 
+if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
+    if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+        # Cargo was missing, so cannot build experimental simulators.
+        # That's fine if running locally, we'll warn the user and then skip.
+        # On CI, though, we should fail when the experimental simulator build
+        # is turned on by ENABLE_EXPERIMENTALSIM, but we can't actually
+        # proceed.
+        if ("$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true") {
+            Write-Host "##[error]Experimental simulators enabled, but cargo was not installed in CI pipeline.";
+        } else {
+            Write-Warning `
+                "Experimental simulators enabled, but cargo missing. " + `
+                "Either install cargo, or set `$Env:ENABLE_EXPERIMENTALSIM " + `
+                "to `"false`". Skipping experimental simulators.";
+        }
+    } else {
+        # Prerequisites are met, so let's go.
+        $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+        & "$expSim/build-qdk-sim-rs.ps1"
+        if ($LastExitCode -ne 0) {
+            $script:all_ok = $False
+        }
+    }
+} else {
+    Write-Host "Skipping build of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+}
+
 function Build-One {
     param(
         [string]$action,
@@ -50,8 +77,6 @@ function Build-One {
         $script:all_ok = $False
     }
 }
-
-Build-One 'publish' '../src/Simulation/CSharpGeneration.App'
 
 Build-One 'build' '../Simulation.sln'
 

@@ -5,8 +5,10 @@
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
+    <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/qdk_sim_rs/drop))</ExperimentalSimBuildPath>
   </PropertyGroup>
 
+  <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
   <PropertyGroup Condition="'$(QsimDll)' == ''">
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
     <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>
@@ -28,11 +30,30 @@
       <Visible>false</Visible>
     </None>
   </ItemGroup>
-  
-  <Target Name="BeforeCSharpCompile">
-    <ItemGroup>
-      <Compile Include="$(GeneratedFilesOutputPath)**/*.cs" Exclude="@(Compile)" AutoGen="true" />
-    </ItemGroup>
+
+  <!-- Copy the experimental simulators from xplat/qdk_sim_rs build to where we can see and use it. -->
+  <PropertyGroup Condition="'$(ExperimentalSimDll)' == ''">
+    <ExperimentalSimDllMac>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.dylib))</ExperimentalSimDllMac>
+    <ExperimentalSimDllLinux>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.so))</ExperimentalSimDllLinux>
+    <ExperimentalSimDllWindows>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/qdk_sim.dll))</ExperimentalSimDllWindows>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(ExperimentalSimDllMac)</ExperimentalSimDll>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(ExperimentalSimDllLinux)</ExperimentalSimDll>
+    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(ExperimentalSimDllWindows)</ExperimentalSimDll>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(ExperimentalSimDll)" Condition="Exists('$(ExperimentalSimDll)')">
+      <Link>Microsoft.Quantum.Experimental.Simulators.Runtime.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateExperimentalSimDll" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <Warning
+      Text="The experimental simulator DLL was not found at '$(ExperimentalSimDll)'; not including in simulators package."
+      Condition="!Exists('$(ExperimentalSimDll)')"
+    />
   </Target>
 
 </Project>

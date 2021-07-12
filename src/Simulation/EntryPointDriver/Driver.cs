@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.EntryPointDriver;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -13,6 +14,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Microsoft.Azure.Quantum.Authentication;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -46,6 +49,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
             ImmutableList.Create("--storage"), default, "The storage account connection string.");
+
+        /// <summary>
+        /// The credential option.
+        /// </summary>
+        private static readonly OptionInfo<CredentialType?> CredentialOption = new OptionInfo<CredentialType?>(
+            ImmutableList.Create("--credential"),
+            CredentialType.Default,
+            "The type of credential to use to authenticate with Azure.");
 
         /// <summary>
         /// The AAD token option.
@@ -83,8 +94,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The job name option.
         /// </summary>
-        private static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
+        private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
+            ImmutableList.Create("--job-name"), string.Empty, "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.
@@ -417,7 +428,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             var validators = AddOptionIfAvailable(command, SubscriptionOption)
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
-                .Concat(AddOptionIfAvailable(command, this.TargetOption))
+                .Concat(AddOptionIfAvailable(command, TargetOption))
+                .Concat(AddOptionIfAvailable(command, CredentialOption))
                 .Concat(AddOptionIfAvailable(command, StorageOption))
                 .Concat(AddOptionIfAvailable(command, AadTokenOption))
                 .Concat(AddOptionIfAvailable(command, BaseUriOption))
@@ -457,18 +469,19 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Subscription = azureSettings.Subscription,
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
-                Target = DefaultIfShadowed(entryPoint, this.TargetOption, azureSettings.Target),
+                Target = DefaultIfShadowed(entryPoint, TargetOption, azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
                 Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
+                Credential = DefaultIfShadowed(entryPoint, CredentialOption, azureSettings.Credential),
                 JobName = DefaultIfShadowed(entryPoint, JobNameOption, azureSettings.JobName),
                 Shots = DefaultIfShadowed(entryPoint, ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(entryPoint, OutputOption, azureSettings.Output),
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
                 Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
             });
-        
+
         /// <summary>
         /// A modification of the command-line <see cref="HelpBuilder"/> class.
         /// </summary>
