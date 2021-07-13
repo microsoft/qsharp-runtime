@@ -249,6 +249,7 @@ TEST_CASE("Restricted Area", "[QubitManager]")
     qm->Allocate(qqq, 2);
     // OK to destruct qubit manager while qubits are still allocated.
     REQUIRE_THROWS(qm->Allocate());
+    delete[] qqq;
 }
 
 TEST_CASE("Nested Restricted Areas", "[QubitManager]")

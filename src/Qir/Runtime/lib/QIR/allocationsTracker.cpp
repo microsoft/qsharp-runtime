@@ -20,7 +20,7 @@ namespace Quantum
         {
             if (inserted.first->second > 0)
             {
-                quantum__rt__fail(quantum__rt__string_create("Allocating an object over an existing object!"));
+                quantum__rt__fail_cstr("Allocating an object over an existing object!");
             }
             else
             {
@@ -34,13 +34,13 @@ namespace Quantum
         auto tracked = this->allocatedObjects.find(object);
         if (tracked == this->allocatedObjects.end())
         {
-            quantum__rt__fail(quantum__rt__string_create("Attempting to addref an object that isn't tracked!"));
+            quantum__rt__fail_cstr("Attempting to addref an object that isn't tracked!");
         }
         else
         {
             if (tracked->second <= 0)
             {
-                quantum__rt__fail(quantum__rt__string_create("Attempting to ressurect a previously released object!"));
+                quantum__rt__fail_cstr("Attempting to ressurect a previously released object!");
             }
             else
             {
@@ -54,13 +54,13 @@ namespace Quantum
         auto tracked = this->allocatedObjects.find(object);
         if (tracked == this->allocatedObjects.end())
         {
-            quantum__rt__fail(quantum__rt__string_create("Attempting to release an object that isn't tracked!"));
+            quantum__rt__fail_cstr("Attempting to release an object that isn't tracked!");
         }
         else
         {
             if (tracked->second <= 0)
             {
-                quantum__rt__fail(quantum__rt__string_create("Attempting to release a previously released object!"));
+                quantum__rt__fail_cstr("Attempting to release a previously released object!");
             }
             else
             {
@@ -75,7 +75,7 @@ namespace Quantum
         {
             if (tracked.second > 0)
             {
-                quantum__rt__fail(quantum__rt__string_create("Found a potentially leaked object!"));
+                quantum__rt__fail_cstr("Found a potentially leaked object!");
             }
         }
     }
