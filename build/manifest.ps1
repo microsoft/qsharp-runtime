@@ -26,6 +26,7 @@ $artifacts = @{
         "Microsoft.Quantum.Type1.Core",
         "Microsoft.Quantum.Type2.Core",
         "Microsoft.Quantum.Type3.Core",
+        "Microsoft.Quantum.Qir.Runtime",
         "Microsoft.Quantum.Qir.Tools",
         "Microsoft.Quantum.QSharp.Foundation"
         "Microsoft.Quantum.Runtime.Core",
