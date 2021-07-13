@@ -215,6 +215,7 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     quantum__rt__array_update_reference_count(a, -1);
     quantum__rt__array_update_reference_count(ac, -1);
     quantum__rt__array_update_reference_count(ca, -1);
+    quantum__rt__array_update_reference_count(c , -1);
 }
 
 TEST_CASE("Arrays: check the slice range", "[qir_support]")
@@ -297,13 +298,15 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
     QirArray* slice = nullptr;
 
     // even if slice results in a single value, it's still an array
-    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});
+    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});   // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
+                                                            // slice == char[1] == { '1' }.
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
-    quantum__rt__array_update_reference_count(slice, -1);
+    quantum__rt__array_update_reference_count(slice, -1);   // slice == dangling pointer.
 
     // reversed slices are alwayes disconnected
-    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});
+    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});   // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
+                                                                // slice == char[3] == {'4', '2', '0'}.
     REQUIRE(quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 0) == '4');
     REQUIRE(*quantum__rt__array_get_element_ptr_1d(slice, 1) == '2');
@@ -498,6 +501,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 1, 1, 0))) == 19);
     REQUIRE(*(reinterpret_cast<int*>(quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 57);
     quantum__rt__array_update_reference_count(slice, -1);
+    quantum__rt__array_update_reference_count(a    , -1);
 }
 
 TEST_CASE("Arrays: project of 3D array", "[qir_support]")
@@ -785,12 +789,12 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
 
-    PTuple inner = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*Qubit*/ void*));
+    PTuple inner = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Qubit*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
     innerWithControls->controls = controlsInner;
-    *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/*QirArrray*/ void*)) = target;
+    *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = target;
 
-    PTuple outer = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    PTuple outer = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
     outerWithControls->controls = controlsOuter;
     outerWithControls->innerTuple = innerWithControls;
@@ -821,16 +825,16 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     QirArray* controlsInner = quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = quantum__rt__qubit_allocate_array(2);
 
-    PTuple args = quantum__rt__tuple_create(+sizeof(/*Qubit*/ void*) + sizeof(int));
+    PTuple args = quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
     *reinterpret_cast<Qubit*>(args) = target;
     *reinterpret_cast<int*>(args + sizeof(/*Qubit*/ void*)) = 42;
 
-    PTuple inner = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*Tuple*/ void*));
+    PTuple inner = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Tuple*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
     innerWithControls->controls = controlsInner;
-    *reinterpret_cast<PTuple*>(innerWithControls->AsTuple() + sizeof(/*QirArrray*/ void*)) = args;
+    *reinterpret_cast<PTuple*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = args;
 
-    PTuple outer = quantum__rt__tuple_create(sizeof(/*QirArrray*/ void*) + sizeof(/*QirTupleHeader*/ void*));
+    PTuple outer = quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
     outerWithControls->controls = controlsOuter;
     outerWithControls->innerTuple = innerWithControls;
@@ -841,7 +845,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     REQUIRE(!combined->ownsQubits);
 
     QirTupleHeader* unpackedArgs =
-        QirTupleHeader::GetHeader(*reinterpret_cast<PTuple*>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
+        QirTupleHeader::GetHeader(*reinterpret_cast<PTuple*>(unpacked->AsTuple() + sizeof(/* QirArray* */ void*)));
     REQUIRE(target == *reinterpret_cast<Qubit*>(unpackedArgs->AsTuple()));
     REQUIRE(42 == *reinterpret_cast<int*>(unpackedArgs->AsTuple() + sizeof(/*Qubit*/ void*)));
 
@@ -1054,6 +1058,7 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     quantum__qis__exp__ctl(ctrls, axes, angle, targets);
     quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
 
+    quantum__rt__array_update_reference_count(axes, -1);
     quantum__rt__qubit_release_array(ctrls);    // The `ctrls` is a dangling pointer from now on.
     quantum__rt__qubit_release_array(targets);  // The `targets` is a dangling pointer from now on.
 

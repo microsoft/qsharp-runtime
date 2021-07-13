@@ -22,7 +22,7 @@ using namespace Microsoft::Quantum;
 ==============================================================================*/
 extern "C"
 {
-    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use unsigned integer type (breaking change).
+    PTuple quantum__rt__tuple_create(int64_t size)  // TODO: Use unsigned integer type for param (breaking change).
     {
         assert((uint64_t)size < std::numeric_limits<QirTupleHeader::TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 64-bit arch.
         return QirTupleHeader::Create(static_cast<QirTupleHeader::TBufSize>(size))->AsTuple();
@@ -187,7 +187,7 @@ int QirTupleHeader::Release()
     int retVal = --this->refCount;
     if (this->refCount == 0)
     {
-        char* buffer = reinterpret_cast<char*>(this);
+        PTuplePointedType* buffer = reinterpret_cast<PTuplePointedType*>(this);
         delete[] buffer;
     }
     return retVal;
@@ -195,7 +195,7 @@ int QirTupleHeader::Release()
 
 QirTupleHeader* QirTupleHeader::Create(TBufSize size)
 {
-    char* buffer = new char[sizeof(QirTupleHeader) + size];
+    PTuplePointedType* buffer = new PTuplePointedType[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
     {
@@ -214,7 +214,7 @@ QirTupleHeader* QirTupleHeader::Create(TBufSize size)
 QirTupleHeader* QirTupleHeader::CreateWithCopiedData(QirTupleHeader* other)
 {
     const TBufSize size = other->tupleSize;
-    char* buffer = new char[sizeof(QirTupleHeader) + size];
+    PTuplePointedType* buffer = new PTuplePointedType[sizeof(QirTupleHeader) + size];
 
     if (GlobalContext() != nullptr)
     {

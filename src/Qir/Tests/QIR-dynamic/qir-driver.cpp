@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
+#include <memory>
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
@@ -41,7 +42,8 @@ using namespace Microsoft::Quantum;
 
 TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
 {
-    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     const int64_t ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
     const int64_t ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
@@ -64,7 +66,8 @@ static bool FileExists(const char * filePath)
 
 TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
 {
-    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     // Dump to the std::cout:
     {
@@ -120,7 +123,8 @@ TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
 
 TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
 {
-    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     // Dump to the std::cout:
     {
@@ -182,15 +186,17 @@ static void AssertMeasMessageTest(void (*funcPtr)(const char *))
     Microsoft::Quantum::OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
 
     // Log something (to the redirected output):
-    REQUIRE_THROWS(funcPtr(testStr));
-
+    REQUIRE_THROWS(funcPtr(testStr));   // Returns with exception caught. Leaks any instances allocated (in .ll)
+                                        // from the moment of a call to the moment of the exception throw.
+                                        // TODO: Extract into a separate .cpp compiled with leak detection off.
     REQUIRE(outStrStream.str() == (std::string(testStr) + "\n"));
 }
 
 
 TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
 {
-    QirExecutionContext::Scoped contextReleaser{CreateFullstateSimulator().release()};
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop());
 

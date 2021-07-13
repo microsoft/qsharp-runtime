@@ -1,0 +1,42 @@
+# Undefined Behavior Sanitizer error suppressions:
+# https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
+
+[implicit-integer-sign-change]
+# frame #4: 0x00007ffff7ecc1f6 libMicrosoft.Quantum.Qir.QSharp.Foundation.so`long std::uniform_int_distribution<long>::operator(this=0x00007fffffffaca8, __urng=0x00007ffff78b3738, __param=0x00007fffffffaca8)<std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul> >(std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul>&, std::uniform_int_distribution<long>::param_type const&) at uniform_int_dist.h:284:9
+fun:*uniform_int_distribution*
+
+[unsigned-integer-overflow]
+# frame #4: 0x00007ffff7ecc4f7 libMicrosoft.Quantum.Qir.QSharp.Foundation.so`std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul>::seed(this=0x00007ffff78b4738, __sd=3850790205) at random.tcc:336:8
+fun:*mersenne_twister_engine*seed*
+# frame #4: 0x00007ffff7eccb8f libMicrosoft.Quantum.Qir.QSharp.Foundation.so`std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul>::max() at random.h:552:58
+fun:*mersenne_twister_engine*max*
+# frame #4: 0x00007ffff7ecd7db libMicrosoft.Quantum.Qir.QSharp.Foundation.so`std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul>::_M_gen_rand(this=0x00007ffff78b4738) at random.tcc:415:33
+fun:*mersenne_twister_engine*_M_gen_rand*
+# frame #4: 0x00007ffff7ecba93 libMicrosoft.Quantum.Qir.QSharp.Foundation.so`long std::uniform_int_distribution<long>::operator(this=0x00007fffffffaca8, __urng=0x00007ffff78b3738, __param=0x00007fffffffaca8)<std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul> >(std::mersenne_twister_engine<unsigned long, 64ul, 312ul, 156ul, 31ul, 13043109905998158313ul, 29ul, 6148914691236517205ul, 17ul, 8202884508482404352ul, 37ul, 18444473444759240704ul, 43ul, 6364136223846793005ul>&, std::uniform_int_distribution<long>::param_type const&) at uniform_int_dist.h:239:28
+fun:*uniform_int_distribution*
+
+## Memory Sanitizer error suppressions:
+#[memory]
+## 1: ==1121==WARNING: MemorySanitizer: use-of-uninitialized-value
+## 1:     #0 0xceef38 in std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, 
+##                                     std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::shared_ptr<Catch::IReporterFactory> >, 
+##                                     std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::shared_ptr<Catch::IReporterFactory> > >, 
+##                                     std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, 
+##                                     std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::shared_ptr<Catch::IReporterFactory> > > 
+##                                    >::_M_get_insert_unique_pos(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) 
+##                                    /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_tree.h:2092:7
+#fun:*_Rb_tree*_M_get_insert_unique_pos*
+## 1:     #0 0x754bc8 in Catch::(anonymous namespace)::parseSpecialTag(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) 
+##            /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/externals/catch2/catch.hpp:14014:40
+#fun:*Catch*parseSpecialTag*
+## 1:     #0 0x440f6e in memcmp (/mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/unittests/qir-runtime-unittests+0x440f6e)
+#fun:*memcmp*
+##
+## The `memcmp` suppression above does not work, but the suppression below still allows to make one step forward.
+## Then the error is reported in `memcmp` again, and moving forward is blocked. Instrumenting libstdc++ is required.
+## https://github.com/google/sanitizers/issues/1429#issuecomment-876799463
+## Instrumenting libstdc++ during CI builds seems impractical (https://stackoverflow.com/a/22301584/6362941).
+#
+##1:   Uninitialized value was created by an allocation of 'tag' in the stack frame of function '_ZN5Catch12makeTestCaseEPNS_12ITestInvokerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11NameAndTagsERKNS_14SourceLineInfoE'
+##1:     #0 0x752310 in Catch::makeTestCase(Catch::ITestInvoker*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, Catch::NameAndTags const&, Catch::SourceLineInfo const&) /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/externals/catch2/catch.hpp:14045
+#fun:*_ZN5Catch12makeTestCaseEPNS_12ITestInvokerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11NameAndTagsERKNS_14SourceLineInfoE*

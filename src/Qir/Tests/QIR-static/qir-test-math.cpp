@@ -106,11 +106,17 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
     // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5), std::runtime_error);
+        // Returns with exception. Leaks the instances created from the moment of call 
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.        
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5);
+            // Returns with exception. Leaks the instances created from the moment of call 
+            // to the moment of exception throw.
+            // TODO: Extract into a separate file compiled with leaks check off.        
     }
     catch (std::runtime_error const& exc)
     {
@@ -226,11 +232,17 @@ TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
 
     // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0), std::runtime_error);
+        // Returns with exception. Leaks the instances created from the moment of call 
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.        
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0);
+            // Returns with exception. Leaks the instances created from the moment of call 
+            // to the moment of exception throw.
+            // TODO: Extract into a separate file compiled with leaks check off.        
     }
     catch (std::runtime_error const& exc)
     {
