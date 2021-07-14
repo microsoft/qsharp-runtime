@@ -1,0 +1,3 @@
+﻿<#@ template language="C#" linePragmas="false" #>
+unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
