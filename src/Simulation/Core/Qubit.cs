@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.Quantum.Simulation.Core
 {
@@ -36,9 +37,11 @@ namespace Microsoft.Quantum.Simulation.Core
         public int Id { get; private set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public virtual object Value => this;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public virtual IEnumerable<Qubit> Qubits => new Qubit[] { this };
 
         public override bool Equals(object obj)
