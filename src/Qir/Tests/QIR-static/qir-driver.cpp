@@ -196,7 +196,9 @@ TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
     bool failed = false;
     try
     {
-        TestFailWithRangeString(0, 5, 42);
+        TestFailWithRangeString(0, 5, 42);  // Returns with exception. Leaks the instances created from the moment of call 
+                                            // to the moment of exception throw.
+                                            // TODO: Extract into a separate file compiled with leaks check off.
     }
     catch (const std::exception& e)
     {
