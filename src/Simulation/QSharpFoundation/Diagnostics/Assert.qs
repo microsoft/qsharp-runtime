@@ -71,7 +71,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ```qsharp
     /// using (register = Qubit()) {
     ///     H(register);
-    ///     AssertProb([PauliZ], [register], One, 0.5,
+    ///     AssertMeasurementProbability([PauliZ], [register], One, 0.5,
     ///         "Measuring in conjugate basis did not give 50/50 results.", 1e-5);
     /// }
     /// ```
