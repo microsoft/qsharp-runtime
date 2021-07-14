@@ -126,8 +126,10 @@ function Pack-Crate() {
         $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
     }
     Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
-        cargo package;
-        Copy-Item -Force -Recurse (Join-Path . "target" "package") $OutPath;
+        cargo +nightly package;
+        # Copy only the .crate file, since we don't need all the intermediate
+        # artifacts brought in by the full folder under target/package.
+        Copy-Item -Force (Join-Path . "target" "package" "*.crate") $OutPath;
     Pop-Location
 }
 
