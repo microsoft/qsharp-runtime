@@ -24,7 +24,7 @@ extern "C"
     // Release a single qubit.
     QIR_SHARED_API void quantum__rt__qubit_release(QUBIT*); // NOLINT
 
-    // Release qubits, owned by the array. The array itself still needs to be released.
+    // Release qubits, owned by the array. The array itself is also released.
     QIR_SHARED_API void quantum__rt__qubit_release_array(QirArray*); // NOLINT
 
     // Borrow a single qubit.
