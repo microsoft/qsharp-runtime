@@ -2,7 +2,8 @@
 
 ## Catch2
 
-We are using v2.12.1 single-header distribution of catch2 native framework from https://github.com/catchorg/Catch2 (2e61d38c7c3078e600c331257b5bebfb81aaa685).
+We are using v2.13.6 single-header distribution of catch2 native framework from https://github.com/catchorg/Catch2, v2.x branch 
+([Getting Catch2](https://github.com/catchorg/Catch2/blob/v2.x/docs/tutorial.md#getting-catch2), "single header version").
 
 ## CLI11
 

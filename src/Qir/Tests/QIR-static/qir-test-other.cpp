@@ -10,6 +10,9 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Other__PauliArrayAsIntFail
 TEST_CASE("QIR: Other.PauliArrayAsIntFail", "[qir.Other][qir.Other.PauliArrayAsIntFail]")
 {
     REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__Other__PauliArrayAsIntFailTest__Interop());
+        // Returns with exception. Leaks the instances created from the moment of call 
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.        
 }
 
 TEST_CASE("QIR: Other.PauliArrayAsInt", "[qir.Other][qir.Other.PauliArrayAsInt]")

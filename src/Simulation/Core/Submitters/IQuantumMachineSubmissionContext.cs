@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
     /// Interface to provide configuration details to submit a job.
     /// </summary>
+    [Obsolete("Replaced by SubmissionOptions.")]
     public interface IQuantumMachineSubmissionContext
     {
         /// <summary>

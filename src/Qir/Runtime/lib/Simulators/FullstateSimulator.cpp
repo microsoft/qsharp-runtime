@@ -36,12 +36,11 @@ typedef void* QUANTUM_SIMULATOR;
 
 namespace
 {
-#ifdef _WIN32
 const char* FULLSTATESIMULATORLIB = "Microsoft.Quantum.Simulator.Runtime.dll";
-#elif defined __APPLE__
-const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
-#else
-const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
+#if defined(__APPLE__)
+const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
+#elif !defined(_WIN32)
+const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
 #endif
 
 QUANTUM_SIMULATOR LoadQuantumSimulator()
@@ -59,8 +58,12 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     handle = ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
     if (handle == nullptr)
     {
-        throw std::runtime_error(
-            std::string("Failed to load ") + FULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+        handle = ::dlopen(XPLATFULLSTATESIMULATORLIB, RTLD_LAZY);
+        if (handle == nullptr)
+        {
+            throw std::runtime_error(
+                std::string("Failed to load ") + XPLATFULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+        }
     }
 #endif
     return handle;
