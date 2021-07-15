@@ -11,7 +11,9 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledTAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
@@ -23,7 +25,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CNOT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CNOTFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />

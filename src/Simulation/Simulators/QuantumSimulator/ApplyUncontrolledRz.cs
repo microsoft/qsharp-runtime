@@ -14,10 +14,5 @@ namespace Microsoft.Quantum.Simulation.Simulators
             CheckAngle(angle);
             R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
         }
-
-        void IIntrinsicApplyUncontrolledRz.AdjointBody(double angle, Qubit target)
-        {
-            ((IIntrinsicApplyUncontrolledRz)this).Body(-angle, target);
-        }
     }
 }

@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Targeting;
 
     /// # Summary
-    /// Applies the controlled-X (or CNOT) gate to a pair of qubits. Does not support 
-    /// the Controlled functor.
+    /// Applies the controlled-NOT (CNOT) gate to a pair of qubits.
     ///
     /// # Description
     /// \begin{align}
@@ -30,11 +28,23 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// Equivalent to:
     /// ```qsharp
-    /// CNOT(control, target);
+    /// Controlled X([control], target);
     /// ```
-    @TargetInstruction("cnot")
-    internal operation ApplyControlledX (control : Qubit, target : Qubit) : Unit is Adj {
-        body intrinsic;
+    operation CNOT (control : Qubit, target : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            ApplyControlledX(control, target);
+        }
+        controlled (ctls, ...) {
+            if (Length(ctls) == 0) {
+                ApplyControlledX(control, target);
+            }
+            elif (Length(ctls) == 1) {
+                CCNOT(ctls[0], control, target);
+            }
+            else {
+                ApplyWithLessControlsA(Controlled CNOT, (ctls, (control, target)));
+            }
+        }
         adjoint self;
     }
 }

@@ -8,7 +8,5 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
     public interface IIntrinsicApplyUncontrolledS : IOperationFactory
     {
         void Body(Qubit target);
-
-        void AdjointBody(Qubit target);
     }
 }

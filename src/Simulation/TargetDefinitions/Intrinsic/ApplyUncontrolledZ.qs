@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Targeting;
 
     /// # Summary
     /// Applies the Pauli $Z$ gate. Note that the Controlled functor is not supported.
@@ -18,6 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
+    @TargetInstruction("z")
     internal operation ApplyUncontrolledZ (qubit : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;

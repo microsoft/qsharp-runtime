@@ -14,12 +14,5 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             T(this.Id, (uint)target.Id);
         }
-
-        void IIntrinsicApplyUncontrolledT.AdjointBody(Qubit target)
-        {
-            this.CheckQubit(target);
-
-            AdjT(this.Id, (uint)target.Id);
-        }
     }
 }
