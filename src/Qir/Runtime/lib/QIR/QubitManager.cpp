@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 #include "QubitManager.hpp"
-#include "QirRuntime.hpp" // For quantum__rt__fail_cstr
+#include "QirRuntime.hpp" // For __quantum__rt__fail_cstr
 #include <cstring> // For memcpy
 
 namespace Microsoft
@@ -16,14 +16,14 @@ namespace Quantum
 
 [[noreturn]] static void FailNow(const char* message)
 {
-     quantum__rt__fail_cstr(message);
+     __quantum__rt__fail_cstr(message);
 }
 
 static void FailIf(bool condition, const char* message)
 {
     if (condition)
     {
-        quantum__rt__fail_cstr(message);
+        __quantum__rt__fail_cstr(message);
     }
 }
 

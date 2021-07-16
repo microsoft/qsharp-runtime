@@ -53,12 +53,12 @@ QirString::QirString(const char* cstr)
 extern "C"
 {
     // Creates a string from an array of UTF-8 bytes.
-    QirString* quantum__rt__string_create(const char* bytes) // NOLINT
+    QirString* __quantum__rt__string_create(const char* bytes) // NOLINT
     {
         return CreateOrReuseAlreadyAllocated(std::string(bytes));
     }
 
-    void quantum__rt__string_update_reference_count(QirString* qstr, int32_t increment) // NOLINT
+    void __quantum__rt__string_update_reference_count(QirString* qstr, int32_t increment) // NOLINT
     {
         if (qstr == nullptr || increment == 0)
         {
@@ -70,7 +70,7 @@ extern "C"
 
         if (qstr->refCount < 0)
         {
-            quantum__rt__fail(quantum__rt__string_create("Attempting to decrement reference count below zero!"));
+            __quantum__rt__fail(__quantum__rt__string_create("Attempting to decrement reference count below zero!"));
         }
         else if (qstr->refCount == 0)
         {
@@ -83,26 +83,26 @@ extern "C"
     }
 
     // Creates a new string that is the concatenation of the two argument strings.
-    QirString* quantum__rt__string_concatenate(QirString* left, QirString* right) // NOLINT
+    QirString* __quantum__rt__string_concatenate(QirString* left, QirString* right) // NOLINT
     {
         return CreateOrReuseAlreadyAllocated(left->str + right->str);
     }
 
     // Returns true if the two strings are equal, false otherwise.
-    bool quantum__rt__string_equal(QirString* left, QirString* right) // NOLINT
+    bool __quantum__rt__string_equal(QirString* left, QirString* right) // NOLINT
     {
         assert((left == right) == (left->str.compare(right->str) == 0));
         return left == right;
     }
 
     // Returns a string representation of the integer.
-    QirString* quantum__rt__int_to_string(int64_t value) // NOLINT
+    QirString* __quantum__rt__int_to_string(int64_t value) // NOLINT
     {
         return CreateOrReuseAlreadyAllocated(std::to_string(value));
     }
 
     // Returns a string representation of the double.
-    QirString* quantum__rt__double_to_string(double value) // NOLINT
+    QirString* __quantum__rt__double_to_string(double value) // NOLINT
     {
         std::ostringstream oss;
         oss.precision(std::numeric_limits<double>::max_digits10);
@@ -126,29 +126,29 @@ extern "C"
     }
 
     // Returns a string representation of the Boolean.
-    QirString* quantum__rt__bool_to_string(bool value) // NOLINT
+    QirString* __quantum__rt__bool_to_string(bool value) // NOLINT
     {
         std::string str = value ? "true" : "false";
         return CreateOrReuseAlreadyAllocated(std::move(str));
     }
 
     // Returns a string representation of the Pauli.
-    QirString* quantum__rt__pauli_to_string(PauliId pauli) // NOLINT
+    QirString* __quantum__rt__pauli_to_string(PauliId pauli) // NOLINT
     {
         switch (pauli)
         {
         case PauliId_I:
-            return quantum__rt__string_create("PauliI");
+            return __quantum__rt__string_create("PauliI");
         case PauliId_X:
-            return quantum__rt__string_create("PauliX");
+            return __quantum__rt__string_create("PauliX");
         case PauliId_Y:
-            return quantum__rt__string_create("PauliY");
+            return __quantum__rt__string_create("PauliY");
         case PauliId_Z:
-            return quantum__rt__string_create("PauliZ");
+            return __quantum__rt__string_create("PauliZ");
         default:
             break;
         }
-        return quantum__rt__string_create("<Unexpected Pauli Value>");
+        return __quantum__rt__string_create("<Unexpected Pauli Value>");
     }
 
     // Returns a string representation of the range.
@@ -162,22 +162,22 @@ extern "C"
         }
         oss << range.end;
 
-        return quantum__rt__string_create(oss.str().c_str());
+        return __quantum__rt__string_create(oss.str().c_str());
     }
 
-    const char* quantum__rt__string_get_data(QirString* str) // NOLINT
+    const char* __quantum__rt__string_get_data(QirString* str) // NOLINT
     {
         return str->str.c_str();
     }
 
-    uint32_t quantum__rt__string_get_length(QirString* str)  // NOLINT
+    uint32_t __quantum__rt__string_get_length(QirString* str)  // NOLINT
     {
         return (uint32_t)(str->str.size());
     }
 
     // Implemented in delegated.cpp:
-    // QirString* quantum__rt__qubit_to_string(QUBIT* qubit); // NOLINT
+    // QirString* __quantum__rt__qubit_to_string(QUBIT* qubit); // NOLINT
 
     // Returns a string representation of the big integer.
-    // TODO QirString* quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
+    // TODO QirString* __quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
 }

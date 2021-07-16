@@ -191,11 +191,13 @@ struct QIR_SHARED_API QirCallable
     void InvokeCaptureCallback(int32_t index, int32_t parameter);
 };
 
-struct QIR_SHARED_API QirRange
+extern "C"
 {
-    int64_t start   = 0;
-    int64_t step    = 0;
-    int64_t end     = 0;
-
-    QirRange(int64_t start, int64_t step, int64_t end);
+struct QirRange
+{
+    int64_t start;
+    int64_t step;
+    int64_t end;
 };
+
+}

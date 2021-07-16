@@ -27,27 +27,27 @@ static std::unordered_map<RESULT*, int>& AllocatedResults()
 
 extern "C"
 {
-    Result quantum__rt__result_get_zero()
+    Result __quantum__rt__result_get_zero()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseZero();
     }
 
-    Result quantum__rt__result_get_one()
+    Result __quantum__rt__result_get_one()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
     }
 
-    QUBIT* quantum__rt__qubit_allocate() // NOLINT
+    QUBIT* __quantum__rt__qubit_allocate() // NOLINT
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
     }
 
-    void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
+    void __quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
     {
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
     }
 
-    void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
+    void __quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
     {
         if (increment == 0)
         {
@@ -95,7 +95,7 @@ extern "C"
         }
     }
 
-    bool quantum__rt__result_equal(RESULT* r1, RESULT* r2) // NOLINT
+    bool __quantum__rt__result_equal(RESULT* r1, RESULT* r2) // NOLINT
     {
         if (r1 == r2)
         {
@@ -105,17 +105,17 @@ extern "C"
     }
 
     // Returns a string representation of the result.
-    QirString* quantum__rt__result_to_string(RESULT* result) // NOLINT
+    QirString* __quantum__rt__result_to_string(RESULT* result) // NOLINT
     {
         ResultValue rv = Microsoft::Quantum::GlobalContext()->GetDriver()->GetResultValue(result);
         assert(rv != Result_Pending);
 
-        return (rv == Result_Zero) ? quantum__rt__string_create("Zero") : quantum__rt__string_create("One");
+        return (rv == Result_Zero) ? __quantum__rt__string_create("Zero") : __quantum__rt__string_create("One");
     }
 
     // Returns a string representation of the qubit.
-    QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
+    QirString* __quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
+        return __quantum__rt__string_create(Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
     }
 }

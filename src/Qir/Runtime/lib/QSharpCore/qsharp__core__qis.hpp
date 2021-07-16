@@ -15,34 +15,34 @@ struct QirArray;
 extern "C"
 {
     // Q# Gate Set
-    QIR_SHARED_API void quantum__qis__exp__body(QirArray*, double, QirArray*);              // NOLINT
-    QIR_SHARED_API void quantum__qis__exp__adj(QirArray*, double, QirArray*);               // NOLINT
-    QIR_SHARED_API void quantum__qis__exp__ctl(QirArray*, QirArray*, double, QirArray*);    // NOLINT
-    QIR_SHARED_API void quantum__qis__exp__ctladj(QirArray*, QirArray*, double, QirArray*); // NOLINT
-    QIR_SHARED_API void quantum__qis__h__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__h__ctl(QirArray*, QUBIT*);                            // NOLINT
-    QIR_SHARED_API RESULT* quantum__qis__measure__body(QirArray*, QirArray*);               // NOLINT
-    QIR_SHARED_API void quantum__qis__r__body(PauliId, double, QUBIT*);                     // NOLINT
-    QIR_SHARED_API void quantum__qis__r__adj(PauliId, double, QUBIT*);                      // NOLINT
-    QIR_SHARED_API void quantum__qis__r__ctl(QirArray*, PauliId, double, QUBIT*);           // NOLINT
-    QIR_SHARED_API void quantum__qis__r__ctladj(QirArray*, PauliId, double, QUBIT*);        // NOLINT
-    QIR_SHARED_API void quantum__qis__s__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__s__adj(QUBIT*);                                       // NOLINT
-    QIR_SHARED_API void quantum__qis__s__ctl(QirArray*, QUBIT*);                            // NOLINT
-    QIR_SHARED_API void quantum__qis__s__ctladj(QirArray*, QUBIT*);                         // NOLINT
-    QIR_SHARED_API void quantum__qis__t__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__t__adj(QUBIT*);                                       // NOLINT
-    QIR_SHARED_API void quantum__qis__t__ctl(QirArray*, QUBIT*);                            // NOLINT
-    QIR_SHARED_API void quantum__qis__t__ctladj(QirArray*, QUBIT*);                         // NOLINT
-    QIR_SHARED_API void quantum__qis__x__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__x__ctl(QirArray*, QUBIT*);                            // NOLINT
-    QIR_SHARED_API void quantum__qis__y__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__y__ctl(QirArray*, QUBIT*);                            // NOLINT
-    QIR_SHARED_API void quantum__qis__z__body(QUBIT*);                                      // NOLINT
-    QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API void __quantum__qis__exp__body(QirArray*, double, QirArray*);              // NOLINT
+    QIR_SHARED_API void __quantum__qis__exp__adj(QirArray*, double, QirArray*);               // NOLINT
+    QIR_SHARED_API void __quantum__qis__exp__ctl(QirArray*, QirArray*, double, QirArray*);    // NOLINT
+    QIR_SHARED_API void __quantum__qis__exp__ctladj(QirArray*, QirArray*, double, QirArray*); // NOLINT
+    QIR_SHARED_API void __quantum__qis__h__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__h__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API RESULT* __quantum__qis__measure__body(QirArray*, QirArray*);               // NOLINT
+    QIR_SHARED_API void __quantum__qis__r__body(PauliId, double, QUBIT*);                     // NOLINT
+    QIR_SHARED_API void __quantum__qis__r__adj(PauliId, double, QUBIT*);                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__r__ctl(QirArray*, PauliId, double, QUBIT*);           // NOLINT
+    QIR_SHARED_API void __quantum__qis__r__ctladj(QirArray*, PauliId, double, QUBIT*);        // NOLINT
+    QIR_SHARED_API void __quantum__qis__s__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__s__adj(QUBIT*);                                       // NOLINT
+    QIR_SHARED_API void __quantum__qis__s__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API void __quantum__qis__s__ctladj(QirArray*, QUBIT*);                         // NOLINT
+    QIR_SHARED_API void __quantum__qis__t__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__t__adj(QUBIT*);                                       // NOLINT
+    QIR_SHARED_API void __quantum__qis__t__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API void __quantum__qis__t__ctladj(QirArray*, QUBIT*);                         // NOLINT
+    QIR_SHARED_API void __quantum__qis__x__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__x__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API void __quantum__qis__y__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__y__ctl(QirArray*, QUBIT*);                            // NOLINT
+    QIR_SHARED_API void __quantum__qis__z__body(QUBIT*);                                      // NOLINT
+    QIR_SHARED_API void __quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
     // Q# Dump:
     // Note: The param `location` must be `const void*`, but it is called from .ll, where `const void*` is not supported.
-    QIR_SHARED_API void quantum__qis__dumpmachine__body(uint8_t* location);                 // NOLINT
-    QIR_SHARED_API void quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits);   // NOLINT
+    QIR_SHARED_API void __quantum__qis__dumpmachine__body(uint8_t* location);                 // NOLINT
+    QIR_SHARED_API void __quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits);   // NOLINT
 }

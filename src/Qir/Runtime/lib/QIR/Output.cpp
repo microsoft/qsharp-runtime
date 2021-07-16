@@ -6,7 +6,7 @@
 // Public API:
 extern "C"
 {
-    void quantum__rt__message(QirString* qstr)   // NOLINT
+    void __quantum__rt__message(QirString* qstr)   // NOLINT
     {
         Microsoft::Quantum::OutputStream::Get() << qstr->str << std::endl;
     }

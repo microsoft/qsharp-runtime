@@ -18,12 +18,12 @@ static IDiagnostics* GetDiagnostics()
 // Implementation:
 extern "C"
 {
-    void quantum__qis__assertmeasurementprobability__body(
+    void __quantum__qis__assertmeasurementprobability__body(
         QirArray* bases, QirArray* qubits, RESULT* result, double prob, QirString* msg, double tol)
     {
         if(bases->count != qubits->count)
         {
-            quantum__rt__fail_cstr(
+            __quantum__rt__fail_cstr(
                 "Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
                 "must be of same size.");
         }
@@ -44,7 +44,7 @@ extern "C"
         if(!GetDiagnostics()->AssertProbability(
             (long)qubits->count, paulis.data(), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol, nullptr))
         {
-            quantum__rt__fail(msg);
+            __quantum__rt__fail(msg);
         }
     }
 
