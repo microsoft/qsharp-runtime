@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Quantum;
+
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
@@ -87,6 +89,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? Location { get; set; }
 
         /// <summary>
+        /// A string to identify this application when making requests to Azure Quantum.
+        /// </summary>
+        public string? UserAgent { get; set; }
+
+        /// <summary>
         /// The name of the submitted job.
         /// </summary>
         public string JobName { get; set; } = "";
@@ -123,6 +130,14 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
+        internal QuantumJobClientOptions CreateClientOptions()
+        {
+            var options = new QuantumJobClientOptions();
+            options.Diagnostics.ApplicationId = UserAgent ?? System.Environment.GetEnvironmentVariable("USER_AGENT");
+
+            return options;
+        }
+
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
@@ -135,6 +150,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal Workspace CreateWorkspace()
         {
             var credentials = CreateCredentials();
+            var clientOptions = CreateClientOptions();
             var location = NormalizeLocation(Location ?? ExtractLocation(BaseUri));
 
             return new Workspace(
@@ -142,7 +158,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 resourceGroupName: ResourceGroup,
                 workspaceName: Workspace,
                 location: location,
-                credential: credentials);
+                credential: credentials,
+                options: clientOptions);
         }
 
         public override string ToString() => string.Join(
@@ -156,6 +173,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"Location: {Location ?? ExtractLocation(BaseUri)}",
             $"Credential: {Credential}",
             $"AadToken: {AadToken?.Substring(0, 5)}",
+            $"UserAgent: {UserAgent}",
             $"Job Name: {JobName}",
             $"Shots: {Shots}",
             $"Output: {Output}",
