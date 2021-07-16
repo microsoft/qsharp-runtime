@@ -10,7 +10,6 @@
 #include <vector>
 #include <fstream>
 #include <climits>
-#include <chrono>
 
 #pragma clang diagnostic push
     // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
@@ -168,10 +167,6 @@ namespace Quantum
 
             qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
-
-            typedef void (*TSeed)(unsigned, unsigned);
-            static TSeed setSimulatorSeed = reinterpret_cast<TSeed>(this->GetProc("seed"));
-            setSimulatorSeed(this->simulatorId, (unsigned)std::chrono::system_clock::now().time_since_epoch().count());
         }
         ~CFullstateSimulator() override
         {
