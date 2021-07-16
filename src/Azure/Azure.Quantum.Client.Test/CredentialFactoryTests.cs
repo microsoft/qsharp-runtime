@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Quantum.Test
     [TestClass]
     public class CredentialFactoryTests
     {
-        private const string SUBSCRIPTION = "916dfd6d-030c-4bd9-b579-7bb6d1926e97";
+        private const string SUBSCRIPTION = "677fc922-91d0-4bf6-9b06-4274d319a0fa";
 
         [DataTestMethod]
         [DataRow(CredentialType.Default, typeof(DefaultQuantumCredential))]
