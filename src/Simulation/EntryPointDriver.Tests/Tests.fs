@@ -969,6 +969,7 @@ let ``Shows help text for submit command`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
@@ -999,6 +1000,7 @@ let ``Shows help text for submit command with default target`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
