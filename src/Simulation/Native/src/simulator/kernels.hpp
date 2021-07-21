@@ -145,6 +145,63 @@ bool isclassical(
 }
 
 template <class T, class A>
+std::pair<bool, bool> is_classical_or_entangled(
+    std::vector<std::complex<T>, A> const& wfn,
+    std::size_t q,
+    T eps = 100. * std::numeric_limits<T>::epsilon())
+{
+    // Iterate through the wave function using offstet and mask to check for both whether the qubit
+    // is classical (in the |0⟩ or |1⟩ state) or is entangled with any other qubit. By checking states
+    // where the target qubit is the only difference, the "isclassical" check can speed up the iteration
+    // which must check the whole vector. If the target qubit has a nonzero probability of being measured
+    // as |0⟩ (variable "have0") AND nonzero probability of being measured as |1⟩ (variable "have1") then
+    // we know it is not classical with regard to the computational basis. Further, if the target qubit
+    // is not classical with regard to the computational basis AND for any two states where the only difference
+    // in the states is the target qubit (ie: |101⟩ and |100⟩ for qubit 0) those have nonzero probability, then
+    // the qubit cannot be entangled.
+    std::size_t offset = 1ull << q;
+    bool have0 = false;
+    bool have1 = false;
+    bool notentangled = false;
+
+    std::size_t maski = ~(offset - 1);
+    // When iterating below, the entry in the wave function with index `i + j` and the entry with index
+    // `i + j + offset` represent two states where the only difference is the measured value of the target
+    // qubit. For example, if the target qubit has id 2 (offset = 4) in wave function of size 4, then for
+    // i = 0 and j = 0 the two states checked are 0 and 4, or |0000⟩ and |0100⟩. When i = 8 and j = 1, the
+    // two states are 9 and 13, or |1001⟩ and |1101⟩.
+#ifndef _MSC_VER
+#pragma omp parallel for schedule(static) reduction(|| : have0, have1, notentangled)
+    for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); i += 2 * offset)
+        for (std::intptr_t j = 0; j < static_cast<std::intptr_t>(offset); ++j)
+        {
+            bool has0 = std::norm(wfn[i + j]) >= eps;
+            bool has1 = std::norm(wfn[i + j + offset]) >= eps;
+            have0 = have0 || has0;
+            have1 = have1 || has1;
+            notentangled = notentangled || (has0 && has1);
+        }
+#else
+#pragma omp parallel for schedule(static) reduction(|| : have0, have1, notentangled)
+    for (std::intptr_t l = 0; l < static_cast<std::intptr_t>(wfn.size()) / 2; l++)
+    {
+        std::intptr_t j = l % offset;
+        std::intptr_t i = ((l & maski) << 1);
+        bool has0 = std::norm(wfn[i + j]) >= eps;
+        bool has1 = std::norm(wfn[i + j + offset]) >= eps;
+        have0 = have0 || has0;
+        have1 = have1 || has1;
+        notentangled = notentangled || (has0 && has1);
+    }
+#endif
+
+    // isclassical = true IFF have0 XOR have1
+    // isentangled = true IFF have0 AND have1 AND for all pairs of states where only the target qubit
+    //               differs one of those states has zero probability.
+    return std::make_pair<bool, bool>(have0 ^ have1, have0 && have1 && !notentangled);
+}
+
+template <class T, class A>
 double jointprobability(std::vector<T, A> const& wfn, std::vector<unsigned> const& qs, bool val = true)
 {
     std::size_t mask = 0;

@@ -69,9 +69,9 @@ extern "C"
         Microsoft::Quantum::Simulator::get(id)->allocateQubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL void release(_In_ unsigned id, _In_ unsigned q)
+    MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned id, _In_ unsigned q)
     {
-        Microsoft::Quantum::Simulator::get(id)->release(q);
+        return Microsoft::Quantum::Simulator::get(id)->release(q);
     }
 
     MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned id)

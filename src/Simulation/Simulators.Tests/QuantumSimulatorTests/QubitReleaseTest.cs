@@ -14,13 +14,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
     public partial class QuantumSimulatorTests
     {
-        //test to check that qubit cannot be released if it is not in zero state
+        //test to check that qubit can be released if it is not entangled
         [Fact]
         public async Task ZeroStateQubitReleaseTest()
         {
             var sim = new QuantumSimulator();
 
-            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => UsingQubitCheck.Run(sim));
+            await UsingQubitCheck.Run(sim);
         }
 
         //test to check that qubit can be released if measured
@@ -39,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var sim = new QuantumSimulator();
 
-            await Assert.ThrowsAsync<ReleasedQubitsAreNotInZeroState>(() => ReleaseMeasureMultipleQubitCheck.Run(sim));
+            await Assert.ThrowsAsync<ReleasedQubitsAreEntangled>(() => ReleaseMeasureMultipleQubitCheck.Run(sim));
         }
 
         //test to check that qubit that is released and reallocated is in state |0>

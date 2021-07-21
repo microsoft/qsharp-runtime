@@ -145,6 +145,9 @@ TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
     Result rOne = iqa->Measure(2, paulis, 2, q);
     REQUIRE(Result_One == sim->GetResultValue(rOne));
 
+    // Disentangle for release.
+    iqa->ControlledX(1, &q[0], q[1]);
+
     sim->ReleaseQubit(q[0]);
     sim->ReleaseQubit(q[1]);
 }
@@ -311,6 +314,10 @@ TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
     // not crashes? consider it passing
     REQUIRE(true);
 
+    // Disentangle for release.
+    iqa->ControlledExp(2, qs, 3, paulis, &qs[2], -0.17);
+    iqa->Exp(2, paulis, qs, -0.42);
+
     for (int i = 0; i < n; i++)
     {
         sim->ReleaseQubit(qs[i]);
@@ -376,6 +383,9 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     });
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
+
+    // Disentangle to prepare for release.
+    iqa->ControlledX(1, &qs[0], qs[1]);
 
     for (int i = 0; i < n; i++)
     {
