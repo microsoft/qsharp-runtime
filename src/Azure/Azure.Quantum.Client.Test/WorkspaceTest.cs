@@ -24,10 +24,10 @@ namespace Microsoft.Azure.Quantum.Test
     {
         private const string SETUP = @"
 Live tests require you to configure your environment with these variables:
-  * E2E_WORKSPACE_NAME: the name of an Azure Quantum workspace to use for live testing.
-  * E2E_SUBSCRIPTION_ID: the Azure Quantum workspace's Subscription Id.
-  * E2E_WORKSPACE_RG: the Azure Quantum workspace's resource group.
-  * E2E_WORKSPACE_LOCATION: the Azure Quantum workspace's location (region).
+  * AZUREQUANTUM_WORKSPACE_NAME: the name of an Azure Quantum workspace to use for live testing.
+  * AZUREQUANTUM_SUBSCRIPTION_ID: the Azure Quantum workspace's Subscription Id.
+  * AZUREQUANTUM_WORKSPACE_RG: the Azure Quantum workspace's resource group.
+  * AZUREQUANTUM_WORKSPACE_LOCATION: the Azure Quantum workspace's location (region).
 
 We'll also try to authenticate with Azure using an instance of DefaultCredential. See
 https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme#authenticate-the-client
@@ -187,10 +187,10 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
 
         private IWorkspace GetLiveWorkspace()
         {
-            if (string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID")) ||
-                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG")) ||
-                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME")) ||
-                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID")))
+            if (string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("AZUREQUANTUM_SUBSCRIPTION_ID")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_RG")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_NAME")) ||
+                string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("AZUREQUANTUM_SUBSCRIPTION_ID")))
             {
                 Assert.Inconclusive(SETUP);
             }
@@ -201,10 +201,10 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
             var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialType.Default);
 
             return new Workspace(
-                subscriptionId: System.Environment.GetEnvironmentVariable("E2E_SUBSCRIPTION_ID"),
-                resourceGroupName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_RG"),
-                workspaceName: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_NAME"),
-                location: System.Environment.GetEnvironmentVariable("E2E_WORKSPACE_LOCATION"),
+                subscriptionId: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_SUBSCRIPTION_ID"),
+                resourceGroupName: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_RG"),
+                workspaceName: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_NAME"),
+                location: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_LOCATION"),
                 options: options,
                 credential: credential);
         }

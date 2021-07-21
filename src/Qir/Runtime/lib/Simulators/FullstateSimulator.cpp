@@ -10,6 +10,8 @@
 #include <vector>
 #include <fstream>
 #include <climits>
+#include <chrono>
+#include <cstdint>
 
 #pragma clang diagnostic push
     // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
@@ -160,7 +162,7 @@ namespace Quantum
         }
 
       public:
-        CFullstateSimulator()
+        CFullstateSimulator(uint32_t userProvidedSeed = 0)
             : handle(LoadQuantumSimulator())
         {
             typedef unsigned (*TInit)();
@@ -168,6 +170,13 @@ namespace Quantum
 
             qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
+
+            typedef void (*TSeed)(unsigned, unsigned);
+            static TSeed setSimulatorSeed = reinterpret_cast<TSeed>(this->GetProc("seed"));
+            setSimulatorSeed(this->simulatorId, 
+                             (userProvidedSeed == 0) 
+                                ? (unsigned)std::chrono::system_clock::now().time_since_epoch().count()
+                                : (unsigned)userProvidedSeed);
         }
         ~CFullstateSimulator() override
         {
@@ -545,9 +554,9 @@ namespace Quantum
         DumpRegisterImpl(outStream, qubits);
     }
 
-    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
+    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator(uint32_t userProvidedSeed /*= 0*/)
     {
-        return std::make_unique<CFullstateSimulator>();
+        return std::make_unique<CFullstateSimulator>(userProvidedSeed);
     }
 } // namespace Quantum
 } // namespace Microsoft
