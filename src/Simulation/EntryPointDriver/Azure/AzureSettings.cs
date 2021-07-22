@@ -130,11 +130,19 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
+        internal string? TrimmedUserAgent() {
+            var userAgent = (UserAgent ?? System.Environment.GetEnvironmentVariable("USER_AGENT")).Trim();
+
+            return (userAgent == null || userAgent.Length < 25)
+                ? userAgent
+                : userAgent.Substring(0, 24);
+            }
+
+
         internal QuantumJobClientOptions CreateClientOptions()
         {
             var options = new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = UserAgent ?? System.Environment.GetEnvironmentVariable("USER_AGENT");
-
+            options.Diagnostics.ApplicationId = TrimmedUserAgent();
             return options;
         }
 
