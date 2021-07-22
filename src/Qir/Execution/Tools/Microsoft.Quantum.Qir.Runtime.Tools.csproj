@@ -6,7 +6,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
-    <AssemblyName>Microsoft.Quantum.Qir.Runtime</AssemblyName>
+    <PackageId>Microsoft.Quantum.Qir.Runtime</PackageId>
   </PropertyGroup>
 
   <PropertyGroup>
