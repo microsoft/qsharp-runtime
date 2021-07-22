@@ -36,7 +36,7 @@ $artifacts = @{
     Assemblies = @(
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
         ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.AutoSubstitution.dll",
-        ".\src\Qir\Execution\Tools\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Qir.Runtime.Tools.dll",
+        ".\src\Qir\Tools\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Qir.Runtime.Tools.dll",
         ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
         ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",

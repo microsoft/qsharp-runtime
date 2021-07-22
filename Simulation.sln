@@ -105,7 +105,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qir-standalone-input-refere
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Execution", "Execution", "{442E66C8-F69F-44E9-9CD9-1F52C37EA41B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Qir.Runtime.Tools", "src\Qir\Execution\Tools\Microsoft.Quantum.Qir.Runtime.Tools.csproj", "{C60226E3-98DE-4E92-AED4-B4A93D4CA063}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Qir.Runtime.Tools", "src\Qir\Tools\Microsoft.Quantum.Qir.Runtime.Tools.csproj", "{C60226E3-98DE-4E92-AED4-B4A93D4CA063}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Qir.Runtime.Tools", "src\Qir\Execution\Tools.Tests\Tests.Microsoft.Quantum.Qir.Runtime.Tools.csproj", "{4794FC80-4594-403F-AFEC-4889EFE87EA0}"
 EndProject

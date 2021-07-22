@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\Simulation\Common\Simulators.Dev.props" />
-  <Import Project="..\..\..\Simulation\Common\AssemblyCommon.props" />
+  <Import Project="..\..\Simulation\Common\Simulators.Dev.props" />
+  <Import Project="..\..\Simulation\Common\AssemblyCommon.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -16,17 +16,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\..\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+    <Compile Include="..\..\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
-    <None Include="..\..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
+    <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
       <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\..\..\Qir\drops\include\**\*" Pack="true" Visible="false" PackagePath="runtimes/any/native/include">
+    <None Include="..\..\Qir\drops\include\**\*" Pack="true" Visible="false" PackagePath="runtimes/any/native/include">
       <Link>runtimes\any\native\include\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
@@ -85,17 +85,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\Simulation\Native\win10\**\*">
+    <None Include="..\..\Simulation\Native\win10\**\*">
       <Link>Libraries\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\..\..\Simulation\Native\osx\**\*">
+    <None Include="..\..\Simulation\Native\osx\**\*">
       <Link>Libraries\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <None Include="..\..\..\Simulation\Native\linux\**\*">
+    <None Include="..\..\Simulation\Native\linux\**\*">
       <Link>Libraries\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
