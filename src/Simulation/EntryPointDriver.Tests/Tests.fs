@@ -671,7 +671,7 @@ let ``Submit allows a long user-agent`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
-               UserAgent: a-very-long-user-agent-
+               UserAgent: a-very-long-user-agent-(
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
