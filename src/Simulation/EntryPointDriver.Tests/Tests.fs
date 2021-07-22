@@ -642,6 +642,45 @@ let ``Submit allows overriding default values`` () =
                Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+               
+[<Fact>]
+let ``Submit allows a long user-agent`` () =
+    let given = test "Returns Unit"
+    given (submitWithNoOpTarget @ [
+        "--verbose"
+        "--storage"
+        "myStorage"
+        "--aad-token"
+        "myToken"
+        "--job-name"
+        "myJobName"
+        "--shots"
+        "750"
+        "--user-agent"
+        "a-very-long-user-agent-(it-will-be-truncated)"
+        "--credential"
+        "cli"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.machine.noop
+               Storage: myStorage
+               Base URI:
+               Location: myLocation
+               Credential: CLI
+               AadToken: myTok
+               UserAgent: a-very-long-user-agent-(
+               Job Name: myJobName
+               Shots: 750
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
                
 [<Fact>]
 let ``Submit extracts the location from a quantum endpoint`` () =
