@@ -168,7 +168,7 @@ Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
 Pack-Wheel -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:WHEEL_OUTDIR;
 Pack-Dotnet '../src/Qir/Execution/Tools/Microsoft.Quantum.Qir.Runtime.Tools.csproj' -ForcePrerelease
-Pack-Dotnet '../src/Qir/Execution/CommandLineTool/Microsoft.Quantum.Qir.CommandLineTool.csproj' -ForcePrerelease
+Pack-Dotnet '../src/Qir/CommandLineTool/Microsoft.Quantum.Qir.CommandLineTool.csproj' -ForcePrerelease
 
 Move-Item -Path (Join-Path $Env:NUGET_OUTDIR Microsoft.Quantum.Qir.CommandLineTool.*) -Destination $Env:INTERNAL_TOOLS_OUTDIR
 
