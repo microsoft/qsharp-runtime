@@ -17,4 +17,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("1594aae8-0e24-442b-9201-430ce9ee4d2e")]
 
-[assembly: InternalsVisibleTo("Tests.Microsoft.Quantum.Qir.Runtime.Tools" + SigningConstants.PUBLIC_KEY)]
+

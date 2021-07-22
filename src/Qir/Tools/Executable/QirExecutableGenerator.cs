@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
-    internal class QirExecutableGenerator : IQirExecutableGenerator
+    public class QirExecutableGenerator : IQirExecutableGenerator
     {
         private readonly IClangClient clangClient;
         private readonly ILogger? logger;
