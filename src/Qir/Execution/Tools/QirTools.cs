@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Tools.Executable;
+using Microsoft.Quantum.Qir.Runtime.Tools.Executable;
 using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.QIR;
 
-namespace Microsoft.Quantum.Qir.Tools
+namespace Microsoft.Quantum.Qir.Runtime.Tools
 {
     /// <summary>
     /// Provides high-level utility methods to work with QIR.

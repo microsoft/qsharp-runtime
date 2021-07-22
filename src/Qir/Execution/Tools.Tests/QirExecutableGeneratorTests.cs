@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Tools.Executable;
+using Microsoft.Quantum.Qir.Runtime.Tools.Executable;
 using Moq;
 using Xunit;
 
-namespace Tests.Microsoft.Quantum.Qir.Tools
+namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
 {
     public class QirExecutableGeneratorTests : IDisposable
     {

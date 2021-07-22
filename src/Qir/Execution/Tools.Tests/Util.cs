@@ -3,7 +3,7 @@
 
 using System.IO;
 
-namespace Tests.Microsoft.Quantum.Qir.Tools
+namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
 {
     internal static class Util
     {

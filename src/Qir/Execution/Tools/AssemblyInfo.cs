@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("1594aae8-0e24-442b-9201-430ce9ee4d2e")]
 
-[assembly: InternalsVisibleTo("Tests.Microsoft.Quantum.Qir.Tools")]
+[assembly: InternalsVisibleTo("Tests.Microsoft.Quantum.Qir.Runtime.Tools")]
 
 // This is required to mock internals in tests.
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -7,10 +7,10 @@ using System.Text;
 
 using Xunit;
 
-using Microsoft.Quantum.Qir.Tools.Driver;
+using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 using Microsoft.Quantum.Qir.Serialization;
 
-namespace Tests.Microsoft.Quantum.Qir.Tools
+namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
 {
     public class QirDriverGeneratorTests
     {

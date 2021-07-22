@@ -7,11 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Quantum.Qir.Serialization;
-using Microsoft.Quantum.Qir.Tools.Driver;
+using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 
 #nullable enable
 
-namespace Microsoft.Quantum.Qir.Tools.Executable
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     /// <summary>
     /// Base for creating and running QIR-based executables.

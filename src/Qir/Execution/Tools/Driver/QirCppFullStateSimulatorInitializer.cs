@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace Microsoft.Quantum.Qir.Tools.Driver
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {
     using System;
     

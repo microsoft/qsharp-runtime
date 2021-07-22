@@ -11,7 +11,7 @@ using Microsoft.Quantum.QsCompiler.SyntaxTokens;
 using Microsoft.Quantum.QsCompiler.SyntaxTree;
 using Microsoft.Quantum.QsCompiler.QIR;
 
-namespace Microsoft.Quantum.Qir.Tools
+namespace Microsoft.Quantum.Qir.Runtime.Tools
 {
     using QsTypeKind = QsTypeKind<ResolvedType, UserDefinedType, QsTypeParameter, CallableInformation>;
 

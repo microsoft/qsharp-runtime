@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Microsoft.Quantum.Qir.Tools.Executable
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     internal interface IQirExecutableGenerator
     {

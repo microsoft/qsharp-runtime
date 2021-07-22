@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Microsoft.Quantum.Qir.Tools.Executable
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     internal class QirExecutableRunner : IQirExecutableRunner
     {

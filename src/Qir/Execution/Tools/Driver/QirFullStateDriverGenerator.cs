@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
 
-namespace Microsoft.Quantum.Qir.Tools.Driver
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {
     public class QirFullStateDriverGenerator: IQirDriverGenerator
     {
