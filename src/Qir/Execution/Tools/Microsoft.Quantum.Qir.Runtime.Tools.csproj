@@ -1,16 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\Simulation\Common\Simulators.Dev.props" />
+  <Import Project="..\..\..\Simulation\Common\AssemblyCommon.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>Microsoft.Quantum.Qir.Runtime</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>Tools for interacting with QIR.</Description>
+    <Description>Native libraries and build tools for linking and executing Quantum Intermediate Representation.</Description>
+    <RootNamespace>Microsoft.Quantum.Qir.Runtime.Tools</RootNamespace>
     <PackageTags>Quantum QIR</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\Simulation\Common\DelaySign.cs" Link="Properties\DelaySign.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
+      <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\..\..\Qir\drops\include\**\*" Pack="true" Visible="false" PackagePath="runtimes/any/native/include">
+      <Link>runtimes\any\native\include\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -47,23 +68,10 @@
       <DependentUpon>QirCppDriver.tt</DependentUpon>
     </Compile>
     <Compile Update="Driver\QirCppFullStateSimulatorInitializer.cs">
-      <DesignTime>False</DesignTime>
+      <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppFullStateSimulatorInitializer.tt</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\..\Qir\drops\bin\**\*">
-      <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\..\Qir\drops\include\**\*">
-      <Link>runtimes\any\native\include\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

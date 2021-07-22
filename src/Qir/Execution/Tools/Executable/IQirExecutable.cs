@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Quantum.Qir.Serialization;
 
-namespace Microsoft.Quantum.Qir.Tools.Executable
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     public interface IQirExecutable
     {
