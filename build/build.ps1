@@ -50,7 +50,7 @@ if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
         }
     }
 } else {
-    Write-Host "Skipping build of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+    Write-Host "Skipping build of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
 }
 
 function Build-One {
