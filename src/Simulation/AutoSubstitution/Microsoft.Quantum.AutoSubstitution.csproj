@@ -19,7 +19,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.18.2107151063-beta" />
+    <PackageReference Include="Microsoft.Quantum.Compiler" Version="0.18.2107153439" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" />
   </ItemGroup>
 
