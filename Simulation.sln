@@ -47,7 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure", "Azure", "{37CDC768
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Quantum.Client", "src\Azure\Azure.Quantum.Client\Microsoft.Azure.Quantum.Client.csproj", "{7F05FD87-A2FB-4915-A988-4EF92AB82179}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Quantum.Client.Test", "src\Azure\Azure.Quantum.Client.Test\Microsoft.Azure.Quantum.Client.Test.csproj", "{4858E5E3-23FA-4928-B99A-54065875A2B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Azure.Quantum.Client", "src\Azure\Azure.Quantum.Client.Test\Tests.Microsoft.Azure.Quantum.Client.csproj", "{4858E5E3-23FA-4928-B99A-54065875A2B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HoneywellExe", "src\Simulation\Simulators.Tests\TestProjects\HoneywellExe\HoneywellExe.csproj", "{1448512E-132F-4DA8-BCBA-D98F16B31600}"
 EndProject
@@ -119,7 +119,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Aut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.AutoSubstitution.Integration", "src\Simulation\AutoSubstitution.Integration.Tests\Tests.Microsoft.Quantum.AutoSubstitution.Integration.csproj", "{D23480EE-88FC-4DF2-86BD-1C5BDD6CD98C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrosoftSimulatorExe", "src\Simulation\Simulators.Tests\TestProjects\MicrosoftSimulatorExe\MicrosoftSimulatorExe.csproj", "{9C317A71-702B-4C5D-9D19-D9A28CD483A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftSimulatorExe", "src\Simulation\Simulators.Tests\TestProjects\MicrosoftSimulatorExe\MicrosoftSimulatorExe.csproj", "{9C317A71-702B-4C5D-9D19-D9A28CD483A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

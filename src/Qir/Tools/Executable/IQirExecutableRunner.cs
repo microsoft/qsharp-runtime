@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
-    internal interface IQirExecutableRunner
+    public interface IQirExecutableRunner
     {
         /// <summary>
         /// Runs a QIR executable with the given arguments.

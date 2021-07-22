@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
-    internal interface IQirExecutableGenerator
+    public interface IQirExecutableGenerator
     {
         /// <summary>
         /// Generates a quantum simulation program executable.
