@@ -43,6 +43,6 @@ define void @TestFailWithRangeString(i64 %start, i64 %step, i64 %end){
   %r1 = insertvalue %Range %r0, i64 %step, 1
   %r2 = insertvalue %Range %r1, i64 %end, 2
   %str = call %String* @__quantum__rt__range_to_string(%Range %r2)
-  call void @__quantum__rt__fail(%String* %str)
+  call void @__quantum__rt__fail(%String* %str)   ; Leaks the `%str`. TODO: Extract into a separate file compiled with leak check off.
   ret void
 }
