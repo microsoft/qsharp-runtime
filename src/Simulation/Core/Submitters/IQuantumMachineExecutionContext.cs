@@ -8,7 +8,9 @@ namespace Microsoft.Quantum.Runtime
     /// <summary>
     /// Interface to provide configuration details to manage execution.
     /// </summary>
-    [Obsolete("No longer used. Some of these options might be supported in the future by the SubmissionOptions class.")]
+    // 
+    // TODO: deprecate once the new setup is fully hooked up.
+    //[Obsolete("No longer used. Some of these options might be supported in the future by the SubmissionOptions class.")]
     public interface IQuantumMachineExecutionContext
     {
         /// <summary>

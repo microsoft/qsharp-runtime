@@ -8,7 +8,9 @@ namespace Microsoft.Quantum.Runtime
     /// <summary>
     /// Interface to provide configuration details to submit a job.
     /// </summary>
-    [Obsolete("Replaced by SubmissionOptions.")]
+    // 
+    // TODO: deprecate once the new setup is fully hooked up.
+    //[Obsolete("Replaced by SubmissionOptions.")]
     public interface IQuantumMachineSubmissionContext
     {
         /// <summary>
