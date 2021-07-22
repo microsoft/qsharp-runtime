@@ -8,7 +8,7 @@ using Microsoft.Quantum.Qir.Serialization;
 
 #nullable enable
 
-namespace Microsoft.Quantum.Qir.Tools.Driver
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {
     internal static class QirCppInterop
     {

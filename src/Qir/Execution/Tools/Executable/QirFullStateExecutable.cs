@@ -7,11 +7,11 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using Microsoft.Quantum.Qir.Tools.Driver;
+using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 
 #nullable enable
 
-namespace Microsoft.Quantum.Qir.Tools.Executable
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     /// <summary>
     /// Class to create and run QIR-based executables that use the full-state simulator.

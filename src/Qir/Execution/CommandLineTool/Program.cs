@@ -10,7 +10,7 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Tools;
+using Microsoft.Quantum.Qir.Runtime.Tools;
 
 namespace Microsoft.Quantum.Qir.CommandLineTool
 {
