@@ -8,11 +8,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        void IIntrinsicApplyUncontrolledS.Body(Qubit target)
+        void IIntrinsicApplyUncontrolledTAdj.Body(Qubit target)
         {
             this.CheckQubit(target);
 
-            S(this.Id, (uint)target.Id);
+            AdjT(this.Id, (uint)target.Id);
         }
     }
 }
