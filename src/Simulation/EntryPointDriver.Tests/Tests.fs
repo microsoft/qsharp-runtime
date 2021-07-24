@@ -570,6 +570,7 @@ let ``Submit uses default values`` () =
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -593,6 +594,7 @@ let ``Submit uses default values with default target`` () =
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -616,6 +618,8 @@ let ``Submit allows overriding default values`` () =
         "myJobName"
         "--shots"
         "750"
+        "--user-agent"
+        "myUserAgent"
         "--credential"
         "cli"
     ])
@@ -628,6 +632,46 @@ let ``Submit allows overriding default values`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
+               UserAgent: myUserAgent
+               Job Name: myJobName
+               Shots: 750
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+               
+[<Fact>]
+let ``Submit allows a long user-agent`` () =
+    let given = test "Returns Unit"
+    given (submitWithNoOpTarget @ [
+        "--verbose"
+        "--storage"
+        "myStorage"
+        "--aad-token"
+        "myToken"
+        "--job-name"
+        "myJobName"
+        "--shots"
+        "750"
+        "--user-agent"
+        "a-very-long-user-agent-(it-will-be-truncated)"
+        "--credential"
+        "cli"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.machine.noop
+               Storage: myStorage
+               Base URI:
+               Location: myLocation
+               Credential: CLI
+               AadToken: myTok
+               UserAgent: a-very-long-user-agent-(
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -653,6 +697,8 @@ let ``Submit extracts the location from a quantum endpoint`` () =
         "myJobName"
         "--credential"
         "VisualStudio"
+        "--user-agent"
+        "myUserAgent"
         "--shots"
         "750"
         "--target"
@@ -667,6 +713,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Location: westus
                 Credential: VisualStudio
                 AadToken: myTok
+                UserAgent: myUserAgent
                 Job Name: myJobName
                 Shots: 750
                 Output: FriendlyUri
@@ -702,6 +749,7 @@ let ``Submit allows overriding default values with default target`` () =
                Location: myLocation
                Credential: Interactive
                AadToken: myTok
+               UserAgent:
                Job Name: myJobName
                Shots: 750
                Output: FriendlyUri
@@ -740,6 +788,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Location: mybaseuri
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -765,6 +814,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -794,6 +844,7 @@ let ``Submit allows spaces for the --location option`` () =
                Location: My Location
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
                Shots: 500
                Output: FriendlyUri
@@ -898,6 +949,7 @@ let ``Submit supports Q# submitters`` () =
          Location: myLocation
          Credential: Default
          AadToken:
+         UserAgent:
          Job Name:
          Shots: 500
          Output: FriendlyUri
@@ -956,6 +1008,7 @@ let ``Shows help text for submit command`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
@@ -986,6 +1039,7 @@ let ``Shows help text for submit command with default target`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.

@@ -10,7 +10,9 @@ namespace Microsoft.Quantum.Runtime
     /// Interface to access the results of a program executed in a quantum machine.
     /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
     /// </summary>
-    [Obsolete("No longer used.")]
+    // 
+    // TODO: deprecate once the new setup is fully hooked up.
+    //[Obsolete("No longer used.")]
     public interface IQuantumMachineOutput<TOutput>
     {
         /// <summary>
