@@ -11,7 +11,9 @@ namespace Microsoft.Quantum.Runtime
     /// <summary>
     /// An interface for submitting Q# programs to Azure.
     /// </summary>
-    [Obsolete("Replaced by IQSharpSubmitter.")]
+    // 
+    // TODO: deprecate once IQSharpSubmitter is fully hooked up.
+    //[Obsolete("Replaced by IQSharpSubmitter.")]
     public interface IQuantumMachine : IAzureSubmitter
     {
         /// <summary>

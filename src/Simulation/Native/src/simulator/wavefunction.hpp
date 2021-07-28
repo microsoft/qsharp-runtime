@@ -13,6 +13,7 @@
 #include <random>
 #include <string.h>
 #include <vector>
+#include <chrono>
 
 #include "gates.hpp"
 #include "types.hpp"
@@ -382,13 +383,13 @@ class Wavefunction
         : num_qubits_(0)
         , wfn_(1, 1.)
     {
-        rng_.seed(std::clock());
+        rng_.seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
     }
 
     void reset()
     {
         fused_.reset();
-        rng_.seed(std::clock());
+        rng_.seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
         num_qubits_ = 0;
         wfn_.resize(1);
         wfn_[0] = 1.;

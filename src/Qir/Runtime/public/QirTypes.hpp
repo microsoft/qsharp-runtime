@@ -70,7 +70,10 @@ struct QIR_SHARED_API QirString
     a header that contains the relevant data. The header immediately precedes the tuple's buffer in memory when the
     tuple is created.
 ======================================================================================================================*/
-using PTuple = char*;   // TODO: consider replacing `char*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
+// TODO: Move these types to inside of `QirTupleHeader`.
+using PTuplePointedType = uint8_t;
+using PTuple = PTuplePointedType*;  // TODO: consider replacing `uint8_t*` with `void*` in order to block the accidental {dereferencing and pointer arithmtic}.
+                                    //       Much pointer arithmetic in tests. GetHeader() uses the pointer arithmetic.
 struct QIR_SHARED_API QirTupleHeader
 {
     using TBufSize = size_t;  // Type of the buffer size.
@@ -80,7 +83,7 @@ struct QIR_SHARED_API QirTupleHeader
     TBufSize tupleSize = 0; // when creating the tuple, must be set to the size of the tuple's data buffer (in bytes)
 
     // flexible array member, must be last in the struct
-    char data[];
+    PTuplePointedType data[];
 
     PTuple AsTuple()
     {
@@ -190,10 +193,9 @@ struct QIR_SHARED_API QirCallable
 
 struct QIR_SHARED_API QirRange
 {
-    int64_t start;
-    int64_t step;
-    int64_t end;
+    int64_t start   = 0;
+    int64_t step    = 0;
+    int64_t end     = 0;
 
-    QirRange();
     QirRange(int64_t start, int64_t step, int64_t end);
 };
