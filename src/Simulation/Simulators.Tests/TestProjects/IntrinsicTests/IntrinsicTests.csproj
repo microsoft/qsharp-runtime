@@ -6,7 +6,6 @@
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
-    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>
