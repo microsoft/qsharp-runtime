@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Quantum.EntryPointDriver;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -64,6 +65,11 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
 
         /// <summary>
+        /// The User-Agent option.
+        /// </summary>
+        private static readonly OptionInfo<string?> UserAgentOption = new OptionInfo<string?>(
+            ImmutableList.Create("--user-agent"), default, "A label to identify this application when making requests to Azure Quantum.");
+        /// <summary>
         /// The base URI option.
         /// </summary>
         private static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
@@ -93,8 +99,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The job name option.
         /// </summary>
-        private static readonly OptionInfo<string?> JobNameOption = new OptionInfo<string?>(
-            ImmutableList.Create("--job-name"), default, "The name of the submitted job.");
+        private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
+            ImmutableList.Create("--job-name"), string.Empty, "The name of the submitted job.");
 
         /// <summary>
         /// The shots option.
@@ -431,6 +437,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 .Concat(AddOptionIfAvailable(command, CredentialOption))
                 .Concat(AddOptionIfAvailable(command, StorageOption))
                 .Concat(AddOptionIfAvailable(command, AadTokenOption))
+                .Concat(AddOptionIfAvailable(command, UserAgentOption))
                 .Concat(AddOptionIfAvailable(command, BaseUriOption))
                 .Concat(AddOptionIfAvailable(command, LocationOption))
                 .Concat(AddOptionIfAvailable(command, JobNameOption))
@@ -471,6 +478,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Target = DefaultIfShadowed(entryPoint, TargetOption, azureSettings.Target),
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
+                UserAgent = DefaultIfShadowed(entryPoint, UserAgentOption, azureSettings.UserAgent),
                 BaseUri = DefaultIfShadowed(entryPoint, BaseUriOption, azureSettings.BaseUri),
                 Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
                 Credential = DefaultIfShadowed(entryPoint, CredentialOption, azureSettings.Credential),
@@ -480,7 +488,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
                 Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
             });
-        
+
         /// <summary>
         /// A modification of the command-line <see cref="HelpBuilder"/> class.
         /// </summary>

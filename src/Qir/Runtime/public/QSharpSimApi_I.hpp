@@ -15,6 +15,7 @@ namespace Quantum
     struct QIR_SHARED_API IQuantumGateSet
     {
         virtual ~IQuantumGateSet() {}
+        IQuantumGateSet() = default;
 
         // Elementary operatons
         virtual void X(Qubit target) = 0;
@@ -50,11 +51,16 @@ namespace Quantum
 
         // Results
         virtual Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) = 0;
+
+      private:
+        IQuantumGateSet& operator=(const IQuantumGateSet&) = delete;
+        IQuantumGateSet(const IQuantumGateSet&) = delete;
     };
 
     struct QIR_SHARED_API IDiagnostics
     {
         virtual ~IDiagnostics() {}
+        IDiagnostics() = default;
 
         // The callback should be invoked on each basis vector (in the standard computational basis) in little-endian
         // order until it returns `false` or the state is fully dumped.
@@ -81,6 +87,10 @@ namespace Quantum
             double probabilityOfZero,
             double precision,
             const char* failureMessage) = 0;  // TODO: The `failureMessage` is not used, consider removing. The `bool` is returned.
+
+      private:
+        IDiagnostics& operator=(const IDiagnostics&) = delete;
+        IDiagnostics(const IDiagnostics&) = delete;
     };
 
 }

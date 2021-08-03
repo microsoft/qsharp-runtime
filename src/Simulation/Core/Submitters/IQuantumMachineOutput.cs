@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Quantum.Runtime
@@ -9,6 +10,9 @@ namespace Microsoft.Quantum.Runtime
     /// Interface to access the results of a program executed in a quantum machine.
     /// <typeparam name="TOutput">Type of output the quantum program returns.</typeparam>
     /// </summary>
+    // 
+    // TODO: deprecate once the new setup is fully hooked up.
+    //[Obsolete("No longer used.")]
     public interface IQuantumMachineOutput<TOutput>
     {
         /// <summary>

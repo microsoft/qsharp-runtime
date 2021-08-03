@@ -154,7 +154,6 @@ function Pack-Wheel() {
 
 Write-Host "##[info]Using nuget to create packages"
 Pack-Dotnet '../src/Azure/Azure.Quantum.Client/Microsoft.Azure.Quantum.Client.csproj'
-Pack-One '../src/Simulation/CSharpGeneration/Microsoft.Quantum.CSharpGeneration.fsproj' '-IncludeReferencedProjects'
 Pack-Dotnet '../src/Simulation/AutoSubstitution/Microsoft.Quantum.AutoSubstitution.csproj'
 Pack-Dotnet '../src/Simulation/EntryPointDriver/Microsoft.Quantum.EntryPointDriver.csproj'
 Pack-Dotnet '../src/Simulation/Core/Microsoft.Quantum.Runtime.Core.csproj'
@@ -165,11 +164,13 @@ Pack-Dotnet '../src/Simulation/Type1Core/Microsoft.Quantum.Type1.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type2Core/Microsoft.Quantum.Type2.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
-Pack-One '../src/Quantum.Development.Kit/Microsoft.Quantum.Development.Kit.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
 Pack-Wheel -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:WHEEL_OUTDIR;
-Pack-One '../src/Qir/Runtime/Microsoft.Quantum.Qir.Runtime.nuspec' -ForcePrerelease
+Pack-Dotnet '../src/Qir/Tools/Microsoft.Quantum.Qir.Runtime.Tools.csproj' -ForcePrerelease
+Pack-Dotnet '../src/Qir/CommandLineTool/Microsoft.Quantum.Qir.CommandLineTool.csproj' -ForcePrerelease
+
+Move-Item -Path (Join-Path $Env:NUGET_OUTDIR Microsoft.Quantum.Qir.CommandLineTool.*) -Destination $Env:INTERNAL_TOOLS_OUTDIR
 
 if (-not $all_ok) {
     throw "At least one project failed to pack. Check the logs."

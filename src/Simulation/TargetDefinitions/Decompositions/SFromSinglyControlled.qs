@@ -22,6 +22,9 @@ namespace Microsoft.Quantum.Intrinsic {
         body (...) {
             ApplyUncontrolledS(qubit);
         }
+        adjoint (...) {
+            ApplyUncontrolledSAdj(qubit);
+        }
         controlled (ctls, ...) {
             if (Length(ctls) == 0) {
                 ApplyUncontrolledS(qubit);
@@ -35,6 +38,21 @@ namespace Microsoft.Quantum.Intrinsic {
             }
             else {
                 ApplyWithLessControlsA(Controlled S, (ctls, qubit));
+            }
+        }
+        controlled adjoint (ctls, ...) {
+            if (Length(ctls) == 0) {
+                ApplyUncontrolledSAdj(qubit);
+            }
+            elif (Length(ctls) == 1) {
+                Adjoint T(ctls[0]);
+                Adjoint T(qubit);
+                CNOT(ctls[0], qubit);
+                T(qubit);
+                CNOT(ctls[0], qubit);
+            }
+            else {
+                ApplyWithLessControlsA(Controlled Adjoint S, (ctls, qubit));
             }
         }
     }

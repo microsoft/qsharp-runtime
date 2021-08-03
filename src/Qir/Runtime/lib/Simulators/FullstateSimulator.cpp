@@ -10,9 +10,17 @@
 #include <vector>
 #include <fstream>
 #include <climits>
+#include <chrono>
+#include <cstdint>
 
-#include "capi.hpp"
+#pragma clang diagnostic push
+    // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
+    #pragma clang diagnostic ignored "-Wreserved-id-macro"
+    #include "capi.hpp"
+#pragma clang diagnostic pop
 
+
+#include "FloatUtils.hpp"
 #include "QirTypes.hpp"         // TODO: Consider removing dependency on this file.
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
@@ -21,7 +29,7 @@
 #include "QubitManager.hpp"
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 typedef HMODULE QUANTUM_SIMULATOR;
 #else // not _WIN32
 #include <dlfcn.h>
@@ -30,20 +38,19 @@ typedef void* QUANTUM_SIMULATOR;
 
 namespace
 {
-#ifdef _WIN32
 const char* FULLSTATESIMULATORLIB = "Microsoft.Quantum.Simulator.Runtime.dll";
-#elif __APPLE__
-const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
-#else
-const char* FULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
+#if defined(__APPLE__)
+const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.dylib";
+#elif !defined(_WIN32)
+const char* XPLATFULLSTATESIMULATORLIB = "libMicrosoft.Quantum.Simulator.Runtime.so";
 #endif
 
 QUANTUM_SIMULATOR LoadQuantumSimulator()
 {
-    QUANTUM_SIMULATOR handle = 0;
+    QUANTUM_SIMULATOR handle = nullptr;
 #ifdef _WIN32
     handle = ::LoadLibraryA(FULLSTATESIMULATORLIB);
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         throw std::runtime_error(
             std::string("Failed to load ") + FULLSTATESIMULATORLIB +
@@ -53,8 +60,12 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     handle = ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
     if (handle == nullptr)
     {
-        throw std::runtime_error(
-            std::string("Failed to load ") + FULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+        handle = ::dlopen(XPLATFULLSTATESIMULATORLIB, RTLD_LAZY);
+        if (handle == nullptr)
+        {
+            throw std::runtime_error(
+                std::string("Failed to load ") + XPLATFULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+        }
     }
 #endif
     return handle;
@@ -99,7 +110,7 @@ namespace Quantum
             return static_cast<unsigned>(pauli);
         }
 
-        const QUANTUM_SIMULATOR handle = 0;
+        const QUANTUM_SIMULATOR handle = nullptr;
 
         using TSimulatorId = unsigned;      // TODO: Use `void*` or a fixed-size integer, starting in native simulator (breaking change).
         static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;  // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.
@@ -130,7 +141,7 @@ namespace Quantum
         {
             std::cout << "*********************" << std::endl;
             this->GetState([](size_t idx, double re, double im) {
-                if (re != 0 || im != 0)
+                if (!Close(re, 0.0) || !Close(im, 0.0))
                 {
                     std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
                 }
@@ -150,7 +161,7 @@ namespace Quantum
         }
 
       public:
-        CFullstateSimulator()
+        CFullstateSimulator(uint32_t userProvidedSeed = 0)
             : handle(LoadQuantumSimulator())
         {
             typedef unsigned (*TInit)();
@@ -158,8 +169,15 @@ namespace Quantum
 
             qubitManager = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
+
+            typedef void (*TSeed)(unsigned, unsigned);
+            static TSeed setSimulatorSeed = reinterpret_cast<TSeed>(this->GetProc("seed"));
+            setSimulatorSeed(this->simulatorId, 
+                             (userProvidedSeed == 0) 
+                                ? (unsigned)std::chrono::system_clock::now().time_since_epoch().count()
+                                : (unsigned)userProvidedSeed);
         }
-        ~CFullstateSimulator()
+        ~CFullstateSimulator() override
         {
             if (this->simulatorId != NULL_SIMULATORID)
             {
@@ -430,7 +448,7 @@ namespace Quantum
             {
                 std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
 
-                if (re != 0 || im != 0)
+                if (!Close(re, 0.0) || !Close(im, 0.0))
                 {
                     outStream << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
                 }
@@ -454,7 +472,7 @@ namespace Quantum
             {
                 outStream << "; ";
             }
-            outStream << (uintptr_t)(((void **)(qubits->buffer))[idx]);
+            outStream << (uintptr_t)((reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)))[idx]);
         }
         outStream << ':' << std::endl;
 
@@ -467,7 +485,7 @@ namespace Quantum
 
     bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits)
     {
-        std::vector<unsigned> ids = GetQubitIds((long)(qubits->count), (Qubit*)(qubits->buffer));
+        std::vector<unsigned> ids = GetQubitIds((long)(qubits->count), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)));
 
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
@@ -531,9 +549,9 @@ namespace Quantum
         DumpRegisterImpl(outStream, qubits);
     }
 
-    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
+    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator(uint32_t userProvidedSeed /*= 0*/)
     {
-        return std::make_unique<CFullstateSimulator>();
+        return std::make_unique<CFullstateSimulator>(userProvidedSeed);
     }
 } // namespace Quantum
 } // namespace Microsoft

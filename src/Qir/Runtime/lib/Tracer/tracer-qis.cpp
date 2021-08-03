@@ -6,14 +6,9 @@
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
 #include "tracer.hpp"
+#include "tracer-qis.hpp"
+#include "TracerInternal.hpp"
 
-namespace Microsoft
-{
-namespace Quantum
-{
-    extern thread_local std::shared_ptr<CTracer> tracer;
-}
-} // namespace Microsoft
 
 using namespace Microsoft::Quantum;
 extern "C"

@@ -1,11 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+
 namespace Microsoft.Quantum.Runtime
 {
     /// <summary>
     /// Interface to provide configuration details to manage execution.
     /// </summary>
+    // 
+    // TODO: deprecate once the new setup is fully hooked up.
+    //[Obsolete("No longer used. Some of these options might be supported in the future by the SubmissionOptions class.")]
     public interface IQuantumMachineExecutionContext
     {
         /// <summary>

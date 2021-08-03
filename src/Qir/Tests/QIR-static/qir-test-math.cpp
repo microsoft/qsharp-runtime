@@ -7,6 +7,7 @@
 #include "catch.hpp"
 
 #include "qsharp__foundation_internal.hpp"
+#include "FloatUtils.hpp"
 
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop();                                  // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop();                                   // NOLINT
@@ -105,11 +106,17 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
     // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5), std::runtime_error);
+        // Returns with exception. Leaks the instances created from the moment of call 
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.        
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5);
+            // Returns with exception. Leaks the instances created from the moment of call 
+            // to the moment of exception throw.
+            // TODO: Extract into a separate file compiled with leaks check off.        
     }
     catch (std::runtime_error const& exc)
     {
@@ -220,16 +227,22 @@ TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
                                                                                std::numeric_limits<double>::max());
         const double cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomDouble();  // This call must be done 
             // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
-        REQUIRE(qsRndNum == cppRndNum);
+        REQUIRE(Close(qsRndNum, cppRndNum));
     }
 
     // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0), std::runtime_error);
+        // Returns with exception. Leaks the instances created from the moment of call 
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.        
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0);
+            // Returns with exception. Leaks the instances created from the moment of call 
+            // to the moment of exception throw.
+            // TODO: Extract into a separate file compiled with leaks check off.        
     }
     catch (std::runtime_error const& exc)
     {

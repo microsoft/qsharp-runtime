@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>qir-cli</ToolCommandName>
+    <Description>Command-line tool for interacting with QIR.</Description>
+    <PackageTags>Quantum QIR</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20213.1" />
+    <ProjectReference Include="..\Tools\Microsoft.Quantum.Qir.Runtime.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

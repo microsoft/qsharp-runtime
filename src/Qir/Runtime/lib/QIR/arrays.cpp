@@ -41,7 +41,14 @@ int QirArray::Release()
     const int rc = --this->refCount;
     if (rc == 0)
     {
-        delete[] this->buffer;
+        if(ownsQubits)
+        {
+            delete[] (reinterpret_cast<Qubit*>(this->buffer));
+        }
+        else
+        {
+            delete[] this->buffer;
+        }
         this->buffer = nullptr;
     }
     return rc;
@@ -55,7 +62,7 @@ QirArray::QirArray(TItemCount qubits_count)
 {
     if (this->count > 0)
     {
-        QUBIT** qbuffer = new QUBIT*[count];
+        Qubit* qbuffer = new Qubit[count];
         for (TItemCount i = 0; i < count; i++)
         {
             qbuffer[i] = quantum__rt__qubit_allocate();
@@ -76,12 +83,24 @@ QirArray::QirArray(TItemCount qubits_count)
 
 QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount dimCount, TDimContainer&& dimSizes)
     : count(count_items)
-    , itemSizeInBytes(item_size_bytes)
+
+    // Each array item needs to be properly aligned. Let's align them by correcting the `itemSizeInBytes`.
+    , itemSizeInBytes(
+        (   (item_size_bytes == 1)
+         || (item_size_bytes == 2)
+         || (item_size_bytes == 4)
+         || ((item_size_bytes % sizeof(size_t)) == 0)   // For built-in types or multiples of architecture alignment
+        ) ? item_size_bytes                             // leave their natural alignment.
+                                    // Other types align on the architecture boundary `sizeof(size_t)`: 4 bytes on 32-bit arch, 8 on 64-bit arch.
+          : item_size_bytes + sizeof(size_t) - (item_size_bytes % sizeof(size_t))
+      )
+
     , dimensions(dimCount)
     , dimensionSizes(std::move(dimSizes))
     , ownsQubits(false)
     , refCount(1)
 {
+    assert(item_size_bytes != 0);
     assert(dimCount > 0);
 
     if (GlobalContext() != nullptr)
@@ -112,11 +131,11 @@ QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount 
     }
 }
 
-QirArray::QirArray(const QirArray* other)
-    : count(other->count)
-    , itemSizeInBytes(other->itemSizeInBytes)
-    , dimensions(other->dimensions)
-    , dimensionSizes(other->dimensionSizes)
+QirArray::QirArray(const QirArray& other)
+    : count(other.count)
+    , itemSizeInBytes(other.itemSizeInBytes)
+    , dimensions(other.dimensions)
+    , dimensionSizes(other.dimensionSizes)
     , ownsQubits(false)
     , refCount(1)
 {
@@ -131,7 +150,7 @@ QirArray::QirArray(const QirArray* other)
     {
         this->buffer = new char[size];
         assert(size <= std::numeric_limits<size_t>::max());
-        memcpy(this->buffer, other->buffer, (size_t)size);
+        memcpy(this->buffer, other.buffer, (size_t)size);
     }
     else
     {
@@ -144,7 +163,7 @@ QirArray::~QirArray()
     assert(this->buffer == nullptr);
 }
 
-char* QirArray::GetItemPointer(TItemCount index)
+char* QirArray::GetItemPointer(TItemCount index) const
 {
     assert(index < this->count);
     return &this->buffer[index * this->itemSizeInBytes];
@@ -156,7 +175,10 @@ void QirArray::Append(const QirArray* other)
     assert(this->itemSizeInBytes == other->itemSizeInBytes);
     assert(this->dimensions == 1 && other->dimensions == 1);
 
-    if (other->count == 0)
+    assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+    const TBufSize other_size = other->count * other->itemSizeInBytes;
+
+    if (other_size == 0)
     {
         return;
     }
@@ -164,11 +186,11 @@ void QirArray::Append(const QirArray* other)
     assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());    // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
     const TBufSize this_size = this->count * this->itemSizeInBytes;
 
-    assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());  // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize other_size = other->count * other->itemSizeInBytes;
-
     char* new_buffer = new char[this_size + other_size];
-    memcpy(new_buffer, this->buffer, this_size);
+    if(this_size)
+    {
+        memcpy(new_buffer, this->buffer, this_size);
+    }
     memcpy(&new_buffer[this_size], other->buffer, other_size);
 
     delete[] this->buffer;
@@ -230,13 +252,11 @@ extern "C"
         assert(qa->ownsQubits);
         if (qa->ownsQubits)
         {
-            QUBIT** qubits = reinterpret_cast<QUBIT**>(qa->buffer);
+            Qubit* qubits = reinterpret_cast<Qubit*>(qa->buffer);
             for (QirArray::TItemCount i = 0; i < qa->count; i++)
             {
                 quantum__rt__qubit_release(qubits[i]);
             }
-
-            qa->ownsQubits = false;
         }
 
         quantum__rt__array_update_reference_count(qa, -1);
@@ -273,7 +293,7 @@ extern "C"
                     delete array;
                     assert(i == -1 && "Attempting to decrement reference count below zero!");
                     break;
-                };
+                }
             }
         }
     }
@@ -320,7 +340,7 @@ extern "C"
         }
         if (forceNewInstance || array->aliasCount > 0)
         {
-            return new QirArray(array);
+            return new QirArray(*array);
         }
         (void)array->AddRef();
         return array;
@@ -331,7 +351,7 @@ extern "C"
         assert(head != nullptr && tail != nullptr);
         assert(head->dimensions == 1 && tail->dimensions == 1);
 
-        QirArray* concatenated = new QirArray(head);
+        QirArray* concatenated = new QirArray(*head);
         concatenated->Append(tail);
         return concatenated;
     }
@@ -416,7 +436,8 @@ extern "C"
             {
                 throw std::runtime_error("invalid range");
             }
-            else if ((r.step > 0 && r.end < r.start) || (r.step < 0 && r.start < r.end))
+            else if (   (r.step > 0 && r.end   < r.start)     // Positive step and negative range.
+                     || (r.step < 0 && r.start < r.end  ))    // Negative step and positive range.
             {
                 // the QirRange generates empty sequence, normalize it
                 this->start = 0;
@@ -424,7 +445,7 @@ extern "C"
                 this->end = 0;
                 this->width = 0;
             }
-            else if (r.step > 0)
+            else if (r.step > 0)    // Positive step and positive range.
             {
                 this->width = (r.end - r.start + 1) / r.step + ((r.end - r.start + 1) % r.step != 0 ? 1 : 0);
                 assert(this->width > 0);
@@ -437,18 +458,26 @@ extern "C"
 
                 this->end = lastSequenceItem + r.step;
             }
-            else
-            {
-                this->width = (r.end - r.start - 1) / r.step + ((r.end - r.start - 1) % r.step != 0 ? 1 : 0);
+            else    // Negative step and negative range.
+            {   // Range{10, -3, 1} == { 10, 7, 4, 1 }
+                // (B) Range{1, -5 , 0} = { 1 }
+                // (C) Range{4, -2, 0} = {4, 2, 0}
+                this->width = (r.end - r.start - 1) / r.step    // (1 - 10 - 1) / (-3) == (-10) / (-3) == 3.
+                                                                // (B) (0 - 1 - 1) / (-5) == -2 / -5 == 0.
+                            + ((r.end - r.start - 1) % r.step != 0 ? 1 : 0); // (-10) % (-3) == -1; (-1) ? 1 : 0 == 1.
+                                                                // (B) -2 % -5 = -2; -2 ? 1 : 0 == 1.
+                                                                // Total: 4.
+                                                                // (B) Total: 1.
                 assert(this->width > 0);
 
-                const int64_t lastSequenceItem = r.start + (this->width - 1) * r.step;
+                const int64_t lastSequenceItem = r.start + (this->width - 1) * r.step;  // 10 + (4 - 1) * (-3) = 1.
+                                                                // (B) 1 + (1 - 1)*(-5) = 1 + 0*5 = 1.
                 if (lastSequenceItem < 0 || r.start >= upperBound)
                 {
                     throw std::runtime_error("range out of bounds");
                 }
 
-                this->end = lastSequenceItem + r.step;
+                this->end = lastSequenceItem + r.step;          // (B) 1 + (-5) = -4.
             }
 
             // normalize the range of width 1, as the step doesn't matter for it
@@ -531,9 +560,13 @@ extern "C"
         {
             assert(dst < slice->count);
 
-            QirArray::TItemCount srcInner = src;
+            int64_t srcInner = src;     // The `srcInner` can go negative in the end of the last iteration.
             for (int64_t index = range.start; index != range.end; index += range.step)
             {
+                assert((dst * itemSizeInBytes + chunkSize) <= (slice->count * slice->itemSizeInBytes));
+                assert((srcInner * (int64_t)itemSizeInBytes + (int64_t)chunkSize) <= (array->count * array->itemSizeInBytes));
+                assert(srcInner >= 0);
+
                 memcpy(&slice->buffer[dst * itemSizeInBytes], &array->buffer[srcInner * itemSizeInBytes], chunkSize);
                 srcInner += (singleIndexRunCount * range.step);
                 dst += singleIndexRunCount;

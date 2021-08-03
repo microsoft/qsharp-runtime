@@ -7,7 +7,11 @@
 #include <memory>
 #include <vector>
 
-#include "CLI11.hpp"
+#pragma clang diagnostic push
+    // Temporarily disable `-Wswitch-enum`, one of the `switch`es in "CLI11.hpp" handles not all the enumerators.
+    #pragma clang diagnostic ignored "-Wswitch-enum"
+    #include "CLI11.hpp"
+#pragma clang diagnostic pop
 
 #include "QirContext.hpp"
 #include "SimFactory.hpp"
@@ -16,6 +20,8 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
+namespace   // == `static`
+{
 struct InteropArray
 {
     size_t Size;   // TODO: Never used?
@@ -33,16 +39,18 @@ struct InteropRange
     int64_t Step;
     int64_t End;
 
-    InteropRange() :
+    [[maybe_unused]] InteropRange() :
         Start(0),
         Step(0),
         End(0){}
 
-    InteropRange(RangeTuple rangeTuple) :
+    [[maybe_unused]] InteropRange(RangeTuple rangeTuple) :
         Start(get<0>(rangeTuple)),
         Step(get<1>(rangeTuple)),
         End(get<2>(rangeTuple)){}
 };
+
+} // namespace   // == `static`
 
 // This is the function corresponding to the QIR entry-point.
 extern "C" void Quantum__StandaloneSupportedInputs__ExerciseInputs( // NOLINT
@@ -59,23 +67,23 @@ extern "C" void Quantum__StandaloneSupportedInputs__ExerciseInputs( // NOLINT
     InteropArray* resultArray,
     const char* stringValue);
 
-const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar = 0x1;
-map<string, bool> BoolAsCharMap{
+static const char InteropFalseAsChar = 0x0;
+static const char InteropTrueAsChar = 0x1;
+static map<string, bool> BoolAsCharMap{
     {"0", InteropFalseAsChar},
     {"false", InteropFalseAsChar},
     {"1", InteropTrueAsChar},
     {"true", InteropTrueAsChar}};
 
-map<string, PauliId> PauliMap{
+static map<string, PauliId> PauliMap{
     {"PauliI", PauliId::PauliId_I},
     {"PauliX", PauliId::PauliId_X},
     {"PauliY", PauliId::PauliId_Y},
     {"PauliZ", PauliId::PauliId_Z}};
 
-const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> ResultAsCharMap{
+static const char InteropResultZeroAsChar = 0x0;
+static const char InteropResultOneAsChar = 0x1;
+static map<string, char> ResultAsCharMap{
     {"0", InteropResultZeroAsChar},
     {"Zero", InteropResultZeroAsChar},
     {"1", InteropResultOneAsChar},
@@ -89,7 +97,7 @@ unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
     return array;
 }
 
-unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
+static unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
 {
     unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
     return range;
@@ -104,7 +112,7 @@ void FreePointerVector(vector<T*>& v)
     }
 }
 
-char TranslatePauliToChar(PauliId& pauli)
+static char TranslatePauliToChar(PauliId& pauli)
 {
     return static_cast<char>(pauli);
 }
@@ -116,13 +124,13 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
+static InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
     InteropRange* range = new InteropRange(rangeTuple);
     return range;
 }
 
-const char* TranslateStringToCharBuffer(string& s)
+static const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }

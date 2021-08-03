@@ -21,13 +21,12 @@ $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",
         "Microsoft.Quantum.AutoSubstitution",
-        "Microsoft.Quantum.CSharpGeneration",
-        "Microsoft.Quantum.Development.Kit",
         "Microsoft.Quantum.EntryPointDriver",
         "Microsoft.Quantum.QSharp.Core",
         "Microsoft.Quantum.Type1.Core",
         "Microsoft.Quantum.Type2.Core",
         "Microsoft.Quantum.Type3.Core",
+        "Microsoft.Quantum.Qir.Runtime",
         "Microsoft.Quantum.QSharp.Foundation"
         "Microsoft.Quantum.Runtime.Core",
         "Microsoft.Quantum.Simulators",
@@ -37,9 +36,7 @@ $artifacts = @{
     Assemblies = @(
         ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
         ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.AutoSubstitution.dll",
-        ".\src\Simulation\CSharpGeneration\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.CSharpGeneration.dll",
-        ".\src\Simulation\CSharpGeneration.App\bin\$Env:BUILD_CONFIGURATION\netcoreapp3.1\Microsoft.Quantum.CSharpGeneration.App.dll",
-        ".\src\Simulation\RoslynWrapper\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.RoslynWrapper.dll",
+        ".\src\Qir\Tools\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Qir.Runtime.Tools.dll",
         ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
         ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
         ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
