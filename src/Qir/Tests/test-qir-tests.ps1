@@ -20,10 +20,10 @@ if ($Env:BUILD_CONFIGURATION -eq "Debug")
         {
             $env:ASAN_OPTIONS += "check_initialization_order=1"    # https://clang.llvm.org/docs/AddressSanitizer.html#initialization-order-checking
         }
-        else
-        {
-            $env:ASAN_OPTIONS += "detect_leaks=1"      # https://clang.llvm.org/docs/AddressSanitizer.html#memory-leak-detection
-        }
+        #else    # AddressSanitizer: detect_leaks is not supported on this platform. Re-enable this once supported.
+        #{
+        #    $env:ASAN_OPTIONS += "detect_leaks=1"      # https://clang.llvm.org/docs/AddressSanitizer.html#memory-leak-detection
+        #}
     }
 }
 
