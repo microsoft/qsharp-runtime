@@ -36,6 +36,7 @@ jobs:
         imageName: 'windows-latest'
   pool: 
     vmImage: $(imageName)
+  timeoutInMinutes: 90
 
   steps:
   - template: steps.yml
