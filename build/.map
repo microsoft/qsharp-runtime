@@ -69,6 +69,7 @@ ci.yml (Build.Configuration = (microsoft.qsharp-runtime           ? Release :
         "List built packages & assemblies" '$(System.DefaultWorkingDirectory)/build'/.\manifest.ps1
             # condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))      # Windows only!
         steps-wrap-up.yml
+            . . .
         (end)
     (end)
 
