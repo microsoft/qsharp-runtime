@@ -4,9 +4,6 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <PackageId>Microsoft.Quantum.Qir.Runtime</PackageId>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <Description>Native libraries and build tools for linking and executing Quantum Intermediate Representation.</Description>
     <RootNamespace>Microsoft.Quantum.Qir.Runtime.Tools</RootNamespace>
     <PackageTags>Quantum QIR</PackageTags>
@@ -18,11 +15,11 @@
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
-    <None Include="Externals\CLI11\*" Pack="true" Visible="false" PackagePath="externals/CLI11">
-      <Link>externals\CLI11\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
+    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/$(TargetFramework)/externals/CLI11">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
       <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
