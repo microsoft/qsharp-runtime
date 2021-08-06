@@ -39,6 +39,24 @@ If (-not (Test-Path -Path $Env:WHEEL_OUTDIR)) { [IO.Directory]::CreateDirectory(
 If ($Env:DOCS_OUTDIR -eq $null) { $Env:DOCS_OUTDIR =  (Join-Path $Env:DROPS_DIR "docs") }
 If (-not (Test-Path -Path $Env:DOCS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:DOCS_OUTDIR) }
 
+Get-ChildItem -Path Env:/* -Include @(
+    "BUILD_BUILDNUMBER",
+    "BUILD_CONFIGURATION",
+    "BUILD_VERBOSITY",
+    "ASSEMBLY_VERSION",
+    "PYTHON_VERSION",
+    "NUGET_VERSION",
+    "NATIVE_SIMULATOR",
+    "QIR_DROPS",
+    "DROPS_DIR",
+    "DROP_NATIVE",
+    "INTERNAL_TOOLS_OUTDIR",
+    "NUGET_OUTDIR",
+    "CRATE_OUTDIR",
+    "WHEEL_OUTDIR",
+    "DOCS_OUTDIR"
+) | Format-Table | Out-String | Write-Host
+
 Get-ChildItem @(
     "Env:\DROPS_DIR",
     "Env:\DROP_NATIVE",
