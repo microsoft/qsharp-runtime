@@ -1,37 +1,96 @@
-# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# https://clang.llvm.org/docs/ClangFormat.html
+# Options listed in this file: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# Visual Studio Code Integration: https://clang.llvm.org/docs/ClangFormat.html#visual-studio-code-integration
+
+# To disable formatting of a specific fragment:
+# ```c++
+# // clang-format off
+#     void    unformatted_code  ;
+# // clang-format on
+# ```
+
+# TERMS
+# Argument:     func(5);    // `5` is an argument. Not to be confused with Parameter.
+# Parameter:    void func(int p) {}     // `p` is a Parameter. Not to be confused with Argument.
 
 ---
 Language: Cpp
 BasedOnStyle: Microsoft
+# To see all the style settings:
+#   clang-format -style=Microsoft -dump-config > MicrosoftStyle
 
-# page width
-ColumnLimit: 120
-ReflowComments: true
+# Commented-out options correspond to the base Style (see `BasedOnStyle`).
 
-# tabs and indents
-UseTab: Never
-IndentWidth: 4
-TabWidth: 4
-AccessModifierOffset: -2
+# Page Width:
+#ColumnLimit: 120
+#ReflowComments: true   # Comments are broken up into multiple lines.
+
+# Include Directives:
+SortIncludes: false     # Includes are never sorted.
+#IncludeBlocks is expected to be ignored.
+
+# Tabs and Indents:
+#UseTab: Never
+#IndentWidth: 4
+#TabWidth: 4
 NamespaceIndentation: Inner
 
-# line and statements layout
-BreakBeforeBraces: Allman
-BinPackParameters: false
-AlignAfterOpenBracket: AlwaysBreak
-AllowShortIfStatementsOnASingleLine: WithoutElse
-AllowShortFunctionsOnASingleLine: Empty
-AllowAllConstructorInitializersOnNextLine: false
-AllowAllArgumentsOnNextLine: true
-AllowAllParametersOfDeclarationOnNextLine: false
-BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeComma
+# Templates:
+SpaceAfterTemplateKeyword: false    # Do not insert space after `template`.
 
-# misc
-Cpp11BracedListStyle: true
-FixNamespaceComments: true
-IncludeBlocks: Preserve
-SpaceBeforeInheritanceColon : true
-SpaceBeforeParens: ControlStatements
-DerivePointerAlignment: false
+# Line and Statements Layout:
+BreakBeforeBraces: Allman
+#AlignAfterOpenBracket: Align
+#AllowShortIfStatementsOnASingleLine: Never
+#AllowAllArgumentsOnNextLine: true
+#BreakBeforeTernaryOperators: true
+AllowShortLambdasOnASingleLine: None    # Never merge lambdas into a single line (leave as is).
+
+# Misc:
+#Cpp11BracedListStyle: true
+#FixNamespaceComments: true
+#SpaceBeforeParens: ControlStatements
 PointerAlignment: Left
+CommentPragmas: '^ NOLINT'  # See regexp examples in `IncludeCategories`.
+MaxEmptyLinesToKeep: 2
+SpacesInContainerLiterals: false
+
+# Function (Including Constructor and Member Function) Declaration and Definition (Including Comments):
+#   If fits in the line (see `ColumnLimit`) then leave as is.
+#   Else (does not fit in the line):
+#   void myFunction(int a,
+#                   int b)
+#   void myFunction(int a,
+#       int b) // With this comment does not fit under `int a`.
+AllowAllParametersOfDeclarationOnNextLine: false
+#BinPackParameters: true
+#AllowShortFunctionsOnASingleLine: None     # Never merge functions into a single line (leave as is).
+
+# Class/Struct Declaration and Definition:
+#   class C
+#       : public B1
+#       , B2
+#   {
+#     public:   // AccessModifierOffset: -2
+#       // Body.
+#   };
+#
+# TODO(rokuzmin): What if short line? E.g. `class C : B1`. Is still broken into multiple lines? If yes then how to disable?
+BreakInheritanceList: BeforeComma   # LineBreak before `:` and before `,`.
+#SpaceBeforeInheritanceColon : true     # Do not remove space before inheritance colon `:` in short lines like `class C : B1`.
+#AccessModifierOffset: -2
+
+# Constructor:
+#SomeClass::SomeClass(T1 param1,
+#                     T2 param2)
+#    : BaseClass1()  // Member initializer list has the same indent as the body.
+#    , BaseClass2()
+#    , memberVar1()
+#    , memberVar2()
+#{
+#    // Body.
+#}
+BreakConstructorInitializers: BeforeComma       # LineBreak before `:` and before `,`.
+ConstructorInitializerAllOnOneLineOrOnePerLine: true    # Horizontal list (`: A(), B(), C()`) or vertical, like in the example above.
+AllowAllConstructorInitializersOnNextLine: false        # Disable horizontal list (`: A(), B(), C()`).
+# SpaceBeforeCtorInitializerColon is expected to be ignored.
