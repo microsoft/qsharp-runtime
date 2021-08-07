@@ -15,10 +15,10 @@
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
-    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/$(TargetFramework)/externals/CLI11">
+    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/$(TargetFramework)/Externals/CLI11">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
       <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
