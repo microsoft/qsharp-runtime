@@ -37,22 +37,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
-    <!-- This is required for simulators' libraries to be copied to the output folder when this project is referenced as a package. -->
-    <Content Include="..\Native\osx\**\*" PackagePath="contentFiles/any/$(TargetFramework)/simulators/osx-x64">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Native\win10\**\*" PackagePath="contentFiles/any/$(TargetFramework)/simulators/win-x64">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Native\linux\**\*" PackagePath="contentFiles/any/$(TargetFramework)/simulators/linux-x64">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <!-- This is required to be able to invoke the native simulator through .NET. -->
     <None Include="..\Native\win10\**\*">
       <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
