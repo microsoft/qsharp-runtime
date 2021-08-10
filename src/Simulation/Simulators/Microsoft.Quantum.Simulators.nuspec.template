@@ -14,6 +14,9 @@
     <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Quantum Q# QSharp</tags>
+    <contentFiles>
+      <files include="any/any/simulators/**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
+   </contentFiles> 
   </metadata>
 
   <files>
