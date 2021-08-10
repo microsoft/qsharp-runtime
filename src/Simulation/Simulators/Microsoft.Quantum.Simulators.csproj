@@ -29,15 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- This is required for simulators' libraries to be copied to the output folder when this project is directly referenced. -->
-    <None Include="$(QSimDll)">
-      <Link Condition="$([MSBuild]::IsOsPlatform('Windows'))">simulators\win-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('OSX'))">simulators\osx-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('Linux'))">simulators\linux-x64\%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <!-- This is required to be able to invoke the native simulator through .NET. -->
     <None Include="..\Native\win10\**\*">
       <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

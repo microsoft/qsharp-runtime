@@ -14,9 +14,6 @@
     <releaseNotes>See: https://docs.microsoft.com/azure/quantum/qdk-relnotes/</releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Quantum Q# QSharp</tags>
-    <contentFiles>
-      <files include="any/any/simulators/**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
-   </contentFiles> 
   </metadata>
 
   <files>
@@ -33,9 +30,6 @@
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.dll" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.xml" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.pdb" target="lib" />
-    <file src="..\Native\build\drop\*.dylib" target="contentFiles\any\any\simulators\linux-x64" />
-    <file src="..\Native\build\drop\*.so" target="contentFiles\any\any\simulators\osx-x64" />
-    <file src="..\Native\build\drop\*.dll" target="contentFiles\any\any\simulators\win-x64" />
     <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>

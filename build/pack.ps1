@@ -17,10 +17,13 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
     $DROP = "$Env:DROP_NATIVE/src/Simulation/Native/build/drop"
     Write-Host "##[info]Copying Microsoft.Quantum.Simulator.Runtime files from $DROP...";
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib") {
-        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/Microsoft.Quantum.Simulator.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.dylib" "osx/libMicrosoft.Quantum.Simulator.Runtime.dylib"
     }
     If (Test-Path "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so") {
-        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so"  "linux/Microsoft.Quantum.Simulator.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.Simulator.Runtime.so" "linux/libMicrosoft.Quantum.Simulator.Runtime.so"
+    }
+    If (Test-Path "$DROP/Microsoft.Quantum.Simulator.Runtime.dll") {
+        Copy-Item -Verbose "$DROP/Microsoft.Quantum.Simulator.Runtime.dll" "win10/Microsoft.Quantum.Simulator.Runtime.dll"
     }
 
 

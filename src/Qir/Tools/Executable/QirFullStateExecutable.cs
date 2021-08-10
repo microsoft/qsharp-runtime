@@ -50,7 +50,6 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
                 : throw new ArgumentException("Unsupported operating system architecture.");
 
             LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "runtimes", osID, "native")));
-            LibraryDirectories.Add(new DirectoryInfo(Path.Combine(thisModulePath, "simulators", osID)));
         }
     }
 }

@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
-    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/$(TargetFramework)/Externals/CLI11">
+    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/any/Externals/CLI11">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
