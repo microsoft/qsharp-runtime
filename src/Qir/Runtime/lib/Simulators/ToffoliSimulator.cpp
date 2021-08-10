@@ -18,9 +18,12 @@ namespace Quantum
         CToffoliSimulator
         Simulator for reversible classical logic.
     ==============================================================================*/
-    class CToffoliSimulator final : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
+    class CToffoliSimulator final
+        : public IRuntimeDriver
+        , public IQuantumGateSet
+        , public IDiagnostics
     {
-        using QubitId = uint64_t;
+        using QubitId       = uint64_t;
         QubitId nextQubitId = 0;
 
         // State of a qubit is represented by a bit in states indexed by qubit's id,
@@ -30,7 +33,7 @@ namespace Quantum
         // The clients should never attempt to derefenece the Result, so we'll use fake
         // pointers to avoid allocation and deallocation.
         Result zero = reinterpret_cast<Result>(0xface0000);
-        Result one = reinterpret_cast<Result>(0xface1000);
+        Result one  = reinterpret_cast<Result>(0xface1000);
 
         static uint64_t GetQubitId(Qubit qubit)
         {
@@ -38,13 +41,15 @@ namespace Quantum
         }
 
       public:
-        CToffoliSimulator() = default;
+        CToffoliSimulator()           = default;
         ~CToffoliSimulator() override = default;
 
         ///
         /// Implementation of IRuntimeDriver
         ///
-        void ReleaseResult(Result /* result */) override {}
+        void ReleaseResult(Result /* result */) override
+        {
+        }
 
         bool AreEqualResults(Result r1, Result r2) override
         {
@@ -69,7 +74,7 @@ namespace Quantum
         {
             Qubit retVal = (Qubit)(uintptr_t)(this->nextQubitId);
             ++(this->nextQubitId);
-            assert(this->nextQubitId < std::numeric_limits<QubitId>::max());    // Check aginast the risk of overflow.
+            assert(this->nextQubitId < std::numeric_limits<QubitId>::max()); // Check aginast the risk of overflow.
             this->states.emplace_back(false);
             return retVal;
         }
@@ -92,20 +97,16 @@ namespace Quantum
         ///
         /// Implementation of IDiagnostics
         ///
-        bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* /* failureMessage */) override
+        bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result,
+                    const char* /* failureMessage */) override
         {
             // Measurements in Toffoli simulator don't change the state.
             // TODO: log failureMessage?
             return AreEqualResults(result, Measure(numTargets, bases, numTargets, targets));
         }
 
-        bool AssertProbability(
-            long numTargets,
-            PauliId bases[],
-            Qubit targets[],
-            double probabilityOfZero,
-            double precision,
-            const char* /* failureMessage */) override
+        bool AssertProbability(long numTargets, PauliId bases[], Qubit targets[], double probabilityOfZero,
+                               double precision, const char* /* failureMessage */) override
         {
             assert(precision >= 0);
 
@@ -122,12 +123,12 @@ namespace Quantum
 
         void DumpMachine(const void* /* location */) override
         {
-            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
+            std::cerr << __func__ << " is not yet implemented" << std::endl; // #645
         }
 
         void DumpRegister(const void* /* location */, const QirArray* /* qubits */) override
         {
-            std::cerr << __func__ << " is not yet implemented" << std::endl;    // #645
+            std::cerr << __func__ << " is not yet implemented" << std::endl; // #645
         }
 
 
@@ -227,17 +228,13 @@ namespace Quantum
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/, double /*theta*/) override
+        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/,
+                         double /*theta*/) override
         {
             throw std::logic_error("operation_not_supported");
         }
-        void ControlledExp(
-            long /*numControls*/,
-            Qubit* /*controls*/,
-            long /*numTargets*/,
-            PauliId* /*paulis*/,
-            Qubit* /*targets*/,
-            double /* theta */) override
+        void ControlledExp(long /*numControls*/, Qubit* /*controls*/, long /*numTargets*/, PauliId* /*paulis*/,
+                           Qubit* /*targets*/, double /* theta */) override
         {
             throw std::logic_error("operation_not_supported");
         }

@@ -22,7 +22,7 @@ BasedOnStyle: Microsoft
 # Commented-out options correspond to the base Style (see `BasedOnStyle`).
 
 # Page Width:
-#ColumnLimit: 120
+#ColumnLimit: 120       # VSCode Show Ruler: https://stackoverflow.com/a/64004251/6362941
 #ReflowComments: true   # Comments are broken up into multiple lines.
 
 # Include Directives:
@@ -37,6 +37,7 @@ NamespaceIndentation: Inner
 
 # Templates:
 SpaceAfterTemplateKeyword: false    # Do not insert space after `template`.
+AlwaysBreakTemplateDeclarations: Yes
 
 # Line and Statements Layout:
 BreakBeforeBraces: Allman
@@ -45,6 +46,8 @@ BreakBeforeBraces: Allman
 #AllowAllArgumentsOnNextLine: true
 #BreakBeforeTernaryOperators: true
 AllowShortLambdasOnASingleLine: None    # Never merge lambdas into a single line (leave as is).
+AllowShortBlocksOnASingleLine: Empty    # Allow `while (true) {}`.
+AlignConsecutiveAssignments: true
 
 # Misc:
 #Cpp11BracedListStyle: true
@@ -64,7 +67,7 @@ SpacesInContainerLiterals: false
 #       int b) // With this comment does not fit under `int a`.
 AllowAllParametersOfDeclarationOnNextLine: false
 #BinPackParameters: true
-#AllowShortFunctionsOnASingleLine: None     # Never merge functions into a single line (leave as is).
+AllowShortFunctionsOnASingleLine: None #None #Empty     # Allow `void f() {}`, `virtual ~IRuntimeDriver() {}`.
 
 # Class/Struct Declaration and Definition:
 #   class C
@@ -75,8 +78,9 @@ AllowAllParametersOfDeclarationOnNextLine: false
 #       // Body.
 #   };
 #
-# TODO(rokuzmin): What if short line? E.g. `class C : B1`. Is still broken into multiple lines? If yes then how to disable?
 BreakInheritanceList: BeforeComma   # LineBreak before `:` and before `,`.
+                                    # However the line with one base class, e.g. `class C : B1`, is formatted to one line,
+                                    # even if already is broken up into multiple lines.
 #SpaceBeforeInheritanceColon : true     # Do not remove space before inheritance colon `:` in short lines like `class C : B1`.
 #AccessModifierOffset: -2
 
@@ -91,6 +95,9 @@ BreakInheritanceList: BeforeComma   # LineBreak before `:` and before `,`.
 #    // Body.
 #}
 BreakConstructorInitializers: BeforeComma       # LineBreak before `:` and before `,`.
+                                                # But if the member init list fits in the line after `)` 
+                                                # then makes the list horizontal and places after `)` :-(. 
+                                                # Failed to disable. https://stackoverflow.com/a/59574671/6362941
 ConstructorInitializerAllOnOneLineOrOnePerLine: true    # Horizontal list (`: A(), B(), C()`) or vertical, like in the example above.
 AllowAllConstructorInitializersOnNextLine: false        # Disable horizontal list (`: A(), B(), C()`).
 # SpaceBeforeCtorInitializerColon is expected to be ignored.
