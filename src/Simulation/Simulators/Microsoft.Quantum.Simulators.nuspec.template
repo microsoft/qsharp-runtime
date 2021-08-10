@@ -33,9 +33,9 @@
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.dll" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.xml" target="lib" />
     <file src="..\Simulators\bin\$Configuration$\**\Microsoft.Quantum.Simulation.*.pdb" target="lib" />
-    <file src="..\Native\build\drop\libMicrosoft.Quantum.Simulator.Runtime.dylib" target="contentFiles\any\any\simulators\linux-x64" />
-    <file src="..\Native\build\drop\libMicrosoft.Quantum.Simulator.Runtime.so" target="contentFiles\any\any\simulators\osx-x64" />
-    <file src="..\Native\build\drop\Microsoft.Quantum.Simulator.Runtime.dll" target="contentFiles\any\any\simulators\win-x64" />
+    <file src="..\Native\build\drop\*.dylib" target="contentFiles\any\any\simulators\linux-x64" />
+    <file src="..\Native\build\drop\*.so" target="contentFiles\any\any\simulators\osx-x64" />
+    <file src="..\Native\build\drop\*.dll" target="contentFiles\any\any\simulators\win-x64" />
     <file src="..\..\..\build\assets\qdk-nuget-icon.png" target="images" />
   </files>
 </package>
