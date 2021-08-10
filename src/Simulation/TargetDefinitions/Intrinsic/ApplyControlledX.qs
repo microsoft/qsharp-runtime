@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// CNOT(control, target);
     /// ```
-    @TargetInstruction("cnot")
+    @TargetInstruction("cnot__body")
     internal operation ApplyControlledX (control : Qubit, target : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
