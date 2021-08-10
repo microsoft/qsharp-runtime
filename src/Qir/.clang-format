@@ -67,7 +67,7 @@ SpacesInContainerLiterals: false
 #       int b) // With this comment does not fit under `int a`.
 AllowAllParametersOfDeclarationOnNextLine: false
 #BinPackParameters: true
-AllowShortFunctionsOnASingleLine: None #None #Empty     # Allow `void f() {}`, `virtual ~IRuntimeDriver() {}`.
+AllowShortFunctionsOnASingleLine: None
 
 # Class/Struct Declaration and Definition:
 #   class C
@@ -96,8 +96,8 @@ BreakInheritanceList: BeforeComma   # LineBreak before `:` and before `,`.
 #}
 BreakConstructorInitializers: BeforeComma       # LineBreak before `:` and before `,`.
                                                 # But if the member init list fits in the line after `)` 
-                                                # then makes the list horizontal and places after `)` :-(. 
-                                                # Failed to disable. https://stackoverflow.com/a/59574671/6362941
+                                                # then makes the list horizontal and places after `)`. 
+                                                # Failed to disable. Problem known for years. https://stackoverflow.com/a/59574671/6362941
 ConstructorInitializerAllOnOneLineOrOnePerLine: true    # Horizontal list (`: A(), B(), C()`) or vertical, like in the example above.
 AllowAllConstructorInitializersOnNextLine: false        # Disable horizontal list (`: A(), B(), C()`).
 # SpaceBeforeCtorInitializerColon is expected to be ignored.
