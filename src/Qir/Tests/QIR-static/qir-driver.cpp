@@ -20,8 +20,8 @@
 #include "catch.hpp"
 
 // Identifiers exposed externally:
-extern "C" void __quantum__qis__k__body(Qubit q);                       // NOLINT
-extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q);    // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q);                    // NOLINT
+extern "C" void __quantum__qis__k__ctl(QirArray* controls, Qubit q); // NOLINT
 
 // Used by a couple test simulators. Catch's REQUIRE macro doesn't deal well with static class members so making it
 // into a global constant.
@@ -43,7 +43,8 @@ To update the *.ll files to a newer version:
 - the generated file name.ll will be placed into `s` folder
 */
 
-struct Array {
+struct Array
+{
     int64_t itemSize;
     void* buffer;
 };
@@ -52,16 +53,14 @@ struct Array {
 // index (starting from index backwards) and every element from index to the end. It returns the sum of elements in this
 // new array
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop( // NOLINT
-    Array* array,
-    int64_t index,
-    int64_t val);
+    Array* array, int64_t index, int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
 
     constexpr int64_t n = 5;
-    int64_t values[n] = {0, 1, 2, 3, 4};
-    auto array = Array{5, values};
+    int64_t values[n]   = {0, 1, 2, 3, 4};
+    auto array          = Array{5, values};
 
     int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop(&array, 2, 42);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
@@ -110,7 +109,8 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
         this->qubits[id] = 1 - this->qubits[id];
     }
 
-    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */,
+                   Qubit targets[]) override
     {
         assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
 
@@ -196,9 +196,9 @@ TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
     bool failed = false;
     try
     {
-        TestFailWithRangeString(0, 5, 42);  // Returns with exception. Leaks the instances created from the moment of call 
-                                            // to the moment of exception throw.
-                                            // TODO: Extract into a separate file compiled with leaks check off.
+        TestFailWithRangeString(0, 5, 42); // Returns with exception. Leaks the instances created from the moment of
+                                           // call to the moment of exception throw.
+                                           // TODO: Extract into a separate file compiled with leaks check off.
     }
     catch (const std::exception& e)
     {
@@ -218,8 +218,8 @@ TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
     REQUIRE(res == 42 - 17);
 }
 
-// The Microsoft__Quantum__Testing__QIR__TestFunctors__Interop tests needs proper semantics of X and M, and nothing else.
-// The validation is done inside the test and it would throw in case of failure.
+// The Microsoft__Quantum__Testing__QIR__TestFunctors__Interop tests needs proper semantics of X and M, and nothing
+// else. The validation is done inside the test and it would throw in case of failure.
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
@@ -265,7 +265,8 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         X(qubit);
     }
 
-    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */, Qubit targets[]) override
+    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */,
+                   Qubit targets[]) override
     {
         assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
 
@@ -280,7 +281,9 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override
+    {
+    } // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {
@@ -293,11 +296,11 @@ struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
     }
 };
 static FunctorsTestSimulator* g_ctrqapi = nullptr;
-static int g_cKCalls = 0;
-static int g_cKCallsControlled = 0;
+static int g_cKCalls                    = 0;
+static int g_cKCallsControlled          = 0;
 extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
 extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop(); // NOLINT
-extern "C" void __quantum__qis__k__body(Qubit q)                              // NOLINT
+extern "C" void __quantum__qis__k__body(Qubit q)                                 // NOLINT
 {
     g_cKCalls++;
     g_ctrqapi->X(q);
@@ -315,7 +318,7 @@ TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__Interop());
 
-    const int cKCalls = g_cKCalls;
+    const int cKCalls           = g_cKCalls;
     const int cKCallsControlled = g_cKCallsControlled;
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop());
     CHECK(g_cKCalls - cKCalls == 3);
