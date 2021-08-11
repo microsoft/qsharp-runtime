@@ -14,26 +14,67 @@ namespace Microsoft.Azure.Quantum.Authentication
     using global::Azure.Identity;
     using Microsoft.Azure.Quantum.Utility;
 
+    /// <summary>
+    /// Implements a custom TokenCredential to use a local file as the source for an AzureQuantum token.
+    ///
+    /// It will only use the local file if the AZUREQUANTUM_TOKEN_FILE environment variable is set, and references
+    /// an existing json file that contains the access_token and expires_on timestamp in milliseconds.
+    ///
+    /// If the environment variable is not set, the file does not exist, or the token is invalid in any way(expired, for example),
+    /// then the credential will throw CredentialUnavailableError, so that DefaultQuantumCredential can fallback to other methods.
+    /// </summary>
     public class TokenFileCredential : TokenCredential
     {
+        /// <summary>
+        /// Environment variable name for the token file path.
+        /// </summary>
         private const string TokenFileEnvironmentVariable = "AZUREQUANTUM_TOKEN_FILE";
+
+        /// <summary>
+        /// File system dependency injected so that unit testing is possible.
+        /// </summary>
         private readonly IFileSystem _fileSystem;
+
+        /// <summary>
+        /// The path to the token file.
+        /// </summary>
         private readonly string? _tokenFilePath;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenFileCredential"/> class.
+        /// </summary>
         public TokenFileCredential()
             : this(new FileSystem())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenFileCredential"/> class.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
         public TokenFileCredential(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             _tokenFilePath = Environment.GetEnvironmentVariable(TokenFileEnvironmentVariable);
         }
 
+        /// <summary>
+        /// Attempts to acquire an <see cref="AccessToken"/> synchronously from a local token file.
+        /// </summary>
+        /// <param name="requestContext">The details of the authentication request.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        /// <returns>The <see cref="AccessToken"/> found in the token file.</returns>
+        /// <exception cref="CredentialUnavailableException">When token is not found or valid.</exception>
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
             => GetTokenImplAsync(false, requestContext, cancellationToken).GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Attempts to acquire an <see cref="AccessToken"/> asynchronously from a local token file.
+        /// </summary>
+        /// <param name="requestContext">The details of the authentication request.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        /// <returns>The <see cref="AccessToken"/> found in the token file.</returns>
+        /// <exception cref="CredentialUnavailableException">When token is not found or valid.</exception>
         public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
             => await GetTokenImplAsync(true, requestContext, cancellationToken).ConfigureAwait(false);
 

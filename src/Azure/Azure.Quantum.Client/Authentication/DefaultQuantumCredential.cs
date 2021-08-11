@@ -16,6 +16,7 @@ namespace Microsoft.Azure.Quantum.Authentication
 
     /// <summary>
     /// Provides a simplified authentication for quantum users by checking in order the following type of credentials.
+    /// - TokenFile
     /// - Environment
     /// - ManagedIdentity
     /// - CLI
