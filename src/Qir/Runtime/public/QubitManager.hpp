@@ -55,7 +55,8 @@ namespace Quantum
         // Fail if the qubit cannot be allocated.
         // Computation complexity is O(number of nested restricted reuse areas) worst case, O(1) amortized cost.
         Qubit Allocate();
-        // Allocate qubitCountToAllocate qubits and store them in the provided array. Extend manager capacity if necessary and possible.
+        // Allocate qubitCountToAllocate qubits and store them in the provided array. 
+        // Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
         // Caller is responsible for providing array of sufficient size to hold qubitCountToAllocate.
         void Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate);
@@ -63,7 +64,8 @@ namespace Quantum
         // Releases a given qubit.
         void Release(Qubit qubit);
         // Releases qubitCountToRelease qubits in the provided array.
-        // Caller is responsible for managing memory used by the array itself (i.e. delete[] array if it was dynamically allocated).
+        // Caller is responsible for managing memory used by the array itself 
+        // (i.e. delete[] array if it was dynamically allocated).
         void Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease);
 
         // Borrow (We treat borrowing as allocation currently)
