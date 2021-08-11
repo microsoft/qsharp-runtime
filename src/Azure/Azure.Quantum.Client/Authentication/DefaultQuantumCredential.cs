@@ -12,7 +12,6 @@ namespace Microsoft.Azure.Quantum.Authentication
     using System.Threading.Tasks;
 
     using global::Azure.Core;
-    using global::Azure.Core.Pipeline;
     using global::Azure.Identity;
 
     /// <summary>
@@ -47,18 +46,19 @@ namespace Microsoft.Azure.Quantum.Authentication
         public string? SubscriptionId { get; }
 
         /// <summary>
-        /// The list of sources that will be used, in order, to get credentials
+        /// The list of sources that will be used, in order, to get credentials.
         /// </summary>
         public virtual IEnumerable<TokenCredential> Sources
         {
             get
             {
+                yield return CredentialFactory.CreateCredential(CredentialType.TokenFile);
                 yield return CredentialFactory.CreateCredential(CredentialType.Environment, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.ManagedIdentity, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.CLI, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.SharedToken, SubscriptionId);
                 // Disable VS credentials until https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071 is fixed:
-                //yield return CredentialFactory.CreateCredential(CredentialType.VisualStudio, SubscriptionId);
+                // yield return CredentialFactory.CreateCredential(CredentialType.VisualStudio, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.VisualStudioCode, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.Interactive, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.DeviceCode, SubscriptionId);
@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <returns>The first <see cref="AccessToken"/> returned by the specified sources. Any credential which raises an Exception will be skipped.</returns>
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
-                => GetTokenImplAsync(false, requestContext, cancellationToken).GetAwaiter().GetResult();
+            => GetTokenImplAsync(false, requestContext, cancellationToken).GetAwaiter().GetResult();
 
         /// <summary>
         /// Sequentially calls <see cref="TokenCredential.GetToken"/> on all the specified sources, returning the first successfully obtained <see cref="AccessToken"/>. This method is called automatically by Azure SDK client libraries. You may call this method directly, but you must also handle token caching and token refreshing.
