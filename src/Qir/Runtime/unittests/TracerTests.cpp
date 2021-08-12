@@ -401,7 +401,7 @@ TEST_CASE("Conditionals: fences and barriers", "[tracer][tracer.conditionals]")
 TEST_CASE("Output: to string", "[tracer]")
 {
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
-    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+    std::shared_ptr<CTracer> tr                   = CreateTracer(1 /*layer duration*/, opNames);
 
     Qubit q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
@@ -448,7 +448,7 @@ TEST_CASE("Output: to string", "[tracer]")
 TEST_CASE("Output: to file", "[tracer]")
 {
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
-    std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/, opNames);
+    std::shared_ptr<CTracer> tr                   = CreateTracer(1 /*layer duration*/, opNames);
 
     Qubit q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
