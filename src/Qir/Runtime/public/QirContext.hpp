@@ -21,7 +21,7 @@ namespace Quantum
 
     struct QIR_SHARED_API QirExecutionContext
     {
-        // Direct access from outside of `QirExecutionContext` is deprecated: The variables are to become `private`. 
+        // Direct access from outside of `QirExecutionContext` is deprecated: The variables are to become `private`.
         // {
         // Use `Microsoft::Quantum::GlobalContext()->GetDriver()` instead:
         IRuntimeDriver* driver = nullptr;
@@ -46,13 +46,14 @@ namespace Quantum
         {
             Scoped(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
             ~Scoped();
+
           private:
             Scoped& operator=(const Scoped&) = delete;
         };
     };
-    
+
     // Direct access is deprecated, use GlobalContext() instead.
-    extern std::unique_ptr<QirExecutionContext> g_context;  
+    extern std::unique_ptr<QirExecutionContext> g_context;
     extern QIR_SHARED_API std::unique_ptr<QirExecutionContext>& GlobalContext();
 
     // Deprecated, use `QirExecutionContext::Scoped` instead.
@@ -60,6 +61,7 @@ namespace Quantum
     {
         QirContextScope(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
         ~QirContextScope();
+
       private:
         QirContextScope& operator=(const QirContextScope&) = delete;
     };

@@ -9,21 +9,23 @@
 #include "qsharp__foundation_internal.hpp"
 #include "FloatUtils.hpp"
 
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__Interop();                               // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__Interop();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__Interop();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__Interop();                                   // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__Interop();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__Interop();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__Interop();                                // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop();                                  // NOLINT
-extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop();                         // NOLINT
-extern "C"  int64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(int64_t min, int64_t max); // NOLINT
-extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(double min, double max);  // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SqrtTest__Interop();          // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__LogTest__Interop();           // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTan2Test__Interop();       // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinTest__Interop();           // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CosTest__Interop();           // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanTest__Interop();           // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcSinTest__Interop();        // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcCosTest__Interop();        // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ArcTanTest__Interop();        // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop();          // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop();          // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop();          // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop(); // NOLINT
+extern "C" int64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(    // NOLINT
+    int64_t min, int64_t max);
+extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop( // NOLINT
+    double min, double max);
 
 TEST_CASE("QIR: Math.Sqrt", "[qir.math][qir.Math.Sqrt]")
 {
@@ -94,29 +96,30 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 {
     // Test that the Q# random number generator is a wrapper around the C++ generator:
     size_t times = 1000;
-    while(--times)
+    while (--times)
     {
-        const int64_t qsRndNum = 
-            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(std::numeric_limits<int64_t>::min(),
-                                                                            std::numeric_limits<int64_t>::max());
-        const int64_t cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomI64();  // This call must be done 
-            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
+        const int64_t qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(
+            std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max());
+        const int64_t cppRndNum = Quantum::Qis::Internal::
+            GetLastGeneratedRandomI64(); // This call must be done
+                                         // _after_ the
+                                         // Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
         REQUIRE(qsRndNum == cppRndNum);
     }
 
     // Make sure the correct exception is thrown if min > max:
     REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5), std::runtime_error);
-        // Returns with exception. Leaks the instances created from the moment of call 
-        // to the moment of exception throw.
-        // TODO: Extract into a separate file compiled with leaks check off.        
+    // Returns with exception. Leaks the instances created from the moment of call
+    // to the moment of exception throw.
+    // TODO: Extract into a separate file compiled with leaks check off.
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(10, 5);
-            // Returns with exception. Leaks the instances created from the moment of call 
-            // to the moment of exception throw.
-            // TODO: Extract into a separate file compiled with leaks check off.        
+        // Returns with exception. Leaks the instances created from the moment of call
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.
     }
     catch (std::runtime_error const& exc)
     {
@@ -124,11 +127,12 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     }
 
     // Test equal minimum and maximum:
-    for(int64_t num: { -5, 0, 3 } )
+    for (int64_t num : {-5, 0, 3})
     {
         REQUIRE(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(num, num) == num);
     }
 
+    // clang-format off
     // There is a strong difference in the opinions about how the random number generator must be tested.
     // More or less agreed-upon items are:
     //  * The test must be 100% deterministic, i.e. must not fail, even with a very low probability. 
@@ -214,35 +218,39 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     //         REQUIRE(*iterExp == *iterAct);
     //     }
 
+    // clang-format on
+
 } // TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
 TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
 {
     // Test that the Q# random number generator is a wrapper around the C++ generator:
     size_t times = 1000;
-    while(--times)
+    while (--times)
     {
-        const double qsRndNum = 
-            Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(std::numeric_limits<double>::min(),
-                                                                               std::numeric_limits<double>::max());
-        const double cppRndNum = Quantum::Qis::Internal::GetLastGeneratedRandomDouble();  // This call must be done 
-            // _after_ the  Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
+        const double qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(
+            std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
+        const double cppRndNum = Quantum::Qis::Internal::
+            GetLastGeneratedRandomDouble(); // This call must be done
+                                            // _after_ the
+                                            // Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
         REQUIRE(Close(qsRndNum, cppRndNum));
     }
 
     // Make sure the correct exception is thrown if min > max:
-    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0), std::runtime_error);
-        // Returns with exception. Leaks the instances created from the moment of call 
-        // to the moment of exception throw.
-        // TODO: Extract into a separate file compiled with leaks check off.        
+    REQUIRE_THROWS_AS(Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0),
+                      std::runtime_error);
+    // Returns with exception. Leaks the instances created from the moment of call
+    // to the moment of exception throw.
+    // TODO: Extract into a separate file compiled with leaks check off.
 
     // Check the exception string:
     try
     {
         (void)Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(10.0, 5.0);
-            // Returns with exception. Leaks the instances created from the moment of call 
-            // to the moment of exception throw.
-            // TODO: Extract into a separate file compiled with leaks check off.        
+        // Returns with exception. Leaks the instances created from the moment of call
+        // to the moment of exception throw.
+        // TODO: Extract into a separate file compiled with leaks check off.
     }
     catch (std::runtime_error const& exc)
     {
