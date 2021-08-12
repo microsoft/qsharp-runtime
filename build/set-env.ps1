@@ -68,5 +68,3 @@ Get-ChildItem @(
 
 Write-Host "PATH:"
 $env:path
-
-get-command clang-format
