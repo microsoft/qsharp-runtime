@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         Default,
 
         /// <summary>
-        /// A custom TokenCredential implemention which uses a local token file.
+        /// A custom TokenCredential implementation which uses a local token file.
         /// </summary>
         TokenFile,
 
