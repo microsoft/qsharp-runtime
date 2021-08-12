@@ -43,18 +43,10 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <summary>
         /// Initializes a new instance of the <see cref="TokenFileCredential"/> class.
         /// </summary>
-        public TokenFileCredential()
-            : this(new FileSystem())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TokenFileCredential"/> class.
-        /// </summary>
         /// <param name="fileSystem">The file system.</param>
-        public TokenFileCredential(IFileSystem fileSystem)
+        public TokenFileCredential(IFileSystem? fileSystem = null)
         {
-            _fileSystem = fileSystem;
+            _fileSystem = fileSystem ?? new FileSystem();
             _tokenFilePath = Environment.GetEnvironmentVariable(TokenFileEnvironmentVariable);
         }
 
