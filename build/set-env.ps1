@@ -65,3 +65,8 @@ Get-ChildItem @(
     "Env:\WHEEL_OUTDIR",
     "Env:\DOCS_OUTDIR"
  ) | Format-Table
+
+Write-Host "PATH:"
+$env:path
+
+get-command clang-format
