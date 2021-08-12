@@ -24,9 +24,6 @@ extern "C"
     QIR_SHARED_API QUBIT* quantum__rt__qubit_allocate(); // NOLINT
     QIR_SHARED_API void quantum__rt__qubit_allocate_array(QUBIT** qubits, int64_t count); // NOLINT
 
-    QIR_SHARED_API void quantum__rt__qubit_allocate_specific(QUBIT*); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_allocate_array_specific(QUBIT** qubits, int64_t count); // NOLINT
-
     QIR_SHARED_API void quantum__rt__qubit_release(QUBIT*); // NOLINT
     QIR_SHARED_API void quantum__rt__qubit_release_array(QUBIT**, int64_t count); // NOLINT
 
@@ -35,19 +32,6 @@ extern "C"
 
     QIR_SHARED_API void quantum__rt__qubit_return(QUBIT*); // NOLINT
     QIR_SHARED_API void quantum__rt__qubit_return_array(QUBIT** qubits, int64_t count); // NOLINT
-
-    QIR_SHARED_API void quantum__rt__qubit_disable(QUBIT*); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_disable_array(QUBIT** qubits, int64_t count); // NOLINT
-
-    // ------------------------------------------------------------------------
-    // Qubit Management Information.
-    // ------------------------------------------------------------------------
-
-    QIR_SHARED_API int64_t quantum__rt__qubit_get_disabled_count(); // NOLINT
-    QIR_SHARED_API int64_t quantum__rt__qubit_get_allocated_count();  // NOLINT
-    QIR_SHARED_API int64_t quantum__rt__qubit_get_free_count(); // NOLINT
-    QIR_SHARED_API int64_t quantum__rt__qubit_get_current_capacity(); // NOLINT
-    QIR_SHARED_API bool quantum__rt__qubit_get_may_extend_capacity(); // NOLINT
 
     // ------------------------------------------------------------------------
     // Qubit Management Restricted Reuse Control. TODO: Names?
