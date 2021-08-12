@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #nullable enable
@@ -17,11 +17,11 @@ namespace Microsoft.Azure.Quantum.Authentication
     /// <summary>
     /// Implements a custom TokenCredential to use a local file as the source for an AzureQuantum token.
     ///
-    /// It will only use the local file if the AZUREQUANTUM_TOKEN_FILE environment variable is set, and references
+    /// It will only use the local file if the <c>AZUREQUANTUM_TOKEN_FILE</c> environment variable is set, and references
     /// an existing json file that contains the access_token and expires_on timestamp in milliseconds.
     ///
     /// If the environment variable is not set, the file does not exist, or the token is invalid in any way(expired, for example),
-    /// then the credential will throw CredentialUnavailableError, so that DefaultQuantumCredential can fallback to other methods.
+    /// then the credential will throw <see cref="CredentialUnavailableError" />, so that DefaultQuantumCredential can fallback to other methods.
     /// </summary>
     public class TokenFileCredential : TokenCredential
     {
