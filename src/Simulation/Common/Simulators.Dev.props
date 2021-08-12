@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <None Include="$(QSimDll)" >
-      <Link>Microsoft.Quantum.Simulator.Runtime.dll</Link>
+      <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
