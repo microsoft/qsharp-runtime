@@ -8,10 +8,9 @@ using System.Linq;
 
 using Azure.Identity;
 
-using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.Azure.Quantum.Test
+namespace Microsoft.Azure.Quantum.Authentication.Test
 {
     [TestClass]
     public class CredentialFactoryTests
@@ -19,6 +18,7 @@ namespace Microsoft.Azure.Quantum.Test
         private const string SUBSCRIPTION = "677fc922-91d0-4bf6-9b06-4274d319a0fa";
 
         [DataTestMethod]
+        [DataRow(CredentialType.TokenFile, typeof(TokenFileCredential))]
         [DataRow(CredentialType.Default, typeof(DefaultQuantumCredential))]
         [DataRow(CredentialType.Environment, typeof(EnvironmentCredential))]
         [DataRow(CredentialType.ManagedIdentity, typeof(ManagedIdentityCredential))]
@@ -86,6 +86,7 @@ namespace Microsoft.Azure.Quantum.Test
             var actual = credential?.Sources.Select(c => c.GetType()).ToArray();
             var expected = new Type[]
                 {
+                    typeof(TokenFileCredential),
                     typeof(EnvironmentCredential),
                     typeof(ManagedIdentityCredential),
                     typeof(AzureCliCredential),
