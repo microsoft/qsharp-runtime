@@ -22,16 +22,16 @@ extern "C"
     // ------------------------------------------------------------------------
 
     QIR_SHARED_API QUBIT* quantum__rt__qubit_allocate(); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_allocate_array(QUBIT** qubits, int64_t count); // NOLINT
+    QIR_SHARED_API QirArray* quantum__rt__qubit_allocate_array(int64_t count); // NOLINT
 
     QIR_SHARED_API void quantum__rt__qubit_release(QUBIT*); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_release_array(QUBIT**, int64_t count); // NOLINT
+    QIR_SHARED_API void quantum__rt__qubit_release_array(QirArray*); // NOLINT
 
     QIR_SHARED_API QUBIT* quantum__rt__qubit_borrow(); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_borrow_array(QUBIT** qubits, int64_t count); // NOLINT
+    QIR_SHARED_API QirArray* quantum__rt__qubit_borrow_array(int64_t count); // NOLINT
 
     QIR_SHARED_API void quantum__rt__qubit_return(QUBIT*); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_return_array(QUBIT** qubits, int64_t count); // NOLINT
+    QIR_SHARED_API void quantum__rt__qubit_return_array(QirArray*); // NOLINT
 
     // ------------------------------------------------------------------------
     // Qubit Management Restricted Reuse Control. TODO: Names?
