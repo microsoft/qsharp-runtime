@@ -13,11 +13,13 @@
 #include <chrono>
 #include <cstdint>
 
+// clang-format off
 #pragma clang diagnostic push
     // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
     #pragma clang diagnostic ignored "-Wreserved-id-macro"
     #include "capi.hpp"
 #pragma clang diagnostic pop
+// clang-format on
 
 
 #include "FloatUtils.hpp"
@@ -53,9 +55,8 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     handle = ::LoadLibraryA(FULLSTATESIMULATORLIB);
     if (handle == nullptr)
     {
-        throw std::runtime_error(
-            std::string("Failed to load ") + FULLSTATESIMULATORLIB +
-            " (error code: " + std::to_string(GetLastError()) + ")");
+        throw std::runtime_error(std::string("Failed to load ") + FULLSTATESIMULATORLIB +
+                                 " (error code: " + std::to_string(GetLastError()) + ")");
     }
 #else
     handle = ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
@@ -64,8 +65,8 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
         handle = ::dlopen(XPLATFULLSTATESIMULATORLIB, RTLD_LAZY);
         if (handle == nullptr)
         {
-            throw std::runtime_error(
-                std::string("Failed to load ") + XPLATFULLSTATESIMULATORLIB + " (" + ::dlerror() + ")");
+            throw std::runtime_error(std::string("Failed to load ") + XPLATFULLSTATESIMULATORLIB + " (" + ::dlerror() +
+                                     ")");
         }
     }
 #endif
@@ -88,14 +89,14 @@ namespace Microsoft
 namespace Quantum
 {
     // TODO: is it OK to load/unload the dll for each simulator instance?
-    class CFullstateSimulator : public IRuntimeDriver, public IQuantumGateSet, public IDiagnostics
+    class CFullstateSimulator
+        : public IRuntimeDriver
+        , public IQuantumGateSet
+        , public IDiagnostics
     {
         typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
-        typedef void (*TSingleQubitControlledGate)(
-            unsigned /*simulator id*/,
-            unsigned /*number of controls*/,
-            unsigned* /*controls*/,
-            unsigned /*qubit id*/);
+        typedef void (*TSingleQubitControlledGate)(unsigned /*simulator id*/, unsigned /*number of controls*/,
+                                                   unsigned* /*controls*/, unsigned /*qubit id*/);
 
         // QuantumSimulator defines paulis as:
         // enum Basis
@@ -113,8 +114,11 @@ namespace Quantum
 
         const QUANTUM_SIMULATOR handle = nullptr;
 
-        using TSimulatorId = unsigned;      // TODO: Use `void*` or a fixed-size integer, starting in native simulator (breaking change).
-        static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;  // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.
+        using TSimulatorId = unsigned; // TODO: Use `void*` or a fixed-size integer,
+                                       // starting in native simulator (breaking change).
+        static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;
+        // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.
+
         TSimulatorId simulatorId = NULL_SIMULATORID;
 
         // the QuantumSimulator expects contiguous ids, starting from 0
@@ -162,21 +166,20 @@ namespace Quantum
         }
 
       public:
-        CFullstateSimulator(uint32_t userProvidedSeed = 0)
-            : handle(LoadQuantumSimulator())
+        CFullstateSimulator(uint32_t userProvidedSeed = 0) : handle(LoadQuantumSimulator())
         {
             typedef unsigned (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
-            qubitManager = std::make_unique<CQubitManager>();
+            qubitManager      = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
 
             typedef void (*TSeed)(unsigned, unsigned);
             static TSeed setSimulatorSeed = reinterpret_cast<TSeed>(this->GetProc("seed"));
-            setSimulatorSeed(this->simulatorId, 
-                             (userProvidedSeed == 0) 
-                                ? (unsigned)std::chrono::system_clock::now().time_since_epoch().count()
-                                : (unsigned)userProvidedSeed);
+            setSimulatorSeed(this->simulatorId,
+                             (userProvidedSeed == 0)
+                                 ? (unsigned)std::chrono::system_clock::now().time_since_epoch().count()
+                                 : (unsigned)userProvidedSeed);
         }
         ~CFullstateSimulator() override
         {
@@ -215,9 +218,9 @@ namespace Quantum
             typedef void (*TAllocateQubit)(unsigned, unsigned);
             static TAllocateQubit allocateQubit = reinterpret_cast<TAllocateQubit>(this->GetProc("allocateQubit"));
 
-            Qubit q = qubitManager->Allocate(); // Allocate qubit in qubit manager.
-            unsigned id = GetQubitId(q); // Get its id.
-            allocateQubit(this->simulatorId, id); // Allocate it in the simulator.
+            Qubit q     = qubitManager->Allocate(); // Allocate qubit in qubit manager.
+            unsigned id = GetQubitId(q);            // Get its id.
+            allocateQubit(this->simulatorId, id);   // Allocate it in the simulator.
             return q;
         }
 
@@ -238,13 +241,15 @@ namespace Quantum
         {
             assert(numBases == numTargets);
             typedef unsigned (*TMeasure)(unsigned, unsigned, unsigned*, unsigned*);
-            static TMeasure m = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
+            static TMeasure m         = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             return reinterpret_cast<Result>(
                 m(this->simulatorId, (unsigned)numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
         }
 
-        void ReleaseResult(Result /*r*/) override {}
+        void ReleaseResult(Result /*r*/) override
+        {
+        }
 
         ResultValue GetResultValue(Result r) override
         {
@@ -277,7 +282,7 @@ namespace Quantum
         void ControlledX(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCX"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -290,7 +295,7 @@ namespace Quantum
         void ControlledY(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCY"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -303,7 +308,7 @@ namespace Quantum
         void ControlledZ(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCZ"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -316,7 +321,7 @@ namespace Quantum
         void ControlledH(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCH"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -329,7 +334,7 @@ namespace Quantum
         void ControlledS(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCS"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -356,7 +361,7 @@ namespace Quantum
         void ControlledT(long numControls, Qubit controls[], Qubit target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCT"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
+            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
             op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
         }
 
@@ -394,26 +399,20 @@ namespace Quantum
         void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
         {
             typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
-            static TExp exp = reinterpret_cast<TExp>(this->GetProc("Exp"));
+            static TExp exp           = reinterpret_cast<TExp>(this->GetProc("Exp"));
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             exp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
         }
 
-        void ControlledExp(
-            long numControls,
-            Qubit controls[],
-            long numTargets,
-            PauliId paulis[],
-            Qubit targets[],
-            double theta) override
+        void ControlledExp(long numControls, Qubit controls[], long numTargets, PauliId paulis[], Qubit targets[],
+                           double theta) override
         {
             typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
-            static TMCExp cexp = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
-            std::vector<unsigned> idsTargets = GetQubitIds(numTargets, targets);
+            static TMCExp cexp                = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
+            std::vector<unsigned> idsTargets  = GetQubitIds(numTargets, targets);
             std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
-            cexp(
-                this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, (unsigned)numControls,
-                idsControls.data(), idsTargets.data());
+            cexp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta,
+                 (unsigned)numControls, idsControls.data(), idsTargets.data());
         }
 
         bool Assert(long numTargets, PauliId* bases, Qubit* targets, Result result, const char* failureMessage) override
@@ -422,21 +421,15 @@ namespace Quantum
             return AssertProbability(numTargets, bases, targets, probabilityOfZero, 1e-10, failureMessage);
         }
 
-        bool AssertProbability(
-            long numTargets,
-            PauliId bases[],
-            Qubit targets[],
-            double probabilityOfZero,
-            double precision,
-            const char* /*failureMessage*/) override
+        bool AssertProbability(long numTargets, PauliId bases[], Qubit targets[], double probabilityOfZero,
+                               double precision, const char* /*failureMessage*/) override
         {
             typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            double actualProbability =
-                1.0 -
-                jointEnsembleProbability(this->simulatorId, (unsigned)numTargets, reinterpret_cast<int*>(bases), ids.data());
+            double actualProbability  = 1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
+                                                                      reinterpret_cast<int*>(bases), ids.data());
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
@@ -449,16 +442,16 @@ namespace Quantum
         bool GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits);
 
       private:
-        TDumpToLocationCallback const dumpToLocationCallback = [](size_t idx, double re, double im, TDumpLocation location) -> bool
-            {
-                std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
+        TDumpToLocationCallback const dumpToLocationCallback = [](size_t idx, double re, double im,
+                                                                  TDumpLocation location) -> bool {
+            std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
 
-                if (!Close(re, 0.0) || !Close(im, 0.0))
-                {
-                    outStream << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
-                }
-                return true;
-            };
+            if (!Close(re, 0.0) || !Close(im, 0.0))
+            {
+                outStream << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
+            }
+            return true;
+        };
     }; // class CFullstateSimulator
 
     void CFullstateSimulator::DumpMachineImpl(std::ostream& outStream)
@@ -471,9 +464,9 @@ namespace Quantum
     void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits)
     {
         outStream << "# wave function for qubits with ids (least to most significant): ";
-        for(QirArray::TItemCount idx = 0; idx < qubits->count; ++idx)
+        for (QirArray::TItemCount idx = 0; idx < qubits->count; ++idx)
         {
-            if(idx != 0)
+            if (idx != 0)
             {
                 outStream << "; ";
             }
@@ -481,56 +474,54 @@ namespace Quantum
         }
         outStream << ':' << std::endl;
 
-        if(!this->GetRegisterTo((TDumpLocation)&outStream, dumpToLocationCallback, qubits))
+        if (!this->GetRegisterTo((TDumpLocation)&outStream, dumpToLocationCallback, qubits))
         {
-            outStream << "## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##" << std::endl;
+            outStream << "## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##"
+                      << std::endl;
         }
         outStream.flush();
     }
 
-    bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits)
+    bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback,
+                                            const QirArray* qubits)
     {
-        std::vector<unsigned> ids = GetQubitIds((long)(qubits->count), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)));
-
+        std::vector<unsigned> ids =
+            GetQubitIds((long)(qubits->count), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)));
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
-        return dumpQubitsToLocation(
-            this->simulatorId, (unsigned)(qubits->count), ids.data(), callback,
-            location);
+        return dumpQubitsToLocation(this->simulatorId, (unsigned)(qubits->count), ids.data(), callback, location);
     }
 
     void CFullstateSimulator::GetStateTo(TDumpLocation location, TDumpToLocationCallback callback)
     {
         static TDumpToLocationAPI dumpTo = reinterpret_cast<TDumpToLocationAPI>(this->GetProc("DumpToLocation"));
-        
+
         dumpTo(this->simulatorId, callback, location);
     }
 
     std::ostream& CFullstateSimulator::GetOutStream(const void* location, std::ofstream& outFileStream)
     {
         // If the location is not nullptr and not empty string then dump to a file:
-        if((location != nullptr) &&
-            (((static_cast<const QirString *>(location))->str) != ""))
+        if ((location != nullptr) && (((static_cast<const QirString*>(location))->str) != ""))
         {
             // Open the file for appending:
-            const std::string& filePath = (static_cast<const QirString *>(location))->str;
+            const std::string& filePath = (static_cast<const QirString*>(location))->str;
 
             bool openException = false;
             try
             {
                 outFileStream.open(filePath, std::ofstream::out | std::ofstream::app);
             }
-            catch(const std::ofstream::failure& e)
+            catch (const std::ofstream::failure& e)
             {
                 openException = true;
                 std::cerr << "Exception caught: \"" << e.what() << "\".\n";
             }
-            
-            if(   ((outFileStream.rdstate() & std::ofstream::failbit) != 0)
-               || openException)
+
+            if (((outFileStream.rdstate() & std::ofstream::failbit) != 0) || openException)
             {
                 std::cerr << "Failed to open dump file \"" + filePath + "\".\n";
-                return OutputStream::Get();     // Dump to std::cout.
+                return OutputStream::Get(); // Dump to std::cout.
             }
 
             return outFileStream;
