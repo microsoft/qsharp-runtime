@@ -12,6 +12,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
             choco install cmake
         }
+        refreshenv
     } elseif ($IsMacOS) {
         # temporary workaround for Bintray sunset
         # remove this after Homebrew is updated to 3.1.1 on MacOS image, see:
