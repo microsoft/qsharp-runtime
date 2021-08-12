@@ -3,6 +3,8 @@
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
+& "$PSScriptRoot/../check-sources-formatted.ps1" $PSScriptRoot
+
 if (-not (Build-CMakeProject $PSScriptRoot "QIR Runtime")) {
     throw "At least one project failed to compile. Check the logs."
 }

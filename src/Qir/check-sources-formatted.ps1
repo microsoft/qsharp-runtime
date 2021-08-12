@@ -1,8 +1,14 @@
 #Requires -PSEdition Core
 
+param (
+    [Parameter()]
+    [String]
+    $DirPath = "$PSScriptRoot"
+)
+
 $tmpFile = "format.log"
 
-"*.cpp","*.c","*.h","*.hpp" | get-childitem -Recurse `
+"$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
     | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
     | %{clang-format -n -Werror -style=file $_.fullname} 2> $tmpFile
 
@@ -16,5 +22,5 @@ if (! ("$filesRequireFormatting" -eq ""))
     Write-Host "##vso[task.logissue type=error;]Formatting check failed. The following files need to be formatted before compiling: "
     Write-Host "(You may use Clang-Format extension in VSCode or clang-format in command line or see https://clang.llvm.org/docs/ClangFormat.html)"
     $filesRequireFormatting | Format-Table
-    throw "Formatting check failed for QIR sources"
+    throw "Formatting check failed for QIR Runtime sources"
 }
