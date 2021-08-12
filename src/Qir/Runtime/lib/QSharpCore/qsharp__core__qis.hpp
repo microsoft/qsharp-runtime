@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreTypes.hpp"    // QUBIT, PauliId, RESULT
+#include "CoreTypes.hpp" // QUBIT, PauliId, RESULT
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -9,7 +9,7 @@ struct QirArray;
 
 /*
     Methods from __quantum__qis namespace are specific to the target. When QIR is generated it might limit or extend
-    the set of intrinsics, supported by the target (known to QIR generator at compile time). This provides the 
+    the set of intrinsics, supported by the target (known to QIR generator at compile time). This provides the
     implementation of the QSharp.Core intrinsics that redirect to IQuantumGateSet.
 */
 extern "C"
@@ -42,7 +42,8 @@ extern "C"
     QIR_SHARED_API void quantum__qis__z__ctl(QirArray*, QUBIT*);                            // NOLINT
 
     // Q# Dump:
-    // Note: The param `location` must be `const void*`, but it is called from .ll, where `const void*` is not supported.
-    QIR_SHARED_API void quantum__qis__dumpmachine__body(uint8_t* location);                 // NOLINT
-    QIR_SHARED_API void quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits);   // NOLINT
+    // Note: The param `location` must be `const void*`,
+    // but it is called from .ll, where `const void*` is not supported.
+    QIR_SHARED_API void quantum__qis__dumpmachine__body(uint8_t* location);                          // NOLINT
+    QIR_SHARED_API void quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits); // NOLINT
 }
