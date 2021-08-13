@@ -6,7 +6,7 @@ param (
     $DirPath = "$PSScriptRoot"
 )
 
-$tmpFile = "format.log"
+$tmpFile = "$PSScriptRoot/format.log"
 
 Write-Host "1"
 "$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
@@ -18,6 +18,7 @@ Write-Host "2"
     | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
     | %{clang-format -n -style=file $_.fullname} *>$tmpFile
 
+Write-Host "3"
 $filesRequireFormatting = get-content $tmpFile | ?{$_ -like "*: warning:*"} `
                             | %{[string]::join(":",($_.split("warning:")[0].split(":") | select -SkipLast 3))} `
                             | sort | unique
