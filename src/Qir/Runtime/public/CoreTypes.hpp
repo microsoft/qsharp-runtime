@@ -25,10 +25,15 @@
   copy or check state of qubits and results. QUBIT* and RESULT* should never be
   dereferenced in client's code.
 ==============================================================================*/
+
+// Although "Qubit" type is declared as a pointer to "QUBIT", it never points to an actual memory
+// and is never intended to be dereferenced anywhere - in the client code or in the runtime.
+// Runtime always operates in terms of qubit ids, which are integers. Qubit ids are casted
+// to this pointer type and stored as pointer values. This is done to ensure that qubit type
+// is a unique type in the QIR.
+
 class QUBIT;
-typedef QUBIT* Qubit;
-// TODO:
-// Replace `typedef QUBIT* Qubit` with `typedef uint64_t QubitId`. Remove all the `GetQubitId()`, `QUBIT`.
+typedef QUBIT* Qubit; // Not a pointer to a memory location, just an integer - qubit id.
 
 class RESULT;
 typedef RESULT* Result; // TODO: Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64.
