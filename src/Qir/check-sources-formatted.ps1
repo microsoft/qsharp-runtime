@@ -27,7 +27,7 @@ $tmpFile = "format.log"
 Write-Host "1"
 &{
    Write-Warning "warning"
-   #Write-Error "error"
+   Write-Error "error"
    Write-Output "output"
 } *>$tmpFile
 
