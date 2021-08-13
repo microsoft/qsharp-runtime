@@ -24,17 +24,17 @@ $tmpFile = "format.log"
 #                            | sort | unique
 #Remove-Item $tmpFile
 
-Write-Host "1"
+Write-Host "A"
 &{
    Write-Warning "warning"
    Write-Error "error"
    Write-Output "output"
-} *>$tmpFile
+} 3>&1 > $tmpFile
 
-Write-Host "2"
+Write-Host "B"
 type $tmpFile
 
-Write-Host "3"
+Write-Host "C"
 throw "Formatting check failed for QIR Runtime sources"
 
 if (! ("$filesRequireFormatting" -eq ""))
