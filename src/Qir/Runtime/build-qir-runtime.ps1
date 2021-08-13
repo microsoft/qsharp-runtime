@@ -3,6 +3,8 @@
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
+Write-Host "##[info]Compile QIR Runtime"
+
 & "$PSScriptRoot/../check-sources-formatted.ps1" $PSScriptRoot
 & "$PSScriptRoot/../check-sources-formatted.ps1" $PSScriptRoot/../Common
 

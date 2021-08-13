@@ -16,6 +16,21 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
 }
 
+if ($Env:ENABLE_QIRRUNTIME -ne "false") {
+    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
+    & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+    $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
+    & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping build of qir tests because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+}
+
 if ($Env:ENABLE_NATIVE -ne "false") {
     $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
     & "$nativeSimulator/build-native-simulator.ps1"
@@ -79,21 +94,6 @@ function Build-One {
 }
 
 Build-One 'build' '../Simulation.sln'
-
-if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-    & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-    $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
-    & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping build of qir tests because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
-}
 
 if (-not $all_ok) {
     throw "At least one project failed to compile. Check the logs."
