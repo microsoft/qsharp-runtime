@@ -8,6 +8,12 @@ param (
 
 $tmpFile = "format.log"
 
+Write-Host "1"
+"$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
+    | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
+    | %{clang-format -n -style=file $_.fullname}
+
+Write-Host "2"
 "$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
     | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
     | %{clang-format -n -style=file $_.fullname} 2> $tmpFile
