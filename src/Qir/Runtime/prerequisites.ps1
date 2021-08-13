@@ -10,6 +10,10 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             Write-Host "Browsing C:\Program Files\LLVM\bin:"
             Get-ChildItem "C:\Program Files\LLVM\bin"
             dir "C:\Program Files\LLVM\bin"
+
+            Write-Host "Exporting the PATH:"
+            "$Env:Path;C:\Program Files\LLVM\bin"
+            Write-Host "##vso[task.setvariable variable=PATH;isOutput=true]$Env:Path;C:\Program Files\LLVM\bin"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
