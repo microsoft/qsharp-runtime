@@ -7,13 +7,14 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             !(Get-Command clang-format -ErrorAction SilentlyContinue)) {
             choco install llvm --version=11.1.0
 
-            Write-Host "Browsing C:\Program Files\LLVM\bin:"
-            Get-ChildItem "C:\Program Files\LLVM\bin"
-            dir "C:\Program Files\LLVM\bin"
+            #Write-Host "Browsing C:\Program Files\LLVM\bin:"
+            #Get-ChildItem "C:\Program Files\LLVM\bin"
+            #dir "C:\Program Files\LLVM\bin"
 
             Write-Host "Exporting the PATH:"
-            "$Env:Path;C:\Program Files\LLVM\bin"
-            Write-Host "##vso[task.setvariable variable=PATH;isOutput=true]$Env:Path;C:\Program Files\LLVM\bin"
+            Write-Host "$Env:Path;C:\Program Files\LLVM\bin"
+            #echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
+            Write-Host "##vso[task.setvariable variable=PATH;]$Env:Path;C:\Program Files\LLVM\bin"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
