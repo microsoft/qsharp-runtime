@@ -145,6 +145,10 @@ TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
     Result rOne = iqa->Measure(2, paulis, 2, q);
     REQUIRE(Result_One == sim->GetResultValue(rOne));
 
+    iqa->X(q[1]);
+    iqa->ControlledX(1, &q[0], q[1]);
+    iqa->H(q[0]);
+
     sim->ReleaseQubit(q[0]);
     sim->ReleaseQubit(q[1]);
 }
@@ -173,6 +177,8 @@ TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
     REQUIRE(!idig->Assert(2, xi, qs, sim->UseZero(), ""));
     REQUIRE(!idig->Assert(2, xi, qs, sim->UseOne(), ""));
 
+    iqa->X(qs[0]);
+
     sim->ReleaseQubit(qs[0]);
     sim->ReleaseQubit(qs[1]);
 }
@@ -195,6 +201,9 @@ TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
     iqa->X(qs[1]);
     iqa->ControlledX(2, qs, qs[2]);
     REQUIRE(Result_One == sim->GetResultValue(MZ(iqa, qs[2])));
+
+    iqa->X(qs[1]);
+    iqa->X(qs[0]);
 
     for (int i = 0; i < 3; i++)
     {
@@ -307,6 +316,8 @@ TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
     PauliId paulis[3] = {PauliId_X, PauliId_Y, PauliId_Z};
     iqa->Exp(2, paulis, qs, 0.42);
     iqa->ControlledExp(2, qs, 3, paulis, &qs[2], 0.17);
+    iqa->ControlledExp(2, qs, 3, paulis, &qs[2], -0.17);
+    iqa->Exp(2, paulis, qs, -0.42);
 
     // not crashes? consider it passing
     REQUIRE(true);
@@ -377,10 +388,30 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
 
+    iqa->Y(qs[2]);
+    iqa->ControlledX(1, &qs[0], qs[1]);
+    iqa->H(qs[0]);
+
     for (int i = 0; i < n; i++)
     {
         sim->ReleaseQubit(qs[i]);
     }
+}
+
+extern "C" int Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop(); // NOLINT
+TEST_CASE("QIR: Simulator rejects unmeasured, non-zero release", "[fullstate_simulator]")
+{
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop());
+}
+
+extern "C" int Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop(); // NOLINT
+TEST_CASE("QIR: Simulator accepts measured release", "[fullstate_simulator]")
+{
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop());
 }
 
 extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(); // NOLINT
