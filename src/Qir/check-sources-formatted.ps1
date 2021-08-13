@@ -1,4 +1,5 @@
 #Requires -PSEdition Core
+#Requires -Version 7.1
 
 param (
     [Parameter()]
@@ -8,17 +9,6 @@ param (
 
 $tmpFile = "format.log"
 
-#Write-Host "1"
-#"$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
-#    | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
-#    | %{clang-format -n -style=file $_.fullname}
-#
-Write-Host "2"
-
-Write-Host "ErrorActionPreference: $ErrorActionPreference"
-Write-Host "Powershell version:"
-$PSVersionTable
-
 $OldErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference='Continue'
 "$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
@@ -26,24 +16,10 @@ $ErrorActionPreference='Continue'
     | %{clang-format -n -style=file $_.fullname} 2>format.log
 $ErrorActionPreference=$OldErrorActionPreference
 
-Write-Host "3"
 $filesRequireFormatting = get-content $tmpFile | ?{$_ -like "*: warning:*"} `
                             | %{[string]::join(":",($_.split("warning:")[0].split(":") | select -SkipLast 3))} `
                             | sort | unique
 Remove-Item $tmpFile
-
-#Write-Host "A"
-#&{
-#   Write-Warning "warning"
-#   Write-Error "error"
-#   Write-Output "output"
-#} #3>&1 > $tmpFile
-
-#Write-Host "B"
-#type $tmpFile
-
-#Write-Host "C"
-#throw "Formatting check failed for QIR Runtime sources"
 
 if (! ("$filesRequireFormatting" -eq ""))
 {

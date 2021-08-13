@@ -67,4 +67,4 @@ Get-ChildItem @(
  ) | Format-Table
 
 Write-Host "PATH:"
-$env:path
+Write-Host "$env:path"
