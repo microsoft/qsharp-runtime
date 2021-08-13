@@ -16,7 +16,7 @@ Write-Host "1"
 Write-Host "2"
 "$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse `
     | ?{$_.fullname -notlike "*\Externals\*"} | ?{$_.fullname -notlike "*\drops\*"} | ?{$_.fullname -notlike "*\bin\*"} `
-    | %{clang-format -n -style=file $_.fullname} 2> $tmpFile
+    | %{clang-format -n -style=file $_.fullname} 2>$tmpFile
 
 $filesRequireFormatting = get-content $tmpFile | ?{$_ -like "*: warning:*"} `
                             | %{[string]::join(":",($_.split("warning:")[0].split(":") | select -SkipLast 3))} `
