@@ -29,7 +29,7 @@ Write-Host "A"
    Write-Warning "warning"
    Write-Error "error"
    Write-Output "output"
-} 3>&1 > $tmpFile
+} #3>&1 > $tmpFile
 
 Write-Host "B"
 type $tmpFile
