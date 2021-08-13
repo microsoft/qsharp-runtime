@@ -34,8 +34,10 @@ namespace Quantum
         OpId barrierId = -1;
 
         Layer(Time startTm, Duration dur)
+            // clang-format off
             : startTime(startTm)
             , duration(dur)
+        // clang-format on
         {
         }
     };
@@ -130,7 +132,9 @@ namespace Quantum
         static LayerId LaterLayerOf(LayerId l1, LayerId l2);
 
         explicit CTracer(int preferredLayerDur)
+            // clang-format off
             : preferredLayerDuration(preferredLayerDur)
+        // clang-format on
         {
         }
 
@@ -168,13 +172,8 @@ namespace Quantum
         // where the first one can be empty or can be viewed as the set of controls.
         // -------------------------------------------------------------------------------------------------------------
         LayerId TraceSingleQubitOp(OpId id, Duration duration, Qubit target);
-        LayerId TraceMultiQubitOp(
-            OpId id,
-            Duration duration,
-            long nFirstGroup,
-            Qubit* firstGroup,
-            long nSecondGroup,
-            Qubit* secondGroup);
+        LayerId TraceMultiQubitOp(OpId id, Duration duration, long nFirstGroup, Qubit* firstGroup, long nSecondGroup,
+                                  Qubit* secondGroup);
 
         Result TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target);
         Result TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, Qubit* targets);
@@ -191,7 +190,7 @@ namespace Quantum
         struct FenceScope
         {
             CTracer* tracer = nullptr;
-            LayerId fence = INVALID;
+            LayerId fence   = INVALID;
             explicit FenceScope(CTracer* tracer, long count1, Result* results1, long count2, Result* results2);
             ~FenceScope();
         };
@@ -210,9 +209,8 @@ namespace Quantum
     };
 
     QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration);
-    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(
-        int preferredLayerDuration,
-        const std::unordered_map<OpId, std::string>& opNames);
+    QIR_SHARED_API std::shared_ptr<CTracer> CreateTracer(int preferredLayerDuration,
+                                                         const std::unordered_map<OpId, std::string>& opNames);
 
 } // namespace Quantum
 } // namespace Microsoft
