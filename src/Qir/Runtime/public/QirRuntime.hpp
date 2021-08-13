@@ -11,14 +11,8 @@
 
 extern "C"
 {
-    //
-    //  THE BRANCH DOESN'T COMPILE AT THIS TIME. ONLY DEFINING A SET OF FUNCTION AT THIS TIME
-    //
-
-
-
     // ------------------------------------------------------------------------
-    // Qubit Management. TODO: Use QirArray? How to modify elements?
+    // Qubit Management.
     // ------------------------------------------------------------------------
 
     QIR_SHARED_API QUBIT* quantum__rt__qubit_allocate(); // NOLINT
@@ -34,12 +28,12 @@ extern "C"
     QIR_SHARED_API void quantum__rt__qubit_return_array(QirArray*); // NOLINT
 
     // ------------------------------------------------------------------------
-    // Qubit Management Restricted Reuse Control. TODO: Names?
+    // Qubit Management Restricted Reuse Control.
     // ------------------------------------------------------------------------
 
-    QIR_SHARED_API void quantum__rt__qubit_start_restricted_reuse_area(); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_next_restricted_reuse_segment(); // NOLINT
-    QIR_SHARED_API void quantum__rt__qubit_end_restricted_reuse_area(); // NOLINT
+    QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_area_start(); // NOLINT
+    QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_segment_next(); // NOLINT
+    QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_area_end(); // NOLINT
 
     // ------------------------------------------------------------------------
     // Old qubit management
