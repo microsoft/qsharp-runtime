@@ -12,7 +12,7 @@ $tmpFile = "format.log"
 $OldErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference='Continue'
 "$DirPath/*.cpp","$DirPath/*.c","$DirPath/*.h","$DirPath/*.hpp" | get-childitem -Recurse | %{$_.fullname -replace "\\", "/"} `
-    | ?{$_ -notlike "*/Externals/*"} | ?{$_ -notlike "*/drops/*"} | ?{$_ -notlike "*/bin/*"} `
+    | ?{$_ -notlike "*/Externals/*"} | ?{$_ -notlike "*/drops/*"} | ?{$_ -notlike "*/bin/*"} | ?{$_ -notlike "*/FullStateDriverGenerator/*"} `
     | %{clang-format -n -style=file $_} 2>format.log
 $ErrorActionPreference=$OldErrorActionPreference
 
