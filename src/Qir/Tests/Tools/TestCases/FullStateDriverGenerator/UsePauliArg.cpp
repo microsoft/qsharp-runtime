@@ -22,21 +22,17 @@ using namespace Microsoft::Quantum;
 using namespace std;
 
 // Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> PauliMap{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
-};
+map<string, PauliId> PauliMap{{"PauliI", PauliId::PauliId_I},
+                              {"PauliX", PauliId::PauliId_X},
+                              {"PauliY", PauliId::PauliId_Y},
+                              {"PauliZ", PauliId::PauliId_Z}};
 
 char TranslatePauliToChar(PauliId& pauli)
 {
     return static_cast<char>(pauli);
 }
 
-extern "C" void UsePauliArg(
-    char PauliArg
-); // QIR interop function.
+extern "C" void UsePauliArg(char PauliArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -49,9 +45,7 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     PauliId PauliArgCli;
@@ -77,9 +71,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UsePauliArg(
-        PauliArgInterop
-    );
+    UsePauliArg(PauliArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

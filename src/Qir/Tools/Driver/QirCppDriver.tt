@@ -33,9 +33,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
+    InteropArray(int64_t size, void* data) : Size(size), Data(data)
+    {
+    }
 };
 
 template<typename T>
@@ -62,15 +62,14 @@ struct InteropRange
     int64_t Step;
     int64_t End;
 
-    InteropRange() :
-        Start(0),
-        Step(0),
-        End(0){}
+    InteropRange() : Start(0), Step(0), End(0)
+    {
+    }
 
-    InteropRange(RangeTuple rangeTuple) :
-        Start(get<0>(rangeTuple)),
-        Step(get<1>(rangeTuple)),
-        End(get<2>(rangeTuple)){}
+    InteropRange(RangeTuple rangeTuple) : Start(get<0>(rangeTuple)), Step(get<1>(rangeTuple)), End(get<2>(rangeTuple))
+    {
+    }
+
 };
 
 unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
@@ -101,23 +100,19 @@ void FreePointerVector(vector<T*>& v)
 
 // Auxiliary functions for interop with Q# Bool type.
 const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar = 0x1;
-map<string, bool> <#= QirCppInterop.CliOptionTransformerMapName(DataType.BoolType) #>{
-    {"0", InteropFalseAsChar},
-    {"false", InteropFalseAsChar},
-    {"1", InteropTrueAsChar},
-    {"true", InteropTrueAsChar}
-};
+const char InteropTrueAsChar  = 0x1;
+map<string, bool> <#= QirCppInterop.CliOptionTransformerMapName(DataType.BoolType) #>{{"0", InteropFalseAsChar},
+                                {"false", InteropFalseAsChar},
+                                {"1", InteropTrueAsChar},
+                                {"true", InteropTrueAsChar}};
 <# } #>
 <# if (EntryPoint.ContainsArgumentType(DataType.PauliType) || EntryPoint.ContainsArrayType(DataType.PauliType)) { #>
 
 // Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> <#= QirCppInterop.CliOptionTransformerMapName(DataType.PauliType) #>{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
-};
+map<string, PauliId> <#= QirCppInterop.CliOptionTransformerMapName(DataType.PauliType) #>{{"PauliI", PauliId::PauliId_I},
+                              {"PauliX", PauliId::PauliId_X},
+                              {"PauliY", PauliId::PauliId_Y},
+                              {"PauliZ", PauliId::PauliId_Z}};
 
 char TranslatePauliToChar(PauliId& pauli)
 {
@@ -145,13 +140,11 @@ const char* TranslateStringToCharBuffer(string& s)
 }
 <# } #>
 
-extern "C" void <#= EntryPoint.Name #>(
-<# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
-    var arg = EntryPoint.Parameters[i];
-    var isLastArg = i == (EntryPoint.Parameters.Count-1); #>
-    <#= arg.InteropType() #> <#= arg.Name #><#= (isLastArg) ? "" : "," #>
-<# } #>
-); // QIR interop function.
+extern "C" void <#= EntryPoint.Name #>(<# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
+                                            var arg = EntryPoint.Parameters[i];
+                                            var isLastArg = i == (EntryPoint.Parameters.Count-1); #>
+                                            <#= arg.InteropType() #> <#= arg.Name #><#= (isLastArg) ? "" : "," #>
+                                        <# } #>); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -167,9 +160,7 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
 <# if (EntryPoint.Parameters.Count > 0) { #>
     // Add a command line option for each entry-point parameter.
@@ -179,8 +170,7 @@ int main(int argc, char* argv[])
 <# if (arg.CliOptionVariableDefaultValue() != null) { #>
     <#= arg.CliOptionVariableName() #> = <#= arg.CliOptionVariableDefaultValue() #>;
 <# } #>
-    app.add_option("<#= arg.CliOptionName() #>", <#= arg.CliOptionVariableName() #>, "<#= arg.CliOptionDescription() #>")
-        ->required()<#= arg.CliOptionTransformerMapName() != null ? "" : ";" #>
+    app.add_option("<#= arg.CliOptionName() #>", <#= arg.CliOptionVariableName() #>, "<#= arg.CliOptionDescription() #>")->required()<#= arg.CliOptionTransformerMapName() != null ? "" : ";" #>
 <# if (arg.CliOptionTransformerMapName() != null) { #>
         ->transform(CLI::CheckedTransformer(<#= arg.CliOptionTransformerMapName() #>, CLI::ignore_case));
 <# } #>
@@ -205,7 +195,7 @@ int main(int argc, char* argv[])
     TranslateVector<<#= arrayCliOptionType #>, <#= arrayInteropType #>>(<#= arg.CliOptionVariableName() #>, <#= arg.IntermediateVariableName() #>, <#= arrayInteropTranslator #>);
     unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.IntermediateVariableName() #>);
 <# } #>
-    InteropArray* <#= arg.InteropVariableName() #> = <#= arg.UniquePtrVariableName() #>.get();
+    InteropArray* <#= arg.InteropVariableName() #>              = <#= arg.UniquePtrVariableName() #>.get();
 <# } #>
 <# else { 
     var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); #>
@@ -229,13 +219,11 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    <#= EntryPoint.Name #>(
-<# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
-    var arg = EntryPoint.Parameters[i];
-    var isLastArg = i == (EntryPoint.Parameters.Count-1); #>
-        <#= arg.InteropVariableName() #><#= (isLastArg) ? "" : "," #>
-<# } #>
-    );
+    <#= EntryPoint.Name #>(<# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
+                                var arg = EntryPoint.Parameters[i];
+                                var isLastArg = i == (EntryPoint.Parameters.Count-1); #>
+                           <#= arg.InteropVariableName() #><#= (isLastArg) ? "" : "," #>
+    <# } #>);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

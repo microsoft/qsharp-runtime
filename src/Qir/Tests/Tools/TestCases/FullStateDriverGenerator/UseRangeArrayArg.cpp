@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
+    InteropArray(int64_t size, void* data) : Size(size), Data(data)
+    {
+    }
 };
 
 template<typename T>
@@ -54,15 +54,13 @@ struct InteropRange
     int64_t Step;
     int64_t End;
 
-    InteropRange() :
-        Start(0),
-        Step(0),
-        End(0){}
+    InteropRange() : Start(0), Step(0), End(0)
+    {
+    }
 
-    InteropRange(RangeTuple rangeTuple) :
-        Start(get<0>(rangeTuple)),
-        Step(get<1>(rangeTuple)),
-        End(get<2>(rangeTuple)){}
+    InteropRange(RangeTuple rangeTuple) : Start(get<0>(rangeTuple)), Step(get<1>(rangeTuple)), End(get<2>(rangeTuple))
+    {
+    }
 };
 
 unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
@@ -87,9 +85,7 @@ void FreePointerVector(vector<T*>& v)
     }
 }
 
-extern "C" void UseRangeArrayArg(
-    InteropArray* RangeArrayArg
-); // QIR interop function.
+extern "C" void UseRangeArrayArg(InteropArray* RangeArrayArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -102,9 +98,7 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     vector<RangeTuple> RangeArrayArgCli;
@@ -116,9 +110,10 @@ int main(int argc, char* argv[])
 
     // Cast parsed arguments to its interop types.
     vector<InteropRange*> RangeArrayArgIntermediate;
-    TranslateVector<RangeTuple, InteropRange*>(RangeArrayArgCli, RangeArrayArgIntermediate, TranslateRangeTupleToInteropRangePointer);
+    TranslateVector<RangeTuple, InteropRange*>(RangeArrayArgCli, RangeArrayArgIntermediate,
+                                               TranslateRangeTupleToInteropRangePointer);
     unique_ptr<InteropArray> RangeArrayArgUniquePtr = CreateInteropArray(RangeArrayArgIntermediate);
-    InteropArray* RangeArrayArgInterop = RangeArrayArgUniquePtr.get();
+    InteropArray* RangeArrayArgInterop              = RangeArrayArgUniquePtr.get();
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -131,9 +126,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseRangeArrayArg(
-        RangeArrayArgInterop
-    );
+    UseRangeArrayArg(RangeArrayArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

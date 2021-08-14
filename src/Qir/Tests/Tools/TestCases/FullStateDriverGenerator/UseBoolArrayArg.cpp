@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
+    InteropArray(int64_t size, void* data) : Size(size), Data(data)
+    {
+    }
 };
 
 template<typename T>
@@ -48,17 +48,13 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
 
 // Auxiliary functions for interop with Q# Bool type.
 const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar = 0x1;
-map<string, bool> BoolAsCharMap{
-    {"0", InteropFalseAsChar},
-    {"false", InteropFalseAsChar},
-    {"1", InteropTrueAsChar},
-    {"true", InteropTrueAsChar}
-};
+const char InteropTrueAsChar  = 0x1;
+map<string, bool> BoolAsCharMap{{"0", InteropFalseAsChar},
+                                {"false", InteropFalseAsChar},
+                                {"1", InteropTrueAsChar},
+                                {"true", InteropTrueAsChar}};
 
-extern "C" void UseBoolArrayArg(
-    InteropArray* BoolArrayArg
-); // QIR interop function.
+extern "C" void UseBoolArrayArg(InteropArray* BoolArrayArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -71,9 +67,7 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     vector<char> BoolArrayArgCli;
@@ -86,7 +80,7 @@ int main(int argc, char* argv[])
 
     // Cast parsed arguments to its interop types.
     unique_ptr<InteropArray> BoolArrayArgUniquePtr = CreateInteropArray(BoolArrayArgCli);
-    InteropArray* BoolArrayArgInterop = BoolArrayArgUniquePtr.get();
+    InteropArray* BoolArrayArgInterop              = BoolArrayArgUniquePtr.get();
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -99,9 +93,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseBoolArrayArg(
-        BoolArrayArgInterop
-    );
+    UseBoolArrayArg(BoolArrayArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

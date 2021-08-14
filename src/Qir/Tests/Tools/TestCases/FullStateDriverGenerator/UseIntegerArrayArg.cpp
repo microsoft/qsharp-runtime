@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
+    InteropArray(int64_t size, void* data) : Size(size), Data(data)
+    {
+    }
 };
 
 template<typename T>
@@ -46,9 +46,7 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-extern "C" void UseIntegerArrayArg(
-    InteropArray* IntegerArrayArg
-); // QIR interop function.
+extern "C" void UseIntegerArrayArg(InteropArray* IntegerArrayArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -61,13 +59,12 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     vector<int64_t> IntegerArrayArgCli;
-    app.add_option("--IntegerArrayArg", IntegerArrayArgCli, "Option to provide a value for the IntegerArrayArg parameter")
+    app.add_option("--IntegerArrayArg", IntegerArrayArgCli,
+                   "Option to provide a value for the IntegerArrayArg parameter")
         ->required();
 
     // After all the options have been added, parse arguments from the command line.
@@ -75,7 +72,7 @@ int main(int argc, char* argv[])
 
     // Cast parsed arguments to its interop types.
     unique_ptr<InteropArray> IntegerArrayArgUniquePtr = CreateInteropArray(IntegerArrayArgCli);
-    InteropArray* IntegerArrayArgInterop = IntegerArrayArgUniquePtr.get();
+    InteropArray* IntegerArrayArgInterop              = IntegerArrayArgUniquePtr.get();
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -88,9 +85,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseIntegerArrayArg(
-        IntegerArrayArgInterop
-    );
+    UseIntegerArrayArg(IntegerArrayArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

@@ -23,17 +23,13 @@ using namespace std;
 
 // Auxiliary functions for interop with Q# Result type.
 const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> ResultAsCharMap{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
-};
+const char InteropResultOneAsChar  = 0x1;
+map<string, char> ResultAsCharMap{{"0", InteropResultZeroAsChar},
+                                  {"Zero", InteropResultZeroAsChar},
+                                  {"1", InteropResultOneAsChar},
+                                  {"One", InteropResultOneAsChar}};
 
-extern "C" void UseResultArg(
-    char ResultArg
-); // QIR interop function.
+extern "C" void UseResultArg(char ResultArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -46,9 +42,7 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     char ResultArgCli;
@@ -74,9 +68,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseResultArg(
-        ResultArgInterop
-    );
+    UseResultArg(ResultArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

@@ -27,9 +27,7 @@ const char* TranslateStringToCharBuffer(string& s)
     return s.c_str();
 }
 
-extern "C" void UseStringArg(
-    const char* StringArg
-); // QIR interop function.
+extern "C" void UseStringArg(const char* StringArg); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -42,14 +40,11 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
+        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     string StringArgCli;
-    app.add_option("--StringArg", StringArgCli, "Option to provide a value for the StringArg parameter")
-        ->required();
+    app.add_option("--StringArg", StringArgCli, "Option to provide a value for the StringArg parameter")->required();
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
@@ -68,9 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseStringArg(
-        StringArgInterop
-    );
+    UseStringArg(StringArgInterop);
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();
