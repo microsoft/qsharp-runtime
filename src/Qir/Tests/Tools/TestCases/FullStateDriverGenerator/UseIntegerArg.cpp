@@ -21,7 +21,9 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-extern "C" void UseIntegerArg(int64_t IntegerArg); // QIR interop function.
+extern "C" void UseIntegerArg(
+    int64_t IntegerArg
+); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -34,12 +36,15 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
+        "--simulation-output",
+        simulationOutputFile,
+        "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     int64_t IntegerArgCli;
     IntegerArgCli = 0;
-    app.add_option("--IntegerArg", IntegerArgCli, "Option to provide a value for the IntegerArg parameter")->required();
+    app.add_option("--IntegerArg", IntegerArgCli, "Option to provide a value for the IntegerArg parameter")
+        ->required();
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
@@ -58,7 +63,9 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseIntegerArg(IntegerArgInterop);
+    UseIntegerArg(
+        IntegerArgInterop
+    );
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

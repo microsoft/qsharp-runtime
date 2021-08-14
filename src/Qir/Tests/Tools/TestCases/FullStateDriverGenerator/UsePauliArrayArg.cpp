@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) : Size(size), Data(data)
-    {
-    }
+    InteropArray(int64_t size, void* data) :
+        Size(size),
+        Data(data){}
 };
 
 template<typename T>
@@ -47,17 +47,21 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
 }
 
 // Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> PauliMap{{"PauliI", PauliId::PauliId_I},
-                              {"PauliX", PauliId::PauliId_X},
-                              {"PauliY", PauliId::PauliId_Y},
-                              {"PauliZ", PauliId::PauliId_Z}};
+map<string, PauliId> PauliMap{
+    {"PauliI", PauliId::PauliId_I},
+    {"PauliX", PauliId::PauliId_X},
+    {"PauliY", PauliId::PauliId_Y},
+    {"PauliZ", PauliId::PauliId_Z}
+};
 
 char TranslatePauliToChar(PauliId& pauli)
 {
     return static_cast<char>(pauli);
 }
 
-extern "C" void UsePauliArrayArg(InteropArray* PauliArrayArg); // QIR interop function.
+extern "C" void UsePauliArrayArg(
+    InteropArray* PauliArrayArg
+); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -70,7 +74,9 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
+        "--simulation-output",
+        simulationOutputFile,
+        "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     vector<PauliId> PauliArrayArgCli;
@@ -85,7 +91,7 @@ int main(int argc, char* argv[])
     vector<char> PauliArrayArgIntermediate;
     TranslateVector<PauliId, char>(PauliArrayArgCli, PauliArrayArgIntermediate, TranslatePauliToChar);
     unique_ptr<InteropArray> PauliArrayArgUniquePtr = CreateInteropArray(PauliArrayArgIntermediate);
-    InteropArray* PauliArrayArgInterop              = PauliArrayArgUniquePtr.get();
+    InteropArray* PauliArrayArgInterop = PauliArrayArgUniquePtr.get();
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -98,7 +104,9 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UsePauliArrayArg(PauliArrayArgInterop);
+    UsePauliArrayArg(
+        PauliArrayArgInterop
+    );
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

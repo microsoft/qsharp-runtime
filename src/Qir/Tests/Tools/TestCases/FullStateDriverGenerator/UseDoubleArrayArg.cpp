@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) : Size(size), Data(data)
-    {
-    }
+    InteropArray(int64_t size, void* data) :
+        Size(size),
+        Data(data){}
 };
 
 template<typename T>
@@ -46,7 +46,9 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-extern "C" void UseDoubleArrayArg(InteropArray* DoubleArrayArg); // QIR interop function.
+extern "C" void UseDoubleArrayArg(
+    InteropArray* DoubleArrayArg
+); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -59,7 +61,9 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
+        "--simulation-output",
+        simulationOutputFile,
+        "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     vector<double_t> DoubleArrayArgCli;
@@ -71,7 +75,7 @@ int main(int argc, char* argv[])
 
     // Cast parsed arguments to its interop types.
     unique_ptr<InteropArray> DoubleArrayArgUniquePtr = CreateInteropArray(DoubleArrayArgCli);
-    InteropArray* DoubleArrayArgInterop              = DoubleArrayArgUniquePtr.get();
+    InteropArray* DoubleArrayArgInterop = DoubleArrayArgUniquePtr.get();
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -84,7 +88,9 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseDoubleArrayArg(DoubleArrayArgInterop);
+    UseDoubleArrayArg(
+        DoubleArrayArgInterop
+    );
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();

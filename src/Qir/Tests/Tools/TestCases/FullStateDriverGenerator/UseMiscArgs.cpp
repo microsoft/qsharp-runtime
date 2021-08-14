@@ -27,9 +27,9 @@ struct InteropArray
     int64_t Size;
     void* Data;
 
-    InteropArray(int64_t size, void* data) : Size(size), Data(data)
-    {
-    }
+    InteropArray(int64_t size, void* data) :
+        Size(size),
+        Data(data){}
 };
 
 template<typename T>
@@ -54,13 +54,15 @@ struct InteropRange
     int64_t Step;
     int64_t End;
 
-    InteropRange() : Start(0), Step(0), End(0)
-    {
-    }
+    InteropRange() :
+        Start(0),
+        Step(0),
+        End(0){}
 
-    InteropRange(RangeTuple rangeTuple) : Start(get<0>(rangeTuple)), Step(get<1>(rangeTuple)), End(get<2>(rangeTuple))
-    {
-    }
+    InteropRange(RangeTuple rangeTuple) :
+        Start(get<0>(rangeTuple)),
+        Step(get<1>(rangeTuple)),
+        End(get<2>(rangeTuple)){}
 };
 
 unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
@@ -77,11 +79,13 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 
 // Auxiliary functions for interop with Q# Bool type.
 const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar  = 0x1;
-map<string, bool> BoolAsCharMap{{"0", InteropFalseAsChar},
-                                {"false", InteropFalseAsChar},
-                                {"1", InteropTrueAsChar},
-                                {"true", InteropTrueAsChar}};
+const char InteropTrueAsChar = 0x1;
+map<string, bool> BoolAsCharMap{
+    {"0", InteropFalseAsChar},
+    {"false", InteropFalseAsChar},
+    {"1", InteropTrueAsChar},
+    {"true", InteropTrueAsChar}
+};
 
 // Auxiliary functions for interop with Q# String type.
 const char* TranslateStringToCharBuffer(string& s)
@@ -89,8 +93,12 @@ const char* TranslateStringToCharBuffer(string& s)
     return s.c_str();
 }
 
-extern "C" void UseMiscArgs(char BoolArg, InteropArray* IntegerArrayArg, InteropRange* RangeArg,
-                            const char* StringArg); // QIR interop function.
+extern "C" void UseMiscArgs(
+    char BoolArg,
+    InteropArray* IntegerArrayArg,
+    InteropRange* RangeArg,
+    const char* StringArg
+); // QIR interop function.
 
 int main(int argc, char* argv[])
 {
@@ -103,7 +111,9 @@ int main(int argc, char* argv[])
     // Add the --simulation-output option.
     string simulationOutputFile;
     CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output", simulationOutputFile, "File where the output produced during the simulation is written");
+        "--simulation-output",
+        simulationOutputFile,
+        "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
     char BoolArgCli;
@@ -113,15 +123,16 @@ int main(int argc, char* argv[])
         ->transform(CLI::CheckedTransformer(BoolAsCharMap, CLI::ignore_case));
 
     vector<int64_t> IntegerArrayArgCli;
-    app.add_option("--IntegerArrayArg", IntegerArrayArgCli,
-                   "Option to provide a value for the IntegerArrayArg parameter")
+    app.add_option("--IntegerArrayArg", IntegerArrayArgCli, "Option to provide a value for the IntegerArrayArg parameter")
         ->required();
 
     RangeTuple RangeArgCli;
-    app.add_option("--RangeArg", RangeArgCli, "Option to provide a value for the RangeArg parameter")->required();
+    app.add_option("--RangeArg", RangeArgCli, "Option to provide a value for the RangeArg parameter")
+        ->required();
 
     string StringArgCli;
-    app.add_option("--StringArg", StringArgCli, "Option to provide a value for the StringArg parameter")->required();
+    app.add_option("--StringArg", StringArgCli, "Option to provide a value for the StringArg parameter")
+        ->required();
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
@@ -130,7 +141,7 @@ int main(int argc, char* argv[])
     char BoolArgInterop = BoolArgCli;
 
     unique_ptr<InteropArray> IntegerArrayArgUniquePtr = CreateInteropArray(IntegerArrayArgCli);
-    InteropArray* IntegerArrayArgInterop              = IntegerArrayArgUniquePtr.get();
+    InteropArray* IntegerArrayArgInterop = IntegerArrayArgUniquePtr.get();
 
     InteropRange* RangeArgInterop = TranslateRangeTupleToInteropRangePointer(RangeArgCli);
 
@@ -147,7 +158,12 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseMiscArgs(BoolArgInterop, IntegerArrayArgInterop, RangeArgInterop, StringArgInterop);
+    UseMiscArgs(
+        BoolArgInterop,
+        IntegerArrayArgInterop,
+        RangeArgInterop,
+        StringArgInterop
+    );
 
     // Flush the output of the simulation.
     simulatorOutputStream->flush();
