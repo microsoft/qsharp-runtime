@@ -15,4 +15,4 @@ namespace Quantum
 } // namespace Quantum
 } // namespace Microsoft
 
-#endif  // #ifndef TRACERINTERNAL_HPP
+#endif // #ifndef TRACERINTERNAL_HPP

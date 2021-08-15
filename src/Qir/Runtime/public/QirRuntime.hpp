@@ -53,7 +53,7 @@ extern "C"
     QIR_SHARED_API char* quantum__rt__memory_allocate(uint64_t size); // NOLINT
 
     // Fail the computation with the given error message.
-    [[noreturn]] QIR_SHARED_API void quantum__rt__fail(QirString* msg); // NOLINT
+    [[noreturn]] QIR_SHARED_API void quantum__rt__fail(QirString* msg);       // NOLINT
     [[noreturn]] QIR_SHARED_API void quantum__rt__fail_cstr(const char* msg); // NOLINT
 
     // Include the given message in the computation's execution log or equivalent.
@@ -70,7 +70,7 @@ extern "C"
     // becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void quantum__rt__result_update_reference_count(RESULT*, int32_t); // NOLINT
 
-    QIR_SHARED_API RESULT* quantum__rt__result_get_one(); // NOLINT
+    QIR_SHARED_API RESULT* quantum__rt__result_get_one();  // NOLINT
     QIR_SHARED_API RESULT* quantum__rt__result_get_zero(); // NOLINT
 
     // ------------------------------------------------------------------------
@@ -123,9 +123,7 @@ extern "C"
     // new array should be set to zero.
     QIR_SHARED_API QirArray* quantum__rt__array_create(int, int, ...); // NOLINT
     QIR_SHARED_API QirArray* quantum__rt__array_create_nonvariadic(    // NOLINT
-        int itemSizeInBytes,
-        int countDimensions,
-        va_list dims);
+        int itemSizeInBytes, int countDimensions, va_list dims);
 
     // Returns the number of dimensions in the array.
     QIR_SHARED_API int32_t quantum__rt__array_get_dim(QirArray*); // NOLINT
@@ -217,13 +215,13 @@ extern "C"
     // Returns a string representation of the range.
     QIR_SHARED_API QirString* quantum__rt__range_to_string(const QirRange&); // NOLINT
 
-    // Returns a pointer to an array that contains a null-terminated sequence of characters 
+    // Returns a pointer to an array that contains a null-terminated sequence of characters
     // (i.e., a C-string) representing the current value of the string object.
     QIR_SHARED_API const char* quantum__rt__string_get_data(QirString* str); // NOLINT
 
     // Returns the length of the string, in terms of bytes.
     // http://www.cplusplus.com/reference/string/string/size/
-    QIR_SHARED_API uint32_t quantum__rt__string_get_length(QirString* str);  // NOLINT
+    QIR_SHARED_API uint32_t quantum__rt__string_get_length(QirString* str); // NOLINT
 
     // Returns a string representation of the big integer.
     // TODO QIR_SHARED_API QirString* quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
@@ -293,12 +291,12 @@ extern "C"
 }
 
 // TODO: Consider separating the `extern "C"` exports and C++ exports.
-namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
+namespace Microsoft // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
 namespace Quantum
 {
-    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()` instead.
-    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
-} // namespace Microsoft
+    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()`
+    // instead.
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream& newOStream);
 } // namespace Quantum
-
+} // namespace Microsoft
