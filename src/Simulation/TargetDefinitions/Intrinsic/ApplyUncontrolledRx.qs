@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Targeting;
 
     /// # Summary
     /// Applies a rotation about the $x$-axis by a given angle. Note that the Controlled
@@ -28,7 +29,8 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliX, theta, qubit);
     /// ```
-    internal operation ApplyUncontrolledRx (theta : Double, qubit : Qubit) : Unit is Adj {
+    @TargetInstruction("rx")
+    internal operation ApplyUncontrolledRx (theta : Double, qubit : Qubit) : Unit {
         body intrinsic;
     }
 }

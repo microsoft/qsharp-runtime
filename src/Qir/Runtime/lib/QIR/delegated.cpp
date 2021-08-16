@@ -31,7 +31,6 @@ extern "C"
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseZero();
     }
-
     Result quantum__rt__result_get_one()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
@@ -58,7 +57,7 @@ extern "C"
             // If we don't have the result in our map, assume it has been allocated by a measurement with refcount = 1,
             // and this is the first attempt to share it.
             std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-            auto rit = trackedResults.find(r);
+            auto rit                                         = trackedResults.find(r);
             if (rit == trackedResults.end())
             {
                 trackedResults[r] = 1 + increment;
@@ -72,7 +71,7 @@ extern "C"
         {
             // If we don't have the result in our map, assume it has been never shared, so it's reference count is 1.
             std::unordered_map<RESULT*, int>& trackedResults = AllocatedResults();
-            auto rit = trackedResults.find(r);
+            auto rit                                         = trackedResults.find(r);
             if (rit == trackedResults.end())
             {
                 assert(increment == -1);
@@ -116,6 +115,7 @@ extern "C"
     // Returns a string representation of the qubit.
     QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
+        return quantum__rt__string_create(
+            Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
     }
 }
