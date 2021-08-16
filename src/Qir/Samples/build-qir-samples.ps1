@@ -12,7 +12,7 @@ Write-Host "##[info]Compile Q# Sample Projects into QIR"
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
-& "$PSScriptRoot/../check-sources-formatted.ps1" $PSScriptRoot
+& (Join-Path $PSScriptRoot ".." check-sources-formatted.ps1) -Path $PSScriptRoot
 
 Build-QirProject (Join-Path $PSScriptRoot StandaloneInputReference qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 
