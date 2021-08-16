@@ -221,7 +221,7 @@ function Build-CMakeProject {
         $buildType = "RelWithDebInfo"
     }
 
-    cmake -G Ninja $clangTidy -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
+    cmake -G Ninja $clangTidy -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to generate $Name."
         $all_ok = $false

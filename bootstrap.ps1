@@ -19,7 +19,7 @@ Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
         --version $Env:NUGET_VERSION;
 Pop-Location
 
-if (-not (Test-Path Env:AGENT_OS)) {
+if (-not (Test-Path Env:AGENT_OS)) {                                    # If not CI build, i.e. local build (if AGENT_OS envvar is not defined)
     if ($Env:ENABLE_NATIVE -ne "false") {
         Write-Host "Build release flavor of the native simulator"
         $Env:BUILD_CONFIGURATION = "Release"
