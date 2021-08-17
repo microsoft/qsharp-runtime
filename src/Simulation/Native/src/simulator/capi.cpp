@@ -71,6 +71,8 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned id, _In_ unsigned q)
     {
+        // The underlying simulator function will return True if and only if the qubit being released
+        // was in the ground state prior to release.
         return Microsoft::Quantum::Simulator::get(id)->release(q);
     }
 
