@@ -131,19 +131,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #define GATE1IMPL(OP)                                                                                                  \
     void OP(logical_qubit_id q)                                                                                        \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply(Gates::OP(q));                                                                                       \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
     void C##OP(logical_qubit_id c, logical_qubit_id q)                                                                 \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
     void C##OP(std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                             \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(q));                                                                         \
     }
 #define GATE1(OP) GATE1IMPL(OP) GATE1CIMPL(OP) GATE1MCIMPL(OP)
@@ -167,19 +167,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 #define GATE1IMPL(OP)                                                                                                  \
     void OP(double phi, logical_qubit_id q)                                                                            \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply(Gates::OP(phi, q));                                                                                  \
     }
 #define GATE1CIMPL(OP)                                                                                                 \
     void C##OP(double phi, logical_qubit_id c, logical_qubit_id q)                                                     \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
     }
 #define GATE1MCIMPL(OP)                                                                                                \
     void C##OP(double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q)                                 \
     {                                                                                                                  \
-        recursive_lock_type l(mutex());                                                                                \
+        recursive_lock_type l(getmutex());                                                                                \
         psi.apply_controlled(c, Gates::OP(phi, q));                                                                    \
     }
 #define GATE1(OP) GATE1IMPL(OP) GATE1CIMPL(OP) GATE1MCIMPL(OP)
