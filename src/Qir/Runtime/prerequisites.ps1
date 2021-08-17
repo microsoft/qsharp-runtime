@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#Requires -Version 6.0
+
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
