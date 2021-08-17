@@ -25,6 +25,11 @@ static std::unordered_map<RESULT*, int>& AllocatedResults()
     return allocatedResults;
 }
 
+static Microsoft::Quantum::IRestrictedAreaManagement* RestrictedAreaManagement()
+{
+    return dynamic_cast<Microsoft::Quantum::IRestrictedAreaManagement*>(Microsoft::Quantum::GlobalContext()->GetDriver());
+}
+
 extern "C"
 {
     Result quantum__rt__result_get_zero()
@@ -45,6 +50,22 @@ extern "C"
     {
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
     }
+
+    void quantum__rt__qubit_restricted_reuse_area_start() // NOLINT
+    {
+        RestrictedAreaManagement()->StartArea();
+    }
+
+    void quantum__rt__qubit_restricted_reuse_segment_next() // NOLINT
+    {
+        RestrictedAreaManagement()->NextSegment();
+    }
+
+    void quantum__rt__qubit_restricted_reuse_area_end() // NOLINT
+    {
+        RestrictedAreaManagement()->EndArea();
+    }
+
 
     void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
     {

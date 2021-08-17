@@ -90,6 +90,7 @@ namespace Quantum
     // TODO: is it OK to load/unload the dll for each simulator instance?
     class CFullstateSimulator
         : public IRuntimeDriver
+        , public IRestrictedAreaManagement
         , public IQuantumGateSet
         , public IDiagnostics
     {
@@ -230,6 +231,22 @@ namespace Quantum
 
             releaseQubit(this->simulatorId, GetQubitId(q)); // Release qubit in the simulator.
             qubitManager->Release(q);                       // Release it in the qubit manager.
+        }
+
+        // IRestrictedAreaManagement
+
+        virtual void StartArea() override
+        {
+            qubitManager->StartRestrictedReuseArea();
+        }
+
+        virtual void NextSegment() override
+        {
+            qubitManager->NextRestrictedReuseSegment();
+        }
+        virtual void EndArea() override
+        {
+            qubitManager->EndRestrictedReuseArea();
         }
 
         Result Measure(long numBases, PauliId bases[], long numTargets, Qubit targets[]) override
