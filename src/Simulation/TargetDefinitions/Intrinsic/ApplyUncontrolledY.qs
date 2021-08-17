@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Input
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    @TargetInstruction("y")
+    @TargetInstruction("y__body")
     internal operation ApplyUncontrolledY (qubit : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
