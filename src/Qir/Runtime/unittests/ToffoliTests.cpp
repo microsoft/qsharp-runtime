@@ -14,14 +14,14 @@ using namespace Microsoft::Quantum;
 static Result MZ(IQuantumGateSet* iqa, Qubit q)
 {
     PauliId pauliZ[1] = {PauliId_Z};
-    Qubit qs[1] = {q};
+    Qubit qs[1]       = {q};
     return iqa->Measure(1, pauliZ, 1, qs);
 }
 
 TEST_CASE("Basis vector", "[toffoli]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateToffoliSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
     constexpr int n = 1000;
     std::vector<Qubit> qubits;
@@ -50,7 +50,7 @@ TEST_CASE("Basis vector", "[toffoli]")
 TEST_CASE("Controlled X", "[toffoli]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateToffoliSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
     Qubit q[4];
     q[0] = sim->AllocateQubit();
@@ -94,7 +94,7 @@ TEST_CASE("Controlled X", "[toffoli]")
 TEST_CASE("Measure and assert probability", "[toffoli]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateToffoliSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
     const int count = 3;
     Qubit qs[count];

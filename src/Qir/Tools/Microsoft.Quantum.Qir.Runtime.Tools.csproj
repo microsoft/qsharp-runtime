@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\Simulation\Common\Simulators.Dev.props" />
-  <Import Project="..\..\Simulation\Common\AssemblyCommon.props" />
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <PackageId>Microsoft.Quantum.Qir.Runtime</PackageId>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <Description>Native libraries and build tools for linking and executing Quantum Intermediate Representation.</Description>
     <RootNamespace>Microsoft.Quantum.Qir.Runtime.Tools</RootNamespace>
     <PackageTags>Quantum QIR</PackageTags>
@@ -21,6 +15,11 @@
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/any/Externals/CLI11">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
       <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -35,15 +34,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2107151063-beta" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="Externals\CLI11\*">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2108156289-beta" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,34 +63,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppFullStateSimulatorInitializer.tt</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(QSimDll)">
-      <Link Condition="$([MSBuild]::IsOsPlatform('Windows'))">Libraries\win-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('OSX'))">Libraries\osx-x64\%(FileName)%(Extension)</Link>
-      <Link Condition="$([MSBuild]::IsOsPlatform('Linux'))">Libraries\linux-x64\%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\Simulation\Native\win10\**\*">
-      <Link>Libraries\win-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\Simulation\Native\osx\**\*">
-      <Link>Libraries\osx-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\Simulation\Native\linux\**\*">
-      <Link>Libraries\linux-x64\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
   </ItemGroup>
 
 </Project>

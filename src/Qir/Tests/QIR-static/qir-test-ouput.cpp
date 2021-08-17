@@ -10,10 +10,10 @@ extern "C" void Microsoft__Quantum__Testing__QIR__Out__MessageTest__Interop(cons
 
 TEST_CASE("QIR: Out.Message", "[qir.Out][qir.Out.Message]")
 {
-    const std::string       testStr1 = "Test String 1";
-    const std::string       testStr2 = "Test String 2";
+    const std::string testStr1 = "Test String 1";
+    const std::string testStr2 = "Test String 2";
 
-    std::ostringstream      outStrStream;
+    std::ostringstream outStrStream;
 
     {
         // Redirect the output from std::cout to outStrStream:
