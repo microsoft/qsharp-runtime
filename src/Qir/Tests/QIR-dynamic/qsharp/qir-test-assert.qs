@@ -82,10 +82,13 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurement(           [PauliZ], [qubit], Zero,      "0: Newly allocated qubit must be in the |0> state.");
         AssertMeasurementProbability([PauliZ], [qubit], Zero, 1.0, "1: Newly allocated qubit must be in the |0> state.", 1e-10);
 
-        X(qubit);   // |0> -> |1>
-
-        AssertMeasurement(           [PauliZ], [qubit], One,      "2: Newly allocated qubit after X() must be in the |1> state.");
-        AssertMeasurementProbability([PauliZ], [qubit], One, 1.0, "3: Newly allocated qubit after X() must be in the |1> state.", 1e-10);
+        within {
+            X(qubit);   // |0> -> |1>
+        }
+        apply {
+            AssertMeasurement(           [PauliZ], [qubit], One,      "2: Newly allocated qubit after X() must be in the |1> state.");
+            AssertMeasurementProbability([PauliZ], [qubit], One, 1.0, "3: Newly allocated qubit after X() must be in the |1> state.", 1e-10);
+        }
     }
 
     @EntryPoint()
@@ -119,14 +122,18 @@ namespace Microsoft.Quantum.Testing.QIR  {
         }  //H(qubit);   // Back to |0>
 
         let str2 = "Newly allocated qubit after x() followed by H() must be in the |-> state";
-        X(qubit);   // |1>
-        H(qubit);   // |->
-        AssertMeasurement(           [PauliX], [qubit], One, str2);
-        // 50% probability in other Pauli bases:
-        AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, str2, 1e-10);
-        AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, str2, 1e-10);
-        AssertMeasurementProbability([PauliY], [qubit], Zero, 0.5, str2, 1e-10);
-        AssertMeasurementProbability([PauliY], [qubit],  One, 0.5, str2, 1e-10);
+        within {
+            X(qubit);   // |1>
+            H(qubit);   // |->
+        }
+        apply {
+            AssertMeasurement(           [PauliX], [qubit], One, str2);
+            // 50% probability in other Pauli bases:
+            AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, str2, 1e-10);
+            AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, str2, 1e-10);
+            AssertMeasurementProbability([PauliY], [qubit], Zero, 0.5, str2, 1e-10);
+            AssertMeasurementProbability([PauliY], [qubit],  One, 0.5, str2, 1e-10);
+        }
     }
 
     // (|0> + i|1>) / SQRT(2) = SH|0> = S|+> 
@@ -146,15 +153,19 @@ namespace Microsoft.Quantum.Testing.QIR  {
             AssertMeasurementProbability([PauliX], [qubit],  One, 0.5, "4: Call failed", 1e-10);
         } // Adjoint S(qubit);   // Back to |+>    // H(qubit);   // Back to |0>
 
-        X(qubit);   // |1>
-        H(qubit);   // |->
-        S(qubit);   // (|0> - i|1>) / SQRT(2)
-        AssertMeasurement(           [PauliY], [qubit], One,       "5: Call failed");
-        // 50% probability in other Pauli bases:
-        AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, "6: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, "7: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliX], [qubit], Zero, 0.5, "8: Call failed", 1e-10);
-        AssertMeasurementProbability([PauliX], [qubit],  One, 0.5, "9: Call failed", 1e-10);
+        within {
+            X(qubit);   // |1>
+            H(qubit);   // |->
+            S(qubit);   // (|0> - i|1>) / SQRT(2)
+        }
+        apply {
+            AssertMeasurement(           [PauliY], [qubit], One,       "5: Call failed");
+            // 50% probability in other Pauli bases:
+            AssertMeasurementProbability([PauliZ], [qubit], Zero, 0.5, "6: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliZ], [qubit],  One, 0.5, "7: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliX], [qubit], Zero, 0.5, "8: Call failed", 1e-10);
+            AssertMeasurementProbability([PauliX], [qubit],  One, 0.5, "9: Call failed", 1e-10);
+        }
     }
 
 
@@ -212,6 +223,9 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [left, right],  One, 0.5, "I: Call failed", 1E-05);
         AssertMeasurementProbability([PauliY, PauliY], [left, right], Zero, 0.5, "J: Call failed", 1E-05);
         AssertMeasurementProbability([PauliY, PauliY], [left, right],  One, 0.5, "K: Call failed", 1E-05);
+
+        Reset(right);
+        Reset(left);
     }
 
     // Task 3.  |0000>+|1111>  or  |0011>+|1100> ?
@@ -236,6 +250,8 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurementProbability([PauliZ, PauliZ], [qubitIds[0], qubitIds[1]], Zero, 1.0, "3: Call failed", 1E-05);   // |00> or |11>
         AssertMeasurementProbability([PauliZ, PauliZ], [qubitIds[1], qubitIds[2]],  One, 1.0, "4: Call failed", 1E-05);   // |01> or |10>
         AssertMeasurementProbability([PauliZ, PauliZ], [qubitIds[2], qubitIds[3]], Zero, 1.0, "5: Call failed", 1E-05);   // |00> or |11>
+
+        ResetAll(qubitIds);
     }
 
     // Bell states (superposition of |00> and |11>, `(|10> + |01>) / SQRT(2)`):
@@ -305,6 +321,9 @@ namespace Microsoft.Quantum.Testing.QIR  {
         AssertMeasurement(           [PauliX, PauliZ], [left, right], Zero,      "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero in 𝑋𝑍-basis"              );
         AssertMeasurementProbability([PauliX, PauliZ], [left, right], Zero, 1.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must return Zero always in 𝑋𝑍-basis", 1E-05);
         AssertMeasurementProbability([PauliX, PauliZ], [left, right],  One, 0.0, "Error: Measuring (|0+> + |1->)/SQRT(2) must not return One in 𝑋𝑍-basis"    , 1E-05);
+
+        Reset(right);
+        Reset(left);
     }
 
 
