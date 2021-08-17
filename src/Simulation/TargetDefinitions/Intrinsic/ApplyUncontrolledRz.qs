@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```qsharp
     /// R(PauliZ, theta, qubit);
     /// ```
-    @TargetInstruction("rz")
+    @TargetInstruction("rz__body")
     internal operation ApplyUncontrolledRz (theta : Double, qubit : Qubit) : Unit {
         body intrinsic;
     }
