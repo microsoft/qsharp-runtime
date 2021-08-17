@@ -124,7 +124,7 @@ class SimulatorInterface
         throw std::runtime_error("this simulator does not support permutation oracle emulation");
     };
 
-    recursive_mutex_type& getmutex() const
+    recursive_mutex_type& mutex() const
     {
         return *mutex_ptr;
     }
