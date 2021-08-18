@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-#Requires -PSEdition Core
 #Requires -Version 7.1
 
 param (
