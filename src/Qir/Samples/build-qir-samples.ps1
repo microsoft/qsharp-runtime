@@ -8,9 +8,12 @@ param (
     $SkipQSharpBuild
 )
 
+Write-Host "##[info]Compile Q# Sample Projects into QIR"
+
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
-Write-Host "##[info]Compile Q# Projects into QIR"
+& (Join-Path $PSScriptRoot ".." check-sources-formatted.ps1) -Path $PSScriptRoot
+
 Build-QirProject (Join-Path $PSScriptRoot StandaloneInputReference qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 
 if (-not (Build-CMakeProject $PSScriptRoot "QIR Samples")) {
