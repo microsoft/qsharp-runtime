@@ -9,7 +9,9 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    struct SimulatorStub : public IRuntimeDriver, public IQuantumGateSet
+    struct SimulatorStub
+        : public IRuntimeDriver
+        , public IQuantumGateSet
     {
         Qubit AllocateQubit() override
         {
@@ -79,17 +81,13 @@ namespace Quantum
         {
             throw std::logic_error("not_implemented: ControlledT");
         }
-        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/, double /*theta*/) override
+        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/,
+                         double /*theta*/) override
         {
             throw std::logic_error("not_implemented: ControlledR");
         }
-        void ControlledExp(
-            long /*numControls*/,
-            Qubit* /*controls*/,
-            long /*numTargets*/,
-            PauliId* /*paulis*/,
-            Qubit* /*targets*/,
-            double /*theta*/) override
+        void ControlledExp(long /*numControls*/, Qubit* /*controls*/, long /*numTargets*/, PauliId* /*paulis*/,
+                           Qubit* /*targets*/, double /*theta*/) override
         {
             throw std::logic_error("not_implemented: ControlledExp");
         }

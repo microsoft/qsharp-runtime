@@ -65,3 +65,6 @@ Get-ChildItem @(
     "Env:\WHEEL_OUTDIR",
     "Env:\DOCS_OUTDIR"
  ) | Format-Table
+
+Write-Host "PATH:"
+Write-Host "$Env:PATH"

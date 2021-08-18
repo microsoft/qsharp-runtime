@@ -6,16 +6,6 @@ $ErrorActionPreference = 'Stop'
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
-if ($Env:ENABLE_NATIVE -ne "false") {
-    $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
-    & "$nativeSimulator/build-native-simulator.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
-}
-
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
     & "$qirRuntime/build-qir-runtime.ps1"
@@ -24,6 +14,16 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     }
 } else {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+}
+
+if ($Env:ENABLE_NATIVE -ne "false") {
+    $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
+    & "$nativeSimulator/build-native-simulator.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+} else {
+    Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }
 
 if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
