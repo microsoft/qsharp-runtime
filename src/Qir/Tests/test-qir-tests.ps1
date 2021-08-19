@@ -15,7 +15,7 @@ if ($Env:BUILD_CONFIGURATION -eq "Debug")
 
     if (-not ($IsWindows))
     {
-        #$env:LSAN_OPTIONS += "suppressions=../../../../LSan.ignore"    # https://clang.llvm.org/docs/AddressSanitizer.html#suppressing-memory-leaks
+        $env:LSAN_OPTIONS += "suppressions=../../../../LSan.ignore"    # https://clang.llvm.org/docs/AddressSanitizer.html#suppressing-memory-leaks
         if (-not ($IsMacOS))
         {
             $env:ASAN_OPTIONS += "check_initialization_order=1"    # https://clang.llvm.org/docs/AddressSanitizer.html#initialization-order-checking
