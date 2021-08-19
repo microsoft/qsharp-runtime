@@ -17,11 +17,16 @@ steps:
   displayName: "Test QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
+
 #- task: UseDotNet@2
 #  displayName: 'Use .NET Core SDK 3.1.300'
 #  inputs:
 #    packageType: sdk
 #    version: '3.1.300'
+- pwsh: src/Simulation/Native/prerequisites.ps1
+  displayName: "Install Native Siumulator Prerequisites"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
 - powershell: |
     #Write-Host "Build release flavor of the native simulator"
     #$Env:BUILD_CONFIGURATION = "Release"
@@ -31,6 +36,7 @@ steps:
     #$Env:BUILD_CONFIGURATION = $null
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
+
 
 - pwsh: src/Qir/Tests/build-qir-tests.ps1
   displayName: "Build QIR Tests"
