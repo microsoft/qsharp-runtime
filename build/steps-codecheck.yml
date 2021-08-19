@@ -3,11 +3,11 @@
 ##
 steps:
 - template: steps-init-codecheck.yml    # Win: Install choco
-
+ 
+  # QIR Runtime:
 - pwsh: src/Qir/Runtime/prerequisites.ps1
   displayName: "Install LLVM, ninja cmake"
   workingDirectory: $(System.DefaultWorkingDirectory)
-
 
 - pwsh: src/Qir/Runtime/build-qir-runtime.ps1
   displayName: "Build QIR Runtime"
@@ -17,27 +17,17 @@ steps:
   displayName: "Test QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
-
-#- task: UseDotNet@2
-#  displayName: 'Use .NET Core SDK 3.1.300'
-#  inputs:
-#    packageType: sdk
-#    version: '3.1.300'
+  # Native Simulator (needed to build and run the QIR tests):
 - pwsh: src/Simulation/Native/prerequisites.ps1
   displayName: "Install Native Siumulator Prerequisites"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - powershell: |
-    #Write-Host "Build release flavor of the native simulator"
-    #$Env:BUILD_CONFIGURATION = "Release"
-    #Push-Location "src/Simulation/Native"
     .\build-native-simulator.ps1
-    #Pop-Location
-    #$Env:BUILD_CONFIGURATION = $null
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
-
+  # QIR Tests:
 - pwsh: src/Qir/Tests/build-qir-tests.ps1
   displayName: "Build QIR Tests"
   workingDirectory: $(System.DefaultWorkingDirectory)
@@ -46,6 +36,7 @@ steps:
   displayName: "Run QIR Tests"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
+  # QIR Samples:
 - pwsh: src/Qir/Samples/build-qir-samples.ps1
   displayName: "Build QIR Samples"
   workingDirectory: $(System.DefaultWorkingDirectory)

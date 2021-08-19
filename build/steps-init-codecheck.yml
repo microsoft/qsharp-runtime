@@ -7,34 +7,3 @@ steps:
   displayName: 'Use NuGet 5.6.0'
   inputs:
     versionSpec: '5.6.0'
- 
-#- task: UseDotNet@2
-#  displayName: 'Use .NET Core SDK 3.1.300'
-#  inputs:
-#    packageType: sdk
-#    version: '3.1.300'
-
-#- script: |
-#    curl https://sh.rustup.rs -sSf | sh -s -- -y
-#    echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-#  displayName: Install rust
-#  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-#- script: |
-#    curl -sSf -o rustup-init.exe https://win.rustup.rs
-#    rustup-init.exe -y
-#    echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
-#  displayName: Windows install rust
-#  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-#- script: |
-#    rustup install nightly
-#    rustup component add rustfmt clippy
-#    rustup component add rustfmt clippy --toolchain nightly
-#  displayName: Enable Rust formatting and nightly options.
-
-###
-## Custom pre-reqs
-###
-#- pwsh: ./bootstrap.ps1
-#  displayName: "Custom prerequisites for the build"
-#  workingDirectory: $(System.DefaultWorkingDirectory)
