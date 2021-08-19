@@ -137,8 +137,8 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             if (settings.DryRun)
             {
-                DisplayError("Dry run is not supported with QIR submission.", null);
-                return 1;
+                return DisplayValidation(submitter.Validate(
+                    submission.QirStream, submission.EntryPointName, submission.Arguments));
             }
 
             var job = submitter.SubmitAsync(
