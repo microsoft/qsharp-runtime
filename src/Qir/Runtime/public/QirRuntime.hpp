@@ -15,55 +15,47 @@ extern "C"
     // Qubit Management.
     // ------------------------------------------------------------------------
 
+    // Allocate one qubit. Qubit is guaranteed to be in |0> state.
+    // Qubit needs to be released via quantum__rt__qubit_release.
     QIR_SHARED_API QUBIT* quantum__rt__qubit_allocate(); // NOLINT
+
+    // Allocate 'count' qubits, allocate and return an array that owns these qubits.
+    // Array and qubits in the array need to be released via quantum__rt__qubit_release_array.
     QIR_SHARED_API QirArray* quantum__rt__qubit_allocate_array(int64_t count); // NOLINT
 
+    // Release one qubit.
     QIR_SHARED_API void quantum__rt__qubit_release(QUBIT*); // NOLINT
+
+    // Release qubits, owned by the array and the array itself.
     QIR_SHARED_API void quantum__rt__qubit_release_array(QirArray*); // NOLINT
 
+    // Borrow one qubit. Qubit is not guaranteed to be in |0> state.
+    // Qubit needs to be returned via quantum__rt__qubit_return in the same state in which it was borrowed.
     QIR_SHARED_API QUBIT* quantum__rt__qubit_borrow(); // NOLINT
+
+    // Borrow 'count' qubits, allocate and return an array that owns these qubits.
+    // Array and qubits in the array need to be returned via quantum__rt__qubit_return_array.
     QIR_SHARED_API QirArray* quantum__rt__qubit_borrow_array(int64_t count); // NOLINT
 
+    // Return one borrowed qubit. Qubit must be in the same state in which it was borrowed.
     QIR_SHARED_API void quantum__rt__qubit_return(QUBIT*); // NOLINT
+
+    // Return borrowed qubits owned by the array. Release array itself.
     QIR_SHARED_API void quantum__rt__qubit_return_array(QirArray*); // NOLINT
 
     // ------------------------------------------------------------------------
     // Qubit Management Restricted Reuse Control.
     // ------------------------------------------------------------------------
 
+    // Start restricted reuse area.
+    // Qubits released within one segment of an area cannot be reused in other segments of the same area.
     QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_area_start(); // NOLINT
+
+    // End current restricted reuse segment and start the next one within the current area.
     QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_segment_next(); // NOLINT
+
+    // End current restricted reuse area.
     QIR_SHARED_API void quantum__rt__qubit_restricted_reuse_area_end(); // NOLINT
-
-    // ------------------------------------------------------------------------
-    // Old qubit management
-    // ------------------------------------------------------------------------
-
-    // Allocates a single qubit.
-    //QIR_SHARED_API QUBIT* quantum__rt__qubit_allocate(); // NOLINT
-    //
-    // Allocates an array of qubits.
-    //QIR_SHARED_API QirArray* quantum__rt__qubit_allocate_array(int64_t count); // NOLINT
-    //
-    // Release a single qubit.
-    //QIR_SHARED_API void quantum__rt__qubit_release(QUBIT*); // NOLINT
-    //
-    // Release qubits, owned by the array. The array itself is also released.
-    //QIR_SHARED_API void quantum__rt__qubit_release_array(QirArray*); // NOLINT
-    //
-    // Borrow a single qubit.
-    // TODO QIR_SHARED_API QUBIT* quantum__rt__qubit_borrow(); // NOLINT
-    //
-    // Borrow an array of qubits.
-    // TODO QIR_SHARED_API QirArray* quantum__rt__qubit_borrow_array(int64_t count); // NOLINT
-    //
-    // Return a borrowed qubit.
-    // TODO QIR_SHARED_API void quantum__rt__qubit_return(QUBIT*); // NOLINT
-    //
-    // Return an array of borrowed qubits.
-    // TODO QIR_SHARED_API void quantum__rt__qubit_return_array(QirArray*); // NOLINT
-
-
 
     // ------------------------------------------------------------------------
     // Utils

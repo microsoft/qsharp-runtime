@@ -51,6 +51,18 @@ extern "C"
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
     }
 
+    QUBIT* quantum__rt__qubit_borrow()
+    {
+        // Currently we implement borrowing as allocation.
+        return quantum__rt__qubit_allocate();
+    }
+
+    void quantum__rt__qubit_return(QUBIT* qubit)
+    {
+        // Currently we implement borrowing as allocation.
+        quantum__rt__qubit_release(qubit);
+    }
+
     void quantum__rt__qubit_restricted_reuse_area_start() // NOLINT
     {
         RestrictedAreaManagement()->StartArea();
