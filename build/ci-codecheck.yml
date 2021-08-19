@@ -1,0 +1,47 @@
+name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
+
+trigger: none
+
+pr:
+- main
+- feature/*
+- features/*
+- release/*
+
+schedules:
+- cron: "0 9 * * Sat"
+  displayName: 'Build for Component Governance'
+  branches:
+    include:
+    - main
+  always: true
+
+variables:
+  Build.Major: 0
+  Build.Minor: 16
+  Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
+  Drop.Native: $(System.DefaultWorkingDirectory)/xplat
+  CI: "true"
+
+jobs:
+- job: build
+  displayName: Build
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-latest'
+      mac:
+        imageName: 'macOS-latest'
+      #windows:                         # No sanitizers supported on Win at the moment.
+      #  imageName: 'windows-latest'
+  pool: 
+    vmImage: $(imageName)
+  #timeoutInMinutes: 90
+
+  steps:
+  - template: steps-codecheck.yml
+
+  #- task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+  #  displayName: 'Component Detection'
+  #  inputs:
+  #    failOnAlert: true

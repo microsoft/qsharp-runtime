@@ -1,0 +1,39 @@
+##
+# Run all build steps.
+##
+steps:
+- template: steps-init-codecheck.yml    # Win: Install choco
+
+- pwsh: src/Qir/Runtime/prerequisites.ps1
+  displayName: "Install LLVM, ninja cmake"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Runtime/build-qir-runtime.ps1
+  displayName: "Build QIR Runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Runtime/test-qir-runtime.ps1
+  displayName: "Test QIR Runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+#- task: UseDotNet@2
+#  displayName: 'Use .NET Core SDK 3.1.300'
+#  inputs:
+#    packageType: sdk
+#    version: '3.1.300'
+
+- pwsh: src/Qir/Tests/build-qir-tests.ps1
+  displayName: "Build QIR Tests"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Tests/test-qir-tests.ps1
+  displayName: "Run QIR Tests"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Samples/build-qir-samples.ps1
+  displayName: "Build QIR Samples"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Samples/test-qir-samples.ps1
+  displayName: "Run QIR Samples"
+  workingDirectory: $(System.DefaultWorkingDirectory)
