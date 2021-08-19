@@ -8,7 +8,7 @@ The QIR runtime includes an implementation of the
 - `public` folder contains the public headers
 - `lib` folder contains the implementation of the runtime and the simulators.
 - `unittests` folder contains tests for the runtime
-- `externals` folder contains external dependencies. We'll strive to keep those minimal.
+- `Externals` folder contains external dependencies. We'll strive to keep those minimal.
 
 ## Build
 
