@@ -8,6 +8,7 @@ steps:
   displayName: "Install LLVM, ninja cmake"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
+
 - pwsh: src/Qir/Runtime/build-qir-runtime.ps1
   displayName: "Build QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
@@ -21,6 +22,15 @@ steps:
 #  inputs:
 #    packageType: sdk
 #    version: '3.1.300'
+- powershell: |
+    #Write-Host "Build release flavor of the native simulator"
+    #$Env:BUILD_CONFIGURATION = "Release"
+    #Push-Location "src/Simulation/Native"
+    .\build-native-simulator.ps1
+    #Pop-Location
+    #$Env:BUILD_CONFIGURATION = $null
+  displayName: "Build Native Simulator"
+  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
 - pwsh: src/Qir/Tests/build-qir-tests.ps1
   displayName: "Build QIR Tests"
