@@ -2,11 +2,15 @@
 # Run all build steps.
 ##
 steps:
-- template: steps-init-codecheck.yml    # Win: Install choco
+
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 5.6.0'
+  inputs:
+    versionSpec: '5.6.0'
  
   # QIR Runtime:
 - pwsh: src/Qir/Runtime/prerequisites.ps1
-  displayName: "Install LLVM, ninja cmake"
+  displayName: "Install QIR Runtime Prerequisistes"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - pwsh: src/Qir/Runtime/build-qir-runtime.ps1
@@ -19,7 +23,7 @@ steps:
 
   # Native Simulator (needed to build and run the QIR tests):
 - pwsh: src/Simulation/Native/prerequisites.ps1
-  displayName: "Install Native Siumulator Prerequisites"
+  displayName: "Install Native Simulator Prerequisites"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - powershell: |

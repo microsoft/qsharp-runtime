@@ -1,9 +1,0 @@
-steps:
-
-##
-# Pre-reqs
-##
-- task: NuGetToolInstaller@0
-  displayName: 'Use NuGet 5.6.0'
-  inputs:
-    versionSpec: '5.6.0'
