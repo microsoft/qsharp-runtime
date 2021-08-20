@@ -26,5 +26,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         public Task<IQuantumMachineJob> SubmitAsync(
             Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options) =>
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
+
+        public string? Validate(
+            Stream qir, string entryPoint, IReadOnlyList<Argument> arguments) =>
+            null;
     }
 }

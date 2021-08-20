@@ -37,15 +37,14 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
 
             executablesDirectory.Create();
 
-            // Concurrently build an executable for each entry point operation.
-            var tasks = EntryPointLoader.LoadEntryPointOperations(qsharpDll).Select(entryPointOp =>
+            // Build an executable for each entry point operation. The builds must run one at a time because they write
+            // to the same intermediate files.
+            foreach (var entryPointOp in EntryPointLoader.LoadEntryPointOperations(qsharpDll))
             {
                 var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
                 var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
-                return exe.BuildAsync(entryPointOp, libraryDirectories, includeDirectories);
-            });
-            
-            await Task.WhenAll(tasks);
+                await exe.BuildAsync(entryPointOp, libraryDirectories, includeDirectories);
+            }
 
             // ToDo: Return list of created file names
         }

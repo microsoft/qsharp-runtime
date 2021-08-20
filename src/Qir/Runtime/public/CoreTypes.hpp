@@ -42,7 +42,7 @@ typedef RESULT* Result; // TODO: Replace with `typedef uintXX_t Result`, where X
 enum ResultValue
 {
     Result_Zero = 0,
-    Result_One = 1,
+    Result_One  = 1,
     Result_Pending, // indicates that this is a deferred result
 };
 

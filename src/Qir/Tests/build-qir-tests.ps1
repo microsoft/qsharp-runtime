@@ -8,9 +8,12 @@ param (
     $SkipQSharpBuild
 )
 
+Write-Host "##[info]Compile Q# Test Projects into QIR"
+
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
-Write-Host "##[info]Compile Q# Projects into QIR"
+& (Join-Path $PSScriptRoot ".." check-sources-formatted.ps1) -Path $PSScriptRoot
+
 Build-QirProject (Join-Path $PSScriptRoot QIR-static qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot QIR-dynamic qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot QIR-tracer qsharp) -SkipQSharpBuild:$SkipQSharpBuild

@@ -33,5 +33,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
 
         public string? Validate<TIn, TOut>(EntryPointInfo<TIn, TOut> entryPoint, TIn argument) => null;
+
+        public string? Validate(
+            Stream qir, string entryPoint, IReadOnlyList<Argument> arguments) =>
+            null;
     }
 }
