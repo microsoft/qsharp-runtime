@@ -1,0 +1,37 @@
+name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
+
+trigger: none
+
+pr:
+- main
+- feature/*
+- features/*
+- release/*
+
+schedules:
+- cron: "0 9 * * Sat"
+  displayName: 'Build for Component Governance'
+  branches:
+    include:
+    - main
+  always: true
+
+variables:
+  CI: "true"
+
+jobs:
+- job: build
+  displayName: Build
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-latest'
+      mac:
+        imageName: 'macOS-latest'
+      #windows:                         # No sanitizers supported on Win at the moment.
+      #  imageName: 'windows-latest'
+  pool: 
+    vmImage: $(imageName)
+
+  steps:
+  - template: steps-codecheck.yml

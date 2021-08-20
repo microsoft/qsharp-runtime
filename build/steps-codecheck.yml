@@ -1,0 +1,50 @@
+##
+# Run all build steps.
+##
+steps:
+
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 5.6.0'
+  inputs:
+    versionSpec: '5.6.0'
+ 
+  # QIR Runtime:
+- pwsh: src/Qir/Runtime/prerequisites.ps1
+  displayName: "Install QIR Runtime Prerequisistes"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Runtime/build-qir-runtime.ps1
+  displayName: "Build QIR Runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Runtime/test-qir-runtime.ps1
+  displayName: "Test QIR Runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+  # Native Simulator (needed to build and run the QIR tests):
+- pwsh: src/Simulation/Native/prerequisites.ps1
+  displayName: "Install Native Simulator Prerequisites"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- powershell: |
+    .\build-native-simulator.ps1
+  displayName: "Build Native Simulator"
+  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
+
+  # QIR Tests:
+- pwsh: src/Qir/Tests/build-qir-tests.ps1
+  displayName: "Build QIR Tests"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Tests/test-qir-tests.ps1
+  displayName: "Run QIR Tests"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+  # QIR Samples:
+- pwsh: src/Qir/Samples/build-qir-samples.ps1
+  displayName: "Build QIR Samples"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- pwsh: src/Qir/Samples/test-qir-samples.ps1
+  displayName: "Run QIR Samples"
+  workingDirectory: $(System.DefaultWorkingDirectory)
