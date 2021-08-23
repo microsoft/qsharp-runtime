@@ -241,14 +241,14 @@ namespace Quantum
                                                                 sharedQubitStatusArray);
     }
 
-    Qubit CQubitManager::Allocate()
+    qubitid_t CQubitManager::Allocate()
     {
         QubitIdType newQubitId = AllocateQubitId();
         FailIf(newQubitId == NoneMarker, "Not enough qubits.");
-        return CreateQubitObject(newQubitId);
+        return ToExternalId(newQubitId);
     }
 
-    void CQubitManager::Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate)
+    void CQubitManager::Allocate(qubitid_t* qubitsToAllocate, int32_t qubitCountToAllocate)
     {
         if (qubitCountToAllocate == 0)
         {
@@ -269,18 +269,16 @@ namespace Quantum
                 }
                 FailNow("Not enough qubits.");
             }
-            qubitsToAllocate[i] = CreateQubitObject(newQubitId);
+            qubitsToAllocate[i] = ToExternalId(newQubitId);
         }
     }
 
-    void CQubitManager::Release(Qubit qubit)
+    void CQubitManager::Release(qubitid_t qubit)
     {
-        FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
-        ReleaseQubitId(QubitToId(qubit));
-        DeleteQubitObject(qubit);
+        ReleaseQubitId(ToInternalId(qubit));
     }
 
-    void CQubitManager::Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease)
+    void CQubitManager::Release(qubitid_t* qubitsToRelease, int32_t qubitCountToRelease)
     {
         if (qubitCountToRelease == 0)
         {
@@ -292,38 +290,36 @@ namespace Quantum
         for (int32_t i = 0; i < qubitCountToRelease; i++)
         {
             Release(qubitsToRelease[i]);
-            qubitsToRelease[i] = nullptr;
         }
     }
 
-    Qubit CQubitManager::Borrow()
+    qubitid_t CQubitManager::Borrow()
     {
         // We don't support true borrowing/returning at the moment.
         return Allocate();
     }
 
-    void CQubitManager::Borrow(Qubit* qubitsToBorrow, int32_t qubitCountToBorrow)
+    void CQubitManager::Borrow(qubitid_t* qubitsToBorrow, int32_t qubitCountToBorrow)
     {
         // We don't support true borrowing/returning at the moment.
         return Allocate(qubitsToBorrow, qubitCountToBorrow);
     }
 
-    void CQubitManager::Return(Qubit qubit)
+    void CQubitManager::Return(qubitid_t qubit)
     {
         // We don't support true borrowing/returning at the moment.
         Release(qubit);
     }
 
-    void CQubitManager::Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn)
+    void CQubitManager::Return(qubitid_t* qubitsToReturn, int32_t qubitCountToReturn)
     {
         // We don't support true borrowing/returning at the moment.
         Release(qubitsToReturn, qubitCountToReturn);
     }
 
-    void CQubitManager::Disable(Qubit qubit)
+    void CQubitManager::Disable(qubitid_t qubit)
     {
-        FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
-        QubitIdType id = QubitToId(qubit);
+        QubitIdType id = ToInternalId(qubit);
 
         // We can only disable explicitly allocated qubits that were not borrowed.
         FailIf(!IsExplicitlyAllocatedId(id), "Cannot disable qubit that is not explicitly allocated.");
@@ -335,7 +331,7 @@ namespace Quantum
         FailIf(allocatedQubitCount < 0, "Incorrect allocated qubit count.");
     }
 
-    void CQubitManager::Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable)
+    void CQubitManager::Disable(qubitid_t* qubitsToDisable, int32_t qubitCountToDisable)
     {
         if (qubitCountToDisable == 0)
         {
@@ -371,53 +367,36 @@ namespace Quantum
     }
 
 
-    bool CQubitManager::IsValidQubit(Qubit qubit) const
+    bool CQubitManager::IsValidQubit(qubitid_t qubit) const
     {
-        return IsValidId(QubitToId(qubit));
+        return IsValidId(ToInternalId(qubit));
     }
 
-    bool CQubitManager::IsDisabledQubit(Qubit qubit) const
+    bool CQubitManager::IsDisabledQubit(qubitid_t qubit) const
     {
-        return IsValidQubit(qubit) && IsDisabledId(QubitToId(qubit));
+        return IsValidQubit(qubit) && IsDisabledId(ToInternalId(qubit));
     }
 
-    bool CQubitManager::IsExplicitlyAllocatedQubit(Qubit qubit) const
+    bool CQubitManager::IsExplicitlyAllocatedQubit(qubitid_t qubit) const
     {
-        return IsValidQubit(qubit) && IsExplicitlyAllocatedId(QubitToId(qubit));
+        return IsValidQubit(qubit) && IsExplicitlyAllocatedId(ToInternalId(qubit));
     }
 
-    bool CQubitManager::IsFreeQubitId(QubitIdType id) const
+    bool CQubitManager::IsFreeQubit(qubitid_t qubit) const
     {
-        return IsValidId(id) && IsFreeId(id);
+        return IsValidQubit(qubit) && IsFreeId(ToInternalId(qubit));
     }
 
-    CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
+    CQubitManager::QubitIdType CQubitManager::ToInternalId(qubitid_t qubit) const
     {
         FailIf(!IsValidQubit(qubit), "Not a valid qubit.");
-        return QubitToId(qubit);
+        return static_cast<CQubitManager::QubitIdType>(qubit);
     }
 
-
-    Qubit CQubitManager::CreateQubitObject(QubitIdType id)
+    qubitid_t CQubitManager::ToExternalId(QubitIdType qubitId) const
     {
-        // Make sure the static_cast won't overflow:
-        FailIf(id < 0 || id >= MaximumQubitCapacity, "Qubit id is out of range.");
-        intptr_t pointerSizedId = static_cast<intptr_t>(id);
-        return reinterpret_cast<Qubit>(pointerSizedId);
-    }
-
-    void CQubitManager::DeleteQubitObject(Qubit /*qubit*/)
-    {
-        // Do nothing. By default we store qubit Id in place of a pointer to a qubit.
-    }
-
-    CQubitManager::QubitIdType CQubitManager::QubitToId(Qubit qubit) const
-    {
-        intptr_t pointerSizedId = reinterpret_cast<intptr_t>(qubit);
-        // Make sure the static_cast won't overflow:
-        FailIf(pointerSizedId < 0 || pointerSizedId > std::numeric_limits<QubitIdType>::max(),
-               "Qubit id is out of range.");
-        return static_cast<QubitIdType>(pointerSizedId);
+        FailIf(qubitId < 0 || qubitId >= MaximumQubitCapacity, "Qubit id is out of range.");
+        return static_cast<qubitid_t>(qubitId);
     }
 
     void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)

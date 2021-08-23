@@ -26,22 +26,22 @@ extern "C"
 
     void quantum__qis__single_qubit_op(int32_t id, int32_t duration, Qubit target) // NOLINT
     {
-        (void)tracer->TraceSingleQubitOp(id, duration, target);
+        (void)tracer->TraceSingleQubitOp(id, duration, QubitToQubitId(target));
     }
     void quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, Qubit target) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), 1,
-                                        &target);
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), BufferAsArrayOfQubitIds(ctls->buffer), 1,
+                                        BufferAsArrayOfQubitIds(&target));
     }
     void quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
         (void)tracer->TraceMultiQubitOp(id, duration, 0, nullptr, (long)(targets->count),
-                                        reinterpret_cast<Qubit*>(targets->buffer));
+                                        BufferAsArrayOfQubitIds(targets->buffer));
     }
     void quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer),
-                                        (long)(targets->count), reinterpret_cast<Qubit*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), BufferAsArrayOfQubitIds(ctls->buffer),
+                                        (long)(targets->count), BufferAsArrayOfQubitIds(targets->buffer));
     }
 
     void quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
@@ -51,13 +51,12 @@ extern "C"
 
     RESULT* quantum__qis__single_qubit_measure(int32_t id, int32_t duration, QUBIT* q) // NOLINT
     {
-        return tracer->TraceSingleQubitMeasurement(id, duration, q);
+        return tracer->TraceSingleQubitMeasurement(id, duration, QubitToQubitId(q));
     }
 
     RESULT* quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
     {
-        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count),
-                                                  reinterpret_cast<Qubit*>(qs->buffer));
+        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count), BufferAsArrayOfQubitIds(qs->buffer));
     }
 
     void quantum__qis__apply_conditionally( // NOLINT

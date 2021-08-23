@@ -6,6 +6,7 @@
 #include <complex>
 
 #include "CoreTypes.hpp"
+#include "QirTypes.hpp"
 
 namespace Microsoft
 {
@@ -19,11 +20,11 @@ namespace Quantum
         IRuntimeDriver() = default;
 
         // Doesn't necessarily provide insight into the state of the qubit (for that look at IDiagnostics)
-        virtual std::string QubitToString(Qubit qubit) = 0;
+        virtual std::string QubitToString(qubitid_t qubit) = 0;
 
         // Qubit management
-        virtual Qubit AllocateQubit()          = 0;
-        virtual void ReleaseQubit(Qubit qubit) = 0;
+        virtual qubitid_t AllocateQubit()          = 0;
+        virtual void ReleaseQubit(qubitid_t qubit) = 0;
 
         virtual void ReleaseResult(Result result)          = 0;
         virtual bool AreEqualResults(Result r1, Result r2) = 0;

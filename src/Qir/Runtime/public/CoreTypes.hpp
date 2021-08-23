@@ -35,6 +35,23 @@
 class QUBIT;
 typedef QUBIT* Qubit; // Not a pointer to a memory location, just an integer - qubit id.
 
+typedef uintptr_t qubitid_t; // We use this type for Qubit Ids in the code that backs QIR.
+
+inline Qubit QubitIdToQubit(qubitid_t id)
+{
+    return reinterpret_cast<Qubit>(id);
+}
+
+inline qubitid_t QubitToQubitId(Qubit qubit)
+{
+    return reinterpret_cast<qubitid_t>(qubit);
+}
+
+inline qubitid_t* BufferAsArrayOfQubitIds(void* ptr)
+{
+    return reinterpret_cast<qubitid_t*>(ptr);
+}
+
 class RESULT;
 typedef RESULT* Result; // TODO: Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64.
                         //       Remove all the `RESULT`.

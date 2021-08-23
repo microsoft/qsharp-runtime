@@ -36,14 +36,14 @@ extern "C"
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
     }
 
-    QUBIT* quantum__rt__qubit_allocate() // NOLINT
+    QUBIT* quantum__rt__qubit_allocate()
     {
-        return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
+        return QubitIdToQubit(Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit());
     }
 
-    void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
+    void quantum__rt__qubit_release(QUBIT* qubit)
     {
-        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
+        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(QubitToQubitId(qubit));
     }
 
     void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
@@ -116,6 +116,6 @@ extern "C"
     QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
         return quantum__rt__string_create(
-            Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
+            Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(QubitToQubitId(qubit)).c_str());
     }
 }

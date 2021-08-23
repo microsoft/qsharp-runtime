@@ -52,40 +52,38 @@ namespace Quantum
         // Allocate a qubit. Extend capacity if necessary and possible.
         // Fail if the qubit cannot be allocated.
         // Computation complexity is O(number of nested restricted reuse areas) worst case, O(1) amortized cost.
-        Qubit Allocate();
+        qubitid_t Allocate();
         // Allocate qubitCountToAllocate qubits and store them in the provided array.
         // Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
         // Caller is responsible for providing array of sufficient size to hold qubitCountToAllocate.
-        void Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate);
+        void Allocate(qubitid_t* qubitsToAllocate, int32_t qubitCountToAllocate);
 
         // Releases a given qubit.
-        void Release(Qubit qubit);
+        void Release(qubitid_t qubit);
         // Releases qubitCountToRelease qubits in the provided array.
         // Caller is responsible for managing memory used by the array itself
         // (i.e. delete[] array if it was dynamically allocated).
-        void Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease);
+        void Release(qubitid_t* qubitsToRelease, int32_t qubitCountToRelease);
 
         // Borrow (We treat borrowing as allocation currently)
-        Qubit Borrow();
-        void Borrow(Qubit* qubitsToBorrow, int32_t qubitCountToBorrow);
+        qubitid_t Borrow();
+        void Borrow(qubitid_t* qubitsToBorrow, int32_t qubitCountToBorrow);
         // Return (We treat returning as release currently)
-        void Return(Qubit qubit);
-        void Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn);
+        void Return(qubitid_t qubit);
+        void Return(qubitid_t* qubitsToReturn, int32_t qubitCountToReturn);
 
         // Disables a given qubit.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(Qubit qubit);
+        void Disable(qubitid_t qubit);
         // Disables a set of given qubits.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable);
+        void Disable(qubitid_t* qubitsToDisable, int32_t qubitCountToDisable);
 
-        bool IsValidQubit(Qubit qubit) const;
-        bool IsDisabledQubit(Qubit qubit) const;
-        bool IsExplicitlyAllocatedQubit(Qubit qubit) const;
-        bool IsFreeQubitId(QubitIdType id) const;
-
-        QubitIdType GetQubitId(Qubit qubit) const;
+        bool IsValidQubit(qubitid_t qubit) const;
+        bool IsDisabledQubit(qubitid_t qubit) const;
+        bool IsExplicitlyAllocatedQubit(qubitid_t qubit) const;
+        bool IsFreeQubit(qubitid_t qubit) const;
 
         // Qubit counts:
 
@@ -126,24 +124,8 @@ namespace Quantum
         }
 
       protected:
-        // May be overriden to create a custom Qubit object.
-        // When not overriden, it just stores qubit Id in place of a pointer to a qubit.
-        // id: unique qubit id
-        // Returns a newly instantiated qubit.
-        virtual Qubit CreateQubitObject(QubitIdType id);
-
-        // May be overriden to delete a custom Qubit object.
-        // Must be overriden if CreateQubitObject is overriden.
-        // When not overriden, it does nothing.
-        // qubit: pointer to QUBIT
-        virtual void DeleteQubitObject(Qubit qubit);
-
-        // May be overriden to get a qubit id from a custom qubit object.
-        // Must be overriden if CreateQubitObject is overriden.
-        // When not overriden, it just reinterprets pointer to qubit as a qubit id.
-        // qubit: pointer to QUBIT
-        // Returns id of a qubit pointed to by qubit.
-        virtual QubitIdType QubitToId(Qubit qubit) const;
+        QubitIdType ToInternalId(qubitid_t qubit) const;
+        qubitid_t ToExternalId(QubitIdType qubitId) const;
 
       private:
         // The end of free lists are marked with NoneMarker value. It is used like null for pointers.

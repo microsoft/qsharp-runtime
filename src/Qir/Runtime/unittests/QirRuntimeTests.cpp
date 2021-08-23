@@ -34,7 +34,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
     }
 
-    Result Measure(long, PauliId[], long, Qubit[]) override
+    Result Measure(long, PauliId[], long, qubitid_t[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
@@ -677,33 +677,26 @@ struct QubitTestQAPI : public SimulatorStub
     const int maxQubits; // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
-    static uint64_t GetQubitId(Qubit q)
-    {
-        return (uint64_t)q;
-    }
-
     QubitTestQAPI(int maxQbits) : maxQubits(maxQbits), allocated((size_t)maxQbits, false)
     {
     }
 
-    Qubit AllocateQubit() override
+    qubitid_t AllocateQubit() override
     {
         assert(this->lastId < this->maxQubits);
         this->lastId++;
         this->allocated.at((size_t)(this->lastId)) = true;
-        return reinterpret_cast<Qubit>(this->lastId);
+        return static_cast<qubitid_t>(this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override
+    void ReleaseQubit(qubitid_t qubit) override
     {
-        const uint64_t id = GetQubitId(qubit);
-        INFO(id);
-        REQUIRE(this->allocated.at(id));
-        this->allocated.at(id).flip();
+        INFO(qubit);
+        REQUIRE(this->allocated.at(qubit));
+        this->allocated.at(qubit).flip();
     }
-    std::string QubitToString(Qubit qubit) override
+    std::string QubitToString(qubitid_t qubit) override
     {
-        const uint64_t id = GetQubitId(qubit);
-        return std::to_string(id);
+        return std::to_string(qubit);
     }
     Result UseZero() override
     {
@@ -762,11 +755,11 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* nestedTuple, int depth);
 struct ControlledCallablesTestSimulator : public SimulatorStub
 {
     int lastId = -1;
-    Qubit AllocateQubit() override
+    qubitid_t AllocateQubit() override
     {
-        return reinterpret_cast<Qubit>(++this->lastId);
+        return static_cast<qubitid_t>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override
+    void ReleaseQubit(qubitid_t /*qubit*/) override
     {
     }
     Result UseZero() override
@@ -977,11 +970,11 @@ struct AdjointsTestSimulator : public SimulatorStub
     double rotationAngle = 0.0;
     double exponentAngle = 0.0;
 
-    Qubit AllocateQubit() override
+    qubitid_t AllocateQubit() override
     {
-        return reinterpret_cast<Qubit>(++this->lastId);
+        return static_cast<qubitid_t>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override
+    void ReleaseQubit(qubitid_t /*qubit*/) override
     {
     }
     Result UseZero() override
@@ -993,11 +986,11 @@ struct AdjointsTestSimulator : public SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 
-    void R(PauliId, Qubit, double theta) override
+    void R(PauliId, qubitid_t, double theta) override
     {
         this->rotationAngle += theta;
     }
-    void Exp(long count, PauliId* paulis, Qubit*, double theta) override
+    void Exp(long count, PauliId* paulis, qubitid_t*, double theta) override
     {
         this->exponentAngle += theta;
 
@@ -1006,11 +999,11 @@ struct AdjointsTestSimulator : public SimulatorStub
         CHECK(paulis[0] == PauliId_Z);
         CHECK(paulis[1] == PauliId_Y);
     }
-    void ControlledR(long, Qubit*, PauliId, Qubit, double theta) override
+    void ControlledR(long, qubitid_t*, PauliId, qubitid_t, double theta) override
     {
         this->rotationAngle += theta;
     }
-    void ControlledExp(long, Qubit*, long count, PauliId* paulis, Qubit*, double theta) override
+    void ControlledExp(long, qubitid_t*, long count, PauliId* paulis, qubitid_t*, double theta) override
     {
         this->exponentAngle += theta;
 
