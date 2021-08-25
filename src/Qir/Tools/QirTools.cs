@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
         /// <param name="libraryDirectories">Directory where the libraries to link to are located.</param>
         /// <param name="includeDirectories">Directory where the headers needed for compilation are located.</param>
         /// <param name="executablesDirectory">Directory where the created executables are placed.</param>
-        /// <param name="debug">Enable additional debugging features, like verifying memory safety at runtime.</param>
+        /// <param name="debug">Enable additional debugging checks at runtime.</param>
         public static async Task BuildFromQSharpDll(
             FileInfo qsharpDll,
             IList<DirectoryInfo> libraryDirectories,

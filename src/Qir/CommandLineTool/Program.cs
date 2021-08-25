@@ -89,7 +89,7 @@ namespace Microsoft.Quantum.Qir.CommandLineTool
 
             buildCommand.AddOption(new Option<bool>(
                 alias: "--debug",
-                description: "Enable additional debugging features, like verifying memory safety at runtime."));
+                description: "Enable additional debugging checks at runtime."));
 
             return buildCommand;
         }
@@ -155,7 +155,7 @@ namespace Microsoft.Quantum.Qir.CommandLineTool
             public DirectoryInfo ExecutablesDirectory { get; set; }
 
             /// <summary>
-            /// Enable additional debugging features, like verifying memory safety at runtime.
+            /// Enable additional debugging checks at runtime.
             /// </summary>
             public bool Debug { get; set; }
         }
