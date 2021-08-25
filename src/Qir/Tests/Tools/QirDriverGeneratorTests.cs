@@ -43,7 +43,7 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                     "UseDoubleArg",
                     new EntryPointOperation
                     {
-                        Name = "UseDoublArg",
+                        Name = "UseDoubleArg",
                         Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArg", Type = DataType.DoubleType}}
                     }
                 },
@@ -164,7 +164,7 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         public void GenerateFullStateSimulatorDriver(string testCase)
         {
             var entryPointOperation = TestCases[testCase];
-            var driverGenerator = new QirFullStateDriverGenerator();
+            var driverGenerator = new QirFullStateDriverGenerator(false);
             var driverFileName = $"{testCase}.cpp";
             var verificationCppSourceCode = RemoveLineEndings(File.ReadAllText(Path.Combine(TestCasesDirectory, driverFileName)));
             Directory.CreateDirectory(TestArtifactsDirectory);
@@ -174,7 +174,6 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
             var generatedCppSourceCode = RemoveLineEndings(generatedStreamReader.ReadToEnd());
             Assert.Equal(verificationCppSourceCode, generatedCppSourceCode);
             generatedStream.Close();
-
         }
     }
 }

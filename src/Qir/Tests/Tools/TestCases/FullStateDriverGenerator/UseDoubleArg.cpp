@@ -21,7 +21,7 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-extern "C" void UseDoublArg(
+extern "C" void UseDoubleArg(
     double_t DoubleArg
 ); // QIR interop function.
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseDoublArg(
+    UseDoubleArg(
         DoubleArgInterop
     );
 
