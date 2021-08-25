@@ -55,3 +55,28 @@ TODO: Consider moving `public\` one level up, or all the rest one level down the
 
 **SimFactory.hpp**      Defines `CreateToffoliSimulator()`, `CreateFullstateSimulator()`.  
                         Depends on `QIR_SHARED_API`, `IRuntimeDriver`
+
+
+# Qubit IDs
+
+## Qubit IDs in plain "C" QIR API
+
+**QUBIT** Class that is declared, but not defined. Pointer to this class never points to a class instance, instead it is just an integer - qubit id. It is needed to create a unique type in LLVM.
+
+**Qubit** Defined as `QUBIT*`. This is never a pointer, this is always qubit ID. It is used in "C" API functions to match QIR definitions.
+
+## Qubit IDs in "C++" classes behind plain "C" API
+
+**qubitid_t** Defined as `uintptr_t`. This is an integer that can hold a pointer. This is used so that "C++" API is defined in terms of IDs. A reinterpret_case from `QUBIT*` to this type should be a no-op.
+
+## Qubit IDs in the full state simulator
+
+**unsigned** Full state simulator historically uses unsigned 32-bit integers for qubit IDs.
+
+## Qubit IDs in Qubit Manager
+
+**int32_t** Qubit Manager uses signed 32-bit integers for qubit IDs. Signed integers are used so that the negative range can be employed for special purposes.
+
+## Qubit IDs in other code
+
+Various parts of the code may also use random types for qubit IDs such as `int`. This is especially dangerous as pointers to such types are just casted to each other, even if they point to arrays.
