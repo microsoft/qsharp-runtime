@@ -11,8 +11,14 @@ namespace Microsoft.Quantum.Runtime.Submitters
     /// <summary>
     /// An interface for submitting Q# programs to Azure.
     /// </summary>
-    public interface IQSharpSubmitter : IAzureSubmitter
+    public interface IQSharpSubmitter
     {
+        /// <summary>
+        /// TODO.
+        /// </summary>
+        // TODO: Uncomment.
+        //Target Target { get; }
+
         /// <summary>
         /// Submits a job to execute a Q# program without waiting for execution to complete.
         /// </summary>

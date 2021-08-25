@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
 
         public string ProviderId => nameof(ErrorQuantumMachine);
 
-        string IAzureSubmitter.Target => Target;
+        //string IAzureSubmitter.Target => Target;
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>

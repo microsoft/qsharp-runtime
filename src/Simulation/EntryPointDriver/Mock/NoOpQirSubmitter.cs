@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
 
         public string ProviderId => nameof(NoOpQirSubmitter);
 
-        string IAzureSubmitter.Target => Target;
+        //string IAzureSubmitter.Target => Target;
 
         public Task<IQuantumMachineJob> SubmitAsync(
             Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options) =>

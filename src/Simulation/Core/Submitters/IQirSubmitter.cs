@@ -12,8 +12,14 @@ namespace Microsoft.Quantum.Runtime.Submitters
     /// <summary>
     /// An interface for submitting QIR programs to Azure.
     /// </summary>
-    public interface IQirSubmitter : IAzureSubmitter
+    public interface IQirSubmitter
     {
+        /// <summary>
+        /// TODO.
+        /// </summary>
+        // TODO: Uncomment.
+        //Target Target { get; }
+
         /// <summary>
         /// Submits a job to execute a QIR program without waiting for execution to complete.
         /// </summary>
