@@ -56,36 +56,36 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return out.str();
     }
 
-    Qubit AllocateQubit() override
+    qubitid_t AllocateQubit() override
     {
-        return nullptr;
+        return 0;
     }
-    void ReleaseQubit(Qubit /*qubit*/) override
+    void ReleaseQubit(qubitid_t /*qubit*/) override
     {
     }
 
-    void X(Qubit) override
+    void X(qubitid_t) override
     {
         this->xCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
-    void ControlledX(long /* numControls */, Qubit* /* controls */, Qubit /* qubit */) override
+    void ControlledX(long /* numControls */, qubitid_t* /* controls */, qubitid_t /* qubit */) override
     {
         this->cxCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
-    void Y(Qubit) override
+    void Y(qubitid_t) override
     {
         this->otherCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
-    void ControlledY(long /* numControls */, Qubit* /* controls */, Qubit /* qubit */) override
+    void ControlledY(long /* numControls */, qubitid_t* /* controls */, qubitid_t /* qubit */) override
     {
         this->otherCallbacks.push_back(this->nGateCallback);
         this->nGateCallback++;
     }
 
-    Result Measure(long /* numBases */, PauliId* /* bases */, long /* numTargets */, Qubit* /* targets */) override
+    Result Measure(long /* numBases */, PauliId* /* bases */, long /* numTargets */, qubitid_t* /* targets */) override
     {
         assert(this->nextMeasureResult < this->mockMeasurements.size() &&
                "ConditionalsTestSimulator isn't set up correctly");
