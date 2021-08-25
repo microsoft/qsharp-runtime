@@ -40,8 +40,7 @@ namespace Microsoft.Azure.Quantum
             string workspaceName,
             string location,
             TokenCredential credential = null,
-            QuantumJobClientOptions options = default,
-            string userAgentPrefix = null)
+            QuantumJobClientOptions options = default)
         {
             // Required parameters:
             Ensure.NotNullOrWhiteSpace(subscriptionId, nameof(subscriptionId));
@@ -52,7 +51,7 @@ namespace Microsoft.Azure.Quantum
             // Optional parameters:
             credential ??= CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId);
             options ??= new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = userAgentPrefix 
+            options.Diagnostics.ApplicationId = options.Diagnostics.ApplicationId
                                                 ?? Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID");
 
             this.ResourceGroupName = resourceGroupName;

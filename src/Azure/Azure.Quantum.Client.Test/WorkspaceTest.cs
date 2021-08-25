@@ -195,6 +195,9 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
                 Assert.Inconclusive(SETUP);
             }
 
+            var options = new QuantumJobClientOptions();
+            options.Diagnostics.ApplicationId = Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID") ?? "ClientTests";
+
             var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialType.Default);
 
             return new Workspace(
@@ -202,8 +205,8 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
                 resourceGroupName: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_RG"),
                 workspaceName: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_NAME"),
                 location: System.Environment.GetEnvironmentVariable("AZUREQUANTUM_WORKSPACE_LOCATION"),
-                credential: credential,
-                userAgentPrefix: "ClientTests");
+                options: options,
+                credential: credential);
         }
 
         private static JobDetails CreateJobDetails(string jobId, string containerUri = null, string inputUri = null)
