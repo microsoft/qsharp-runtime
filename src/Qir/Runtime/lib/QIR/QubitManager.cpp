@@ -389,7 +389,7 @@ namespace Quantum
 
     CQubitManager::QubitIdType CQubitManager::ToInternalId(qubitid_t qubit) const
     {
-        FailIf(!IsValidQubit(qubit), "Not a valid qubit.");
+        FailIf(qubit >= MaximumQubitCapacity, "Qubit id is out of range.");
         return static_cast<CQubitManager::QubitIdType>(qubit);
     }
 
