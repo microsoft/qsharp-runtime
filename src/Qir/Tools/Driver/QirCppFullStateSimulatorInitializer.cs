@@ -14,24 +14,16 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
     /// <summary>
     /// Class to produce the template output
     /// </summary>
-    
-    #line 1 "C:\Users\samarsha\Code\microsoft\qsharp-runtime\src\Qir\Tools\Driver\QirCppFullStateSimulatorInitializer.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class QirCppFullStateSimulatorInitializer : QirCppFullStateSimulatorInitializerBase
     {
-#line hidden
         /// <summary>
         /// Create the template output
         /// </summary>
         public virtual string TransformText()
         {
             this.Write("unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();\r\nQirContextScope qirctx(sim.get(), ");
-            
-            #line 3 "C:\Users\samarsha\Code\microsoft\qsharp-runtime\src\Qir\Tools\Driver\QirCppFullStateSimulatorInitializer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.debug ? "true" : "false"));
-            
-            #line default
-            #line hidden
             this.Write(" /*trackAllocatedObjects*/);");
             return this.GenerationEnvironment.ToString();
         }
