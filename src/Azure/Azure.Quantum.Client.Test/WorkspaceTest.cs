@@ -196,7 +196,7 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
             }
 
             var options = new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = "ClientTests";
+            options.Diagnostics.ApplicationId = Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID") ?? "ClientTests";
 
             var credential = Authentication.CredentialFactory.CreateCredential(Authentication.CredentialType.Default);
 
