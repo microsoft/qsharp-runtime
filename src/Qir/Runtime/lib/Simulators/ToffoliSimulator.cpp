@@ -74,7 +74,7 @@ namespace Quantum
             return retVal;
         }
 
-        void ReleaseQubit(qubitid_t qubit) override
+        void ReleaseQubit([[maybe_unused]] qubitid_t qubit) override
         {
             assert((qubit + 1) == this->nextQubitId);
             assert(!this->states.at(qubit));
