@@ -28,9 +28,6 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             return this.GenerationEnvironment.ToString();
         }
     }
-    
-    #line default
-    #line hidden
     #region Base class
     /// <summary>
     /// Base class for this transformation
