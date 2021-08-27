@@ -64,6 +64,9 @@
     <None Update="TestCases\FullStateDriverGenerator\UseStringArg.cpp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestCases\FullStateDriverGenerator\UseNoArgsDebug.cpp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

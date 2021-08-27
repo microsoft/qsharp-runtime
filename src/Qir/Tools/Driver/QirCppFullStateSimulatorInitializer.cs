@@ -22,8 +22,9 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();\r\nQirContextScope qir" +
-                    "ctx(sim.get(), false /*trackAllocatedObjects*/);");
+            this.Write("unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();\r\nQirContextScope qirctx(sim.get(), ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.debug ? "true" : "false"));
+            this.Write(" /*trackAllocatedObjects*/);");
             return this.GenerationEnvironment.ToString();
         }
     }
