@@ -51,6 +51,8 @@ namespace Microsoft.Azure.Quantum
             // Optional parameters:
             credential ??= CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId);
             options ??= new QuantumJobClientOptions();
+            options.Diagnostics.ApplicationId = options.Diagnostics.ApplicationId
+                                                ?? Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID");
 
             this.ResourceGroupName = resourceGroupName;
             this.WorkspaceName = workspaceName;

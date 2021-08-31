@@ -21,8 +21,7 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-extern "C" void UseDoubleArg(
-    double_t DoubleArg
+extern "C" void UseNoArgsDebug(
 ); // QIR interop function.
 
 int main(int argc, char* argv[])
@@ -31,7 +30,7 @@ int main(int argc, char* argv[])
 
     // Initialize runtime.
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
+    QirContextScope qirctx(sim.get(), true /*trackAllocatedObjects*/);
 
     // Add the --simulation-output option.
     string simulationOutputFile;
@@ -40,17 +39,8 @@ int main(int argc, char* argv[])
         simulationOutputFile,
         "File where the output produced during the simulation is written");
 
-    // Add a command line option for each entry-point parameter.
-    double_t DoubleArgCli;
-    DoubleArgCli = 0.0;
-    app.add_option("--DoubleArg", DoubleArgCli, "Option to provide a value for the DoubleArg parameter")
-        ->required();
-
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
-
-    // Cast parsed arguments to its interop types.
-    double_t DoubleArgInterop = DoubleArgCli;
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;
@@ -63,8 +53,7 @@ int main(int argc, char* argv[])
     }
 
     // Execute the entry point operation.
-    UseDoubleArg(
-        DoubleArgInterop
+    UseNoArgsDebug(
     );
 
     // Flush the output of the simulation.
