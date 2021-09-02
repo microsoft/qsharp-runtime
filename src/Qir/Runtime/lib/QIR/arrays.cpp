@@ -247,6 +247,12 @@ extern "C"
         return new QirArray((QirArray::TItemCount)count);
     }
 
+    QirArray* quantum__rt__qubit_borrow_array(int64_t count)
+    {
+        // Currently we implement borrowing as allocation.
+        return quantum__rt__qubit_allocate_array(count);
+    }
+
     void quantum__rt__qubit_release_array(QirArray* qa)
     {
         if (qa == nullptr)
@@ -265,6 +271,12 @@ extern "C"
         }
 
         quantum__rt__array_update_reference_count(qa, -1);
+    }
+
+    void quantum__rt__qubit_return_array(QirArray* qa)
+    {
+        // Currently we implement borrowing as allocation.
+        quantum__rt__qubit_release_array(qa);
     }
 
     // TODO: Use `QirArray::TItemSize itemSizeInBytes, QirArray::TItemCount count_items` (breaking change):
