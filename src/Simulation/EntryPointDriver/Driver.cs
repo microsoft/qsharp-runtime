@@ -430,6 +430,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
+            // TODO: Make stuff mutually exclusive here.
             var validators = AddOptionIfAvailable(command, SubscriptionOption)
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
