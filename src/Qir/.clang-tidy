@@ -1,5 +1,5 @@
 Checks: 
-  '-*,bugprone-*,readability-identifier-*,readability-braces-around-statements'
+  '-*,bugprone-*,readability-identifier-*,readability-braces-around-statements,clang-analyzer-*'
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 
