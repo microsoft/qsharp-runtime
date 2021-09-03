@@ -181,8 +181,8 @@ namespace Quantum
         sharedQubitStatusArray = new QubitIdType[(size_t)qubitCapacity];
 
         // These objects are passed by value (copies are created)
-        QubitListInSharedArray FreeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
-        RestrictedReuseArea outermostArea(FreeQubitsFresh);
+        QubitListInSharedArray freeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
+        RestrictedReuseArea outermostArea(freeQubitsFresh);
         freeQubitsInAreas.PushToBack(outermostArea);
 
         freeQubitCount = qubitCapacity;

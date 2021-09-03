@@ -54,8 +54,8 @@ int QirArray::Release()
     return rc;
 }
 
-QirArray::QirArray(TItemCount qubits_count)
-    : count(qubits_count)
+QirArray::QirArray(TItemCount qubitsCount)
+    : count(qubitsCount)
     , itemSizeInBytes((TItemSize)sizeof(void*))
     , ownsQubits(true)
     , refCount(1)
@@ -81,25 +81,25 @@ QirArray::QirArray(TItemCount qubits_count)
     }
 }
 
-QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount dimCount, TDimContainer&& dimSizes)
-    : count(count_items)
+QirArray::QirArray(TItemCount countItems, TItemSize itemSizeBytes, TDimCount dimCount, TDimContainer&& dimSizes)
+    : count(countItems)
 
     // Each array item needs to be properly aligned. Let's align them by correcting the `itemSizeInBytes`.
     , itemSizeInBytes(
-          ((item_size_bytes == 1) || (item_size_bytes == 2) || (item_size_bytes == 4) ||
-           ((item_size_bytes % sizeof(size_t)) == 0) // For built-in types or multiples of architecture alignment
+          ((itemSizeBytes == 1) || (itemSizeBytes == 2) || (itemSizeBytes == 4) ||
+           ((itemSizeBytes % sizeof(size_t)) == 0) // For built-in types or multiples of architecture alignment
            )
-              ? item_size_bytes // leave their natural alignment.
-                                // Other types align on the architecture boundary `sizeof(size_t)`:
-                                // 4 bytes on 32-bit arch, 8 on 64-bit arch.
-              : item_size_bytes + sizeof(size_t) - (item_size_bytes % sizeof(size_t)))
+              ? itemSizeBytes // leave their natural alignment.
+                              // Other types align on the architecture boundary `sizeof(size_t)`:
+                              // 4 bytes on 32-bit arch, 8 on 64-bit arch.
+              : itemSizeBytes + sizeof(size_t) - (itemSizeBytes % sizeof(size_t)))
 
     , dimensions(dimCount)
     , dimensionSizes(std::move(dimSizes))
     , ownsQubits(false)
     , refCount(1)
 {
-    assert(item_size_bytes != 0);
+    assert(itemSizeBytes != 0);
     assert(dimCount > 0);
 
     if (GlobalContext() != nullptr)
@@ -112,18 +112,18 @@ QirArray::QirArray(TItemCount count_items, TItemSize item_size_bytes, TDimCount 
         assert(this->dimensionSizes.empty() || this->dimensionSizes[0] == this->count);
         if (this->dimensionSizes.empty())
         {
-            this->dimensionSizes.push_back(count_items);
+            this->dimensionSizes.push_back(countItems);
         }
     }
 
     assert(this->count * (TBufSize)itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize buffer_size = this->count * itemSizeInBytes;
-    if (buffer_size > 0)
+    const TBufSize bufferSize = this->count * itemSizeInBytes;
+    if (bufferSize > 0)
     {
-        this->buffer = new char[buffer_size];
-        assert(buffer_size <= std::numeric_limits<size_t>::max());
-        memset(this->buffer, 0, (size_t)buffer_size);
+        this->buffer = new char[bufferSize];
+        assert(bufferSize <= std::numeric_limits<size_t>::max());
+        memset(this->buffer, 0, (size_t)bufferSize);
     }
     else
     {
@@ -178,26 +178,26 @@ void QirArray::Append(const QirArray* other)
 
     assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize other_size = other->count * other->itemSizeInBytes;
+    const TBufSize otherSize = other->count * other->itemSizeInBytes;
 
-    if (other_size == 0)
+    if (otherSize == 0)
     {
         return;
     }
 
     assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize this_size = this->count * this->itemSizeInBytes;
+    const TBufSize thisSize = this->count * this->itemSizeInBytes;
 
-    char* new_buffer = new char[this_size + other_size];
-    if (this_size)
+    char* newBuffer = new char[thisSize + otherSize];
+    if (thisSize)
     {
-        memcpy(new_buffer, this->buffer, this_size);
+        memcpy(newBuffer, this->buffer, thisSize);
     }
-    memcpy(&new_buffer[this_size], other->buffer, other_size);
+    memcpy(&newBuffer[thisSize], other->buffer, otherSize);
 
     delete[] this->buffer;
-    this->buffer = new_buffer;
+    this->buffer = newBuffer;
     this->count += other->count;
     this->dimensionSizes[0] = this->count;
 }
@@ -279,11 +279,10 @@ extern "C"
         __quantum__rt__qubit_release_array(qa);
     }
 
-    // TODO: Use `QirArray::TItemSize itemSizeInBytes, QirArray::TItemCount count_items` (breaking change):
-    QirArray* __quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t count_items)
+    QirArray* __quantum__rt__array_create_1d(int32_t itemSizeInBytes, int64_t countItems)
     {
         assert(itemSizeInBytes > 0);
-        return new QirArray((QirArray::TItemCount)count_items, (QirArray::TItemSize)itemSizeInBytes);
+        return new QirArray((QirArray::TItemCount)countItems, (QirArray::TItemSize)itemSizeInBytes);
     }
 
     // Bucketing of addref/release is non-standard so for now we'll keep the more traditional addref/release semantics
