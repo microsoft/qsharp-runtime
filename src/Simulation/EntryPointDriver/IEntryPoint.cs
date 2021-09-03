@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.EntryPointDriver;
+using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -32,6 +32,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The command-line options corresponding to the entry point's parameters.
         /// </summary>
         IEnumerable<Option> Options { get; }
+
+        // TODO: Add documentation.
+        Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings)
+        {
+            Console.WriteLine("GenerateAzurePayload - Default Implementation");
+            return Task.Run(() => 0);
+        }
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.
