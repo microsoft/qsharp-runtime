@@ -193,13 +193,28 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         public async Task<int> Run(string[] args)
         {
+            var generateAzurePayloadSubCommands =
+                this.entryPoints.Select(this.CreateGenerateAzureQuantumPayloadEntryPointCommand).ToList();
             var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand).ToList();
             var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand).ToList();
 
-            var simulate = CreateSimulateCommand(simulateSubCommands);
-            var submit = CreateSubmitCommand(submitSubCommands);
+            // TODO: Add generate command.
+            var generate = CreateTopLevelCommand(
+                "generateazurepayload",
+                "Locally generate payload that can be submitted to Azure.",
+                generateAzurePayloadSubCommands);
 
-            var root = new RootCommand() { simulate.Command, submit.Command };
+            var simulate = CreateTopLevelCommand(
+                "simulate",
+                "(default) Run the program using a local simulator.",
+                simulateSubCommands);
+            
+            var submit = CreateTopLevelCommand(
+                "submit",
+                "Submit the program to Azure Quantum.",
+                submitSubCommands);
+
+            var root = new RootCommand() { simulate.Command, submit.Command, generate.Command };
             if (this.entryPoints.Count() == 1)
             {
                 SetSubCommandAsDefault(root, simulate.Command, simulate.Validators);
@@ -340,60 +355,49 @@ namespace Microsoft.Quantum.EntryPointDriver
             return ImmutableList.Create(validator);
         }
 
-        /// <summary>
-        /// Creates the simulate command.
-        /// </summary>
-        /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>The created simulate command with the validators for that command.</returns>
-        private static CommandWithValidators CreateSimulateCommand(
+        // TODO: Add documentation.
+        // TODO: This should take name and description of the command as arguments.
+        private static CommandWithValidators CreateTopLevelCommand(
+            string name,
+            string description,
             List<CommandWithValidators> entryPointCommands)
         {
-            var simulate = new Command("simulate", "(default) Run the program using a local simulator.");
+            var topLevelCommand= new Command(name, description);
             if (entryPointCommands.Count() == 1)
             {
                 var epCommandWValidators = entryPointCommands.First();
                 epCommandWValidators.Command.IsHidden = true;
-                simulate.AddCommand(epCommandWValidators.Command);
-                SetSubCommandAsDefault(simulate, epCommandWValidators.Command, epCommandWValidators.Validators);
-                return new CommandWithValidators(simulate, epCommandWValidators.Validators);
+                topLevelCommand.AddCommand(epCommandWValidators.Command);
+                SetSubCommandAsDefault(topLevelCommand, epCommandWValidators.Command, epCommandWValidators.Validators);
+                return new CommandWithValidators(topLevelCommand, epCommandWValidators.Validators);
             }
             else
             {
                 foreach (var epCommandWValidators in entryPointCommands)
                 {
-                    simulate.AddCommand(epCommandWValidators.Command);
+                    topLevelCommand.AddCommand(epCommandWValidators.Command);
                 }
-                return new CommandWithValidators(simulate, Validators.Empty);
+                return new CommandWithValidators(topLevelCommand, Validators.Empty);
             }
         }
 
-        /// <summary>
-        /// Creates the Azure submit command.
-        /// </summary>
-        /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
-        /// <returns>The created submit command with the validators for that command.</returns>
-        private static CommandWithValidators CreateSubmitCommand(List<CommandWithValidators> entryPointCommands)
+        // TODO: Add documentation.
+        // TODO: Maybe this can be abstracted because the only different logic is the handler.
+        private CommandWithValidators CreateGenerateAzureQuantumPayloadEntryPointCommand(IEntryPoint entryPoint)
         {
-            var submit = new Command("submit", "Submit the program to Azure Quantum.")
+            var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                IsHidden = true,
+                Handler = CommandHandler.Create(
+                    (ParseResult parseResult, GenerateAzurePayloadSettings settings) =>
+                        this.GenerateAzurePayload(parseResult, settings, entryPoint))
             };
-            if (entryPointCommands.Count() == 1)
+            foreach (var option in entryPoint.Options)
             {
-                var epCommandWValidators = entryPointCommands.First();
-                epCommandWValidators.Command.IsHidden = true;
-                submit.AddCommand(epCommandWValidators.Command);
-                SetSubCommandAsDefault(submit, epCommandWValidators.Command, epCommandWValidators.Validators);
-                return new CommandWithValidators(submit, epCommandWValidators.Validators);
+                command.AddOption(option);
             }
-            else
-            {
-                foreach (var epCommandWValidators in entryPointCommands)
-                {
-                    submit.AddCommand(epCommandWValidators.Command);
-                }
-                return new CommandWithValidators(submit, Validators.Empty);
-            }
+
+            // TODO: Check if Validators should be empty.
+            return new CommandWithValidators(command, Validators.Empty);
         }
 
         /// <summary>
@@ -452,6 +456,10 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             return new CommandWithValidators(command, validators.ToImmutableList());
         }
+
+        // TODO: Add documentation.
+        private Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint) =>
+            entryPoint.GenerateAzurePayload(parseResult, settings);
 
         /// <summary>
         /// Simulates the entry point.
