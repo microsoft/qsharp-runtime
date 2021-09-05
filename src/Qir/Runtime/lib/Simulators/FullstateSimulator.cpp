@@ -482,9 +482,10 @@ namespace Quantum
         void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
         {
             typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
-            static TExp exp           = reinterpret_cast<TExp>(this->GetProc("Exp"));
-            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            exp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
+            static TExp exp                      = reinterpret_cast<TExp>(this->GetProc("Exp"));
+            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
+            exp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, ids.data());
             UnmarkAsMeasuredQubitList(numTargets, targets);
         }
 
@@ -492,11 +493,12 @@ namespace Quantum
                            double theta) override
         {
             typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
-            static TMCExp cexp                = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
-            std::vector<unsigned> idsTargets  = GetQubitIds(numTargets, targets);
-            std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
-            cexp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta,
-                 (unsigned)numControls, idsControls.data(), idsTargets.data());
+            static TMCExp cexp                   = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
+            std::vector<unsigned> idsTargets     = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> idsControls    = GetQubitIds(numControls, controls);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
+            cexp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, (unsigned)numControls,
+                 idsControls.data(), idsTargets.data());
             UnmarkAsMeasuredQubitList(numTargets, targets);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
