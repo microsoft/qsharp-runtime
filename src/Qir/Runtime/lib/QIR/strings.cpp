@@ -15,7 +15,7 @@
 std::unordered_map<std::string, QirString*>& AllocatedStrings();
 
 
-std::unordered_map<std::string, QirString*>& AllocatedStrings()     // Cannot be static, is called by tests. 
+std::unordered_map<std::string, QirString*>& AllocatedStrings() // Cannot be static, is called by tests.
 {
     static std::unordered_map<std::string, QirString*> allocatedStrings;
     return allocatedStrings;
@@ -23,7 +23,7 @@ std::unordered_map<std::string, QirString*>& AllocatedStrings()     // Cannot be
 
 static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
 {
-    QirString* qstr = nullptr;
+    QirString* qstr       = nullptr;
     auto alreadyAllocated = AllocatedStrings().find(str);
     if (alreadyAllocated != AllocatedStrings().end())
     {
@@ -33,19 +33,23 @@ static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
     }
     else
     {
-        qstr = new QirString(std::move(str));
+        qstr                          = new QirString(std::move(str));
         AllocatedStrings()[qstr->str] = qstr;
     }
     return qstr;
 }
 
 QirString::QirString(std::string&& otherStr)
+    // clang-format off
     : str(std::move(otherStr))
+// clang-format on
 {
 }
 
 QirString::QirString(const char* cstr)
+    // clang-format off
     : str(cstr)
+// clang-format on
 {
 }
 
@@ -170,7 +174,7 @@ extern "C"
         return str->str.c_str();
     }
 
-    uint32_t __quantum__rt__string_get_length(QirString* str)  // NOLINT
+    uint32_t __quantum__rt__string_get_length(QirString* str) // NOLINT
     {
         return (uint32_t)(str->str.size());
     }

@@ -29,8 +29,7 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     vector<ResultValue> mockMeasurements;
     size_t nextMeasureResult = 0;
 
-    explicit ConditionalsTestSimulator(vector<ResultValue>&& results)
-        : mockMeasurements(results)
+    explicit ConditionalsTestSimulator(vector<ResultValue>&& results) : mockMeasurements(results)
     {
     }
 
@@ -61,7 +60,9 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
     {
         return nullptr;
     }
-    void ReleaseQubit(Qubit /*qubit*/) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override
+    {
+    }
 
     void X(Qubit) override
     {
@@ -86,9 +87,8 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
 
     Result Measure(long /* numBases */, PauliId* /* bases */, long /* numTargets */, Qubit* /* targets */) override
     {
-        assert(
-            this->nextMeasureResult < this->mockMeasurements.size() &&
-            "ConditionalsTestSimulator isn't set up correctly");
+        assert(this->nextMeasureResult < this->mockMeasurements.size() &&
+               "ConditionalsTestSimulator isn't set up correctly");
 
         Result r = (this->mockMeasurements[this->nextMeasureResult] == Result_Zero) ? UseZero() : UseOne();
         this->nextMeasureResult++;
@@ -101,7 +101,9 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
         return (r1 == r2);
     }
 
-    void ReleaseResult(Result /*result*/) override {} // the results aren't allocated by this test simulator
+    void ReleaseResult(Result /*result*/) override
+    {
+    } // the results aren't allocated by this test simulator
 
     Result UseZero() override
     {

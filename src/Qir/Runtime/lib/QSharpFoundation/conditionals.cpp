@@ -35,11 +35,8 @@ extern "C"
         clb->Invoke();
     }
 
-    void __quantum__qis__applyconditionallyintrinsic__body(
-        QirArray* rs1,
-        QirArray* rs2,
-        QirCallable* clbOnAllEqual,
-        QirCallable* clbOnSomeDifferent)
+    void __quantum__qis__applyconditionallyintrinsic__body(QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual,
+                                                           QirCallable* clbOnSomeDifferent)
     {
         QirCallable* clb = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
         clb->Invoke();

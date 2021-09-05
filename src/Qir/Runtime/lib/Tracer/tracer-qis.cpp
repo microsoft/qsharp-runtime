@@ -30,18 +30,18 @@ extern "C"
     }
     void __quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, Qubit target) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), 1, &target);
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), 1,
+                                        &target);
     }
     void __quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(
-            id, duration, 0, nullptr, (long)(targets->count), reinterpret_cast<Qubit*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(id, duration, 0, nullptr, (long)(targets->count),
+                                        reinterpret_cast<Qubit*>(targets->buffer));
     }
     void __quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(
-            id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), (long)(targets->count),
-            reinterpret_cast<Qubit*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer),
+                                        (long)(targets->count), reinterpret_cast<Qubit*>(targets->buffer));
     }
 
     void __quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
@@ -56,18 +56,15 @@ extern "C"
 
     RESULT* __quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
     {
-        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count), reinterpret_cast<Qubit*>(qs->buffer));
+        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count),
+                                                  reinterpret_cast<Qubit*>(qs->buffer));
     }
 
     void __quantum__qis__apply_conditionally( // NOLINT
-        QirArray* rs1,
-        QirArray* rs2,
-        QirCallable* clbOnAllEqual,
-        QirCallable* clbOnSomeDifferent)
+        QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual, QirCallable* clbOnSomeDifferent)
     {
-        CTracer::FenceScope sf(
-            tracer.get(), (long)(rs1->count), reinterpret_cast<Result*>(rs1->buffer), (long)(rs2->count),
-            reinterpret_cast<Result*>(rs2->buffer));
+        CTracer::FenceScope sf(tracer.get(), (long)(rs1->count), reinterpret_cast<Result*>(rs1->buffer),
+                               (long)(rs2->count), reinterpret_cast<Result*>(rs2->buffer));
 
         clbOnAllEqual->Invoke();
         clbOnSomeDifferent->Invoke();

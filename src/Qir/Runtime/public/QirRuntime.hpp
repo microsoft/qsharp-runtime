@@ -12,32 +12,50 @@
 extern "C"
 {
     // ------------------------------------------------------------------------
-    // Qubits
+    // Qubit Management.
     // ------------------------------------------------------------------------
 
-    // Allocates a single qubit.
+    // Allocate one qubit. Qubit is guaranteed to be in |0> state.
+    // Qubit needs to be released via __quantum__rt__qubit_release.
     QIR_SHARED_API QUBIT* __quantum__rt__qubit_allocate(); // NOLINT
 
-    // Allocates an array of qubits.
+    // Allocate 'count' qubits, allocate and return an array that owns these qubits.
+    // Array and qubits in the array need to be released via __quantum__rt__qubit_release_array.
     QIR_SHARED_API QirArray* __quantum__rt__qubit_allocate_array(int64_t count); // NOLINT
 
-    // Release a single qubit.
+    // Release one qubit.
     QIR_SHARED_API void __quantum__rt__qubit_release(QUBIT*); // NOLINT
 
-    // Release qubits, owned by the array. The array itself is also released.
+    // Release qubits, owned by the array and the array itself.
     QIR_SHARED_API void __quantum__rt__qubit_release_array(QirArray*); // NOLINT
 
-    // Borrow a single qubit.
-    // TODO QIR_SHARED_API QUBIT* __quantum__rt__qubit_borrow(); // NOLINT
+    // Borrow one qubit. Qubit is not guaranteed to be in |0> state.
+    // Qubit needs to be returned via __quantum__rt__qubit_return in the same state in which it was borrowed.
+    QIR_SHARED_API QUBIT* __quantum__rt__qubit_borrow(); // NOLINT
 
-    // Borrow an array of qubits.
-    // TODO QIR_SHARED_API QirArray* __quantum__rt__qubit_borrow_array(int64_t count); // NOLINT
+    // Borrow 'count' qubits, allocate and return an array that owns these qubits.
+    // Array and qubits in the array need to be returned via __quantum__rt__qubit_return_array.
+    QIR_SHARED_API QirArray* __quantum__rt__qubit_borrow_array(int64_t count); // NOLINT
 
-    // Return a borrowed qubit.
-    // TODO QIR_SHARED_API void __quantum__rt__qubit_return(QUBIT*); // NOLINT
+    // Return one borrowed qubit. Qubit must be in the same state in which it was borrowed.
+    QIR_SHARED_API void __quantum__rt__qubit_return(QUBIT*); // NOLINT
 
-    // Return an array of borrowed qubits.
-    // TODO QIR_SHARED_API void __quantum__rt__qubit_return_array(QirArray*); // NOLINT
+    // Return borrowed qubits owned by the array. Release array itself.
+    QIR_SHARED_API void __quantum__rt__qubit_return_array(QirArray*); // NOLINT
+
+    // ------------------------------------------------------------------------
+    // Qubit Management Restricted Reuse Control.
+    // ------------------------------------------------------------------------
+
+    // Start restricted reuse area.
+    // Qubits released within one segment of an area cannot be reused in other segments of the same area.
+    QIR_SHARED_API void __quantum__rt__qubit_restricted_reuse_area_start(); // NOLINT
+
+    // End current restricted reuse segment and start the next one within the current area.
+    QIR_SHARED_API void __quantum__rt__qubit_restricted_reuse_segment_next(); // NOLINT
+
+    // End current restricted reuse area.
+    QIR_SHARED_API void __quantum__rt__qubit_restricted_reuse_area_end(); // NOLINT
 
     // ------------------------------------------------------------------------
     // Utils
@@ -53,7 +71,7 @@ extern "C"
     QIR_SHARED_API char* __quantum__rt__memory_allocate(uint64_t size); // NOLINT
 
     // Fail the computation with the given error message.
-    [[noreturn]] QIR_SHARED_API void __quantum__rt__fail(QirString* msg); // NOLINT
+    [[noreturn]] QIR_SHARED_API void __quantum__rt__fail(QirString* msg);       // NOLINT
     [[noreturn]] QIR_SHARED_API void __quantum__rt__fail_cstr(const char* msg); // NOLINT
 
     // Include the given message in the computation's execution log or equivalent.
@@ -70,7 +88,7 @@ extern "C"
     // becomes 0. The behavior is undefined if the reference count becomes negative.
     QIR_SHARED_API void __quantum__rt__result_update_reference_count(RESULT*, int32_t); // NOLINT
 
-    QIR_SHARED_API RESULT* __quantum__rt__result_get_one(); // NOLINT
+    QIR_SHARED_API RESULT* __quantum__rt__result_get_one();  // NOLINT
     QIR_SHARED_API RESULT* __quantum__rt__result_get_zero(); // NOLINT
 
     // ------------------------------------------------------------------------
@@ -114,7 +132,7 @@ extern "C"
     // Returns the length of a dimension of the array. The int is the zero-based dimension to return the length of; it
     // must be 0 for a 1-dimensional array.
     QIR_SHARED_API int64_t __quantum__rt__array_get_size(QirArray*, int32_t); // NOLINT
-    QIR_SHARED_API int64_t __quantum__rt__array_get_size_1d(QirArray*); // NOLINT
+    QIR_SHARED_API int64_t __quantum__rt__array_get_size_1d(QirArray*);       // NOLINT
 
     // Returns a pointer to the element of the array at the zero-based index given by the int64_t.
     QIR_SHARED_API char* __quantum__rt__array_get_element_ptr_1d(QirArray*, int64_t); // NOLINT
@@ -124,9 +142,7 @@ extern "C"
     // new array should be set to zero.
     QIR_SHARED_API QirArray* __quantum__rt__array_create(int, int, ...); // NOLINT
     QIR_SHARED_API QirArray* __quantum__rt__array_create_nonvariadic(    // NOLINT
-        int itemSizeInBytes,
-        int countDimensions,
-        va_list dims);
+        int itemSizeInBytes, int countDimensions, va_list dims);
 
     // Returns the number of dimensions in the array.
     QIR_SHARED_API int32_t __quantum__rt__array_get_dim(QirArray*); // NOLINT
@@ -173,11 +189,11 @@ extern "C"
     // Updates the callable by applying the Controlled functor.
     QIR_SHARED_API void __quantum__rt__callable_make_controlled(QirCallable*); // NOLINT
 
-    // Invokes the function in the corresponding index in the memory management table of the callable with the capture tuple and
-    // the given 32-bit integer. Does nothing if  the memory management table pointer or the function pointer at that
-    // index is null.
+    // Invokes the function in the corresponding index in the memory management table of the callable with the capture
+    // tuple and the given 32-bit integer. Does nothing if  the memory management table pointer or the function pointer
+    // at that index is null.
     QIR_SHARED_API void __quantum__rt__capture_update_reference_count(QirCallable*, int32_t); // NOLINT
-    QIR_SHARED_API void __quantum__rt__capture_update_alias_count(QirCallable*, int32_t); // NOLINT
+    QIR_SHARED_API void __quantum__rt__capture_update_alias_count(QirCallable*, int32_t);     // NOLINT
 
     // ------------------------------------------------------------------------
     // Strings
@@ -219,13 +235,13 @@ extern "C"
     // Returns a string representation of the range.
     QIR_SHARED_API QirString* quantum__rt__range_to_string(const QirRange&); // NOLINT
 
-    // Returns a pointer to an array that contains a null-terminated sequence of characters 
+    // Returns a pointer to an array that contains a null-terminated sequence of characters
     // (i.e., a C-string) representing the current value of the string object.
     QIR_SHARED_API const char* __quantum__rt__string_get_data(QirString* str); // NOLINT
 
     // Returns the length of the string, in terms of bytes.
     // http://www.cplusplus.com/reference/string/string/size/
-    QIR_SHARED_API uint32_t __quantum__rt__string_get_length(QirString* str);  // NOLINT
+    QIR_SHARED_API uint32_t __quantum__rt__string_get_length(QirString* str); // NOLINT
 
     // Returns a string representation of the big integer.
     // TODO QIR_SHARED_API QirString* __quantum__rt__bigint_to_string(QirBigInt*); // NOLINT
@@ -295,12 +311,12 @@ extern "C"
 }
 
 // TODO: Consider separating the `extern "C"` exports and C++ exports.
-namespace Microsoft           // Replace with `namespace Microsoft::Quantum` after migration to C++17.
+namespace Microsoft // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
 namespace Quantum
 {
-    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()` instead.
-    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream & newOStream);
-} // namespace Microsoft
+    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()`
+    // instead.
+    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream& newOStream);
 } // namespace Quantum
-
+} // namespace Microsoft

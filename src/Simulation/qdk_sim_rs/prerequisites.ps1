@@ -21,5 +21,6 @@ if (-not (Get-Command rustup -ErrorAction SilentlyContinue)) {
 # Now that rustup is available, go on and make sure that nightly support for
 # rustfmt and clippy is available.
 rustup install nightly
+rustup toolchain install nightly
 rustup component add rustfmt clippy
 rustup component add rustfmt clippy --toolchain nightly

@@ -15,7 +15,7 @@ target_link_libraries(qir-input-reference-standalone PUBLIC
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )
 
-set(standalone_includes "${PROJECT_SOURCE_DIR}/../Common/externals/CLI11")
+set(standalone_includes "${PROJECT_SOURCE_DIR}/../Common/Externals/CLI11")
 
 target_include_directories(qir-input-reference-standalone PUBLIC
   "${standalone_includes}"

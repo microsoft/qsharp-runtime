@@ -92,7 +92,7 @@ function Build-CMakeProject {
     $warningFlags += " -Wno-exit-time-destructors"
 
     # Temporarily disable "-Wextra-semi-stmt" that warns about redundant `;` in the end of `INFO(id);` of Catch tests framework (which looks fixed in the latest Catch version).
-    # Disable until the Catch header "src\Qir\Common\externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
+    # Disable until the Catch header "src\Qir\Common\Externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
     $warningFlags += " -Wno-extra-semi-stmt"    # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
 
     $env:CFLAGS   += $warningFlags
@@ -221,7 +221,7 @@ function Build-CMakeProject {
         $buildType = "RelWithDebInfo"
     }
 
-    cmake -G Ninja $clangTidy -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
+    cmake -G Ninja $clangTidy -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to generate $Name."
         $all_ok = $false

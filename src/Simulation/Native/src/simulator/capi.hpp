@@ -70,7 +70,7 @@ extern "C"
 
     // allocate and release
     MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned sid, _In_ unsigned qid); // NOLINT
-    MICROSOFT_QUANTUM_DECL void release(_In_ unsigned sid, _In_ unsigned q); // NOLINT
+    MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned sid, _In_ unsigned q); // NOLINT
     MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned sid); // NOLINT
 
     // single-qubit gates

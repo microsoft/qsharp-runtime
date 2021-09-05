@@ -22,7 +22,7 @@ using namespace Microsoft::Quantum;
 struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
     int lastId = -1;
-    const int maxResults;       // TODO: Use unsigned type.
+    const int maxResults; // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
     static int GetResultId(Result r)
@@ -30,9 +30,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
         return static_cast<int>(reinterpret_cast<int64_t>(r));
     }
 
-    ResultsReferenceCountingTestQAPI(int maxRes)
-        : maxResults(maxRes),
-        allocated((size_t)maxRes, false)
+    ResultsReferenceCountingTestQAPI(int maxRes) : maxResults(maxRes), allocated((size_t)maxRes, false)
     {
     }
 
@@ -111,7 +109,7 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
     REQUIRE(__quantum__rt__array_get_dim(a) == 1);
     REQUIRE(__quantum__rt__array_get_size(a, 0) == 5);
 
-    QirArray* b = new QirArray(1, sizeof(char));
+    QirArray* b                                    = new QirArray(1, sizeof(char));
     *__quantum__rt__array_get_element_ptr_1d(b, 0) = '!';
 
     QirArray* ab = __quantum__rt__array_concatenate(a, b);
@@ -127,7 +125,7 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
 TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
 {
     const size_t count = 5 * 3 * 4; // 60
-    QirArray* a = __quantum__rt__array_create(sizeof(int), 3, (int64_t)5, (int64_t)3, (int64_t)4);
+    QirArray* a        = __quantum__rt__array_create(sizeof(int), 3, (int64_t)5, (int64_t)3, (int64_t)4);
     REQUIRE(__quantum__rt__array_get_dim(a) == 3);
     REQUIRE(__quantum__rt__array_get_size(a, 0) == 5);
     REQUIRE(__quantum__rt__array_get_size(a, 1) == 3);
@@ -215,15 +213,15 @@ TEST_CASE("Arrays: empty", "[qir_support]")
     __quantum__rt__array_update_reference_count(a, -1);
     __quantum__rt__array_update_reference_count(ac, -1);
     __quantum__rt__array_update_reference_count(ca, -1);
-    __quantum__rt__array_update_reference_count(c , -1);
+    __quantum__rt__array_update_reference_count(c, -1);
 }
 
 TEST_CASE("Arrays: check the slice range", "[qir_support]")
 {
     const int64_t dim0 = 5;
     const int64_t dim1 = 6;
-    QirArray* a = __quantum__rt__array_create(sizeof(int), 2, dim0, dim1);
-    QirArray* slice = nullptr;
+    QirArray* a        = __quantum__rt__array_create(sizeof(int), 2, dim0, dim1);
+    QirArray* slice    = nullptr;
 
     // invalid range
     CHECK_THROWS(quantum__rt__array_slice(a, 0, {0, 0, 0}));
@@ -262,7 +260,7 @@ TEST_CASE("Arrays: check the slice range", "[qir_support]")
 TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
 {
     const int64_t dim = 5;
-    QirArray* a = __quantum__rt__array_create_1d(sizeof(char), dim);
+    QirArray* a       = __quantum__rt__array_create_1d(sizeof(char), dim);
     memcpy(a->buffer, "01234", 5);
     QirArray* slice = nullptr;
 
@@ -293,20 +291,20 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
 TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
 {
     const int64_t dim = 5;
-    QirArray* a = __quantum__rt__array_create_1d(sizeof(char), dim);
+    QirArray* a       = __quantum__rt__array_create_1d(sizeof(char), dim);
     memcpy(a->buffer, "01234", 5);
     QirArray* slice = nullptr;
 
     // even if slice results in a single value, it's still an array
-    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0});   // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
-                                                            // slice == char[1] == { '1' }.
+    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0}); // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
+                                                          // slice == char[1] == { '1' }.
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
-    __quantum__rt__array_update_reference_count(slice, -1);   // slice == dangling pointer.
+    __quantum__rt__array_update_reference_count(slice, -1); // slice == dangling pointer.
 
     // reversed slices are alwayes disconnected
-    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0});   // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
-                                                                // slice == char[3] == {'4', '2', '0'}.
+    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0}); // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
+                                                              // slice == char[3] == {'4', '2', '0'}.
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '4');
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 1) == '2');
@@ -323,7 +321,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     const int64_t dim1 = 3;
     const int64_t dim2 = 4;
 
-    QirArray* a = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
+    QirArray* a     = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* slice = nullptr;
 
     const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
@@ -340,8 +338,8 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     // 400 401 402 403 | 410 411 412 413 | 420 421 422 423 -- [48 - 59]
     memcpy(a->buffer, reinterpret_cast<char*>(data.data()), count * sizeof(int));
     REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, 1, 0, 0))) == 12);
-    REQUIRE(
-        *(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) == count - 1);
+    REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) ==
+            count - 1);
 
     // if the range covers the whole dimension, it's effectively a copy
     slice = quantum__rt__array_slice(a, 1, {0, 1, dim1 - 1});
@@ -440,7 +438,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     const int64_t dim1 = 3;
     const int64_t dim2 = 4;
 
-    QirArray* a = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
+    QirArray* a     = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* slice = nullptr;
 
     const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
@@ -457,8 +455,8 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     // 400 401 402 403 | 410 411 412 413 | 420 421 422 423 -- [48 - 59]
     memcpy(a->buffer, reinterpret_cast<char*>(data.data()), count * sizeof(int));
     REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, 1, 0, 0))) == 12);
-    REQUIRE(
-        *(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) == count - 1);
+    REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) ==
+            count - 1);
 
     // if the range consists of a single point, the slice still has the same dimensions
     slice = quantum__rt__array_slice(a, 1, {1, -dim1, 0}); // items with second index = 1
@@ -501,7 +499,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(slice, 1, 1, 0))) == 19);
     REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(slice, 4, 2, 1))) == 57);
     __quantum__rt__array_update_reference_count(slice, -1);
-    __quantum__rt__array_update_reference_count(a    , -1);
+    __quantum__rt__array_update_reference_count(a, -1);
 }
 
 TEST_CASE("Arrays: project of 3D array", "[qir_support]")
@@ -511,7 +509,7 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     const int64_t dim1 = 3;
     const int64_t dim2 = 4;
 
-    QirArray* a = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
+    QirArray* a       = __quantum__rt__array_create(sizeof(int), dims, dim0, dim1, dim2);
     QirArray* project = nullptr;
 
     const size_t count = (size_t)(dim0 * dim1 * dim2); // 60
@@ -528,8 +526,8 @@ TEST_CASE("Arrays: project of 3D array", "[qir_support]")
     // 400 401 402 403 | 410 411 412 413 | 420 421 422 423 -- [48 - 59]
     memcpy(a->buffer, reinterpret_cast<char*>(data.data()), count * sizeof(int));
     REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, 1, 0, 0))) == 12);
-    REQUIRE(
-        *(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) == count - 1);
+    REQUIRE(*(reinterpret_cast<int*>(__quantum__rt__array_get_element_ptr(a, dim0 - 1, dim1 - 1, dim2 - 1))) ==
+            count - 1);
 
     // project on 0 dimension, expected result:
     // indexes                                 -- values
@@ -585,8 +583,8 @@ TEST_CASE("Strings: reuse", "[qir_support]")
 
 TEST_CASE("Strings: concatenate", "[qir_support]")
 {
-    QirString* a = __quantum__rt__string_create("abc");
-    QirString* b = __quantum__rt__string_create("xyz");
+    QirString* a          = __quantum__rt__string_create("abc");
+    QirString* b          = __quantum__rt__string_create("xyz");
     QirString* abExpected = __quantum__rt__string_create("abcxyz");
 
     QirString* ab = __quantum__rt__string_concatenate(a, b);
@@ -675,8 +673,8 @@ TEST_CASE("Strings: conversions from custom qir types", "[qir_support]")
 
 struct QubitTestQAPI : public SimulatorStub
 {
-    int lastId = -1;            // TODO: Use unsigned type.
-    const int maxQubits;        // TODO: Use unsigned type.
+    int lastId = -1;     // TODO: Use unsigned type.
+    const int maxQubits; // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
     static uint64_t GetQubitId(Qubit q)
@@ -684,9 +682,7 @@ struct QubitTestQAPI : public SimulatorStub
         return (uint64_t)q;
     }
 
-    QubitTestQAPI(int maxQbits)
-        : maxQubits(maxQbits),
-        allocated((size_t)maxQbits, false)
+    QubitTestQAPI(int maxQbits) : maxQubits(maxQbits), allocated((size_t)maxQbits, false)
     {
     }
 
@@ -737,7 +733,7 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     QirString* qstr = nullptr;
 
     Qubit q = __quantum__rt__qubit_allocate();
-    qstr = __quantum__rt__qubit_to_string(q);
+    qstr    = __quantum__rt__qubit_to_string(q);
     REQUIRE(qstr->str == std::string("0"));
     __quantum__rt__string_update_reference_count(qstr, -1);
     __quantum__rt__qubit_release(q);
@@ -749,14 +745,14 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(qs->itemSizeInBytes == sizeof(void*));
 
     Qubit last = *reinterpret_cast<Qubit*>(__quantum__rt__array_get_element_ptr_1d(qs, 2));
-    qstr = __quantum__rt__qubit_to_string(last);
+    qstr       = __quantum__rt__qubit_to_string(last);
     REQUIRE(qstr->str == std::string("3"));
     __quantum__rt__string_update_reference_count(qstr, -1);
 
     QirArray* copy = __quantum__rt__array_copy(qs, true /*force*/);
     REQUIRE(!copy->ownsQubits);
 
-    __quantum__rt__qubit_release_array(qs);   // The `qs` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(qs); // The `qs` is a dangling pointer from now on.
     REQUIRE(!qapi->HaveQubitsInFlight());
 
     __quantum__rt__array_update_reference_count(copy, -1);
@@ -770,7 +766,9 @@ struct ControlledCallablesTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override
+    {
+    }
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);
@@ -785,22 +783,22 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
     QirExecutionContext::Scoped qirctx(qapi.get());
 
-    Qubit target = __quantum__rt__qubit_allocate();
+    Qubit target            = __quantum__rt__qubit_allocate();
     QirArray* controlsInner = __quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = __quantum__rt__qubit_allocate_array(2);
 
     PTuple inner = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Qubit*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
-    innerWithControls->controls = controlsInner;
+    innerWithControls->controls          = controlsInner;
     *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = target;
 
     PTuple outer = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
-    outerWithControls->controls = controlsOuter;
-    outerWithControls->innerTuple = innerWithControls;
+    outerWithControls->controls          = controlsOuter;
+    outerWithControls->innerTuple        = innerWithControls;
 
     QirTupleHeader* unpacked = FlattenControlArrays(outerWithControls->GetHeader(), 2 /*depth*/);
-    QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->AsTuple()));
+    QirArray* combined       = *(reinterpret_cast<QirArray**>(unpacked->AsTuple()));
     REQUIRE(5 == combined->count);
     REQUIRE(!combined->ownsQubits);
     REQUIRE(target == *reinterpret_cast<Qubit*>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
@@ -811,8 +809,8 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     __quantum__rt__tuple_update_reference_count(inner, -1);
 
     // release the original resources
-    __quantum__rt__qubit_release_array(controlsOuter);    // The `controlsOuter` is a dangling pointer from now on.
-    __quantum__rt__qubit_release_array(controlsInner);    // The `controlsInner` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(controlsOuter); // The `controlsOuter` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(controlsInner); // The `controlsInner` is a dangling pointer from now on.
     __quantum__rt__qubit_release(target);
 }
 
@@ -821,26 +819,26 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
     QirExecutionContext::Scoped qirctx(qapi.get());
 
-    Qubit target = __quantum__rt__qubit_allocate();
+    Qubit target            = __quantum__rt__qubit_allocate();
     QirArray* controlsInner = __quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = __quantum__rt__qubit_allocate_array(2);
 
-    PTuple args = __quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
+    PTuple args                     = __quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
     *reinterpret_cast<Qubit*>(args) = target;
     *reinterpret_cast<int*>(args + sizeof(/*Qubit*/ void*)) = 42;
 
     PTuple inner = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Tuple*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
-    innerWithControls->controls = controlsInner;
+    innerWithControls->controls          = controlsInner;
     *reinterpret_cast<PTuple*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = args;
 
     PTuple outer = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
-    outerWithControls->controls = controlsOuter;
-    outerWithControls->innerTuple = innerWithControls;
+    outerWithControls->controls          = controlsOuter;
+    outerWithControls->innerTuple        = innerWithControls;
 
     QirTupleHeader* unpacked = FlattenControlArrays(outerWithControls->GetHeader(), 2 /*depth*/);
-    QirArray* combined = *(reinterpret_cast<QirArray**>(unpacked->AsTuple()));
+    QirArray* combined       = *(reinterpret_cast<QirArray**>(unpacked->AsTuple()));
     REQUIRE(5 == combined->count);
     REQUIRE(!combined->ownsQubits);
 
@@ -856,8 +854,8 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     __quantum__rt__tuple_update_reference_count(args, -1);
 
     // release the original resources
-    __quantum__rt__qubit_release_array(controlsOuter);    // The `controlsOuter` is a dangling pointer from now on.
-    __quantum__rt__qubit_release_array(controlsInner);    // The `controlsInner` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(controlsOuter); // The `controlsOuter` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(controlsInner); // The `controlsInner` is a dangling pointer from now on.
     __quantum__rt__qubit_release(target);
 }
 
@@ -897,10 +895,11 @@ TEST_CASE("Allocation tracking for tuples", "[qir_support]")
 
     __quantum__rt__tuple_update_reference_count(maybeLeaked, -1);
     CHECK_NOTHROW(QirExecutionContext::Deinit());
-
 }
 
-static void NoopCallableEntry(PTuple, PTuple, PTuple) {}
+static void NoopCallableEntry(PTuple, PTuple, PTuple)
+{
+}
 TEST_CASE("Allocation tracking for callables", "[qir_support]")
 {
     t_CallableEntry entries[4] = {NoopCallableEntry, nullptr, nullptr, nullptr};
@@ -974,7 +973,7 @@ TEST_CASE("Tuples: copy elision", "[qir_support]")
 // Adjoints for R and Exp are implemented by qis, so let's check they at least do the angle invertion in adjoints.
 struct AdjointsTestSimulator : public SimulatorStub
 {
-    int lastId = -1;
+    int lastId           = -1;
     double rotationAngle = 0.0;
     double exponentAngle = 0.0;
 
@@ -982,7 +981,9 @@ struct AdjointsTestSimulator : public SimulatorStub
     {
         return reinterpret_cast<Qubit>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override {}
+    void ReleaseQubit(Qubit /*qubit*/) override
+    {
+    }
     Result UseZero() override
     {
         return reinterpret_cast<Result>(0);
@@ -1026,7 +1027,7 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
 
     const double angle = 0.42;
 
-    Qubit target = __quantum__rt__qubit_allocate();
+    Qubit target    = __quantum__rt__qubit_allocate();
     QirArray* ctrls = __quantum__rt__qubit_allocate_array(2);
 
     __quantum__qis__r__body(PauliId_Y, angle, target);
@@ -1034,7 +1035,7 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
     __quantum__qis__r__ctl(ctrls, PauliId_X, angle, target);
     __quantum__qis__r__ctladj(ctrls, PauliId_X, angle, target);
 
-    __quantum__rt__qubit_release_array(ctrls);        // The `ctrls` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(ctrls); // The `ctrls` is a dangling pointer from now on.
     __quantum__rt__qubit_release(target);
 
     REQUIRE(qapi->rotationAngle == Approx(0).epsilon(0.0001));
@@ -1048,10 +1049,10 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     const double angle = 0.42;
 
     QirArray* targets = __quantum__rt__qubit_allocate_array(2);
-    QirArray* ctrls = __quantum__rt__qubit_allocate_array(2);
-    QirArray* axes = __quantum__rt__array_create_1d(1 /*element size*/, 2 /*count*/);
-    axes->buffer[0] = 2;
-    axes->buffer[1] = 3;
+    QirArray* ctrls   = __quantum__rt__qubit_allocate_array(2);
+    QirArray* axes    = __quantum__rt__array_create_1d(1 /*element size*/, 2 /*count*/);
+    axes->buffer[0]   = 2;
+    axes->buffer[1]   = 3;
 
     __quantum__qis__exp__body(axes, angle, targets);
     __quantum__qis__exp__adj(axes, angle, targets);
@@ -1059,8 +1060,8 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     __quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
 
     __quantum__rt__array_update_reference_count(axes, -1);
-    __quantum__rt__qubit_release_array(ctrls);    // The `ctrls` is a dangling pointer from now on.
-    __quantum__rt__qubit_release_array(targets);  // The `targets` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(ctrls);   // The `ctrls` is a dangling pointer from now on.
+    __quantum__rt__qubit_release_array(targets); // The `targets` is a dangling pointer from now on.
 
     REQUIRE(qapi->exponentAngle == Approx(0).epsilon(0.0001));
 }
