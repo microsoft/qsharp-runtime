@@ -352,6 +352,11 @@ extern "C"
         return array->dimensionSizes[(size_t)dim];
     }
 
+    int64_t __quantum__rt__array_get_size_1d(QirArray* array)
+    {
+        return __quantum__rt__array_get_size(array, 0);
+    }
+
     QirArray* __quantum__rt__array_copy(QirArray* array, bool forceNewInstance)
     {
         if (array == nullptr)

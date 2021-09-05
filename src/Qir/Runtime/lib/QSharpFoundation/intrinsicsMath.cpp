@@ -51,6 +51,11 @@ extern "C"
         return std::cosh(theta);
     }
 
+    double __quantum__qis__tanh__body(double theta)
+    {
+        return std::tanh(theta);
+    }
+
     double __quantum__qis__arcsin__body(double theta)
     {
         return std::asin(theta); // https://en.cppreference.com/w/cpp/numeric/math/asin

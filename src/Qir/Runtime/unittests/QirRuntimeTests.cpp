@@ -107,13 +107,13 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
     memcpy(a->buffer, "Hello", 5);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(a, 4) == 'o');
     REQUIRE(__quantum__rt__array_get_dim(a) == 1);
-    REQUIRE(__quantum__rt__array_get_size(a, 0) == 5);
+    REQUIRE(__quantum__rt__array_get_size_1d(a) == 5);
 
     QirArray* b                                    = new QirArray(1, sizeof(char));
     *__quantum__rt__array_get_element_ptr_1d(b, 0) = '!';
 
     QirArray* ab = __quantum__rt__array_concatenate(a, b);
-    REQUIRE(__quantum__rt__array_get_size(ab, 0) == 6);
+    REQUIRE(__quantum__rt__array_get_size_1d(ab) == 6);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(ab, 4) == 'o');
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(ab, 5) == '!');
 
@@ -194,21 +194,21 @@ TEST_CASE("Arrays: empty", "[qir_support]")
 
     QirArray* a = __quantum__rt__array_create_1d(sizeof(char), 0);
     REQUIRE(__quantum__rt__array_get_dim(a) == 1);
-    REQUIRE(__quantum__rt__array_get_size(a, 0) == 0);
+    REQUIRE(__quantum__rt__array_get_size_1d(a) == 0);
     REQUIRE(a->buffer == nullptr);
 
     QirArray* a1 = __quantum__rt__array_copy(a, true /*force*/);
     REQUIRE(__quantum__rt__array_get_dim(a1) == 1);
-    REQUIRE(__quantum__rt__array_get_size(a1, 0) == 0);
+    REQUIRE(__quantum__rt__array_get_size_1d(a1) == 0);
     REQUIRE(a1->buffer == nullptr);
     __quantum__rt__array_update_reference_count(a1, -1);
 
     QirArray* c = __quantum__rt__array_create_1d(sizeof(char), 5);
     memcpy(c->buffer, "hello", 5);
     QirArray* ac = __quantum__rt__array_concatenate(a, c);
-    REQUIRE(__quantum__rt__array_get_size(ac, 0) == 5);
+    REQUIRE(__quantum__rt__array_get_size_1d(ac) == 5);
     QirArray* ca = __quantum__rt__array_concatenate(c, a);
-    REQUIRE(__quantum__rt__array_get_size(ca, 0) == 5);
+    REQUIRE(__quantum__rt__array_get_size_1d(ca) == 5);
 
     __quantum__rt__array_update_reference_count(a, -1);
     __quantum__rt__array_update_reference_count(ac, -1);
