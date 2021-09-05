@@ -1032,8 +1032,9 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
 
     __quantum__qis__r__body(PauliId_Y, angle, target);
     __quantum__qis__r__adj(PauliId_Y, angle, target);
-    __quantum__qis__r__ctl(ctrls, PauliId_X, angle, target);
-    __quantum__qis__r__ctladj(ctrls, PauliId_X, angle, target);
+    QirRTuple args = {PauliId_X, angle, target};
+    __quantum__qis__r__ctl(ctrls, &args);
+    __quantum__qis__r__ctladj(ctrls, &args);
 
     __quantum__rt__qubit_release_array(ctrls); // The `ctrls` is a dangling pointer from now on.
     __quantum__rt__qubit_release(target);
@@ -1051,13 +1052,14 @@ TEST_CASE("Adjoints of Exp should use inverse of the angle", "[qir_support]")
     QirArray* targets = __quantum__rt__qubit_allocate_array(2);
     QirArray* ctrls   = __quantum__rt__qubit_allocate_array(2);
     QirArray* axes    = __quantum__rt__array_create_1d(1 /*element size*/, 2 /*count*/);
-    axes->buffer[0]   = 2;
-    axes->buffer[1]   = 3;
+    axes->buffer[0]   = PauliId_Z;
+    axes->buffer[1]   = PauliId_Y;
 
     __quantum__qis__exp__body(axes, angle, targets);
     __quantum__qis__exp__adj(axes, angle, targets);
-    __quantum__qis__exp__ctl(ctrls, axes, angle, targets);
-    __quantum__qis__exp__ctladj(ctrls, axes, angle, targets);
+    QirExpTuple args = {axes, angle, targets};
+    __quantum__qis__exp__ctl(ctrls, &args);
+    __quantum__qis__exp__ctladj(ctrls, &args);
 
     __quantum__rt__array_update_reference_count(axes, -1);
     __quantum__rt__qubit_release_array(ctrls);   // The `ctrls` is a dangling pointer from now on.

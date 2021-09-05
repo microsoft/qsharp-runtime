@@ -113,6 +113,17 @@ namespace Quantum
             return static_cast<unsigned>(pauli);
         }
 
+        std::vector<unsigned> GetBases(long num, PauliId* paulis)
+        {
+            std::vector<unsigned> convertedBases;
+            convertedBases.reserve((size_t)num);
+            for (auto i = 0; i < num; i++)
+            {
+                convertedBases.push_back(GetBasis(paulis[i]));
+            }
+            return convertedBases;
+        }
+
         const QUANTUM_SIMULATOR handle = nullptr;
 
         using TSimulatorId = unsigned; // TODO: Use `void*` or a fixed-size integer,
@@ -286,8 +297,10 @@ namespace Quantum
                 // If measuring exactly one qubit, mark it as measured for tracking.
                 isMeasured[ids[0]] = true;
             }
+            std::vector<unsigned> convertedBases = GetBases(numBases, bases);
+
             return reinterpret_cast<Result>(
-                m(this->simulatorId, (unsigned)numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
+                m(this->simulatorId, (unsigned)numBases, convertedBases.data(), ids.data()));
         }
 
         void ReleaseResult(Result /*r*/) override
@@ -500,9 +513,11 @@ namespace Quantum
             typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
-            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            double actualProbability  = 1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
-                                                                      reinterpret_cast<int*>(bases), ids.data());
+            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, bases);
+            double actualProbability =
+                1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
+                                               reinterpret_cast<int*>(convertedBases.data()), ids.data());
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
