@@ -12,6 +12,10 @@
 declare %"struct.QirArray"* @quantum__rt__array_slice(%"struct.QirArray"*, i32, %"struct.QirRange"* dereferenceable(24))
 declare %"struct.QirString"* @quantum__rt__range_to_string(%"struct.QirRange"* dereferenceable(24) %range)
 
+; NOTE: These three functions can be converted to extern C once the spec and compiler are updated to pass %Range by
+; pointer instead of by value (see https://github.com/microsoft/qsharp-language/issues/108). Once that
+; happens, this file can be removed. 
+
 define dllexport %Array* @__quantum__rt__array_slice(%Array* %.ar, i32 %dim, %Range %.range) {
   %ar = bitcast %Array* %.ar to %"struct.QirArray"*
   %.prange = alloca %Range
