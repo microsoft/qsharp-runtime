@@ -86,6 +86,7 @@ namespace Microsoft.Quantum.Diagnostics {
     operation AssertMeasurementProbability(bases : Pauli[], qubits : Qubit[], result : Result, prob : Double, msg : String, tolerance : Double) : Unit
     is Adj + Ctl {
         body intrinsic;
+        adjoint self;
     }
 
 }

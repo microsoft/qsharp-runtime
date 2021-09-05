@@ -21,6 +21,11 @@ extern "C"
 {
 
     // Implementations:
+    double __quantum__qis__nan__body()
+    {
+        return std::sqrt(-1.0); // sqrt(<negative>) -> NaN
+    }
+
     bool __quantum__qis__isnan__body(double d)
     {
         return std::isnan(d); // https://en.cppreference.com/w/cpp/numeric/math/isnan
@@ -33,7 +38,27 @@ extern "C"
 
     bool __quantum__qis__isinf__body(double d)
     {
-        return std::isinf(d); // https://en.cppreference.com/w/cpp/numeric/math/isinf
+        return std::isinf(d) && d > 0.0; // https://en.cppreference.com/w/cpp/numeric/math/isinf
+    }
+
+    bool __quantum__qis__isnegativeinfinity__body(double d)
+    {
+        return std::isinf(d) && d < 0.0; // https://en.cppreference.com/w/cpp/numeric/math/isinf
+    }
+
+    double __quantum__qis__sin__body(double d)
+    {
+        return std::sin(d);
+    }
+
+    double __quantum__qis__cos__body(double d)
+    {
+        return std::cos(d);
+    }
+
+    double __quantum__qis__tan__body(double d)
+    {
+        return std::tan(d);
     }
 
     double __quantum__qis__arctan2__body(double y, double x)
@@ -69,6 +94,16 @@ extern "C"
     double __quantum__qis__arctan__body(double theta)
     {
         return std::atan(theta); // https://en.cppreference.com/w/cpp/numeric/math/atan
+    }
+
+    double __quantum__qis__sqrt__body(double d)
+    {
+        return std::sqrt(d);
+    }
+
+    double __quantum__qis__log__body(double d)
+    {
+        return std::log(d);
     }
 
     double __quantum__qis__ieeeremainder__body(double x, double y)

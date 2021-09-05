@@ -48,4 +48,11 @@ extern "C"
         }
     }
 
+    void __quantum__qis__assertmeasurementprobability__ctl(QirArray* /* ctls */,
+                                                           QirAssertMeasurementProbabilityTuple* args)
+    {
+        __quantum__qis__assertmeasurementprobability__body(args->bases, args->qubits, args->result, args->prob,
+                                                           args->msg, args->tol);
+    }
+
 } // extern "C"
