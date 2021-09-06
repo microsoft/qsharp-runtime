@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Quantum.Authentication
     /// <summary>
     /// Implements a custom TokenCredential to use a local file as the source for an AzureQuantum token.
     ///
-    /// It will only use the local file if the <c>AZUREQUANTUM_TOKEN_FILE</c> environment variable is set, and references
+    /// It will only use the local file if the <c>AZURE_QUANTUM_TOKEN_FILE</c> environment variable is set, and references
     /// an existing json file that contains the access_token and expires_on timestamp in milliseconds.
     ///
     /// If the environment variable is not set, the file does not exist, or the token is invalid in any way(expired, for example),
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.Quantum.Authentication
         /// <summary>
         /// Environment variable name for the token file path.
         /// </summary>
-        private const string TokenFileEnvironmentVariable = "AZUREQUANTUM_TOKEN_FILE";
+        private const string TokenFileEnvironmentVariable = "AZURE_QUANTUM_TOKEN_FILE";
 
         /// <summary>
         /// File system dependency injected so that unit testing is possible.

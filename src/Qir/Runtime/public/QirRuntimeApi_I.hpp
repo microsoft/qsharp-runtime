@@ -39,5 +39,21 @@ namespace Quantum
         IRuntimeDriver(const IRuntimeDriver&)            = delete;
     };
 
+    struct QIR_SHARED_API IRestrictedAreaManagement
+    {
+        virtual ~IRestrictedAreaManagement()
+        {
+        }
+        IRestrictedAreaManagement() = default;
+
+        virtual void StartArea()   = 0;
+        virtual void NextSegment() = 0;
+        virtual void EndArea()     = 0;
+
+      private:
+        IRestrictedAreaManagement& operator=(const IRestrictedAreaManagement&) = delete;
+        IRestrictedAreaManagement(const IRestrictedAreaManagement&)            = delete;
+    };
+
 } // namespace Quantum
 } // namespace Microsoft

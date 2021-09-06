@@ -25,25 +25,59 @@ static std::unordered_map<RESULT*, int>& AllocatedResults()
     return allocatedResults;
 }
 
+static Microsoft::Quantum::IRestrictedAreaManagement* RestrictedAreaManagement()
+{
+    return dynamic_cast<Microsoft::Quantum::IRestrictedAreaManagement*>(
+        Microsoft::Quantum::GlobalContext()->GetDriver());
+}
+
 extern "C"
 {
     Result quantum__rt__result_get_zero()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseZero();
     }
+
     Result quantum__rt__result_get_one()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
     }
 
-    QUBIT* quantum__rt__qubit_allocate() // NOLINT
+    QUBIT* quantum__rt__qubit_allocate()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
     }
 
-    void quantum__rt__qubit_release(QUBIT* qubit) // NOLINT
+    void quantum__rt__qubit_release(QUBIT* qubit)
     {
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
+    }
+
+    QUBIT* quantum__rt__qubit_borrow()
+    {
+        // Currently we implement borrowing as allocation.
+        return quantum__rt__qubit_allocate();
+    }
+
+    void quantum__rt__qubit_return(QUBIT* qubit)
+    {
+        // Currently we implement borrowing as allocation.
+        quantum__rt__qubit_release(qubit);
+    }
+
+    void quantum__rt__qubit_restricted_reuse_area_start()
+    {
+        RestrictedAreaManagement()->StartArea();
+    }
+
+    void quantum__rt__qubit_restricted_reuse_segment_next()
+    {
+        RestrictedAreaManagement()->NextSegment();
+    }
+
+    void quantum__rt__qubit_restricted_reuse_area_end()
+    {
+        RestrictedAreaManagement()->EndArea();
     }
 
     void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)

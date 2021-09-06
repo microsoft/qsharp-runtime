@@ -49,19 +49,19 @@ namespace Microsoft.Azure.Quantum.Authentication.Test
         [TestInitialize]
         public void TestInitialize()
         {
-            Environment.SetEnvironmentVariable("AZUREQUANTUM_TOKEN_FILE", _tokenFilePath);
+            Environment.SetEnvironmentVariable("AZURE_QUANTUM_TOKEN_FILE", _tokenFilePath);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            Environment.SetEnvironmentVariable("AZUREQUANTUM_TOKEN_FILE", null);
+            Environment.SetEnvironmentVariable("AZURE_QUANTUM_TOKEN_FILE", null);
         }
 
         [TestMethod]
         public void Test_WhenFileNotSet_Throws_CredentialUnavailableException()
         {
-            Environment.SetEnvironmentVariable("AZUREQUANTUM_TOKEN_FILE", null);
+            Environment.SetEnvironmentVariable("AZURE_QUANTUM_TOKEN_FILE", null);
             var credential = new TokenFileCredential();
 
             var exception = Assert.ThrowsException<CredentialUnavailableException>(() =>

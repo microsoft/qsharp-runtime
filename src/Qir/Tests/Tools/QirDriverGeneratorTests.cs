@@ -24,6 +24,10 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                     new EntryPointOperation{Name = "UseNoArgs"}
                 },
                 {
+                    "UseNoArgsDebug",
+                    new EntryPointOperation{Name = "UseNoArgsDebug"}
+                },
+                {
                     "UseBoolArg",
                     new EntryPointOperation
                     {
@@ -43,7 +47,7 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                     "UseDoubleArg",
                     new EntryPointOperation
                     {
-                        Name = "UseDoublArg",
+                        Name = "UseDoubleArg",
                         Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArg", Type = DataType.DoubleType}}
                     }
                 },
@@ -146,25 +150,26 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
             str.Replace("\n", string.Empty).Replace("\r", string.Empty);
 
         [Theory]
-        [InlineData("UseNoArgs")]
-        [InlineData("UseBoolArg")]
-        [InlineData("UseBoolArrayArg")]
-        [InlineData("UseDoubleArg")]
-        [InlineData("UseDoubleArrayArg")]
-        [InlineData("UseIntegerArg")]
-        [InlineData("UseIntegerArrayArg")]
-        [InlineData("UsePauliArg")]
-        [InlineData("UsePauliArrayArg")]
-        [InlineData("UseRangeArg")]
-        [InlineData("UseRangeArrayArg")]
-        [InlineData("UseResultArg")]
-        [InlineData("UseResultArrayArg")]
-        [InlineData("UseStringArg")]
-        [InlineData("UseMiscArgs")]
-        public void GenerateFullStateSimulatorDriver(string testCase)
+        [InlineData("UseNoArgs", false)]
+        [InlineData("UseNoArgsDebug", true)]
+        [InlineData("UseBoolArg", false)]
+        [InlineData("UseBoolArrayArg", false)]
+        [InlineData("UseDoubleArg", false)]
+        [InlineData("UseDoubleArrayArg", false)]
+        [InlineData("UseIntegerArg", false)]
+        [InlineData("UseIntegerArrayArg", false)]
+        [InlineData("UsePauliArg", false)]
+        [InlineData("UsePauliArrayArg", false)]
+        [InlineData("UseRangeArg", false)]
+        [InlineData("UseRangeArrayArg", false)]
+        [InlineData("UseResultArg", false)]
+        [InlineData("UseResultArrayArg", false)]
+        [InlineData("UseStringArg", false)]
+        [InlineData("UseMiscArgs", false)]
+        public void GenerateFullStateSimulatorDriver(string testCase, bool debug)
         {
             var entryPointOperation = TestCases[testCase];
-            var driverGenerator = new QirFullStateDriverGenerator();
+            var driverGenerator = new QirFullStateDriverGenerator(debug);
             var driverFileName = $"{testCase}.cpp";
             var verificationCppSourceCode = RemoveLineEndings(File.ReadAllText(Path.Combine(TestCasesDirectory, driverFileName)));
             Directory.CreateDirectory(TestArtifactsDirectory);
@@ -174,7 +179,6 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
             var generatedCppSourceCode = RemoveLineEndings(generatedStreamReader.ReadToEnd());
             Assert.Equal(verificationCppSourceCode, generatedCppSourceCode);
             generatedStream.Close();
-
         }
     }
 }

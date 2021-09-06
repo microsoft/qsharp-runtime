@@ -7,7 +7,11 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {
     public class QirFullStateSimulatorInitializer : IQirRuntimeInitializer
     {
-        public string Generate() => new QirCppFullStateSimulatorInitializer().TransformText();
+        private readonly bool debug;
+
+        internal QirFullStateSimulatorInitializer(bool debug) => this.debug = debug;
+
+        public string Generate() => new QirCppFullStateSimulatorInitializer(this.debug).TransformText();
 
         public IEnumerable<string> Headers => new [] {
                 "SimFactory.hpp"
