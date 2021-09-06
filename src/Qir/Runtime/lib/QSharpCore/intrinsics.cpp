@@ -65,10 +65,9 @@ extern "C"
     {
         assert(args->paulis->count == args->targets->count);
 
-        std::vector<PauliId> pauliIds = ExtractPauliIds(args->paulis);
-        GateSet()->ControlledExp((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer),
-                                 (long)(args->paulis->count), reinterpret_cast<PauliId*>(pauliIds.data()),
-                                 reinterpret_cast<Qubit*>(args->targets->buffer), -(args->angle));
+        QirExpTuple updatedArgs = {args->paulis, -(args->angle), args->targets};
+
+        __quantum__qis__exp__ctl(ctls, &updatedArgs);
     }
 
     void __quantum__qis__h__body(Qubit qubit)

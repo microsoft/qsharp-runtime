@@ -14,7 +14,7 @@ struct QirRTuple
     QUBIT* target;
 };
 
-struct QirExpTuple // NOLINT
+struct QirExpTuple
 {
     QirArray* paulis;
     double angle;
