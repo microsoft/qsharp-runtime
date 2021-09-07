@@ -199,12 +199,12 @@ public:
 	}
 
 	// Same as MCX, but we assert that the target is 0 before execution
-	void AND(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
+	void MCApplyAnd(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
 		Assert(std::vector<Gates::Basis>{Gates::Basis::PauliZ}, std::vector<logical_qubit_id>{target}, 0);
 		MCX(controls, target);
 	}
 	// Same as MCX, but we assert that the target is 0 after execution
-	void AdjAND(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
+	void MCApplyAndAdj(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
 		MCX(controls, target);
 		Assert(std::vector<Gates::Basis>{Gates::Basis::PauliZ}, std::vector<logical_qubit_id>{target}, 0);
 		_set_qubit_to_zero(target);

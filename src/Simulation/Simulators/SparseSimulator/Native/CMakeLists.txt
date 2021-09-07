@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_MACOSX_RPATH 1)
+# Main build files
+add_library(SparseQuantumSimulator SHARED factory.cpp capi.cpp)
+
 # Set OpenMP if it is available
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
@@ -14,12 +18,6 @@ if(OpenMP_CXX_FOUND)
 		target_compile_definitions(SparseQuantumSimulator PRIVATE DOMP_GE_V3=1)
 	endif()
 endif()
-	
-
-
-set(CMAKE_MACOSX_RPATH 1)
-# Main build files
-add_library(SparseQuantumSimulator SHARED factory.cpp capi.cpp)
 
 # Windows adds a special dllexport command which must be defined
 if (WIN32)

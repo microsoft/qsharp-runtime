@@ -100,12 +100,12 @@ extern "C"
         getSimulator(sim_id)->CSWAP(std::vector<logical_qubit_id>(c, c + n), q1, q2);
     }
 
-    MICROSOFT_QUANTUM_DECL void MCAnd_cpp(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
-        getSimulator(sim_id)->AND(std::vector<logical_qubit_id>(controls, controls + length), target);
+    MICROSOFT_QUANTUM_DECL void MCApplyAnd_cpp(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
+        getSimulator(sim_id)->MCApplyAnd(std::vector<logical_qubit_id>(controls, controls + length), target);
     }
 
-    MICROSOFT_QUANTUM_DECL void MCAdjointAnd_cpp(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
-        getSimulator(sim_id)->AdjAND(std::vector<logical_qubit_id>(controls, controls + length), target);
+    MICROSOFT_QUANTUM_DECL void MCAdjointApplyAnd(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
+        getSimulator(sim_id)->MCApplyAndAdj(std::vector<logical_qubit_id>(controls, controls + length), target);
     }
 
     // rotations

@@ -846,7 +846,7 @@ public:
                         auto internal_end = _qubit_data.end();
                         for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end();){
                             internal_state = current_state;
-                            current_state.jump_forward(_jump_size);
+                            current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
                             internal_end = current_state;
                             #pragma omp task firstprivate(internal_state) firstprivate(internal_end)
                             {
@@ -1076,7 +1076,7 @@ public:
         flip.set(index);
         // The amplitude for the new state
         amplitude new_state;
-        // Loops over all states in the wavefunction _qubut_date
+        // Loops over all states in the wavefunction _qubit_data
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
             // An iterator pointing to the state labelled by the flip
             auto flipped_state = _qubit_data.find(current_state->first ^ flip);
@@ -1321,8 +1321,8 @@ private:
             // Loop through the wavefunction
             while (_current_state != _qubit_data.end()){
                 // Update local variables
-                local_state = _current_state;
-                _current_state.jump_forward(_jump_size);
+                local_state = _current_state; 
+                _current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
                 local_end = _current_state;
                 // Unlock state to allow other threads to modify their state
                 state_lock.unlock();

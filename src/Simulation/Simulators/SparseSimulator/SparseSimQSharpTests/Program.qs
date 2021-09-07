@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.SparseSimulatorTests {
@@ -155,20 +155,6 @@ namespace Microsoft.Quantum.SparseSimulatorTests {
         ResetAll(qubits);
     }
 
-    operation MCXTime(nqubits : Int, ngates : Int) : Unit {
-        use qubits = Qubit[nqubits];
-        for idx in 0..nqubits - 1 {
-            H(qubits[idx]);
-        }
-        for idx in 0..nqubits - 1 {
-            CNOT(qubits[idx], qubits[(idx+1)% nqubits]);
-        }
-        for idy in 1..ngates {
-            CNOT(qubits[idy %nqubits], qubits[(idy+1)%nqubits]);
-        }
-        ResetAll(qubits);
-    }
-
     @Test("Microsoft.Quantum.SparseSimulation.SparseSimulator")
 	operation PartialDumpTest() : Unit  {
         use qubits = Qubit[4] {
@@ -185,7 +171,7 @@ namespace Microsoft.Quantum.SparseSimulatorTests {
         }
     }
 
-
+    
     operation _FakeR1Frac(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         RFrac(PauliZ, -numerator, denominator + 1, qubit[0]);
         RFrac(PauliI, numerator, denominator + 1, qubit[0]);

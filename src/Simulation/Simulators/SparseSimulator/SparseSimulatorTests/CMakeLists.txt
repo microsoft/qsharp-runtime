@@ -11,9 +11,3 @@ enable_testing()
 set(CMAKE_MACOSX_RPATH 1)
 add_executable(SparseSimulatorTests SparseSimulatorTests.cpp)
 add_test(SparseSimulatorTests SparseSimulatorTests)
-
-#target_compile_options(SparseQuantumSimulator PUBLIC -fdeclspec)
-
-#add_executable(SparseQuantumSimulatorExe SparseQuantumSimulator.cpp)
-# target_include_directories(${EXE} PUBLIC ${OSSIM_INCLUDE_DIRS})
-# target_link_libraries(${EXE} PRIVATE ${OPENMP_LINKER_FLAG})

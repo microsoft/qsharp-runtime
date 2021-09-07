@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -107,17 +107,17 @@ namespace Microsoft.Quantum.SparseSimulation
 
         // Basic gates
         [DllImport(simulator_dll)]
-        private static extern void MCAnd_cpp(uint sim, int length, int[] controls, int target);
-        public void MCAnd(IQArray<Qubit> controls, Qubit qubit)
+        private static extern void MCApplyAnd_cpp(uint sim, int length, int[] controls, int target);
+        public void MCApplyAnd(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCApplyAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
         }
 
         [DllImport(simulator_dll)]
-        private static extern void MCAdjointAnd_cpp(uint sim, int length, int[] controls, int target);
-        public void MCAdjointAnd(IQArray<Qubit> controls, Qubit qubit)
+        private static extern void MCAdjointApplyAnd_cpp(uint sim, int length, int[] controls, int target);
+        public void MCAdjointApplyAnd(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCAdjointAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCAdjointApplyAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
         }
 
 
