@@ -64,11 +64,11 @@ public:
 		_max_num_qubits_used = 0;
 		_current_number_qubits_used = 0;
 
-		_Ry_queue = std::vector<bool>(num_qubits, 0);
-		_Rx_queue = std::vector<bool>(num_qubits, 0);
-		_H_queue  = std::vector<bool>(num_qubits, 0);
-		_Rx_angles = std::vector<double>(num_qubits, 0.0);
-		_Ry_angles = std::vector<double>(num_qubits, 0.0);
+		_queue_Ry = std::vector<bool>(num_qubits, 0);
+		_queue_Rx = std::vector<bool>(num_qubits, 0);
+		_queue_H  = std::vector<bool>(num_qubits, 0);
+		_angles_Rx = std::vector<double>(num_qubits, 0.0);
+		_angles_Ry = std::vector<double>(num_qubits, 0.0);
 
 	}
 
@@ -113,11 +113,11 @@ public:
 
 			num_qubits = _quantum_state->get_num_qubits();
 			_occupied_qubits.resize(num_qubits, 0);
-			_Ry_queue.resize(num_qubits, 0);
-			_Rx_queue.resize(num_qubits, 0);
-			_H_queue.resize(num_qubits, 0);
-			_Rx_angles.resize(num_qubits, 0.0);
-			_Ry_angles.resize(num_qubits, 0.0);
+			_queue_Ry.resize(num_qubits, 0);
+			_queue_Rx.resize(num_qubits, 0);
+			_queue_H.resize(num_qubits, 0);
+			_angles_Rx.resize(num_qubits, 0.0);
+			_angles_Ry.resize(num_qubits, 0.0);
 		}
 		// The external qubit manager should prevent this, but this checks anyway
 		if (_occupied_qubits[qubit]) {
@@ -150,11 +150,11 @@ public:
 
 	void X(logical_qubit_id index) {
 		// XY = - YX
-		if (_Ry_queue[index]){
-			_Ry_angles[index] *= -1.0;
+		if (_queue_Ry[index]){
+			_angles_Ry[index] *= -1.0;
 		}
 		// Rx trivially commutes
-		if (_H_queue[index]) {
+		if (_queue_H[index]) {
 			_queued_operations.push_back(operation(OP::Z, index));
 			return;
 		}
@@ -172,20 +172,20 @@ public:
 			_execute_if(controls);
 		} else {
 			// An H on the control but not the target forces execution
-			if (_Ry_queue[controls[0]] || _Rx_queue[controls[0]] || (_H_queue[controls[0]] && !_H_queue[target])){
+			if (_queue_Ry[controls[0]] || _queue_Rx[controls[0]] || (_queue_H[controls[0]] && !_queue_H[target])){
 				_execute_queued_ops(controls, OP::Ry);
 			}
 		}
 		// Ry on the target causes issues
-		if (_Ry_queue[target]){
+		if (_queue_Ry[target]){
 			_execute_queued_ops(target, OP::Ry);
 		}
 		// Rx on the target trivially commutes
 
 		// An H on the target flips the operation
-		if (_H_queue[target]){
+		if (_queue_H[target]){
 			// If it is a CNOT and there is also an H on the control, we swap control and target
-			if (controls.size() == 1 && _H_queue[controls[0]]){
+			if (controls.size() == 1 && _queue_H[controls[0]]){
 				_queued_operations.push_back(operation(OP::MCX, controls[0], std::vector<logical_qubit_id>{target}));
 				_set_qubit_to_nonzero(controls[0]);
 			} else {
@@ -212,8 +212,8 @@ public:
 
 	void Y(logical_qubit_id index) {
 		// XY = -YX
-		if (_Rx_queue[index]){
-			_Rx_angles[index] *= -1.0;
+		if (_queue_Rx[index]){
+			_angles_Rx[index] *= -1.0;
 		}
 		// commutes with H up to phase, so we ignore the H queue
 		_queued_operations.push_back(operation(OP::Y, index));	
@@ -223,11 +223,11 @@ public:
 	void MCY(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
 		_execute_if(controls);
 		// Commutes with Ry on the target, not Rx
-		if (_Rx_queue[target]){
+		if (_queue_Rx[target]){
 			_execute_queued_ops(target, OP::Rx);
 		}
 		// YH = -YH, so we add a phase to track this
-		if (_H_queue[target]){
+		if (_queue_H[target]){
 			// The phase added does not depend on the target
 			// Thus we use one of the controls as a target
 			_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
@@ -239,15 +239,15 @@ public:
 	
 	void Z(logical_qubit_id index) {
 		// ZY = -YZ
-		if (_Ry_queue[index]){
-			_Ry_angles[index] *= -1;
+		if (_queue_Ry[index]){
+			_angles_Ry[index] *= -1;
 		}
 		// XZ = -ZX
-		if (_Rx_queue[index]){
-			_Rx_angles[index] *= -1;
+		if (_queue_Rx[index]){
+			_angles_Rx[index] *= -1;
 		}
 		// HZ = XH
-		if (_H_queue[index]) {
+		if (_queue_H[index]) {
 			_queued_operations.push_back(operation(OP::X, index));
 			_set_qubit_to_nonzero(index);
 			return;
@@ -263,17 +263,17 @@ public:
 		// must execute. 
 		size_t count = 0;
 		for (auto control : controls) {
-			if (_Ry_queue[control] || _Rx_queue[control]){
+			if (_queue_Ry[control] || _queue_Rx[control]){
 				count += 2;
 			}
-			if (_H_queue[control]){
+			if (_queue_H[control]){
 				count++;
 			}
 		}
-		if (_Ry_queue[target] || _Rx_queue[target]){
+		if (_queue_Ry[target] || _queue_Rx[target]){
 			count +=2;
 		}
-		if (_H_queue[target]) {count++;}
+		if (_queue_H[target]) {count++;}
 		if (count > 1) {
 			_execute_queued_ops(controls, OP::Ry);
 			_execute_queued_ops(target, OP::Ry);
@@ -282,7 +282,7 @@ public:
 			// with the target
 			std::vector<logical_qubit_id> new_controls(controls);
 			for (logical_qubit_id control : controls){
-				if (_H_queue[control]){
+				if (_queue_H[control]){
 					std::swap(new_controls[control], target);
 				}
 			}
@@ -297,7 +297,7 @@ public:
 	// Any phase gate
 	void Phase(amplitude const& phase, logical_qubit_id index) {
 		// Rx, Ry, and H do not commute well with arbitrary phase gates
-		if (_Ry_queue[index] || _Ry_queue[index] || _H_queue[index]){
+		if (_queue_Ry[index] || _queue_Ry[index] || _queue_H[index]){
 			_execute_queued_ops(index, OP::Ry);
 		}
 		_queued_operations.push_back(operation(OP::Phase, index, phase));
@@ -353,20 +353,20 @@ public:
 		// Tries to absorb the rotation into the existing queue,
 		// if it hits a different kind of rotation, the queue executes
 		if (b == Gates::Basis::PauliY){
-			_Ry_queue[index] = true;
-			_Ry_angles[index] += phi;
+			_queue_Ry[index] = true;
+			_angles_Ry[index] += phi;
 			_set_qubit_to_nonzero(index);
 			return;
-		} else if (_Ry_queue[index]) {
+		} else if (_queue_Ry[index]) {
 			_execute_queued_ops(index, OP::Ry);
 		}
 
 		if (b == Gates::Basis::PauliX){
-			_Rx_queue[index] = true;
-			_Rx_angles[index] += phi;
+			_queue_Rx[index] = true;
+			_angles_Rx[index] += phi;
 			_set_qubit_to_nonzero(index);
 			return;
-		} else if (_Rx_queue[index]){
+		} else if (_queue_Rx[index]){
 			_execute_queued_ops(index, OP::Rz);
 		}
 
@@ -374,7 +374,7 @@ public:
 		if (b == Gates::Basis::PauliZ){
 			// HRz = RxH, but that's the wrong order for this structure
 			// Thus we must execute the H queue
-			if (_H_queue[index]){
+			if (_queue_H[index]){
 				_execute_queued_ops(index, OP::H);
 			}
 			// Rz(phi) = RI(phi)*R1(-2*phi)
@@ -396,13 +396,13 @@ public:
 
 		_execute_if(controls);
 		// The target can commute with rotations of the same type
-		if (_Ry_queue[target] && b != Gates::Basis::PauliY){
+		if (_queue_Ry[target] && b != Gates::Basis::PauliY){
 			_execute_queued_ops(target, OP::Ry);
 		} 
-		if (_Rx_queue[target] && b != Gates::Basis::PauliX){
+		if (_queue_Rx[target] && b != Gates::Basis::PauliX){
 			_execute_queued_ops(target, OP::Rx);
 		}
-		if (_H_queue[target]){
+		if (_queue_H[target]){
 			_execute_queued_ops(target, OP::H);
 		}
 		// Execute any phase and permutation gates
@@ -450,13 +450,13 @@ public:
 	
 	void H(logical_qubit_id index) {
 		// YH = -HY
-		_Ry_angles[index] *= (_Ry_queue[index] ? -1.0 : 1.0);
+		_angles_Ry[index] *= (_queue_Ry[index] ? -1.0 : 1.0);
 		// Commuting with Rx creates a phase, but on the wrong side
 		// So we execute any Rx immediately
-		if (_Rx_queue[index]){
+		if (_queue_Rx[index]){
 			_execute_queued_ops(index, OP::Rx);
 		}
-		_H_queue[index] = !_H_queue[index];
+		_queue_H[index] = !_queue_H[index];
 		_set_qubit_to_nonzero(index);
 	}
 
@@ -464,7 +464,7 @@ public:
 		// No commutation on controls
 		_execute_if(controls);
 		// No Ry or Rx commutation on target
-		if (_Ry_queue[target] || _Rx_queue[target]){
+		if (_queue_Ry[target] || _queue_Rx[target]){
 			_execute_queued_ops(target, OP::Ry);
 		} 
 		// Commutes through H gates on the target, so it does not check
@@ -482,11 +482,11 @@ public:
 			std::swap(index_2, index_1);
 		} 
 		// Everything commutes nicely with a swap
-		_Ry_queue.swap(_Ry_queue[index_1],  _Ry_queue[index_2]);
-		std::swap(_Ry_angles[index_1], _Ry_angles[index_2]);
-		_Rx_queue.swap(_Rx_queue[index_1],  _Rx_queue[index_2]);
-		std::swap(_Rx_angles[index_1], _Rx_angles[index_2]);
-		_H_queue.swap(_H_queue[index_1],  _H_queue[index_2]);
+		_queue_Ry.swap(_queue_Ry[index_1],  _queue_Ry[index_2]);
+		std::swap(_angles_Ry[index_1], _angles_Ry[index_2]);
+		_queue_Rx.swap(_queue_Rx[index_1],  _queue_Rx[index_2]);
+		std::swap(_angles_Rx[index_1], _angles_Rx[index_2]);
+		_queue_H.swap(_queue_H[index_1],  _queue_H[index_2]);
 		_occupied_qubits.swap(_occupied_qubits[index_1], _occupied_qubits[index_2]);
 		logical_qubit_id shift = index_2 - index_1;
 		_queued_operations.push_back(operation(OP::SWAP, index_1, shift, index_2));
@@ -538,7 +538,7 @@ public:
 	void Assert(std::vector<Gates::Basis> axes, std::vector<logical_qubit_id> const& qubits, bool result) {
 		// Assertions will not commute well with Rx or Ry
 		for (auto qubit : qubits) {
-			if (_Rx_queue[qubit] || _Ry_queue[qubit]){
+			if (_queue_Rx[qubit] || _queue_Ry[qubit]){
 				_execute_queued_ops(qubits, OP::Ry);
 			}
 		}
@@ -549,15 +549,15 @@ public:
 			switch (axes[i]){
 				case Gates::Basis::PauliY:
 					// HY=YH, so we switch the eigenvalue
-					if (_H_queue[qubits[i]]){
-						result ^= _H_queue[qubits[i]];
+					if (_queue_H[qubits[i]]){
+						result ^= _queue_H[qubits[i]];
 					}
 					isAllZ = false;
 					isEmpty = false;
 					break; 
 				case Gates::Basis::PauliX:
 					// HX = ZH
-					if (_H_queue[qubits[i]]){
+					if (_queue_H[qubits[i]]){
 						axes[i] = Gates::Basis::PauliZ;
 					} else {
 						isAllZ = false;
@@ -566,7 +566,7 @@ public:
 					break;
 				case Gates::Basis::PauliZ:
 					// HZ = XH
-					if (_H_queue[qubits[i]]){
+					if (_queue_H[qubits[i]]){
 						axes[i] = Gates::Basis::PauliX;
 						isAllZ = false;
 					}
@@ -670,12 +670,12 @@ private:
 	// that have yet to be applied to the wavefunction. 
 	// Since HH=I and Rx(theta_1)Rx(theta_2) = Rx(theta_1+theta_2)
 	// it only needs a boolean to track them.
-	std::vector<bool> _H_queue;
-	std::vector<bool> _Rx_queue;
-	std::vector<bool> _Ry_queue;
+	std::vector<bool> _queue_H;
+	std::vector<bool> _queue_Rx;
+	std::vector<bool> _queue_Ry;
 
-	std::vector<double> _Rx_angles;
-	std::vector<double> _Ry_angles;
+	std::vector<double> _angles_Rx;
+	std::vector<double> _angles_Ry;
 
 	// Store which qubits are non-zero as a bitstring
 	std::vector<bool> _occupied_qubits;
@@ -715,38 +715,38 @@ private:
 	// The next three functions execute the H, and/or Rx, and/or Ry 
 	// queues on a single qubit
 	void _execute_RyRxH_single_qubit(logical_qubit_id const &index){
-		if (_H_queue[index]){
+		if (_queue_H[index]){
 			_quantum_state->H(index);
-			_H_queue[index] = false;
+			_queue_H[index] = false;
 		}
-		if (_Rx_queue[index]){
-			_quantum_state->R(Gates::Basis::PauliX, _Rx_angles[index], index);
-			_Rx_angles[index] = 0.0;
-			_Rx_queue[index] = false;
+		if (_queue_Rx[index]){
+			_quantum_state->R(Gates::Basis::PauliX, _angles_Rx[index], index);
+			_angles_Rx[index] = 0.0;
+			_queue_Rx[index] = false;
 		}
-		if (_Ry_queue[index]){
-			_quantum_state->R(Gates::Basis::PauliY, _Ry_angles[index], index);
-			_Ry_angles[index] = 0.0;
-			_Ry_queue[index] = false;
+		if (_queue_Ry[index]){
+			_quantum_state->R(Gates::Basis::PauliY, _angles_Ry[index], index);
+			_angles_Ry[index] = 0.0;
+			_queue_Ry[index] = false;
 		}
 	}
 
 	void _execute_RxH_single_qubit(logical_qubit_id const &index){
-		if (_H_queue[index]){
+		if (_queue_H[index]){
 			_quantum_state->H(index);
-			_H_queue[index] = false;
+			_queue_H[index] = false;
 		}
-		if (_Rx_queue[index]){
-			_quantum_state->R(Gates::Basis::PauliX, _Rx_angles[index], index);
-			_Rx_angles[index] = 0.0;
-			_Rx_queue[index] = false;
+		if (_queue_Rx[index]){
+			_quantum_state->R(Gates::Basis::PauliX, _angles_Rx[index], index);
+			_angles_Rx[index] = 0.0;
+			_queue_Rx[index] = false;
 		}
 	}
 
 	void _execute_H_single_qubit(logical_qubit_id const &index){
-		if (_H_queue[index]){
+		if (_queue_H[index]){
 			_quantum_state->H(index);
-			_H_queue[index] = false;
+			_queue_H[index] = false;
 		}
 	}
 	
@@ -818,7 +818,7 @@ private:
 	// Executes if there is anything already queued on the qubit target
 	// Used when queuing gates that do not commute well
 	void _execute_if(logical_qubit_id &target){
-		if (_Ry_queue[target] || _Rx_queue[target] || _H_queue[target]){
+		if (_queue_Ry[target] || _queue_Rx[target] || _queue_H[target]){
 			_execute_queued_ops(target, OP::Ry);
 		}
 	}
@@ -827,7 +827,7 @@ private:
 	// Used when queuing gates that do not commute well
 	void _execute_if(std::vector<logical_qubit_id> const &controls) {
 		for (auto control : controls){
-			if (_Ry_queue[control] || _Rx_queue[control] || _H_queue[control]){
+			if (_queue_Ry[control] || _queue_Rx[control] || _queue_H[control]){
 				_execute_queued_ops(controls, OP::Ry);
 				return;
 			}
