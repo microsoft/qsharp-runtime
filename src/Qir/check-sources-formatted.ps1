@@ -12,6 +12,11 @@ param (
 if (-not $IsMacOS) {   # We do not control the clang-format version on MacOS, and that version (12.0.1) requires formatting contradicting the version on Win and Linux (11.1.0).
     $tmpFile = "format.log"
 
+    $clangFormatCommand = "clang-format"
+    if(($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
+        $script:clangFormatCommand = "clang-format-11"
+    }
+
     $OldErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference='Continue'
     "*.cpp", "*.c", "*.h", "*.hpp" `
@@ -24,7 +29,7 @@ if (-not $IsMacOS) {   # We do not control the clang-format version on MacOS, an
         | Where-Object { $_ -notlike "*/bin/*" } `
         | Where-Object {$_ -notlike "*/FullStateDriverGenerator/*"} `
         | ForEach-Object {
-            clang-format -n -style=file $_
+            & $clangFormatCommand -n -style=file $_
         } 2>$tmpFile
     $ErrorActionPreference=$OldErrorActionPreference
 
@@ -38,7 +43,7 @@ if (-not $IsMacOS) {   # We do not control the clang-format version on MacOS, an
         Write-Host "##vso[task.logissue type=error;]Formatting check failed. The following files need to be formatted before compiling: "
         Write-Host "(You may use the Clang-Format extension in VSCode, clang-format in command line, or see https://clang.llvm.org/docs/ClangFormat.html)"
         $filesRequireFormatting | Format-Table
-        clang-format --version
+        & $clangFormatCommand --version
         throw "Formatting check failed for QIR Runtime sources"
     }
 }

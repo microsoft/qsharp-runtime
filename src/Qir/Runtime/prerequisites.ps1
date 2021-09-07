@@ -29,10 +29,10 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     } else {
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
             sudo apt update
-            sudo apt-get install -y ninja-build clang-11 clang-tidy-11
+            sudo apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
         } else {
             apt update
-            apt-get install -y ninja-build clang-11 clang-tidy-11
+            apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
         }
     }
 }
