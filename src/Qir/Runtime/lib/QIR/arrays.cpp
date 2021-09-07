@@ -559,6 +559,10 @@ extern "C"
         const QirArray::TItemCount sliceItemsCount = std::accumulate(
             sliceDims.begin(), sliceDims.end(), (QirArray::TItemCount)1, std::multiplies<QirArray::TItemCount>());
         QirArray* slice = new QirArray(sliceItemsCount, itemSizeInBytes, dimensions, std::move(sliceDims));
+        if (nullptr == slice->buffer)
+        {
+            return slice;
+        }
         const QirArray::TItemCount singleIndexRunCount = RunCount(array->dimensionSizes, (QirArray::TDimCount)dim);
         const QirArray::TItemCount rowCount            = singleIndexRunCount * array->dimensionSizes[(size_t)dim];
 
@@ -635,6 +639,10 @@ extern "C"
         const QirArray::TItemCount projectItemsCount = std::accumulate(
             projectDims.begin(), projectDims.end(), (QirArray::TItemCount)1, std::multiplies<QirArray::TItemCount>());
         QirArray* project = new QirArray(projectItemsCount, itemSizeInBytes, dimensions - 1, std::move(projectDims));
+        if (nullptr == project->buffer)
+        {
+            return project;
+        }
 
         const QirArray::TItemCount singleIndexRunCount = RunCount(array->dimensionSizes, (QirArray::TDimCount)dim);
         const QirArray::TItemCount rowCount            = singleIndexRunCount * array->dimensionSizes[(size_t)dim];
@@ -642,6 +650,7 @@ extern "C"
         assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes <
                std::numeric_limits<QirArray::TBufSize>::max());
         // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
+
         const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
 
         QirArray::TItemCount dst = 0;
