@@ -1,6 +1,6 @@
 set(TEST_FILES
   qir-test-noqsharp.ll
-  qsharp/obj/qsharp/qir-gen.bc
+  qsharp/qir/qir-gen.ll
 )
 
 #==============================================================================

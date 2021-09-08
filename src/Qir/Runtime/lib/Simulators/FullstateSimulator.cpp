@@ -113,6 +113,17 @@ namespace Quantum
             return static_cast<unsigned>(pauli);
         }
 
+        std::vector<unsigned> GetBases(long num, PauliId* paulis)
+        {
+            std::vector<unsigned> convertedBases;
+            convertedBases.reserve((size_t)num);
+            for (auto i = 0; i < num; i++)
+            {
+                convertedBases.push_back(GetBasis(paulis[i]));
+            }
+            return convertedBases;
+        }
+
         const QUANTUM_SIMULATOR handle = nullptr;
 
         using TSimulatorId = unsigned; // TODO: Use `void*` or a fixed-size integer,
@@ -254,7 +265,7 @@ namespace Quantum
                 // We reject the release of a qubit that is not in the ground state (releaseQubit returns false),
                 // and was not recently measured (ie: the last operation was not measurement). This means the
                 // state is not well known, and therefore the safety of release is not guaranteed.
-                quantum__rt__fail_cstr("Released qubit neither measured nor in ground state.");
+                __quantum__rt__fail_cstr("Released qubit neither measured nor in ground state.");
             }
             qubitManager->Release(q); // Release it in the qubit manager.
         }
@@ -286,8 +297,10 @@ namespace Quantum
                 // If measuring exactly one qubit, mark it as measured for tracking.
                 isMeasured[ids[0]] = true;
             }
+            std::vector<unsigned> convertedBases = GetBases(numBases, bases);
+
             return reinterpret_cast<Result>(
-                m(this->simulatorId, (unsigned)numBases, reinterpret_cast<unsigned*>(bases), ids.data()));
+                m(this->simulatorId, (unsigned)numBases, convertedBases.data(), ids.data()));
         }
 
         void ReleaseResult(Result /*r*/) override
@@ -469,9 +482,10 @@ namespace Quantum
         void Exp(long numTargets, PauliId paulis[], Qubit targets[], double theta) override
         {
             typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
-            static TExp exp           = reinterpret_cast<TExp>(this->GetProc("Exp"));
-            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            exp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta, ids.data());
+            static TExp exp                      = reinterpret_cast<TExp>(this->GetProc("Exp"));
+            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
+            exp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, ids.data());
             UnmarkAsMeasuredQubitList(numTargets, targets);
         }
 
@@ -479,11 +493,12 @@ namespace Quantum
                            double theta) override
         {
             typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
-            static TMCExp cexp                = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
-            std::vector<unsigned> idsTargets  = GetQubitIds(numTargets, targets);
-            std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
-            cexp(this->simulatorId, (unsigned)numTargets, reinterpret_cast<unsigned*>(paulis), theta,
-                 (unsigned)numControls, idsControls.data(), idsTargets.data());
+            static TMCExp cexp                   = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
+            std::vector<unsigned> idsTargets     = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> idsControls    = GetQubitIds(numControls, controls);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
+            cexp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, (unsigned)numControls,
+                 idsControls.data(), idsTargets.data());
             UnmarkAsMeasuredQubitList(numTargets, targets);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -500,9 +515,11 @@ namespace Quantum
             typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
-            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            double actualProbability  = 1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
-                                                                      reinterpret_cast<int*>(bases), ids.data());
+            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
+            std::vector<unsigned> convertedBases = GetBases(numTargets, bases);
+            double actualProbability =
+                1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
+                                               reinterpret_cast<int*>(convertedBases.data()), ids.data());
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
