@@ -4,7 +4,7 @@
 #Requires -Version 6.0
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+    if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue)) {
             choco install llvm --version=11.1.0
