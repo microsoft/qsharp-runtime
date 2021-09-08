@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
         IIntrinsicApplyUncontrolledX,
         IIntrinsicApplyUncontrolledY,
         IIntrinsicApplyUncontrolledZ,
-        IIntrinsicM,
+        IIntrinsicMZ,
         IIntrinsicReset
     { }
 }
