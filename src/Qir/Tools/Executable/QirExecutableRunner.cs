@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -37,6 +38,11 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
             using var streamWriter = new StreamWriter(stream);
             await streamWriter.WriteAsync(output);
             logger?.LogInformation($"Executable has finished running. Result code: {process.ExitCode}");
+
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException($"Executable failed with exit code: {process.ExitCode}");
+            }
         }
     }
 }
