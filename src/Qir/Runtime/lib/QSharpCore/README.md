@@ -18,16 +18,9 @@ Same-level entities are independent of each other (unless specified otherwise). 
 
 ## Level 1
 
-**qsharp__core__qis.hpp**   Declares `quantum__qis__*()` gate set implementations.  
+**qsharp__core__qis.hpp**   Declares `__quantum__qis__*()` gate set implementations.  
                             Depends on `public\CoreTypes.hpp` (QUBIT, PauliId, RESULT) 
                             Uses `QirArray *` from `public\QirTypes.hpp`.
 
-**intrinsics.cpp**          Defines `quantum__qis__*()` gate set implementation.
+**intrinsics.cpp**          Defines `__quantum__qis__*()` gate set implementation.
                             Each API depends on `GlobalContext()`, `IQuantumGateSet`.
-
-## Level 2
-
-**qsharp-core-qis.ll**      Defines `@__quantum__qis__*()` quantum gate set entry points (to be called by the `.ll` files generated from users' `.qs` files).  
-                            The C++ Standard reserves the identifiers starting with double underscores `__`, that is why the definitions of `@__quantum__qis__*`
-                            have been put to `.ll` file rather than `.cpp` file.  
-                            Depends on `quantum__qis__*` implementations (in **intrinsics.cpp**).  
