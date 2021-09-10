@@ -47,9 +47,17 @@ std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantu
 	return (nqubits > max_num_bits / 2) ? std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim)): expand_wfn_helper<max_num_bits / 2>(old_sim, nqubits);
 }
 
+// Sparse simulator only stores non-zero coefficients of the quantum state.
+// Zero coefficients are simply not stored.
+// It has good performance only when the number of non-zero coefficients is low.
+// It employs hashtable structure (by Malte Skarupke) to store non-zero coefficients.
+// Keys are basis vectors represented by std::bitset<>.
+// Values are amplitudes represented by std::complex<RealType>.
+// Hashtable is reallocated and reconstructed on almost every gate.
+// Reallocation is saved for some gates that can be performed in one round.
 class SparseSimulator
 {
-public:
+public: 
 
 	std::set<std::string> operations_done;
 
@@ -584,13 +592,16 @@ public:
 		// as a phase/permutation gate
 		// This means if an assert fails, it will fail
 		// at some future point, not at the point of failure
-		#if NDEBUG
+		#if defined(NDEBUG)
 			if (isAllZ) {
 				_queued_operations.push_back(operation(OP::Assert, qubits, result));
+				// In release mode we queue Z assertion and return.
 				return;
 			}
 		#endif
-		// X or Y assertions require execution
+		// X or Y assertions require immediate execution.
+		// We also execute Z assertion immediately in debug mode
+		// to provide feedback at the point of failure.
 		_execute_queued_ops(qubits, OP::PermuteLarge);
 		_quantum_state->Assert(axes, qubits, result);
 	}

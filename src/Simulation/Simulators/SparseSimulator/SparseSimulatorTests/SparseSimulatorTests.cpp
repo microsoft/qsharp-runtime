@@ -7,9 +7,6 @@
 #include "TestHelpers.hpp"
 #include <cmath>
 #include <iostream>
-#include <locale> // necessary for string conversions for logging
-#include <codecvt> // necessary for string conversions for logging
-#include <string> // necessary for string conversions for logging
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
@@ -70,7 +67,7 @@ namespace SparseSimulatorTests
 			uint64_t k = 0;
 			qubit_label_type<num_qubits> label1(0);
 			qubit_label_type<num_qubits> label2(1);
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
 			for (i = 0; i < 500; i++){
 				k += i * i * i * i;
 				uint64_t m = 0;
@@ -78,7 +75,9 @@ namespace SparseSimulatorTests
 				for (j = 0; j < 500; j++){
 					m += j * j * j * j;
 					label2 = qubit_label_type<num_qubits>(m);
-					Assert::AreEqual<bool>(k < m, label1 < label2, converter.from_bytes("Comparing " + std::to_string(k) + " to " + std::to_string(m) + "\n").c_str());
+					wchar_t message[100];
+					swprintf(message, sizeof(message)/sizeof(*message), L"Comparing %llu to %llu\n", k, m);
+					Assert::AreEqual<bool>(k < m, label1 < label2, message);
 				}
 			}
 		}
