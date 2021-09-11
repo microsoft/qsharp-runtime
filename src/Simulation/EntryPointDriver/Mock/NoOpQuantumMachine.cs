@@ -19,9 +19,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// </summary>
         internal const string Target = "test.machine.noop";
 
-        public string ProviderId => nameof(NoOpQuantumMachine);
-
-        //string IAzureSubmitter.Target => Target;
+        string IQuantumMachine.Target => "test.machine.noop";
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>

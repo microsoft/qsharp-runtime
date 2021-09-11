@@ -32,6 +32,10 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static readonly ImmutableList<SubmitterInfo> QSharpSubmitters = ImmutableList<SubmitterInfo>.Empty;
 
+        // TODO: Write documentation.
+        // TODO: Implement.
+        public static IQirSubmitter? QirPayloadGenerator(string target) => null;
+
         /// <summary>
         /// Returns a QIR submitter.
         /// </summary>
@@ -76,6 +80,14 @@ namespace Microsoft.Azure.Quantum
             var args = new object?[] { target, workspace, storageConnection };
             return (T)type.InvokeMember(
                 submitter.MethodName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
+        }
+
+        // TODO: Add documentation.
+        private static T? AzurePayloadGenerator<T>(IEnumerable<SubmitterInfo> submittersInfo, string target)
+            where T : class
+        {
+            // TODO: Implement.
+            return null;
         }
 
         /// <summary>

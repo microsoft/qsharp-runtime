@@ -14,10 +14,9 @@ namespace Microsoft.Quantum.Runtime.Submitters
     public interface IQSharpSubmitter
     {
         /// <summary>
-        /// TODO.
+        /// TODO: Write documentation.
         /// </summary>
-        // TODO: Uncomment.
-        //Target Target { get; }
+        string Target { get; }
 
         /// <summary>
         /// Submits a job to execute a Q# program without waiting for execution to complete.

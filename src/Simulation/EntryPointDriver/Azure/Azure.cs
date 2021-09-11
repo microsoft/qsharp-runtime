@@ -20,6 +20,15 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// </summary>
     public static class Azure
     {
+
+        // TODO: Add documentation.
+        public static Task<int> GenerateAzurePayload(
+            GenerateAzurePayloadSettings settings)
+        {
+            Console.WriteLine("Microsoft.Quantum.EntryPointDriver.Azure.GenerateAzurePayload");
+            return Task.Run(() => 0);
+        }
+
         /// <summary>
         /// Submits an entry point to Azure Quantum. If <paramref name="qirSubmission"/> is non-null and a QIR submitter
         /// is available for the target in <paramref name="settings"/>, the QIR entry point is submitted. Otherwise, the
@@ -293,6 +302,14 @@ namespace Microsoft.Quantum.EntryPointDriver
             NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
+        };
+
+        // TODO: Add Documentation.
+        // TODO: Implement.
+        private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
+        {
+            null => null,
+
         };
 
         /// <summary>

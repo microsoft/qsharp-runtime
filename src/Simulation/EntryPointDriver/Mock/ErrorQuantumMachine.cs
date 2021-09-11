@@ -15,14 +15,12 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
     /// </summary>
     internal class ErrorQuantumMachine : IQuantumMachine
     {
-        /// <summary>
+        // <summary>
         /// The target for the error quantum machine.
         /// </summary>
         internal const string Target = "test.machine.error";
 
-        public string ProviderId => nameof(ErrorQuantumMachine);
-
-        //string IAzureSubmitter.Target => Target;
+        string IQuantumMachine.Target => Target;
 
         public Task<IQuantumMachineOutput<TOutput>> ExecuteAsync<TInput, TOutput>(
             EntryPointInfo<TInput, TOutput> info, TInput input) =>

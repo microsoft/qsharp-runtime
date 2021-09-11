@@ -19,8 +19,7 @@ namespace Microsoft.Quantum.Runtime
         /// <summary>
         /// TODO.
         /// </summary>
-        // TODO: Uncomment.
-        //Target Target { get; }
+        string Target { get; }
 
         /// <summary>
         /// Function that configures a job object before submission.
