@@ -172,7 +172,7 @@ namespace Microsoft.Quantum.Testing.QIR  {
     // Multiple qubits:
 
     // Quantum Katas, Joint Measurement Workbook,
-    //  https://mybinder.org/v2/gh/microsoft/QuantumKatas/HEAD?filepath=JointMeasurements%2FWorkbook_JointMeasurements.ipynb
+    //  https://mybinder.org/v2/gh/microsoft/QuantumKatas/main?urlpath=/notebooks/JointMeasurements%2FWorkbook_JointMeasurements.ipynb
 
     //  Task 1. Single-qubit measurement
     //  Task 2. Parity measurement
