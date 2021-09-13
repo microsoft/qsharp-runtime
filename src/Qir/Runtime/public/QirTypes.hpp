@@ -43,13 +43,13 @@ struct QIR_SHARED_API QirArray
     int AddRef();
     int Release();
 
-    QirArray(TItemCount cQubits);
+    explicit QirArray(TItemCount cQubits);
     QirArray(TItemCount cItems, TItemSize itemSizeInBytes, TDimCount dimCount = 1, TDimContainer&& dimSizes = {});
     QirArray(const QirArray& other);
 
     ~QirArray();
 
-    char* GetItemPointer(TItemCount index) const;
+    [[nodiscard]] char* GetItemPointer(TItemCount index) const;
     void Append(const QirArray* other);
 };
 
@@ -61,8 +61,8 @@ struct QIR_SHARED_API QirString
     long refCount = 1;
     std::string str;
 
-    QirString(std::string&& str);
-    QirString(const char* cstr);
+    explicit QirString(std::string&& str);
+    explicit QirString(const char* cstr);
 };
 
 /*======================================================================================================================
@@ -72,10 +72,10 @@ struct QIR_SHARED_API QirString
     a header that contains the relevant data. The header immediately precedes the tuple's buffer in memory when the
     tuple is created.
 ======================================================================================================================*/
-// TODO: Move these types to inside of `QirTupleHeader`.
+// TODO (rokuzmin): Move these types to inside of `QirTupleHeader`.
 using PTuplePointedType = uint8_t;
-using PTuple = PTuplePointedType*; // TODO: consider replacing `uint8_t*` with `void*` in order to block the accidental
-                                   //       {dereferencing and pointer arithmtic}.
+using PTuple = PTuplePointedType*; // TODO(rokuzmin): consider replacing `uint8_t*` with `void*` in order to block
+                                   //       the accidental {dereferencing and pointer arithmetic}.
                                    //       Much pointer arithmetic in tests. GetHeader() uses the pointer arithmetic.
 struct QIR_SHARED_API QirTupleHeader
 {
@@ -90,7 +90,7 @@ struct QIR_SHARED_API QirTupleHeader
 
     PTuple AsTuple()
     {
-        return data;
+        return (PTuple)data;
     }
 
     int AddRef();
@@ -139,12 +139,12 @@ static_assert(sizeof(TupleWithControls) == 2 * sizeof(void*),
 /*======================================================================================================================
     QirCallable
 ======================================================================================================================*/
-typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple); // TODO: Move to `QirCallable::t_CallableEntry`.
-typedef void (*t_CaptureCallback)(PTuple, int32_t);      // TODO: Move to `QirCallable::t_CaptureCallback`.
+typedef void (*t_CallableEntry)(PTuple, PTuple, PTuple); // TODO(rokuzmin): Move to `QirCallable::t_CallableEntry`.
+typedef void (*t_CaptureCallback)(PTuple, int32_t);      // TODO(rokuzmin): Move to `QirCallable::t_CaptureCallback`.
 struct QIR_SHARED_API QirCallable
 {
     static int constexpr Adjoint    = 1;
-    static int constexpr Controlled = 1 << 1;
+    static int constexpr Controlled = 1u << 1;
 
   private:
     static int constexpr TableSize = 4;
