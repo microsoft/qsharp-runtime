@@ -643,7 +643,7 @@ namespace Quantum
     std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
     {
         return std::make_unique<CFullstateSimulator>(0);
-    }    
+    }
 
     extern "C" IRuntimeDriver* CreateFullstateSimulator(long userProvidedSeed)
     {

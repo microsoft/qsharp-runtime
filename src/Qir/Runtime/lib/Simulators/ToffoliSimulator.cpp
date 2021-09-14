@@ -260,6 +260,6 @@ namespace Quantum
     {
         return std::make_unique<CToffoliSimulator>();
     }
-    
+
 } // namespace Quantum
 } // namespace Microsoft
