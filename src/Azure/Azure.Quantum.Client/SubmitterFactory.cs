@@ -132,7 +132,11 @@ namespace Microsoft.Azure.Quantum
         private static Type QdkType(string name)
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
+            // TODO: Revert this line after testing and remove console writes.
+            Console.WriteLine($"Type Name: {name}");
+            Console.WriteLine($"Assembly Name: {Assembly.GetExecutingAssembly().GetName()} | Version: {version}");
             var strongName = $"{name}, Version={version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5";
+            Console.WriteLine($"strongName: {strongName}");
             return Type.GetType(strongName, true);
         }
 
