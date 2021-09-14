@@ -642,13 +642,13 @@ namespace Quantum
 
     std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator()
     {
-        return std::make_unique<CFullstateSimulator>(userProvidedSeed);
+        return std::make_unique<CFullstateSimulator>(0);
     }    
 
     extern "C" IRuntimeDriver* CreateFullstateSimulator(long userProvidedSeed)
     {
         return new CFullstateSimulator((uint32_t)userProvidedSeed);
     }
-    
+
 } // namespace Quantum
 } // namespace Microsoft
