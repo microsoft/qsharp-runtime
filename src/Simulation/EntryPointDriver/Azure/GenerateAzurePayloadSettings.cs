@@ -13,5 +13,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The target device ID.
         /// </summary>
         public string? Target { get; set; }
+
+        /// <summary>
+        /// Show additional information.
+        /// </summary>
+        public bool Verbose { get; set; }
     }
 }

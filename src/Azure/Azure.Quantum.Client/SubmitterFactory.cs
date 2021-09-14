@@ -33,8 +33,8 @@ namespace Microsoft.Azure.Quantum
         private static readonly ImmutableList<SubmitterInfo> QSharpSubmitters = ImmutableList<SubmitterInfo>.Empty;
 
         // TODO: Write documentation.
-        // TODO: Implement.
-        public static IQirSubmitter? QirPayloadGenerator(string target) => null;
+        public static IQirSubmitter? QirPayloadGenerator(string target) =>
+            AzurePayloadGenerator<IQirSubmitter>(QirSubmitters, target);
 
         /// <summary>
         /// Returns a QIR submitter.
@@ -83,11 +83,19 @@ namespace Microsoft.Azure.Quantum
         }
 
         // TODO: Add documentation.
-        private static T? AzurePayloadGenerator<T>(IEnumerable<SubmitterInfo> submittersInfo, string target)
+        private static T? AzurePayloadGenerator<T>(IEnumerable<SubmitterInfo> submitters, string target)
             where T : class
         {
-            // TODO: Implement.
-            return null;
+            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
+            if (submitter is null)
+            {
+                return null;
+            }
+
+            var type = QdkType(submitter.TypeName);
+            var args = new object?[] { target };
+            return (T)type.InvokeMember(
+                submitter.MethodName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
         }
 
         /// <summary>

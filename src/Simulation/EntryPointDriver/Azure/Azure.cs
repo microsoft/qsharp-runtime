@@ -23,10 +23,27 @@ namespace Microsoft.Quantum.EntryPointDriver
 
         // TODO: Add documentation.
         public static Task<int> GenerateAzurePayload(
-            GenerateAzurePayloadSettings settings)
+            GenerateAzurePayloadSettings settings, QirSubmission? qirSubmission)
         {
             Console.WriteLine("Microsoft.Quantum.EntryPointDriver.Azure.GenerateAzurePayload");
-            return Task.Run(() => 0);
+            if (!(qirSubmission is null) && QirAzurePayloadGenerator(settings) is { } generator)
+            {
+                return GenerateQirAzurePayload(settings, generator, qirSubmission);
+            }
+
+            if (qirSubmission is null)
+            {
+                DisplayError(
+                    $"The target {settings.Target} requires QIR submission, but the project was built without QIR. "
+                    + "Please enable QIR generation in the project settings.",
+                    null);
+            }
+            else
+            {
+                DisplayError($"No submitters were found for the target {settings.Target}.", null);
+            }
+
+            return Task.FromResult(1);
         }
 
         /// <summary>
@@ -78,6 +95,15 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
 
             return Task.FromResult(1);
+        }
+
+        // TODO: Document.
+        private static async Task<int> GenerateQirAzurePayload(
+            GenerateAzurePayloadSettings settings, IQirSubmitter generator, QirSubmission submission)
+        {
+            LogIfVerbose(settings, "Generating QIR Azure Payload");
+            return await Task<int>.Run(() => DisplayValidation(generator.Validate(
+                submission.QirStream, submission.EntryPointName, submission.Arguments)));
         }
 
         /// <summary>
@@ -266,6 +292,16 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
+        // TODO: Add documentation.
+        private static void LogIfVerbose(GenerateAzurePayloadSettings settings, string message)
+        {
+            if (settings.Verbose)
+            {
+                Console.WriteLine(message);
+                Console.WriteLine();
+            }
+        }
+
         /// <summary>
         /// Returns a Q# machine for the target in the given Azure settings.
         /// </summary>
@@ -291,6 +327,14 @@ namespace Microsoft.Quantum.EntryPointDriver
             _ => SubmitterFactory.QSharpSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
+        // TODO: Add Documentation.
+        // TODO: Add NoOp submitters for testing.
+        private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
+        {
+            null => null,
+            _ => SubmitterFactory.QirPayloadGenerator(settings.Target)
+        };
+
         /// <summary>
         /// Returns a QIR submitter for the target in the given Azure settings.
         /// </summary>
@@ -302,14 +346,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
             NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
-        };
-
-        // TODO: Add Documentation.
-        // TODO: Implement.
-        private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
-        {
-            null => null,
-
         };
 
         /// <summary>
