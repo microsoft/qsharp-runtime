@@ -403,7 +403,10 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
-            return new CommandWithValidators(command, Validators.Empty);
+            var validators = AddOptionIfAvailable(command, TargetOption)
+                .Concat(AddOptionIfAvailable(command, VerboseOption));
+
+            return new CommandWithValidators(command, validators.ToImmutableList());
         }
 
         /// <summary>
@@ -415,7 +418,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
-                Handler = CommandHandler.Create((ParseResult parseResult, string simulator) => this.Simulate(parseResult, simulator, entryPoint))
+                Handler = CommandHandler.Create(
+                    (ParseResult parseResult, string simulator) => this.Simulate(parseResult, simulator, entryPoint))
             };
             foreach (var option in entryPoint.Options)
             {
@@ -470,8 +474,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="entryPoint">The entry point to generate payload for.</param>
         /// <returns>The exit code.</returns>
         private Task<int> GenerateAzurePayload(
-            ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint) =>
-                entryPoint.GenerateAzurePayload(parseResult, settings);
+            ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint)
+        {
+            // TODO: Remove Console write.
+            Console.WriteLine($"GenerateAzurePayload:\nTarget={settings.Target}\nVerbose={settings.Verbose}");
+            return entryPoint.GenerateAzurePayload(parseResult, settings);
+        }
+                
 
         /// <summary>
         /// Simulates the entry point.
