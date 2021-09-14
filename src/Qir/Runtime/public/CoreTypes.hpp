@@ -36,7 +36,7 @@ class QUBIT;
 typedef QUBIT* Qubit; // Not a pointer to a memory location, just an integer - qubit id.
 
 class RESULT;
-typedef RESULT* Result; // TODO: Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64.
+typedef RESULT* Result; // TODO(rokuzmin): Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64.
                         //       Remove all the `RESULT`.
 
 enum ResultValue

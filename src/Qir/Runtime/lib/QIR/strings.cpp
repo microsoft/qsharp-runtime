@@ -28,7 +28,7 @@ static QirString* CreateOrReuseAlreadyAllocated(std::string&& str)
     if (alreadyAllocated != AllocatedStrings().end())
     {
         qstr = alreadyAllocated->second;
-        assert(qstr->str.compare(str) == 0);
+        assert(qstr->str == str);
         qstr->refCount++;
     }
     else
@@ -95,7 +95,7 @@ extern "C"
     // Returns true if the two strings are equal, false otherwise.
     bool __quantum__rt__string_equal(QirString* left, QirString* right) // NOLINT
     {
-        assert((left == right) == (left->str.compare(right->str) == 0));
+        assert((left == right) == (left->str == right->str));
         return left == right;
     }
 
@@ -115,7 +115,7 @@ extern "C"
 
         // Remove padding zeros from the decimal part (relies on the fact that the output for integers always contains
         // period).
-        std::size_t pos1 = str.find_last_not_of("0");
+        std::size_t pos1 = str.find_last_not_of('0');
         if (pos1 != std::string::npos)
         {
             str.erase(pos1 + 1);

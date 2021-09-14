@@ -181,8 +181,8 @@ namespace Quantum
         sharedQubitStatusArray = new QubitIdType[(size_t)qubitCapacity];
 
         // These objects are passed by value (copies are created)
-        QubitListInSharedArray FreeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
-        RestrictedReuseArea outermostArea(FreeQubitsFresh);
+        QubitListInSharedArray freeQubitsFresh(0, qubitCapacity - 1, sharedQubitStatusArray);
+        RestrictedReuseArea outermostArea(freeQubitsFresh);
         freeQubitsInAreas.PushToBack(outermostArea);
 
         freeQubitCount = qubitCapacity;
@@ -431,7 +431,7 @@ namespace Quantum
         // existing values (NonMarker or indexes in the array).
 
         // Prepare new shared status array
-        QubitIdType* newStatusArray = new QubitIdType[(size_t)requestedCapacity];
+        auto* newStatusArray = new QubitIdType[(size_t)requestedCapacity];
         memcpy(newStatusArray, sharedQubitStatusArray, (size_t)qubitCapacity * sizeof(newStatusArray[0]));
         QubitListInSharedArray newFreeQubits(qubitCapacity, requestedCapacity - 1, newStatusArray);
 

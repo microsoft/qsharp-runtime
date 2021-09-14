@@ -4,7 +4,7 @@
 #pragma once
 
 #include <cstdint>
-#include <stdarg.h> // for va_list
+#include <cstdarg> // for va_list
 
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
@@ -310,7 +310,7 @@ extern "C"
     // TODO QIR_SHARED_API bool __quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
 
-// TODO: Consider separating the `extern "C"` exports and C++ exports.
+// TODO(rokuzmin): Consider separating the `extern "C"` exports and C++ exports.
 namespace Microsoft // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
 namespace Quantum
