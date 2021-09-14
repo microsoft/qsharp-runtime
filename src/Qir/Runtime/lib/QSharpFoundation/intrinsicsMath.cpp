@@ -21,61 +21,101 @@ extern "C"
 {
 
     // Implementations:
-    bool quantum__qis__isnan__body(double d)
+    double __quantum__qis__nan__body()
+    {
+        return std::sqrt(-1.0); // sqrt(<negative>) -> NaN
+    }
+
+    bool __quantum__qis__isnan__body(double d)
     {
         return std::isnan(d); // https://en.cppreference.com/w/cpp/numeric/math/isnan
     }
 
-    double quantum__qis__infinity__body()
+    double __quantum__qis__infinity__body()
     {
         return (double)INFINITY; // https://en.cppreference.com/w/c/numeric/math/INFINITY
     }
 
-    bool quantum__qis__isinf__body(double d)
+    bool __quantum__qis__isinf__body(double d)
     {
-        return std::isinf(d); // https://en.cppreference.com/w/cpp/numeric/math/isinf
+        return std::isinf(d) && d > 0.0; // https://en.cppreference.com/w/cpp/numeric/math/isinf
     }
 
-    double quantum__qis__arctan2__body(double y, double x)
+    bool __quantum__qis__isnegativeinfinity__body(double d)
+    {
+        return std::isinf(d) && d < 0.0; // https://en.cppreference.com/w/cpp/numeric/math/isinf
+    }
+
+    double __quantum__qis__sin__body(double d)
+    {
+        return std::sin(d);
+    }
+
+    double __quantum__qis__cos__body(double d)
+    {
+        return std::cos(d);
+    }
+
+    double __quantum__qis__tan__body(double d)
+    {
+        return std::tan(d);
+    }
+
+    double __quantum__qis__arctan2__body(double y, double x)
     {
         return std::atan2(y, x); // https://en.cppreference.com/w/cpp/numeric/math/atan2
     }
 
-    double quantum__qis__sinh__body(double theta)
+    double __quantum__qis__sinh__body(double theta)
     {
         return std::sinh(theta);
     }
 
-    double quantum__qis__cosh__body(double theta)
+    double __quantum__qis__cosh__body(double theta)
     {
         return std::cosh(theta);
     }
 
-    double quantum__qis__arcsin__body(double theta)
+    double __quantum__qis__tanh__body(double theta)
+    {
+        return std::tanh(theta);
+    }
+
+    double __quantum__qis__arcsin__body(double theta)
     {
         return std::asin(theta); // https://en.cppreference.com/w/cpp/numeric/math/asin
     }
 
-    double quantum__qis__arccos__body(double theta)
+    double __quantum__qis__arccos__body(double theta)
     {
         return std::acos(theta); // https://en.cppreference.com/w/cpp/numeric/math/acos
     }
 
-    double quantum__qis__arctan__body(double theta)
+    double __quantum__qis__arctan__body(double theta)
     {
         return std::atan(theta); // https://en.cppreference.com/w/cpp/numeric/math/atan
     }
 
-    double quantum__qis__ieeeremainder__body(double x, double y)
+    double __quantum__qis__sqrt__body(double d)
+    {
+        return std::sqrt(d);
+    }
+
+    double __quantum__qis__log__body(double d)
+    {
+        return std::log(d);
+    }
+
+    double __quantum__qis__ieeeremainder__body(double x, double y)
     {
         return std::remainder(x, y); // https://en.cppreference.com/w/cpp/numeric/math/remainder
     }
 
-    int64_t quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
+    int64_t __quantum__qis__drawrandomint__body(int64_t minimum, int64_t maximum)
     {
         if (minimum > maximum)
         {
-            quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
+            __quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
         }
 
         // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
@@ -87,11 +127,11 @@ extern "C"
         return lastGeneratedRndI64;
     }
 
-    double quantum__qis__drawrandomdouble__body(double minimum, double maximum)
+    double __quantum__qis__drawrandomdouble__body(double minimum, double maximum)
     {
         if (minimum > maximum)
         {
-            quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
+            __quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
         }
 
         // For testing purposes we need separate generators for Int and Double:

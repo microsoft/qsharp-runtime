@@ -11,7 +11,6 @@ set(includes
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(tracer-obj OBJECT ${source_files})
-target_source_from_qir(tracer-obj tracer-bridge.ll)
 target_include_directories(tracer-obj PUBLIC ${includes})
 set_property(TARGET tracer-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(tracer-obj PRIVATE EXPORT_QIR_API)

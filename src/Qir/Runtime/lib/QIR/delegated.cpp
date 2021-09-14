@@ -33,54 +33,54 @@ static Microsoft::Quantum::IRestrictedAreaManagement* RestrictedAreaManagement()
 
 extern "C"
 {
-    Result quantum__rt__result_get_zero()
+    Result __quantum__rt__result_get_zero()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseZero();
     }
 
-    Result quantum__rt__result_get_one()
+    Result __quantum__rt__result_get_one()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->UseOne();
     }
 
-    QUBIT* quantum__rt__qubit_allocate()
+    QUBIT* __quantum__rt__qubit_allocate()
     {
         return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
     }
 
-    void quantum__rt__qubit_release(QUBIT* qubit)
+    void __quantum__rt__qubit_release(QUBIT* qubit)
     {
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
     }
 
-    QUBIT* quantum__rt__qubit_borrow()
+    QUBIT* __quantum__rt__qubit_borrow()
     {
         // Currently we implement borrowing as allocation.
-        return quantum__rt__qubit_allocate();
+        return __quantum__rt__qubit_allocate();
     }
 
-    void quantum__rt__qubit_return(QUBIT* qubit)
+    void __quantum__rt__qubit_return(QUBIT* qubit)
     {
         // Currently we implement borrowing as allocation.
-        quantum__rt__qubit_release(qubit);
+        __quantum__rt__qubit_release(qubit);
     }
 
-    void quantum__rt__qubit_restricted_reuse_area_start()
+    void __quantum__rt__qubit_restricted_reuse_area_start()
     {
         RestrictedAreaManagement()->StartArea();
     }
 
-    void quantum__rt__qubit_restricted_reuse_segment_next()
+    void __quantum__rt__qubit_restricted_reuse_segment_next()
     {
         RestrictedAreaManagement()->NextSegment();
     }
 
-    void quantum__rt__qubit_restricted_reuse_area_end()
+    void __quantum__rt__qubit_restricted_reuse_area_end()
     {
         RestrictedAreaManagement()->EndArea();
     }
 
-    void quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
+    void __quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)
     {
         if (increment == 0)
         {
@@ -128,7 +128,7 @@ extern "C"
         }
     }
 
-    bool quantum__rt__result_equal(RESULT* r1, RESULT* r2) // NOLINT
+    bool __quantum__rt__result_equal(RESULT* r1, RESULT* r2) // NOLINT
     {
         if (r1 == r2)
         {
@@ -138,18 +138,18 @@ extern "C"
     }
 
     // Returns a string representation of the result.
-    QirString* quantum__rt__result_to_string(RESULT* result) // NOLINT
+    QirString* __quantum__rt__result_to_string(RESULT* result) // NOLINT
     {
         ResultValue rv = Microsoft::Quantum::GlobalContext()->GetDriver()->GetResultValue(result);
         assert(rv != Result_Pending);
 
-        return (rv == Result_Zero) ? quantum__rt__string_create("Zero") : quantum__rt__string_create("One");
+        return (rv == Result_Zero) ? __quantum__rt__string_create("Zero") : __quantum__rt__string_create("One");
     }
 
     // Returns a string representation of the qubit.
-    QirString* quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
+    QirString* __quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return quantum__rt__string_create(
+        return __quantum__rt__string_create(
             Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
     }
 }
