@@ -9,5 +9,5 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_MACOSX_RPATH 1)
-add_executable(SparseSimulatorTests SparseSimulatorTests.cpp)
+add_executable(SparseSimulatorTests SparseSimulatorTests.cpp TestHelpers.cpp)
 add_test(SparseSimulatorTests SparseSimulatorTests)
