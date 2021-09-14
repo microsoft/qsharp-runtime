@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Runtime
     public interface IQuantumMachine
     {
         /// <summary>
-        /// TODO.
+        /// The name of the execution target.
         /// </summary>
         string Target { get; }
 

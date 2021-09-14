@@ -21,7 +21,12 @@ namespace Microsoft.Quantum.EntryPointDriver
     public static class Azure
     {
 
-        // TODO: Add documentation.
+        /// <summary>
+        /// Generates payload for Azure offline.
+        /// </summary>
+        /// <param name="settings">The settings for generating azure payload.</param>
+        /// <param name="qirSubmission">A QIR entry point submission.</param>
+        /// <returns>The exit code.</returns>
         public static Task<int> GenerateAzurePayload(
             GenerateAzurePayloadSettings settings, QirSubmission? qirSubmission)
         {
@@ -97,12 +102,18 @@ namespace Microsoft.Quantum.EntryPointDriver
             return Task.FromResult(1);
         }
 
-        // TODO: Document.
+        /// <summary>
+        /// Generates QIR payload for Azure.
+        /// </summary>
+        /// <param name="settings">The settings for generating azure payload.</param>
+        /// <param name="generator">The payload generator.</param>
+        /// <param name="submission">A QIR entry point submission.</param>
+        /// <returns>The exit code.</returns>
         private static async Task<int> GenerateQirAzurePayload(
             GenerateAzurePayloadSettings settings, IQirSubmitter generator, QirSubmission submission)
         {
             LogIfVerbose(settings, "Generating QIR Azure Payload");
-            return await Task<int>.Run(() => DisplayValidation(generator.Validate(
+            return await Task<int>.Run(() => DisplayPayloadGeneration(generator.Validate(
                 submission.QirStream, submission.EntryPointName, submission.Arguments)));
         }
 
@@ -211,6 +222,24 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
+        /// Displays a message depending on whether the payload could be generated.
+        /// </summary>
+        /// <param name="message">The paylod generation error message, or null if payload generation was successfull.</param>
+        /// <returns>The exit code.</returns>
+        private static int DisplayPayloadGeneration(string? message)
+        {
+            if (message is null)
+            {
+                Console.WriteLine("✔️  Payload generated.");
+                return 0;
+            }
+
+            Console.WriteLine("❌  Payload could not be generated." + Environment.NewLine);
+            Console.WriteLine(message);
+            return 1;
+        }
+
+        /// <summary>
         /// Displays a validation message for a program.
         /// </summary>
         /// <param name="message">The validation error message, or null if the program is valid.</param>
@@ -292,7 +321,11 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
-        // TODO: Add documentation.
+        /// <summary>
+        /// Logs a message if the verbose setting is enabled.
+        /// </summary>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <param name="message">The message.</param>
         private static void LogIfVerbose(GenerateAzurePayloadSettings settings, string message)
         {
             if (settings.Verbose)
@@ -327,10 +360,14 @@ namespace Microsoft.Quantum.EntryPointDriver
             _ => SubmitterFactory.QSharpSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
         };
 
-        // TODO: Add Documentation.
-        // TODO: Add NoOp submitters for testing.
+        /// <summary>
+        /// Returns a QIR submitter for the target in the given settings.
+        /// </summary>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <returns>A QIR submitter.</returns>
         private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
         {
+            // TODO: Add NoOp submitters for testing.
             null => null,
             _ => SubmitterFactory.QirPayloadGenerator(settings.Target)
         };

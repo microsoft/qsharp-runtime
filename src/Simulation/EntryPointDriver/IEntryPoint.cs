@@ -33,12 +33,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         IEnumerable<Option> Options { get; }
 
-        // TODO: Add documentation.
-        Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings)
-        {
-            Console.WriteLine("GenerateAzurePayload - Default Implementation");
-            return Task.Run(() => 0);
-        }
+        /// <summary>
+        /// Generates payload for Azure Quantum for the entry point.
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <returns>The exit code.</returns>
+        Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings);
 
         /// <summary>
         /// Submits the entry point to Azure Quantum.

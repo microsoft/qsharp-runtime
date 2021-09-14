@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Runtime.Submitters
     public interface IQSharpSubmitter
     {
         /// <summary>
-        /// TODO: Write documentation.
+        /// The name of the execution target.
         /// </summary>
         string Target { get; }
 

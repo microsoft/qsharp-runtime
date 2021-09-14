@@ -18,6 +18,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// The target for the no-op QIR submitter.
         /// </summary>
         internal const string Target = "test.submitter.qir.noop";
+
         string IQirSubmitter.Target => Target;
 
         public Task<IQuantumMachineJob> SubmitAsync(

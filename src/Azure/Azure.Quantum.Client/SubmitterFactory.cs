@@ -32,9 +32,12 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static readonly ImmutableList<SubmitterInfo> QSharpSubmitters = ImmutableList<SubmitterInfo>.Empty;
 
-        // TODO: Write documentation.
-        public static IQirSubmitter? QirPayloadGenerator(string target) =>
-            AzurePayloadGenerator<IQirSubmitter>(QirSubmitters, target);
+        /// <summary>
+        /// Returns a QIR submitter that can generate the payload to Azure offline.
+        /// </summary>
+        /// <param name="target">The name of the execution target.</param>
+        /// <returns>A QIR submitter.</returns>
+        public static IQirSubmitter? QirPayloadGenerator(string target) => AzurePayloadGenerator(QirSubmitters, target);
 
         /// <summary>
         /// Returns a QIR submitter.
@@ -58,6 +61,26 @@ namespace Microsoft.Azure.Quantum
             Submitter<IQSharpSubmitter>(QSharpSubmitters, target, workspace, storageConnection);
 
         /// <summary>
+        /// Returns an instance of a QIR submitter that can generate payload for Azure offline from the given list that matches the target.
+        /// </summary>
+        /// <param name="submitters">Information about each submitter.</param>
+        /// <param name="target">The name of the execution target.</param>
+        /// <returns>The QIR submitter instance.</returns>
+        private static IQirSubmitter? AzurePayloadGenerator(IEnumerable<SubmitterInfo> submitters, string target)
+        {
+            var constructorInfo = ConstructorInfo(submitters, target);
+            if (constructorInfo is null)
+            {
+                return null;
+            }
+
+            (var constructorName, var constructorType) = constructorInfo.Value;
+            var args = new object?[] { target };
+            return (IQirSubmitter)constructorType.InvokeMember(
+                constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
+        }
+
+        /// <summary>
         /// Returns an instance of a submitter from the given list that matches the target.
         /// </summary>
         /// <param name="submitters">Information about each submitter.</param>
@@ -70,21 +93,25 @@ namespace Microsoft.Azure.Quantum
             IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
             where T : class
         {
-            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
-            if (submitter is null)
+            var constructorInfo = ConstructorInfo(submitters, target);
+            if (constructorInfo is null)
             {
                 return null;
             }
 
-            var type = QdkType(submitter.TypeName);
+            (var constructorName, var constructorType) = constructorInfo.Value;
             var args = new object?[] { target, workspace, storageConnection };
-            return (T)type.InvokeMember(
-                submitter.MethodName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
+            return (T)constructorType.InvokeMember(
+                constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
         }
 
-        // TODO: Add documentation.
-        private static T? AzurePayloadGenerator<T>(IEnumerable<SubmitterInfo> submitters, string target)
-            where T : class
+        /// <summary>
+        /// Returns the name and the type of a constructor that matches the target.
+        /// </summary>
+        /// <param name="submitters">Information about each submitter.</param>
+        /// <param name="target">The name of the execution target.</param>
+        /// <returns>A name and type tuple.</returns>
+        private static (string Name, Type Type)? ConstructorInfo(IEnumerable<SubmitterInfo> submitters, string target)
         {
             var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
             if (submitter is null)
@@ -92,10 +119,9 @@ namespace Microsoft.Azure.Quantum
                 return null;
             }
 
+            var name = submitter.MethodName;
             var type = QdkType(submitter.TypeName);
-            var args = new object?[] { target };
-            return (T)type.InvokeMember(
-                submitter.MethodName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
+            return (name, type);
         }
 
         /// <summary>

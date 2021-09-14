@@ -194,11 +194,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         public async Task<int> Run(string[] args)
         {
             var generateAzurePayloadSubCommands =
-                this.entryPoints.Select(this.CreateGenerateAzureQuantumPayloadEntryPointCommand).ToList();
+                this.entryPoints.Select(this.CreateGenerateAzurePayloadEntryPointCommand).ToList();
             var simulateSubCommands = this.entryPoints.Select(this.CreateSimulateEntryPointCommand).ToList();
             var submitSubCommands = this.entryPoints.Select(this.CreateSubmitEntryPointCommand).ToList();
 
-            // TODO: Add generate command.
             var generate = CreateTopLevelCommand(
                 "generateazurepayload",
                 "Locally generate payload that can be submitted to Azure.",
@@ -355,8 +354,13 @@ namespace Microsoft.Quantum.EntryPointDriver
             return ImmutableList.Create(validator);
         }
 
-        // TODO: Add documentation.
-        // TODO: This should take name and description of the command as arguments.
+         /// <summary>
+        /// Creates a top-level command.
+        /// </summary>
+        /// <param name="name">The name of the command.</param>
+        /// <param name="description">The description of the command.</param>
+        /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
+        /// <returns>The created simulate command with the validators for that command.</returns>
         private static CommandWithValidators CreateTopLevelCommand(
             string name,
             string description,
@@ -381,9 +385,12 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
-        // TODO: Add documentation.
-        // TODO: Maybe this can be abstracted because the only different logic is the handler.
-        private CommandWithValidators CreateGenerateAzureQuantumPayloadEntryPointCommand(IEntryPoint entryPoint)
+        /// <summary>
+        /// Creates a sub command specific to the given entry point for the generateazurepayload command.
+        /// </summary>
+        /// <param name="entryPoint">The entry point to make a command for.</param>
+        /// <returns>The command corresponding to the given entry point with the validators for that command.</returns>
+        private CommandWithValidators CreateGenerateAzurePayloadEntryPointCommand(IEntryPoint entryPoint)
         {
             var command = new Command(entryPoint.Name, entryPoint.Summary)
             {
@@ -396,7 +403,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
-            // TODO: Check if Validators should be empty.
             return new CommandWithValidators(command, Validators.Empty);
         }
 
@@ -434,7 +440,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 command.AddOption(option);
             }
 
-            // TODO: Make stuff mutually exclusive here.
             var validators = AddOptionIfAvailable(command, SubscriptionOption)
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
@@ -457,9 +462,16 @@ namespace Microsoft.Quantum.EntryPointDriver
             return new CommandWithValidators(command, validators.ToImmutableList());
         }
 
-        // TODO: Add documentation.
-        private Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint) =>
-            entryPoint.GenerateAzurePayload(parseResult, settings);
+        /// <summary>
+        /// Generates payload for Azure Quantum for the entry point.
+        /// </summary>
+        /// <param name="parseResult">The command-line parsing result.</param>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <param name="entryPoint">The entry point to generate payload for.</param>
+        /// <returns>The exit code.</returns>
+        private Task<int> GenerateAzurePayload(
+            ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint) =>
+                entryPoint.GenerateAzurePayload(parseResult, settings);
 
         /// <summary>
         /// Simulates the entry point.

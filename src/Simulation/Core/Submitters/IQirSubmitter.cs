@@ -15,9 +15,8 @@ namespace Microsoft.Quantum.Runtime.Submitters
     public interface IQirSubmitter
     {
         /// <summary>
-        /// TODO Write documentation.
+        /// The name of the execution target.
         /// </summary>
-        // TODO: Uncomment.
         string Target { get; }
 
         /// <summary>
