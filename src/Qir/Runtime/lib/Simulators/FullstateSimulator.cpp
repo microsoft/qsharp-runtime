@@ -640,9 +640,9 @@ namespace Quantum
         DumpRegisterImpl(outStream, qubits);
     }
 
-    std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator(uint32_t userProvidedSeed /*= 0*/)
+    extern "C" IRuntimeDriver* CreateFullstateSimulator()
     {
-        return std::make_unique<CFullstateSimulator>(userProvidedSeed);
+        return new CFullstateSimulator(0);
     }
 } // namespace Quantum
 } // namespace Microsoft

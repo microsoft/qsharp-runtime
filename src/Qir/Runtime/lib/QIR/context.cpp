@@ -19,13 +19,13 @@ namespace Quantum
         return g_context;
     }
 
-    void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects)
+    extern "C" void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);
         g_context = std::make_unique<QirExecutionContext>(driver, trackAllocatedObjects);
     }
 
-    void ReleaseQirContext()
+    extern "C" void ReleaseQirContext()
     {
         assert(g_context != nullptr);
 

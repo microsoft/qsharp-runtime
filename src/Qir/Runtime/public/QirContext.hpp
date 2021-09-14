@@ -15,9 +15,9 @@ namespace Quantum
     struct AllocationsTracker;
 
     // Deprecated: Use `QirExecutionContext::Init()` instead.
-    QIR_SHARED_API void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
+    extern "C" QIR_SHARED_API void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
     // Deprecated: Use `QirExecutionContext::Deinit()` instead.
-    QIR_SHARED_API void ReleaseQirContext();
+    extern "C" QIR_SHARED_API void ReleaseQirContext();
 
     struct QIR_SHARED_API QirExecutionContext
     {
