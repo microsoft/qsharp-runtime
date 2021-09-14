@@ -14,10 +14,10 @@ namespace Microsoft
 namespace Quantum
 {
     // Toffoli Simulator
-    QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateToffoliSimulator();
+    extern "C" QIR_SHARED_API IRuntimeDriver* CreateToffoliSimulator();
 
     // Full State Simulator
-    QIR_SHARED_API std::unique_ptr<IRuntimeDriver> CreateFullstateSimulator(uint32_t userProvidedSeed = 0);
+    extern "C" QIR_SHARED_API IRuntimeDriver* CreateFullstateSimulator(long userProvidedSeed);
 
 } // namespace Quantum
 } // namespace Microsoft

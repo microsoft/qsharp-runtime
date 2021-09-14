@@ -8,6 +8,11 @@
     <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/qdk_sim_rs/drop))</ExperimentalSimBuildPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
+  </ItemGroup>
+
   <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
   <PropertyGroup Condition="'$(QsimDll)' == ''">
     <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
@@ -17,11 +22,6 @@
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindows)</QSimDll>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
-    <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="$(QSimDll)" >

@@ -256,10 +256,9 @@ namespace Quantum
         }
     };
 
-    std::unique_ptr<IRuntimeDriver> CreateToffoliSimulator()
+    extern "C" IRuntimeDriver* CreateToffoliSimulator()
     {
-        return std::make_unique<CToffoliSimulator>();
+        return new CToffoliSimulator();
     }
-
 } // namespace Quantum
 } // namespace Microsoft
