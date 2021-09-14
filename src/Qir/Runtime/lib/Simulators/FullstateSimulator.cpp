@@ -642,7 +642,7 @@ namespace Quantum
 
     extern "C" IRuntimeDriver* CreateFullstateSimulator(long userProvidedSeed)
     {
-        return new CFullstateSimulator(userProvidedSeed);
+        return new CFullstateSimulator((uint32_t)userProvidedSeed);
     }
 } // namespace Quantum
 } // namespace Microsoft
