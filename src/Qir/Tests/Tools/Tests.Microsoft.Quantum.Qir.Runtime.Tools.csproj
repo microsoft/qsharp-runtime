@@ -12,6 +12,7 @@
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2108156289-beta" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
