@@ -208,7 +208,7 @@ namespace Quantum
             int32_t prevAreaWithFreeQubits = 0;
 
             RestrictedReuseArea() = default;
-            RestrictedReuseArea(QubitListInSharedArray freeQubits);
+            explicit RestrictedReuseArea(QubitListInSharedArray freeQubits);
         };
 
         // This is NOT a pure stack! We modify it only by push/pop, but we also iterate over elements.
@@ -219,15 +219,16 @@ namespace Quantum
             CRestrictedReuseAreaStack()                                 = default;
             CRestrictedReuseAreaStack(const CRestrictedReuseAreaStack&) = delete;
             CRestrictedReuseAreaStack& operator=(const CRestrictedReuseAreaStack&) = delete;
-            ~CRestrictedReuseAreaStack()                                           = default;
+            CRestrictedReuseAreaStack(CRestrictedReuseAreaStack&&)                 = delete;
+            CRestrictedReuseAreaStack& operator=(CRestrictedReuseAreaStack&&) = delete;
+            ~CRestrictedReuseAreaStack()                                      = default;
 
             void PushToBack(RestrictedReuseArea area);
             RestrictedReuseArea PopFromBack();
             RestrictedReuseArea& PeekBack();
-            int32_t Count() const;
+            [[nodiscard]] int32_t Count() const;
         };
 
-      private:
         void EnsureCapacity(QubitIdType requestedCapacity);
 
         // Take free qubit id from a free list without extending capacity.
@@ -238,11 +239,12 @@ namespace Quantum
         // Put qubit id back into a free list for the current restricted reuse area.
         void ReleaseQubitId(QubitIdType id);
 
-        bool IsValidId(QubitIdType id) const;
-        bool IsDisabledId(QubitIdType id) const;
-        bool IsFreeId(QubitIdType id) const;
-        bool IsExplicitlyAllocatedId(QubitIdType id) const;
+        [[nodiscard]] bool IsValidId(QubitIdType id) const;
+        [[nodiscard]] bool IsDisabledId(QubitIdType id) const;
+        [[nodiscard]] bool IsFreeId(QubitIdType id) const;
+        [[nodiscard]] bool IsExplicitlyAllocatedId(QubitIdType id) const;
 
+      private:
         // Configuration Properties:
         bool mayExtendCapacity = true;
 

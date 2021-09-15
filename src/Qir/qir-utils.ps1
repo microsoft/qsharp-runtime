@@ -173,7 +173,7 @@ function Build-CMakeProject {
     } # if ($Env:BUILD_CONFIGURATION -eq "Debug") 
 
 
-    if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
+    if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
         Write-Host "On MacOS build $Name using the default C/C++ compiler (should be AppleClang)"
     }
