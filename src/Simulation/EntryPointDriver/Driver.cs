@@ -474,13 +474,8 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="entryPoint">The entry point to generate payload for.</param>
         /// <returns>The exit code.</returns>
         private Task<int> GenerateAzurePayload(
-            ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint)
-        {
-            // TODO: Remove Console write.
-            Console.WriteLine($"GenerateAzurePayload:\nTarget={settings.Target}\nVerbose={settings.Verbose}");
-            return entryPoint.GenerateAzurePayload(parseResult, settings);
-        }
-                
+            ParseResult parseResult, GenerateAzurePayloadSettings settings, IEntryPoint entryPoint) =>
+                entryPoint.GenerateAzurePayload(parseResult, settings);
 
         /// <summary>
         /// Simulates the entry point.

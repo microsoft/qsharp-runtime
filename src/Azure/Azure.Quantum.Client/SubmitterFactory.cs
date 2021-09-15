@@ -82,8 +82,6 @@ namespace Microsoft.Azure.Quantum
             }
 
             (var constructorName, var constructorType) = constructorInfo.Value;
-            // TODO: Remove this debug write.
-            Console.WriteLine($"constructorName: {constructorName}, constructorType: {constructorType}");
             var args = new object?[] { target };
             return (IQirSubmitter)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
@@ -109,8 +107,6 @@ namespace Microsoft.Azure.Quantum
             }
 
             (var constructorName, var constructorType) = constructorInfo.Value;
-            // TODO: Remove this debug write.
-            Console.WriteLine($"constructorName: {constructorName}, constructorType: {constructorType}");
             var args = new object?[] { target, workspace, storageConnection };
             return (T)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
@@ -143,11 +139,7 @@ namespace Microsoft.Azure.Quantum
         private static Type QdkType(string name)
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            // TODO: Revert this line after testing and remove console writes.
-            Console.WriteLine($"Type Name: {name}");
-            Console.WriteLine($"Assembly Name: {Assembly.GetExecutingAssembly().GetName()} | Version: {version}");
             var strongName = $"{name}, Version={version}, Culture=neutral, PublicKeyToken=40866b40fd95c7f5";
-            Console.WriteLine($"strongName: {strongName}");
             return Type.GetType(strongName, true);
         }
 
