@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         public string GetCommandLineArguments(ExecutionInformation executionInformation)
         {
-            string Argument(Parameter param)
+            string ToArgument(Parameter param)
             {
                 var prefix = param.Name.Length > 1 ? "--" : "-";
                 var value = GetArgumentValueString(param, executionInformation.ArgumentValues[param.Name]);
@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             }
 
             var parameters = executionInformation.EntryPoint.Parameters.OrderBy(param => param.Position);
-            return string.Join(" ", parameters.Select(Argument));
+            return string.Join(" ", parameters.Select(ToArgument));
         }
 
         private static string GetArgumentValueString(Parameter argument, ArgumentValue argumentValue)
