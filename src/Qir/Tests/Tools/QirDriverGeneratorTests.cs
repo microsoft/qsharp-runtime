@@ -182,49 +182,54 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         }
 
         [Theory]
-        [MemberData(nameof(GenerateCommandLineArgumentsData))]
+        [MemberData(nameof(CommandLineArgumentsData))]
         public void GenerateCommandLineArguments(string expected, ExecutionInformation info)
         {
             var generator = new QirFullStateDriverGenerator(false);
             Assert.Equal(expected, generator.GetCommandLineArguments(info));
         }
 
-        public static IEnumerable<object[]> GenerateCommandLineArgumentsData()
+        public static IEnumerable<object[]> CommandLineArgumentsData
         {
-            static object[] TestCase(
-                string expected, List<Parameter> parameters, Dictionary<string, ArgumentValue> arguments) =>
-                new object[]
-                {
-                    expected,
-                    new ExecutionInformation
+            get
+            {
+                static object[] TestCase(
+                    string expected, List<Parameter> parameters, Dictionary<string, ArgumentValue> arguments) =>
+                    new object[]
                     {
-                        EntryPoint = new EntryPointOperation { Parameters = parameters },
-                        ArgumentValues = arguments
-                    }
-                };
+                        expected,
+                        new ExecutionInformation
+                        {
+                            EntryPoint = new EntryPointOperation { Parameters = parameters },
+                            ArgumentValues = arguments
+                        }
+                    };
 
-            yield return TestCase(
-                "--foo 5",
-                new List<Parameter> { new Parameter { Name = "foo", Position = 0, Type = DataType.IntegerType } },
-                new Dictionary<string, ArgumentValue> { ["foo"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 } });
+                yield return TestCase(
+                    "--foo 5",
+                    new List<Parameter> { new Parameter { Name = "foo", Position = 0, Type = DataType.IntegerType } },
+                    new Dictionary<string, ArgumentValue>
+                        { ["foo"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 } });
 
-            yield return TestCase(
-                "-n 5",
-                new List<Parameter> { new Parameter { Name = "n", Position = 0, Type = DataType.IntegerType } },
-                new Dictionary<string, ArgumentValue> { ["n"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 } });
+                yield return TestCase(
+                    "-n 5",
+                    new List<Parameter> { new Parameter { Name = "n", Position = 0, Type = DataType.IntegerType } },
+                    new Dictionary<string, ArgumentValue>
+                        { ["n"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 } });
 
-            yield return TestCase(
-                "--foo 5 --bar \"abc\"",
-                new List<Parameter>
-                {
-                    new Parameter { Name = "bar", Position = 1, Type = DataType.StringType },
-                    new Parameter { Name = "foo", Position = 0, Type = DataType.IntegerType }
-                },
-                new Dictionary<string, ArgumentValue>
-                {
-                    ["bar"] = new ArgumentValue { Type = DataType.StringType, String = "abc" },
-                    ["foo"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 }
-                });
+                yield return TestCase(
+                    "--foo 5 --bar \"abc\"",
+                    new List<Parameter>
+                    {
+                        new Parameter { Name = "bar", Position = 1, Type = DataType.StringType },
+                        new Parameter { Name = "foo", Position = 0, Type = DataType.IntegerType }
+                    },
+                    new Dictionary<string, ArgumentValue>
+                    {
+                        ["bar"] = new ArgumentValue { Type = DataType.StringType, String = "abc" },
+                        ["foo"] = new ArgumentValue { Type = DataType.IntegerType, Integer = 5 }
+                    });
+            }
         }
     }
 }
