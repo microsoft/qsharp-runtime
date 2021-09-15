@@ -27,6 +27,12 @@ namespace Microsoft.Azure.Quantum
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirSubmitter"));
 
+        private static readonly ImmutableList<SubmitterInfo> QirPayloadGenerators = ImmutableList.Create(
+            new SubmitterInfo(
+                new Regex(@"\Amicrosoft\.simulator\.([\w]+\.)*[\w]+\z"),
+                "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "QirPayloadGenerator"));
+
         /// <summary>
         /// Information about each supported Q# submitter.
         /// </summary>
@@ -37,7 +43,8 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         /// <param name="target">The name of the execution target.</param>
         /// <returns>A QIR submitter.</returns>
-        public static IQirSubmitter? QirPayloadGenerator(string target) => AzurePayloadGenerator(QirSubmitters, target);
+        public static IQirSubmitter? QirPayloadGenerator(string target) =>
+            AzurePayloadGenerator(QirPayloadGenerators, target);
 
         /// <summary>
         /// Returns a QIR submitter.
@@ -75,6 +82,8 @@ namespace Microsoft.Azure.Quantum
             }
 
             (var constructorName, var constructorType) = constructorInfo.Value;
+            // TODO: Remove this debug write.
+            Console.WriteLine($"constructorName: {constructorName}, constructorType: {constructorType}");
             var args = new object?[] { target };
             return (IQirSubmitter)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
@@ -100,6 +109,8 @@ namespace Microsoft.Azure.Quantum
             }
 
             (var constructorName, var constructorType) = constructorInfo.Value;
+            // TODO: Remove this debug write.
+            Console.WriteLine($"constructorName: {constructorName}, constructorType: {constructorType}");
             var args = new object?[] { target, workspace, storageConnection };
             return (T)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
