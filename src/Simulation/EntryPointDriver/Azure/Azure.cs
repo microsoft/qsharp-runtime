@@ -367,8 +367,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>A QIR submitter.</returns>
         private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
         {
-            // TODO: Add NoOp submitters for testing.
             null => null,
+            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
+            NoOpSubmitter.Target => new NoOpSubmitter(),
             _ => SubmitterFactory.QirPayloadGenerator(settings.Target)
         };
 
