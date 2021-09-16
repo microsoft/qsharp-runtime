@@ -5,8 +5,6 @@
 
 using Microsoft.Quantum.Simulation.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Microsoft.Quantum.Canon;
 

@@ -8,7 +8,6 @@ using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.QuantumProcessor;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -17,7 +16,7 @@ using System.Text;
 namespace Microsoft.Quantum.SparseSimulation
 {
 
-    public partial class GetAmplitudeFromInt
+    partial class GetAmplitudeFromInt
     {
         public class Native : GetAmplitudeFromInt
         {
@@ -27,14 +26,14 @@ namespace Microsoft.Quantum.SparseSimulation
                 sim = m as SparseSimulator;
             }
 
-            public override Func<(IQArray<Qubit>, long), Microsoft.Quantum.Math.Complex> __Body__ => sim == null ? base.__Body__ : (args) => {
+            public override Func<(IQArray<Qubit>, long), Microsoft.Quantum.Math.Complex> __Body__ => (args) => {
                 return sim.GetAmplitude(args.Item1, args.Item2);
             };
 
         }
     }
 
-    public partial class GetAmplitude
+    partial class GetAmplitude
     {
         public class Native : GetAmplitude
         {
@@ -44,7 +43,7 @@ namespace Microsoft.Quantum.SparseSimulation
                 sim = m as SparseSimulator;
             }
 
-            public override Func<(IQArray<Qubit>, System.Numerics.BigInteger), Microsoft.Quantum.Math.Complex> __Body__ => sim == null ? base.__Body__ : args => {
+            public override Func<(IQArray<Qubit>, System.Numerics.BigInteger), Microsoft.Quantum.Math.Complex> __Body__ =>  args => {
                 return sim.GetAmplitude(args.Item1, args.Item2);
             };
 
@@ -269,7 +268,7 @@ namespace Microsoft.Quantum.SparseSimulation
     /// Samples a random label from the wavefunction, proportional to its amplitude squared,
     /// and returns it as a boolean array
     /// </summary>
-    public partial class Sample
+    partial class Sample
     {
         private SparseSimulator simulator;
         public class Native : Sample

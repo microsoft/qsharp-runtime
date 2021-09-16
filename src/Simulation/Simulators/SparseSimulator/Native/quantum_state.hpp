@@ -30,7 +30,6 @@ namespace Microsoft::Quantum::SPARSESIMULATOR
 // power of square root of -1
 inline amplitude iExp(int power)
 {
-
     int p = ((power % 4) + 8) % 4;
     switch (p)
     {

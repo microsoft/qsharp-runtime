@@ -21,22 +21,21 @@ namespace Microsoft.Quantum.SparseSimulatorTests {
             CNOT(qubits[0], qubits[2]);
             CNOT(qubits[1], qubits[3]);
             (Controlled H)([qubits[2]], (qubits[3]));
-            DumpMachine("Test file");
-            let expected = [
-                (0.5, 0L),
-                (0.353553,5L),
-                (0.5,10L),
-                (0.353553,7L),
-                (0.353553,13L),
-                (-0.353553,15L)];
-			mutable results = new Complex[Length(expected)];
-            let expBasicC = Complex(2.0,0.0);
-            let basicC = GetAmplitude(qubits, 0L);
-            let invC = Complex(basicC::Real/AbsSquaredComplex(basicC), basicC::Imag/AbsSquaredComplex(basicC));
-            for (value, label) in expected {
-                let c = TimesC(GetAmplitude(qubits, label), invC);
-                Fact(AbsD(c::Real  - expBasicC::Real*value) + AbsD(c::Imag - expBasicC::Imag*value) < 0.001, "Controlled H failed");
-            }
+            let expected_vals = [
+                Complex(0.5, 0.0),
+                Complex(0.353553,0.0),
+                Complex(0.5,0.0),
+                Complex(0.353553,0.0),
+                Complex(0.353553,0.0),
+                Complex(-0.353553,0.0)];
+            let expected_labels = [
+                0L,
+                5L,
+                10L,
+                7L,
+                13L,
+                15L];
+            AssertAmplitudes(expected_labels, expected_vals, LittleEndian(qubits), 0.001);
             ResetAll(qubits);
         }
     }
@@ -172,40 +171,40 @@ namespace Microsoft.Quantum.SparseSimulatorTests {
     }
 
     
-    operation _FakeR1Frac(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation FakeR1Frac(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         RFrac(PauliZ, -numerator, denominator + 1, qubit[0]);
         RFrac(PauliI, numerator, denominator + 1, qubit[0]);
     }
     
-    operation R1FracWithArray(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation R1FracWithArray(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         R1Frac(numerator, denominator, qubit[0]);
     }
 
-    operation _FakeR1(angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation FakeR1(angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
         R(PauliZ, angle, qubit[0]);
         R(PauliI, -angle, qubit[0]);
     }
-    operation R1WithArray(angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation R1WithArray(angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
         R1(angle, qubit[0]);
     }
     @Test("Microsoft.Quantum.SparseSimulation.SparseSimulator")
     operation Rotation1CompareTest() : Unit {
         for denom in 0..5{
             for num in 1..2..(2^denom - 1){
-                AssertOperationsEqualReferenced(1, R1FracWithArray(num, denom, _), _FakeR1Frac(num, denom, _));
-                AssertOperationsEqualReferenced(1, _FakeR1Frac(num, denom, _), R1FracWithArray(num, denom, _));
+                AssertOperationsEqualReferenced(1, R1FracWithArray(num, denom, _), FakeR1Frac(num, denom, _));
+                AssertOperationsEqualReferenced(1, FakeR1Frac(num, denom, _), R1FracWithArray(num, denom, _));
 		    }
         }
         for angle in 0..314 {
-            AssertOperationsEqualReferenced(1, R1WithArray(IntAsDouble(angle)/100.0, _), _FakeR1(IntAsDouble(angle)/100.0, _));
-            AssertOperationsEqualReferenced(1, _FakeR1(IntAsDouble(angle)/100.0, _), R1WithArray(IntAsDouble(angle)/100.0, _));
+            AssertOperationsEqualReferenced(1, R1WithArray(IntAsDouble(angle)/100.0, _), FakeR1(IntAsDouble(angle)/100.0, _));
+            AssertOperationsEqualReferenced(1, FakeR1(IntAsDouble(angle)/100.0, _), R1WithArray(IntAsDouble(angle)/100.0, _));
         }
     }
 
-    operation RFracWithArray(axis : Pauli, num : Int, denom : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation RFracWithArray(axis : Pauli, num : Int, denom : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         RFrac(axis, num, denom, qubit[0]);
     }
-    operation RWithArray(axis : Pauli, angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
+    internal operation RWithArray(axis : Pauli, angle : Double, qubit : Qubit[]) : Unit is Adj + Ctl {
         R(axis, angle, qubit[0]);
     }
     @Test("Microsoft.Quantum.SparseSimulation.SparseSimulator")
