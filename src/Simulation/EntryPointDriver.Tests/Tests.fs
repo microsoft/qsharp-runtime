@@ -1049,7 +1049,8 @@ let ``Shows help text for submit command with default target`` () =
                       --verbose                                           Show additional information about the submission.
                       -?, -h, --help                                      Show help and usage information"
     let given = testWithTarget "foo.target" "Help"
-    given ["submit"; "--help"] |> yields message
+    let tmp = given ["submit"; "--help"]
+    tmp |> yields message
 
 [<Fact>]
 let ``Supports simulating multiple entry points`` () =

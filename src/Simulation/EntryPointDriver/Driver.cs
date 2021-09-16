@@ -201,16 +201,19 @@ namespace Microsoft.Quantum.EntryPointDriver
             var generate = CreateTopLevelCommand(
                 "generateazurepayload",
                 "Locally generate payload that can be submitted to Azure.",
+                true,
                 generateAzurePayloadSubCommands);
 
             var simulate = CreateTopLevelCommand(
                 "simulate",
                 "(default) Run the program using a local simulator.",
+                false,
                 simulateSubCommands);
             
             var submit = CreateTopLevelCommand(
                 "submit",
                 "Submit the program to Azure Quantum.",
+                true,
                 submitSubCommands);
 
             var root = new RootCommand() { simulate.Command, submit.Command, generate.Command };
@@ -359,14 +362,20 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="name">The name of the command.</param>
         /// <param name="description">The description of the command.</param>
+        /// <param name="isHidden">Whether the command should be hidden.</param>
         /// <param name="entryPointCommands">The entry point commands that will be the sub commands to the created command.</param>
         /// <returns>The created simulate command with the validators for that command.</returns>
         private static CommandWithValidators CreateTopLevelCommand(
             string name,
             string description,
+            bool isHidden,
             List<CommandWithValidators> entryPointCommands)
         {
-            var topLevelCommand= new Command(name, description);
+            var topLevelCommand= new Command(name, description)
+            {
+                IsHidden = isHidden
+            };
+
             if (entryPointCommands.Count() == 1)
             {
                 var epCommandWValidators = entryPointCommands.First();
