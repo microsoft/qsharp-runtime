@@ -974,7 +974,7 @@ let ``Uses documentation`` () =
                        %s [options] [command]
 
                      Options:
-                       -n <n> (REQUIRED)                                   A number.
+                       -n <n> (REQUIRED)                                   An integer.
                        --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                        --my-cool-bool (REQUIRED)                           A neat bit.
                        -s, --simulator <simulator>                         The name of the simulator to use.
@@ -998,7 +998,7 @@ let ``Shows help text for generateazurepayload command`` () =
                       %s generateazurepayload [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target> (REQUIRED)                        The target device ID.
@@ -1016,7 +1016,7 @@ let ``Shows help text for generateazurepayload command with default target`` () 
                       %s generateazurepayload [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target>                                   The target device ID.
@@ -1034,7 +1034,7 @@ let ``Shows help text for submit command`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
@@ -1065,7 +1065,7 @@ let ``Shows help text for submit command with default target`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
