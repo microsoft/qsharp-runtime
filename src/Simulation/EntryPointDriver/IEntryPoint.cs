@@ -38,7 +38,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The generate Azure payload settings.</param>
-        /// <returns>The exit code.</returns>
+        /// <returns>The exit code of the payload generation process.</returns>
         Task<int> GenerateAzurePayload(ParseResult parseResult, GenerateAzurePayloadSettings settings);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The submission settings.</param>
-        /// <returns>The exit code.</returns>
+        /// <returns>The exit code of the submssion process.</returns>
         Task<int> Submit(ParseResult parseResult, AzureSettings settings);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="parseResult">The command-line parsing result.</param>
         /// <param name="settings">The driver settings.</param>
         /// <param name="simulator">The simulator to use.</param>
-        /// <returns>The exit code.</returns>
+        /// <returns>The exit code of the simulation process.</returns>
         Task<int> Simulate(ParseResult parseResult, DriverSettings settings, string simulator);
     }
 }

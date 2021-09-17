@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
     /// </summary>
     internal class ErrorQuantumMachine : IQuantumMachine
     {
-        // <summary>
+        /// <summary>
         /// The target for the error quantum machine.
         /// </summary>
         internal const string Target = "test.machine.error";
