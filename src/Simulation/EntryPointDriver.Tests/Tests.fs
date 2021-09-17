@@ -974,7 +974,7 @@ let ``Uses documentation`` () =
                        %s [options] [command]
 
                      Options:
-                       -n <n> (REQUIRED)                                   A number.
+                       -n <n> (REQUIRED)                                   An integer.
                        --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                        --my-cool-bool (REQUIRED)                           A neat bit.
                        -s, --simulator <simulator>                         The name of the simulator to use.
@@ -990,6 +990,42 @@ let ``Uses documentation`` () =
     given ["-?"] |> yields message
 
 [<Fact>]
+let ``Shows help text for generateazurepayload command`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s generateazurepayload [options]
+
+                    Options:
+                      -n <n> (REQUIRED)                                   An integer.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      --target <target> (REQUIRED)                        The target device ID.
+                      --verbose                                           Show additional information about the submission.
+                      -?, -h, --help                                      Show help and usage information"
+    let given = test "Help"
+    given ["generateazurepayload"; "--help"] |> yields message
+
+[<Fact>]
+let ``Shows help text for generateazurepayload command with default target`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s generateazurepayload [options]
+
+                    Options:
+                      -n <n> (REQUIRED)                                   An integer.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      --target <target>                                   The target device ID.
+                      --verbose                                           Show additional information about the submission.
+                      -?, -h, --help                                      Show help and usage information"
+    let given = testWithTarget "foo.target" "Help"
+    given ["generateazurepayload"; "--help"] |> yields message
+
+[<Fact>]
 let ``Shows help text for submit command`` () =
     let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
     let message =
@@ -998,7 +1034,7 @@ let ``Shows help text for submit command`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
@@ -1029,7 +1065,7 @@ let ``Shows help text for submit command with default target`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
