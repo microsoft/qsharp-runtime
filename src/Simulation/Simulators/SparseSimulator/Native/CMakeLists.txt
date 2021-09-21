@@ -17,6 +17,8 @@ if(OpenMP_CXX_FOUND)
 	if (OpenMP_CXX_VERSION_MAJOR GREATER_EQUAL 3)
 		target_compile_definitions(SparseQuantumSimulator PRIVATE DOMP_GE_V3=1)
 	endif()
+	target_include_directories(SparseQuantumSimulator PUBLIC ${OpenMP_CXX_INCLUDE_DIRS})
+	target_link_libraries(SparseQuantumSimulator PUBLIC ${OpenMP_CXX_LIBRARIES})
 endif()
 
 # Windows adds a special dllexport command which must be defined
