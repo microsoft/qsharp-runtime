@@ -132,7 +132,8 @@ extern "C"
     // Returns a string representation of the Boolean.
     QirString* __quantum__rt__bool_to_string(bool value) // NOLINT
     {
-        std::string str = value ? "true" : "false";
+        volatile bool tmp = value;
+        std::string str = (tmp ? "true" : "false");
         return CreateOrReuseAlreadyAllocated(std::move(str));
     }
 
