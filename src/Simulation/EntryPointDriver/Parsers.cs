@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.CommandLine.Parsing;
 using System.ComponentModel;
 using System.Linq;
@@ -48,6 +50,29 @@ namespace Microsoft.Quantum.EntryPointDriver
             argument.ErrorMessage = validation.ErrorMessage;
             return validation.IsSuccess ? new QArray<T>(validation.Value) : default!;
         };
+
+        /// <summary>
+        /// Parses a sequence of <c>key=value</c> arguments as a dictionary of key-value pairs.
+        /// </summary>
+        /// <param name="argument">The argument result.</param>
+        /// <returns>The parsed dictionary.</returns>
+        internal static ImmutableDictionary<string, string> ParseDictionary(ArgumentResult argument)
+        {
+            var pairs = argument.Tokens
+                .Select(token =>
+                {
+                    var items = token.Value.Split('=', 2);
+                    return items.Length == 2
+                        ? Validation<KeyValuePair<string, string>>.Success(KeyValuePair.Create(items[0], items[1]))
+                        : Validation<KeyValuePair<string, string>>.Failure($"This is not a \"key=value\" pair: '{token.Value}'");
+                })
+                .Sequence();
+
+            argument.ErrorMessage = pairs.ErrorMessage;
+            return pairs.IsSuccess
+                ? ImmutableDictionary.CreateRange(pairs.Value)
+                : ImmutableDictionary<string, string>.Empty;
+        }
 
         /// <summary>
         /// Returns the value parser for the given type.

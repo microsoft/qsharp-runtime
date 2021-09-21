@@ -572,6 +572,7 @@ let ``Submit uses default values`` () =
                AadToken:
                UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -596,6 +597,7 @@ let ``Submit uses default values with default target`` () =
                AadToken:
                UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -634,6 +636,7 @@ let ``Submit allows overriding default values`` () =
                AadToken: myTok
                UserAgent: myUserAgent
                Job Name: myJobName
+               Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -673,6 +676,7 @@ let ``Submit allows a long user-agent`` () =
                AadToken: myTok
                UserAgent: a-very-long-user-agent-(
                Job Name: myJobName
+               Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -715,6 +719,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 AadToken: myTok
                 UserAgent: myUserAgent
                 Job Name: myJobName
+                Job Parameters:
                 Shots: 750
                 Output: FriendlyUri
                 Dry Run: False
@@ -751,6 +756,7 @@ let ``Submit allows overriding default values with default target`` () =
                AadToken: myTok
                UserAgent:
                Job Name: myJobName
+               Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -790,6 +796,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
                AadToken:
                UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -816,6 +823,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
                AadToken:
                UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -846,6 +854,7 @@ let ``Submit allows spaces for the --location option`` () =
                AadToken:
                UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -951,6 +960,7 @@ let ``Submit supports Q# submitters`` () =
          AadToken:
          UserAgent:
          Job Name:
+         Job Parameters:
          Shots: 500
          Output: FriendlyUri
          Dry Run: False
@@ -1048,6 +1058,7 @@ let ``Shows help text for submit command`` () =
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
+                      --job-params <job-params>                           Additional parameters for the submitted job in the format \"key=value\".
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
@@ -1079,6 +1090,7 @@ let ``Shows help text for submit command with default target`` () =
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
+                      --job-params <job-params>                           Additional parameters for the submitted job in the format \"key=value\".
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.

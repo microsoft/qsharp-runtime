@@ -30,57 +30,64 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The subscription option.
         /// </summary>
         private static readonly OptionInfo<string> SubscriptionOption = new OptionInfo<string>(
-            ImmutableList.Create("--subscription"), "The subscription ID.");
+            ImmutableList.Create("--subscription"), Maybe.Nothing<string>(), "The subscription ID.");
 
         /// <summary>
         /// The resource group option.
         /// </summary>
         private static readonly OptionInfo<string> ResourceGroupOption = new OptionInfo<string>(
-            ImmutableList.Create("--resource-group"), "The resource group name.");
+            ImmutableList.Create("--resource-group"), Maybe.Nothing<string>(), "The resource group name.");
 
         /// <summary>
         /// The workspace option.
         /// </summary>
         private static readonly OptionInfo<string> WorkspaceOption = new OptionInfo<string>(
-            ImmutableList.Create("--workspace"), "The workspace name.");
+            ImmutableList.Create("--workspace"), Maybe.Nothing<string>(), "The workspace name.");
 
         /// <summary>
         /// The storage option.
         /// </summary>
         private static readonly OptionInfo<string?> StorageOption = new OptionInfo<string?>(
-            ImmutableList.Create("--storage"), default, "The storage account connection string.");
+            ImmutableList.Create("--storage"), Maybe.Just<string?>(null), "The storage account connection string.");
 
         /// <summary>
         /// The credential option.
         /// </summary>
         private static readonly OptionInfo<CredentialType?> CredentialOption = new OptionInfo<CredentialType?>(
             ImmutableList.Create("--credential"),
-            CredentialType.Default,
+            Maybe.Just<CredentialType?>(CredentialType.Default),
             "The type of credential to use to authenticate with Azure.");
 
         /// <summary>
         /// The AAD token option.
         /// </summary>
         private static readonly OptionInfo<string?> AadTokenOption = new OptionInfo<string?>(
-            ImmutableList.Create("--aad-token"), default, "The Azure Active Directory authentication token.");
+            ImmutableList.Create("--aad-token"),
+            Maybe.Just<string?>(null), 
+            "The Azure Active Directory authentication token.");
 
         /// <summary>
         /// The User-Agent option.
         /// </summary>
         private static readonly OptionInfo<string?> UserAgentOption = new OptionInfo<string?>(
-            ImmutableList.Create("--user-agent"), default, "A label to identify this application when making requests to Azure Quantum.");
+            ImmutableList.Create("--user-agent"),
+            Maybe.Just<string?>(null),
+            "A label to identify this application when making requests to Azure Quantum.");
+
         /// <summary>
         /// The base URI option.
         /// </summary>
         private static readonly OptionInfo<Uri?> BaseUriOption = new OptionInfo<Uri?>(
-            ImmutableList.Create("--base-uri"), default, "The base URI of the Azure Quantum endpoint.");
+            ImmutableList.Create("--base-uri"),
+            Maybe.Just<Uri?>(null),
+            "The base URI of the Azure Quantum endpoint.");
 
         /// <summary>
         /// The location to use with the default endpoint option.
         /// </summary>
         private static readonly OptionInfo<string?> LocationOption = new OptionInfo<string?>(
             ImmutableList.Create("--location"),
-            default,
+            Maybe.Just<string?>(null),
             "The location to use with the default endpoint.",
             validator: result =>
             {
@@ -100,14 +107,24 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The job name option.
         /// </summary>
         private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
-            ImmutableList.Create("--job-name"), string.Empty, "The name of the submitted job.");
+            ImmutableList.Create("--job-name"), Maybe.Just(string.Empty), "The name of the submitted job.");
+
+        /// <summary>
+        /// The job parameters option.
+        /// </summary>
+        private static readonly OptionInfo<ImmutableDictionary<string, string>> JobParamsOption =
+            new OptionInfo<ImmutableDictionary<string, string>>(
+                ImmutableList.Create("--job-params"),
+                Maybe.Just(ImmutableDictionary<string, string>.Empty),
+                "Additional parameters for the submitted job in the format \"key=value\".",
+                argument: new Argument<ImmutableDictionary<string, string>>(Parsers.ParseDictionary));
 
         /// <summary>
         /// The shots option.
         /// </summary>
         private static readonly OptionInfo<int> ShotsOption = new OptionInfo<int>(
             ImmutableList.Create("--shots"),
-            500,
+            Maybe.Just(500),
             "The number of times the program is executed on the target machine.",
             validator: result =>
                 int.TryParse(result.Tokens.SingleOrDefault()?.Value, out var value) && value <= 0
@@ -119,7 +136,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private static readonly OptionInfo<OutputFormat> OutputOption = new OptionInfo<OutputFormat>(
             ImmutableList.Create("--output"),
-            OutputFormat.FriendlyUri,
+            Maybe.Just(OutputFormat.FriendlyUri),
             "The information to show in the output after the job is submitted.");
 
         /// <summary>
@@ -127,14 +144,14 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private static readonly OptionInfo<bool> DryRunOption = new OptionInfo<bool>(
             ImmutableList.Create("--dry-run"),
-            false,
+            Maybe.Just(false),
             "Validate the program and options, but do not submit to Azure Quantum.");
 
         /// <summary>
         /// The verbose option.
         /// </summary>
         private static readonly OptionInfo<bool> VerboseOption = new OptionInfo<bool>(
-            ImmutableList.Create("--verbose"), false, "Show additional information about the submission.");
+            ImmutableList.Create("--verbose"), Maybe.Just(false), "Show additional information about the submission.");
 
         /// <summary>
         /// The target option.
@@ -167,7 +184,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             this.SimulatorOption = new OptionInfo<string>(
                 this.settings.SimulatorOptionAliases,
-                this.settings.DefaultSimulatorName,
+                Maybe.Just(this.settings.DefaultSimulatorName),
                 "The name of the simulator to use.",
                 suggestions: new[]
                 {
@@ -177,11 +194,12 @@ namespace Microsoft.Quantum.EntryPointDriver
                     this.settings.DefaultSimulatorName
                 });
 
-            var targetAliases = ImmutableList.Create("--target");
-            const string targetDescription = "The target device ID.";
-            this.TargetOption = string.IsNullOrWhiteSpace(settings.DefaultExecutionTarget)
-                ? new OptionInfo<string?>(targetAliases, targetDescription)
-                : new OptionInfo<string?>(targetAliases, this.settings.DefaultExecutionTarget, targetDescription);
+            this.TargetOption = new OptionInfo<string?>(
+                ImmutableList.Create("--target"),
+                string.IsNullOrWhiteSpace(settings.DefaultExecutionTarget)
+                    ? Maybe.Nothing<string?>()
+                    : Maybe.Just<string?>(this.settings.DefaultExecutionTarget),
+                "The target device ID.");
 
             this.entryPoints = entryPoints;
         }
@@ -288,13 +306,16 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 return value;
             }
-            else
-            {
-                DisplayWithColor(ConsoleColor.Yellow, Console.Error,
-                    $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " +
-                    $"Using default value {option.DefaultValue}.");
-                return option.DefaultValue;
-            }
+
+            return option.DefaultValue.Case(
+                () => throw new ArgumentException("Option has no default value."),
+                defaultValue =>
+                {
+                    DisplayWithColor(ConsoleColor.Yellow, Console.Error, 
+                        $"Warning: Option {option.Aliases.First()} is overridden by an entry point parameter name. " + 
+                        $"Using default value {defaultValue}.");
+                    return defaultValue;
+                });
         }
 
         /// <summary>
@@ -307,11 +328,13 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The list of validators added to the command during this function.</returns>
         private static Validators AddOptionIfAvailable<T>(Command command, OptionInfo<T> option)
         {
+            var required = option.DefaultValue.Case(() => true, defaultValue => false);
+
             if (IsAliasAvailable(option.Aliases.First(), command.Options))
             {
-                command.AddOption(option.Create(option.Aliases.Where(alias => IsAliasAvailable(alias, command.Options))));
+                command.AddOption(option.ToOption(option.Aliases.Where(alias => IsAliasAvailable(alias, command.Options))));
             }
-            else if (option.Required)
+            else if (required)
             {
                 ValidateSymbol<CommandResult> validator = commandResult =>
                     $"The required option {option.Aliases.First()} conflicts with an entry point parameter name.";
@@ -464,6 +487,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 .Concat(AddOptionIfAvailable(command, BaseUriOption))
                 .Concat(AddOptionIfAvailable(command, LocationOption))
                 .Concat(AddOptionIfAvailable(command, JobNameOption))
+                .Concat(AddOptionIfAvailable(command, JobParamsOption))
                 .Concat(AddOptionIfAvailable(command, ShotsOption))
                 .Concat(AddOptionIfAvailable(command, OutputOption))
                 .Concat(AddOptionIfAvailable(command, DryRunOption))
@@ -517,6 +541,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Location = DefaultIfShadowed(entryPoint, LocationOption, azureSettings.Location),
                 Credential = DefaultIfShadowed(entryPoint, CredentialOption, azureSettings.Credential),
                 JobName = DefaultIfShadowed(entryPoint, JobNameOption, azureSettings.JobName),
+                JobParams = DefaultIfShadowed(entryPoint, JobParamsOption, azureSettings.JobParams),
                 Shots = DefaultIfShadowed(entryPoint, ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(entryPoint, OutputOption, azureSettings.Output),
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),

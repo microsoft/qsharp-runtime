@@ -8,6 +8,7 @@ using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +100,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string JobName { get; set; } = "";
 
         /// <summary>
+        /// Additional parameters for the submitted job.
+        /// </summary>
+        public ImmutableDictionary<string, string> JobParams { get; set; } = ImmutableDictionary<string, string>.Empty;
+
+        /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
@@ -183,6 +189,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"AadToken: {AadToken?.Substring(0, 5)}",
             $"UserAgent: {TrimmedUserAgent()}",
             $"Job Name: {JobName}",
+            $"Job Parameters: {string.Join(", ", JobParams)}",
             $"Shots: {Shots}",
             $"Output: {Output}",
             $"Dry Run: {DryRun}",
