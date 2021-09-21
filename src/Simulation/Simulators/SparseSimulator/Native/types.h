@@ -10,7 +10,9 @@
 #include <shared_mutex>
 #include <mutex>
 
+
 #include "quantum_hash_map.hpp"
+
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
@@ -35,8 +37,11 @@ template <size_t num_qubits>
 using qubit_label_type = std::bitset<num_qubits>;
 
 // Wavefunctions are hash maps of some key (std::bitset or a string)
+//template <typename key>
+//using abstract_wavefunction = ska::bytell_hash_map<key, amplitude, std::hash<key>>;
+
 template <typename key>
-using abstract_wavefunction = ska::bytell_hash_map<key, amplitude, std::hash<key>>;
+using abstract_wavefunction = std::unordered_map<key, amplitude>;
 
 // Wavefunctions with strings as keys are "universal" in that they do not depend
 // on the total number of qubits

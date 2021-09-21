@@ -18,7 +18,9 @@
 #endif
 
 #include "basic_quantum_state.hpp"
+
 #include "quantum_hash_map.hpp"
+
 #include "types.h"
 #include "gates.h"
 
@@ -566,6 +568,19 @@ public:
             break;
         }
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
+
+            // What happens if the key isn't present in the hashtable?
+            auto aaa = _qubit_data.find(current_state->first ^ XYs);
+            if (aaa == (_qubit_data).end()) {
+                // Here we shouldn't be able to dereference aaa!
+                // ska::flat_hash_map allows it and we get junk, but std::unordered_map doesn't allow it and we get exception.
+                auto bbb = aaa->second;
+                auto bbb1 = bbb;
+            } else {
+                auto ccc = aaa->second;
+            }
+
+
             if (std::norm(_qubit_data.find(current_state->first ^ XYs)->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
                 qubit_label label = current_state->first;
                 amplitude val = current_state->second;
@@ -845,7 +860,12 @@ public:
                         auto internal_end = _qubit_data.end();
                         for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end();){
                             internal_state = current_state;
-                            current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
+
+                            //current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
+                            for (size_t i=0; (i<_jump_size) && (_current_state != _qubit_data.end()); i++) {
+                                ++_current_state;
+                            }
+
                             internal_end = current_state;
                             #pragma omp task firstprivate(internal_state) firstprivate(internal_end)
                             {
@@ -1321,7 +1341,12 @@ private:
             while (_current_state != _qubit_data.end()){
                 // Update local variables
                 local_state = _current_state; 
-                _current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
+
+                //_current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
+                for (size_t i=0; (i<_jump_size) && (_current_state != _qubit_data.end()); i++) {
+                    ++_current_state;
+                }
+
                 local_end = _current_state;
                 // Unlock state to allow other threads to modify their state
                 state_lock.unlock();
