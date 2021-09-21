@@ -1092,7 +1092,7 @@ let ``Shows help text for submit command`` () =
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
-                      --job-params <job-params>                           Additional parameters for the submitted job in the format \"key=value\".
+                      --job-params <job-params>                           Additional target-specific parameters for the submitted job (in the format \"key=value\").
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
@@ -1124,7 +1124,7 @@ let ``Shows help text for submit command with default target`` () =
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
-                      --job-params <job-params>                           Additional parameters for the submitted job in the format \"key=value\".
+                      --job-params <job-params>                           Additional target-specific parameters for the submitted job (in the format \"key=value\").
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.

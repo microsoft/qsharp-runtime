@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
@@ -137,11 +138,14 @@ namespace Microsoft.Quantum.EntryPointDriver
                 return DisplayValidation(valid ? null : message);
             }
 
-            var job = machine.SubmitAsync(
-                submission.EntryPointInfo,
-                submission.Argument,
-                new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
+            var context = new SubmissionContext
+            {
+                FriendlyName = settings.JobName,
+                Shots = settings.Shots,
+                InputParams = settings.JobParams
+            };
 
+            var job = machine.SubmitAsync(submission.EntryPointInfo, submission.Argument, context);
             return await DisplayJobOrError(settings, job);
         }
 
@@ -394,6 +398,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             public string? FriendlyName { get; set; }
 
             public int Shots { get; set; }
+
+            public ImmutableDictionary<string, string> InputParams { get; set; } = ImmutableDictionary<string, string>.Empty;
         }
     }
 }

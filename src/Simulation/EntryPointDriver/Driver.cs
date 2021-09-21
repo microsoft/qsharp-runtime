@@ -116,7 +116,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             new OptionInfo<ImmutableDictionary<string, string>>(
                 ImmutableList.Create("--job-params"),
                 Maybe.Just(ImmutableDictionary<string, string>.Empty),
-                "Additional parameters for the submitted job in the format \"key=value\".",
+                "Additional target-specific parameters for the submitted job (in the format \"key=value\").",
                 argument: new Argument<ImmutableDictionary<string, string>>(Parsers.ParseDictionary));
 
         /// <summary>

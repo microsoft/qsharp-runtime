@@ -100,7 +100,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string JobName { get; set; } = "";
 
         /// <summary>
-        /// Additional parameters for the submitted job.
+        /// Additional target-specific parameters for the submitted job.
         /// </summary>
         public ImmutableDictionary<string, string> JobParams { get; set; } = ImmutableDictionary<string, string>.Empty;
 
@@ -155,7 +155,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
