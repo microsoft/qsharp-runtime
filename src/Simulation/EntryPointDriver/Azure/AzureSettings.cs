@@ -189,7 +189,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"AadToken: {AadToken?.Substring(0, 5)}",
             $"UserAgent: {TrimmedUserAgent()}",
             $"Job Name: {JobName}",
-            $"Job Parameters: {string.Join(", ", JobParams)}",
+            $"Job Parameters: {string.Join(", ", JobParams.OrderBy(item => item.Key))}",
             $"Shots: {Shots}",
             $"Output: {Output}",
             $"Dry Run: {DryRun}",

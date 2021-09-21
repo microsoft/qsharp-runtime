@@ -970,6 +970,40 @@ let ``Submit supports Q# submitters`` () =
 
          https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
+[<Fact>]
+let ``Submit supports job parameters`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--job-params"; "foo=bar"; "baz=qux"; "--verbose"])
+    |> yields
+        "Subscription: mySubscription
+         Resource Group: myResourceGroup
+         Workspace: myWorkspace
+         Target: test.submitter.noop
+         Storage:
+         Base URI:
+         Location: myLocation
+         Credential: Default
+         AadToken:
+         UserAgent:
+         Job Name:
+         Job Parameters: [baz, qux], [foo, bar]
+         Shots: 500
+         Output: FriendlyUri
+         Dry Run: False
+         Verbose: True
+
+         Submitting Q# entry point.
+
+         https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit fails if job parameters can't be parsed`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--job-params"; "foobar"])
+    |> failsWith "This is not a \"key=value\" pair: 'foobar'"
+
 // Help
 
 [<Fact>]
