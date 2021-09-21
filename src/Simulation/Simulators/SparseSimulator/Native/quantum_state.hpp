@@ -569,24 +569,30 @@ public:
         }
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
 
-            // What happens if the key isn't present in the hashtable?
-            auto aaa = _qubit_data.find(current_state->first ^ XYs);
-            if (aaa == (_qubit_data).end()) {
-                // Here we shouldn't be able to dereference aaa!
-                // ska::flat_hash_map allows it and we get junk, but std::unordered_map doesn't allow it and we get exception.
-                auto bbb = aaa->second;
-                auto bbb1 = bbb;
-            } else {
-                auto ccc = aaa->second;
-            }
+            // // What happens if the key isn't present in the hashtable?
+            // auto aaa = _qubit_data.find(current_state->first ^ XYs);
+            // if (aaa == (_qubit_data).end()) {
+            //     // Here we shouldn't be able to dereference aaa!
+            //     // ska::flat_hash_map allows it and we get junk, but std::unordered_map doesn't allow it and we get exception.
+            //     auto bbb = aaa->second;
+            //     auto bbb1 = bbb;
+            // } else {
+            //     auto ccc = aaa->second;
+            // }
 
 
-            if (std::norm(_qubit_data.find(current_state->first ^ XYs)->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
+            // The amplitude of current_state should always be non-zero, if the data structure
+            // is properly maintained. Since the flipped state should match the amplitude (up to phase),
+            // if the flipped state is not in _qubit_data, it implicitly has an ampltude of 0.0, which
+            // is *not* a match, so the assertion should fail. 
+            auto flipped_state = _qubit_data.find(current_state->first ^ XYs);
+            if (flipped_state == _qubit_data.end() ||
+                std::norm(flipped_state->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
                 qubit_label label = current_state->first;
                 amplitude val = current_state->second;
                 std::cout << "Problematic state: " << label << "\n";
                 std::cout << "Expected " << val * (get_parity(label & YZs) ? -phaseShift : phaseShift);
-                std::cout << ", got " << _qubit_data.find(label ^ XYs)->second << "\n";
+                std::cout << ", got " << (flipped_state == _qubit_data.end() ? 0.0 : flipped_state->second) << "\n";
                 std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
                 throw std::runtime_error("Not an eigenstate");
             }
