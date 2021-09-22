@@ -11,11 +11,6 @@
 #include <algorithm>
 #include <list>
 #include <iostream>
-#include <atomic>
-#include <thread>
-#ifdef _OPENMP
-    #include <omp.h>
-#endif
 
 #include "basic_quantum_state.hpp"
 
@@ -99,12 +94,6 @@ public:
         std::mt19937 gen(rd());
         std::uniform_real_distribution<double> dist(0, 1);
         _rng = [gen, dist]() mutable { return dist(gen); };
-
-        _initialize_threads();
-    }
-
-    ~QuantumState() {
-        complete_threads();
     }
 
     // Copy data from an existing simulator
@@ -122,8 +111,6 @@ public:
         for (auto current_state = old_qubit_data.begin(); current_state != old_qubit_data.end(); ++current_state) {
             _qubit_data.emplace(qubit_label(current_state->first), current_state->second);
         }
-        // Create local threads for this state
-        _initialize_threads();
     }
 
     logical_qubit_id get_num_qubits() { 
@@ -568,19 +555,6 @@ public:
             break;
         }
         for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
-
-            // // What happens if the key isn't present in the hashtable?
-            // auto aaa = _qubit_data.find(current_state->first ^ XYs);
-            // if (aaa == (_qubit_data).end()) {
-            //     // Here we shouldn't be able to dereference aaa!
-            //     // ska::flat_hash_map allows it and we get junk, but std::unordered_map doesn't allow it and we get exception.
-            //     auto bbb = aaa->second;
-            //     auto bbb1 = bbb;
-            // } else {
-            //     auto ccc = aaa->second;
-            // }
-
-
             // The amplitude of current_state should always be non-zero, if the data structure
             // is properly maintained. Since the flipped state should match the amplitude (up to phase),
             // if the flipped state is not in _qubit_data, it implicitly has an ampltude of 0.0, which
@@ -726,35 +700,38 @@ public:
         if (operation_list.size()==0){return;}
 
         // Condense the list into a memory-efficient vector with qubit labels
-        _operation_vector.reserve(operation_list.size());
+        // TODO: Is this still needed after multithreading is removed? Can we work off operation_list?
+        std::vector<internal_operation> operation_vector;
+        operation_vector.reserve(operation_list.size());
+
         for (auto op : operation_list){
             switch (op.gate_type) { 
                 case OP::X:
                 case OP::Y:
                 case OP::Z:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target));
                     break;
                 case OP::MCX:
                 case OP::MCY:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls)));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls)));
                     break;
                 case OP::MCZ:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls).set(op.target)));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls).set(op.target)));
                     break;
                 case OP::Phase:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, op.phase));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, op.phase));
                     break;
                 case OP::MCPhase:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls).set(op.target), op.phase));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls).set(op.target), op.phase));
                     break;
                 case OP::SWAP:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, op.target_2));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, op.target_2));
                     break;
                 case OP::MCSWAP:
-                    _operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls), op.target_2));
+                    operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls), op.target_2));
                     break;
                 case OP::Assert:
-                    _operation_vector.push_back(internal_operation(op.gate_type, _get_mask(op.controls), op.result));
+                    operation_vector.push_back(internal_operation(op.gate_type, _get_mask(op.controls), op.result));
                     break;
                 default:
                     throw std::runtime_error("Unsupported operation");
@@ -762,198 +739,76 @@ public:
             }
         }
 
-        _new_qubit_data = make_wavefunction();
+        wavefunction new_qubit_data = make_wavefunction();
         
-        // Threading introduces a lot of overhead so it 
-        // is only worthwhile for large instances
-        // 64 and 4096 are empirical values
-        if (_operation_vector.size() < 64 || _qubit_data.size() < 4096){ // small; do not thread
-            // Iterates through and applies all operations
-            for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end(); ++current_state){
-                qubit_label label = current_state->first;
-                amplitude val = current_state->second;
-                // Iterate through vector of operations and apply each gate
-                for (int i=0; i < _operation_vector.size(); i++) { 
-                    auto &op = _operation_vector[i];
-                    switch (op.gate_type) { 
-                        case OP::X:
+        // Iterates through and applies all operations
+        for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end(); ++current_state){
+            qubit_label label = current_state->first;
+            amplitude val = current_state->second;
+            // Iterate through vector of operations and apply each gate
+            for (int i=0; i < operation_vector.size(); i++) { 
+                auto &op = operation_vector[i];
+                switch (op.gate_type) { 
+                    case OP::X:
+                        label.flip(op.target);
+                        break;
+                    case OP::MCX:
+                        if ((op.controls & label) == op.controls){
                             label.flip(op.target);
-                            break;
-                        case OP::MCX:
-                            if ((op.controls & label) == op.controls){
-                                label.flip(op.target);
-                            }
-                            break;
-                        case OP::Y:
+                        }
+                        break;
+                    case OP::Y:
+                        label.flip(op.target);
+                        val *= (label[op.target]) ? 1i : -1i;
+                        break;
+                    case OP::MCY:
+                        if ((op.controls & label) == op.controls){
                             label.flip(op.target);
                             val *= (label[op.target]) ? 1i : -1i;
-                            break;
-                        case OP::MCY:
-                            if ((op.controls & label) == op.controls){
-                                label.flip(op.target);
-                                val *= (label[op.target]) ? 1i : -1i;
-                            }
-                            break;
-                        case OP::Z:
-                            val *= (label[op.target] ? -1 : 1);
-                            break;
-                        case OP::MCZ:
-                            val *= ((op.controls & label) == op.controls) ? -1 : 1;
-                            break;
-                        case OP::Phase:
-                            val *= label[op.target] ? op.phase : 1;
-                            break;
-                        case OP::MCPhase:
-                            val *= ((op.controls & label) == op.controls) ? op.phase : 1;
-                            break;
-                        case OP::SWAP:
-                            if (label[op.target] != label[op.target_2]){
-                                label.flip(op.target);
-                                label.flip(op.target_2);
-                            }
-                            break;
-                        case OP::MCSWAP:
-                            if (((label & op.controls) == op.controls) && (label[op.target] != label[op.target_2])){
-                                label.flip(op.target);
-                                label.flip(op.target_2);
-                            } 
-                            break;
-                        case OP::Assert:
-                            if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
-                                std::cout << "Problematic state: " << label << "\n";
-                                std::cout << "Amplitude: " << val << "\n";
-                                std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
-                                throw std::runtime_error("Assert failed");
-                            }
-                            break;
-                        default:
-                            throw std::runtime_error("Unsupported operation");
-                            break;
-                    }
-                }
-                // Insert the new state into the new wavefunction
-                _new_qubit_data.emplace(label, val);
-            }
-            _qubit_data = std::move(_new_qubit_data);
-            _new_qubit_data.clear();
-            _operation_vector.clear();
-        } else { // Large enough to multi-thread
-            #ifndef DOMP_GE_V3 // OMP version is too low; uses condition variables
-                // Lock the mutex so the threads stay asleep during prep
-                std::unique_lock<std::mutex> state_lock(_state_mtx);
-                _new_qubit_data = wavefunction(_qubit_data.size());
-                // jump_size gives a rough guess for how many states each thread should process
-                // to minimize contention for current_state
-                _jump_size = std::max((size_t)1 , (size_t)(_qubit_data.size() / (8*_thread_pool.size())));
-                // Set the _current state (this allows the threads to wake up)
-                _current_state = _qubit_data.begin();
-                
-                // Wake up all threads
-                cv.notify_all();
-                // Wait for the number of running threads to be 0
-                // This will spuriously wake many times
-                cv.wait(state_lock, [&](){
-                    return _current_state == _qubit_data.end() && _running_threads == 0;
-                });
-                // Here all threads are finished
-            #else
-                #pragma omp parallel 
-                {
-                    _jump_size = std::max((size_t)1 , (size_t)(_qubit_data.size() / (8*omp_get_num_threads())));
-                    #pragma omp single
-                    {
-                        auto internal_state = _qubit_data.begin();
-                        auto internal_end = _qubit_data.end();
-                        for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end();){
-                            internal_state = current_state;
-
-                            //current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
-                            for (size_t i=0; (i<_jump_size) && (_current_state != _qubit_data.end()); i++) {
-                                ++_current_state;
-                            }
-
-                            internal_end = current_state;
-                            #pragma omp task firstprivate(internal_state) firstprivate(internal_end)
-                            {
-                                qubit_label label;
-                                amplitude val;
-                                for (; internal_state != internal_end; ++internal_state){
-                                    label = internal_state->first;
-                                    val = internal_state->second;
-                                    for (int i=0; i < _operation_vector.size(); i++) { 
-                                        auto &op = _operation_vector[i];
-                                        switch (op.gate_type) { 
-                                            case OP::X:
-                                                label.flip(op.target);
-                                                break;
-                                            case OP::MCX:
-                                                if ((op.controls & label) == op.controls){
-                                                    label.flip(op.target);
-                                                }
-                                                break;
-                                            case OP::Y:
-                                                label.flip(op.target);
-                                                val *= (label[op.target]) ? 1i : -1i;
-                                                break;
-                                            case OP::MCY:
-                                                if ((op.controls & label) == op.controls){
-                                                    label.flip(op.target);
-                                                    val *= (label[op.target]) ? 1i : -1i;
-                                                }
-                                                break;
-                                            case OP::Z:
-                                                val *= (label[op.target] ? -1 : 1);
-                                                break;
-                                            case OP::MCZ:
-                                                val *= ((op.controls & label) == op.controls) ? -1 : 1;
-                                                break;
-                                            case OP::Phase:
-                                                val *= label[op.target] ? op.phase : 1;
-                                                break;
-                                            case OP::MCPhase:
-                                                val *= ((op.controls & label) == op.controls) ? op.phase : 1;
-                                                break;
-                                            case OP::SWAP:
-                                                if (label[op.target] != label[op.target_2]){
-                                                    label.flip(op.target);
-                                                    label.flip(op.target_2);
-                                                }
-                                                break;
-                                            case OP::MCSWAP:
-                                                if (((label & op.controls) == op.controls) && (label[op.target] != label[op.target_2])){
-                                                    label.flip(op.target);
-                                                    label.flip(op.target_2);
-                                                } 
-                                                break;
-                                            case OP::Assert:
-                                                if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
-                                                    std::cout << "Problematic state: " << label << "\n";
-                                                    std::cout << "Amplitude: " << val << "\n";
-                                                    std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
-                                                    throw std::runtime_error("Assert failed");
-                                                }
-                                                break;
-                                            default:
-                                                throw std::runtime_error("Unsupported operation");
-                                                break;
-                                        }
-                                    }
-                                    #pragma omp critical
-                                    {
-                                        _new_qubit_data.emplace(label, val);
-                                    }
-                                }
-                            }
-
                         }
-                    }
-                    #pragma omp barrier
+                        break;
+                    case OP::Z:
+                        val *= (label[op.target] ? -1 : 1);
+                        break;
+                    case OP::MCZ:
+                        val *= ((op.controls & label) == op.controls) ? -1 : 1;
+                        break;
+                    case OP::Phase:
+                        val *= label[op.target] ? op.phase : 1;
+                        break;
+                    case OP::MCPhase:
+                        val *= ((op.controls & label) == op.controls) ? op.phase : 1;
+                        break;
+                    case OP::SWAP:
+                        if (label[op.target] != label[op.target_2]){
+                            label.flip(op.target);
+                            label.flip(op.target_2);
+                        }
+                        break;
+                    case OP::MCSWAP:
+                        if (((label & op.controls) == op.controls) && (label[op.target] != label[op.target_2])){
+                            label.flip(op.target);
+                            label.flip(op.target_2);
+                        } 
+                        break;
+                    case OP::Assert:
+                        if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
+                            std::cout << "Problematic state: " << label << "\n";
+                            std::cout << "Amplitude: " << val << "\n";
+                            std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
+                            throw std::runtime_error("Assert failed");
+                        }
+                        break;
+                    default:
+                        throw std::runtime_error("Unsupported operation");
+                        break;
                 }
-            #endif
-            _qubit_data = std::move(_new_qubit_data);
-            _operation_vector.clear();
-            _new_qubit_data.clear();
+            }
+            // Insert the new state into the new wavefunction
+            new_qubit_data.emplace(label, val);
         }
+        _qubit_data = std::move(new_qubit_data);
+        operation_vector.clear();
     }
 
     void R(Gates::Basis b, double phi, logical_qubit_id index){
@@ -1185,34 +1040,6 @@ public:
     // Returns the rng from this simulator
     std::function<double()> get_rng() { return _rng; }
 
-    // Finishes the threads which wait for the queue
-    void complete_threads() {
-        in_use=false;
-        // If this spuriously wakes up threads,
-        // they will still end because in_use is false
-        _current_state = _qubit_data.begin();
-        cv.notify_all();
-
-        for (auto &thread : _thread_pool){
-            thread.join();
-        }
-    }
-
-    int get_num_threads() {
-        #ifndef DOMP_GE_V3
-            return static_cast<int>(_thread_pool.size());
-        #else
-            int threads=0;
-            #pragma omp parallel
-            {
-                #pragma omp master
-                threads = omp_get_num_threads();
-            }
-            return threads;
-        #endif
-    }
-
-
 private:
     // Internal type used to store operations with bitsets 
     // instead of vectors of qubit ids
@@ -1257,191 +1084,7 @@ private:
     qubit_label _get_mask(std::vector<logical_qubit_id> const& indices){
         return get_mask<num_qubits>(indices);
     }
-
-    //********* Member variables for multithreading permutations ******//
-    // Shared iterator through the wavefunction
-    // Should point to _qubit_data.end() unless in use
-    decltype(_qubit_data.begin()) _current_state;
-    // Vector of waiting threads
-    std::vector<std::thread> _thread_pool;
-    // Condition variable, locked on _state_mtx
-    std::condition_variable cv;
-    // Mutex to prevent concurrent access to _current_state
-    std::mutex _state_mtx;
-    // Mutex to prevent concurrent access to _new_qubit_data
-    std::mutex _wfn_mtx;
-    // Used as a flag to decide when the thread pool is necessary,
-    // i.e., it is only set to false when the simulator is being destroyed
-    std::atomic<bool> in_use = true;
-    // Counts running threads, so controlling thread knows when the permutation is finished
-    std::atomic<int> _running_threads = 0;
-    // A vector of operations that all threads point to to read which operations to apply
-    std::vector<internal_operation> _operation_vector;
-    // New wavefunction which will replace the old one
-    wavefunction _new_qubit_data;
-    // The number of elements of the hash map that each thread will handle in one iteration
-    size_t _jump_size;
-    // Max number of threads
-    int max_num_threads = std::thread::hardware_concurrency();
-
-    // Called on creation, starts the thread pool and waits for all threads to 
-    // finish initialization tasks
-    void _initialize_threads() {
-        // Unnecessary if OpenMP Is available
-        #ifndef DOMP_GE_V3
-            // Prevents spurious wake-ups
-            _current_state = _qubit_data.end();
-            _thread_pool = std::vector<std::thread>();
-            #ifndef _OPENMP
-                int num_threads = std::thread::hardware_concurrency();
-            #else
-                int num_threads = 1;
-                #pragma omp parallel
-                {
-                    #pragma omp single
-                    num_threads = omp_get_num_threads();
-                }
-            #endif
-            // Lock the state, so that all the new threads get stopped during their execution
-            std::unique_lock<std::mutex> state_lock(_state_mtx);
-            for (int i = 0; i < num_threads; i++){
-                // Each running thread will decrement this just before it waits on the condition variable
-                ++_running_threads;
-                _thread_pool.push_back(std::thread([this](){this->_wait_to_permute();}));
-            }
-            // Waits until all the running threads have finished initializing
-            // This ensures the simulation does not actually start 
-            // until the thread pool has finished initializing
-            cv.wait(state_lock, [&](){return _running_threads==0;});
-        #endif
-    }
-
-    // Function that all threads in _thread_pool run
-    // Waits on the condition variable, then applies _operation_vector
-    // to the qubit data
-    void _wait_to_permute(){
-        // Prep local variables
-        auto local_state = _qubit_data.begin();
-        auto local_end = _qubit_data.end();
-        // Initialize a wfn lock to avoid recreating this object in every loop
-        std::unique_lock<std::mutex> wfn_lock(_wfn_mtx);
-        wfn_lock.unlock();
-        // First lock the state so we can wait on it
-        std::unique_lock<std::mutex> state_lock(_state_mtx);
-        // Set the _current_state to ensure it waits
-        _current_state = _qubit_data.end();
-        // Reduce number of running threads
-        _running_threads--;
-        // Notify all (i.e., the constructor thread)
-        // which will wait until the lock is released to check the number of running threads
-        cv.notify_all();
-        // Wait until we set the current state to the start of the wavefunction
-        cv.wait(state_lock, [&](){
-            return _current_state != _qubit_data.end();
-        });
-        
-        // Loop continuously
-        while (in_use){
-            ++_running_threads;
-            // Loop through the wavefunction
-            while (_current_state != _qubit_data.end()){
-                // Update local variables
-                local_state = _current_state; 
-
-                //_current_state.jump_forward(_jump_size); // Extra hash map functionality missing in STL
-                for (size_t i=0; (i<_jump_size) && (_current_state != _qubit_data.end()); i++) {
-                    ++_current_state;
-                }
-
-                local_end = _current_state;
-                // Unlock state to allow other threads to modify their state
-                state_lock.unlock();
-                // Loop through the chunk that this thread has taken
-                for (; local_state != local_end; ++local_state){
-                    qubit_label label = local_state->first;
-                    amplitude val = local_state->second;
-                    
-                    for (auto op : _operation_vector){
-                        switch (op.gate_type) { 
-                            case OP::X:
-                                label.flip(op.target);
-                                break;
-                            case OP::MCX:
-                                if ((op.controls & label) == op.controls){
-                                    label.flip(op.target);
-                                }
-                                break;
-                            case OP::Y:
-                                label.flip(op.target);
-                                val *= (label[op.target]) ? 1i : -1i;
-                                break;
-                            case OP::MCY:
-                                if ((op.controls & label) == op.controls){
-                                    label.flip(op.target);
-                                    val *= (label[op.target]) ? 1i : -1i;
-                                }
-                                break;
-                            case OP::Z:
-                                val *= (label[op.target] ? -1 : 1);
-                                break;
-                            case OP::MCZ:
-                                val *= ((op.controls & label) == op.controls) ? -1 : 1;
-                                break;
-                            case OP::Phase:
-                                val *= label[op.target] ? op.phase : 1;
-                                break;
-                            case OP::MCPhase:
-                                val *= ((op.controls & label) == op.controls) ? op.phase : 1;
-                                break;
-                            case OP::SWAP:
-                                if (label[op.target] != label[op.target_2]){
-                                    label.flip(op.target);
-                                    label.flip(op.target_2);
-                                }
-                                break;
-                            case OP::MCSWAP:
-                                if (((label & op.controls) == op.controls) && (label[op.target] != label[op.target_2])){
-                                    label.flip(op.target);
-                                    label.flip(op.target_2);
-                                } 
-                                break;
-                            case OP::Assert:
-                                if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
-                                    std::cout << "Problematic state: " << label << "\n";
-                                    std::cout << "Amplitude: " << val << "\n";
-                                    std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
-                                    throw std::runtime_error("Assert failed");
-                                }
-                                break;
-                            default:
-                                throw std::runtime_error("Unsupported operation");
-                                break;
-                        }
-                    }
-
-                    wfn_lock.lock();
-                    _new_qubit_data.emplace(label, val);
-                    wfn_lock.unlock();
-                }
-                // Lock before checking and modifying the current state
-                state_lock.lock();
-            }
-            // This thread has finished iterating through the wavefunction
-            --_running_threads;
-            // Notify all other threads (i.e., the controlling thread)
-            // if this is the last thread to finish
-            // The check on _running_threads avoids spurious wake-ups to
-            // the controlling thread, but takes a bit of time as _running_threads
-            // is atomic
-            if (_running_threads ==0)
-                cv.notify_all();
-            // Wait on the state lock before repeating the loop
-            // The wait unlocks state_lock
-            cv.wait(state_lock, [&](){return _current_state != _qubit_data.end();});
-        }
-    }
-
-    
+   
     // Split the wavefunction if separable, otherwise return false
     // Idea is that if we have a_bb|b1>|b2> as the first state, then for
     // any other state a_xx|x1>|x2>, we must also have a_xb|x1>|b2> and a_bx|b1>|x2>

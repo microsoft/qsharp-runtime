@@ -68,9 +68,6 @@ public:
 
     virtual std::function<double()> get_rng() = 0;
 
-    virtual void complete_threads() = 0;
-    virtual int get_num_threads() = 0;
-
     virtual std::string Sample()  = 0;
 };
 
