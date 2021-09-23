@@ -454,10 +454,10 @@ extern "C"
     {
         int64_t start; // inclusive
         int64_t step;  // cannot be zero
-        int64_t end;   // exclusive
+        int64_t end;   // EXclusive (as opposed to `QirRange`)
         int64_t width; // number of items in the range
 
-        CheckedRange(const QirRange& r, int64_t upperBound) // lower bound assumed to be 0
+        CheckedRange(const QirRange& r, int64_t upperBound /*exclusive*/) // lower bound assumed to be 0 (inclusive)
         {
             this->start = r.start;
             this->step  = r.step;
@@ -475,9 +475,12 @@ extern "C"
                 this->end   = 0;
                 this->width = 0;
             }
-            else if (r.step > 0) // Positive step and positive range.
+            else if (r.step > 0) // Positive step and non-negative range.
             {
-                this->width = (r.end - r.start + 1) / r.step + ((r.end - r.start + 1) % r.step != 0 ? 1 : 0);
+                this->width = (r.end - r.start + 1) / r.step                   // Number of full periods.
+                              + ((r.end - r.start + 1) % r.step != 0 ? 1 : 0); // Every item is in the beginning of its
+                                                                               // period (also true for the last item in
+                                                                               // incomplete period at the end).
                 assert(this->width > 0);
 
                 const int64_t lastSequenceItem = r.start + (this->width - 1) * r.step;
@@ -486,9 +489,10 @@ extern "C"
                     throw std::runtime_error("range out of bounds");
                 }
 
-                this->end = lastSequenceItem + r.step;
+                this->end = lastSequenceItem + r.step; // `this->end` is EXclusive (as opposed to `QirRange`).
+                                                       // `this->end` can also be `lastSequenceItem + 1`.
             }
-            else // Negative step and negative range.
+            else // Negative step and non-positive range.
             {    // Range{10, -3, 1} == { 10, 7, 4, 1 }
                 // (B) Range{1, -5 , 0} = { 1 }
                 // (C) Range{4, -2, 0} = {4, 2, 0}
@@ -509,6 +513,8 @@ extern "C"
                 }
 
                 this->end = lastSequenceItem + r.step; // (B) 1 + (-5) = -4.
+                                                       // `this->end` is EXclusive (as opposed to `QirRange`).
+                                                       // `this->end` can also be `lastSequenceItem - 1`.
             }
 
             // normalize the range of width 1, as the step doesn't matter for it
@@ -529,7 +535,10 @@ extern "C"
     // on. The %Range specifies the slice. Both ends of the range are inclusive. Negative step means the the order of
     // elements should be reversed.
     // TODO: Use `QirArray::TDimCount dim` (breaking change):
-    QirArray* quantum__rt__array_slice(QirArray* array, int32_t dim, const QirRange& qirRange) // NOLINT
+    QirArray* quantum__rt__array_slice( // NOLINT
+        QirArray* array, int32_t dim, const QirRange& qirRange,
+        bool /*ignored: forceNewInstance*/) // https://github.com/microsoft/qsharp-language/issues/102
+                                            // https://github.com/microsoft/qsharp-runtime/pull/830#issuecomment-925435170
     {
         assert(array != nullptr);
         assert(dim >= 0 && dim < array->dimensions);

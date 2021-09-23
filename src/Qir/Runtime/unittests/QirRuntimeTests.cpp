@@ -19,6 +19,8 @@
 
 using namespace Microsoft::Quantum;
 
+static constexpr bool forseNewInstance = true;
+
 struct ResultsReferenceCountingTestQAPI : public SimulatorStub
 {
     int lastId = -1;
@@ -224,32 +226,32 @@ TEST_CASE("Arrays: check the slice range", "[qir_support]")
     QirArray* slice    = nullptr;
 
     // invalid range
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {0, 0, 0}));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {0, 0, 0}, forseNewInstance));
 
     // violated bounds
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, 1, dim0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 1, {0, 1, dim1}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {-1, 1, dim0 - 1}));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, 1, dim0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 1, {0, 1, dim1}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {-1, 1, dim0 - 1}, forseNewInstance));
 
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, -1, dim0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 1, {dim1, -1, 0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0 - 1, -1, -1}));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, -1, dim0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 1, {dim1, -1, 0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0 - 1, -1, -1}, forseNewInstance));
 
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, 3, dim0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 1, {0, 3, dim1 + 2}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {-1, 3, dim0 - 1}));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, 3, dim0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 1, {0, 3, dim1 + 2}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {-1, 3, dim0 - 1}, forseNewInstance));
 
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, -3, dim0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 1, {dim1, -3, 0}));
-    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0 - 1, -3, -3}));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0, -3, dim0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 1, {dim1, -3, 0}, forseNewInstance));
+    CHECK_THROWS(quantum__rt__array_slice(a, 0, {dim0 - 1, -3, -3}, forseNewInstance));
 
     // empty range should produce empty array
-    slice = quantum__rt__array_slice(a, 0, {dim0 - 1, 1, 0});
+    slice = quantum__rt__array_slice(a, 0, {dim0 - 1, 1, 0}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
     __quantum__rt__array_update_reference_count(slice, -1);
 
-    slice = quantum__rt__array_slice(a, 1, {0, -1, dim0 - 1});
+    slice = quantum__rt__array_slice(a, 1, {0, -1, dim0 - 1}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == 0);
     __quantum__rt__array_update_reference_count(slice, -1);
@@ -265,13 +267,13 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
     QirArray* slice = nullptr;
 
     // even if slice results in a single value, it's still an array
-    slice = quantum__rt__array_slice(a, 0, {1, 2 * dim, dim});
+    slice = quantum__rt__array_slice(a, 0, {1, 2 * dim, dim}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
     __quantum__rt__array_update_reference_count(slice, -1);
 
     // if the range covers the whole array, it's effectively a copy
-    slice = quantum__rt__array_slice(a, 0, {0, 1, dim - 1});
+    slice = quantum__rt__array_slice(a, 0, {0, 1, dim - 1}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '0');
     REQUIRE(*__quantum__rt__array_get_element_ptr(slice, 4) == '4');
@@ -279,7 +281,7 @@ TEST_CASE("Arrays: slice of 1D array", "[qir_support]")
 
     // disconnected slice (also check that the end of range can be above bounds as long as the generated sequence is
     // within them)
-    slice = quantum__rt__array_slice(a, 0, {0, 4, dim + 1});
+    slice = quantum__rt__array_slice(a, 0, {0, 4, dim + 1}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 2);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '0');
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 1) == '4');
@@ -296,15 +298,17 @@ TEST_CASE("Arrays: reversed slice of 1D array", "[qir_support]")
     QirArray* slice = nullptr;
 
     // even if slice results in a single value, it's still an array
-    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0}); // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
-                                                          // slice == char[1] == { '1' }.
+    slice = quantum__rt__array_slice(a, 0, {1, -dim, 0}, forseNewInstance);
+    // Range{1, -dim, 0} == Range{1, -5, 0} == { 1 }.
+    // slice == char[1] == { '1' }.
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 1);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '1');
     __quantum__rt__array_update_reference_count(slice, -1); // slice == dangling pointer.
 
     // reversed slices are alwayes disconnected
-    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0}); // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
-                                                              // slice == char[3] == {'4', '2', '0'}.
+    slice = quantum__rt__array_slice(a, 0, {dim - 1, -2, 0}, forseNewInstance);
+    // Range{dim - 1, -2, 0} == Range{4, -2, 0} == {4, 2, 0}.
+    // slice == char[3] == {'4', '2', '0'}.
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 0) == '4');
     REQUIRE(*__quantum__rt__array_get_element_ptr_1d(slice, 1) == '2');
@@ -342,7 +346,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
             count - 1);
 
     // if the range covers the whole dimension, it's effectively a copy
-    slice = quantum__rt__array_slice(a, 1, {0, 1, dim1 - 1});
+    slice = quantum__rt__array_slice(a, 1, {0, 1, dim1 - 1}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -352,7 +356,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     __quantum__rt__array_update_reference_count(slice, -1);
 
     // if the range consists of a single point, the slice still has the same dimensions
-    slice = quantum__rt__array_slice(a, 1, {1, 2 * dim1, dim1}); // items with second index = 1
+    slice = quantum__rt__array_slice(a, 1, {1, 2 * dim1, dim1}, forseNewInstance); // items with second index = 1
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == 1);
@@ -362,7 +366,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     __quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on 0 dimension
-    slice = quantum__rt__array_slice(a, 0, {1, 1, 3}); // items with first index = 1, 2 or 3
+    slice = quantum__rt__array_slice(a, 0, {1, 1, 3}, forseNewInstance); // items with first index = 1, 2 or 3
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -378,7 +382,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     // ...                            [25 ...               ]
     // ...                            [37 ...               ]
     // 400 401 | 410 411 | 420 421 -- [49 50 | 53 54 | 57 58]
-    slice = quantum__rt__array_slice(a, 2, {1, 1, 2}); // items with last index = 1 or 2
+    slice = quantum__rt__array_slice(a, 2, {1, 1, 2}, forseNewInstance); // items with last index = 1 or 2
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -391,7 +395,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
 
     // slice on sparse range in 0 dimension (also check that the end of range can be above bounds as long as the
     // generated sequence is within them)
-    slice = quantum__rt__array_slice(a, 0, {0, 3, dim0}); // items with first index = 0 or 3
+    slice = quantum__rt__array_slice(a, 0, {0, 3, dim0}, forseNewInstance); // items with first index = 0 or 3
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 2);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -401,7 +405,7 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     __quantum__rt__array_update_reference_count(slice, -1);
 
     // slice on sparse range in the middle dimension
-    slice = quantum__rt__array_slice(a, 1, {0, 2, 2}); // items with second index = 0 or 2
+    slice = quantum__rt__array_slice(a, 1, {0, 2, 2}, forseNewInstance); // items with second index = 0 or 2
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == 2);
@@ -417,7 +421,8 @@ TEST_CASE("Arrays: slice of 3D array", "[qir_support]")
     // ...                         -- [25 ...               ]
     // ...                         -- [37 ...               ]
     // 400 401 | 410 411 | 420 421 -- [49 51 | 53 55 | 57 59]
-    slice = quantum__rt__array_slice(a, 2, {1, 2, 3}); // items with last index = 1 or 3 (all odd numbers)
+    slice =
+        quantum__rt__array_slice(a, 2, {1, 2, 3}, forseNewInstance); // items with last index = 1 or 3 (all odd numbers)
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -459,7 +464,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
             count - 1);
 
     // if the range consists of a single point, the slice still has the same dimensions
-    slice = quantum__rt__array_slice(a, 1, {1, -dim1, 0}); // items with second index = 1
+    slice = quantum__rt__array_slice(a, 1, {1, -dim1, 0}, forseNewInstance); // items with second index = 1
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == 1);
@@ -473,7 +478,7 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     // 000 001 002 003 | 010 011 012 013 | 020 021 022 023 -- [36 - 47]
     // 100 101 102 103 | 110 111 112 113 | 120 121 122 123 -- [24 - 35]
     // 200 201 202 203 | 210 211 212 213 | 220 221 222 223 -- [12 - 23]
-    slice = quantum__rt__array_slice(a, 0, {dim0 - 2, -1, 1});
+    slice = quantum__rt__array_slice(a, 0, {dim0 - 2, -1, 1}, forseNewInstance);
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == 3);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
@@ -489,7 +494,8 @@ TEST_CASE("Arrays: reversed slice of 3D array", "[qir_support]")
     // ...                         -- [27 ...               ]
     // ...                         -- [39 ...               ]
     // 400 401 | 410 411 | 420 421 -- [51 49 | 55 53 | 59 57]
-    slice = quantum__rt__array_slice(a, 2, {dim2 - 1, -2, 0}); // items with last index 3, 1 (all odd numbers)
+    slice = quantum__rt__array_slice(a, 2, {dim2 - 1, -2, 0},
+                                     forseNewInstance); // items with last index 3, 1 (all odd numbers)
     REQUIRE(__quantum__rt__array_get_dim(slice) == dims);
     REQUIRE(__quantum__rt__array_get_size(slice, 0) == dim0);
     REQUIRE(__quantum__rt__array_get_size(slice, 1) == dim1);
