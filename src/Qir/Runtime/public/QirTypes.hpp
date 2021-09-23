@@ -194,10 +194,11 @@ struct QIR_SHARED_API QirCallable
 
 extern "C"
 {
+    // https://docs.microsoft.com/azure/quantum/user-guide/language/expressions/valueliterals#range-literals
     struct QirRange
     {
-        int64_t start;
+        int64_t start; // Inclusive.
         int64_t step;
-        int64_t end;
+        int64_t end; // Inclusive.
     };
 }
