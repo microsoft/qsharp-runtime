@@ -1,11 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using System;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
     /// <summary>
     /// Represents an optional value of type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T">The value type.</typeparam>
+    /// <typeparam name="T">The type of the value.</typeparam>
     internal abstract class Maybe<T>
     {
         private Maybe()
@@ -15,9 +18,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// Case analysis on <see cref="Maybe{T}"/>.
         /// </summary>
-        /// <param name="onNothing">Handles the case when this <see cref="Maybe{T}"/> is <see cref="Nothing"/>.</param>
-        /// <param name="onJust">Handles the case when this <see cref="Maybe{T}"/> is <see cref="Just"/>.</param>
-        /// <typeparam name="TResult"></typeparam>
+        /// <param name="onNothing">Handles the case when this is <see cref="Nothing"/>.</param>
+        /// <param name="onJust">Handles the case when this is <see cref="Just"/>.</param>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <returns>The result of handling the cases.</returns>
         internal abstract TResult Case<TResult>(Func<TResult> onNothing, Func<T, TResult> onJust);
 
@@ -48,7 +51,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             /// <summary>
             /// Creates a <see cref="Just"/> instance.
             /// </summary>
-            /// <param name="value">The value present.</param>
+            /// <param name="value">The value.</param>
             internal Just(T value) => this.value = value;
 
             internal override TResult Case<TResult>(Func<TResult> onNothing, Func<T, TResult> onJust) => onJust(value);
@@ -61,16 +64,16 @@ namespace Microsoft.Quantum.EntryPointDriver
     internal static class Maybe
     {
         /// <summary>
-        /// The <see cref="Maybe{T}.Nothing"/> case for a value of type <typeparamref name="T"/>.
+        /// The <see cref="Maybe{T}.Nothing"/> case.
         /// </summary>
         /// <typeparam name="T">The type of the value that is not present.</typeparam>
         /// <returns>The <see cref="Maybe{T}.Nothing"/> case.</returns>
         internal static Maybe<T> Nothing<T>() => Maybe<T>.Nothing.Instance;
 
         /// <summary>
-        /// The <see cref="Maybe{T}.Just"/> case for a value of type <typeparamref name="T"/>.
+        /// The <see cref="Maybe{T}.Just"/> case.
         /// </summary>
-        /// <param name="value">The value present.</param>
+        /// <param name="value">The value.</param>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <returns>The <see cref="Maybe{T}.Just"/> case.</returns>
         internal static Maybe<T> Just<T>(T value) => new Maybe<T>.Just(value);
