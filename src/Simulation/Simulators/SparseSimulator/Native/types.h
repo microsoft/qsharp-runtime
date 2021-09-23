@@ -7,20 +7,9 @@
 #include <complex>
 #include <unordered_map>
 #include <bitset>
-#include <shared_mutex>
-#include <mutex>
-
-
-#include "quantum_hash_map.hpp"
-
 
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
-
-using mutex_type = std::mutex;
-using recursive_mutex_type = std::recursive_mutex;
-using lock_type = std::lock_guard<mutex_type>;
-using recursive_lock_type = std::lock_guard<recursive_mutex_type>;
 
 #ifndef USE_SINGLE_PRECISION
     using RealType = double;
@@ -37,9 +26,6 @@ template <size_t num_qubits>
 using qubit_label_type = std::bitset<num_qubits>;
 
 // Wavefunctions are hash maps of some key (std::bitset or a string)
-//template <typename key>
-//using abstract_wavefunction = ska::bytell_hash_map<key, amplitude, std::hash<key>>;
-
 template <typename key>
 using abstract_wavefunction = std::unordered_map<key, amplitude>;
 

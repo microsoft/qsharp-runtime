@@ -14,8 +14,6 @@
 
 #include "basic_quantum_state.hpp"
 
-#include "quantum_hash_map.hpp"
-
 #include "types.h"
 #include "gates.h"
 
