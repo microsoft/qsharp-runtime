@@ -3,115 +3,100 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
-    /// <summary>
-    /// Represents either a success or a failure of a process.
-    /// </summary>
-    /// <typeparam name="T">The type of the success value.</typeparam>
-    internal readonly struct Validation<T>
+    internal abstract class Validation<TValue, TError>
     {
-        /// <summary>
-        /// True if the validation succeeded.
-        /// </summary>
-        internal bool IsSuccess { get; }
-
-        /// <summary>
-        /// True if the validation failed.
-        /// </summary>
-        internal bool IsFailure => !IsSuccess;
-
-        /// <summary>
-        /// The success value of the validation.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the validation failed.</exception>
-        internal T Value =>
-            // Suppress null warning since ValueOrDefault may not be null if IsSuccess is true.
-            (IsSuccess ? ValueOrDefault : throw new InvalidOperationException())!;
-
-        /// <summary>
-        /// The success value of the validation or a default value if the validation failed.
-        /// </summary>
-        [MaybeNull]
-        internal T ValueOrDefault { get; }
-
-        /// <summary>
-        /// The error message of the validation, or null if the validation has no error message.
-        /// </summary>
-        internal string? ErrorMessage { get; }
-
-        /// <summary>
-        /// Creates a new validation.
-        /// </summary>
-        /// <param name="isSuccess">True if the validation succeeded.</param>
-        /// <param name="value">The success value or a default value</param>
-        /// <param name="errorMessage">The error message.</param>
-        private Validation(bool isSuccess, T value, string? errorMessage)
+        private Validation()
         {
-            IsSuccess = isSuccess;
-            ValueOrDefault = value;
-            ErrorMessage = errorMessage;
         }
 
-        /// <summary>
-        /// Creates a successful validation.
-        /// </summary>
-        /// <param name="value">The success value.</param>
-        /// <returns>The successful validation.</returns>
-        internal static Validation<T> Success(T value) =>
-            new Validation<T>(true, value, default);
+        internal abstract TResult Case<TResult>(Func<TValue, TResult> onSuccess, Func<TError, TResult> onFailure);
 
-        /// <summary>
-        /// Creates a failed validation.
-        /// </summary>
-        /// <param name="errorMessage">The error message.</param>
-        /// <returns>The failed validation.</returns>
-        internal static Validation<T> Failure(string? errorMessage = null) =>
-            new Validation<T>(false, default!, errorMessage);
+        internal class Success : Validation<TValue, TError>
+        {
+            private readonly TValue value;
+
+            internal Success(TValue value) => this.value = value;
+
+            internal override TResult Case<TResult>(Func<TValue, TResult> onSuccess, Func<TError, TResult> onFailure) =>
+                onSuccess(value);
+        }
+
+        internal class Failure : Validation<TValue, TError>
+        {
+            private readonly TError error;
+
+            internal Failure(TError error) => this.error = error;
+
+            internal override TResult Case<TResult>(Func<TValue, TResult> onSuccess, Func<TError, TResult> onFailure) =>
+                onFailure(error);
+        }
     }
 
     /// <summary>
-    /// Extension methods for <see cref="Validation{T}"/>.
+    /// Static methods for <see cref="Validation{TSuccess, TError}"/>.
     /// </summary>
-    internal static class ValidationExtensions
+    internal static class Validation
     {
+        internal static Validation<TValue, TError> Success<TValue, TError>(TValue value) =>
+            new Validation<TValue, TError>.Success(value);
+
+        internal static Validation<TValue, TError> Failure<TValue, TError>(TError error) =>
+            new Validation<TValue, TError>.Failure(error);
+
+        internal static Validation<TValue2, TError2> Map<TValue1, TValue2, TError1, TError2>(
+            this Validation<TValue1, TError1> validation,
+            Func<TValue1, TValue2> mapValue,
+            Func<TError1, TError2> mapError) =>
+            validation.Case(
+                value => Success<TValue2, TError2>(mapValue(value)), 
+                error => Failure<TValue2, TError2>(mapError(error)));
+
         /// <summary>
-        /// Sequentially composes two validations, passing the value of the first validation to another
-        /// validation-producing function if the first validation is a success.
+        /// Composes two validations, passing the value of the first validation to another validation-producing function
+        /// if the first validation is a success.
         /// </summary>
-        /// <typeparam name="T1">The type of the first validation's success value.</typeparam>
-        /// <typeparam name="T2">The type of the second validation's success value.</typeparam>
+        /// <typeparam name="TValue1">The value type of the first validation.</typeparam>
+        /// <typeparam name="TValue2">The value type of the second validation.</typeparam>
+        /// <typeparam name="TError">The error type of both validations.</typeparam>
         /// <param name="validation">The first validation.</param>
         /// <param name="bind">
         /// A function that takes the value of the first validation and returns a second validation.
         /// </param>
         /// <returns>
         /// The first validation if the first validation is a failure; otherwise, the return value of calling the bind
-        /// function on the first validation's success value.
+        /// function on the first validation's value.
         /// </returns>
-        internal static Validation<T2> Bind<T1, T2>(this Validation<T1> validation, Func<T1, Validation<T2>> bind) =>
-            validation.IsFailure ? Validation<T2>.Failure(validation.ErrorMessage) : bind(validation.Value);
+        internal static Validation<TValue2, TError> Bind<TValue1, TValue2, TError>(
+            this Validation<TValue1, TError> validation, Func<TValue1, Validation<TValue2, TError>> bind) =>
+            validation.Case(bind, Failure<TValue2, TError>);
 
         /// <summary>
-        /// Converts an enumerable of validations into a validation of an enumerable.
+        /// Converts an enumerable of validations into a validation of an enumerable of values and errors.
         /// </summary>
-        /// <typeparam name="T">The type of the validation success values.</typeparam>
+        /// <typeparam name="TValue">The value type of the validations.</typeparam>
+        /// <typeparam name="TError">The error type of the validations.</typeparam>
         /// <param name="validations">The validations to sequence.</param>
         /// <returns>
-        /// A validation that contains an enumerable of the validation values if all of the validations are a success,
-        /// or the first error message if one of the validations is a failure.
+        /// A validation that contains an enumerable of values if all validations are a success, or an enumerable of
+        /// errors if any validation is a failure.
         /// </returns>
-        internal static Validation<IEnumerable<T>> Sequence<T>(this IEnumerable<Validation<T>> validations)
+        internal static Validation<IEnumerable<TValue>, IEnumerable<TError>> Sequence<TValue, TError>(
+            this IEnumerable<Validation<TValue, TError>> validations)
         {
-            var results = validations.ToLookup(validation => validation.IsSuccess);
-            var successes = results[true];
-            var failures = results[false];
+            var (successes, failures) = validations.Aggregate(
+                (ImmutableList<TValue>.Empty, ImmutableList<TError>.Empty),
+                (acc, validation) => validation.Case(
+                    value => (acc.Item1.Add(value), acc.Item2),
+                    error => (acc.Item1, acc.Item2.Add(error))));
+
             return failures.Any()
-                ? Validation<IEnumerable<T>>.Failure(failures.First().ErrorMessage)
-                : Validation<IEnumerable<T>>.Success(successes.Select(validation => validation.Value));
+                ? Failure<IEnumerable<TValue>, IEnumerable<TError>>(failures)
+                : Success<IEnumerable<TValue>, IEnumerable<TError>>(successes);
         }
     }
 }
