@@ -107,6 +107,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "AadToken: ",
                     "UserAgent: ",
                     "Job Name: ",
+                    "Job Parameters: ",
                     "Shots: 500",
                     "Output: FriendlyUri",
                     "Dry Run: False",
