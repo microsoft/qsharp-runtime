@@ -535,8 +535,10 @@ extern "C"
     // on. The %Range specifies the slice. Both ends of the range are inclusive. Negative step means the the order of
     // elements should be reversed.
     // TODO: Use `QirArray::TDimCount dim` (breaking change):
-    QirArray* quantum__rt__array_slice(QirArray* array, int32_t dim, const QirRange& qirRange, // NOLINT
-                                       bool forceNewInstance)
+    QirArray* quantum__rt__array_slice( // NOLINT
+        QirArray* array, int32_t dim, const QirRange& qirRange,
+        bool /*ignored: forceNewInstance*/) // https://github.com/microsoft/qsharp-language/issues/102
+                                            // https://github.com/microsoft/qsharp-runtime/pull/830#issuecomment-925435170
     {
         assert(array != nullptr);
         assert(dim >= 0 && dim < array->dimensions);
@@ -557,7 +559,7 @@ extern "C"
         // When range covers the whole dimension, can return a copy of the array without doing any math.
         if (range.step == 1 && range.start == 0 && range.end == array->dimensionSizes[(size_t)dim])
         {
-            return __quantum__rt__array_copy(array, forceNewInstance);
+            return __quantum__rt__array_copy(array, true /*force*/);
         }
 
         // Create slice array of appropriate size.
