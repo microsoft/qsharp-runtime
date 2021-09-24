@@ -154,7 +154,8 @@ extern "C"
 
     // Creates and returns an array that is a slice of an existing array. The int indicates which dimension
     // the slice is on. The %Range specifies the slice.
-    QIR_SHARED_API QirArray* quantum__rt__array_slice(QirArray*, int32_t, const QirRange&); // NOLINT
+    QIR_SHARED_API QirArray* quantum__rt__array_slice(QirArray*, int32_t, const QirRange&, // NOLINT
+                                                      bool /*ignored: forceNewInstance*/);
 
     // Creates and returns an array that is a projection of an existing array. The int indicates which dimension the
     // projection is on, and the int64_t specifies the specific index value to project. The returned Array* will have
