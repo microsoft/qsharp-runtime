@@ -457,7 +457,7 @@ namespace Quantum
 
     void CQubitManager::ReleaseQubitId(QubitIdType id)
     {
-        FailIf(id >= qubitCapacity, "Internal Error: Cannot release an invalid qubit.");
+        FailIf(id < 0 || id >= qubitCapacity, "Internal Error: Cannot release an invalid qubit.");
         if (IsDisabledId(id))
         {
             // Nothing to do. Qubit will stay disabled.
