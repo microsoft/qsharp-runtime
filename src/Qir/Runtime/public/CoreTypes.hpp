@@ -33,7 +33,7 @@
 // is a unique type in the QIR.
 
 class QUBIT;
-typedef QUBIT* Qubit; // Not a pointer to a memory location, just an integer - qubit id.
+typedef intptr_t QubitIdType;
 
 class RESULT;
 typedef RESULT* Result; // TODO(rokuzmin): Replace with `typedef uintXX_t Result`, where XX is 8|16|32|64.

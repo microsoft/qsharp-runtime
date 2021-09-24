@@ -41,7 +41,7 @@ extern "C"
         }
 
         if (!GetDiagnostics()->AssertProbability((long)qubits->count, paulis.data(),
-                                                 reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol,
+                                                 reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)), prob, tol,
                                                  nullptr))
         {
             __quantum__rt__fail(msg);

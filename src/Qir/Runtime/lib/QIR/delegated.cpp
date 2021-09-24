@@ -45,12 +45,12 @@ extern "C"
 
     QUBIT* __quantum__rt__qubit_allocate()
     {
-        return Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit();
+        return reinterpret_cast<QUBIT*>(Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit());
     }
 
     void __quantum__rt__qubit_release(QUBIT* qubit)
     {
-        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(qubit);
+        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(reinterpret_cast<QubitIdType>(qubit));
     }
 
     QUBIT* __quantum__rt__qubit_borrow()
@@ -149,7 +149,9 @@ extern "C"
     // Returns a string representation of the qubit.
     QirString* __quantum__rt__qubit_to_string(QUBIT* qubit) // NOLINT
     {
-        return __quantum__rt__string_create(
-            Microsoft::Quantum::GlobalContext()->GetDriver()->QubitToString(qubit).c_str());
+        return __quantum__rt__string_create(Microsoft::Quantum::GlobalContext()
+                                                ->GetDriver()
+                                                ->QubitToString(reinterpret_cast<QubitIdType>(qubit))
+                                                .c_str());
     }
 }

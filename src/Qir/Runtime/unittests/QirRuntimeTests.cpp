@@ -36,7 +36,7 @@ struct ResultsReferenceCountingTestQAPI : public SimulatorStub
     {
     }
 
-    Result Measure(long, PauliId[], long, Qubit[]) override
+    Result Measure(long, PauliId[], long, QubitIdType[]) override
     {
         assert(this->lastId < this->maxResults);
         this->lastId++;
@@ -683,32 +683,32 @@ struct QubitTestQAPI : public SimulatorStub
     const int maxQubits; // TODO: Use unsigned type.
     std::vector<bool> allocated;
 
-    static uint64_t GetQubitId(Qubit q)
+    static QubitIdType GetQubitId(QubitIdType q)
     {
-        return (uint64_t)q;
+        return q;
     }
 
     QubitTestQAPI(int maxQbits) : maxQubits(maxQbits), allocated((size_t)maxQbits, false)
     {
     }
 
-    Qubit AllocateQubit() override
+    QubitIdType AllocateQubit() override
     {
         assert(this->lastId < this->maxQubits);
         this->lastId++;
         this->allocated.at((size_t)(this->lastId)) = true;
-        return reinterpret_cast<Qubit>(this->lastId);
+        return static_cast<QubitIdType>(this->lastId);
     }
-    void ReleaseQubit(Qubit qubit) override
+    void ReleaseQubit(QubitIdType qubit) override
     {
-        const uint64_t id = GetQubitId(qubit);
+        const QubitIdType id = GetQubitId(qubit);
         INFO(id);
-        REQUIRE(this->allocated.at(id));
-        this->allocated.at(id).flip();
+        REQUIRE(this->allocated.at(static_cast<size_t>(id)));
+        this->allocated.at(static_cast<size_t>(id)).flip();
     }
-    std::string QubitToString(Qubit qubit) override
+    std::string QubitToString(QubitIdType qubit) override
     {
-        const uint64_t id = GetQubitId(qubit);
+        const QubitIdType id = GetQubitId(qubit);
         return std::to_string(id);
     }
     Result UseZero() override
@@ -738,8 +738,8 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     QirExecutionContext::Scoped qirctx(qapi.get());
     QirString* qstr = nullptr;
 
-    Qubit q = __quantum__rt__qubit_allocate();
-    qstr    = __quantum__rt__qubit_to_string(q);
+    QUBIT* q = __quantum__rt__qubit_allocate();
+    qstr     = __quantum__rt__qubit_to_string(q);
     REQUIRE(qstr->str == std::string("0"));
     __quantum__rt__string_update_reference_count(qstr, -1);
     __quantum__rt__qubit_release(q);
@@ -750,8 +750,8 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
     REQUIRE(qs->count == 3);
     REQUIRE(qs->itemSizeInBytes == sizeof(void*));
 
-    Qubit last = *reinterpret_cast<Qubit*>(__quantum__rt__array_get_element_ptr_1d(qs, 2));
-    qstr       = __quantum__rt__qubit_to_string(last);
+    QUBIT* last = *reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(qs, 2));
+    qstr        = __quantum__rt__qubit_to_string(last);
     REQUIRE(qstr->str == std::string("3"));
     __quantum__rt__string_update_reference_count(qstr, -1);
 
@@ -767,12 +767,12 @@ TEST_CASE("Qubits: allocate, release, dump", "[qir_support]")
 QirTupleHeader* FlattenControlArrays(QirTupleHeader* nestedTuple, int depth);
 struct ControlledCallablesTestSimulator : public SimulatorStub
 {
-    int lastId = -1;
-    Qubit AllocateQubit() override
+    intptr_t lastId = -1;
+    QubitIdType AllocateQubit() override
     {
-        return reinterpret_cast<Qubit>(++this->lastId);
+        return static_cast<QubitIdType>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override
+    void ReleaseQubit(QubitIdType /*qubit*/) override
     {
     }
     Result UseZero() override
@@ -789,14 +789,14 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
     QirExecutionContext::Scoped qirctx(qapi.get());
 
-    Qubit target            = __quantum__rt__qubit_allocate();
+    QUBIT* target           = __quantum__rt__qubit_allocate();
     QirArray* controlsInner = __quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = __quantum__rt__qubit_allocate_array(2);
 
     PTuple inner = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Qubit*/ void*));
     TupleWithControls* innerWithControls = TupleWithControls::FromTuple(inner);
     innerWithControls->controls          = controlsInner;
-    *reinterpret_cast<Qubit*>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = target;
+    *reinterpret_cast<QUBIT**>(innerWithControls->AsTuple() + sizeof(/* QirArray* */ void*)) = target;
 
     PTuple outer = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*QirTupleHeader*/ void*));
     TupleWithControls* outerWithControls = TupleWithControls::FromTuple(outer);
@@ -807,7 +807,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case2)", "[qir_support]")
     QirArray* combined       = *(reinterpret_cast<QirArray**>(unpacked->AsTuple()));
     REQUIRE(5 == combined->count);
     REQUIRE(!combined->ownsQubits);
-    REQUIRE(target == *reinterpret_cast<Qubit*>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
+    REQUIRE(target == *reinterpret_cast<QUBIT**>(unpacked->AsTuple() + sizeof(/*QirArrray*/ void*)));
 
     unpacked->Release();
     __quantum__rt__array_update_reference_count(combined, -1);
@@ -825,12 +825,12 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
     std::unique_ptr<ControlledCallablesTestSimulator> qapi = std::make_unique<ControlledCallablesTestSimulator>();
     QirExecutionContext::Scoped qirctx(qapi.get());
 
-    Qubit target            = __quantum__rt__qubit_allocate();
+    QUBIT* target           = __quantum__rt__qubit_allocate();
     QirArray* controlsInner = __quantum__rt__qubit_allocate_array(3);
     QirArray* controlsOuter = __quantum__rt__qubit_allocate_array(2);
 
-    PTuple args                     = __quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
-    *reinterpret_cast<Qubit*>(args) = target;
+    PTuple args                      = __quantum__rt__tuple_create(sizeof(/*Qubit*/ void*) + sizeof(int));
+    *reinterpret_cast<QUBIT**>(args) = target;
     *reinterpret_cast<int*>(args + sizeof(/*Qubit*/ void*)) = 42;
 
     PTuple inner = __quantum__rt__tuple_create(sizeof(/* QirArray* */ void*) + sizeof(/*Tuple*/ void*));
@@ -850,7 +850,7 @@ TEST_CASE("Unpacking input tuples of nested callables (case1)", "[qir_support]")
 
     QirTupleHeader* unpackedArgs =
         QirTupleHeader::GetHeader(*reinterpret_cast<PTuple*>(unpacked->AsTuple() + sizeof(/* QirArray* */ void*)));
-    REQUIRE(target == *reinterpret_cast<Qubit*>(unpackedArgs->AsTuple()));
+    REQUIRE(target == *reinterpret_cast<QUBIT**>(unpackedArgs->AsTuple()));
     REQUIRE(42 == *reinterpret_cast<int*>(unpackedArgs->AsTuple() + sizeof(/*Qubit*/ void*)));
 
     unpacked->Release();
@@ -979,15 +979,15 @@ TEST_CASE("Tuples: copy elision", "[qir_support]")
 // Adjoints for R and Exp are implemented by qis, so let's check they at least do the angle invertion in adjoints.
 struct AdjointsTestSimulator : public SimulatorStub
 {
-    int lastId           = -1;
+    intptr_t lastId      = -1;
     double rotationAngle = 0.0;
     double exponentAngle = 0.0;
 
-    Qubit AllocateQubit() override
+    QubitIdType AllocateQubit() override
     {
-        return reinterpret_cast<Qubit>(++this->lastId);
+        return static_cast<QubitIdType>(++this->lastId);
     }
-    void ReleaseQubit(Qubit /*qubit*/) override
+    void ReleaseQubit(QubitIdType /*qubit*/) override
     {
     }
     Result UseZero() override
@@ -999,11 +999,11 @@ struct AdjointsTestSimulator : public SimulatorStub
         return reinterpret_cast<Result>(1);
     }
 
-    void R(PauliId, Qubit, double theta) override
+    void R(PauliId, QubitIdType, double theta) override
     {
         this->rotationAngle += theta;
     }
-    void Exp(long count, PauliId* paulis, Qubit*, double theta) override
+    void Exp(long count, PauliId* paulis, QubitIdType*, double theta) override
     {
         this->exponentAngle += theta;
 
@@ -1012,11 +1012,11 @@ struct AdjointsTestSimulator : public SimulatorStub
         CHECK(paulis[0] == PauliId_Z);
         CHECK(paulis[1] == PauliId_Y);
     }
-    void ControlledR(long, Qubit*, PauliId, Qubit, double theta) override
+    void ControlledR(long, QubitIdType*, PauliId, QubitIdType, double theta) override
     {
         this->rotationAngle += theta;
     }
-    void ControlledExp(long, Qubit*, long count, PauliId* paulis, Qubit*, double theta) override
+    void ControlledExp(long, QubitIdType*, long count, PauliId* paulis, QubitIdType*, double theta) override
     {
         this->exponentAngle += theta;
 
@@ -1033,7 +1033,7 @@ TEST_CASE("Adjoints of R should use inverse of the angle", "[qir_support]")
 
     const double angle = 0.42;
 
-    Qubit target    = __quantum__rt__qubit_allocate();
+    QUBIT* target   = __quantum__rt__qubit_allocate();
     QirArray* ctrls = __quantum__rt__qubit_allocate_array(2);
 
     __quantum__qis__r__body(PauliId_Y, angle, target);
