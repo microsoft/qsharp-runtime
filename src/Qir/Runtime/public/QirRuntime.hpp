@@ -4,7 +4,7 @@
 #pragma once
 
 #include <cstdint>
-#include <stdarg.h> // for va_list
+#include <cstdarg> // for va_list
 
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
@@ -154,7 +154,8 @@ extern "C"
 
     // Creates and returns an array that is a slice of an existing array. The int indicates which dimension
     // the slice is on. The %Range specifies the slice.
-    QIR_SHARED_API QirArray* quantum__rt__array_slice(QirArray*, int32_t, const QirRange&); // NOLINT
+    QIR_SHARED_API QirArray* quantum__rt__array_slice(QirArray*, int32_t, const QirRange&, // NOLINT
+                                                      bool /*ignored: forceNewInstance*/);
 
     // Creates and returns an array that is a projection of an existing array. The int indicates which dimension the
     // projection is on, and the int64_t specifies the specific index value to project. The returned Array* will have
@@ -310,7 +311,7 @@ extern "C"
     // TODO QIR_SHARED_API bool __quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
 
-// TODO: Consider separating the `extern "C"` exports and C++ exports.
+// TODO(rokuzmin): Consider separating the `extern "C"` exports and C++ exports.
 namespace Microsoft // Replace with `namespace Microsoft::Quantum` after migration to C++17.
 {
 namespace Quantum

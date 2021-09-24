@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 
         public override IList<DirectoryInfo> LibraryDirectories { get; } = new List<DirectoryInfo>();
 
-        internal QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, bool debug, ILogger? logger = null)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, bool debug, ILogger? logger = null)
             : base(executableFile, qirBitcode, new QirFullStateDriverGenerator(debug), logger)
         {
             var thisModulePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

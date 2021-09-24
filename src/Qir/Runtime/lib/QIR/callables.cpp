@@ -102,7 +102,11 @@ extern "C"
         {
             for (int i = increment; i < 0; i++)
             {
-                (void)callable->Release();
+                if (0 == callable->Release())
+                {
+                    assert(-1 == i && "Attempting to decrement reference count below zero!");
+                    break;
+                }
             }
         }
     }

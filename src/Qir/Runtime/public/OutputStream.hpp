@@ -15,8 +15,14 @@ namespace Quantum
     {
         struct QIR_SHARED_API ScopedRedirector
         {
-            ScopedRedirector(std::ostream& newOstream);
+            explicit ScopedRedirector(std::ostream& newOstream);
             ~ScopedRedirector();
+
+          private:
+            ScopedRedirector(const ScopedRedirector&) = delete;
+            ScopedRedirector& operator=(const ScopedRedirector&) = delete;
+            ScopedRedirector(ScopedRedirector&&)                 = delete;
+            ScopedRedirector& operator=(ScopedRedirector&&) = delete;
 
           private:
             std::ostream& old;

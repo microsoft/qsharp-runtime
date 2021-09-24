@@ -33,20 +33,15 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         public string GetCommandLineArguments(ExecutionInformation executionInformation)
         {
-            // Sort arguments by position.
-            var sortedArguments = executionInformation.EntryPoint.Parameters.OrderBy(arg => arg.Position);
-            var argumentBuilder = new StringBuilder();
-            foreach (var arg in sortedArguments)
+            string ToArgument(Parameter param)
             {
-                if (argumentBuilder.Length != 0)
-                {
-                    argumentBuilder.Append(' ');
-                }
-
-                argumentBuilder.Append($"--{arg.Name}").Append(' ').Append(GetArgumentValueString(arg, executionInformation.ArgumentValues[arg.Name]));
+                var prefix = param.Name.Length > 1 ? "--" : "-";
+                var value = GetArgumentValueString(param, executionInformation.ArgumentValues[param.Name]);
+                return $"{prefix}{param.Name} {value}";
             }
 
-            return argumentBuilder.ToString();
+            var parameters = executionInformation.EntryPoint.Parameters.OrderBy(param => param.Position);
+            return string.Join(" ", parameters.Select(ToArgument));
         }
 
         private static string GetArgumentValueString(Parameter argument, ArgumentValue argumentValue)
