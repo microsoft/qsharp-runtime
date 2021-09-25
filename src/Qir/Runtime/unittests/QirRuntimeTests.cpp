@@ -985,7 +985,7 @@ struct AdjointsTestSimulator : public SimulatorStub
 
     QubitIdType AllocateQubit() override
     {
-        return static_cast<QubitIdType>(++this->lastId);
+        return ++this->lastId;
     }
     void ReleaseQubit(QubitIdType /*qubit*/) override
     {
