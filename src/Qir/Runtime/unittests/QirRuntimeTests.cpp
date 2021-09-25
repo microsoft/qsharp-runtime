@@ -979,7 +979,7 @@ TEST_CASE("Tuples: copy elision", "[qir_support]")
 // Adjoints for R and Exp are implemented by qis, so let's check they at least do the angle invertion in adjoints.
 struct AdjointsTestSimulator : public SimulatorStub
 {
-    QubitIdType lastId      = -1;
+    QubitIdType lastId   = -1;
     double rotationAngle = 0.0;
     double exponentAngle = 0.0;
 
