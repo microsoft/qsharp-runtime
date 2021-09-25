@@ -232,7 +232,7 @@ namespace Quantum
 
         virtual std::string QubitToString(QubitIdType q) override
         {
-            return std::to_string(GetQubitId(q));
+            return std::to_string(q);
         }
 
         void DumpMachine(const void* location) override;
