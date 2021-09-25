@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             public uint SimulatorId { get; }
 
-            public double Probability => JointEnsembleProbability(this.SimulatorId, 1, PAULI_Z, new uint[] { (uint)this.Id });
+            public double Probability => JointEnsembleProbability(this.SimulatorId, 1, PAULI_Z, new IntPtr[] { (IntPtr)this.Id });
         }
     }
 }

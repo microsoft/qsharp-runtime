@@ -274,7 +274,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         psi.reset();
     }
 
-    unsigned num_qubits() const
+    logical_qubit_id num_qubits() const
     {
         recursive_lock_type l(getmutex());
         return psi.num_qubits();

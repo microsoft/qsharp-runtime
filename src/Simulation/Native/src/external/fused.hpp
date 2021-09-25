@@ -114,21 +114,21 @@ class Fused
     }
     
     template <class T, class A, class M>
-    void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q) const
+    void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<positional_qubit_id> const& cs, positional_qubit_id q) const
     {
-        Fusion::IndexVector qs = std::vector<unsigned>(1, q);
+        Fusion::IndexVector qs = std::vector<positional_qubit_id>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
     }
 
     template <class T, class A, class M>
-    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q) const
+    void apply(std::vector<T, A>& wfn, M const& mat, positional_qubit_id q) const
     {
-      std::vector<unsigned> cs;
+      std::vector<positional_qubit_id> cs;
       apply_controlled(wfn, mat, cs, q);
     }
 
     template <class T, class A>
-    bool shouldFlush(std::vector<T, A>& wfn, std::vector<unsigned> const& cs, unsigned q)
+    bool shouldFlush(std::vector<T, A>& wfn, std::vector<positional_qubit_id> const& cs, positional_qubit_id q)
     {
         // Major runtime logic change here
 

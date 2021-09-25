@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 
@@ -12,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubit(target);
 
-            Z(this.Id, (uint)target.Id);
+            Z(this.Id, (IntPtr)target.Id);
         }
 
         void IIntrinsicZ.ControlledBody(IQArray<Qubit> controls, Qubit target)
@@ -21,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicZ)this).Body(target),
-                (count, ids) => MCZ(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCZ(this.Id, count, ids, (IntPtr)target.Id));
         }
     }
 }

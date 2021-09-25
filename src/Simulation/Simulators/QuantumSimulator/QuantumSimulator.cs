@@ -204,7 +204,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        static void SafeControlled(IQArray<Qubit> ctrls, Action noControlsAction, Action<uint, uint[]> controlledAction)
+        static void SafeControlled(IQArray<Qubit> ctrls, Action noControlsAction, Action<uint, IntPtr[]> controlledAction)
         {
             if (ctrls == null || ctrls.Length == 0)
             {

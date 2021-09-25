@@ -81,9 +81,9 @@ public:
 		return global_factor_;
 	}
 
-	static void remap_qubits(std::set<Index>& qubits, const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) {
+	static void remap_qubits(std::set<Index>& qubits, const std::unordered_map<Index, Index>& mapFromOldLocToNewLoc) {
 		std::set<Index> tempSet;
-		for (unsigned elem : qubits) {
+		for (Index elem : qubits) {
 			if (mapFromOldLocToNewLoc.find(elem) != mapFromOldLocToNewLoc.end()) {
 				tempSet.insert(mapFromOldLocToNewLoc.at(elem));
 			}
@@ -91,11 +91,11 @@ public:
 		qubits.swap(tempSet);
 	}
 
-	void remap_target_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) const {
+	void remap_target_set(const std::unordered_map<Index, Index>& mapFromOldLocToNewLoc) const {
 		remap_qubits(target_set_, mapFromOldLocToNewLoc);
 	}
 
-	void remap_ctrl_set(const std::unordered_map<unsigned, unsigned>& mapFromOldLocToNewLoc) const {
+	void remap_ctrl_set(const std::unordered_map<Index, Index>& mapFromOldLocToNewLoc) const {
 		remap_qubits(ctrl_set_, mapFromOldLocToNewLoc);
 	}
 	

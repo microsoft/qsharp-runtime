@@ -11,27 +11,27 @@
 
 // some convenience functions
 
-void CX(unsigned sim_id, unsigned c, unsigned q)
+void CX(unsigned sim_id, intptr_t c, intptr_t q)
 {
     MCX(sim_id, 1, &c, q);
 }
 
-void CZ(unsigned sim_id, unsigned c, unsigned q)
+void CZ(unsigned sim_id, intptr_t c, intptr_t q)
 {
     MCZ(sim_id, 1, &c, q);
 }
 
-void Ry(unsigned sim_id, double phi, unsigned q)
+void Ry(unsigned sim_id, double phi, intptr_t q)
 {
     R(sim_id, 3, phi, q);
 }
 
-void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRz(unsigned sim_id, double phi, intptr_t c, intptr_t q)
 {
     MCR(sim_id, 2, phi, 1, &c, q);
 }
 
-void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRx(unsigned sim_id, double phi, intptr_t c, intptr_t q)
 {
     MCR(sim_id, 1, phi, 1, &c, q);
 }
@@ -42,7 +42,7 @@ void dump(unsigned sim_id, const char* label)
         std::cout << idx << ":\t" << r << '\t' << i << '\n';
         return true;
     };
-    auto sim_ids_callback = [](unsigned idx) { std::cout << idx << " "; };
+    auto sim_ids_callback = [](intptr_t idx) { std::cout << idx << " "; };
 
     std::cout << label << "\n"
               << "wave function for ids (least to most significant): [";
@@ -55,7 +55,7 @@ void test_teleport()
 {
     auto sim_id = init();
 
-    unsigned qs[] = {0, 1, 2};
+    intptr_t qs[] = {0, 1, 2};
 
     dump(sim_id, "teleport-pre.txt");
 
@@ -313,7 +313,7 @@ void test_permute_basis()
         auto b = (index >> 2) & 3;
         return a | (a ^ b) << 2;
     };
-    constexpr auto nqubits = 4u;
+    constexpr intptr_t nqubits = 4;
     constexpr auto nstates = 1ul << nqubits;
     std::size_t table[nstates];
     for (std::size_t i = 0; i < nstates; ++i)
@@ -321,11 +321,11 @@ void test_permute_basis()
         table[i] = permutation(i);
     }
 
-    std::vector<unsigned> qbit_ids(nqubits);
-    for (unsigned i = 0; i < qbit_ids.size(); ++i)
+    std::vector<intptr_t> qbit_ids(nqubits);
+    for (intptr_t i = 0; (size_t)i < qbit_ids.size(); ++i)
         qbit_ids[i] = i + 1;
 
-    for (unsigned i = 0; i < nqubits + 1; ++i)
+    for (intptr_t i = 0; i < nqubits + 1; ++i)
         allocateQubit(sim_id, i);
     // Dump(sim_id, "permute-start.txt");
 
@@ -368,7 +368,7 @@ void test_permute_basis_adjoint()
         auto b = (index >> 2) & 3;
         return a | (a ^ b) << 2;
     };
-    constexpr auto nqubits = 4u;
+    constexpr intptr_t nqubits = 4;
     constexpr auto nstates = 1ul << nqubits;
     std::size_t table[nstates];
     for (std::size_t i = 0; i < nstates; ++i)
@@ -376,11 +376,11 @@ void test_permute_basis_adjoint()
         table[i] = permutation(i);
     }
 
-    std::vector<unsigned> qbit_ids(nqubits);
-    for (unsigned i = 0; i < nqubits; ++i)
+    std::vector<intptr_t> qbit_ids(nqubits);
+    for (intptr_t i = 0; i < nqubits; ++i)
         qbit_ids[i] = i + 1;
 
-    for (unsigned i = 0; i < nqubits + 1; ++i)
+    for (intptr_t i = 0; i < nqubits + 1; ++i)
         allocateQubit(sim_id, i);
 
     // create some quantum state
@@ -405,7 +405,7 @@ void test_permute_basis_adjoint()
     assert(M(sim_id, 3) == false);
     assert(M(sim_id, 4) == false);
 
-    for (unsigned i = 0; i < nqubits + 1; ++i)
+    for (intptr_t i = 0; i < nqubits + 1; ++i)
         release(sim_id, i);
     destroy(sim_id);
 }

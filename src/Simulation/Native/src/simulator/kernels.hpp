@@ -21,16 +21,16 @@ namespace SIMULATOR
 namespace kernels
 {
 
-inline std::size_t make_mask(std::vector<unsigned> const& qs)
+inline std::size_t make_mask(std::vector<positional_qubit_id> const& qs)
 {
     std::size_t mask = 0;
-    for (std::size_t q : qs)
+    for (positional_qubit_id q : qs)
         mask = mask | (1ull << q);
     return mask;
 }
 
 template <class T, class A>
-void swap(std::vector<T, A>& wfn, unsigned q1, unsigned q2)
+void swap(std::vector<T, A>& wfn, positional_qubit_id q1, positional_qubit_id q2)
 {
     if (q1 == q2) return;
     if (q1 > q2) std::swap(q1, q2);
@@ -60,7 +60,7 @@ void swap(std::vector<T, A>& wfn, unsigned q1, unsigned q2)
 }
 
 template <class T, class A>
-void jointcollapse(std::vector<T, A>& wfn, std::vector<unsigned> const& qs, bool val)
+void jointcollapse(std::vector<T, A>& wfn, std::vector<positional_qubit_id> const& qs, bool val)
 {
     std::size_t mask = make_mask(qs);
 
@@ -73,7 +73,7 @@ void jointcollapse(std::vector<T, A>& wfn, std::vector<unsigned> const& qs, bool
 template <class T, class A>
 unsigned getvalue(
     std::vector<std::complex<T>, A> const& wfn,
-    unsigned q,
+    positional_qubit_id q,
     double eps = 100. * std::numeric_limits<T>::epsilon())
 {
     std::size_t mask = 1ull << q;
@@ -84,7 +84,7 @@ unsigned getvalue(
 }
 
 template <class T, class A>
-void collapse(std::vector<T, A>& wfn, unsigned q, bool val, bool compact = false)
+void collapse(std::vector<T, A>& wfn, positional_qubit_id q, bool val, bool compact = false)
 {
     if (compact)
     {
@@ -113,7 +113,7 @@ void collapse(std::vector<T, A>& wfn, unsigned q, bool val, bool compact = false
 template <class T, class A>
 bool isclassical(
     std::vector<std::complex<T>, A> const& wfn,
-    std::size_t q,
+    positional_qubit_id q,
     T eps = 100. * std::numeric_limits<T>::epsilon())
 {
     std::size_t offset = 1ull << q;
@@ -145,11 +145,11 @@ bool isclassical(
 }
 
 template <class T, class A>
-double jointprobability(std::vector<T, A> const& wfn, std::vector<unsigned> const& qs, bool val = true)
+double jointprobability(std::vector<T, A> const& wfn, std::vector<positional_qubit_id> const& qs, bool val = true)
 {
     std::size_t mask = 0;
     double prob = 0.;
-    for (std::size_t q : qs)
+    for (positional_qubit_id q : qs)
         mask = mask | (1ull << q);
 // sum up probabilities for all configuratiions where an odd number of selected bits is set
 #pragma omp parallel for schedule(static) reduction(+ : prob)
@@ -159,7 +159,7 @@ double jointprobability(std::vector<T, A> const& wfn, std::vector<unsigned> cons
 }
 
 template <class T, class A>
-double probability(std::vector<std::complex<T>, A> const& wfn, unsigned q)
+double probability(std::vector<std::complex<T>, A> const& wfn, positional_qubit_id q)
 {
     std::size_t offset = 1ull << q;
     T prob = 0.;
@@ -215,11 +215,11 @@ void apply_controlled_exp(
     std::vector<std::complex<T>, A>& wfn,
     std::vector<Gates::Basis> const& b,
     double phi,
-    std::vector<unsigned> const& cs,
-    std::vector<unsigned> const& qs)
+    std::vector<positional_qubit_id> const& cs,
+    std::vector<positional_qubit_id> const& qs)
 {
     assert(qs.size() > 1);
-    unsigned lowest = *std::min_element(qs.begin(), qs.end());
+    positional_qubit_id lowest = *std::min_element(qs.begin(), qs.end());
 
     std::size_t offset = 1ull << lowest;
     std::size_t cmask = make_mask(cs);
@@ -285,13 +285,13 @@ template <class T, class A>
 double jointprobability(
     std::vector<T, A> const& wfn,
     std::vector<Gates::Basis> const& b,
-    std::vector<unsigned> const& qs,
+    std::vector<positional_qubit_id> const& qs,
     bool val = true)
 {
     assert(qs.size() > 1);
 
     double prob = 0.;
-    unsigned lowest = *std::min_element(qs.begin(), qs.end());
+    positional_qubit_id lowest = *std::min_element(qs.begin(), qs.end());
 
     std::size_t offset = 1 << lowest;
 
@@ -374,7 +374,7 @@ void normalize(std::vector<T, A>& wfn)
 template <class T, class A1, class A2>
 void subsytemwavefunction_by_pivot(
     std::vector<T, A1> const& wfn,
-    std::vector<unsigned> const& qs,
+    std::vector<positional_qubit_id> const& qs,
     std::vector<T, A2>& qubitswfn,
     std::size_t pivot_position)
 {
@@ -409,9 +409,9 @@ void subsytemwavefunction_by_pivot(
 template <class T, class A1, class A2, class A3>
 bool istensorproduct(
     std::vector<T, A1> const& wfn,
-    std::vector<unsigned> const& qs1,
+    std::vector<positional_qubit_id> const& qs1,
     std::vector<T, A2> const& wfn1,
-    std::vector<unsigned> const& qs2,
+    std::vector<positional_qubit_id> const& qs2,
     std::vector<T, A3> const& wfn2,
     T phase,
     double tolerance)
@@ -470,7 +470,7 @@ bool istensorproduct(
 template <class T, class A1, class A2>
 bool subsytemwavefunction(
     std::vector<T, A1> const& wfn,
-    std::vector<unsigned> const& qs,
+    std::vector<positional_qubit_id> const& qs,
     std::vector<T, A2>& qubitswfn,
     double tolerance)
 {
@@ -480,7 +480,7 @@ bool subsytemwavefunction(
     assert(tolerance > 0.0);
 
     // We need a sorted list of qubits:
-    std::vector<unsigned> sorted(qs);
+    std::vector<positional_qubit_id> sorted(qs);
     std::sort(sorted.begin(), sorted.end());
 
     std::size_t pivot_position = argmaxnrm2(wfn);
@@ -494,7 +494,7 @@ bool subsytemwavefunction(
 
     if (total_qubits > sorted.size())
     {
-        std::vector<unsigned> qs_rest = complement(sorted, total_qubits);
+        std::vector<positional_qubit_id> qs_rest = complement(sorted, total_qubits);
         std::vector<T, A1> qubitswfn_rest(1ull << (qs_rest.size()));
         assert(qubitswfn_rest.size() * qubitswfn.size() == wfn.size());
         subsytemwavefunction_by_pivot(wfn, qs_rest, qubitswfn_rest, pivot_position);

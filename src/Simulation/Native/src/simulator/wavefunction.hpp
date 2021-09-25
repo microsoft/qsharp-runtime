@@ -346,7 +346,7 @@ class Wavefunction
 #endif
 
     /// Number of currently allocated qubits.
-    unsigned num_qubits_;
+    logical_qubit_id num_qubits_;
 
     /// Represents the state of the system with num_qubits_ qubits in little-endian notation (that is, the qubit
     /// with positional id = 0 corresponds to the least significant bit in the index of the standard computational
@@ -405,7 +405,7 @@ class Wavefunction
 
     constexpr positional_qubit_id invalid_qubit_position() const
     {
-        return std::numeric_limits<unsigned>::max();
+        return std::numeric_limits<positional_qubit_id>::max();
     }
 
     positional_qubit_id get_qubit_position(logical_qubit_id q) const
@@ -513,7 +513,7 @@ class Wavefunction
         flush();
         wfn_.resize(2 * wfn_.size());
 
-        if (id < qubitmap_.size())
+        if (static_cast<size_t>(id) < qubitmap_.size())
         {
             assert(qubitmap_[id] == invalid_qubit_position());
             qubitmap_[id] = num_qubits_++;
@@ -540,7 +540,7 @@ class Wavefunction
     }
 
     /// the number of used qubits
-    unsigned num_qubits() const
+    logical_qubit_id num_qubits() const
     {
         return num_qubits_;
     }

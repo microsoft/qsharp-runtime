@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 
@@ -12,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubit(target);
 
-            T(this.Id, (uint)target.Id);
+            T(this.Id, (IntPtr)target.Id);
         }
 
         void IIntrinsicT.ControlledBody(IQArray<Qubit> controls, Qubit target)
@@ -21,14 +22,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicT)this).Body(target),
-                (count, ids) => MCT(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCT(this.Id, count, ids, (IntPtr)target.Id));
         }
 
         void IIntrinsicT.AdjointBody(Qubit target)
         {
             this.CheckQubit(target);
 
-            AdjT(this.Id, (uint)target.Id);
+            AdjT(this.Id, (IntPtr)target.Id);
         }
 
         void IIntrinsicT.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
@@ -37,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicT)this).AdjointBody(target),
-                (count, ids) => MCAdjT(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCAdjT(this.Id, count, ids, (IntPtr)target.Id));
         }
     }
 }

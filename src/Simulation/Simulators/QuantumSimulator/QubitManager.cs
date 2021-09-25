@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators.Exceptions;
@@ -47,7 +48,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             protected override Qubit Allocate(bool usedOnlyForBorrowing)
             {
                 Qubit qubit = base.Allocate(usedOnlyForBorrowing);
-                if (qubit != null) { AllocateOne(this.SimulatorId, (uint)qubit.Id); }
+                if (qubit != null) { AllocateOne(this.SimulatorId, (IntPtr)qubit.Id); }
                 return qubit;
             }
 
@@ -56,7 +57,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 base.Release(qubit, wasUsedOnlyForBorrowing);
                 if (qubit != null)
                 {
-                    bool isReleasedQubitZero = ReleaseOne(this.SimulatorId, (uint)qubit.Id);
+                    bool isReleasedQubitZero = ReleaseOne(this.SimulatorId, (IntPtr)qubit.Id);
                     if (!(isReleasedQubitZero || qubit.IsMeasured) && throwOnReleasingQubitsNotInZeroState)
                     {
                         throw new ReleasedQubitsAreNotInZeroState();

@@ -29,21 +29,21 @@ class SimulatorInterface
 
     virtual std::size_t random(std::size_t n, double* d) = 0;
 
-    virtual double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<unsigned> qs) = 0;
+    virtual double JointEnsembleProbability(std::vector<Gates::Basis> bs, std::vector<logical_qubit_id> qs) = 0;
 
     virtual bool InjectState(
         const std::vector<logical_qubit_id>& qubits,
         const std::vector<ComplexType>& amplitudes) = 0;
 
     // allocate and release
-    virtual void allocateQubit(unsigned q) = 0;
-    virtual bool release(unsigned q) = 0;
-    virtual unsigned num_qubits() const = 0;
+    virtual void allocateQubit(logical_qubit_id q) = 0;
+    virtual bool release(logical_qubit_id q) = 0;
+    virtual logical_qubit_id num_qubits() const = 0;
 
     // single-qubit gates
 
-#define GATE1IMPL(OP) virtual void OP(unsigned q) = 0;
-#define GATE1MCIMPL(OP) virtual void C##OP(std::vector<unsigned> const& c, unsigned q) = 0;
+#define GATE1IMPL(OP) virtual void OP(logical_qubit_id q) = 0;
+#define GATE1MCIMPL(OP) virtual void C##OP(std::vector<logical_qubit_id> const& c, logical_qubit_id q) = 0;
 #define GATE1(OP) GATE1IMPL(OP) GATE1MCIMPL(OP)
 
     GATE1(X)
@@ -61,31 +61,34 @@ class SimulatorInterface
 #undef GATE1MCIMPL
 
     // rotations
-    virtual void R(Gates::Basis b, double phi, unsigned q) = 0;
-    virtual void CR(Gates::Basis b, double phi, std::vector<unsigned> const& c, unsigned q) = 0;
+    virtual void R(Gates::Basis b, double phi, logical_qubit_id q) = 0;
+    virtual void CR(Gates::Basis b, double phi, std::vector<logical_qubit_id> const& c, logical_qubit_id q) = 0;
 
     // Exponential of Pauli operators
     virtual void CExp(
         std::vector<Gates::Basis> bs,
         double phi,
-        std::vector<unsigned> const& cs,
-        std::vector<unsigned> qs) = 0;
+        std::vector<logical_qubit_id> const& cs,
+        std::vector<logical_qubit_id> qs) = 0;
 
-    virtual void Exp(std::vector<Gates::Basis> const& bs, double phi, std::vector<unsigned> const& qs)
+    virtual void Exp(std::vector<Gates::Basis> const& bs, double phi, std::vector<logical_qubit_id> const& qs)
     {
-        CExp(bs, phi, std::vector<unsigned>(), qs);
+        CExp(bs, phi, std::vector<logical_qubit_id>(), qs);
     }
 
     // measurements
 
-    virtual bool M(unsigned q) = 0;
-    virtual bool Measure(std::vector<Gates::Basis> bs, std::vector<unsigned> qs) = 0;
+    virtual bool M(logical_qubit_id q) = 0;
+    virtual bool Measure(std::vector<Gates::Basis> bs, std::vector<logical_qubit_id> qs) = 0;
 
     virtual void seed(unsigned s) = 0;
     virtual void reset() = 0;
     virtual ComplexType const* data() const = 0;
 
-    virtual bool subsytemwavefunction(std::vector<unsigned> const& qs, WavefunctionStorage& qubitswfn, double tolerance)
+    virtual bool subsytemwavefunction(
+        std::vector<logical_qubit_id> const& qs,
+        WavefunctionStorage& qubitswfn,
+        double tolerance)
     {
         assert(false);
         return false;
@@ -104,19 +107,22 @@ class SimulatorInterface
         assert(false);
         return false;
     }
-    virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, TDumpToLocationCallback callback, TDumpLocation location)
+    virtual bool dumpQubits(
+        std::vector<logical_qubit_id> const& qs,
+        TDumpToLocationCallback callback,
+        TDumpLocation location)
     {
         assert(false);
         return false;
     }
-    virtual void dumpIds(void (*callback)(unsigned))
+    virtual void dumpIds(void (*callback)(intptr_t))
     {
         assert(false);
     }
 
     // apply permutation of basis states to the wave function
     virtual void permuteBasis(
-        std::vector<unsigned> const& qs,
+        std::vector<logical_qubit_id> const& qs,
         std::size_t table_size,
         std::size_t const* permutation_table,
         bool adjoint = false)

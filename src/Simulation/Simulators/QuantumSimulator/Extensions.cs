@@ -14,14 +14,14 @@ namespace Microsoft.Quantum.Simulation
     public static partial class Extensions
     {
         /// <summary>
-        /// Returns the ids of a qubit array as a uint[]
+        /// Returns the ids of a qubit array as a IntPtr[]
         /// </summary>
-        public static uint[] GetIds(this IQArray<Qubit> qubits)
+        public static IntPtr[] GetIds(this IQArray<Qubit> qubits)
         {
             Debug.Assert(qubits != null, "Can't get Ids from a null array of qubits");
-            if (qubits == null) { return new uint[0]; }
+            if (qubits == null) { return new IntPtr[0]; }
 
-            return (from q in qubits where q != null select (uint)q.Id).ToArray();
+            return (from q in qubits where q != null select (IntPtr)q.Id).ToArray();
         }
 
         /// <summary>

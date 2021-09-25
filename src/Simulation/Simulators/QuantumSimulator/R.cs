@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 
@@ -13,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             this.CheckQubit(target);
             CheckAngle(angle);
 
-            R(this.Id, pauli, angle, (uint)target.Id);
+            R(this.Id, pauli, angle, (IntPtr)target.Id);
         }
 
         void IIntrinsicR.AdjointBody(Pauli pauli, double angle, Qubit target)
@@ -28,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicR)this).Body(pauli, angle, target),
-                (count, ids) => MCR(this.Id, pauli, angle, count, ids, (uint)target.Id));
+                (count, ids) => MCR(this.Id, pauli, angle, count, ids, (IntPtr)target.Id));
         }
 
 

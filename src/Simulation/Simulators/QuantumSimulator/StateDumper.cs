@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <param name="real">The real portion of the amplitude of the given basis state vector.</param>
             /// <param name="img">The imaginary portion of the amplitude of the given basis state vector.</param>
             /// <returns>true if dumping should continue, false to stop dumping.</returns>
-            public abstract bool Callback(uint idx, double real, double img);
+            public abstract bool Callback(IntPtr idx, double real, double img);
 
             /// <summary>
             /// The QuantumSimulator being reported.
@@ -81,7 +81,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// Returns a string that represents the label for the given base state.
             /// </summary>
-            public virtual string FormatBaseState(uint idx) =>
+            public virtual string FormatBaseState(IntPtr idx) =>
                 $"∣{idx.ToString().PadLeft(_maxCharsStateId, ' ')}❭";
 
             /// <summary>
@@ -144,7 +144,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The method to use to format the amplitude into a string.
             /// </summary>
-            public virtual string Format(uint idx, double real, double img)
+            public virtual string Format(IntPtr idx, double real, double img)
             {
                 var amplitude = (real * real) + (img * img);
                 var angle = System.Math.Atan2(img, real);
@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// The callback method. Formats the given state and invokes the <see cref="Channel"/>
             /// </summary>
             /// <returns>True, so the entire wave function is dumped.</returns>
-            public override bool Callback(uint idx, double real, double img)
+            public override bool Callback(IntPtr idx, double real, double img)
             {
                 Channel(Format(idx, real, img));
                 return true;

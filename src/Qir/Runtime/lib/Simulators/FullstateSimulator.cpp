@@ -95,9 +95,9 @@ namespace Quantum
         , public IQuantumGateSet
         , public IDiagnostics
     {
-        typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
+        typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, intptr_t /*qubit id*/);
         typedef void (*TSingleQubitControlledGate)(unsigned /*simulator id*/, unsigned /*number of controls*/,
-                                                   unsigned* /*controls*/, unsigned /*qubit id*/);
+                                                   intptr_t* /*controls*/, intptr_t /*qubit id*/);
 
         // QuantumSimulator defines paulis as:
         // enum Basis
@@ -136,23 +136,6 @@ namespace Quantum
         // the QuantumSimulator expects contiguous ids, starting from 0
         std::unique_ptr<CQubitManager> qubitManager;
 
-        unsigned GetQubitId(QubitIdType qubit) const
-        {
-            // Qubit manager uses unsigned range of intptr_t for qubit ids.
-            return static_cast<unsigned>(qubit);
-        }
-
-        std::vector<unsigned> GetQubitIds(long num, QubitIdType* qubits) const
-        {
-            std::vector<unsigned> ids;
-            ids.reserve((size_t)num);
-            for (long i = 0; i < num; i++)
-            {
-                ids.push_back(GetQubitId(qubits[i]));
-            }
-            return ids;
-        }
-
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void DumpState()
         {
@@ -179,14 +162,14 @@ namespace Quantum
 
         void UnmarkAsMeasuredSingleQubit(QubitIdType q)
         {
-            isMeasured[GetQubitId(q)] = false;
+            isMeasured[static_cast<size_t>(q)] = false;
         }
 
         void UnmarkAsMeasuredQubitList(long num, QubitIdType* qubit)
         {
-            for (const auto& id : GetQubitIds(num, qubit))
+            for (auto id = 0; id < num; id++)
             {
-                isMeasured[id] = false;
+                isMeasured[static_cast<size_t>(qubit[id])] = false;
             }
         }
 
@@ -240,27 +223,25 @@ namespace Quantum
 
         QubitIdType AllocateQubit() override
         {
-            typedef void (*TAllocateQubit)(unsigned, unsigned);
+            typedef void (*TAllocateQubit)(unsigned, intptr_t);
             static TAllocateQubit allocateQubit = reinterpret_cast<TAllocateQubit>(this->GetProc("allocateQubit"));
 
             QubitIdType q = qubitManager->Allocate(); // Allocate qubit in qubit manager.
-            unsigned id   = GetQubitId(q);            // Get its id.
-            allocateQubit(this->simulatorId, id);     // Allocate it in the simulator.
-            if (isMeasured.size() < id + 1)
+            allocateQubit(this->simulatorId, q);      // Allocate it in the simulator.
+            if (isMeasured.size() < static_cast<size_t>(q + 1))
             {
-                isMeasured.resize(id + 1, false);
+                isMeasured.resize(static_cast<size_t>(q + 1), false);
             }
             return q;
         }
 
         void ReleaseQubit(QubitIdType q) override
         {
-            typedef bool (*TReleaseQubit)(unsigned, unsigned);
+            typedef bool (*TReleaseQubit)(unsigned, intptr_t);
             static TReleaseQubit releaseQubit = reinterpret_cast<TReleaseQubit>(this->GetProc("release"));
 
             // Release qubit in the simulator, checking to make sure that release was valid.
-            auto id = GetQubitId(q);
-            if (!releaseQubit(this->simulatorId, id) && !isMeasured[id])
+            if (!releaseQubit(this->simulatorId, q) && !isMeasured[static_cast<size_t>(q)])
             {
                 // We reject the release of a qubit that is not in the ground state (releaseQubit returns false),
                 // and was not recently measured (ie: the last operation was not measurement). This means the
@@ -289,18 +270,16 @@ namespace Quantum
         Result Measure(long numBases, PauliId bases[], long numTargets, QubitIdType targets[]) override
         {
             assert(numBases == numTargets);
-            typedef unsigned (*TMeasure)(unsigned, unsigned, unsigned*, unsigned*);
-            static TMeasure m         = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
-            std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
-            if (ids.size() == 1)
+            typedef unsigned (*TMeasure)(unsigned, unsigned, unsigned*, intptr_t*);
+            static TMeasure m = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
+            if (numTargets == 1)
             {
                 // If measuring exactly one qubit, mark it as measured for tracking.
-                isMeasured[ids[0]] = true;
+                isMeasured[static_cast<size_t>(targets[0])] = true;
             }
             std::vector<unsigned> convertedBases = GetBases(numBases, bases);
 
-            return reinterpret_cast<Result>(
-                m(this->simulatorId, (unsigned)numBases, convertedBases.data(), ids.data()));
+            return reinterpret_cast<Result>(m(this->simulatorId, (unsigned)numBases, convertedBases.data(), targets));
         }
 
         void ReleaseResult(Result /*r*/) override
@@ -332,15 +311,14 @@ namespace Quantum
         void X(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("X"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledX(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCX"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -348,15 +326,14 @@ namespace Quantum
         void Y(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("Y"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledY(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCY"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -364,15 +341,14 @@ namespace Quantum
         void Z(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("Z"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledZ(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCZ"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -380,15 +356,14 @@ namespace Quantum
         void H(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("H"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledH(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCH"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -396,15 +371,14 @@ namespace Quantum
         void S(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("S"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledS(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCS"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -412,7 +386,7 @@ namespace Quantum
         void AdjointS(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("AdjS"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
@@ -420,8 +394,7 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjS"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -429,15 +402,14 @@ namespace Quantum
         void T(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("T"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
         void ControlledT(long numControls, QubitIdType controls[], QubitIdType target) override
         {
             static TSingleQubitControlledGate op = reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCT"));
-            std::vector<unsigned> ids            = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -445,7 +417,7 @@ namespace Quantum
         void AdjointT(QubitIdType q) override
         {
             static TSingleQubitGate op = reinterpret_cast<TSingleQubitGate>(this->GetProc("AdjT"));
-            op(this->simulatorId, GetQubitId(q));
+            op(this->simulatorId, q);
             UnmarkAsMeasuredSingleQubit(q);
         }
 
@@ -453,53 +425,48 @@ namespace Quantum
         {
             static TSingleQubitControlledGate op =
                 reinterpret_cast<TSingleQubitControlledGate>(this->GetProc("MCAdjT"));
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            op(this->simulatorId, (unsigned)numControls, ids.data(), GetQubitId(target));
+            op(this->simulatorId, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
 
         void R(PauliId axis, QubitIdType target, double theta) override
         {
-            typedef unsigned (*TR)(unsigned, unsigned, double, unsigned);
+            typedef unsigned (*TR)(unsigned, unsigned, double, intptr_t);
             static TR r = reinterpret_cast<TR>(this->GetProc("R"));
 
-            r(this->simulatorId, GetBasis(axis), theta, GetQubitId(target));
+            r(this->simulatorId, GetBasis(axis), theta, target);
             UnmarkAsMeasuredSingleQubit(target);
         }
 
         void ControlledR(long numControls, QubitIdType controls[], PauliId axis, QubitIdType target,
                          double theta) override
         {
-            typedef unsigned (*TMCR)(unsigned, unsigned, double, unsigned, unsigned*, unsigned);
+            typedef unsigned (*TMCR)(unsigned, unsigned, double, unsigned, intptr_t*, intptr_t);
             static TMCR cr = reinterpret_cast<TMCR>(this->GetProc("MCR"));
 
-            std::vector<unsigned> ids = GetQubitIds(numControls, controls);
-            cr(this->simulatorId, GetBasis(axis), theta, (unsigned)numControls, ids.data(), GetQubitId(target));
+            cr(this->simulatorId, GetBasis(axis), theta, (unsigned)numControls, controls, target);
             UnmarkAsMeasuredSingleQubit(target);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
 
         void Exp(long numTargets, PauliId paulis[], QubitIdType targets[], double theta) override
         {
-            typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
+            typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, intptr_t*);
             static TExp exp                      = reinterpret_cast<TExp>(this->GetProc("Exp"));
-            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
             std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
-            exp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, ids.data());
+            exp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, targets);
             UnmarkAsMeasuredQubitList(numTargets, targets);
         }
 
         void ControlledExp(long numControls, QubitIdType controls[], long numTargets, PauliId paulis[],
                            QubitIdType targets[], double theta) override
         {
-            typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
+            typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, intptr_t*, intptr_t*);
             static TMCExp cexp                   = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
-            std::vector<unsigned> idsTargets     = GetQubitIds(numTargets, targets);
-            std::vector<unsigned> idsControls    = GetQubitIds(numControls, controls);
             std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
-            cexp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, (unsigned)numControls,
-                 idsControls.data(), idsTargets.data());
+            cexp(this->simulatorId, (unsigned)numTargets, convertedBases.data(), theta, (unsigned)numControls, controls,
+                 targets);
             UnmarkAsMeasuredQubitList(numTargets, targets);
             UnmarkAsMeasuredQubitList(numControls, controls);
         }
@@ -514,14 +481,13 @@ namespace Quantum
         bool AssertProbability(long numTargets, PauliId bases[], QubitIdType targets[], double probabilityOfZero,
                                double precision, const char* /*failureMessage*/) override
         {
-            typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
+            typedef double (*TOp)(unsigned id, unsigned n, int* b, intptr_t* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
-            std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
             std::vector<unsigned> convertedBases = GetBases(numTargets, bases);
             double actualProbability =
                 1.0 - jointEnsembleProbability(this->simulatorId, (unsigned)numTargets,
-                                               reinterpret_cast<int*>(convertedBases.data()), ids.data());
+                                               reinterpret_cast<int*>(convertedBases.data()), targets);
 
             return (std::abs(actualProbability - probabilityOfZero) < precision);
         }
@@ -582,11 +548,10 @@ namespace Quantum
     bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback,
                                             const QirArray* qubits)
     {
-        std::vector<unsigned> ids =
-            GetQubitIds((long)(qubits->count), reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)));
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
-        return dumpQubitsToLocation(this->simulatorId, (unsigned)(qubits->count), ids.data(), callback, location);
+        return dumpQubitsToLocation(this->simulatorId, (unsigned)(qubits->count),
+                                    reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)), callback, location);
     }
 
     void CFullstateSimulator::GetStateTo(TDumpLocation location, TDumpToLocationCallback callback)

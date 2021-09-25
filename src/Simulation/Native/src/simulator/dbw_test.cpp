@@ -22,27 +22,27 @@
 using namespace std;
 
 // some convenience functions
-void CX(unsigned sim_id, unsigned c, unsigned q)
+void CX(unsigned sim_id, intptr_t c, intptr_t q)
 {
     MCX(sim_id, 1, &c, q);
 }
 
-void CZ(unsigned sim_id, unsigned c, unsigned q)
+void CZ(unsigned sim_id, intptr_t c, intptr_t q)
 {
     MCZ(sim_id, 1, &c, q);
 }
 
-void Ry(unsigned sim_id, double phi, unsigned q)
+void Ry(unsigned sim_id, double phi, intptr_t q)
 {
     R(sim_id, 2, phi, q);
 }
 
-void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRz(unsigned sim_id, double phi, intptr_t c, intptr_t q)
 {
     MCR(sim_id, 3, phi, 1, &c, q);
 }
 
-void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRx(unsigned sim_id, double phi, intptr_t c, intptr_t q)
 {
     MCR(sim_id, 1, phi, 1, &c, q);
 }
@@ -53,7 +53,7 @@ void dump(unsigned sim_id, const char* label)
         std::cout << idx << ":\t" << r << '\t' << i << '\n';
         return true;
     };
-    auto sim_ids_callback = [](unsigned idx) { std::cout << idx << " "; };
+    auto sim_ids_callback = [](intptr_t idx) { std::cout << idx << " "; };
 
     std::cout << label << "\n"
               << "wave function for ids (least to most significant): [";
@@ -221,7 +221,7 @@ int main()
         for (int j = 0; j < prb.size(); j++)
         {
             auto qs = prb[j];
-            uint32_t cs[2];
+            intptr_t cs[2];
             switch (qs.size())
             {
             case 0: // No op
