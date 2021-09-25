@@ -170,15 +170,25 @@ CMake doesn't support using LLVM's IR files as input so instead we invoke Clang 
 
 ## Coding style and conventions
 
-Please enable file-based clang-format and run it before submitting your changes for review (in VS Code: Alt+Shift+F on
- a file). It will take care of spaces, indentations and many other formatting issues automatically and safely.
+If during compilation you see an error like this
+
+```
+##vso[task.logissue type=error;]Formatting check failed. The following files need to be formatted before compiling:
+```
+
+then this means that the edits you made violate the
+[coding style](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/.clang-format)
+enforced by clang-format utility. To format the file install the
+Clang-Format extension to your editor ([example for VSCode](https://clang.llvm.org/docs/ClangFormat.html#visual-studio-code-integration)),
+open the file, press the corresponding formatting hot keys (for VSCode it is \<Alt+Shift+f\>), and save the file.  
+See more links in [.clang-format](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/.clang-format) file.
 
 Most of our coding style and conventions are enforced via clang-tidy. The project is currently set up to treat
  clang-tidy warnings as build errors and we'd like to keep it this way. If you absolutely need to violate the style,
  mark the problematic line with `// NOLINT`. To suppress style checks in a whole folder, add .clang-tidy file into the
  folder with checks reduced to `Checks: '-*,bugprone-*'`.
 
-Clang-tidy checks reference: [https://releases.llvm.org/10.0.0/tools/clang/tools/extra/docs/clang-tidy/checks/list.html]
+Clang-tidy checks reference: [https://clang.llvm.org/extra/clang-tidy/checks/list.html]
 
 Conventions not covered by .clang-format and .clang-tidy:
 
