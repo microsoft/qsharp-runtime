@@ -1,5 +1,5 @@
 {
     "msbuild-sdks": {
-        "Microsoft.Quantum.Sdk": "0.18.2107150698-alpha"
+        "Microsoft.Quantum.Sdk": "0.18.2109163417-beta"
     }
 }

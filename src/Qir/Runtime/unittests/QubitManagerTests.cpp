@@ -12,7 +12,7 @@ using namespace Microsoft::Quantum;
 TEST_CASE("Simple allocation and release of one qubit", "[QubitManagerBasic]")
 {
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>();
-    Qubit q = qm->Allocate();
+    Qubit q                           = qm->Allocate();
     qm->Release(q);
 }
 
@@ -44,7 +44,7 @@ TEST_CASE("Qubit Status", "[QubitManagerBasic]")
 {
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(2, false);
 
-    Qubit q0 = qm->Allocate();
+    Qubit q0                        = qm->Allocate();
     CQubitManager::QubitIdType q0id = qm->GetQubitId(q0);
     REQUIRE(qm->IsValidQubit(q0));
     REQUIRE(qm->IsExplicitlyAllocatedQubit(q0));
@@ -63,7 +63,7 @@ TEST_CASE("Qubit Status", "[QubitManagerBasic]")
     REQUIRE(!qm->IsFreeQubitId(q0id));
     REQUIRE(qm->GetFreeQubitCount() == 1);
 
-    Qubit q1 = qm->Allocate();
+    Qubit q1                        = qm->Allocate();
     CQubitManager::QubitIdType q1id = qm->GetQubitId(q1);
     REQUIRE(q0id != q1id);
 
@@ -82,9 +82,9 @@ TEST_CASE("Qubit Status", "[QubitManagerBasic]")
 
 TEST_CASE("Qubit Counts", "[QubitManagerBasic]")
 {
-    constexpr int totalQubitCount = 100;
+    constexpr int totalQubitCount    = 100;
     constexpr int disabledQubitCount = 29;
-    constexpr int extraQubitCount = 43;
+    constexpr int extraQubitCount    = 43;
     static_assert(extraQubitCount <= totalQubitCount);
     static_assert(disabledQubitCount <= totalQubitCount);
     // We don't want capacity to be extended at first...
@@ -99,19 +99,19 @@ TEST_CASE("Qubit Counts", "[QubitManagerBasic]")
     Qubit* qubits = new Qubit[disabledQubitCount];
     qm->Allocate(qubits, disabledQubitCount);
     REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
-    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount - disabledQubitCount);
     REQUIRE(qm->GetAllocatedQubitCount() == disabledQubitCount);
     REQUIRE(qm->GetDisabledQubitCount() == 0);
 
     qm->Disable(qubits, disabledQubitCount);
     REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
-    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount - disabledQubitCount);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
 
     qm->Release(qubits, disabledQubitCount);
     REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
-    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount - disabledQubitCount);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
     delete[] qubits;
@@ -119,13 +119,13 @@ TEST_CASE("Qubit Counts", "[QubitManagerBasic]")
     qubits = new Qubit[extraQubitCount];
     qm->Allocate(qubits, extraQubitCount);
     REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
-    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount-extraQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount - disabledQubitCount - extraQubitCount);
     REQUIRE(qm->GetAllocatedQubitCount() == extraQubitCount);
     REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
 
     qm->Release(qubits, extraQubitCount);
     REQUIRE(qm->GetQubitCapacity() == totalQubitCount);
-    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount-disabledQubitCount);
+    REQUIRE(qm->GetFreeQubitCount() == totalQubitCount - disabledQubitCount);
     REQUIRE(qm->GetAllocatedQubitCount() == 0);
     REQUIRE(qm->GetDisabledQubitCount() == disabledQubitCount);
     delete[] qubits;
@@ -249,15 +249,17 @@ TEST_CASE("Restricted Area", "[QubitManager]")
     qm->Allocate(qqq, 2);
     // OK to destruct qubit manager while qubits are still allocated.
     REQUIRE_THROWS(qm->Allocate());
+    delete[] qqq;
 }
 
 TEST_CASE("Nested Restricted Areas", "[QubitManager]")
 {
-    constexpr int n = 10;
+    constexpr int n                   = 10;
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(n, false);
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         Qubit q = qm->Allocate(); // Reuse qubit from previous area
-        qm->Release(q); // Put a free qubit in the innermost area
+        qm->Release(q);           // Put a free qubit in the innermost area
         qm->StartRestrictedReuseArea();
     }
     REQUIRE(qm->GetFreeQubitCount() == n);
@@ -269,7 +271,8 @@ TEST_CASE("Nested Restricted Areas", "[QubitManager]")
     REQUIRE(qm->GetFreeQubitCount() == 0);
     REQUIRE_THROWS(qm->Allocate()); // Reached capacity
     qm->Release(qubits, n);
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         qm->EndRestrictedReuseArea();
     }
     qm->Allocate(qubits, n);
@@ -283,25 +286,27 @@ TEST_CASE("Nested Restricted Areas With Qubits", "[QubitManager]")
     constexpr int n = 100;
 
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(n, false);
-    Qubit* qubits = new Qubit[n];
+    Qubit* qubits                     = new Qubit[n];
     qm->Allocate(qubits, n); // Allocate All
     REQUIRE(qm->GetFreeQubitCount() == 0);
 
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         qm->StartRestrictedReuseArea();
         qm->Release(qubits[i]); // Put a free qubit in this area
     }
     REQUIRE(qm->GetFreeQubitCount() == n); // There're n free qubits, one in each area
-    qm->Allocate(qubits, n); // And we can allocate them all
+    qm->Allocate(qubits, n);               // And we can allocate them all
 
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         qm->EndRestrictedReuseArea();
         qm->Release(qubits[i]); // Release out of order
     }
 
     REQUIRE(qm->GetFreeQubitCount() == n); // There're n free qubits still
-    qm->Allocate(qubits, n); // And we can allocate them.
-    REQUIRE_THROWS(qm->Allocate()); // Reached capacity
+    qm->Allocate(qubits, n);               // And we can allocate them.
+    REQUIRE_THROWS(qm->Allocate());        // Reached capacity
     qm->Release(qubits, n);
     REQUIRE(qm->GetFreeQubitCount() == n);
     delete[] qubits;
@@ -309,12 +314,13 @@ TEST_CASE("Nested Restricted Areas With Qubits", "[QubitManager]")
 
 TEST_CASE("Many Nested Restricted Areas", "[QubitManager]")
 {
-    constexpr int n = 10000;
+    constexpr int n                   = 10000;
     std::unique_ptr<CQubitManager> qm = std::make_unique<CQubitManager>(1, false);
     REQUIRE(qm->GetFreeQubitCount() == 1);
 
     // Allocate a lot of nested areas
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         qm->StartRestrictedReuseArea();
     }
 
@@ -324,7 +330,8 @@ TEST_CASE("Many Nested Restricted Areas", "[QubitManager]")
     qm->Release(q);
     REQUIRE(qm->GetFreeQubitCount() == 1);
 
-    for (int i = 0; i<n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         qm->EndRestrictedReuseArea();
     }
 

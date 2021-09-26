@@ -18,34 +18,43 @@ static IDiagnostics* GetDiagnostics()
 // Implementation:
 extern "C"
 {
-    void quantum__qis__assertmeasurementprobability__body(
-        QirArray* bases, QirArray* qubits, RESULT* result, double prob, QirString* msg, double tol)
+    void __quantum__qis__assertmeasurementprobability__body(QirArray* bases, QirArray* qubits, RESULT* result,
+                                                            double prob, QirString* msg, double tol)
     {
-        if(bases->count != qubits->count)
+        if (bases->count != qubits->count)
         {
-            quantum__rt__fail_cstr(
-                "Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
-                "must be of same size.");
+            __quantum__rt__fail_cstr("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
+                                     "must be of same size.");
         }
 
-        IRuntimeDriver *driver = GlobalContext()->GetDriver();
-        if(driver->AreEqualResults(result, driver->UseOne()))
+        IRuntimeDriver* driver = GlobalContext()->GetDriver();
+        if (driver->AreEqualResults(result, driver->UseOne()))
         {
             prob = 1.0 - prob;
         }
 
         // Convert paulis from sequence of bytes to sequence of PauliId:
         std::vector<PauliId> paulis(bases->count);
-        for(QirArray::TItemCount i = 0; i < bases->count; ++i)
+        for (QirArray::TItemCount i = 0; i < bases->count; ++i)
         {
-            paulis[i] = (PauliId)*(bases->GetItemPointer(i));
+            paulis[i] = (PauliId) * (bases->GetItemPointer(i));
         }
 
-        if(!GetDiagnostics()->AssertProbability(
-            (long)qubits->count, paulis.data(), reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol, nullptr))
+        if (!GetDiagnostics()->AssertProbability((long)qubits->count, paulis.data(),
+                                                 reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol,
+                                                 nullptr))
         {
-            quantum__rt__fail(msg);
+            __quantum__rt__fail(msg);
         }
+    }
+
+    void __quantum__qis__assertmeasurementprobability__ctl(QirArray* /* ctls */,
+                                                           QirAssertMeasurementProbabilityTuple* args)
+    {
+        // Controlled AssertMeasurementProbability ignores control bits. See the discussion on
+        // https://github.com/microsoft/qsharp-runtime/pull/450 for more details.
+        __quantum__qis__assertmeasurementprobability__body(args->bases, args->qubits, args->result, args->prob,
+                                                           args->msg, args->tol);
     }
 
 } // extern "C"

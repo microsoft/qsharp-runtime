@@ -17,7 +17,7 @@ add_executable(qir-runtime-unittests
 )
 
 target_include_directories(qir-runtime-unittests PUBLIC 
-  "${PROJECT_SOURCE_DIR}/../Common/externals/catch2"
+  "${PROJECT_SOURCE_DIR}/../Common/Externals/catch2"
   ${public_includes}
   ${common_includes}
   "${PROJECT_SOURCE_DIR}/lib/QIR"

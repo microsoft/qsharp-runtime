@@ -17,15 +17,15 @@ Same-level entities are independent of each other (unless specified otherwise). 
 **public\QirTypes.hpp**     Defines `QirArray`, `QirString`, `PTuple`, `QirTupleHeader`, `TupleWithControls`, `QirCallable`, `QirRange`.  
                             Depends on the listed earlier ones.
 
-**public\QirRuntime.hpp**   Declares `quantum__rt__*()`. Depends on the listed earlier ones.  
+**public\QirRuntime.hpp**   Declares `__quantum__rt__*()`. Depends on the listed earlier ones.  
 
 
 ## Level 1
 
-**conditionals.cpp**        Defines `quantum__qis__apply*__body()`.  
+**conditionals.cpp**        Defines `__quantum__qis__apply*__body()`.  
                             Depends on QIR's `quantum__rt__result_{equal,get_zero}()`, declared in **public\QirRuntime.hpp**.  
 
-**intrinsicsMath.cpp**      Defines `quantum__qis__*` math funcs implementations, 
+**intrinsicsMath.cpp**      Defines `__quantum__qis__*` math funcs implementations, 
                             `Quantum::Qis::Internal::{excStrDrawRandomVal,RandomizeSeed,GetLastGeneratedRandomI64,GetLastGeneratedRandomDouble}`.  
                             Depends on `quantum__rt__fail()`, `quantum__rt__string_create()`, declared in **public\QirRuntime.hpp**.  
 
@@ -33,9 +33,5 @@ Same-level entities are independent of each other (unless specified otherwise). 
 ## Level 2
 
 **qsharp__foundation__qis.hpp**
-                            Declares `quantum__qis__*()` math funcs and ApplyIf.  
+                            Declares `__quantum__qis__*()` math funcs and ApplyIf.  
                             Depends on **public\CoreTypes.hpp**, **public\QirTypes.hpp**.
-                        
-**qsharp-foundation-qis.ll**
-                            Defines `@__quantum__qis__*()` math funcs and ApplyIf - entry points (to be called by the `.ll` files generated from users' `.qs` files).  
-                            Depends on `quantum__qis__*` implementations (in **intrinsicsMath.cpp**, **conditionals.cpp**, ).

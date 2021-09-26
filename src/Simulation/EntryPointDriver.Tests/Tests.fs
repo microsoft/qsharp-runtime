@@ -570,7 +570,9 @@ let ``Submit uses default values`` () =
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -593,7 +595,9 @@ let ``Submit uses default values with default target`` () =
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -616,6 +620,8 @@ let ``Submit allows overriding default values`` () =
         "myJobName"
         "--shots"
         "750"
+        "--user-agent"
+        "myUserAgent"
         "--credential"
         "cli"
     ])
@@ -628,7 +634,49 @@ let ``Submit allows overriding default values`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
+               UserAgent: myUserAgent
                Job Name: myJobName
+               Job Parameters:
+               Shots: 750
+               Output: FriendlyUri
+               Dry Run: False
+               Verbose: True
+
+               Submitting Q# entry point using a quantum machine.
+
+               https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+               
+[<Fact>]
+let ``Submit allows a long user-agent`` () =
+    let given = test "Returns Unit"
+    given (submitWithNoOpTarget @ [
+        "--verbose"
+        "--storage"
+        "myStorage"
+        "--aad-token"
+        "myToken"
+        "--job-name"
+        "myJobName"
+        "--shots"
+        "750"
+        "--user-agent"
+        "a-very-long-user-agent-(it-will-be-truncated)"
+        "--credential"
+        "cli"
+    ])
+    |> yields "Subscription: mySubscription
+               Resource Group: myResourceGroup
+               Workspace: myWorkspace
+               Target: test.machine.noop
+               Storage: myStorage
+               Base URI:
+               Location: myLocation
+               Credential: CLI
+               AadToken: myTok
+               UserAgent: a-very-long-user-agent-(
+               Job Name: myJobName
+               Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -653,6 +701,8 @@ let ``Submit extracts the location from a quantum endpoint`` () =
         "myJobName"
         "--credential"
         "VisualStudio"
+        "--user-agent"
+        "myUserAgent"
         "--shots"
         "750"
         "--target"
@@ -667,7 +717,9 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Location: westus
                 Credential: VisualStudio
                 AadToken: myTok
+                UserAgent: myUserAgent
                 Job Name: myJobName
+                Job Parameters:
                 Shots: 750
                 Output: FriendlyUri
                 Dry Run: False
@@ -702,7 +754,9 @@ let ``Submit allows overriding default values with default target`` () =
                Location: myLocation
                Credential: Interactive
                AadToken: myTok
+               UserAgent:
                Job Name: myJobName
+               Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
@@ -740,7 +794,9 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Location: mybaseuri
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -765,7 +821,9 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Location: myLocation
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -794,7 +852,9 @@ let ``Submit allows spaces for the --location option`` () =
                Location: My Location
                Credential: Default
                AadToken:
+               UserAgent:
                Job Name:
+               Job Parameters:
                Shots: 500
                Output: FriendlyUri
                Dry Run: False
@@ -898,7 +958,9 @@ let ``Submit supports Q# submitters`` () =
          Location: myLocation
          Credential: Default
          AadToken:
+         UserAgent:
          Job Name:
+         Job Parameters:
          Shots: 500
          Output: FriendlyUri
          Dry Run: False
@@ -907,6 +969,67 @@ let ``Submit supports Q# submitters`` () =
          Submitting Q# entry point.
 
          https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit supports job parameters`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--job-params"; "foo=bar"; "baz=qux"; "--verbose"])
+    |> yields
+        "Subscription: mySubscription
+         Resource Group: myResourceGroup
+         Workspace: myWorkspace
+         Target: test.submitter.noop
+         Storage:
+         Base URI:
+         Location: myLocation
+         Credential: Default
+         AadToken:
+         UserAgent:
+         Job Name:
+         Job Parameters: [baz, qux], [foo, bar]
+         Shots: 500
+         Output: FriendlyUri
+         Dry Run: False
+         Verbose: True
+
+         Submitting Q# entry point.
+
+         https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Extra equals symbols in a job parameter are parsed as part of the value`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--job-params"; "foo=bar=baz"; "--verbose"])
+    |> yields
+        "Subscription: mySubscription
+         Resource Group: myResourceGroup
+         Workspace: myWorkspace
+         Target: test.submitter.noop
+         Storage:
+         Base URI:
+         Location: myLocation
+         Credential: Default
+         AadToken:
+         UserAgent:
+         Job Name:
+         Job Parameters: [foo, bar=baz]
+         Shots: 500
+         Output: FriendlyUri
+         Dry Run: False
+         Verbose: True
+
+         Submitting Q# entry point.
+
+         https://www.example.com/00000000-0000-0000-0000-0000000000000"
+
+[<Fact>]
+let ``Submit fails if job parameters can't be parsed`` () =
+    let given = testWithTarget "test.submitter.noop" "Returns Unit"
+
+    given (submitWithoutTarget @ ["--job-params"; "foobar"])
+    |> failsWith "This is not a \"key=value\" pair: 'foobar'"
 
 // Help
 
@@ -922,7 +1045,7 @@ let ``Uses documentation`` () =
                        %s [options] [command]
 
                      Options:
-                       -n <n> (REQUIRED)                                   A number.
+                       -n <n> (REQUIRED)                                   An integer.
                        --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                        --my-cool-bool (REQUIRED)                           A neat bit.
                        -s, --simulator <simulator>                         The name of the simulator to use.
@@ -938,6 +1061,42 @@ let ``Uses documentation`` () =
     given ["-?"] |> yields message
 
 [<Fact>]
+let ``Shows help text for generateazurepayload command`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s generateazurepayload [options]
+
+                    Options:
+                      -n <n> (REQUIRED)                                   An integer.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      --target <target> (REQUIRED)                        The target device ID.
+                      --verbose                                           Show additional information about the submission.
+                      -?, -h, --help                                      Show help and usage information"
+    let given = test "Help"
+    given ["generateazurepayload"; "--help"] |> yields message
+
+[<Fact>]
+let ``Shows help text for generateazurepayload command with default target`` () =
+    let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
+    let message =
+        name
+        |> sprintf "Usage:
+                      %s generateazurepayload [options]
+
+                    Options:
+                      -n <n> (REQUIRED)                                   An integer.
+                      --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
+                      --my-cool-bool (REQUIRED)                           A neat bit.
+                      --target <target>                                   The target device ID.
+                      --verbose                                           Show additional information about the submission.
+                      -?, -h, --help                                      Show help and usage information"
+    let given = testWithTarget "foo.target" "Help"
+    given ["generateazurepayload"; "--help"] |> yields message
+
+[<Fact>]
 let ``Shows help text for submit command`` () =
     let name = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly().Location)
     let message =
@@ -946,7 +1105,7 @@ let ``Shows help text for submit command`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
@@ -956,9 +1115,11 @@ let ``Shows help text for submit command`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
+                      --job-params <job-params>                           Additional target-specific parameters for the submitted job (in the format \"key=value\").
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
@@ -976,7 +1137,7 @@ let ``Shows help text for submit command with default target`` () =
                       %s submit [options]
 
                     Options:
-                      -n <n> (REQUIRED)                                   A number.
+                      -n <n> (REQUIRED)                                   An integer.
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --subscription <subscription> (REQUIRED)            The subscription ID.
@@ -986,9 +1147,11 @@ let ``Shows help text for submit command with default target`` () =
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
+                      --user-agent <user-agent>                           A label to identify this application when making requests to Azure Quantum.
                       --base-uri <base-uri>                               The base URI of the Azure Quantum endpoint.
                       --location <location>                               The location to use with the default endpoint.
                       --job-name <job-name>                               The name of the submitted job.
+                      --job-params <job-params>                           Additional target-specific parameters for the submitted job (in the format \"key=value\").
                       --shots <shots>                                     The number of times the program is executed on the target machine.
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.

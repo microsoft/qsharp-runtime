@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
@@ -20,6 +21,37 @@ namespace Microsoft.Quantum.EntryPointDriver
     /// </summary>
     public static class Azure
     {
+
+        /// <summary>
+        /// Generates payload for Azure offline.
+        /// </summary>
+        /// <param name="settings">The settings for generating azure payload.</param>
+        /// <param name="qirSubmission">A QIR entry point submission.</param>
+        /// <returns>The exit code.</returns>
+        public static Task<int> GenerateAzurePayload(
+            GenerateAzurePayloadSettings settings, QirSubmission? qirSubmission)
+        {
+            Console.WriteLine("Microsoft.Quantum.EntryPointDriver.Azure.GenerateAzurePayload");
+            if (!(qirSubmission is null) && QirAzurePayloadGenerator(settings) is { } generator)
+            {
+                return GenerateQirAzurePayload(settings, generator, qirSubmission);
+            }
+
+            if (qirSubmission is null)
+            {
+                DisplayError(
+                    $"The target {settings.Target} requires QIR submission, but the project was built without QIR. "
+                    + "Please enable QIR generation in the project settings.",
+                    null);
+            }
+            else
+            {
+                DisplayError($"No submitters were found for the target {settings.Target}.", null);
+            }
+
+            return Task.FromResult(1);
+        }
+
         /// <summary>
         /// Submits an entry point to Azure Quantum. If <paramref name="qirSubmission"/> is non-null and a QIR submitter
         /// is available for the target in <paramref name="settings"/>, the QIR entry point is submitted. Otherwise, the
@@ -72,6 +104,21 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
+        /// Generates QIR payload for Azure.
+        /// </summary>
+        /// <param name="settings">The settings for generating azure payload.</param>
+        /// <param name="generator">The payload generator.</param>
+        /// <param name="submission">A QIR entry point submission.</param>
+        /// <returns>The exit code.</returns>
+        private static async Task<int> GenerateQirAzurePayload(
+            GenerateAzurePayloadSettings settings, IQirSubmitter generator, QirSubmission submission)
+        {
+            LogIfVerbose(settings, "Generating QIR Azure Payload");
+            return await Task<int>.Run(() => DisplayPayloadGeneration(generator.Validate(
+                submission.QirStream, submission.EntryPointName, submission.Arguments)));
+        }
+
+        /// <summary>
         /// Submits a Q# entry point to Azure Quantum using a quantum machine.
         /// </summary>
         /// <typeparam name="TIn">The entry point's argument type.</typeparam>
@@ -91,11 +138,14 @@ namespace Microsoft.Quantum.EntryPointDriver
                 return DisplayValidation(valid ? null : message);
             }
 
-            var job = machine.SubmitAsync(
-                submission.EntryPointInfo,
-                submission.Argument,
-                new SubmissionContext { FriendlyName = settings.JobName, Shots = settings.Shots });
+            var context = new SubmissionContext
+            {
+                FriendlyName = settings.JobName,
+                Shots = settings.Shots,
+                InputParams = settings.JobParams
+            };
 
+            var job = machine.SubmitAsync(submission.EntryPointInfo, submission.Argument, context);
             return await DisplayJobOrError(settings, job);
         }
 
@@ -137,8 +187,8 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             if (settings.DryRun)
             {
-                DisplayError("Dry run is not supported with QIR submission.", null);
-                return 1;
+                return DisplayValidation(submitter.Validate(
+                    submission.QirStream, submission.EntryPointName, submission.Arguments));
             }
 
             var job = submitter.SubmitAsync(
@@ -173,6 +223,24 @@ namespace Microsoft.Quantum.EntryPointDriver
                     ex.Message);
                 return 1;
             }
+        }
+
+        /// <summary>
+        /// Displays a message depending on whether the payload could be generated.
+        /// </summary>
+        /// <param name="message">The paylod generation error message, or null if payload generation was successfull.</param>
+        /// <returns>The exit code.</returns>
+        private static int DisplayPayloadGeneration(string? message)
+        {
+            if (message is null)
+            {
+                Console.WriteLine("✔️  Payload generated.");
+                return 0;
+            }
+
+            Console.WriteLine("❌  Payload could not be generated." + Environment.NewLine);
+            Console.WriteLine(message);
+            return 1;
         }
 
         /// <summary>
@@ -258,6 +326,20 @@ namespace Microsoft.Quantum.EntryPointDriver
         }
 
         /// <summary>
+        /// Logs a message if the verbose setting is enabled.
+        /// </summary>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <param name="message">The message.</param>
+        private static void LogIfVerbose(GenerateAzurePayloadSettings settings, string message)
+        {
+            if (settings.Verbose)
+            {
+                Console.WriteLine(message);
+                Console.WriteLine();
+            }
+        }
+
+        /// <summary>
         /// Returns a Q# machine for the target in the given Azure settings.
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
@@ -283,6 +365,19 @@ namespace Microsoft.Quantum.EntryPointDriver
         };
 
         /// <summary>
+        /// Returns a QIR submitter for the target in the given settings.
+        /// </summary>
+        /// <param name="settings">The generate Azure payload settings.</param>
+        /// <returns>A QIR submitter.</returns>
+        private static IQirSubmitter? QirAzurePayloadGenerator(GenerateAzurePayloadSettings settings) => settings.Target switch
+        {
+            null => null,
+            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
+            NoOpSubmitter.Target => new NoOpSubmitter(),
+            _ => SubmitterFactory.QirPayloadGenerator(settings.Target)
+        };
+
+        /// <summary>
         /// Returns a QIR submitter for the target in the given Azure settings.
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
@@ -303,6 +398,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             public string? FriendlyName { get; set; }
 
             public int Shots { get; set; }
+
+            public ImmutableDictionary<string, string> InputParams { get; set; } = ImmutableDictionary<string, string>.Empty;
         }
     }
 }

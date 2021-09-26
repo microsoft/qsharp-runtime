@@ -35,6 +35,19 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
     }
 
     @EntryPoint()
+    function InfTest() : Int {
+        if IsInf(0.0)                               { return 1; }
+        if not IsInf(INFINITY())                    { return 2; }
+        if IsInf(-INFINITY())                       { return 3; }
+
+        if IsNegativeInfinity(0.0)                  { return 4; }
+        if not IsNegativeInfinity(-INFINITY())      { return 5; }
+        if IsNegativeInfinity(INFINITY())           { return 6; }
+
+        return 0;
+    }
+
+    @EntryPoint()
     function ArcTan2Test() : Int {
 
         // function ArcTan2(y : Double, x : Double) : Double 

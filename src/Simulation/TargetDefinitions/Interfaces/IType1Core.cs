@@ -11,11 +11,13 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
         IIntrinsicApplyUncontrolledRy,
         IIntrinsicApplyUncontrolledRz,
         IIntrinsicApplyUncontrolledS,
+        IIntrinsicApplyUncontrolledSAdj,
         IIntrinsicApplyUncontrolledT,
+        IIntrinsicApplyUncontrolledTAdj,
         IIntrinsicApplyUncontrolledX,
         IIntrinsicApplyUncontrolledY,
         IIntrinsicApplyUncontrolledZ,
-        IIntrinsicM,
+        IIntrinsicMZ,
         IIntrinsicReset
     { }
 }

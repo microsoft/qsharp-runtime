@@ -71,6 +71,7 @@ namespace Microsoft.Quantum.Testing.QIR
             H(ctls[0]);
             H(ctls[1]);
             if (M(targets[0]) != Zero) { set res = 2; }
+            ResetAll(targets + ctls);
         }
         if (res != 0) { return 70 + res; }
 
@@ -79,7 +80,23 @@ namespace Microsoft.Quantum.Testing.QIR
             H(qs[0]);
             H(qs[2]);
             if (Measure([PauliX, PauliZ, PauliX], qs) != Zero) { set res = 80; }
+            ResetAll(qs);
         }
         return res;
+    }
+
+    @EntryPoint()
+    operation InvalidRelease() : Unit {
+        use q = Qubit();
+        let _ = M(q);
+        X(q);
+    }
+
+    @EntryPoint()
+    operation MeasureRelease() : Unit {
+        use qs = Qubit[2];
+        X(qs[0]);
+        let _ = Measure([PauliX], [qs[1]]);
+        let _ = M(qs[0]);
     }
 }
