@@ -185,6 +185,7 @@ extern "C"
         _In_reads_(n) logical_qubit_id* q)
     {
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (int i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<logical_qubit_id> qv(q, q + n);
@@ -201,6 +202,7 @@ extern "C"
         _In_reads_(n) logical_qubit_id* q)
     {
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (int i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<logical_qubit_id> qv(q, q + n);
@@ -225,6 +227,7 @@ extern "C"
         _In_reads_(n) logical_qubit_id* q)
     {
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (int i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<logical_qubit_id> qv(q, q + n);
@@ -278,6 +281,7 @@ extern "C"
     // Asserts that the gates in `b`, measured on the qubits in `q`, return `result`
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){
         std::vector<Gates::Basis> bv;
+        bv.reserve(n);
         for (int i = 0; i < n; ++i)
             bv.push_back(static_cast<Gates::Basis>(*(b + i)));
         std::vector<logical_qubit_id> qv(q, q + n);

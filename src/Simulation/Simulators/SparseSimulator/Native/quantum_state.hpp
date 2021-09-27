@@ -43,7 +43,7 @@ inline amplitude iExp(int power)
 }
 
 template<size_t num_qubits>
-bool get_parity(std::bitset<num_qubits> bitstring){
+bool get_parity(std::bitset<num_qubits> const& bitstring){
     return bitstring.count() % 2;
 }
 
@@ -65,7 +65,7 @@ inline bool operator<(const std::bitset<N>& lhs, const std::bitset<N>& rhs) {
 // which bits are non-zero
 template<size_t num_qubits>
 std::bitset<num_qubits> get_mask(std::vector<logical_qubit_id> const& indices){
-    std::bitset<num_qubits> mask = std::bitset<num_qubits>();
+    std::bitset<num_qubits> mask;
     for (logical_qubit_id index : indices) {
         mask.set(index);
     }
@@ -648,7 +648,7 @@ public:
 
 
     // Probe the amplitude of a single basis state
-    amplitude probe(qubit_label label) {
+    amplitude probe(qubit_label const& label) {
         auto qubit = _qubit_data.find(label);
         // States not in the hash map are assumed to be 0
         if (qubit == _qubit_data.end()) {
@@ -659,7 +659,7 @@ public:
         }
     }
 
-    amplitude probe(std::string label) {
+    amplitude probe(std::string const& label) {
         qubit_label bit_label = qubit_label(label);
         return probe(bit_label);
     }
@@ -667,7 +667,7 @@ public:
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
-    bool dump_qubits(std::vector<logical_qubit_id> qubits, void (*callback)(char*, double, double)) {
+    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
         // Create two wavefunctions
         // check if they are tensor products
         wavefunction dump_wfn;
@@ -1096,7 +1096,7 @@ private:
     // Thus, the norm of wfn1 will be 1/|c_b|^2; thus the norm of wfn2 is 1/|d_b|^2 = |c_b|^2/|a_bb|^2
     // So we iterate through the smaller wavefunction, to get the normalizing constant, 
     // then normalize both
-    bool _split_wavefunction(qubit_label first_mask, wavefunction &wfn1, wavefunction &wfn2){
+    bool _split_wavefunction(qubit_label const& first_mask, wavefunction &wfn1, wavefunction &wfn2){
         qubit_label second_mask = ~first_mask;
         // Guesses size
         wfn1 = wavefunction((int)std::sqrt(_qubit_data.size()));

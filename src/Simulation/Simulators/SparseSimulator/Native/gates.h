@@ -213,7 +213,7 @@ struct condensed_operation {
     std::bitset<num_qubits> controls;
     condensed_operation(OP gate_type_arg, 
         logical_qubit_id target_arg, 
-        std::bitset<num_qubits> controls_arg
+        std::bitset<num_qubits> const& controls_arg
         ) : gate_type(gate_type_arg),
             target(target_arg),
             controls(controls_arg){}
@@ -229,7 +229,7 @@ struct condensed_operation {
     //mcswap
     condensed_operation(OP gate_type_arg, 
         logical_qubit_id target1_arg,
-        std::bitset<num_qubits> controls_arg, 
+        std::bitset<num_qubits> const& controls_arg, 
         logical_qubit_id target_2_arg
         ) : gate_type(gate_type_arg),
             target(target1_arg),
@@ -246,7 +246,7 @@ struct condensed_operation {
     // MCPhase
     condensed_operation(OP gate_type_arg, 
         logical_qubit_id target_arg, 
-        std::bitset<num_qubits> controls_arg, 
+        std::bitset<num_qubits> const& controls_arg, 
         amplitude phase_arg
         ) : gate_type(gate_type_arg),
             target(target_arg),
@@ -256,7 +256,7 @@ struct condensed_operation {
     bool result;
     // Assert
     condensed_operation(OP gate_type_arg, 
-            std::bitset<num_qubits> Zs_arg, 
+            std::bitset<num_qubits> const& Zs_arg, 
             bool result_arg
             ) : target(0),
                 gate_type(gate_type_arg),

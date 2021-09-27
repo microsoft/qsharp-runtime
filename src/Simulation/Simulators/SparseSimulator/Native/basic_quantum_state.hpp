@@ -48,9 +48,9 @@ public:
     virtual bool Measure(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&) = 0;
 
 
-    virtual amplitude probe(std::string label) = 0;
+    virtual amplitude probe(std::string const& label) = 0;
 
-    virtual bool dump_qubits(std::vector<logical_qubit_id> qubits, void (*callback)(char*, double, double)) = 0;
+    virtual bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) = 0;
 
     virtual void dump_all(logical_qubit_id max_qubit_id, void (*callback)(char*, double, double)) = 0;
 

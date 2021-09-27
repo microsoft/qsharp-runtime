@@ -235,7 +235,7 @@ public:
 		if (_queue_Rx[target]){
 			_execute_queued_ops(target, OP::Rx);
 		}
-		// YH = -YH, so we add a phase to track this
+		// HY = -YH, so we add a phase to track this
 		if (_queue_H[target]){
 			// The phase added does not depend on the target
 			// Thus we use one of the controls as a target
@@ -429,7 +429,7 @@ public:
 
 	void MCRFrac(std::vector<logical_qubit_id> const& controls, Gates::Basis axis, std::int64_t numerator, std::int64_t power, logical_qubit_id target) {	
 		// Opposite sign convention
-		MCR(controls, axis, -(double)numerator * pow(0.5, power - 1) * M_PI, target);
+		MCR(controls, axis, -(double)numerator * std::pow(0.5, power - 1) * M_PI, target);
 	}
 
 	void Exp(std::vector<Gates::Basis> const& axes, double angle, std::vector<logical_qubit_id> const& qubits){
@@ -646,7 +646,7 @@ public:
 	}
 
 	// Returns the amplitude of a given bitstring
-	amplitude probe(std::string label) {
+	amplitude probe(std::string const& label) {
 		_execute_queued_ops();
 		return _quantum_state->probe(label);
 	}
@@ -659,7 +659,7 @@ public:
 	// Dumps the state of a subspace of particular qubits, if they are not entangled
 	// This requires it to detect if the subspace is entangled, construct a new 
 	// projected wavefunction, then call the `callback` function on each state.
-	bool dump_qubits(std::vector<logical_qubit_id> qubits, void (*callback)(char*, double, double)) {
+	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
 		_execute_queued_ops(qubits, OP::Ry);
 		return _quantum_state->dump_qubits(qubits, callback);
 	}
@@ -803,7 +803,7 @@ private:
 	// Executes all phase and permutation operations,
 	// then any H, Rx, or Ry gates queued on any of the qubit indices, 
 	// up to the level specified (where H < Rx < Ry)
-	void _execute_queued_ops(std::vector<logical_qubit_id> indices, OP level = OP::Ry){
+	void _execute_queued_ops(std::vector<logical_qubit_id> const& indices, OP level = OP::Ry){
 		_execute_phase_and_permute();
 		switch (level){
 			case OP::Ry:
@@ -829,7 +829,7 @@ private:
 
 	// Executes if there is anything already queued on the qubit target
 	// Used when queuing gates that do not commute well
-	void _execute_if(logical_qubit_id &target){
+	void _execute_if(logical_qubit_id target){
 		if (_queue_Ry[target] || _queue_Rx[target] || _queue_H[target]){
 			_execute_queued_ops(target, OP::Ry);
 		}

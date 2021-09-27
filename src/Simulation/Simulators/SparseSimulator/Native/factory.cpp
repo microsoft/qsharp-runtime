@@ -25,7 +25,7 @@ unsigned createSimulator(logical_qubit_id num_qubits)
     size_t emptySlot = -1;
     for (auto const& s : _simulators)
     {
-        if (s == NULL)
+        if (s == nullptr)
         {
             emptySlot = &s - &_simulators[0];
             break;
