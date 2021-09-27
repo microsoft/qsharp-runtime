@@ -41,7 +41,8 @@ if (-not $IsMacOS) {   # We do not control the clang-format version on MacOS, an
     if ("$filesRequireFormatting" -ne "")
     {
         Write-Host "##vso[task.logissue type=error;]Formatting check failed. The following files need to be formatted before compiling: "
-        Write-Host "(You may use the Clang-Format extension in VSCode, clang-format in command line, or see https://clang.llvm.org/docs/ClangFormat.html)"
+        Write-Host ("(See https://github.com/microsoft/qsharp-runtime/tree/main/src/Qir/Runtime#coding-style-and-conventions " +
+                    "or https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/.clang-format)")
         $filesRequireFormatting | Format-Table
         & $clangFormatCommand --version
         throw "Formatting check failed for QIR Runtime sources"
