@@ -26,8 +26,8 @@
   dereferenced in client's code.
 ==============================================================================*/
 
-// Although "Qubit" type is declared as a pointer to "QUBIT", it never points to an actual memory
-// and is never intended to be dereferenced anywhere - in the client code or in the runtime.
+// Although QIR uses an opaque pointer to the type "QUBIT", it never points to an actual memory
+// and is never intended to be dereferenced anywhere - in the client code or in our runtime.
 // Runtime always operates in terms of qubit ids, which are integers. Qubit ids are casted
 // to this pointer type and stored as pointer values. This is done to ensure that qubit type
 // is a unique type in the QIR.
