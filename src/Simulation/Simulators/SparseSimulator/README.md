@@ -138,22 +138,7 @@ which tells the `SparseSimulator` class to forward the call to its internal `Spa
 # Internal Logic
 We desribe the main data structure strategies and optimizations in the paper at https://arxiv.org/abs/2105.01533.
 
-## Threading Logic
-The multithreading uses OpenMP where possible, but the Visual Studio compiler's version is too low, and hence it relies on std::thread. The build detects the version of OpenMP:
- - If OpenMP is not available, it does not set the flags `DOMP_GE_V3` nor `_OPENMP`. This will select std::thread and use `std::hardware_concurrency` to decide on the number of threads.
- - If OpenMP is available but the version is too low (i.e., Visual Studio), it does not set `DOMP_GE_V3` but does set `_OPENMP`. Here it will use std::thread but use `omp_get_num_threads` to decide on the number of threads.
- - If OpenMP is availalble and the version is at least 3, it will set both flags to 1 and use OpenMP parallelism
-
-
 # Future Optimizations
 
 ## Delayed Release
 Currently the simulator executes any queued operations on any qubits it needs to release. This is not strictly necessary: it could add an assertion that the qubits are zero, and continue on. However, it's important to set the `_occupied_qubits` vector to be `0` for that qubit after it is released, but this will not necessarily be true if the gates are not executed. Hence, to delay the release of qubits, it will need a more involved method to track occupied qubits, and qubits which are actually 0.
-
-
-# Licence
-The wavefunction uses the bytell hash map written by Malte Skarupke, which has the following licence:
-
-Copyright Malte Skarupke 2017.
-Distributed under the Boost Software License, Version 1.0.
-    (See http://www.boost.org/LICENSE_1_0.txt)

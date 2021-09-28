@@ -49,6 +49,7 @@ bool get_parity(std::bitset<num_qubits> const& bitstring){
 
 // Compares two bitsets as through they were bitstrings
 // Used to enforce an ordering on bitsets, though currently not referenced
+
 template<size_t N>
 inline bool operator<(const std::bitset<N>& lhs, const std::bitset<N>& rhs) {
     std::bitset<N> mask = lhs ^ rhs;
@@ -60,7 +61,7 @@ inline bool operator<(const std::bitset<N>& lhs, const std::bitset<N>& rhs) {
     }
     return ((lhs) & ull_mask).to_ullong() < ((rhs) & ull_mask).to_ullong();
 }
-    
+
 // Transforms a vector of indices into a bitset where the indices indicate precisely
 // which bits are non-zero
 template<size_t num_qubits>

@@ -50,7 +50,7 @@ std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantu
 // Sparse simulator only stores non-zero coefficients of the quantum state.
 // It has good performance only when the number of non-zero coefficients is low.
 // If the number of non-zero coefficients is low, the number of qubits may be fairly large.
-// Sparse simulator employs hashtable structure (by Malte Skarupke) to store non-zero coefficients.
+// Sparse simulator employs std::unordered_map hashtable.
 // Keys are basis vectors represented by std::bitset<>.
 // Values are non-zero amplitudes represented by std::complex<RealType>.
 // Zero amplitudes are simply not stored.

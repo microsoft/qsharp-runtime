@@ -33,12 +33,12 @@ unsigned createSimulator(logical_qubit_id num_qubits)
     }
     if (emptySlot == -1)
     {
-        _simulators.push_back(std::shared_ptr<SparseSimulator>(new SparseSimulator(num_qubits)));
+        _simulators.push_back(std::make_shared<SparseSimulator>(num_qubits));
         emptySlot = _simulators.size() - 1;
     }
     else
     {
-        _simulators[emptySlot] = std::shared_ptr<SparseSimulator>(new SparseSimulator(num_qubits));
+        _simulators[emptySlot] = std::make_shared<SparseSimulator>(num_qubits);
     }
 
     return static_cast<unsigned>(emptySlot);
@@ -49,7 +49,7 @@ void destroySimulator(unsigned id)
 {
     std::lock_guard<std::shared_mutex> lock(_mutex);
 
-    _simulators[id].reset();
+    _simulators[id].reset(); // Set pointer to nullptr
 }
 
 // Returns a simulator at some id (used for the C++/C# API)
