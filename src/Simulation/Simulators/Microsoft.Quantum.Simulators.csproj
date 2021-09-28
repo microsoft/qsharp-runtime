@@ -46,4 +46,11 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <BondCodegen Remove="SparseSimulator\**" />
+    <Compile Remove="SparseSimulator\**" />
+    <EmbeddedResource Remove="SparseSimulator\**" />
+    <QSharpCompile Remove="SparseSimulator\**" />
+  </ItemGroup>
+
 </Project>
