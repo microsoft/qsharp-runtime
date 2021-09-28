@@ -70,8 +70,7 @@ namespace Quantum
         firstElement              = id;           // The new element is now the first in the chain.
     }
 
-    CQubitManager::QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(
-        QubitIdType* sharedQbitStatusArray)
+    QubitIdType CQubitManager::QubitListInSharedArray::TakeQubitFromFront(QubitIdType* sharedQbitStatusArray)
     {
         FailIf(sharedQbitStatusArray == nullptr, "Shared status array is not provided.");
 
@@ -241,14 +240,14 @@ namespace Quantum
                                                                 sharedQubitStatusArray);
     }
 
-    Qubit CQubitManager::Allocate()
+    QubitIdType CQubitManager::Allocate()
     {
         QubitIdType newQubitId = AllocateQubitId();
         FailIf(newQubitId == NoneMarker, "Not enough qubits.");
-        return CreateQubitObject(newQubitId);
+        return newQubitId;
     }
 
-    void CQubitManager::Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate)
+    void CQubitManager::Allocate(QubitIdType* qubitsToAllocate, QubitIdType qubitCountToAllocate)
     {
         if (qubitCountToAllocate == 0)
         {
@@ -258,76 +257,73 @@ namespace Quantum
         FailIf(qubitsToAllocate == nullptr, "No array provided for qubits to be allocated.");
 
         // Consider optimization for initial allocation of a large array at once
-        for (int32_t i = 0; i < qubitCountToAllocate; i++)
+        for (QubitIdType i = 0; i < qubitCountToAllocate; i++)
         {
             QubitIdType newQubitId = AllocateQubitId();
             if (newQubitId == NoneMarker)
             {
-                for (int32_t k = 0; k < i; k++)
+                for (QubitIdType k = 0; k < i; k++)
                 {
                     Release(qubitsToAllocate[k]);
                 }
                 FailNow("Not enough qubits.");
             }
-            qubitsToAllocate[i] = CreateQubitObject(newQubitId);
+            qubitsToAllocate[i] = newQubitId;
         }
     }
 
-    void CQubitManager::Release(Qubit qubit)
+    void CQubitManager::Release(QubitIdType qubit)
     {
         FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
-        ReleaseQubitId(QubitToId(qubit));
-        DeleteQubitObject(qubit);
+        ReleaseQubitId(qubit);
     }
 
-    void CQubitManager::Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease)
+    void CQubitManager::Release(QubitIdType* qubitsToRelease, QubitIdType qubitCountToRelease)
     {
         if (qubitCountToRelease == 0)
         {
             return;
         }
-        FailIf(qubitCountToRelease < 0, "Cannot release negative number of qubits.");
         FailIf(qubitsToRelease == nullptr, "No array provided with qubits to be released.");
 
-        for (int32_t i = 0; i < qubitCountToRelease; i++)
+        for (QubitIdType i = 0; i < qubitCountToRelease; i++)
         {
             Release(qubitsToRelease[i]);
-            qubitsToRelease[i] = nullptr;
+            qubitsToRelease[i] = 0;
         }
     }
 
-    Qubit CQubitManager::Borrow()
+    QubitIdType CQubitManager::Borrow()
     {
         // We don't support true borrowing/returning at the moment.
         return Allocate();
     }
 
-    void CQubitManager::Borrow(Qubit* qubitsToBorrow, int32_t qubitCountToBorrow)
+    void CQubitManager::Borrow(QubitIdType* qubitsToBorrow, QubitIdType qubitCountToBorrow)
     {
         // We don't support true borrowing/returning at the moment.
         return Allocate(qubitsToBorrow, qubitCountToBorrow);
     }
 
-    void CQubitManager::Return(Qubit qubit)
+    void CQubitManager::Return(QubitIdType qubit)
     {
         // We don't support true borrowing/returning at the moment.
         Release(qubit);
     }
 
-    void CQubitManager::Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn)
+    void CQubitManager::Return(QubitIdType* qubitsToReturn, QubitIdType qubitCountToReturn)
     {
         // We don't support true borrowing/returning at the moment.
         Release(qubitsToReturn, qubitCountToReturn);
     }
 
-    void CQubitManager::Disable(Qubit qubit)
+    void CQubitManager::Disable(QubitIdType qubit)
     {
         FailIf(!IsValidQubit(qubit), "Qubit is not valid.");
-        QubitIdType id = QubitToId(qubit);
 
         // We can only disable explicitly allocated qubits that were not borrowed.
-        FailIf(!IsExplicitlyAllocatedId(id), "Cannot disable qubit that is not explicitly allocated.");
-        sharedQubitStatusArray[id] = DisabledMarker;
+        FailIf(!IsExplicitlyAllocatedId(qubit), "Cannot disable qubit that is not explicitly allocated.");
+        sharedQubitStatusArray[qubit] = DisabledMarker;
 
         disabledQubitCount++;
         FailIf(disabledQubitCount <= 0, "Incorrect disabled qubit count.");
@@ -335,16 +331,15 @@ namespace Quantum
         FailIf(allocatedQubitCount < 0, "Incorrect allocated qubit count.");
     }
 
-    void CQubitManager::Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable)
+    void CQubitManager::Disable(QubitIdType* qubitsToDisable, QubitIdType qubitCountToDisable)
     {
         if (qubitCountToDisable == 0)
         {
             return;
         }
-        FailIf(qubitCountToDisable < 0, "Cannot disable negative number of qubits.");
         FailIf(qubitsToDisable == nullptr, "No array provided with qubits to be disabled.");
 
-        for (int32_t i = 0; i < qubitCountToDisable; i++)
+        for (QubitIdType i = 0; i < qubitCountToDisable; i++)
         {
             Disable(qubitsToDisable[i]);
         }
@@ -371,53 +366,24 @@ namespace Quantum
     }
 
 
-    bool CQubitManager::IsValidQubit(Qubit qubit) const
+    bool CQubitManager::IsValidQubit(QubitIdType qubit) const
     {
-        return IsValidId(QubitToId(qubit));
+        return IsValidId(qubit);
     }
 
-    bool CQubitManager::IsDisabledQubit(Qubit qubit) const
+    bool CQubitManager::IsDisabledQubit(QubitIdType qubit) const
     {
-        return IsValidQubit(qubit) && IsDisabledId(QubitToId(qubit));
+        return IsValidQubit(qubit) && IsDisabledId(qubit);
     }
 
-    bool CQubitManager::IsExplicitlyAllocatedQubit(Qubit qubit) const
+    bool CQubitManager::IsExplicitlyAllocatedQubit(QubitIdType qubit) const
     {
-        return IsValidQubit(qubit) && IsExplicitlyAllocatedId(QubitToId(qubit));
+        return IsValidQubit(qubit) && IsExplicitlyAllocatedId(qubit);
     }
 
     bool CQubitManager::IsFreeQubitId(QubitIdType id) const
     {
         return IsValidId(id) && IsFreeId(id);
-    }
-
-    CQubitManager::QubitIdType CQubitManager::GetQubitId(Qubit qubit) const
-    {
-        FailIf(!IsValidQubit(qubit), "Not a valid qubit.");
-        return QubitToId(qubit);
-    }
-
-
-    Qubit CQubitManager::CreateQubitObject(QubitIdType id)
-    {
-        // Make sure the static_cast won't overflow:
-        FailIf(id < 0 || id >= MaximumQubitCapacity, "Qubit id is out of range.");
-        intptr_t pointerSizedId = static_cast<intptr_t>(id);
-        return reinterpret_cast<Qubit>(pointerSizedId);
-    }
-
-    void CQubitManager::DeleteQubitObject(Qubit /*qubit*/)
-    {
-        // Do nothing. By default we store qubit Id in place of a pointer to a qubit.
-    }
-
-    CQubitManager::QubitIdType CQubitManager::QubitToId(Qubit qubit) const
-    {
-        intptr_t pointerSizedId = reinterpret_cast<intptr_t>(qubit);
-        // Make sure the static_cast won't overflow:
-        FailIf(pointerSizedId < 0 || pointerSizedId > std::numeric_limits<QubitIdType>::max(),
-               "Qubit id is out of range.");
-        return static_cast<QubitIdType>(pointerSizedId);
     }
 
     void CQubitManager::EnsureCapacity(QubitIdType requestedCapacity)
@@ -444,7 +410,7 @@ namespace Quantum
         freeQubitsInAreas[0].FreeQubitsReuseAllowed.MoveAllQubitsFrom(newFreeQubits, sharedQubitStatusArray);
     }
 
-    CQubitManager::QubitIdType CQubitManager::TakeFreeQubitId()
+    QubitIdType CQubitManager::TakeFreeQubitId()
     {
         // First we try to take qubit from the current (innermost) area.
         QubitIdType id = freeQubitsInAreas.PeekBack().FreeQubitsReuseAllowed.TakeQubitFromFront(sharedQubitStatusArray);
@@ -476,7 +442,7 @@ namespace Quantum
         return id;
     }
 
-    CQubitManager::QubitIdType CQubitManager::AllocateQubitId()
+    QubitIdType CQubitManager::AllocateQubitId()
     {
         QubitIdType newQubitId = TakeFreeQubitId();
         if (newQubitId == NoneMarker && mayExtendCapacity)

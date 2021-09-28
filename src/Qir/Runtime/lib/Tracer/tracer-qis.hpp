@@ -11,11 +11,11 @@ extern "C"
 {
     QIR_SHARED_API void __quantum__qis__on_operation_start(int64_t /* id */); // NOLINT
     QIR_SHARED_API void __quantum__qis__on_operation_end(int64_t /* id */);   // NOLINT
-    QIR_SHARED_API void __quantum__qis__swap(Qubit /*q1*/, Qubit /*q2*/);     // NOLINT
+    QIR_SHARED_API void __quantum__qis__swap(QUBIT* /*q1*/, QUBIT* /*q2*/);   // NOLINT
 
-    QIR_SHARED_API void __quantum__qis__single_qubit_op(int32_t id, int32_t duration, Qubit target); // NOLINT
-    QIR_SHARED_API void __quantum__qis__single_qubit_op_ctl(                                         // NOLINT
-        int32_t id, int32_t duration, QirArray* ctls, Qubit target);
+    QIR_SHARED_API void __quantum__qis__single_qubit_op(int32_t id, int32_t duration, QUBIT* target); // NOLINT
+    QIR_SHARED_API void __quantum__qis__single_qubit_op_ctl(                                          // NOLINT
+        int32_t id, int32_t duration, QirArray* ctls, QUBIT* target);
     QIR_SHARED_API void __quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets); // NOLINT
     QIR_SHARED_API void __quantum__qis__multi_qubit_op_ctl(                                              // NOLINT
         int32_t id, int32_t duration, QirArray* ctls, QirArray* targets);

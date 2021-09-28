@@ -96,21 +96,21 @@ namespace Quantum
         std::unordered_set<OpId> seenOps;
 
       private:
-        QubitState& UseQubit(Qubit q)
+        QubitState& UseQubit(QubitIdType q)
         {
-            size_t qubitIndex = reinterpret_cast<size_t>(q);
+            size_t qubitIndex = static_cast<size_t>(q);
             assert(qubitIndex < this->qubits.size());
             return this->qubits[qubitIndex];
         }
-        const QubitState& UseQubit(Qubit q) const
+        const QubitState& UseQubit(QubitIdType q) const
         {
-            size_t qubitIndex = reinterpret_cast<size_t>(q);
+            size_t qubitIndex = static_cast<size_t>(q);
             assert(qubitIndex < this->qubits.size());
             return this->qubits[qubitIndex];
         }
 
         // If no appropriate layer found, returns `REQUESTNEW`.
-        LayerId FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const;
+        LayerId FindLayerToInsertOperationInto(QubitIdType q, Duration opDuration) const;
 
         // Returns the index of the created layer.
         LayerId CreateNewLayer(Duration minRequiredDuration);
@@ -119,7 +119,7 @@ namespace Quantum
         void AddOperationToLayer(OpId id, LayerId layer);
 
         // Update the qubit state with the new layer information.
-        void UpdateQubitState(Qubit q, LayerId layer, Duration opDuration);
+        void UpdateQubitState(QubitIdType q, LayerId layer, Duration opDuration);
 
         // Considers global barriers and conditional fences to find the fence currently in effect.
         LayerId GetEffectiveFence() const;
@@ -147,9 +147,9 @@ namespace Quantum
         // -------------------------------------------------------------------------------------------------------------
         // IRuntimeDriver interface
         // -------------------------------------------------------------------------------------------------------------
-        Qubit AllocateQubit() override;
-        void ReleaseQubit(Qubit qubit) override;
-        std::string QubitToString(Qubit qubit) override;
+        QubitIdType AllocateQubit() override;
+        void ReleaseQubit(QubitIdType qubit) override;
+        std::string QubitToString(QubitIdType qubit) override;
         void ReleaseResult(Result result) override;
 
         bool AreEqualResults(Result /*r1*/, Result /*r2*/) override
@@ -171,12 +171,12 @@ namespace Quantum
         // qubits into the same array. To avoid the copy, the tracer provides a method that takes two groups of qubits,
         // where the first one can be empty or can be viewed as the set of controls.
         // -------------------------------------------------------------------------------------------------------------
-        LayerId TraceSingleQubitOp(OpId id, Duration duration, Qubit target);
-        LayerId TraceMultiQubitOp(OpId id, Duration duration, long nFirstGroup, Qubit* firstGroup, long nSecondGroup,
-                                  Qubit* secondGroup);
+        LayerId TraceSingleQubitOp(OpId id, Duration duration, QubitIdType target);
+        LayerId TraceMultiQubitOp(OpId id, Duration duration, long nFirstGroup, QubitIdType* firstGroup,
+                                  long nSecondGroup, QubitIdType* secondGroup);
 
-        Result TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target);
-        Result TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, Qubit* targets);
+        Result TraceSingleQubitMeasurement(OpId id, Duration duration, QubitIdType target);
+        Result TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, QubitIdType* targets);
         LayerId GetLayerIdOfSourceMeasurement(Result r) const
         {
             return reinterpret_cast<LayerId>(r);
