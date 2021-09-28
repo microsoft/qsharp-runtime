@@ -37,22 +37,22 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer's IRuntimeDriver implementation
     //------------------------------------------------------------------------------------------------------------------
-    Qubit CTracer::AllocateQubit()
+    QubitIdType CTracer::AllocateQubit()
     {
         size_t qubit = qubits.size();
         qubits.emplace_back(QubitState{});
-        return reinterpret_cast<Qubit>(qubit);
+        return static_cast<QubitIdType>(qubit);
     }
 
-    void CTracer::ReleaseQubit(Qubit /*qubit*/)
+    void CTracer::ReleaseQubit(QubitIdType /*qubit*/)
     {
         // nothing for now
     }
 
     // TODO: what would be meaningful information we could printout for a qubit?
-    std::string CTracer::QubitToString(Qubit q)
+    std::string CTracer::QubitToString(QubitIdType q)
     {
-        size_t qubitIndex        = reinterpret_cast<size_t>(q);
+        size_t qubitIndex        = static_cast<size_t>(q);
         const QubitState& qstate = this->UseQubit(q);
 
         std::stringstream str(std::to_string(qubitIndex));
@@ -107,7 +107,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::FindLayerToInsertOperationInto
     //------------------------------------------------------------------------------------------------------------------
-    LayerId CTracer::FindLayerToInsertOperationInto(Qubit q, Duration opDuration) const
+    LayerId CTracer::FindLayerToInsertOperationInto(QubitIdType q, Duration opDuration) const
     {
         const QubitState& qstate = this->UseQubit(q);
 
@@ -160,7 +160,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::UpdateQubitState
     //------------------------------------------------------------------------------------------------------------------
-    void CTracer::UpdateQubitState(Qubit q, LayerId layer, Duration opDuration)
+    void CTracer::UpdateQubitState(QubitIdType q, LayerId layer, Duration opDuration)
     {
         QubitState& qstate = this->UseQubit(q);
         for (OpId idPending : qstate.pendingZeroDurationOps)
@@ -178,7 +178,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceSingleQubitOp
     //------------------------------------------------------------------------------------------------------------------
-    LayerId CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, Qubit target)
+    LayerId CTracer::TraceSingleQubitOp(OpId id, Duration opDuration, QubitIdType target)
     {
         this->seenOps.insert(id);
 
@@ -207,8 +207,8 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceMultiQubitOp
     //------------------------------------------------------------------------------------------------------------------
-    LayerId CTracer::TraceMultiQubitOp(OpId id, Duration opDuration, long nFirstGroup, Qubit* firstGroup,
-                                       long nSecondGroup, Qubit* secondGroup)
+    LayerId CTracer::TraceMultiQubitOp(OpId id, Duration opDuration, long nFirstGroup, QubitIdType* firstGroup,
+                                       long nSecondGroup, QubitIdType* secondGroup)
     {
         assert(nFirstGroup >= 0);
         assert(nSecondGroup > 0);
@@ -270,7 +270,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceSingleQubitMeasurement
     //------------------------------------------------------------------------------------------------------------------
-    Result CTracer::TraceSingleQubitMeasurement(OpId id, Duration duration, Qubit target)
+    Result CTracer::TraceSingleQubitMeasurement(OpId id, Duration duration, QubitIdType target)
     {
         LayerId layerId = this->TraceSingleQubitOp(id, duration, target);
         return reinterpret_cast<Result>(layerId);
@@ -279,7 +279,7 @@ namespace Quantum
     //------------------------------------------------------------------------------------------------------------------
     // CTracer::TraceMultiQubitMeasurement
     //------------------------------------------------------------------------------------------------------------------
-    Result CTracer::TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, Qubit* targets)
+    Result CTracer::TraceMultiQubitMeasurement(OpId id, Duration duration, long nTargets, QubitIdType* targets)
     {
         LayerId layerId = this->TraceMultiQubitOp(id, duration, 0, nullptr, nTargets, targets);
         return reinterpret_cast<Result>(layerId);

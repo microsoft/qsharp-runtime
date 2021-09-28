@@ -43,7 +43,7 @@ int QirArray::Release()
     {
         if (ownsQubits)
         {
-            delete[](reinterpret_cast<Qubit*>(this->buffer));
+            delete[](reinterpret_cast<QubitIdType*>(this->buffer));
         }
         else
         {
@@ -62,10 +62,10 @@ QirArray::QirArray(TItemCount qubitsCount)
 {
     if (this->count > 0)
     {
-        Qubit* qbuffer = new Qubit[count];
+        QubitIdType* qbuffer = new QubitIdType[count];
         for (TItemCount i = 0; i < count; i++)
         {
-            qbuffer[i] = __quantum__rt__qubit_allocate();
+            qbuffer[i] = reinterpret_cast<QubitIdType>(__quantum__rt__qubit_allocate());
         }
         this->buffer = reinterpret_cast<char*>(qbuffer);
     }
@@ -263,10 +263,10 @@ extern "C"
         assert(qa->ownsQubits);
         if (qa->ownsQubits)
         {
-            Qubit* qubits = reinterpret_cast<Qubit*>(qa->buffer);
+            QubitIdType* qubits = reinterpret_cast<QubitIdType*>(qa->buffer);
             for (QirArray::TItemCount i = 0; i < qa->count; i++)
             {
-                __quantum__rt__qubit_release(qubits[i]);
+                __quantum__rt__qubit_release(reinterpret_cast<QUBIT*>(qubits[i]));
             }
         }
 
