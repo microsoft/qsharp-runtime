@@ -247,7 +247,7 @@ namespace Quantum
         return newQubitId;
     }
 
-    void CQubitManager::Allocate(QubitIdType* qubitsToAllocate, QubitIdType qubitCountToAllocate)
+    void CQubitManager::Allocate(QubitIdType* qubitsToAllocate, int32_t qubitCountToAllocate)
     {
         if (qubitCountToAllocate == 0)
         {
@@ -257,7 +257,7 @@ namespace Quantum
         FailIf(qubitsToAllocate == nullptr, "No array provided for qubits to be allocated.");
 
         // Consider optimization for initial allocation of a large array at once
-        for (QubitIdType i = 0; i < qubitCountToAllocate; i++)
+        for (int32_t i = 0; i < qubitCountToAllocate; i++)
         {
             QubitIdType newQubitId = AllocateQubitId();
             if (newQubitId == NoneMarker)
@@ -278,7 +278,7 @@ namespace Quantum
         ReleaseQubitId(qubit);
     }
 
-    void CQubitManager::Release(QubitIdType* qubitsToRelease, QubitIdType qubitCountToRelease)
+    void CQubitManager::Release(QubitIdType* qubitsToRelease, int32_t qubitCountToRelease)
     {
         if (qubitCountToRelease == 0)
         {
@@ -286,10 +286,10 @@ namespace Quantum
         }
         FailIf(qubitsToRelease == nullptr, "No array provided with qubits to be released.");
 
-        for (QubitIdType i = 0; i < qubitCountToRelease; i++)
+        for (int32_t i = 0; i < qubitCountToRelease; i++)
         {
             Release(qubitsToRelease[i]);
-            qubitsToRelease[i] = 0;
+            qubitsToRelease[i] = NoneMarker;
         }
     }
 
@@ -299,7 +299,7 @@ namespace Quantum
         return Allocate();
     }
 
-    void CQubitManager::Borrow(QubitIdType* qubitsToBorrow, QubitIdType qubitCountToBorrow)
+    void CQubitManager::Borrow(QubitIdType* qubitsToBorrow, int32_t qubitCountToBorrow)
     {
         // We don't support true borrowing/returning at the moment.
         return Allocate(qubitsToBorrow, qubitCountToBorrow);
@@ -311,7 +311,7 @@ namespace Quantum
         Release(qubit);
     }
 
-    void CQubitManager::Return(QubitIdType* qubitsToReturn, QubitIdType qubitCountToReturn)
+    void CQubitManager::Return(QubitIdType* qubitsToReturn, int32_t qubitCountToReturn)
     {
         // We don't support true borrowing/returning at the moment.
         Release(qubitsToReturn, qubitCountToReturn);
@@ -331,7 +331,7 @@ namespace Quantum
         FailIf(allocatedQubitCount < 0, "Incorrect allocated qubit count.");
     }
 
-    void CQubitManager::Disable(QubitIdType* qubitsToDisable, QubitIdType qubitCountToDisable)
+    void CQubitManager::Disable(QubitIdType* qubitsToDisable, int32_t qubitCountToDisable)
     {
         if (qubitCountToDisable == 0)
         {
@@ -339,7 +339,7 @@ namespace Quantum
         }
         FailIf(qubitsToDisable == nullptr, "No array provided with qubits to be disabled.");
 
-        for (QubitIdType i = 0; i < qubitCountToDisable; i++)
+        for (int32_t i = 0; i < qubitCountToDisable; i++)
         {
             Disable(qubitsToDisable[i]);
         }
