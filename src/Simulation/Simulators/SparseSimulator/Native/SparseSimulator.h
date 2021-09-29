@@ -62,7 +62,7 @@ public:
 
 	std::set<std::string> operations_done;
 
-	SparseSimulator(logical_qubit_id num_qubits)  {
+	SparseSimulator(logical_qubit_id num_qubits) {
 		// Constructs a quantum state templated to the right number of qubits
 		// and returns a pointer to it as a basic_quantum_state
 		_quantum_state = construct_wfn_helper<MAX_QUBITS>(num_qubits);
@@ -95,11 +95,11 @@ public:
 
 	// Outputs the wavefunction as it is currently,
 	// without executing any operations
-	void DumpWavefunctionQuietly(size_t indent = 0){
+	void DumpWavefunctionQuietly(size_t indent = 0) {
 		_quantum_state->DumpWavefunction(indent);
 	}
 
-	void set_random_seed(unsigned seed = std::mt19937::default_seed){
+	void set_random_seed(unsigned seed = std::mt19937::default_seed) {
 		_quantum_state->set_random_seed(seed);
 	}
 

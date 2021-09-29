@@ -11,11 +11,7 @@
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
-#ifndef USE_SINGLE_PRECISION
-    using RealType = double;
-#else
-    using RealType = float;
-#endif
+using RealType = double;
 
 // Logical qubit id is visible to the clients and is immutable during the lifetime of the qubit.
 using logical_qubit_id = unsigned;
