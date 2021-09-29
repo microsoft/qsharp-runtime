@@ -29,9 +29,4 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(SparseQuantumSimulator PUBLIC -O3 -ftree-vectorize -mavx2 -mfma -fopenmp)
 endif()
 
-# Sets NDEBUG to true for all non-debug settings
-if (NOT (CMAKE_BUILD_TYPE:STRING STREQUAL "Debug"))
-	target_compile_definitions(SparseQuantumSimulator PRIVATE NDEBUG=1)
-endif()
-
 message("Compiler flags: ${CMAKE_CXX_FLAGS_RELEASE}")
