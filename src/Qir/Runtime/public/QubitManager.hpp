@@ -55,28 +55,28 @@ namespace Quantum
         // Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
         // Caller is responsible for providing array of sufficient size to hold qubitCountToAllocate.
-        void Allocate(QubitIdType* qubitsToAllocate, QubitIdType qubitCountToAllocate);
+        void Allocate(QubitIdType* qubitsToAllocate, int32_t qubitCountToAllocate);
 
         // Releases a given qubit.
         void Release(QubitIdType qubit);
         // Releases qubitCountToRelease qubits in the provided array.
         // Caller is responsible for managing memory used by the array itself
         // (i.e. delete[] array if it was dynamically allocated).
-        void Release(QubitIdType* qubitsToRelease, QubitIdType qubitCountToRelease);
+        void Release(QubitIdType* qubitsToRelease, int32_t qubitCountToRelease);
 
         // Borrow (We treat borrowing as allocation currently)
         QubitIdType Borrow();
-        void Borrow(QubitIdType* qubitsToBorrow, QubitIdType qubitCountToBorrow);
+        void Borrow(QubitIdType* qubitsToBorrow, int32_t qubitCountToBorrow);
         // Return (We treat returning as release currently)
         void Return(QubitIdType qubit);
-        void Return(QubitIdType* qubitsToReturn, QubitIdType qubitCountToReturn);
+        void Return(QubitIdType* qubitsToReturn, int32_t qubitCountToReturn);
 
         // Disables a given qubit.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
         void Disable(QubitIdType qubit);
         // Disables a set of given qubits.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(QubitIdType* qubitsToDisable, QubitIdType qubitCountToDisable);
+        void Disable(QubitIdType* qubitsToDisable, int32_t qubitCountToDisable);
 
         bool IsValidQubit(QubitIdType qubit) const;
         bool IsDisabledQubit(QubitIdType qubit) const;
