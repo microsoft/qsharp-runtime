@@ -192,9 +192,10 @@ function Build-CMakeProject {
         $env:CXX = "clang++.exe"
         $env:RC = "clang++.exe"
 
-        if (!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") {
+        if ((!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") -or `
+            (Test-Path Env:AGENT_OS)) {
             # LLVM was installed by Chocolatey, so add the install location to the path.
-            $env:PATH += ";$($env:SystemDrive)\Program Files\LLVM\bin"
+            $env:PATH = "$($env:SystemDrive)\Program Files\LLVM\bin;$env:Path"
         }
 
         if (Get-Command clang-tidy -ErrorAction SilentlyContinue) {

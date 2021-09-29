@@ -6,9 +6,10 @@
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
-            !(Get-Command clang-format -ErrorAction SilentlyContinue)) {
+            !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
+            (Test-Path Env:/AGENT_OS)) {
             choco install llvm --version=11.1.0
-            Write-Host "##vso[task.setvariable variable=PATH;]$Env:Path;C:\Program Files\LLVM\bin"
+            Write-Host "##vso[task.setvariable variable=PATH;]C:\Program Files\LLVM\bin;$Env:Path"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
