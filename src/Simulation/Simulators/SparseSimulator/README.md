@@ -17,7 +17,12 @@ This is a an alternative quantum simulator, compatible with Q\# and Microsoft's 
  - Dotnet cake v1.1.0
 
 # Setup
-To build the Sparse Simulator, call `dotnet restore` from the main `SparseSimulator` folder, then `dotnet cake`. This builds the C++ backend and the C\# interface. 
+Bild:
+```
+cd SparseSimulator
+pwsh ./build.ps1
+```
+This builds the C++ backend and the C\# interface.
 
 To use the SparseSimulator in a Q\# project, ensure that it includes
 ```xml
