@@ -58,10 +58,6 @@ The sparse simulator has some extra C\# Q\# operations for specific purposes.
 ## Member functions of `SparseSimulator`
 `SetLogging(bool)`: Logging is set to `false` by default; if set to true, the simulator will output the name of each operation as it executes them. 
 
-## Q\# Functions
-
-`Sample(register : qubit [])`: This acts like measuring `register` in the Pauli-Z basis, and returns a boolean array of the result of that measurement, except it is non-destructive. 
-
 # Adding Gates
 
 To add a gate to the simulator, you will need to add it to:

@@ -288,10 +288,4 @@ extern "C"
         return true;
     }
 
-    // Returns a character string of the label of a randomly sampled state
-    MICROSOFT_QUANTUM_DECL const char* Sample_cpp(unsigned sim_id){
-        sample_string = getSimulator(sim_id)->Sample();
-        return sample_string.c_str();    
-    }
-
 }

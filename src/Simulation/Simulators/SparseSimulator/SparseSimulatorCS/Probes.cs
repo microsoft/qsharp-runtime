@@ -209,31 +209,6 @@ namespace Microsoft.Quantum.SparseSimulation
 
     }
 
-
-    /// <summary>
-    /// Samples a random label from the wavefunction, proportional to its amplitude squared,
-    /// and returns it as a boolean array
-    /// </summary>
-    partial class Sample
-    {
-        private SparseSimulator simulator;
-        public class Native : Sample
-        {
-            public Native(IOperationFactory m) : base(m)
-            {
-                simulator = m as SparseSimulator;
-            }
-            public override Func<IQArray<Qubit>, IQArray<bool>> __Body__ => (__in__) =>
-            {
-                if (simulator != null)
-                {
-                    return new QArray<bool>(((SparseSimulatorProcessor)simulator.QuantumProcessor).Sample(__in__));
-                }
-                return new QArray<bool>( new bool[0]);
-            };
-        }
-    }
-
     public partial class SparseSimulatorProcessor : QuantumProcessorBase {
 
 
@@ -271,24 +246,6 @@ namespace Microsoft.Quantum.SparseSimulation
 
         [DllImport(simulator_dll)]
         private static extern uint num_qubits_cpp(uint sim);
-
-        [DllImport(simulator_dll)]
-        private static extern IntPtr Sample_cpp(uint sim);
-
-        public bool[] Sample(IQArray<Qubit> register)
-        {
-            var result = Marshal.PtrToStringAnsi(Sample_cpp(Id)).ToCharArray();
-            Array.Reverse(result);
-            var bool_result = new bool[register.Length];
-            for (int i=0; i < register.Length; i++) 
-            {
-                bool_result[i] = (result[register[i].Id] == '1' ? true : false);
-            }
-            return bool_result;
-        }
     }
-
-
-
 
 }

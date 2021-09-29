@@ -10,7 +10,6 @@ namespace Microsoft.Quantum.SparseSimulatorTests {
     open Microsoft.Quantum.Arithmetic;
     open Microsoft.Quantum.Arrays;
     open Microsoft.Quantum.Preparation;
-    open Microsoft.Quantum.SparseSimulation;
     open Microsoft.Quantum.Math;
 
     operation DumpIdRotation() : Unit {

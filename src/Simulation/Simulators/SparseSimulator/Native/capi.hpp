@@ -139,5 +139,4 @@ extern "C"
         _In_ void (*callback)(char* , double, double));
 
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result);
-    MICROSOFT_QUANTUM_DECL const char* Sample_cpp(unsigned sim_id);
 }
