@@ -15,40 +15,6 @@ using System.Text;
 
 namespace Microsoft.Quantum.SparseSimulation
 {
-
-    partial class GetAmplitudeFromInt
-    {
-        public class Native : GetAmplitudeFromInt
-        {
-            private SparseSimulator sim = null;
-            public Native(IOperationFactory m) : base(m)
-            {
-                sim = m as SparseSimulator;
-            }
-
-            public override Func<(IQArray<Qubit>, long), Microsoft.Quantum.Math.Complex> __Body__ => (args) => {
-                return sim.GetAmplitude(args.Item1, args.Item2);
-            };
-
-        }
-    }
-
-    partial class GetAmplitude
-    {
-        public class Native : GetAmplitude
-        {
-            private SparseSimulator sim = null;
-            public Native(IOperationFactory m) : base(m)
-            {
-                sim = m as SparseSimulator;
-            }
-
-            public override Func<(IQArray<Qubit>, System.Numerics.BigInteger), Microsoft.Quantum.Math.Complex> __Body__ =>  args => {
-                return sim.GetAmplitude(args.Item1, args.Item2);
-            };
-
-        }
-    }
     public partial class SparseSimulator : QuantumProcessorDispatcher, IDisposable
     {
         // // Converts a big integer into a string label
@@ -75,26 +41,6 @@ namespace Microsoft.Quantum.SparseSimulation
             Array.Reverse(newlabel);
             return new string(newlabel);
         }
-
-        //  Returns the amplitude of a single state
-        public Microsoft.Quantum.Math.Complex GetAmplitude(string label)
-        {
-            return ((SparseSimulatorProcessor)this.QuantumProcessor).GetAmplitude(label);
-        }
-        public Microsoft.Quantum.Math.Complex GetAmplitude(uint label)
-        {
-            return GetAmplitude(label.ToString());
-        }
-        public Microsoft.Quantum.Math.Complex GetAmplitude(System.Numerics.BigInteger label)
-        {
-            return GetAmplitude(label.ToString());
-        }
-
-        public Microsoft.Quantum.Math.Complex GetAmplitude(IQArray<Qubit> qubits, System.Numerics.BigInteger label)
-        {
-            return GetAmplitude(InterleaveLabelByArray(qubits, label));
-        }
-
 
         // Dumps the state in qubits to `target` (a filename), if the qubits are 
         // either null or not entangled to the rest of the machine;
@@ -325,18 +271,6 @@ namespace Microsoft.Quantum.SparseSimulation
 
         [DllImport(simulator_dll)]
         private static extern uint num_qubits_cpp(uint sim);
-
-        // Returns the amplitude of a specific state, given by a string representing its label
-        [DllImport(simulator_dll)]
-        private static extern void GetAmplitude_cpp(uint sim, uint label_length, char[] label, ref double real, ref double imag);
-
-        public Microsoft.Quantum.Math.Complex GetAmplitude(string label)
-        {
-            double real = 0;
-            double imag = 0;
-            GetAmplitude_cpp(Id, (uint)label.Length, label.ToCharArray(), ref real, ref imag);
-            return new Microsoft.Quantum.Math.Complex((real, imag));
-        }
 
         [DllImport(simulator_dll)]
         private static extern IntPtr Sample_cpp(uint sim);

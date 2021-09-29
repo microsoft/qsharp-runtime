@@ -60,12 +60,6 @@ The sparse simulator has some extra C\# Q\# operations for specific purposes.
 
 ## Q\# Functions
 
-`GetAmplitudeFromInt(qubit : Qubit[], label : Int)`: Uses `label` as a bitstring to index the qubits in `qubit`. It returns the amplitude of the state with that label, where the value of all other qubits is 0.
-
-`GetAmplitude(qubit : Qubit[], label : BigInt) : Complex` : Same as `GetAmplitudeFromInt`, but uses a BigInt as an index.
-
-`AssertProbBigInt (stateIndex : BigInt, expected : Double, qubits : Microsoft.Quantum.Arithmetic.LittleEndian, tolerance : Double) : Unit`: Asserts that the probability to measure the qubits in `Qubits` and find the value `stateIndex` is within `tolerance` of the expected probability `expected`.
-
 `Sample(register : qubit [])`: This acts like measuring `register` in the Pauli-Z basis, and returns a boolean array of the result of that measurement, except it is non-destructive. 
 
 # Adding Gates

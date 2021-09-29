@@ -268,15 +268,6 @@ extern "C"
         return getSimulator(sim_id)->dump_qubits(qs, callback);
     }
 
-    // Writes the real and imaginary parts of the amplitude of the state `label` 
-    // (a binary bistring of length `length`) to the arguments of `real` and `imag`
-    MICROSOFT_QUANTUM_DECL void GetAmplitude_cpp(_In_ unsigned sim_id,  _In_ size_t length, _In_ const char* label, _Out_ double &real, _Out_ double &imag)
-    {
-       amplitude val = getSimulator(sim_id)->probe(std::string(label, length));
-       real = val.real();
-       imag = val.imag();
-    }
-
 
     // Asserts that the gates in `b`, measured on the qubits in `q`, return `result`
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){
