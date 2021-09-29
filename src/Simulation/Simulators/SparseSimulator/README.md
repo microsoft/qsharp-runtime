@@ -20,15 +20,19 @@ This is a an alternative quantum simulator, compatible with Q\# and Microsoft's 
 To build the Sparse Simulator, call `dotnet restore` from the main `SparseSimulator` folder, then `dotnet cake`. This builds the C++ backend and the C\# interface. 
 
 To use the SparseSimulator in a Q\# project, ensure that it includes
-`<ItemGroup>`
-`    <ProjectReference Include="path/to/SparseSimulator/SparseSimulatorCS/SparseSimulator.csproj"/>`
-`</ItemGroup>`
+```xml
+<ItemGroup>
+    <ProjectReference Include="path/to/SparseSimulator/SparseSimulatorCS/SparseSimulator.csproj"/>
+</ItemGroup>
+```
 in the `.csproj` file, to import the sparse simulator. 
 
 The C\# sparse simulator class and all its Q\# functions are in the `Microsoft.Quantum.SparseSimulation` namespace. 
 
-A sparse simulator object can be initialized in C\# by calling `SparseSimulator()`. In an executable Q\# project, add 
-`<DefaultSimulator>Microsoft.Quantum.SparseSimulation.SparseSimulator</DefaultSimulator>`
+A sparse simulator object can be initialized in C\# by calling `SparseSimulator()`. In an executable Q\# project, add
+```xml
+<DefaultSimulator>Microsoft.Quantum.SparseSimulation.SparseSimulator</DefaultSimulator>
+```
 to the property group in the `.csproj` file.
 
 To run a test with the sparse simulator, add `@Test("Microsoft.Quantum.SparseSimulation.SparseSimulator")` above the test operation.

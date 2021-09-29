@@ -17,8 +17,6 @@ class BasicQuantumState
 {
 public:
 
-    BasicQuantumState() {}
-
     virtual logical_qubit_id get_num_qubits() = 0;
 
     virtual void DumpWavefunction(size_t indent = 0) = 0;
