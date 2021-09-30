@@ -9,7 +9,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
             (Test-Path Env:/AGENT_OS)) {
             choco install llvm --version=11.1.0 --allow-downgrade
-            Write-Host "##vso[task.setvariable variable=PATH;]C:\Program Files\LLVM\bin;$Env:Path"
+            Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
