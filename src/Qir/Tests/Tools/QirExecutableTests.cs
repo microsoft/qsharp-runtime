@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 using Microsoft.Quantum.Qir.Runtime.Tools.Executable;
 using Moq;

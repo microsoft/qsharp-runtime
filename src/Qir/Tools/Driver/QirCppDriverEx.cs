@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {

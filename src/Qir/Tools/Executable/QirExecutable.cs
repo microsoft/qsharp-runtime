@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 
 #nullable enable

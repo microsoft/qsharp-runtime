@@ -41,7 +41,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             // Build an executable for each entry point operation. The builds must run one at a time because they write
             // to the same intermediate files.
             var qirBitcode = qirContentStream.ToArray();
-            foreach (var entryPointOp in EntryPointLoader.LoadEntryPointOperations(qirContentStream))
+            foreach (var entryPointOp in EntryPointOperationLoader.LoadEntryPointOperations(qsharpDll.FullName))
             {
                 var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
                 var exe = new QirFullStateExecutable(exeFileInfo, qirBitcode, debug);

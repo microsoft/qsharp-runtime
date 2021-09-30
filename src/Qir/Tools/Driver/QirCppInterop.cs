@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 #nullable enable
 

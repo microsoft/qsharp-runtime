@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Quantum.Qir.Serialization
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
 {
     /// <summary>
     /// This class provides extension methods for objects in the Microsoft.Quantum.QsCompiler.BondSchemas.Execution namespace.

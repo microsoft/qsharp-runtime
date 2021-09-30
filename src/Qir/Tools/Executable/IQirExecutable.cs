@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {

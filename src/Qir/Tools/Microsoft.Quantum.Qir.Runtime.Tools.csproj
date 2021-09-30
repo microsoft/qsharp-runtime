@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <Nullable>enable</Nullable>
     <PackageId>Microsoft.Quantum.Qir.Runtime</PackageId>
     <Description>Native libraries and build tools for linking and executing Quantum Intermediate Representation.</Description>
     <RootNamespace>Microsoft.Quantum.Qir.Runtime.Tools</RootNamespace>

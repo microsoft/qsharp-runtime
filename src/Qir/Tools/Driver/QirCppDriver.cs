@@ -10,7 +10,7 @@
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 {
     using System.IO;
-    using Microsoft.Quantum.Qir.Serialization;
+    using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
     using System;
     
     /// <summary>

@@ -8,7 +8,7 @@ using System.Text;
 using Xunit;
 
 using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
 {
