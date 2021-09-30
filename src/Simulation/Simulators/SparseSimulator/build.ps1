@@ -58,10 +58,10 @@ Push-Location $BuildDir
     }
 
     # Generate the build scripts:
-    Invoke-Expression $CmakeConfigCommand
+    ( Invoke-Expression $CmakeConfigCommand ) || ( Invoke-Expression "Pop-Location" && Invoke-Expression "Exit 1" )
 
     # Invoke the build scripts:
-    cmake --build .
+    ( cmake --build . ) || ( Invoke-Expression "Pop-Location" && Invoke-Expression "Exit 1" )
 
 # popd
 Pop-Location
@@ -69,8 +69,10 @@ Pop-Location
 
 # BUILD C# PART AND TESTS
 
-dotnet build . --configuration $Env:BUILD_CONFIGURATION
-# dotnet test . --configuration $Env:BUILD_CONFIGURATION
+Push-Location $PSScriptRoot
+    dotnet build . --configuration $Env:BUILD_CONFIGURATION
+    # dotnet test . --configuration $Env:BUILD_CONFIGURATION
+Pop-Location
 
 if ($ClearConfig -ne $null) {
     $Env:BUILD_CONFIGURATION = $Null
