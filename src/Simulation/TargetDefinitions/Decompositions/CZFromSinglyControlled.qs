@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 namespace Microsoft.Quantum.Canon {
     open Microsoft.Quantum.Intrinsic;
 
@@ -32,10 +35,10 @@ namespace Microsoft.Quantum.Canon {
             ApplyControlledZ(control, target);
         }
         controlled (ctls, ...) {
-            if (Length(ctls) == 0) {
+            if Length(ctls) == 0 {
                 ApplyControlledZ(control, target);
             }
-            elif (Length(ctls) == 1) {
+            elif Length(ctls) == 1 {
                 CCZ(ctls[0], control, target);
             }
             else {
