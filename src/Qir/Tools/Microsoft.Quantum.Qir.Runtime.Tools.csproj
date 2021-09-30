@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <BondCodegen Remove="**\*.bond" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
     <Content Include=".\Externals\CLI11\*" PackagePath="contentFiles/any/any/Externals/CLI11">
       <Pack>true</Pack>
@@ -36,7 +40,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2109163417-beta" />
+    <PackageReference Include="Bond.CSharp" Version="9.0.3" />
+    <PackageReference Include="System.CodeDom" Version="5.0.0" />
+    <!--PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.18.2109163417-beta" PrivateAssets="All" /-->
   </ItemGroup>
 
   <ItemGroup>

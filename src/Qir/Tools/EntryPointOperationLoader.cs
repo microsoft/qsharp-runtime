@@ -6,15 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Quantum.Qir.Serialization;
-using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.SyntaxTokens;
-using Microsoft.Quantum.QsCompiler.SyntaxTree;
-using Microsoft.Quantum.QsCompiler.QIR;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools
 {
-    using QsTypeKind = QsTypeKind<ResolvedType, UserDefinedType, QsTypeParameter, CallableInformation>;
-
     internal static class EntryPointLoader
     {
         /// <summary>
