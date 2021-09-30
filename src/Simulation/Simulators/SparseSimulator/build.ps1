@@ -3,11 +3,8 @@
 
 #Requires -Version 7.1
 
-if ($Env:BUILD_CONFIGURATION -eq $null) {
-    $ClearConfig = $True
-    $Env:BUILD_CONFIGURATION = "Debug"
-}
-
+& (Join-Path $PSScriptRoot .. .. .. .. build set-env.ps1)
+$FailureCommands = 'Write-Host "##vso[task.logissue type=error;] Failed to build SparseSimulator" ;  Pop-Location ; Exit 1'
 
 # BULD NATIVE PART
 
@@ -20,7 +17,6 @@ if (-not (Test-Path $BuildDir)) {
 # pushd Native\build\(Debug|Release)
 Push-Location $BuildDir
 
-    # cmake -S ..\..
     $CmakeConfigCommand = "& cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$Env:BUILD_CONFIGURATION -S ..\.. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
@@ -58,10 +54,10 @@ Push-Location $BuildDir
     }
 
     # Generate the build scripts:
-    ( Invoke-Expression $CmakeConfigCommand ) || ( Invoke-Expression "Pop-Location" && Invoke-Expression "Exit 1" )
+    ( Invoke-Expression $CmakeConfigCommand ) || ( Invoke-Expression $FailureCommands )
 
     # Invoke the build scripts:
-    ( cmake --build . ) || ( Invoke-Expression "Pop-Location" && Invoke-Expression "Exit 1" )
+    ( cmake --build . ) || ( Invoke-Expression $FailureCommands )
 
 # popd
 Pop-Location
@@ -70,11 +66,5 @@ Pop-Location
 # BUILD C# PART AND TESTS
 
 Push-Location $PSScriptRoot
-    dotnet build . --configuration $Env:BUILD_CONFIGURATION
-    # dotnet test . --configuration $Env:BUILD_CONFIGURATION
+    ( dotnet build . --configuration $Env:BUILD_CONFIGURATION ) || ( Invoke-Expression $FailureCommands )
 Pop-Location
-
-if ($ClearConfig -ne $null) {
-    $Env:BUILD_CONFIGURATION = $Null
-    $ClearConfig = $Null
-}
