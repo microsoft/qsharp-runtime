@@ -8,8 +8,9 @@ project(qirruntime)
 # specify the C++ standard, compiler and other tools
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+
+include(${CMAKE_SOURCE_DIR}/cmake/LlvmIr.cmake)
 
 # Always use available Spectre mitigations where available
 if (NOT APPLE)
@@ -32,5 +33,7 @@ set(common_includes "${PROJECT_SOURCE_DIR}/../Common/Include")
 
 include(qir_cmake_include)
 
+
 add_subdirectory(lib)
 add_subdirectory(unittests)
+

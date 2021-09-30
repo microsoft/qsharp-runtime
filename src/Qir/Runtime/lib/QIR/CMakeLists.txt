@@ -23,6 +23,7 @@ set(rt_sup_source_files
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
+
 target_source_from_qir(qir-rt-support-obj bridge-rt.ll)
 target_include_directories(qir-rt-support-obj PUBLIC 
     ${public_includes}   
@@ -30,6 +31,14 @@ target_include_directories(qir-rt-support-obj PUBLIC
 )
 set_property(TARGET qir-rt-support-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(qir-rt-support-obj PRIVATE EXPORT_QIR_API)
+
+
+#+++++++++++++++++++++++++++++++++++++
+# qir-rt as LLVM IR
+#+++++++++++++++++++++++++++++++++++++
+microsoft_add_ir_library(qir-rt-support-obj-ir qir-rt-support-obj-ir-files SOURCES ${rt_sup_source_files} INCLUDES ${public_includes} ${common_includes})
+
+
 
 #+++++++++++++++++++++++++++++++++++++
 # qir-qis
@@ -55,3 +64,20 @@ install(TARGETS Microsoft.Quantum.Qir.Runtime
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
   ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
+
+
+#+++++++++++++++++++++++++++++++++++++
+# qir-rt combined LLVM IR 
+#+++++++++++++++++++++++++++++++++++++
+
+microsoft_link_ir(
+    TARGET runtime-qir
+    OUTPUT "runtime.ll"
+    DEPENDS qir-rt-support-obj-ir
+    SOURCES ${qir-rt-support-obj-ir-files}
+)
+
+
+
+
+
