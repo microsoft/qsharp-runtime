@@ -25,7 +25,7 @@
 // ReSharper disable RedundantUsingDirective
 #endregion
 
-namespace Microsoft.Quantum.Qir.Serialization
+namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
 {
     using System.Collections.Generic;
 
@@ -55,7 +55,7 @@ namespace Microsoft.Quantum.Qir.Serialization
         public List<DataType> ElementTypes { get; set; }
 
         public Parameter()
-            : this("Microsoft.Quantum.Qir.Serialization.Parameter", "Parameter")
+            : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.Parameter", "Parameter")
         { }
 
         protected Parameter(string fullName, string name)
@@ -85,7 +85,7 @@ namespace Microsoft.Quantum.Qir.Serialization
         public List<ArgumentValue> Collection { get; set; }
 
         public ArgumentValue()
-            : this("Microsoft.Quantum.Qir.Serialization.ArgumentValue", "ArgumentValue")
+            : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.ArgumentValue", "ArgumentValue")
         { }
 
         protected ArgumentValue(string fullName, string name)
@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Qir.Serialization
         public List<Parameter> Parameters { get; set; }
 
         public EntryPointOperation()
-            : this("Microsoft.Quantum.Qir.Serialization.EntryPointOperation", "EntryPointOperation")
+            : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.EntryPointOperation", "EntryPointOperation")
         { }
 
         protected EntryPointOperation(string fullName, string name)
@@ -126,7 +126,7 @@ namespace Microsoft.Quantum.Qir.Serialization
         public Dictionary<string, ArgumentValue> ArgumentValues { get; set; }
 
         public ExecutionInformation()
-            : this("Microsoft.Quantum.Qir.Serialization.ExecutionInformation", "ExecutionInformation")
+            : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.ExecutionInformation", "ExecutionInformation")
         { }
 
         protected ExecutionInformation(string fullName, string name)
@@ -147,7 +147,7 @@ namespace Microsoft.Quantum.Qir.Serialization
         public System.ArraySegment<byte> QirBytecode { get; set; }
 
         public QirExecutionWrapper()
-            : this("Microsoft.Quantum.Qir.Serialization.QirExecutionWrapper", "QirExecutionWrapper")
+            : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.QirExecutionWrapper", "QirExecutionWrapper")
         { }
 
         protected QirExecutionWrapper(string fullName, string name)
@@ -156,4 +156,4 @@ namespace Microsoft.Quantum.Qir.Serialization
             QirBytecode = new System.ArraySegment<byte>();
         }
     }
-} // Microsoft.Quantum.Qir.Serialization
+} // Microsoft.Quantum.Qir.Runtime.Tools.Serialization

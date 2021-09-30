@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Quantum.Qir.Serialization;
+using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools
 {
@@ -21,17 +21,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
         /// <exception cref="FileNotFoundException"><paramref name="assemblyFileInfo"/> does not exist.</exception>
         /// <exception cref="ArgumentException"><paramref name="assemblyFileInfo"/> does not contain a Q# syntax tree.</exception>
         /// <exception cref="ArgumentException">Encounters invalid parameters for an entry point.</exception>
-        public static IList<EntryPointOperation> LoadEntryPointOperations(FileInfo assemblyFileInfo)
-        {
-            if (!AssemblyLoader.LoadReferencedAssembly(assemblyFileInfo.FullName, out var compilation))
-            {
-                throw new ArgumentException("Unable to read the Q# syntax tree from the given DLL.");
-            }
-
-            return GenerateEntryPointOperations(compilation);
-        }
-
-        private static IList<EntryPointOperation> GenerateEntryPointOperations(QsCompilation compilation)
+        public static IList<EntryPointOperation> LoadEntryPointOperations(MemoryStream qirBitcodeStream)
         {
             var globals = compilation.Namespaces.GlobalCallableResolutions();
 
