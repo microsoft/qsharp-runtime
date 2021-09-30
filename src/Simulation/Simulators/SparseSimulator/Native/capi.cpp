@@ -28,7 +28,7 @@ extern "C"
     }
 
 
-    MICROSOFT_QUANTUM_DECL void destroy_cpp?(unsigned sim_id)   // `?` is an intentional tmp error to check the CI build failure.
+    MICROSOFT_QUANTUM_DECL void destroy_cpp(unsigned sim_id)
     {
         destroySimulator(sim_id);
     }
