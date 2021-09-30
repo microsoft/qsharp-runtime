@@ -9,8 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 using Microsoft.Quantum.Qir.Runtime.Tools.Driver;
 
-#nullable enable
-
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     /// <summary>

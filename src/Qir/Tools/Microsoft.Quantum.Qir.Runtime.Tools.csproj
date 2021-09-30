@@ -6,6 +6,19 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Nullable>enable</Nullable>
+    <!--
+      CS1570 (Doc): Bad XML.
+      CS1571 (Doc): Duplicate <param> name.
+      CS1572 (Doc): <param> name does not match an actual parameter name.
+      CS1574 (Doc): Bad <cref>.
+      CS1587 (Doc): XML comment appears before something not documentable.
+      CS1734 (Doc): Bad <paramref>.
+      nullable:     Enable all nullable warnings as error.
+    -->
+    <WarningsAsErrors>1570;1571;1572;1574;1587;1734;nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackageId>Microsoft.Quantum.Qir.Runtime</PackageId>
     <Description>Native libraries and build tools for linking and executing Quantum Intermediate Representation.</Description>
     <RootNamespace>Microsoft.Quantum.Qir.Runtime.Tools</RootNamespace>

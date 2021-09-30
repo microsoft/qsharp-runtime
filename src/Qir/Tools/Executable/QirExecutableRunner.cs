@@ -7,8 +7,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-#nullable enable
-
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 {
     internal class QirExecutableRunner : IQirExecutableRunner
