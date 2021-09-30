@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Linq;
 using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
@@ -63,5 +64,71 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
                 DataType.ArrayType => "InteropArray*",
                 _ => throw new ArgumentException($"Invalid data type: {dataType}")
             };
+
+        public static string? CliOptionVariableDefaultValue(DataType? dataType) =>
+            dataType switch
+            {
+                DataType.BoolType => "InteropFalseAsChar",
+                DataType.IntegerType => "0",
+                DataType.DoubleType => "0.0",
+                DataType.PauliType => "PauliId::PauliId_I",
+                DataType.RangeType => null,
+                DataType.ResultType => "InteropResultZeroAsChar",
+                DataType.StringType => null,
+                DataType.ArrayType => null,
+                _ => throw new ArgumentException($"Invalid data type: {dataType}")
+            };
+    }
+
+    internal static class ArgumentCppExtensions
+    {
+        public static string CliOptionDescription(this Parameter @this) =>
+            $"Option to provide a value for the {@this.Name} parameter";
+
+        public static string CliOptionName(this Parameter @this)
+        {
+            if (String.IsNullOrEmpty(@this.Name))
+            {
+                throw new InvalidOperationException($"Invalid parameter name '{@this.Name}'");
+            }
+
+            return @this.Name.Length == 1 ? $"-{@this.Name}" : $"--{@this.Name}";
+        }
+
+        public static string? CliOptionTransformerMapName(this Parameter @this) =>
+            @this.Type switch
+            {
+                DataType.ArrayType => QirCppInterop.CliOptionTransformerMapName(@this.ArrayType),
+                _ => QirCppInterop.CliOptionTransformerMapName(@this.Type)
+            };
+
+        public static string CliOptionType(this Parameter @this) =>
+            @this.Type switch
+            {
+                DataType.ArrayType => $"vector<{QirCppInterop.CliOptionType(@this.ArrayType)}>",
+                _ => QirCppInterop.CliOptionType(@this.Type)
+            };
+
+        public static string CliOptionVariableName(this Parameter @this) => $"{@this.Name}Cli";
+
+        public static string? CliOptionVariableDefaultValue(this Parameter @this) =>
+            QirCppInterop.CliOptionVariableDefaultValue(@this.Type);
+
+        public static string IntermediateVariableName(this Parameter @this) => $"{@this.Name}Intermediate";
+
+        public static string InteropVariableName(this Parameter @this) => $"{@this.Name}Interop";
+
+        public static string InteropType(this Parameter @this) => QirCppInterop.InteropType(@this.Type);
+
+        public static string UniquePtrVariableName(this Parameter @this) => $"{@this.Name}UniquePtr";
+    }
+
+    internal static class EntryPointOperationCppExtension
+    {
+        public static bool ContainsArgumentType(this EntryPointOperation @this, DataType type) =>
+            @this.Parameters.Where(arg => arg.Type == type).Any();
+
+        public static bool ContainsArrayType(this EntryPointOperation @this, DataType type) =>
+            @this.Parameters.Where(arg => arg.ArrayType == type).Any();
     }
 }
