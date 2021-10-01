@@ -25,36 +25,7 @@
 
 using namespace Microsoft::Quantum;
 using namespace std;
-<# if (EntryPoint.ContainsArgumentType(DataType.ArrayType)) { #>
 
-// Auxiliary functions for interop with Q# Array type.
-struct InteropArray
-{
-    int64_t Size;
-    void* Data;
-
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
-};
-
-template<typename T>
-unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
-{
-    unique_ptr<InteropArray> array(new InteropArray(v.size(), v.data()));
-    return array;
-}
-
-template<typename S, typename D>
-void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, function<D(S&)> translationFunction)
-{
-    destinationVector.resize(sourceVector.size());
-    transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
-}
-<# } #>
-<# if (EntryPoint.ContainsArgumentType(DataType.RangeType) || EntryPoint.ContainsArrayType(DataType.RangeType)) { #>
-
-// Auxiliary functions for interop with Q# Range type.
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
@@ -73,77 +44,27 @@ struct InteropRange
         End(get<2>(rangeTuple)){}
 };
 
-unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
-{
-    unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
-    return range;
-}
-
 InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
-    InteropRange* range = new InteropRange(rangeTuple);
-    return range;
+    return new InteropRange(rangeTuple);
 }
-<# } #>
-<# if (EntryPoint.ContainsArrayType(DataType.RangeType)) { #>
 
-// Auxiliary functions for interop with Q# Range[] type
-template<typename T>
-void FreePointerVector(vector<T*>& v)
-{
-    for (auto p : v)
-    {
-        delete p;
-    }
-}
-<# } #>
-<# if (EntryPoint.ContainsArgumentType(DataType.BoolType) || EntryPoint.ContainsArrayType(DataType.BoolType)) { #>
-
-// Auxiliary functions for interop with Q# Bool type.
-const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar = 0x1;
-map<string, bool> <#= QirCppInterop.CliOptionTransformerMapName(DataType.BoolType) #>{
-    {"0", InteropFalseAsChar},
-    {"false", InteropFalseAsChar},
-    {"1", InteropTrueAsChar},
-    {"true", InteropTrueAsChar}
+map<string, char> IntTypeMap {
+    {"false", 0x0},
+    {"true", 0x1},
+    {"Zero", 0x0},
+    {"One", 0x1},
+    {"PauliI", static_cast<char>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<char>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<char>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<char>(PauliId::PauliId_Z)}
 };
-<# } #>
-<# if (EntryPoint.ContainsArgumentType(DataType.PauliType) || EntryPoint.ContainsArrayType(DataType.PauliType)) { #>
-
-// Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> <#= QirCppInterop.CliOptionTransformerMapName(DataType.PauliType) #>{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
-};
-
-char TranslatePauliToChar(PauliId& pauli)
-{
-    return static_cast<char>(pauli);
-}
-<# } #>
-<# if (EntryPoint.ContainsArgumentType(DataType.ResultType) || EntryPoint.ContainsArrayType(DataType.ResultType)) { #>
-
-// Auxiliary functions for interop with Q# Result type.
-const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> <#= QirCppInterop.CliOptionTransformerMapName(DataType.ResultType) #>{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
-};
-<# } #>
-<# if (EntryPoint.ContainsArgumentType(DataType.StringType) || EntryPoint.ContainsArrayType(DataType.StringType)) { #>
 
 // Auxiliary functions for interop with Q# String type.
 const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }
-<# } #>
 
 extern "C" void <#= EntryPoint.Name #>(
 <# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
@@ -176,13 +97,10 @@ int main(int argc, char* argv[])
 <# } #>
 <# foreach (var arg in EntryPoint.Parameters) { #>
     <#= arg.CliOptionType() #> <#= arg.CliOptionVariableName() #>;
-<# if (arg.CliOptionVariableDefaultValue() != null) { #>
-    <#= arg.CliOptionVariableName() #> = <#= arg.CliOptionVariableDefaultValue() #>;
-<# } #>
     app.add_option("<#= arg.CliOptionName() #>", <#= arg.CliOptionVariableName() #>, "<#= arg.CliOptionDescription() #>")
-        ->required()<#= arg.CliOptionTransformerMapName() != null ? "" : ";" #>
-<# if (arg.CliOptionTransformerMapName() != null) { #>
-        ->transform(CLI::CheckedTransformer(<#= arg.CliOptionTransformerMapName() #>, CLI::ignore_case));
+        ->required()<#= arg.Type == DataType.Integer ? "" : ";" #>
+<# if (arg.Type == DataType.Integer) { #>
+        ->transform(CLI::CheckedTransformer(IntTypeMap, CLI::ignore_case));
 <# } #>
 
 <# } #>
@@ -193,28 +111,12 @@ int main(int argc, char* argv[])
     // Cast parsed arguments to its interop types.
 <# } #>
 <# foreach (var arg in EntryPoint.Parameters) { #>
-<# if (arg.Type == DataType.ArrayType) { 
-    var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); #>
-<# if (arrayInteropTranslator == null) { #>
-    unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.CliOptionVariableName() #>);
-<# } #>
-<# else {
-    var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
-    var arrayInteropType = QirCppInterop.InteropType(arg.ArrayType); #>
-    vector<<#= arrayInteropType #>> <#= arg.IntermediateVariableName() #>;
-    TranslateVector<<#= arrayCliOptionType #>, <#= arrayInteropType #>>(<#= arg.CliOptionVariableName() #>, <#= arg.IntermediateVariableName() #>, <#= arrayInteropTranslator #>);
-    unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.IntermediateVariableName() #>);
-<# } #>
-    InteropArray* <#= arg.InteropVariableName() #> = <#= arg.UniquePtrVariableName() #>.get();
-<# } #>
-<# else { 
-    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); #>
+<# var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); #>
 <# if (interopTranslator == null) { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= arg.CliOptionVariableName() #>;
 <# } #>
 <# else { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= interopTranslator #>(<#= arg.CliOptionVariableName() #>);
-<# } #>
 <# } #>
 
 <# } #>

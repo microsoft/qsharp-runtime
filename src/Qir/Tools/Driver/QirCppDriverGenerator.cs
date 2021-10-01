@@ -15,8 +15,6 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
     {
         private readonly IQirRuntimeInitializer RuntimeInitalizer;
 
-        private delegate string StringConversion(ArgumentValue value);
-
         public QirCppDriverGenerator(IQirRuntimeInitializer runtimeInitializer)
         {
             RuntimeInitalizer = runtimeInitializer;
@@ -49,87 +47,49 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             // Today, only the first argument value in the array will be used.
             return argument.Type switch
             {
-                DataType.BoolType => GetBoolValueString(argumentValue),
-                DataType.DoubleType => GetDoubleValueString(argumentValue),
-                DataType.IntegerType => GetIntegerValueString(argumentValue),
-                DataType.PauliType => GetPauliValueString(argumentValue),
-                DataType.RangeType => GetRangeValueString(argumentValue),
-                DataType.ResultType => GetResultValueString(argumentValue),
-                DataType.StringType => GetStringValueString(argumentValue),
-                DataType.ArrayType => GetArrayValueString(argument.ArrayType, argumentValue.Array),
-                _ => throw new ArgumentException($"Unsupported data type {argument.Type}")
+                DataType.Double => GetDoubleValueString(argumentValue),
+                DataType.Integer => GetIntegerValueString(argumentValue),
+                DataType.BytePointer => GetBytePointerValueString(argumentValue),
+                DataType.Collection => GetCollectionValueString(argument.ElementTypes, argumentValue.Collection),
+                _ => throw new NotSupportedException($"Unsupported data type {argument.Type}")
             };
         }
 
-        private static string GetArrayValueString(DataType? arrayType, IList<ArgumentValue> arrayValue)
+        private static string GetCollectionValueString(IList<DataType> itemTypes, IList<ArgumentValue> itemValues)
         {
-            static string ConvertArray(IList<ArgumentValue> list, StringConversion conversion) =>
-                string.Join(' ', list.Select(item => conversion.Invoke(item)));
+            // used for Range, Array, BigInt, (Tuples are not valid entry points arguments)
+            var isRange = itemValues.Count == 3 && itemValues.All(v => v.Type == DataType.Integer);
+            var isArrayOrBigInt = itemValues.Count == 2 && itemValues[0].Type == DataType.Integer && itemValues[1].Type == DataType.BytePointer;
 
-            return arrayType switch
+            if (isRange)
             {
-                DataType.BoolType => ConvertArray(arrayValue, GetBoolValueString),
-                DataType.DoubleType => ConvertArray(arrayValue, GetDoubleValueString),
-                DataType.IntegerType => ConvertArray(arrayValue, GetIntegerValueString),
-                DataType.PauliType => ConvertArray(arrayValue, GetPauliValueString),
-                DataType.RangeType => ConvertArray(arrayValue, GetRangeValueString),
-                DataType.ResultType => ConvertArray(arrayValue, GetResultValueString),
-                DataType.StringType => ConvertArray(arrayValue, GetStringValueString),
-                _ => throw new ArgumentException($"Unsupported array data type {arrayType}")
-            };
+                return string.Join(' ', itemValues.Select(item => GetIntegerValueString(item)));
+            }
+            else if (isArrayOrBigInt)
+            {
+                throw new NotSupportedException("Arguments of type array or BigInt are not yet supported");
+            }
+            else
+            {
+                throw new NotSupportedException($"Unsupported data type [{String.Join(", ", itemTypes)}] for entry point argument");
+            }
         }
 
-        private static string GetResultValueString(ArgumentValue value)
+        private static string GetBytePointerValueString(ArgumentValue value)
         {
-            if (value?.Result == null)
+            // used for Strings (Qubit and Callables are not valid entry point arguments)
+            if (value?.BytePointer == null)
             {
-                throw new ArgumentNullException("Cannot convert null result value to string.");
-            }
-            return value.Result == ResultValue.One ? "1" : "0";
-        }
-
-        private static string GetRangeValueString(ArgumentValue value)
-        {
-            if (value?.Range == null)
-            {
-                throw new ArgumentNullException("Cannot convert null range value to string.");
-            }
-            var rangeValue = value.Range;
-            return $"{rangeValue.Start} {rangeValue.Step} {rangeValue.End}";
-        }
-
-        private static string GetStringValueString(ArgumentValue value)
-        {
-            if (value?.String == null)
-            {
-                throw new ArgumentNullException("Cannot convert null string value to string.");
+                throw new ArgumentNullException("Cannot convert null byte pointer value to string.");
             }
 
-            return $"\"{value.String}\"";
-        }
-
-        private static string GetBoolValueString(ArgumentValue value)
-        {
-            if (value?.Bool == null)
-            {
-                throw new ArgumentNullException("Cannot convert null bool value to string.");
-            }
-
-            return value.Bool.ToString().ToLower();
-        }
-
-        private static string GetPauliValueString(ArgumentValue value)
-        {
-            if (value?.Pauli == null)
-            {
-                throw new ArgumentNullException("Cannot convert null pauli value to string.");
-            }
-
-            return value.Pauli.ToString().ToLower();
+            var strContent = Encoding.UTF8.GetString(value.BytePointer.ToArray());
+            return $"\"{strContent}\""; // FIXME: WITH QUOTES?
         }
 
         private static string GetDoubleValueString(ArgumentValue value)
         {
+            // used for Double
             if (value?.Double == null)
             {
                 throw new ArgumentNullException("Cannot convert null double value to string.");
@@ -140,6 +100,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         private static string GetIntegerValueString(ArgumentValue value)
         {
+            // used for Int, Bool, Pauli, and Result
             if (value?.Integer == null)
             {
                 throw new ArgumentNullException("Cannot convert null integer value to string.");

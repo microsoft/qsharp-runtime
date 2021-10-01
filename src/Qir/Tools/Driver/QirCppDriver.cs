@@ -48,38 +48,10 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             this.Write(this.ToStringHelper.ToStringWithCulture(header));
             this.Write("\"\r\n");
  } 
-            this.Write("\r\nusing namespace Microsoft::Quantum;\r\nusing namespace std;\r\n");
- if (EntryPoint.ContainsArgumentType(DataType.ArrayType)) { 
             this.Write(@"
-// Auxiliary functions for interop with Q# Array type.
-struct InteropArray
-{
-    int64_t Size;
-    void* Data;
+using namespace Microsoft::Quantum;
+using namespace std;
 
-    InteropArray(int64_t size, void* data) :
-        Size(size),
-        Data(data){}
-};
-
-template<typename T>
-unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
-{
-    unique_ptr<InteropArray> array(new InteropArray(v.size(), v.data()));
-    return array;
-}
-
-template<typename S, typename D>
-void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, function<D(S&)> translationFunction)
-{
-    destinationVector.resize(sourceVector.size());
-    transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
-}
-");
- } 
- if (EntryPoint.ContainsArgumentType(DataType.RangeType) || EntryPoint.ContainsArrayType(DataType.RangeType)) { 
-            this.Write(@"
-// Auxiliary functions for interop with Q# Range type.
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
@@ -98,52 +70,29 @@ struct InteropRange
         End(get<2>(rangeTuple)){}
 };
 
-unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
-{
-    unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
-    return range;
-}
-
 InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
-    InteropRange* range = new InteropRange(rangeTuple);
-    return range;
+    return new InteropRange(rangeTuple);
 }
-");
- } 
- if (EntryPoint.ContainsArrayType(DataType.RangeType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# Range[] type\r\ntemplate<typename T>\r\n" +
-                    "void FreePointerVector(vector<T*>& v)\r\n{\r\n    for (auto p : v)\r\n    {\r\n        d" +
-                    "elete p;\r\n    }\r\n}\r\n");
- } 
- if (EntryPoint.ContainsArgumentType(DataType.BoolType) || EntryPoint.ContainsArrayType(DataType.BoolType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# Bool type.\r\nconst char InteropFalseA" +
-                    "sChar = 0x0;\r\nconst char InteropTrueAsChar = 0x1;\r\nmap<string, bool> ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(QirCppInterop.CliOptionTransformerMapName(DataType.BoolType)));
-            this.Write("{\r\n    {\"0\", InteropFalseAsChar},\r\n    {\"false\", InteropFalseAsChar},\r\n    {\"1\", " +
-                    "InteropTrueAsChar},\r\n    {\"true\", InteropTrueAsChar}\r\n};\r\n");
- } 
- if (EntryPoint.ContainsArgumentType(DataType.PauliType) || EntryPoint.ContainsArrayType(DataType.PauliType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# Pauli type.\r\nmap<string, PauliId> ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(QirCppInterop.CliOptionTransformerMapName(DataType.PauliType)));
-            this.Write("{\r\n    {\"PauliI\", PauliId::PauliId_I},\r\n    {\"PauliX\", PauliId::PauliId_X},\r\n    " +
-                    "{\"PauliY\", PauliId::PauliId_Y},\r\n    {\"PauliZ\", PauliId::PauliId_Z}\r\n};\r\n\r\nchar " +
-                    "TranslatePauliToChar(PauliId& pauli)\r\n{\r\n    return static_cast<char>(pauli);\r\n}" +
-                    "\r\n");
- } 
- if (EntryPoint.ContainsArgumentType(DataType.ResultType) || EntryPoint.ContainsArrayType(DataType.ResultType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# Result type.\r\nconst char InteropResu" +
-                    "ltZeroAsChar = 0x0;\r\nconst char InteropResultOneAsChar = 0x1;\r\nmap<string, char>" +
-                    " ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(QirCppInterop.CliOptionTransformerMapName(DataType.ResultType)));
-            this.Write("{\r\n    {\"0\", InteropResultZeroAsChar},\r\n    {\"Zero\", InteropResultZeroAsChar},\r\n " +
-                    "   {\"1\", InteropResultOneAsChar},\r\n    {\"One\", InteropResultOneAsChar}\r\n};\r\n");
- } 
- if (EntryPoint.ContainsArgumentType(DataType.StringType) || EntryPoint.ContainsArrayType(DataType.StringType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# String type.\r\nconst char* TranslateS" +
-                    "tringToCharBuffer(string& s)\r\n{\r\n    return s.c_str();\r\n}\r\n");
- } 
-            this.Write("\r\nextern \"C\" void ");
+
+map<string, char> IntTypeMap {
+    {""false"", 0x0},
+    {""true"", 0x1},
+    {""Zero"", 0x0},
+    {""One"", 0x1},
+    {""PauliI"", static_cast<char>(PauliId::PauliId_I)},
+    {""PauliX"", static_cast<char>(PauliId::PauliId_X)},
+    {""PauliY"", static_cast<char>(PauliId::PauliId_Y)},
+    {""PauliZ"", static_cast<char>(PauliId::PauliId_Z)}
+};
+
+// Auxiliary functions for interop with Q# String type.
+const char* TranslateStringToCharBuffer(string& s)
+{
+    return s.c_str();
+}
+
+extern ""C"" void ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
  for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
@@ -182,27 +131,17 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionType()));
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
-            this.Write(";\r\n");
- if (arg.CliOptionVariableDefaultValue() != null) { 
-            this.Write("    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
-            this.Write(" = ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableDefaultValue()));
-            this.Write(";\r\n");
- } 
-            this.Write("    app.add_option(\"");
+            this.Write(";\r\n    app.add_option(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionName()));
             this.Write("\", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(", \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionDescription()));
             this.Write("\")\r\n        ->required()");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionTransformerMapName() != null ? "" : ";"));
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Type == DataType.Integer ? "" : ";"));
             this.Write("\r\n");
- if (arg.CliOptionTransformerMapName() != null) { 
-            this.Write("        ->transform(CLI::CheckedTransformer(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionTransformerMapName()));
-            this.Write(", CLI::ignore_case));\r\n");
+ if (arg.Type == DataType.Integer) { 
+            this.Write("        ->transform(CLI::CheckedTransformer(IntTypeMap, CLI::ignore_case));\r\n");
  } 
             this.Write("\r\n");
  } 
@@ -212,46 +151,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("    // Cast parsed arguments to its interop types.\r\n");
  } 
  foreach (var arg in EntryPoint.Parameters) { 
- if (arg.Type == DataType.ArrayType) { 
-    var arrayInteropTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.ArrayType); 
- if (arrayInteropTranslator == null) { 
-            this.Write("    unique_ptr<InteropArray> ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
-            this.Write(" = CreateInteropArray(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
-            this.Write(");\r\n");
- } 
- else {
-    var arrayCliOptionType = QirCppInterop.CliOptionType(arg.ArrayType);
-    var arrayInteropType = QirCppInterop.InteropType(arg.ArrayType); 
-            this.Write("    vector<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayInteropType));
-            this.Write("> ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.IntermediateVariableName()));
-            this.Write(";\r\n    TranslateVector<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayCliOptionType));
-            this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayInteropType));
-            this.Write(">(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
-            this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.IntermediateVariableName()));
-            this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayInteropTranslator));
-            this.Write(");\r\n    unique_ptr<InteropArray> ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
-            this.Write(" = CreateInteropArray(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.IntermediateVariableName()));
-            this.Write(");\r\n");
- } 
-            this.Write("    InteropArray* ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
-            this.Write(" = ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
-            this.Write(".get();\r\n");
- } 
- else { 
-    var interopTranslator = QirCppInterop.CliOptionTypeToInteropTypeTranslator(arg.Type); 
+ var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); 
  if (interopTranslator == null) { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
@@ -271,7 +171,6 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(");\r\n");
- } 
  } 
             this.Write("\r\n");
  } 

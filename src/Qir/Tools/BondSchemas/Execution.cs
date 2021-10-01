@@ -78,8 +78,8 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
         [global::Bond.Id(15), global::Bond.Type(typeof(global::Bond.Tag.nullable<double>))]
         public double? Double { get; set; }
 
-        [global::Bond.Id(20), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<sbyte>>))]
-        public List<sbyte> BytePointer { get; set; }
+        [global::Bond.Id(20), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<byte>>))]
+        public List<byte> BytePointer { get; set; }
 
         [global::Bond.Id(25), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<ArgumentValue>>))]
         public List<ArgumentValue> Collection { get; set; }

@@ -33,7 +33,7 @@ struct ArgumentValue
     15: nullable<double> Double;
 
     // Not null when Type is BytePointer.
-    20: nullable<vector<int8>> BytePointer;
+    20: nullable<vector<uint8>> BytePointer;
 
     // Not null when Type is Collection.
     25: nullable<vector<ArgumentValue>> Collection;
