@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <IsPackable>true</IsPackable>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
 <!--From qsharp-runtime /src/Simulation/common/Simulators.Dev.props-->
