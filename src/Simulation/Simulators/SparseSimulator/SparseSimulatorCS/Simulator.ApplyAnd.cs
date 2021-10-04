@@ -10,6 +10,7 @@ using Microsoft.Quantum.Canon;
 
 namespace Microsoft.Quantum.SparseSimulation
 {
+    /*
     public class ApplyAndWrapper : ApplyAnd
     {
         private SparseSimulator simulator;
@@ -57,4 +58,5 @@ namespace Microsoft.Quantum.SparseSimulation
             ((SparseSimulatorProcessor)this.QuantumProcessor).MCAdjointApplyAnd(controls, target);
         }
     }
+    */
 }

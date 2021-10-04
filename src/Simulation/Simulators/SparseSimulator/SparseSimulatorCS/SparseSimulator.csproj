@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Quantum.Sdk/0.15.2101126940">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -16,6 +16,13 @@
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindows)</QSimDll>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="..\..\..\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
+    <ProjectReference Include="..\..\..\QsharpCore\Microsoft.Quantum.QSharp.Core.csproj" IncludeInSimulatorPackage="true" />
+  </ItemGroup>
+    
+        
 	<ItemGroup>
 		<None Include="$(QSimDLL)">
 			<Link>SparseQuantumSimulator.dll</Link>
