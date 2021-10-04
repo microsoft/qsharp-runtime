@@ -27,7 +27,7 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
             .\build.ps1
         Pop-Location
 
-        Write-Host "Build release flavor of the native simulator"
+        Write-Host "Build release flavor of the full state simulator"
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/Native")
             .\build-native-simulator.ps1
         Pop-Location

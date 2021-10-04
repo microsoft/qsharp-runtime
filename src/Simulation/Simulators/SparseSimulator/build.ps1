@@ -17,7 +17,7 @@ if (-not (Test-Path $BuildDir)) {
 # pushd Native\build\(Debug|Release)
 Push-Location $BuildDir
 
-    $CmakeConfigCommand = "& cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$Env:BUILD_CONFIGURATION -S ..\.. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
+    $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$Env:BUILD_CONFIGURATION -S ..\.. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
