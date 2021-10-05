@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
         /// </summary>
         public static bool ValueEquals(this QirExecutionWrapper @this, QirExecutionWrapper other)
         {
-            return @this.QirBytecode.ValueEquals(other.QirBytecode) &&
+            return @this.QirBitcode.ValueEquals(other.QirBitcode) &&
                    AreNullablesEqual(@this.Executions, other.Executions, (a, b) => AreCollectionsEqual(a, b, ValueEquals));
         }
 

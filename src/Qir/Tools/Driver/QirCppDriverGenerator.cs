@@ -49,6 +49,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             {
                 DataType.Double => GetDoubleValueString(argumentValue),
                 DataType.Integer => GetIntegerValueString(argumentValue),
+                DataType.Enum => GetEnumValueString(argumentValue),
                 DataType.BytePointer => GetBytePointerValueString(argumentValue),
                 DataType.Collection => GetCollectionValueString(argument.ElementTypes, argumentValue.Collection),
                 _ => throw new NotSupportedException($"Unsupported data type {argument.Type}")
@@ -100,13 +101,24 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         private static string GetIntegerValueString(ArgumentValue value)
         {
-            // used for Int, Bool, Pauli, and Result
+            // used for Int
             if (value?.Integer == null)
             {
                 throw new ArgumentNullException("Cannot convert null integer value to string.");
             }
 
             return value.Integer.ToString().ToLower();
+        }
+
+        private static string GetEnumValueString(ArgumentValue value)
+        {
+            // used for Bool, Pauli, and Result
+            if (value?.Enum == null)
+            {
+                throw new ArgumentNullException("Cannot convert null integer value to string.");
+            }
+
+            return ((int)value.Enum).ToString().ToLower();
         }
     }
 }

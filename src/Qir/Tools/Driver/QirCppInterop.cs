@@ -28,6 +28,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             {
                 DataType.Integer => "int64_t",
                 DataType.Double => "double_t",
+                DataType.Enum => "uint8_t", // string value is mapped to uint8_t using CheckedTransformer
                 DataType.BytePointer => "string",
                 DataType.Collection => 
                     @this.ElementTypes.Count == 3 
@@ -43,6 +44,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             {
                 DataType.Integer => "int64_t",
                 DataType.Double => "double_t",
+                DataType.Enum => "uint8_t",
                 DataType.BytePointer => "const char*",
                 DataType.Collection =>
                     @this.ElementTypes.Count == 3
@@ -56,6 +58,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             {
                 DataType.Integer => null,
                 DataType.Double => null,
+                DataType.Enum => null, // done using CheckedTransformer instead
                 DataType.BytePointer => "TranslateStringToCharBuffer",
                 DataType.Collection =>
                     @this.ElementTypes.Count == 3

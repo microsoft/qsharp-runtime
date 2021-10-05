@@ -44,22 +44,21 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
     return new InteropRange(rangeTuple);
 }
 
-map<string, char> IntTypeMap {
-    {"false", 0x0},
-    {"true", 0x1},
-    {"Zero", 0x0},
-    {"One", 0x1},
-    {"PauliI", static_cast<char>(PauliId::PauliId_I)},
-    {"PauliX", static_cast<char>(PauliId::PauliId_X)},
-    {"PauliY", static_cast<char>(PauliId::PauliId_Y)},
-    {"PauliZ", static_cast<char>(PauliId::PauliId_Z)}
-};
-
-// Auxiliary functions for interop with Q# String type.
 const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }
+
+map<string, uint8_t> EnumMap {
+    {"false", static_cast<uint8_t>(0)},
+    {"true", static_cast<uint8_t>(1)},
+    {"Zero", static_cast<uint8_t>(0)},
+    {"One", static_cast<uint8_t>(1)},
+    {"PauliI", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<uint8_t>(PauliId::PauliId_Z)}
+};
 
 extern "C" void UseDoubleArg(
     double_t DoubleArg

@@ -75,22 +75,21 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
     return new InteropRange(rangeTuple);
 }
 
-map<string, char> IntTypeMap {
-    {""false"", 0x0},
-    {""true"", 0x1},
-    {""Zero"", 0x0},
-    {""One"", 0x1},
-    {""PauliI"", static_cast<char>(PauliId::PauliId_I)},
-    {""PauliX"", static_cast<char>(PauliId::PauliId_X)},
-    {""PauliY"", static_cast<char>(PauliId::PauliId_Y)},
-    {""PauliZ"", static_cast<char>(PauliId::PauliId_Z)}
-};
-
-// Auxiliary functions for interop with Q# String type.
 const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }
+
+map<string, uint8_t> EnumMap {
+    {""false"", static_cast<uint8_t>(0)},
+    {""true"", static_cast<uint8_t>(1)},
+    {""Zero"", static_cast<uint8_t>(0)},
+    {""One"", static_cast<uint8_t>(1)},
+    {""PauliI"", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {""PauliX"", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {""PauliY"", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {""PauliZ"", static_cast<uint8_t>(PauliId::PauliId_Z)}
+};
 
 extern ""C"" void ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
@@ -138,10 +137,10 @@ extern ""C"" void ");
             this.Write(", \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionDescription()));
             this.Write("\")\r\n        ->required()");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Type == DataType.Integer ? "" : ";"));
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Type == DataType.Enum ? "" : ";"));
             this.Write("\r\n");
- if (arg.Type == DataType.Integer) { 
-            this.Write("        ->transform(CLI::CheckedTransformer(IntTypeMap, CLI::ignore_case));\r\n");
+ if (arg.Type == DataType.Enum) { 
+            this.Write("        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));\r\n");
  } 
             this.Write("\r\n");
  } 

@@ -21,18 +21,47 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-// Auxiliary functions for interop with Q# Result type.
-const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> ResultAsCharMap{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
+using RangeTuple = tuple<int64_t, int64_t, int64_t>;
+struct InteropRange
+{
+    int64_t Start;
+    int64_t Step;
+    int64_t End;
+
+    InteropRange() :
+        Start(0),
+        Step(0),
+        End(0){}
+
+    InteropRange(RangeTuple rangeTuple) :
+        Start(get<0>(rangeTuple)),
+        Step(get<1>(rangeTuple)),
+        End(get<2>(rangeTuple)){}
+};
+
+InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
+{
+    return new InteropRange(rangeTuple);
+}
+
+const char* TranslateStringToCharBuffer(string& s)
+{
+    return s.c_str();
+}
+
+map<string, uint8_t> EnumMap {
+    {"false", static_cast<uint8_t>(0)},
+    {"true", static_cast<uint8_t>(1)},
+    {"Zero", static_cast<uint8_t>(0)},
+    {"One", static_cast<uint8_t>(1)},
+    {"PauliI", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<uint8_t>(PauliId::PauliId_Z)}
 };
 
 extern "C" void UseResultArg(
-    char ResultArg
+    uint8_t ResultArg
 ); // QIR interop function.
 
 int main(int argc, char* argv[])
@@ -51,17 +80,16 @@ int main(int argc, char* argv[])
         "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
-    char ResultArgCli;
-    ResultArgCli = InteropResultZeroAsChar;
+    uint8_t ResultArgCli;
     app.add_option("--ResultArg", ResultArgCli, "Option to provide a value for the ResultArg parameter")
         ->required()
-        ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
 
     // Cast parsed arguments to its interop types.
-    char ResultArgInterop = ResultArgCli;
+    uint8_t ResultArgInterop = ResultArgCli;
 
     // Redirect the simulator output from std::cout if the --simulation-output option is present.
     ostream* simulatorOutputStream = &cout;

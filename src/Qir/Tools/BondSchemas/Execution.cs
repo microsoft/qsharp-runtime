@@ -34,6 +34,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
     {
         Integer,
         Double,
+        Enum,
         BytePointer,
         Collection,
     }
@@ -78,10 +79,13 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
         [global::Bond.Id(15), global::Bond.Type(typeof(global::Bond.Tag.nullable<double>))]
         public double? Double { get; set; }
 
-        [global::Bond.Id(20), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<byte>>))]
+        [global::Bond.Id(20), global::Bond.Type(typeof(global::Bond.Tag.nullable<byte>))]
+        public byte? Enum { get; set; }
+
+        [global::Bond.Id(25), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<byte>>))]
         public List<byte> BytePointer { get; set; }
 
-        [global::Bond.Id(25), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<ArgumentValue>>))]
+        [global::Bond.Id(30), global::Bond.Type(typeof(global::Bond.Tag.nullable<List<ArgumentValue>>))]
         public List<ArgumentValue> Collection { get; set; }
 
         public ArgumentValue()
@@ -144,7 +148,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
         public List<ExecutionInformation> Executions { get; set; }
 
         [global::Bond.Id(10)]
-        public System.ArraySegment<byte> QirBytecode { get; set; }
+        public System.ArraySegment<byte> QirBitcode { get; set; }
 
         public QirExecutionWrapper()
             : this("Microsoft.Quantum.Qir.Runtime.Tools.Serialization.QirExecutionWrapper", "QirExecutionWrapper")
@@ -153,7 +157,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Serialization
         protected QirExecutionWrapper(string fullName, string name)
         {
             Executions = new List<ExecutionInformation>();
-            QirBytecode = new System.ArraySegment<byte>();
+            QirBitcode = new System.ArraySegment<byte>();
         }
     }
 } // Microsoft.Quantum.Qir.Runtime.Tools.Serialization

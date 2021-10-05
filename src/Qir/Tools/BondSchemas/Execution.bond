@@ -7,6 +7,7 @@ enum DataType
 {
     Integer,
     Double,
+    Enum,
     BytePointer,
     Collection
 }
@@ -32,11 +33,14 @@ struct ArgumentValue
     // Not null when Type is Double.
     15: nullable<double> Double;
 
+    // Not null when Type is Enum.
+    20: nullable<uint8> Enum;
+
     // Not null when Type is BytePointer.
-    20: nullable<vector<uint8>> BytePointer;
+    25: nullable<vector<uint8>> BytePointer;
 
     // Not null when Type is Collection.
-    25: nullable<vector<ArgumentValue>> Collection;
+    30: nullable<vector<ArgumentValue>> Collection;
 }
 
 struct EntryPointOperation
@@ -57,5 +61,5 @@ struct QirExecutionWrapper
 {
     5: vector<ExecutionInformation> Executions;
 
-    10: blob QirBytecode;
+    10: blob QirBitcode;
 }

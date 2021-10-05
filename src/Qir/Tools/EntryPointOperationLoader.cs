@@ -49,11 +49,17 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             elementTypes = null;
             if (rt.IsFloatingPoint)
             {
+                // used for Double
                 return DataType.Double;
+            }
+            else if (rt.IsInteger && rt.IntegerBitWidth == 8)
+            {
+                // used for Bool, Pauli, and Result
+                return DataType.Enum;
             }
             else if (rt.IsInteger)
             {
-                // used for Int, Bool, Pauli, and Result
+                // used for Int
                 return DataType.Integer;
             }
             else if (rt is IPointerType ptrType && ptrType.ElementType is IStructType structType)

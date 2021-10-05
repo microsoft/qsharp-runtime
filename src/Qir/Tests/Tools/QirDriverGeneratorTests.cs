@@ -28,14 +28,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                     "UseNoArgsDebug",
                     new EntryPointOperation{Name = "UseNoArgsDebug"}
                 },
-                //{
-                //    "UseBoolArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseBoolArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArg", Type = DataType.BoolType}}
-                //    }
-                //},
+                {
+                    "UseBoolArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseBoolArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArg", Type = DataType.Enum}}
+                    }
+                },
                 //{
                 //    "UseBoolArrayArg",
                 //    new EntryPointOperation
@@ -44,14 +44,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArrayArg", Type = DataType.ArrayType, ArrayType = DataType.BoolType}}
                 //    }
                 //},
-                //{
-                //    "UseDoubleArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseDoubleArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArg", Type = DataType.DoubleType}}
-                //    }
-                //},
+                {
+                    "UseDoubleArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseDoubleArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArg", Type = DataType.Double}}
+                    }
+                },
                 //{
                 //    "UseDoubleArrayArg",
                 //    new EntryPointOperation
@@ -60,14 +60,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArrayArg", Type = DataType.ArrayType, ArrayType = DataType.DoubleType}}
                 //    }
                 //},
-                //{
-                //    "UseIntegerArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseIntegerArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArg", Type = DataType.IntegerType}}
-                //    }
-                //},
+                {
+                    "UseIntegerArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseIntegerArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArg", Type = DataType.Integer}}
+                    }
+                },
                 //{
                 //    "UseIntegerArrayArg",
                 //    new EntryPointOperation
@@ -76,14 +76,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArrayArg", Type = DataType.ArrayType, ArrayType = DataType.IntegerType}}
                 //    }
                 //},
-                //{
-                //    "UsePauliArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UsePauliArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "PauliArg", Type = DataType.PauliType}}
-                //    }
-                //},
+                {
+                    "UsePauliArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UsePauliArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "PauliArg", Type = DataType.Enum }}
+                    }
+                },
                 //{
                 //    "UsePauliArrayArg",
                 //    new EntryPointOperation
@@ -108,14 +108,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "RangeArrayArg", Type = DataType.ArrayType, ArrayType = DataType.RangeType}}
                 //    }
                 //},
-                //{
-                //    "UseResultArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseResultArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArg", Type = DataType.ResultType}}
-                //    }
-                //},
+                {
+                    "UseResultArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseResultArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArg", Type = DataType.Enum}}
+                    }
+                },
                 //{
                 //    "UseResultArrayArg",
                 //    new EntryPointOperation
@@ -124,14 +124,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArrayArg", Type = DataType.ArrayType, ArrayType = DataType.ResultType}}
                 //    }
                 //},
-                //{
-                //    "UseStringArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseStringArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "StringArg", Type = DataType.StringType}}
-                //    }
-                //},
+                {
+                    "UseStringArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseStringArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "StringArg", Type = DataType.BytePointer}}
+                    }
+                },
                 //{
                 //    "UseMiscArgs",
                 //    new EntryPointOperation
@@ -153,19 +153,19 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         [Theory]
         [InlineData("UseNoArgs", false)]
         [InlineData("UseNoArgsDebug", true)]
-        //[InlineData("UseBoolArg", false)]
+        [InlineData("UseBoolArg", false)]
         //[InlineData("UseBoolArrayArg", false)]
-        //[InlineData("UseDoubleArg", false)]
+        [InlineData("UseDoubleArg", false)]
         //[InlineData("UseDoubleArrayArg", false)]
-        //[InlineData("UseIntegerArg", false)]
+        [InlineData("UseIntegerArg", false)]
         //[InlineData("UseIntegerArrayArg", false)]
-        //[InlineData("UsePauliArg", false)]
+        [InlineData("UsePauliArg", false)]
         //[InlineData("UsePauliArrayArg", false)]
         //[InlineData("UseRangeArg", false)]
         //[InlineData("UseRangeArrayArg", false)]
-        //[InlineData("UseResultArg", false)]
+        [InlineData("UseResultArg", false)]
         //[InlineData("UseResultArrayArg", false)]
-        //[InlineData("UseStringArg", false)]
+        [InlineData("UseStringArg", false)]
         //[InlineData("UseMiscArgs", false)]
         public void GenerateFullStateSimulatorDriver(string testCase, bool debug)
         {
