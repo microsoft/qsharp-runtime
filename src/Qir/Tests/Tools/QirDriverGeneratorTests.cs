@@ -92,14 +92,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                 //        Parameters = new List<Parameter>{new Parameter{ Name = "PauliArrayArg", Type = DataType.ArrayType, ArrayType = DataType.PauliType}}
                 //    }
                 //},
-                //{
-                //    "UseRangeArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseRangeArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "RangeArg", Type = DataType.RangeType}}
-                //    }
-                //},
+                {
+                    "UseRangeArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseRangeArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "RangeArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Integer, DataType.Integer, DataType.Integer } }}
+                    }
+                },
                 //{
                 //    "UseRangeArrayArg",
                 //    new EntryPointOperation
@@ -161,7 +161,7 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         //[InlineData("UseIntegerArrayArg", false)]
         [InlineData("UsePauliArg", false)]
         //[InlineData("UsePauliArrayArg", false)]
-        //[InlineData("UseRangeArg", false)]
+        [InlineData("UseRangeArg", false)]
         //[InlineData("UseRangeArrayArg", false)]
         [InlineData("UseResultArg", false)]
         //[InlineData("UseResultArrayArg", false)]

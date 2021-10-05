@@ -21,7 +21,6 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-// Auxiliary functions for interop with Q# Range type.
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
@@ -40,17 +39,26 @@ struct InteropRange
         End(get<2>(rangeTuple)){}
 };
 
-unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
-{
-    unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
-    return range;
-}
-
 InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
-    InteropRange* range = new InteropRange(rangeTuple);
-    return range;
+    return new InteropRange(rangeTuple);
 }
+
+const char* TranslateStringToCharBuffer(string& s)
+{
+    return s.c_str();
+}
+
+map<string, uint8_t> EnumMap {
+    {"false", static_cast<uint8_t>(0)},
+    {"true", static_cast<uint8_t>(1)},
+    {"Zero", static_cast<uint8_t>(0)},
+    {"One", static_cast<uint8_t>(1)},
+    {"PauliI", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<uint8_t>(PauliId::PauliId_Z)}
+};
 
 extern "C" void UseRangeArg(
     InteropRange* RangeArg
