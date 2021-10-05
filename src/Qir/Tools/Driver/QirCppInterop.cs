@@ -26,7 +26,6 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
         public static string CliOptionType(this Parameter @this) =>
             @this.Type switch
             {
-                //DataType.BoolType => "char",
                 DataType.Integer => "int64_t",
                 DataType.Double => "double_t",
                 DataType.BytePointer => "string",

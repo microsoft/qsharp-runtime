@@ -21,6 +21,46 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
+using RangeTuple = tuple<int64_t, int64_t, int64_t>;
+struct InteropRange
+{
+    int64_t Start;
+    int64_t Step;
+    int64_t End;
+
+    InteropRange() :
+        Start(0),
+        Step(0),
+        End(0){}
+
+    InteropRange(RangeTuple rangeTuple) :
+        Start(get<0>(rangeTuple)),
+        Step(get<1>(rangeTuple)),
+        End(get<2>(rangeTuple)){}
+};
+
+InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
+{
+    return new InteropRange(rangeTuple);
+}
+
+map<string, char> IntTypeMap {
+    {"false", 0x0},
+    {"true", 0x1},
+    {"Zero", 0x0},
+    {"One", 0x1},
+    {"PauliI", static_cast<char>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<char>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<char>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<char>(PauliId::PauliId_Z)}
+};
+
+// Auxiliary functions for interop with Q# String type.
+const char* TranslateStringToCharBuffer(string& s)
+{
+    return s.c_str();
+}
+
 extern "C" void UseDoubleArg(
     double_t DoubleArg
 ); // QIR interop function.
@@ -42,7 +82,6 @@ int main(int argc, char* argv[])
 
     // Add a command line option for each entry-point parameter.
     double_t DoubleArgCli;
-    DoubleArgCli = 0.0;
     app.add_option("--DoubleArg", DoubleArgCli, "Option to provide a value for the DoubleArg parameter")
         ->required();
 

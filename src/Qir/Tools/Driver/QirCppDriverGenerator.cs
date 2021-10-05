@@ -84,7 +84,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             }
 
             var strContent = Encoding.UTF8.GetString(value.BytePointer.ToArray());
-            return $"\"{strContent}\""; // FIXME: WITH QUOTES?
+            return $"\"{strContent}\"";
         }
 
         private static string GetDoubleValueString(ArgumentValue value)
