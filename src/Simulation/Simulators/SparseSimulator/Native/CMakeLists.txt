@@ -20,3 +20,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 message("Compiler flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+
+include(CTest)
+enable_testing()
+
+foreach(TEST SparseSimulatorTests CSharpIntegrationTests)
+    add_executable(${TEST} ${TEST}.cpp TestHelpers.cpp)
+    target_include_directories(${TEST} PRIVATE ../../../../Qir/Common/Externals/catch2)
+    add_test(${TEST} ${TEST})
+endforeach()

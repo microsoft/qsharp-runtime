@@ -3,13 +3,10 @@
 
 #pragma once
 
-#include "pch.h"
-#include "CppUnitTest.h"
-#include "../Native/SparseSimulator.h"
+#include "SparseSimulator.h"
 #include <cmath>
 #include <iostream>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
 
 #ifndef M_PI
