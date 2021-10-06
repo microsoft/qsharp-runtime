@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <cstdint>
 
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
 using namespace SparseSimulatorTestHelpers;
@@ -199,7 +200,7 @@ TEST_CASE("HXZCommutationTest")
     for (int i = n_qubits - 1; i >= 0; i--) {
         H_cpp(sim, i);
     }
-    for (__int64 i = 0; i< pow(2, n_qubits); i++) {
+    for (std::uint64_t i = 0; i < (std::uint64_t{1} << n_qubits); i++) {
         amplitude state = getSimulator(sim)->probe(std::bitset<n_qubits>(i).to_string());
         if (i == one_state.to_ulong()) {
             assert_amplitude_equality(state, 1.0, 0.0);

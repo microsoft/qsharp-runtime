@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include "../Native/SparseSimulator.h"
+#include "SparseSimulator.h"
 #include <cmath>
 #include <iostream>
 #include <catch.hpp>

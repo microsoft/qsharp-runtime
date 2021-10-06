@@ -8,6 +8,7 @@
 #include "TestHelpers.hpp"
 #include <cmath>
 #include <iostream>
+#include <cstdint>
 
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
 using namespace SparseSimulatorTestHelpers;
@@ -600,7 +601,7 @@ TEST_CASE("MTest") {
             }
             total_tests += n_tests;
             ratio = (double)ones / (double)total_tests;
-            double abs_diff = abs(expected_ratio - ratio);
+            double abs_diff = std::abs(expected_ratio - ratio);
             // Based on Chernoff bounds
             log_prob = abs_diff * abs_diff * expected_ratio * (double)total_tests;
             std_dev = sqrt(expected_ratio * (1.0 - expected_ratio)) / (double)total_tests;
@@ -753,7 +754,7 @@ TEST_CASE("HXZCommutationTest") {
     for (int i = n_qubits - 1; i >= 0; i--) {
         sim.H(qubits[i]);
     }
-    for (__int64 i = 0; i < pow(2, n_qubits); i++) {
+    for (std::uint64_t i = 0; i < (std::uint64_t{1} << n_qubits); i++) {
         amplitude state = sim.probe(std::bitset<n_qubits>(i).to_string());
         if (i == one_state.to_ulong()) {
             assert_amplitude_equality(state, 1.0, 0.0);

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../Native/SparseSimulator.h"
+#include "SparseSimulator.h"
 #include <cmath>
 #include <iostream>
 
