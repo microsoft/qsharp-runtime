@@ -28,6 +28,7 @@
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
+#include "SimFactory.h"
 #include "OutputStream.hpp"
 #include "QubitManager.hpp"
 
@@ -646,5 +647,11 @@ namespace Quantum
     {
         return std::make_unique<CFullstateSimulator>(userProvidedSeed);
     }
+
+    extern "C" void* CreateFullstateSimulatorC(uint32_t userProvidedSeed)
+    {
+        return (IRuntimeDriver*)new CFullstateSimulator(userProvidedSeed);
+    }
+
 } // namespace Quantum
 } // namespace Microsoft
