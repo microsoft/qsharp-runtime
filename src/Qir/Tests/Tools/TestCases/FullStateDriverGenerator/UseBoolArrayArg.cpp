@@ -110,7 +110,8 @@ int main(int argc, char* argv[])
     // Add a command line option for each entry-point parameter.
     vector<uint8_t> BoolArrayArgCli;
     app.add_option("--BoolArrayArg", BoolArrayArgCli, "Option to provide a value for the BoolArrayArg parameter")
-        ->required();
+        ->required()
+        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);

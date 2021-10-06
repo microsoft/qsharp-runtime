@@ -21,7 +21,6 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-// Auxiliary functions for interop with Q# Array type.
 struct InteropArray
 {
     int64_t Size;
@@ -46,7 +45,6 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-// Auxiliary functions for interop with Q# Range type.
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
@@ -65,36 +63,33 @@ struct InteropRange
         End(get<2>(rangeTuple)){}
 };
 
-unique_ptr<InteropRange> CreateInteropRange(RangeTuple rangeTuple)
-{
-    unique_ptr<InteropRange> range(new InteropRange(rangeTuple));
-    return range;
-}
-
 InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
 {
-    InteropRange* range = new InteropRange(rangeTuple);
-    return range;
+    return new InteropRange(rangeTuple);
 }
 
-// Auxiliary functions for interop with Q# Bool type.
-const char InteropFalseAsChar = 0x0;
-const char InteropTrueAsChar = 0x1;
-map<string, bool> BoolAsCharMap{
-    {"0", InteropFalseAsChar},
-    {"false", InteropFalseAsChar},
-    {"1", InteropTrueAsChar},
-    {"true", InteropTrueAsChar}
-};
-
-// Auxiliary functions for interop with Q# String type.
 const char* TranslateStringToCharBuffer(string& s)
 {
     return s.c_str();
 }
 
+map<string, uint8_t> EnumMap {
+    {"0", static_cast<uint8_t>(0)},
+    {"1", static_cast<uint8_t>(1)},
+    {"2", static_cast<uint8_t>(2)},
+    {"3", static_cast<uint8_t>(3)},
+    {"false", static_cast<uint8_t>(0)},
+    {"true", static_cast<uint8_t>(1)},
+    {"Zero", static_cast<uint8_t>(0)},
+    {"One", static_cast<uint8_t>(1)},
+    {"PauliI", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<uint8_t>(PauliId::PauliId_Z)}
+};
+
 extern "C" void UseMiscArgs(
-    char BoolArg,
+    uint8_t BoolArg,
     InteropArray* IntegerArrayArg,
     InteropRange* RangeArg,
     const char* StringArg
@@ -116,11 +111,10 @@ int main(int argc, char* argv[])
         "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
-    char BoolArgCli;
-    BoolArgCli = InteropFalseAsChar;
+    uint8_t BoolArgCli;
     app.add_option("--BoolArg", BoolArgCli, "Option to provide a value for the BoolArg parameter")
         ->required()
-        ->transform(CLI::CheckedTransformer(BoolAsCharMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));
 
     vector<int64_t> IntegerArrayArgCli;
     app.add_option("--IntegerArrayArg", IntegerArrayArgCli, "Option to provide a value for the IntegerArrayArg parameter")
@@ -138,7 +132,7 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
     // Cast parsed arguments to its interop types.
-    char BoolArgInterop = BoolArgCli;
+    uint8_t BoolArgInterop = BoolArgCli;
 
     unique_ptr<InteropArray> IntegerArrayArgUniquePtr = CreateInteropArray(IntegerArrayArgCli);
     InteropArray* IntegerArrayArgInterop = IntegerArrayArgUniquePtr.get();

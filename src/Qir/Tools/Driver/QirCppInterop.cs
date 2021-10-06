@@ -24,6 +24,10 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         public static string CliOptionVariableName(this Parameter @this) => $"{@this.Name}Cli";
 
+        public static bool CliOptionRequiresCheckedTransformer(this Parameter @this) =>
+            @this.Type == DataType.Enum || 
+            (@this.Type == DataType.Collection && @this.ElementTypes.Count == 1 && @this.ElementTypes[0] == DataType.Enum);
+
         public static string CliOptionType(this DataType @this, IList<DataType>? elementTypes = null) =>
             @this switch
             {
@@ -37,6 +41,8 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
                     throw new NotSupportedException($"Invalid element types [{string.Join(", ", elementTypes)}] for collection"),
                 _ => throw new ArgumentException($"Invalid data type: {@this}")
             };
+
+        public static string IntermediateVariableName(this Parameter @this) => $"{@this.Name}Intermediate";
 
         public static string InteropVariableName(this Parameter @this) => $"{@this.Name}Interop";
 

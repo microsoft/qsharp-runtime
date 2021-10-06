@@ -117,9 +117,9 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             this.Write(", \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionDescription()));
             this.Write("\")\r\n        ->required()");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Type == DataType.Enum ? "" : ";"));
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionRequiresCheckedTransformer() ? "" : ";"));
             this.Write("\r\n");
- if (arg.Type == DataType.Enum) { 
+ if (arg.CliOptionRequiresCheckedTransformer()) { 
             this.Write("        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));\r\n");
  } 
             this.Write("\r\n");
@@ -130,7 +130,20 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             this.Write("    // Cast parsed arguments to its interop types.\r\n");
  } 
  foreach (var arg in EntryPoint.Parameters) { 
- var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); 
+            this.Write("\r\n");
+ if (arg.Type == DataType.Collection && arg.ElementTypes.Count == 1) { 
+            this.Write("    unique_ptr<InteropArray> ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
+            this.Write(" = CreateInteropArray(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
+            this.Write(");\r\n    InteropArray* ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropVariableName()));
+            this.Write(" = ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.UniquePtrVariableName()));
+            this.Write(".get();\r\n");
+ } 
+ else { 
+   var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); 
  if (interopTranslator == null) { 
             this.Write("    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.InteropType()));
@@ -150,6 +163,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(");\r\n");
+ } 
  } 
             this.Write("\r\n");
  } 

@@ -52,14 +52,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                         Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArg", Type = DataType.Double}}
                     }
                 },
-                //{
-                //    "UseDoubleArrayArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseDoubleArrayArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArrayArg", Type = DataType.ArrayType, ArrayType = DataType.DoubleType}}
-                //    }
-                //},
+                {
+                    "UseDoubleArrayArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseDoubleArrayArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "DoubleArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Double } } }
+                    }
+                },
                 {
                     "UseIntegerArg",
                     new EntryPointOperation
@@ -68,14 +68,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                         Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArg", Type = DataType.Integer}}
                     }
                 },
-                //{
-                //    "UseIntegerArrayArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseIntegerArrayArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArrayArg", Type = DataType.ArrayType, ArrayType = DataType.IntegerType}}
-                //    }
-                //},
+                {
+                    "UseIntegerArrayArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseIntegerArrayArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "IntegerArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Integer } } }
+                    }
+                },
                 {
                     "UsePauliArg",
                     new EntryPointOperation
@@ -84,14 +84,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                         Parameters = new List<Parameter>{new Parameter{ Name = "PauliArg", Type = DataType.Enum }}
                     }
                 },
-                //{
-                //    "UsePauliArrayArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UsePauliArrayArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "PauliArrayArg", Type = DataType.ArrayType, ArrayType = DataType.PauliType}}
-                //    }
-                //},
+                {
+                    "UsePauliArrayArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UsePauliArrayArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "PauliArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Enum } } }
+                    }
+                },
                 {
                     "UseRangeArg",
                     new EntryPointOperation
@@ -116,14 +116,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                         Parameters = new List<Parameter>{new Parameter{ Name = "ResultArg", Type = DataType.Enum}}
                     }
                 },
-                //{
-                //    "UseResultArrayArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseResultArrayArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArrayArg", Type = DataType.ArrayType, ArrayType = DataType.ResultType}}
-                //    }
-                //},
+                {
+                    "UseResultArrayArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseResultArrayArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "ResultArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Enum } } }
+                    }
+                },
                 {
                     "UseStringArg",
                     new EntryPointOperation
@@ -133,18 +133,26 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                     }
                 },
                 //{
-                //    "UseMiscArgs",
+                //    "UseStringArrayArg",
                 //    new EntryPointOperation
                 //    {
-                //        Name = "UseMiscArgs",
-                //        Parameters = new List<Parameter>{
-                //            new Parameter{ Name = "BoolArg", Type = DataType.BoolType},
-                //            new Parameter{ Name = "IntegerArrayArg", Position = 1, Type = DataType.ArrayType, ArrayType = DataType.IntegerType},
-                //            new Parameter{ Name = "RangeArg", Position = 2, Type = DataType.RangeType},
-                //            new Parameter{ Name = "StringArg", Position = 3, Type = DataType.StringType}
-                //        }
+                //        Name = "UseStringArrayArg",
+                //        Parameters = new List<Parameter>{new Parameter{ Name = "StringArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.BytePointer } }}
                 //    }
-                //}
+                //},
+                {
+                    "UseMiscArgs",
+                    new EntryPointOperation
+                    {
+                        Name = "UseMiscArgs",
+                        Parameters = new List<Parameter>{
+                            new Parameter{ Name = "BoolArg", Type = DataType.Enum},
+                            new Parameter{ Name = "IntegerArrayArg", Position = 1, Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Integer }},
+                            new Parameter{ Name = "RangeArg", Position = 2, Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Integer, DataType.Integer, DataType.Integer }},
+                            new Parameter{ Name = "StringArg", Position = 3, Type = DataType.BytePointer}
+                        }
+                    }
+                }
             };
 
         private static string RemoveLineEndings(string str) =>
@@ -156,17 +164,18 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         [InlineData("UseBoolArg", false)]
         [InlineData("UseBoolArrayArg", false)]
         [InlineData("UseDoubleArg", false)]
-        //[InlineData("UseDoubleArrayArg", false)]
+        [InlineData("UseDoubleArrayArg", false)]
         [InlineData("UseIntegerArg", false)]
-        //[InlineData("UseIntegerArrayArg", false)]
+        [InlineData("UseIntegerArrayArg", false)]
         [InlineData("UsePauliArg", false)]
-        //[InlineData("UsePauliArrayArg", false)]
+        [InlineData("UsePauliArrayArg", false)]
         [InlineData("UseRangeArg", false)]
         //[InlineData("UseRangeArrayArg", false)]
         [InlineData("UseResultArg", false)]
-        //[InlineData("UseResultArrayArg", false)]
+        [InlineData("UseResultArrayArg", false)]
         [InlineData("UseStringArg", false)]
-        //[InlineData("UseMiscArgs", false)]
+        //[InlineData("UseStringArrayArg", false)]
+        [InlineData("UseMiscArgs", false)]
         public void GenerateFullStateSimulatorDriver(string testCase, bool debug)
         {
             var entryPointOperation = TestCases[testCase];

@@ -125,8 +125,8 @@ int main(int argc, char* argv[])
 <# foreach (var arg in EntryPoint.Parameters) { #>
     <#= arg.Type.CliOptionType(arg.ElementTypes) #> <#= arg.CliOptionVariableName() #>;
     app.add_option("<#= arg.CliOptionName() #>", <#= arg.CliOptionVariableName() #>, "<#= arg.CliOptionDescription() #>")
-        ->required()<#= arg.Type == DataType.Enum ? "" : ";" #>
-<# if (arg.Type == DataType.Enum) { #>
+        ->required()<#= arg.CliOptionRequiresCheckedTransformer() ? "" : ";" #>
+<# if (arg.CliOptionRequiresCheckedTransformer()) { #>
         ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));
 <# } #>
 
@@ -138,12 +138,19 @@ int main(int argc, char* argv[])
     // Cast parsed arguments to its interop types.
 <# } #>
 <# foreach (var arg in EntryPoint.Parameters) { #>
-<# var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); #>
+
+<# if (arg.Type == DataType.Collection && arg.ElementTypes.Count == 1) { #>
+    unique_ptr<InteropArray> <#= arg.UniquePtrVariableName() #> = CreateInteropArray(<#= arg.CliOptionVariableName() #>);
+    InteropArray* <#= arg.InteropVariableName() #> = <#= arg.UniquePtrVariableName() #>.get();
+<# } #>
+<# else { 
+   var interopTranslator = arg.CliOptionTypeToInteropTypeTranslator(); #>
 <# if (interopTranslator == null) { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= arg.CliOptionVariableName() #>;
 <# } #>
 <# else { #>
     <#= arg.InteropType() #> <#= arg.InteropVariableName() #> = <#= interopTranslator #>(<#= arg.CliOptionVariableName() #>);
+<# } #>
 <# } #>
 
 <# } #>

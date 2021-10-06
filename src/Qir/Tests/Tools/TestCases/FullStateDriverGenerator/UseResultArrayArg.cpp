@@ -21,7 +21,6 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-// Auxiliary functions for interop with Q# Array type.
 struct InteropArray
 {
     int64_t Size;
@@ -46,14 +45,47 @@ void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, func
     transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
 }
 
-// Auxiliary functions for interop with Q# Result type.
-const char InteropResultZeroAsChar = 0x0;
-const char InteropResultOneAsChar = 0x1;
-map<string, char> ResultAsCharMap{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
+using RangeTuple = tuple<int64_t, int64_t, int64_t>;
+struct InteropRange
+{
+    int64_t Start;
+    int64_t Step;
+    int64_t End;
+
+    InteropRange() :
+        Start(0),
+        Step(0),
+        End(0){}
+
+    InteropRange(RangeTuple rangeTuple) :
+        Start(get<0>(rangeTuple)),
+        Step(get<1>(rangeTuple)),
+        End(get<2>(rangeTuple)){}
+};
+
+InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
+{
+    return new InteropRange(rangeTuple);
+}
+
+const char* TranslateStringToCharBuffer(string& s)
+{
+    return s.c_str();
+}
+
+map<string, uint8_t> EnumMap {
+    {"0", static_cast<uint8_t>(0)},
+    {"1", static_cast<uint8_t>(1)},
+    {"2", static_cast<uint8_t>(2)},
+    {"3", static_cast<uint8_t>(3)},
+    {"false", static_cast<uint8_t>(0)},
+    {"true", static_cast<uint8_t>(1)},
+    {"Zero", static_cast<uint8_t>(0)},
+    {"One", static_cast<uint8_t>(1)},
+    {"PauliI", static_cast<uint8_t>(PauliId::PauliId_I)},
+    {"PauliX", static_cast<uint8_t>(PauliId::PauliId_X)},
+    {"PauliY", static_cast<uint8_t>(PauliId::PauliId_Y)},
+    {"PauliZ", static_cast<uint8_t>(PauliId::PauliId_Z)}
 };
 
 extern "C" void UseResultArrayArg(
@@ -76,10 +108,10 @@ int main(int argc, char* argv[])
         "File where the output produced during the simulation is written");
 
     // Add a command line option for each entry-point parameter.
-    vector<char> ResultArrayArgCli;
+    vector<uint8_t> ResultArrayArgCli;
     app.add_option("--ResultArrayArg", ResultArrayArgCli, "Option to provide a value for the ResultArrayArg parameter")
         ->required()
-        ->transform(CLI::CheckedTransformer(ResultAsCharMap, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(EnumMap, CLI::ignore_case));
 
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
