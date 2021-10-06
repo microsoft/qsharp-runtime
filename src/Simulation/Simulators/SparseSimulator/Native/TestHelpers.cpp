@@ -1,20 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#include "pch.h"
-#include "CppUnitTest.h"
 #include "../Native/SparseSimulator.h"
 #include <cmath>
 #include <iostream>
+#include <catch.hpp>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Microsoft::Quantum::SPARSESIMULATOR;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-#define TEST_TOLERANCE 0.00000001
+#define TEST_TOLERANCE 1.e-10
 
 
 namespace SparseSimulatorTestHelpers
@@ -87,7 +85,6 @@ namespace SparseSimulatorTestHelpers
 			std::size_t mask = make_mask(qs);
 			amplitude phase = std::exp(amplitude(0., -phi));
 
-#pragma omp parallel for schedule(static)
 			for (std::intptr_t x = 0; x < static_cast<std::intptr_t>(wfn.size()); x++)
 				wfn[x] *= (std::bitset<64>(x & mask).count() % 2 ? phase : std::conj(phase));
 		}
@@ -138,13 +135,7 @@ namespace SparseSimulatorTestHelpers
 
 	// Assertions for equality of amplitude types
 	inline void assert_double_equality_with_tolerance(double value1, double value2) {
-		if (value1 > value2) {
-			value1 = std::max(value1 - TEST_TOLERANCE, value2);
-		}
-		else {
-			value1 = std::min(value1 + TEST_TOLERANCE, value2);
-		}
-		Assert::AreEqual(value1, value2);
+		REQUIRE(value1 == Approx(value2).margin(TEST_TOLERANCE));
 	}
 
 	void assert_amplitude_equality(amplitude amp, double real, double imag) {
@@ -155,6 +146,4 @@ namespace SparseSimulatorTestHelpers
 	void assert_amplitude_equality(amplitude expected_amp, amplitude actual_amp) {
 		assert_amplitude_equality(actual_amp, expected_amp.real(), expected_amp.imag());
 	}
-
-	
 }
