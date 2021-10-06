@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <list>
 #include <iostream>
+#include <memory>
 
 #include "basic_quantum_state.hpp"
 
