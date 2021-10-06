@@ -1,11 +1,13 @@
-<Project Sdk="Microsoft.Quantum.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
     
     <Import Project="..\..\..\Common\Simulators.Test.props" />
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	  <DefaultSimulator>Microsoft.Quantum.SparseSimulation.SparseSimulator</DefaultSimulator>
+	  <ApplicationIcon />
+	  <StartupObject />
   </PropertyGroup>
 
 	<ItemGroup>
