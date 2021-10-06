@@ -36,14 +36,14 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
                         Parameters = new List<Parameter>{new Parameter{ Name = "BoolArg", Type = DataType.Enum}}
                     }
                 },
-                //{
-                //    "UseBoolArrayArg",
-                //    new EntryPointOperation
-                //    {
-                //        Name = "UseBoolArrayArg",
-                //        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArrayArg", Type = DataType.ArrayType, ArrayType = DataType.BoolType}}
-                //    }
-                //},
+                {
+                    "UseBoolArrayArg",
+                    new EntryPointOperation
+                    {
+                        Name = "UseBoolArrayArg",
+                        Parameters = new List<Parameter>{new Parameter{ Name = "BoolArrayArg", Type = DataType.Collection, ElementTypes = new List<DataType> { DataType.Enum } }}
+                    }
+                },
                 {
                     "UseDoubleArg",
                     new EntryPointOperation
@@ -154,7 +154,7 @@ namespace Tests.Microsoft.Quantum.Qir.Runtime.Tools
         [InlineData("UseNoArgs", false)]
         [InlineData("UseNoArgsDebug", true)]
         [InlineData("UseBoolArg", false)]
-        //[InlineData("UseBoolArrayArg", false)]
+        [InlineData("UseBoolArrayArg", false)]
         [InlineData("UseDoubleArg", false)]
         //[InlineData("UseDoubleArrayArg", false)]
         [InlineData("UseIntegerArg", false)]

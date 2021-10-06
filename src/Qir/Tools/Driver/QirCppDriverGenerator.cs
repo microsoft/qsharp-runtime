@@ -34,7 +34,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             string ToArgument(Parameter param)
             {
                 var prefix = param.Name.Length > 1 ? "--" : "-";
-                var value = GetArgumentValueString(param, executionInformation.ArgumentValues[param.Name]);
+                var value = GetArgumentValueString(executionInformation.ArgumentValues[param.Name], param.Type, param.ElementTypes);
                 return $"{prefix}{param.Name} {value}";
             }
 
@@ -42,33 +42,35 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             return string.Join(" ", parameters.Select(ToArgument));
         }
 
-        private static string GetArgumentValueString(Parameter argument, ArgumentValue argumentValue)
+        private static string GetArgumentValueString(ArgumentValue argumentValue, DataType argumentType, IList<DataType>? elementTypes = null)
         {
             // Today, only the first argument value in the array will be used.
-            return argument.Type switch
+            return argumentType switch
             {
                 DataType.Double => GetDoubleValueString(argumentValue),
                 DataType.Integer => GetIntegerValueString(argumentValue),
                 DataType.Enum => GetEnumValueString(argumentValue),
                 DataType.BytePointer => GetBytePointerValueString(argumentValue),
-                DataType.Collection => GetCollectionValueString(argument.ElementTypes, argumentValue.Collection),
-                _ => throw new NotSupportedException($"Unsupported data type {argument.Type}")
+                DataType.Collection => elementTypes != null 
+                    ? GetCollectionValueString(elementTypes, argumentValue.Collection)
+                    : throw new NotSupportedException($"Collection requires defined element type"),
+                _ => throw new NotSupportedException($"Unsupported data type {argumentType}")
             };
         }
 
         private static string GetCollectionValueString(IList<DataType> itemTypes, IList<ArgumentValue> itemValues)
         {
             // used for Range, Array, BigInt, (Tuples are not valid entry points arguments)
-            var isRange = itemValues.Count == 3 && itemValues.All(v => v.Type == DataType.Integer);
-            var isArrayOrBigInt = itemValues.Count == 2 && itemValues[0].Type == DataType.Integer && itemValues[1].Type == DataType.BytePointer;
+            var isRange = itemTypes.Count == 3 && itemValues.All(v => v.Type == DataType.Integer);
+            var isArray = itemTypes.Count == 1 && itemValues.All(v => v.Type == itemTypes[0]);
 
             if (isRange)
             {
                 return string.Join(' ', itemValues.Select(item => GetIntegerValueString(item)));
             }
-            else if (isArrayOrBigInt)
+            else if (isArray)
             {
-                throw new NotSupportedException("Arguments of type array or BigInt are not yet supported");
+                return string.Join(' ', itemValues.Select(item => GetArgumentValueString(item, itemTypes[0])));
             }
             else
             {

@@ -48,50 +48,30 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
             this.Write(this.ToStringHelper.ToStringWithCulture(header));
             this.Write("\"\r\n");
  } 
-            this.Write(@"
-using namespace Microsoft::Quantum;
-using namespace std;
-
-using RangeTuple = tuple<int64_t, int64_t, int64_t>;
-struct InteropRange
-{
-    int64_t Start;
-    int64_t Step;
-    int64_t End;
-
-    InteropRange() :
-        Start(0),
-        Step(0),
-        End(0){}
-
-    InteropRange(RangeTuple rangeTuple) :
-        Start(get<0>(rangeTuple)),
-        Step(get<1>(rangeTuple)),
-        End(get<2>(rangeTuple)){}
-};
-
-InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
-{
-    return new InteropRange(rangeTuple);
-}
-
-const char* TranslateStringToCharBuffer(string& s)
-{
-    return s.c_str();
-}
-
-map<string, uint8_t> EnumMap {
-    {""false"", static_cast<uint8_t>(0)},
-    {""true"", static_cast<uint8_t>(1)},
-    {""Zero"", static_cast<uint8_t>(0)},
-    {""One"", static_cast<uint8_t>(1)},
-    {""PauliI"", static_cast<uint8_t>(PauliId::PauliId_I)},
-    {""PauliX"", static_cast<uint8_t>(PauliId::PauliId_X)},
-    {""PauliY"", static_cast<uint8_t>(PauliId::PauliId_Y)},
-    {""PauliZ"", static_cast<uint8_t>(PauliId::PauliId_Z)}
-};
-
-extern ""C"" void ");
+            this.Write("\r\nusing namespace Microsoft::Quantum;\r\nusing namespace std;\r\n\r\nstruct InteropArra" +
+                    "y\r\n{\r\n    int64_t Size;\r\n    void* Data;\r\n\r\n    InteropArray(int64_t size, void*" +
+                    " data) :\r\n        Size(size),\r\n        Data(data){}\r\n};\r\n\r\ntemplate<typename T>\r" +
+                    "\nunique_ptr<InteropArray> CreateInteropArray(vector<T>& v)\r\n{\r\n    unique_ptr<In" +
+                    "teropArray> array(new InteropArray(v.size(), v.data()));\r\n    return array;\r\n}\r\n" +
+                    "\r\ntemplate<typename S, typename D>\r\nvoid TranslateVector(vector<S>& sourceVector" +
+                    ", vector<D>& destinationVector, function<D(S&)> translationFunction)\r\n{\r\n    des" +
+                    "tinationVector.resize(sourceVector.size());\r\n    transform(sourceVector.begin()," +
+                    " sourceVector.end(), destinationVector.begin(), translationFunction);\r\n}\r\n\r\nusin" +
+                    "g RangeTuple = tuple<int64_t, int64_t, int64_t>;\r\nstruct InteropRange\r\n{\r\n    in" +
+                    "t64_t Start;\r\n    int64_t Step;\r\n    int64_t End;\r\n\r\n    InteropRange() :\r\n     " +
+                    "   Start(0),\r\n        Step(0),\r\n        End(0){}\r\n\r\n    InteropRange(RangeTuple " +
+                    "rangeTuple) :\r\n        Start(get<0>(rangeTuple)),\r\n        Step(get<1>(rangeTupl" +
+                    "e)),\r\n        End(get<2>(rangeTuple)){}\r\n};\r\n\r\nInteropRange* TranslateRangeTuple" +
+                    "ToInteropRangePointer(RangeTuple& rangeTuple)\r\n{\r\n    return new InteropRange(ra" +
+                    "ngeTuple);\r\n}\r\n\r\nconst char* TranslateStringToCharBuffer(string& s)\r\n{\r\n    retu" +
+                    "rn s.c_str();\r\n}\r\n\r\nmap<string, uint8_t> EnumMap {\r\n    {\"0\", static_cast<uint8_" +
+                    "t>(0)},\r\n    {\"1\", static_cast<uint8_t>(1)},\r\n    {\"2\", static_cast<uint8_t>(2)}" +
+                    ",\r\n    {\"3\", static_cast<uint8_t>(3)},\r\n    {\"false\", static_cast<uint8_t>(0)},\r" +
+                    "\n    {\"true\", static_cast<uint8_t>(1)},\r\n    {\"Zero\", static_cast<uint8_t>(0)},\r" +
+                    "\n    {\"One\", static_cast<uint8_t>(1)},\r\n    {\"PauliI\", static_cast<uint8_t>(Paul" +
+                    "iId::PauliId_I)},\r\n    {\"PauliX\", static_cast<uint8_t>(PauliId::PauliId_X)},\r\n  " +
+                    "  {\"PauliY\", static_cast<uint8_t>(PauliId::PauliId_Y)},\r\n    {\"PauliZ\", static_c" +
+                    "ast<uint8_t>(PauliId::PauliId_Z)}\r\n};\r\n\r\nextern \"C\" void ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
  for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
@@ -127,7 +107,7 @@ extern ""C"" void ");
  } 
  foreach (var arg in EntryPoint.Parameters) { 
             this.Write("    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionType()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(arg.Type.CliOptionType(arg.ElementTypes)));
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(arg.CliOptionVariableName()));
             this.Write(";\r\n    app.add_option(\"");

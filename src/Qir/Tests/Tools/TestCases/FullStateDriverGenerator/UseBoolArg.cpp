@@ -21,6 +21,31 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
+struct InteropArray
+{
+    int64_t Size;
+    void* Data;
+
+    InteropArray(int64_t size, void* data) :
+        Size(size),
+        Data(data){}
+};
+
+template<typename T>
+unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
+{
+    unique_ptr<InteropArray> array(new InteropArray(v.size(), v.data()));
+    return array;
+}
+
+template<typename S, typename D>
+void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, function<D(S&)> translationFunction)
+{
+    destinationVector.resize(sourceVector.size());
+    transform(sourceVector.begin(), sourceVector.end(), destinationVector.begin(), translationFunction);
+}
+
+
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
 struct InteropRange
 {
@@ -50,6 +75,10 @@ const char* TranslateStringToCharBuffer(string& s)
 }
 
 map<string, uint8_t> EnumMap {
+    {"0", static_cast<uint8_t>(0)},
+    {"1", static_cast<uint8_t>(1)},
+    {"2", static_cast<uint8_t>(2)},
+    {"3", static_cast<uint8_t>(3)},
     {"false", static_cast<uint8_t>(0)},
     {"true", static_cast<uint8_t>(1)},
     {"Zero", static_cast<uint8_t>(0)},

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Quantum.Qir.Runtime.Tools.Serialization;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
@@ -23,18 +24,18 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
         public static string CliOptionVariableName(this Parameter @this) => $"{@this.Name}Cli";
 
-        public static string CliOptionType(this Parameter @this) =>
-            @this.Type switch
+        public static string CliOptionType(this DataType @this, IList<DataType>? elementTypes = null) =>
+            @this switch
             {
                 DataType.Integer => "int64_t",
                 DataType.Double => "double_t",
                 DataType.Enum => "uint8_t", // string value is mapped to uint8_t using CheckedTransformer
                 DataType.BytePointer => "string",
                 DataType.Collection => 
-                    @this.ElementTypes.Count == 3 
-                    ? "RangeTuple"
-                    : throw new NotSupportedException("Arguments of type array or BigInt are not yet supported"),
-                _ => throw new ArgumentException($"Invalid data type: {@this.Type}")
+                    elementTypes?.Count == 3 ? "RangeTuple" :
+                    elementTypes?.Count == 1 ? $"vector<{elementTypes[0].CliOptionType()}>" :
+                    throw new NotSupportedException($"Invalid element types [{string.Join(", ", elementTypes)}] for collection"),
+                _ => throw new ArgumentException($"Invalid data type: {@this}")
             };
 
         public static string InteropVariableName(this Parameter @this) => $"{@this.Name}Interop";
@@ -47,9 +48,9 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
                 DataType.Enum => "uint8_t",
                 DataType.BytePointer => "const char*",
                 DataType.Collection =>
-                    @this.ElementTypes.Count == 3
-                    ? "InteropRange*"
-                    : throw new NotSupportedException("Arguments of type array or BigInt are not yet supported"),
+                    @this.ElementTypes.Count == 3 ? "InteropRange*" :
+                    @this.ElementTypes.Count == 1 ? "InteropArray*" :
+                    throw new NotSupportedException($"Invalid element types [{string.Join(", ", @this.ElementTypes)}] for collection"),
                 _ => throw new ArgumentException($"Invalid data type: {@this.Type}")
             };
 
@@ -61,9 +62,9 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
                 DataType.Enum => null, // done using CheckedTransformer instead
                 DataType.BytePointer => "TranslateStringToCharBuffer",
                 DataType.Collection =>
-                    @this.ElementTypes.Count == 3
-                    ? "TranslateRangeTupleToInteropRangePointer"
-                    : throw new NotSupportedException("Arguments of type array or BigInt are not yet supported"),
+                    @this.ElementTypes.Count == 3 ? "TranslateRangeTupleToInteropRangePointer" :
+                    @this.ElementTypes.Count == 1 ? "TranslateVector" :
+                    throw new NotSupportedException($"Invalid element types [{string.Join(", ", @this.ElementTypes)}] for collection"),
                 _ => throw new ArgumentException($"Invalid data type: {@this.Type}")
             };
 

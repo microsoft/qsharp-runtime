@@ -65,8 +65,18 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             else if (rt is IPointerType ptrType && ptrType.ElementType is IStructType structType)
             {
                 // used for Range, Array, BigInt, (and Tuple -> N/A for entry points)
-                elementTypes = structType.Members.Select(t => MapResolvedTypeToDataType(t, out var _)).ToList();
-                return DataType.Collection;
+                if (structType.Members.Count == 2 && structType.Members[0].IsInteger && structType.Members[1] is IPointerType elementPtr)
+                {
+                    // used for Array and BigInt
+                    elementTypes = new List<DataType>() { MapResolvedTypeToDataType(elementPtr.ElementType, out var _) };
+                    return DataType.Collection;
+                }
+                else
+                {
+                    // used for Range
+                    elementTypes = structType.Members.Select(t => MapResolvedTypeToDataType(t, out var _)).ToList();
+                    return DataType.Collection;
+                }
             }
             else if (rt.IsPointer)
             {
