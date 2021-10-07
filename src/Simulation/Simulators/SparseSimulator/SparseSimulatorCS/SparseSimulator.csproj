@@ -9,8 +9,8 @@
 
 <!--From qsharp-runtime /src/Simulation/common/Simulators.Dev.props-->
   <PropertyGroup Condition="'$(QsimDll)' == ''">
-    <QsimDllMac>..\Native\build\libSparseQuantumSimulator.dylib</QsimDllMac>
-    <QsimDllLinux>..\Native\build\libSparseQuantumSimulator.so</QsimDllLinux>
+    <QsimDllMac>..\Native\build\$(Configuration)\libSparseQuantumSimulator.dylib</QsimDllMac>
+    <QsimDllLinux>..\Native\build\$(Configuration)\libSparseQuantumSimulator.so</QsimDllLinux>
     <QsimDllWindows>..\Native\build\$(Configuration)\SparseQuantumSimulator.dll</QsimDllWindows>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(QsimDllMac)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
