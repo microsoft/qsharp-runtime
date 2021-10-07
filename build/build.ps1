@@ -17,13 +17,13 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
 }
 
 if ($Env:ENABLE_NATIVE -ne "false") {
-    ( & (Join-Path $PSScriptRoot .. src Simulation Simulators SparseSimulator build.ps1) ) || ( $script:all_ok = $False )
-
     $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
     & "$nativeSimulator/build-native-simulator.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
+
+    ( & (Join-Path $PSScriptRoot .. src Simulation Simulators SparseSimulator build.ps1) ) || ( $script:all_ok = $False )
 } else {
     Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }
