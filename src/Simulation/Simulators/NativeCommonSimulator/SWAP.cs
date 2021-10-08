@@ -7,7 +7,7 @@ using Microsoft.Quantum.Intrinsic.Interfaces;
 namespace Microsoft.Quantum.Simulation.Simulators
 {
 
-    public partial class QuantumSimulator
+    public partial class NativeCommonSimulator
     {
         void IIntrinsicSWAP.Body(Qubit target1, Qubit target2)
         {

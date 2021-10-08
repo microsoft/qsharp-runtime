@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : SimulatorBase, IDisposable
+    public partial class NativeCommonSimulator : SimulatorBase, IDisposable
     {
         class QSimQubit : Qubit
         {

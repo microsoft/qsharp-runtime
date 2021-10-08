@@ -6,11 +6,11 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator
+    public partial class NativeCommonSimulator
     {
         /// <summary>
         /// This class allows you to dump the state (wave function)
-        /// of the QuantumSimulator into a callback function.
+        /// of the NativeCommonSimulator into a callback function.
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
             /// </summary>
-            public StateDumper(QuantumSimulator qsim)
+            public StateDumper(NativeCommonSimulator qsim)
             {
                 this.Simulator = qsim;
             }
@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The callback method that will be used to report the amplitude 
             /// of each basis vector of the wave function.
-            /// The method should return 'true' if the QuantumSimulator should 
+            /// The method should return 'true' if the NativeCommonSimulator should 
             /// continue reporting the state of the remaining basis vectors.
             /// </summary>
             /// <param name="idx">The index of the basis state vector being reported.</param>
@@ -37,9 +37,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public abstract bool Callback(uint idx, double real, double img);
 
             /// <summary>
-            /// The QuantumSimulator being reported.
+            /// The NativeCommonSimulator being reported.
             /// </summary>
-            public QuantumSimulator Simulator { get; }
+            public NativeCommonSimulator Simulator { get; }
 
             /// <summary>
             /// Entry method to get the dump of the wave function.
@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private int _maxCharsStateId;
 
-            public SimpleDumper(QuantumSimulator qsim, Action<string> channel) : base(qsim)
+            public SimpleDumper(NativeCommonSimulator qsim, Action<string> channel) : base(qsim)
             {
                 this.Channel = channel;
             }

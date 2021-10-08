@@ -8,7 +8,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator
+    public partial class NativeCommonSimulator
     {
         /// <summary>
         /// Dumps the wave function for the given qubits into the given target. 
@@ -65,9 +65,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
         {
-            private QuantumSimulator Simulator { get; }
+            private NativeCommonSimulator Simulator { get; }
 
-            public QsimDumpMachine(QuantumSimulator m) : base(m)
+            public QsimDumpMachine(NativeCommonSimulator m) : base(m)
             {
                 this.Simulator = m;
             }
@@ -82,9 +82,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
         {
-            private QuantumSimulator Simulator { get; }
+            private NativeCommonSimulator Simulator { get; }
 
-            public QSimDumpRegister(QuantumSimulator m) : base(m)
+            public QSimDumpRegister(NativeCommonSimulator m) : base(m)
             {
                 this.Simulator = m;
             }
