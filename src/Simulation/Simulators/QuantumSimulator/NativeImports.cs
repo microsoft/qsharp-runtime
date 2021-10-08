@@ -7,7 +7,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class QuantumSimulator
     {
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "allocateQubit")]
         private static extern void AllocateOne(uint id, uint qubit_id);
