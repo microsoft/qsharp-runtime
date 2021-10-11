@@ -1,3 +1,6 @@
+# https://clang.llvm.org/extra/clang-tidy/
+# https://clang.llvm.org/extra/clang-tidy/checks/list.html
+
 Checks: 
   'bugprone-*,readability-identifier-*,readability-braces-around-statements,cert*,\
   -llvmlibc-callee-namespace,-llvmlibc-implementation-in-namespace,\
