@@ -13,101 +13,101 @@ namespace Quantum
         : public IRuntimeDriver
         , public IQuantumGateSet
     {
-        Qubit AllocateQubit() override
+        QubitIdType AllocateQubit() override
         {
             throw std::logic_error("not_implemented: AllocateQubit");
         }
-        void ReleaseQubit(Qubit /* qubit */) override
+        void ReleaseQubit(QubitIdType /* qubit */) override
         {
             throw std::logic_error("not_implemented: ReleaseQubit");
         }
-        virtual std::string QubitToString(Qubit /* qubit */) override
+        virtual std::string QubitToString(QubitIdType /* qubit */) override
         {
             throw std::logic_error("not_implemented: QubitToString");
         }
-        void X(Qubit /*target*/) override
+        void X(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: X");
         }
-        void Y(Qubit /*target*/) override
+        void Y(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: Y");
         }
-        void Z(Qubit /* target */) override
+        void Z(QubitIdType /* target */) override
         {
             throw std::logic_error("not_implemented: Z");
         }
-        void H(Qubit /*target*/) override
+        void H(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: H");
         }
-        void S(Qubit /*target*/) override
+        void S(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: S");
         }
-        void T(Qubit /*target*/) override
+        void T(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: T");
         }
-        void R(PauliId /* axis */, Qubit /* target */, double /* theta */) override
+        void R(PauliId /* axis */, QubitIdType /* target */, double /* theta */) override
         {
             throw std::logic_error("not_implemented: R");
         }
-        void Exp(long /* numTargets */, PauliId* /* paulis */, Qubit* /* targets */, double /* theta */) override
+        void Exp(long /* numTargets */, PauliId* /* paulis */, QubitIdType* /* targets */, double /* theta */) override
         {
             throw std::logic_error("not_implemented: Exp");
         }
-        void ControlledX(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledX(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledX");
         }
-        void ControlledY(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledY(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledY");
         }
-        void ControlledZ(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledZ(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledZ");
         }
-        void ControlledH(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledH(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledH");
         }
-        void ControlledS(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledS(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledS");
         }
-        void ControlledT(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledT(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledT");
         }
-        void ControlledR(long /*numControls*/, Qubit* /*controls*/, PauliId /*axis*/, Qubit /*target*/,
+        void ControlledR(long /*numControls*/, QubitIdType* /*controls*/, PauliId /*axis*/, QubitIdType /*target*/,
                          double /*theta*/) override
         {
             throw std::logic_error("not_implemented: ControlledR");
         }
-        void ControlledExp(long /*numControls*/, Qubit* /*controls*/, long /*numTargets*/, PauliId* /*paulis*/,
-                           Qubit* /*targets*/, double /*theta*/) override
+        void ControlledExp(long /*numControls*/, QubitIdType* /*controls*/, long /*numTargets*/, PauliId* /*paulis*/,
+                           QubitIdType* /*targets*/, double /*theta*/) override
         {
             throw std::logic_error("not_implemented: ControlledExp");
         }
-        void AdjointS(Qubit /*target*/) override
+        void AdjointS(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: AdjointS");
         }
-        void AdjointT(Qubit /*target*/) override
+        void AdjointT(QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: AdjointT");
         }
-        void ControlledAdjointS(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledAdjointS(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledAdjointS");
         }
-        void ControlledAdjointT(long /*numControls*/, Qubit* /*controls*/, Qubit /*target*/) override
+        void ControlledAdjointT(long /*numControls*/, QubitIdType* /*controls*/, QubitIdType /*target*/) override
         {
             throw std::logic_error("not_implemented: ControlledAdjointT");
         }
-        Result Measure(long /*numBases*/, PauliId* /*bases*/, long /*numTargets*/, Qubit* /*targets*/) override
+        Result Measure(long /*numBases*/, PauliId* /*bases*/, long /*numTargets*/, QubitIdType* /*targets*/) override
         {
             throw std::logic_error("not_implemented: Measure");
         }

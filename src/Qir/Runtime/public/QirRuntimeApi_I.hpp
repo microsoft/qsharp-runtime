@@ -19,11 +19,11 @@ namespace Quantum
         IRuntimeDriver() = default;
 
         // Doesn't necessarily provide insight into the state of the qubit (for that look at IDiagnostics)
-        virtual std::string QubitToString(Qubit qubit) = 0;
+        virtual std::string QubitToString(QubitIdType qubit) = 0;
 
         // Qubit management
-        virtual Qubit AllocateQubit()          = 0;
-        virtual void ReleaseQubit(Qubit qubit) = 0;
+        virtual QubitIdType AllocateQubit()          = 0;
+        virtual void ReleaseQubit(QubitIdType qubit) = 0;
 
         virtual void ReleaseResult(Result result)          = 0;
         virtual bool AreEqualResults(Result r1, Result r2) = 0;

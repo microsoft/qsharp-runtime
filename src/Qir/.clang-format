@@ -1,6 +1,7 @@
 # https://clang.llvm.org/docs/ClangFormat.html
 # Options listed in this file: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 # Visual Studio Code Integration: https://clang.llvm.org/docs/ClangFormat.html#visual-studio-code-integration
+# VSCode Show (Line End) Ruler: https://stackoverflow.com/a/64004251/6362941
 
 # To disable formatting of a specific fragment:
 # ```c++
