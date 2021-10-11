@@ -22,6 +22,8 @@ if ($Env:ENABLE_NATIVE -ne "false") {
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
+
+    ( & (Join-Path $PSScriptRoot .. src Simulation Simulators SparseSimulator build.ps1) ) || ( $script:all_ok = $False )
 } else {
     Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
 }

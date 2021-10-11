@@ -5,6 +5,8 @@
 $all_ok = $True
 
 if ($Env:ENABLE_NATIVE -ne "false") {
+    ( & (Join-Path $PSScriptRoot .. src Simulation Simulators SparseSimulator test.ps1) ) || ( $script:all_ok = $False )
+
     $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
     & "$nativeSimulator/test-native-simulator.ps1"
     if ($LastExitCode -ne 0) {
