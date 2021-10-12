@@ -30,6 +30,8 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Foundation
   qsharp-foundation-qis-support-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
+  ${LIBCMT_SPECTRE}
+  ${LIBVCRUNTIME_SPECTRE}
 )
 add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 
