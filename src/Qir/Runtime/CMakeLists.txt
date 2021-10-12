@@ -30,7 +30,7 @@ if (WIN32)
         message(FATAL_ERROR "Could not locate vswhere.exe - unable to source vc redistributable")
         endif()
         execute_process(
-        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/lib/spectre/x64
+        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/lib/spectre/x64 -sort
         OUTPUT_VARIABLE _vs_install_loc_out
         RESULT_VARIABLE _vs_where_exitcode
         OUTPUT_STRIP_TRAILING_WHITESPACE
