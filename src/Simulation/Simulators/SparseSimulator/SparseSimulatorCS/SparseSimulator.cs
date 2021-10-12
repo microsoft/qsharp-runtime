@@ -31,7 +31,7 @@ namespace Microsoft.Quantum.SparseSimulation
         public SparseSimulator() : base(new SparseSimulatorProcessor() )
         {
             // Emulates AND
-            Register(typeof(ApplyAnd), typeof(ApplyAndWrapper), typeof(IUnitary));
+            //Register(typeof(ApplyAnd), typeof(ApplyAndWrapper), typeof(IUnitary));
             Id = ((SparseSimulatorProcessor)this.QuantumProcessor).Id;
         }
 

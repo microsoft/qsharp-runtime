@@ -3,6 +3,8 @@
 
 #Requires -Version 7.1
 
+Write-Host "##[info]Build SparseSimulator"
+
 & (Join-Path $PSScriptRoot .. .. .. .. build set-env.ps1)
 $FailureCommands = 'Write-Host "##vso[task.logissue type=error;] Failed to build SparseSimulator. See errors below or above." ;  Pop-Location ; Exit 1'
 
