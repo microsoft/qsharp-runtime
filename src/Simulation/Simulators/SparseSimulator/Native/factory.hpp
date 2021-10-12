@@ -11,9 +11,9 @@
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
-unsigned createSimulator(logical_qubit_id);
-void destroySimulator(unsigned);
+simulator_id_type createSimulator(logical_qubit_id);
+void destroySimulator(simulator_id_type);
 
-std::shared_ptr<SparseSimulator>& getSimulator(unsigned);
+std::shared_ptr<SparseSimulator>& getSimulator(simulator_id_type);
 
 } // namespace Microsoft::Quantum::SPARSESIMULATOR

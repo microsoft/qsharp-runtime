@@ -55,7 +55,7 @@ namespace SparseSimulatorTestHelpers
 
 	inline static void removeIdentities(std::vector<Gates::Basis>& b, std::vector<logical_qubit_id>& qs)
 	{
-		unsigned i = 0;
+		size_t i = 0;
 		while (i != b.size())
 		{
 			if (b[i] == Gates::Basis::PauliI)
@@ -92,7 +92,7 @@ namespace SparseSimulatorTestHelpers
 			std::size_t xy_bits = 0;
 			std::size_t yz_bits = 0;
 			int y_count = 0;
-			for (unsigned i = 0; i < b.size(); ++i)
+			for (size_t i = 0; i < b.size(); ++i)
 			{
 				switch (b[i])
 				{

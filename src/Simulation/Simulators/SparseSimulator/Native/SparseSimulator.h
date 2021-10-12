@@ -52,7 +52,7 @@ std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantu
 // If the number of non-zero coefficients is low, the number of qubits may be fairly large.
 // Sparse simulator employs std::unordered_map hashtable.
 // Keys are basis vectors represented by std::bitset<>.
-// Values are non-zero amplitudes represented by std::complex<RealType>.
+// Values are non-zero amplitudes represented by std::complex<real_type>.
 // Zero amplitudes are simply not stored.
 // Hashtable is reallocated and reconstructed on almost every gate.
 // Reallocation is saved for some gates that can be performed in one round.
@@ -99,7 +99,7 @@ public:
 		_quantum_state->DumpWavefunction(indent);
 	}
 
-	void set_random_seed(unsigned seed = std::mt19937::default_seed) {
+	void set_random_seed(std::mt19937::result_type seed = std::mt19937::default_seed) {
 		_quantum_state->set_random_seed(seed);
 	}
 

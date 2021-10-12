@@ -17,7 +17,7 @@ namespace Microsoft::Quantum::SPARSESIMULATOR
 std::shared_mutex _mutex;
 std::vector<std::shared_ptr<SparseSimulator>> _simulators;
 
-unsigned createSimulator(logical_qubit_id num_qubits)
+simulator_id_type createSimulator(logical_qubit_id num_qubits)
 {
     if (num_qubits > MAX_QUBITS)
         throw std::runtime_error("Max number of qubits is exceeded!");
@@ -41,11 +41,11 @@ unsigned createSimulator(logical_qubit_id num_qubits)
         _simulators[emptySlot] = std::make_shared<SparseSimulator>(num_qubits);
     }
 
-    return static_cast<unsigned>(emptySlot);
+    return static_cast<simulator_id_type>(emptySlot);
 }
 
 // Deletes a simulator in the vector
-void destroySimulator(unsigned id)
+void destroySimulator(simulator_id_type id)
 {
     std::lock_guard<std::shared_mutex> lock(_mutex);
 
@@ -53,7 +53,7 @@ void destroySimulator(unsigned id)
 }
 
 // Returns a simulator at some id (used for the C++/C# API)
-std::shared_ptr<SparseSimulator>& getSimulator(unsigned id)
+std::shared_ptr<SparseSimulator>& getSimulator(simulator_id_type id)
 {
     std::shared_lock<std::shared_mutex> shared_lock(_mutex);
 

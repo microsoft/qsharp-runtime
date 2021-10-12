@@ -25,8 +25,8 @@ using namespace SparseSimulatorTestHelpers;
 
 template<size_t num_qubits>
 void MultiExpReferenceTest(
-    std::function<void(unsigned)> qubit_prep,
-    std::function<void(unsigned)> qubit_clear
+    std::function<void(simulator_id_type)> qubit_prep,
+    std::function<void(simulator_id_type)> qubit_clear
 ) {
     const qubit_label_type<num_qubits> zero(0);
     logical_qubit_id* qubits = new logical_qubit_id[3];
@@ -40,11 +40,11 @@ void MultiExpReferenceTest(
         Paulis[2] = intPaulis / 16;
         
         for (double angle = 0.0; angle < M_PI / 2.0; angle += 0.1) {
-            unsigned sim = init_cpp(32);
+            simulator_id_type sim = init_cpp(32);
             qubit_prep(sim);
             
             std::vector<amplitude> vector_rep(8, 0.0);
-            for (unsigned i = 0; i < 8; i++) {
+            for (size_t i = 0; i < 8; i++) {
                 vector_rep[i] = getSimulator(sim)->probe(std::bitset<3>(i).to_string());
             }
             // New simulator Exp
@@ -52,7 +52,7 @@ void MultiExpReferenceTest(
             // Old simulator Exp
             std::vector<Gates::Basis> actualPaulis = { (Gates::Basis)Paulis[0],(Gates::Basis)Paulis[1], (Gates::Basis)Paulis[2] };
             apply_exp(vector_rep, actualPaulis, angle, std::vector<unsigned>{ 0, 1, 2 });
-            for (unsigned i = 0; i < 8; i++) {
+            for (size_t i = 0; i < 8; i++) {
                 amplitude result = getSimulator(sim)->probe(std::bitset<3>(i).to_string());
                 assert_amplitude_equality(vector_rep[i], result);
             }
@@ -63,16 +63,16 @@ void MultiExpReferenceTest(
 }
 
 TEST_CASE("initializationTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
 }
 
 TEST_CASE("AllocationTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
     allocateQubit_cpp(sim, 0);
     releaseQubit_cpp(sim, 0);
 }
 TEST_CASE("AllocateRebuildTest") {
-    unsigned sim = init_cpp(64);
+    simulator_id_type sim = init_cpp(64);
     for (int i = 0; i < 1024; i++) {
         allocateQubit_cpp(sim, i);
         getSimulator(sim)->X(i);
@@ -85,7 +85,7 @@ TEST_CASE("AllocateRebuildTest") {
 }
 
 TEST_CASE("XTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
     allocateQubit_cpp(sim, 0);
     X_cpp(sim, 0);
     assert_amplitude_equality(getSimulator(sim)->probe("0"), 0.0, 0.0);
@@ -94,7 +94,7 @@ TEST_CASE("XTest") {
     releaseQubit_cpp(sim, 0);
 }
 TEST_CASE("ZTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
     allocateQubit_cpp(sim, 0);
     Z_cpp(sim, 0);
     assert_amplitude_equality(getSimulator(sim)->probe("0"), 1.0, 0.0);
@@ -113,7 +113,7 @@ TEST_CASE("ZTest") {
     releaseQubit_cpp(sim, 0);
 }
 TEST_CASE("HTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
     allocateQubit_cpp(sim, 0);
     H_cpp(sim, 0);
     assert_amplitude_equality(getSimulator(sim)->probe("0"), 1.0 / sqrt(2.0), 0.0);
@@ -133,7 +133,7 @@ TEST_CASE("HTest") {
 }
 
 TEST_CASE("TGateTest") {
-    unsigned sim = init_cpp(32);
+    simulator_id_type sim = init_cpp(32);
     allocateQubit_cpp(sim, 0);
     T_cpp(sim, 0);
     assert_amplitude_equality(getSimulator(sim)->probe("0"), 1.0, 0.0);
@@ -170,7 +170,7 @@ TEST_CASE("TGateTest") {
 TEST_CASE("HCancellationTest")
 {
     int n_qubits = 16;
-    unsigned sim = init_cpp(n_qubits);
+    simulator_id_type sim = init_cpp(n_qubits);
     size_t buckets = 0;
     for (int i = 0; i < n_qubits; i++) {
         allocateQubit_cpp(sim, i);
@@ -186,7 +186,7 @@ TEST_CASE("HCancellationTest")
 TEST_CASE("HXZCommutationTest")
 {
     const int n_qubits = 16;
-    unsigned sim = init_cpp(n_qubits);
+    simulator_id_type sim = init_cpp(n_qubits);
     for (int i = 0; i < n_qubits; i++) {
         allocateQubit_cpp(sim, i);
         H_cpp(sim, i);
@@ -214,7 +214,7 @@ TEST_CASE("HXZCommutationTest")
 TEST_CASE("ResetTest")
 {
     const int n_qubits = 16;
-    unsigned sim = init_cpp(n_qubits);
+    simulator_id_type sim = init_cpp(n_qubits);
     allocateQubit_cpp(sim, 0);
     Reset_cpp(sim, 0);
     amplitude state = getSimulator(sim)->probe("0");
@@ -244,12 +244,12 @@ TEST_CASE("ResetTest")
 
 TEST_CASE("MultiExpWithHTest") {
     const int num_qubits = 32;
-    auto qubit_prep = [](unsigned sim ) {
+    auto qubit_prep = [](simulator_id_type sim ) {
         H_cpp(sim, 0);
         H_cpp(sim, 1);
         H_cpp(sim, 2);
     };
-    auto qubit_clear = [](unsigned sim) {
+    auto qubit_clear = [](simulator_id_type sim) {
         H_cpp(sim, 2);
         releaseQubit_cpp(sim, 2);
         H_cpp(sim, 1);
@@ -262,12 +262,12 @@ TEST_CASE("MultiExpWithHTest") {
 
 TEST_CASE("MultiExpBasisTest") {
     const int num_qubits = 32;
-    auto qubit_prep = [](unsigned sim, int index) {
+    auto qubit_prep = [](simulator_id_type sim, int index) {
         if ((index & 1) == 0) { X_cpp(sim, 0); }
         if ((index & 2) == 0) { X_cpp(sim, 1); }
         if ((index & 4) == 0) { X_cpp(sim, 2); }
     };
-    auto qubit_clear = [](unsigned sim, int index) {
+    auto qubit_clear = [](simulator_id_type sim, int index) {
         if ((index & 1) == 0) { X_cpp(sim, 0); }
         releaseQubit_cpp(sim, 0);
         if ((index & 2) == 0) { X_cpp(sim, 1); }
@@ -276,7 +276,7 @@ TEST_CASE("MultiExpBasisTest") {
         releaseQubit_cpp(sim, 2);
     };
     for (int i = 0; i < 8; i++) {
-        MultiExpReferenceTest<num_qubits>([=](unsigned sim) {qubit_prep(sim, i); }, [=](unsigned sim) {qubit_clear(sim, i); });
+        MultiExpReferenceTest<num_qubits>([=](simulator_id_type sim) {qubit_prep(sim, i); }, [=](simulator_id_type sim) {qubit_clear(sim, i); });
     }
 }
 
@@ -285,7 +285,7 @@ TEST_CASE("R1Test") {
     amplitude result0;
     amplitude result1;
     for (double angle = 0.0; angle < M_PI / 2.0; angle += 0.1) {
-        unsigned sim = init_cpp(num_qubits);
+        simulator_id_type sim = init_cpp(num_qubits);
         H_cpp(sim, 0);
         R1_cpp(sim, angle, 0);
         result0 = getSimulator(sim)->probe("0");

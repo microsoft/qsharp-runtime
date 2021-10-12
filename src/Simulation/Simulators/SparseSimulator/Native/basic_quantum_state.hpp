@@ -21,7 +21,7 @@ public:
 
     virtual void DumpWavefunction(size_t indent = 0) = 0;
 
-    virtual void set_random_seed(unsigned seed  = std::mt19937::default_seed) = 0;
+    virtual void set_random_seed(std::mt19937::result_type seed  = std::mt19937::default_seed) = 0;
 
     virtual void set_precision(double new_precision) = 0;
 

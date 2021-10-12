@@ -11,12 +11,15 @@
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
-using RealType = double;
+// Runtime may use multiple simulators so a simulator id is used to identify the simulator needed.
+using simulator_id_type = unsigned;
 
 // Logical qubit id is visible to the clients and is immutable during the lifetime of the qubit.
 using logical_qubit_id = unsigned;
 
-using amplitude = std::complex<RealType>;
+using real_type = double;
+
+using amplitude = std::complex<real_type>;
 
 template <size_t num_qubits>
 using qubit_label_type = std::bitset<num_qubits>;

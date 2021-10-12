@@ -22,45 +22,45 @@ std::string sample_string;
 extern "C"
 {
 
-    MICROSOFT_QUANTUM_DECL unsigned init_cpp(logical_qubit_id num_qubits)
+    MICROSOFT_QUANTUM_DECL simulator_id_type init_cpp(logical_qubit_id num_qubits)
     {
        return createSimulator(num_qubits);
     }
 
 
-    MICROSOFT_QUANTUM_DECL void destroy_cpp(unsigned sim_id)
+    MICROSOFT_QUANTUM_DECL void destroy_cpp(simulator_id_type sim_id)
     {
         destroySimulator(sim_id);
     }
 
-    MICROSOFT_QUANTUM_DECL void seed_cpp(unsigned sim_id, _In_ unsigned s){
+    MICROSOFT_QUANTUM_DECL void seed_cpp(simulator_id_type sim_id, _In_ unsigned int s){
         getSimulator(sim_id)->set_random_seed(s);
     }
 
-    MICROSOFT_QUANTUM_DECL void allocateQubit_cpp(unsigned sim_id, logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void allocateQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
     {
         getSimulator(sim_id)->allocate_specific_qubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(unsigned sim_id, logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
     {
         getSimulator(sim_id)->release(q);
     }
 
-    MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(unsigned sim_id)
+    MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(simulator_id_type sim_id)
     {
         return getSimulator(sim_id)->get_num_qubits();
     }
 
 // Generic single-qubit gate
 #define FWDGATE1(G)                                                                                                    \
-    MICROSOFT_QUANTUM_DECL void G##_cpp(unsigned sim_id, _In_ logical_qubit_id q)                                                   \
+    MICROSOFT_QUANTUM_DECL void G##_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)                                                   \
     {                                                                                                                  \
         getSimulator(sim_id)->G(q);                                                                  \
     }
 // Generic multi-qubit gate
 #define FWDCSGATE1(G)                                                                                                  \
-    MICROSOFT_QUANTUM_DECL void MC##G##_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) logical_qubit_id* c, _In_ logical_qubit_id q)   \
+    MICROSOFT_QUANTUM_DECL void MC##G##_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) logical_qubit_id* c, _In_ logical_qubit_id q)   \
     {                                                                                                                  \
                                                                                                                        \
         getSimulator(sim_id)->MC##G(std::vector<logical_qubit_id>(c, c + n), q);                                                   \
@@ -92,44 +92,44 @@ extern "C"
 
 
 
-    MICROSOFT_QUANTUM_DECL void SWAP_cpp(unsigned sim_id, _In_ logical_qubit_id q1, _In_ logical_qubit_id q2){
+    MICROSOFT_QUANTUM_DECL void SWAP_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q1, _In_ logical_qubit_id q2){
         getSimulator(sim_id)->SWAP(q1, q2);
     }
 
-    MICROSOFT_QUANTUM_DECL void MCSWAP_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) logical_qubit_id* c, _In_ logical_qubit_id q1, _In_ logical_qubit_id q2){
+    MICROSOFT_QUANTUM_DECL void MCSWAP_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) logical_qubit_id* c, _In_ logical_qubit_id q1, _In_ logical_qubit_id q2){
         getSimulator(sim_id)->CSWAP(std::vector<logical_qubit_id>(c, c + n), q1, q2);
     }
 
-    MICROSOFT_QUANTUM_DECL void MCApplyAnd_cpp(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
+    MICROSOFT_QUANTUM_DECL void MCApplyAnd_cpp(simulator_id_type sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
         getSimulator(sim_id)->MCApplyAnd(std::vector<logical_qubit_id>(controls, controls + length), target);
     }
 
-    MICROSOFT_QUANTUM_DECL void MCAdjointApplyAnd_cpp(unsigned sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
+    MICROSOFT_QUANTUM_DECL void MCAdjointApplyAnd_cpp(simulator_id_type sim_id,_In_ int length, _In_reads_(length) logical_qubit_id* controls, _In_ logical_qubit_id target){
         getSimulator(sim_id)->MCApplyAndAdj(std::vector<logical_qubit_id>(controls, controls + length), target);
     }
 
     // rotations
 
-    MICROSOFT_QUANTUM_DECL void R_cpp(unsigned sim_id, _In_ int b, _In_ double phi, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void R_cpp(simulator_id_type sim_id, _In_ int b, _In_ double phi, _In_ logical_qubit_id q)
     {
         getSimulator(sim_id)->R(static_cast<Gates::Basis>(b), phi, q);
     }
-    MICROSOFT_QUANTUM_DECL void Rfrac_cpp(unsigned sim_id, _In_ int b, _In_ std::int64_t numerator, _In_ std::int64_t power, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void Rfrac_cpp(simulator_id_type sim_id, _In_ int b, _In_ std::int64_t numerator, _In_ std::int64_t power, _In_ logical_qubit_id q)
     {
         getSimulator(sim_id)->RFrac(static_cast<Gates::Basis>(b), numerator, power, q);
     }
-    MICROSOFT_QUANTUM_DECL void R1_cpp(unsigned sim_id,_In_ double phi, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void R1_cpp(simulator_id_type sim_id,_In_ double phi, _In_ logical_qubit_id q)
     {
         getSimulator(sim_id)->R1(phi, q);
     }
-    MICROSOFT_QUANTUM_DECL void R1frac_cpp(unsigned sim_id, _In_ std::int64_t numerator, _In_ std::int64_t power, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL void R1frac_cpp(simulator_id_type sim_id, _In_ std::int64_t numerator, _In_ std::int64_t power, _In_ logical_qubit_id q)
     {
         getSimulator(sim_id)->R1Frac(numerator, power, q);
     }
 
     // multi-controlled rotations
     MICROSOFT_QUANTUM_DECL void MCR_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int b,
         _In_ double phi,
         _In_ logical_qubit_id nc,
@@ -141,7 +141,7 @@ extern "C"
     }
 
     MICROSOFT_QUANTUM_DECL void MCRFrac_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int b,
         _In_ std::int64_t numerator, 
         _In_ std::int64_t power,
@@ -154,7 +154,7 @@ extern "C"
     }
 
     MICROSOFT_QUANTUM_DECL void MCR1_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ double phi,
         _In_ int nc,
         _In_reads_(nc) logical_qubit_id* c,
@@ -165,7 +165,7 @@ extern "C"
     }
 
     MICROSOFT_QUANTUM_DECL void MCR1Frac_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ std::int64_t numerator, 
         _In_ std::int64_t power,
         _In_ int nc,
@@ -178,7 +178,7 @@ extern "C"
 
     // Exponential of Pauli operators
     MICROSOFT_QUANTUM_DECL void Exp_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,
         _In_ double phi,
@@ -193,7 +193,7 @@ extern "C"
     }
 
    MICROSOFT_QUANTUM_DECL void MCExp_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int nc,
         _In_ int n,
         _In_reads_(nc) logical_qubit_id* c,
@@ -211,17 +211,17 @@ extern "C"
     }
 
     // measurements
-    MICROSOFT_QUANTUM_DECL bool M_cpp(unsigned sim_id, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL bool M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)
     {
         return getSimulator(sim_id)->M(q);
     }
 
-    MICROSOFT_QUANTUM_DECL void Reset_cpp(unsigned sim_id, _In_ logical_qubit_id q){
+    MICROSOFT_QUANTUM_DECL void Reset_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q){
         getSimulator(sim_id)->Reset(q);
     }
 
     MICROSOFT_QUANTUM_DECL bool Measure_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,
         _In_reads_(n) logical_qubit_id* q)
@@ -236,7 +236,7 @@ extern "C"
 
     // Extracts the probability of measuring a One result on qubits q with basis b
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,
         _In_reads_(n) logical_qubit_id* q)
@@ -253,13 +253,13 @@ extern "C"
     // Iterates through the entire wavefunction and calls `callback` on every state in the superposition
     // It will write the label of the state, in binary, from qubit 0 to `max_qubit_id`, into the char* pointer, then call `callback`
     //  with the real and complex values as the double arguments
-     MICROSOFT_QUANTUM_DECL void Dump_cpp(unsigned sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char* , double, double)){
+     MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char* , double, double)){
         return getSimulator(sim_id)->dump_all(max_qubit_id, callback);
      }
 
      // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
-        unsigned sim_id,
+        simulator_id_type sim_id,
         _In_ logical_qubit_id n,
         _In_reads_(n) logical_qubit_id* q,
         _In_ void (*callback)(char* , double, double))
@@ -270,7 +270,7 @@ extern "C"
 
 
     // Asserts that the gates in `b`, measured on the qubits in `q`, return `result`
-    MICROSOFT_QUANTUM_DECL bool Assert_cpp(unsigned sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){
+    MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){
         std::vector<Gates::Basis> bv;
         bv.reserve(n);
         for (int i = 0; i < n; ++i)

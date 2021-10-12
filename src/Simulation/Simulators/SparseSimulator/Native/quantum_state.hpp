@@ -136,7 +136,7 @@ public:
     }
 
 
-    void set_random_seed(unsigned seed) {
+    void set_random_seed(std::mt19937::result_type seed) {
          std::mt19937 gen(seed);
         std::uniform_real_distribution<double> dist(0, 1);
         _rng = [gen, dist]() mutable { return dist(gen); };

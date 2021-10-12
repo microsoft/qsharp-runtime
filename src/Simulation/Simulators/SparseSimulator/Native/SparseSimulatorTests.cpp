@@ -32,17 +32,17 @@ void MultiExpTest(
         };
         for (double angle = 0.0; angle < M_PI / 2.0; angle += 0.1) {
             SparseSimulator sim = SparseSimulator(num_qubits);
-            std::vector<unsigned> qubits{ 0,1,2 };
+            std::vector<logical_qubit_id> qubits{ 0,1,2 };
             qubit_prep(sim);
             std::vector<amplitude> vector_rep(8, 0.0);
-            for (unsigned i = 0; i < 8; i++) {
+            for (size_t i = 0; i < 8; i++) {
                 vector_rep[i] = sim.probe(std::bitset<3>(i).to_string());
             }
             // New simulator Exp
             sim.Exp(Paulis, angle, qubits);
             // Old simulator Exp
-            apply_exp(vector_rep, Paulis, angle, std::vector<unsigned>{ 0, 1, 2 });
-            for (unsigned i = 0; i < 8; i++) {
+            apply_exp(vector_rep, Paulis, angle, std::vector<logical_qubit_id>{ 0, 1, 2 });
+            for (size_t i = 0; i < 8; i++) {
                 amplitude result = sim.probe(std::bitset<3>(i).to_string());
                 assert_amplitude_equality(vector_rep[i], result);
             }
@@ -578,7 +578,7 @@ TEST_CASE("CSWAPGateTest") {
 TEST_CASE("MTest") {
     const logical_qubit_id num_qubits = 32;
     const qubit_label_type<num_qubits> zero(0);
-    const int n_tests = 5000;
+    const size_t n_tests = 5000;
     const double log_false_positive_threshold = 0.1;
     const double log_false_negative_threshold = 100.0;
     for (double angle = 0.0; angle < M_PI / 2.0; angle += 0.1) {
@@ -586,8 +586,8 @@ TEST_CASE("MTest") {
         sim.set_random_seed(12345);
         double expected_ratio = sin(angle / 2.0) * sin(angle / 2.0);
         double ratio = 0.0;
-        unsigned long total_tests = 0;
-        unsigned long  ones = 0;
+        size_t total_tests = 0;
+        size_t ones = 0;
         double std_dev = 0.0;
         double log_prob = 0.0;
         logical_qubit_id qubit = 0;
