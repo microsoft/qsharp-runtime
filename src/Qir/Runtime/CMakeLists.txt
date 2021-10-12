@@ -26,15 +26,14 @@ if (WIN32)
     find_program(_vswhere_tool
         NAMES vswhere
         PATHS "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/Installer")
-        if (NOT ${vswhere})
+    if (NOT ${vswhere})
         message(FATAL_ERROR "Could not locate vswhere.exe - unable to source vc redistributable")
-        endif()
-        execute_process(
-        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/lib/spectre/x64 -sort
+    endif()
+    execute_process(
+        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.29.*/**/lib/spectre/x64 -sort
         OUTPUT_VARIABLE _vs_install_loc_out
         RESULT_VARIABLE _vs_where_exitcode
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
     file(TO_CMAKE_PATH "${_vs_install_loc_out}" SPECTRE_LIB_PATH_OUT)
     string(REGEX REPLACE "[\r\n]+" ";" SPECTRE_LIB_PATH ${SPECTRE_LIB_PATH_OUT})
     message(INFO "*** install loc: ${SPECTRE_LIB_PATH}")
