@@ -9,6 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        // TODO(rokuzmin): QSimAssertProb is never used?
         public class QSimAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private NativeCommonSimulator Simulator { get; }
@@ -38,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     expectedPr = 1 - expectedPr;
                 }
 
-                var ensemblePr = JointEnsembleProbability(Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds());
+                var ensemblePr = this.Simulator.JointEnsembleProbability((uint)paulis.Length, paulis.ToArray(), qubits.GetIds());
 
                 if (Abs(ensemblePr - expectedPr) > tol)
                 {

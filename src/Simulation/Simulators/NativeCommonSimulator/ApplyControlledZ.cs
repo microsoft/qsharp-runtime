@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubits(new QArray<Qubit>(new Qubit[]{ control, target }));
 
-            MCZ(this.Id, 1, new uint[]{(uint)control.Id}, (uint)target.Id);
+            MCZ(1, new uint[]{(uint)control.Id}, (uint)target.Id);
         }
     }
 }

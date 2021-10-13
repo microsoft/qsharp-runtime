@@ -16,9 +16,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             this.CheckQubits(new QArray<Qubit>(new Qubit[]{ qubit1, qubit2 }));
 
-            MCX(this.Id, 1, new uint[]{(uint)qubit1.Id}, (uint)qubit2.Id);
-            MCX(this.Id, 1, new uint[]{(uint)qubit2.Id}, (uint)qubit1.Id);
-            MCX(this.Id, 1, new uint[]{(uint)qubit1.Id}, (uint)qubit2.Id);
+            MCX(1, new uint[]{(uint)qubit1.Id}, (uint)qubit2.Id);
+            MCX(1, new uint[]{(uint)qubit2.Id}, (uint)qubit1.Id);
+            MCX(1, new uint[]{(uint)qubit1.Id}, (uint)qubit2.Id);
         }
     }
 }

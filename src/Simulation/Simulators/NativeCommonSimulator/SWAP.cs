@@ -15,9 +15,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             var ctrls2 = new QArray<Qubit>(target2);
             this.CheckQubits(ctrls1, target2);
 
-            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
-            MCX(this.Id, (uint)ctrls2.Length, ctrls2.GetIds(), (uint)target1.Id);
-            MCX(this.Id, (uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
+            MCX((uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
+            MCX((uint)ctrls2.Length, ctrls2.GetIds(), (uint)target1.Id);
+            MCX((uint)ctrls1.Length, ctrls1.GetIds(), (uint)target2.Id);
         }
 
         void IIntrinsicSWAP.ControlledBody(IQArray<Qubit> controls, Qubit target1, Qubit target2)
@@ -32,9 +32,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 var ctrls_2 = QArray<Qubit>.Add(controls, new QArray<Qubit>(target2));
                 this.CheckQubits(ctrls_1, target2);
                 
-                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
-                MCX(this.Id, (uint)ctrls_2.Length, ctrls_2.GetIds(), (uint)target1.Id);
-                MCX(this.Id, (uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
+                MCX((uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
+                MCX((uint)ctrls_2.Length, ctrls_2.GetIds(), (uint)target1.Id);
+                MCX((uint)ctrls_1.Length, ctrls_1.GetIds(), (uint)target2.Id);
             }
         }
     }

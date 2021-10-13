@@ -9,6 +9,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract void Exp(uint n, Pauli[] paulis, double angle, uint[] ids);
+        protected abstract void MCExp(uint n, Pauli[] paulis, double angle, uint nc, uint[] ctrls, uint[] ids);
+
         void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);
@@ -19,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 throw new InvalidOperationException($"Both input arrays for Exp (paulis, targets), must be of same size.");
             }
 
-            Exp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, targets.GetIds());
+            Exp((uint)paulis.Length, paulis.ToArray(), angle, targets.GetIds());
         }
 
         void IIntrinsicExp.AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
@@ -39,7 +42,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicExp)this).Body(paulis, angle, targets),
-                (count, ids) => MCExp(this.Id, (uint)paulis.Length, paulis.ToArray(), angle, count, ids, targets.GetIds()));
+                (count, ids) => MCExp((uint)paulis.Length, paulis.ToArray(), angle, count, ids, targets.GetIds()));
         }
 
         void IIntrinsicExp.ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)

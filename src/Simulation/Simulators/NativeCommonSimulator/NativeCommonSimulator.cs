@@ -12,24 +12,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
+    public abstract partial class NativeCommonSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
     {
-        public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime";
-
-        private delegate void IdsCallback(uint id);
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpIds")]
-        private static extern void sim_QubitsIds(uint id, IdsCallback callback);
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "init")]
-        private static extern uint Init();
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "destroy")]
-        private static extern uint Destroy(uint id);
-
-        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "seed")]
-        private static extern void SetSeed(uint id, UInt32 seedValue);
-
         /// <summary>
         /// Creates a an instance of a quantum simulator.
         /// </summary>
@@ -45,14 +29,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             (int?)randomNumberGeneratorSeed
         )
         {
-            Id = Init();
-            // Make sure that the same seed used by the built-in System.Random
-            // instance is also used by the native simulator itself.
-            SetSeed(this.Id, (uint)this.Seed);
-            ((QSimQubitManager)QubitManager).Init(Id);
+            Debug.Assert(this.QubitManager != null);
+            ((QSimQubitManager)this.QubitManager).Simulator = this;
         }
 
-        public uint Id { get; }
+        public uint Id { get; protected set; }
 
         public override string Name
         {
@@ -190,20 +171,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return used;
         }
 
-        /// <summary>
-        ///     Returns the list of the qubits' ids currently allocated in the simulator.
-        /// </summary>
-        public uint[] QubitIds
-        {
-            get
-            {
-                var ids = new List<uint>();
-                sim_QubitsIds(this.Id, ids.Add);
-                Debug.Assert(ids.Count == this.QubitManager.AllocatedQubitsCount);
-                return ids.ToArray();
-            }
-        }
-
         static void SafeControlled(IQArray<Qubit> ctrls, Action noControlsAction, Action<uint, uint[]> controlledAction)
         {
             if (ctrls == null || ctrls.Length == 0)
@@ -217,9 +184,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            Destroy(this.Id);
         }
     }
 }

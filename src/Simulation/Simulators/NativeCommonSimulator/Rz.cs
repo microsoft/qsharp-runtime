@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubit(target, nameof(target));
             CheckAngle(angle);
-            R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
+            R(Pauli.PauliZ, angle, (uint)target.Id);
         }
 
         void IIntrinsicRz.AdjointBody(double angle, Qubit target)
@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubits(controls, target);
             CheckAngle(angle);
-            MCR(this.Id, Pauli.PauliZ, angle, (uint)controls.Length, controls.GetIds(), (uint)target.Id);
+            MCR(Pauli.PauliZ, angle, (uint)controls.Length, controls.GetIds(), (uint)target.Id);
         }
 
         void IIntrinsicRz.ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target)

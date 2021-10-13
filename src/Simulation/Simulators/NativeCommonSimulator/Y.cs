@@ -8,11 +8,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract void Y(uint qubit);
+        protected abstract void MCY(uint count, uint[] ctrls, uint qubit);
+        
         void IIntrinsicY.Body(Qubit target)
         {
             this.CheckQubit(target);
 
-            Y(this.Id, (uint)target.Id);
+            Y((uint)target.Id);
         }
 
         void IIntrinsicY.ControlledBody(IQArray<Qubit> controls, Qubit target)
@@ -21,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicY)this).Body(target),
-                (count, ids) => MCY(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCY(count, ids, (uint)target.Id));
         }
     }
 }

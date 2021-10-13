@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubit(target);
 
-            Z(this.Id, (uint)target.Id);
+            Z((uint)target.Id);
         }
     }
 }

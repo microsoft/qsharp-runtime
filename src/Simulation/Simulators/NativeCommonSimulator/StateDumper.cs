@@ -8,6 +8,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected delegate bool DumpCallback(uint idx, double real, double img);
+        
+        protected abstract void sim_Dump(DumpCallback callback);
+        protected abstract bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback);
+
         /// <summary>
         /// This class allows you to dump the state (wave function)
         /// of the NativeCommonSimulator into a callback function.
@@ -48,13 +53,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 if (qubits == null)
                 {
-                    sim_Dump(Simulator.Id, Callback);
+                    this.Simulator.sim_Dump(Callback);
                     return true;
                 }
                 else
                 {
                     var ids = qubits.GetIds();
-                    return sim_DumpQubits(Simulator.Id, (uint)ids.Length, ids, Callback);
+                    return this.Simulator.sim_DumpQubits((uint)ids.Length, ids, Callback);
                 }
             }
         }

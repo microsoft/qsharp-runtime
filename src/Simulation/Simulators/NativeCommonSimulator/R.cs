@@ -8,12 +8,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract void R(Pauli basis, double angle, uint qubit);
+        protected abstract void MCR(Pauli basis, double angle, uint count, uint[] ctrls, uint qubit);
+        
         void IIntrinsicR.Body(Pauli pauli, double angle, Qubit target)
         {
             this.CheckQubit(target);
             CheckAngle(angle);
 
-            R(this.Id, pauli, angle, (uint)target.Id);
+            R(pauli, angle, (uint)target.Id);
         }
 
         void IIntrinsicR.AdjointBody(Pauli pauli, double angle, Qubit target)
@@ -28,7 +31,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicR)this).Body(pauli, angle, target),
-                (count, ids) => MCR(this.Id, pauli, angle, count, ids, (uint)target.Id));
+                (count, ids) => MCR(pauli, angle, count, ids, (uint)target.Id));
         }
 
 

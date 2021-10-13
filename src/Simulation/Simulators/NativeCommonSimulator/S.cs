@@ -8,11 +8,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract void S(uint qubit);
+        protected abstract void AdjS(uint qubit);
+        protected abstract void MCS(uint count, uint[] ctrls, uint qubit);
+        protected abstract void MCAdjS(uint count, uint[] ctrls, uint qubit);
+
         void IIntrinsicS.Body(Qubit target)
         {
             this.CheckQubit(target);
 
-            S(this.Id, (uint)target.Id);
+            S((uint)target.Id);
         }
 
         void IIntrinsicS.ControlledBody(IQArray<Qubit> controls, Qubit target)
@@ -21,14 +26,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicS)this).Body(target),
-                (count, ids) => MCS(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCS(count, ids, (uint)target.Id));
         }
 
         void IIntrinsicS.AdjointBody(Qubit target)
         {
             this.CheckQubit(target);
 
-            AdjS(this.Id, (uint)target.Id);
+            AdjS((uint)target.Id);
         }
 
         void IIntrinsicS.ControlledAdjointBody(IQArray<Qubit> controls, Qubit target)
@@ -37,7 +42,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             SafeControlled(controls,
                 () => ((IIntrinsicS)this).AdjointBody(target),
-                (count, ids) => MCAdjS(this.Id, count, ids, (uint)target.Id));
+                (count, ids) => MCAdjS(count, ids, (uint)target.Id));
         }
     }
 }

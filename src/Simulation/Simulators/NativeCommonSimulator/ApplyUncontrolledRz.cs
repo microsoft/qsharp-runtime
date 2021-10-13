@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             this.CheckQubit(target, nameof(target));
             CheckAngle(angle);
-            R(this.Id, Pauli.PauliZ, angle, (uint)target.Id);
+            R(Pauli.PauliZ, angle, (uint)target.Id);
         }
     }
 }

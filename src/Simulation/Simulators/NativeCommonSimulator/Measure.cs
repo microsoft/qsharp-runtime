@@ -9,6 +9,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract uint Measure(uint n, Pauli[] b, uint[] ids);
+        
         Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);
@@ -22,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 // that qubit as measured.
                 targets[0].IsMeasured = true;
             }
-            return Measure(this.Id, (uint)paulis.Length, paulis.ToArray(), targets.GetIds()).ToResult();
+            return Measure((uint)paulis.Length, paulis.ToArray(), targets.GetIds()).ToResult();
         }
     }
 }

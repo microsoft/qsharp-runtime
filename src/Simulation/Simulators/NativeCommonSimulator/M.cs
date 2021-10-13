@@ -8,12 +8,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
+        protected abstract uint M(uint q);
+    
         Result IIntrinsicM.Body(Qubit target)
         {
             this.CheckQubit(target);
             //setting qubit as measured to allow for release
             target.IsMeasured = true;
-            return M(this.Id, (uint)target.Id).ToResult();
+            return M((uint)target.Id).ToResult();
         }
     }
 }

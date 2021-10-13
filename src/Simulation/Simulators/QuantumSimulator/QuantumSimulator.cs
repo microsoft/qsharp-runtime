@@ -28,13 +28,23 @@ namespace Microsoft.Quantum.Simulation.Simulators
                randomNumberGeneratorSeed,
                disableBorrowing)
         {
+            Id = InitNative();
+            // Make sure that the same seed used by the built-in System.Random
+            // instance is also used by the native simulator itself.
+            SetSeedNative(this.Id, (uint)this.Seed);
+            //((QSimQubitManager)QubitManager).Init(Id);
+        }
+
+        public override void Dispose()
+        {
+            DestroyNative(this.Id);
         }
 
         public override string Name
         {
             get
             {
-                return "QuantumSimulator";
+                return "Quantum Simulator";
             }
         }
     }

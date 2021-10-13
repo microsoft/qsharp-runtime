@@ -9,7 +9,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
-        public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement
+        protected abstract double JointEnsembleProbability(uint n, Pauli[] b, uint[] q);
+
+        public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement // TODO(rokuzmin): QSimAssert is never used?
         {
             private NativeCommonSimulator Simulator { get; }
 
@@ -32,7 +34,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 var tolerance = 1.0e-10;
                 var expectedPr = result == Result.Zero ? 0.0 : 1.0;
 
-                var ensemblePr = JointEnsembleProbability(this.Simulator.Id, (uint)paulis.Length, paulis.ToArray(), qubits.GetIds());
+                var ensemblePr = this.Simulator.JointEnsembleProbability((uint)paulis.Length, paulis.ToArray(), qubits.GetIds());
                 
                 if (Abs(ensemblePr - expectedPr) > tolerance)
                 {

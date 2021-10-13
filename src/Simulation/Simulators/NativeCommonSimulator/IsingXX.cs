@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             CheckAngle(angle);
             this.CheckQubits(targets);
 
-            Exp(this.Id, (uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
+            Exp((uint)targets.Length, paulis, angle * 2.0, targets.GetIds());
         }
 
         void IIntrinsicIsingXX.AdjointBody(double angle, Qubit target1, Qubit target2)
@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 CheckAngle(angle);
                 this.CheckQubits(QArray<Qubit>.Add(controls, targets));
 
-                MCExp(this.Id, (uint)targets.Length, paulis, angle * 2.0, (uint)controls.Length, controls.GetIds(), targets.GetIds());
+                MCExp((uint)targets.Length, paulis, angle * 2.0, (uint)controls.Length, controls.GetIds(), targets.GetIds());
             }
         }
 

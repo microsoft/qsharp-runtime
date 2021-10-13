@@ -13,10 +13,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // The native simulator doesn't have a reset operation, so simulate
             // it via an M follow by a conditional X.
             this.CheckQubit(target);
-            var res = M(this.Id, (uint)target.Id);
+            var res = M((uint)target.Id);
             if (res == 1)
             {
-                X(this.Id, (uint)target.Id);
+                X((uint)target.Id);
             }
         }
     }

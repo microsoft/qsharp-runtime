@@ -10,21 +10,21 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class NativeCommonSimulator
     {
-        class QSimQubitManager : QubitManager
+        protected abstract void AllocateOne(uint qubit_id);
+        protected abstract bool ReleaseOne(uint qubit_id);
+
+        protected class QSimQubitManager : QubitManager
         {
             readonly bool throwOnReleasingQubitsNotInZeroState;
 
-            public uint SimulatorId { get; private set; }
+            public NativeCommonSimulator? Simulator { get; set; }   // Must not be nullable (and public). But we cannot 
+                // initialize it properly _during construction_. We initialize it _after construction_. 
+                // That is why it is nullable and public.
 
             public QSimQubitManager(bool throwOnReleasingQubitsNotInZeroState = true, long qubitCapacity = 32, bool mayExtendCapacity = true, bool disableBorrowing = false)
                 : base(qubitCapacity, mayExtendCapacity, disableBorrowing)
             {
                 this.throwOnReleasingQubitsNotInZeroState = throwOnReleasingQubitsNotInZeroState;
-            }
-
-            public void Init(uint simulatorId)
-            {
-                this.SimulatorId = simulatorId;
             }
 
             /// <summary>
@@ -34,20 +34,25 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             public override Qubit CreateQubitObject(long id)
             {
-                Debug.Assert(id < 50, "Using a qubit id > 50. This is a full-state simulator! Validating ids uniquenes might start becoming slow.");
+                Debug.Assert(id < 50, "Using a qubit id > 50. This is a full-state simulator! Validating ids uniqueness might start becoming slow.");
 
                 if (id >= this.MaxId)
                 {
                     this.MaxId = id + 1;
                 }
 
-                return new QSimQubit((int)id, SimulatorId);
+                Debug.Assert(Simulator != null);
+                return new QSimQubit((int)id, Simulator);
             }
 
-            protected override Qubit Allocate(bool usedOnlyForBorrowing)
+            protected override Qubit? Allocate(bool usedOnlyForBorrowing)
             {
-                Qubit qubit = base.Allocate(usedOnlyForBorrowing);
-                if (qubit != null) { AllocateOne(this.SimulatorId, (uint)qubit.Id); }
+                Qubit? qubit = base.Allocate(usedOnlyForBorrowing);
+                if (qubit != null) 
+                {
+                    Debug.Assert(Simulator != null);
+                    Simulator.AllocateOne((uint)qubit.Id); 
+                }
                 return qubit;
             }
 
@@ -56,7 +61,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 base.Release(qubit, wasUsedOnlyForBorrowing);
                 if (qubit != null)
                 {
-                    bool isReleasedQubitZero = ReleaseOne(this.SimulatorId, (uint)qubit.Id);
+                    Debug.Assert(Simulator != null);
+                    bool isReleasedQubitZero = Simulator.ReleaseOne((uint)qubit.Id);
                     if (!(isReleasedQubitZero || qubit.IsMeasured) && throwOnReleasingQubitsNotInZeroState)
                     {
                         throw new ReleasedQubitsAreNotInZeroState();

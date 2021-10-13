@@ -14,16 +14,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private static Pauli[] PAULI_Z = new Pauli[] { Pauli.PauliZ };
+
+            private NativeCommonSimulator Simulator { get; }
         
-            public QSimQubit(int id, uint simulatorId) : base(id)
+            public QSimQubit(int id, NativeCommonSimulator sim) : base(id)
             {
-                this.SimulatorId = simulatorId;
+                this.Simulator = sim;
             }
 
-            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-            public uint SimulatorId { get; }
-
-            public double Probability => JointEnsembleProbability(this.SimulatorId, 1, PAULI_Z, new uint[] { (uint)this.Id });
+            public double Probability => this.Simulator.JointEnsembleProbability(1, PAULI_Z, new uint[] { (uint)this.Id });
         }
     }
 }
