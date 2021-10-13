@@ -45,10 +45,18 @@ if (WIN32)
     find_library(LIBCMT_SPECTRE_DEB libcmtd PATHS ${SPECTRE_LIB_PATH} REQUIRED)
     set(LIBCMT_SPECTRE debug ${LIBCMT_SPECTRE_DEB} optimized ${LIBCMT_SPECTRE_REL})
     message(INFO "*** using spectre lib: ${LIBCMT_SPECTRE}")
+    find_library(LIBCPMT_SPECTRE_REL libcpmt PATHS ${SPECTRE_LIB_PATH} REQUIRED)
+    find_library(LIBCPMT_SPECTRE_DEB libcpmtd PATHS ${SPECTRE_LIB_PATH} REQUIRED)
+    set(LIBCPMT_SPECTRE debug ${LIBCPMT_SPECTRE_DEB} optimized ${LIBCPMT_SPECTRE_REL})
+    message(INFO "*** using spectre lib: ${LIBCPMT_SPECTRE}")
     find_library(LIBVCRUNTIME_SPECTRE_REL libvcruntime PATHS ${SPECTRE_LIB_PATH} REQUIRED)
     find_library(LIBVCRUNTIME_SPECTRE_DEB libvcruntimed PATHS ${SPECTRE_LIB_PATH} REQUIRED)
     set(LIBVCRUNTIME_SPECTRE debug ${LIBVCRUNTIME_SPECTRE_DEB} optimized ${LIBVCRUNTIME_SPECTRE_REL})
     message(INFO "*** using spectre lib: ${LIBVCRUNTIME_SPECTRE}")
+    set(SPECTRE_LIBS
+        ${LIBCMT_SPECTRE}
+        ${LIBCPMT_SPECTRE}
+        ${LIBVCRUNTIME_SPECTRE})
 
     add_link_options("LINKER:/guard:cf")
 endif()

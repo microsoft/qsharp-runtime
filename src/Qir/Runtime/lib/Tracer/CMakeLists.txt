@@ -25,8 +25,7 @@ target_link_libraries(Microsoft.Quantum.Qir.Tracer
   tracer-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
-  ${LIBCMT_SPECTRE}
-  ${LIBVCRUNTIME_SPECTRE}
+  ${SPECTRE_LIBS}
 )
 add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 
