@@ -6,7 +6,7 @@ using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         protected abstract void Y(uint qubit);
         protected abstract void MCY(uint count, uint[] ctrls, uint qubit);

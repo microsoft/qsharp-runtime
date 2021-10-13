@@ -7,14 +7,14 @@ using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         // TODO(rokuzmin): QSimAssertProb is never used?
         public class QSimAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
-            private NativeCommonSimulator Simulator { get; }
+            private CommonNativeSimulator Simulator { get; }
 
-            public QSimAssertProb(NativeCommonSimulator m) : base(m)
+            public QSimAssertProb(CommonNativeSimulator m) : base(m)
             {
                 this.Simulator = m;
             }

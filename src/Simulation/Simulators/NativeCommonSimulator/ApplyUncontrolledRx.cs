@@ -6,7 +6,7 @@ using Microsoft.Quantum.Intrinsic.Interfaces;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         void IIntrinsicApplyUncontrolledRx.Body(double angle, Qubit target)
         {

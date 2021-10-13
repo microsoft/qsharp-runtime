@@ -7,15 +7,15 @@ using static System.Math;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         protected abstract double JointEnsembleProbability(uint n, Pauli[] b, uint[] q);
 
         public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement // TODO(rokuzmin): QSimAssert is never used?
         {
-            private NativeCommonSimulator Simulator { get; }
+            private CommonNativeSimulator Simulator { get; }
 
-            public QSimAssert(NativeCommonSimulator m) : base(m)
+            public QSimAssert(CommonNativeSimulator m) : base(m)
             {
                 this.Simulator = m;
             }

@@ -8,7 +8,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         protected virtual QVoid process(Action<string> channel, IQArray<Qubit>? qubits)
         {
@@ -55,9 +55,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // TODO(rokuzmin): QsimDumpMachine is never used?
         public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
         {
-            private NativeCommonSimulator Simulator { get; }
+            private CommonNativeSimulator Simulator { get; }
 
-            public QsimDumpMachine(NativeCommonSimulator m) : base(m)
+            public QsimDumpMachine(CommonNativeSimulator m) : base(m)
             {
                 this.Simulator = m;
             }
@@ -73,9 +73,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // TODO(rokuzmin): QSimDumpRegister is never used?
         public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
         {
-            private NativeCommonSimulator Simulator { get; }
+            private CommonNativeSimulator Simulator { get; }
 
-            public QSimDumpRegister(NativeCommonSimulator m) : base(m)
+            public QSimDumpRegister(CommonNativeSimulator m) : base(m)
             {
                 this.Simulator = m;
             }

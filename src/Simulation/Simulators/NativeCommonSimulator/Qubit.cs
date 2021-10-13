@@ -8,16 +8,16 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator : SimulatorBase, IDisposable
+    public partial class CommonNativeSimulator : SimulatorBase, IDisposable
     {
         class QSimQubit : Qubit
         {
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private static Pauli[] PAULI_Z = new Pauli[] { Pauli.PauliZ };
 
-            private NativeCommonSimulator Simulator { get; }
+            private CommonNativeSimulator Simulator { get; }
         
-            public QSimQubit(int id, NativeCommonSimulator sim) : base(id)
+            public QSimQubit(int id, CommonNativeSimulator sim) : base(id)
             {
                 this.Simulator = sim;
             }

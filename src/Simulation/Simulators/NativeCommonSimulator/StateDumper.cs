@@ -6,7 +6,7 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         protected delegate bool DumpCallback(uint idx, double real, double img);
         
@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
             /// </summary>
-            public StateDumper(NativeCommonSimulator qsim)
+            public StateDumper(CommonNativeSimulator qsim)
             {
                 this.Simulator = qsim;
             }
@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The NativeCommonSimulator being reported.
             /// </summary>
-            public NativeCommonSimulator Simulator { get; }
+            public CommonNativeSimulator Simulator { get; }
 
             /// <summary>
             /// Entry method to get the dump of the wave function.
@@ -72,7 +72,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private int _maxCharsStateId;
 
-            public SimpleDumper(NativeCommonSimulator qsim, Action<string> channel) : base(qsim)
+            public SimpleDumper(CommonNativeSimulator qsim, Action<string> channel) : base(qsim)
             {
                 this.Channel = channel;
             }

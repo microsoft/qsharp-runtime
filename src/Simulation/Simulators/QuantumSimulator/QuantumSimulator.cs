@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class QuantumSimulator : NativeCommonSimulator
+    public partial class QuantumSimulator : CommonNativeSimulator
     {
         /// <summary>
         /// Creates a an instance of a quantum simulator.

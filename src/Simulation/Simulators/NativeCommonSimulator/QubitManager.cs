@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class NativeCommonSimulator
+    public partial class CommonNativeSimulator
     {
         protected abstract void AllocateOne(uint qubit_id);
         protected abstract bool ReleaseOne(uint qubit_id);
@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             readonly bool throwOnReleasingQubitsNotInZeroState;
 
-            public NativeCommonSimulator? Simulator { get; set; }   // Must not be nullable (and public). But we cannot 
+            public CommonNativeSimulator? Simulator { get; set; }   // Must not be nullable (and public). But we cannot 
                 // initialize it properly _during construction_. We initialize it _after construction_. 
                 // That is why it is nullable and public.
 

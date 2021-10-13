@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public abstract partial class NativeCommonSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
+    public abstract partial class CommonNativeSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IDisposable
     {
         /// <summary>
         /// Creates a an instance of a quantum simulator.
@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <param name="throwOnReleasingQubitsNotInZeroState"> If set to true, the exception is thrown when trying to release qubits not in zero state. </param>
         /// <param name="randomNumberGeneratorSeed"> Seed for the random number generator used by a simulator for measurement outcomes and the Random operation. </param>
         /// <param name="disableBorrowing"> If true, Borrowing qubits will be disabled, and a new qubit will be allocated instead every time borrowing is requested. Performance may improve. </param>
-        private protected NativeCommonSimulator(
+        private protected CommonNativeSimulator(
             bool throwOnReleasingQubitsNotInZeroState = true,
             UInt32? randomNumberGeneratorSeed = null,
             bool disableBorrowing = false)
@@ -39,7 +39,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get
             {
-                return "NativeCommonSimulator";
+                return "CommonNativeSimulator";
             }
         }
 
