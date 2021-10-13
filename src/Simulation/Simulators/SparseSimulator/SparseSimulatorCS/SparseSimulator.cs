@@ -15,6 +15,9 @@ using Microsoft.Quantum.SparseSimulation;
 namespace Microsoft.Quantum.SparseSimulation
 {
 
+    using QubitIdType = System.IntPtr;
+    using SimulatorIdType = System.UInt32;
+
     // Class that can be used as a simulator, but is mostly a wrapper
     // for the underlying SparseSimulatorProcessor
     public partial class SparseSimulator : QuantumProcessorDispatcher, IDisposable
@@ -69,106 +72,131 @@ namespace Microsoft.Quantum.SparseSimulation
         private string stackDepth;
 
         // C++ code uses the Id to refer to this simulator in a vector of simulators
-        public uint Id { get; }
+        public SimulatorIdType Id { get; }
 
         public string Name => "Sparse Simulator";
 
         [DllImport(simulator_dll)]
-        private static extern uint init_cpp(uint num_qubits);
+        private static extern SimulatorIdType init_cpp(QubitIdType num_qubits);
         public SparseSimulatorProcessor(uint num_qubits = 64)
         {
-            Id = init_cpp(num_qubits);
+            Id = init_cpp((QubitIdType)num_qubits);
             stackDepth = "";
         }
 
-
         [DllImport(simulator_dll)]
-        private static extern void seed_cpp(uint sim, uint new_seed);
+        private static extern void seed_cpp(SimulatorIdType sim, uint new_seed);
         public void SetSeed(uint newSeed = 5489)
         {
             seed_cpp(Id, newSeed);
         }
 
-
-
         // Basic gates
         [DllImport(simulator_dll)]
-        private static extern void MCApplyAnd_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCApplyAnd_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public void MCApplyAnd(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCApplyAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCApplyAnd_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
 
         [DllImport(simulator_dll)]
-        private static extern void MCAdjointApplyAnd_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCAdjointApplyAnd_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public void MCAdjointApplyAnd(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCAdjointApplyAnd_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCAdjointApplyAnd_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
 
 
         [DllImport(simulator_dll)]
-        private static extern void X_cpp(uint sim, int qubit_id);
+        private static extern void X_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void X(Qubit qubit)
-        { X_cpp(Id, qubit.Id); }
+        {
+            X_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void MCX_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCX_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledX(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCX_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCX_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void Z_cpp(uint sim, int qubit_id);
+        private static extern void Z_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void Z(Qubit qubit)
-        { Z_cpp(Id, qubit.Id); }
+        {
+            Z_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void MCZ_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCZ_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledZ(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCZ_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCZ_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void Y_cpp(uint sim, int qubit_id);
+        private static extern void Y_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void Y(Qubit qubit)
-        { Y_cpp(Id, qubit.Id); }
+        {
+            Y_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void MCY_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCY_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledY(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCY_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCY_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern int H_cpp(uint sim, int qubit_id);
+        private static extern int H_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void H(Qubit qubit)
-        { H_cpp(Id, qubit.Id); }
+        {
+            H_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void MCH_cpp(uint sim, int length, int[] controls, int target);
+        private static extern void MCH_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledH(IQArray<Qubit> controls, Qubit qubit)
         {
-            MCH_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCH_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void S_cpp(uint sim, int qubit_id);
+        private static extern void S_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void S(Qubit qubit)
-        { S_cpp(Id, qubit.Id); }
+        {
+            S_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void AdjS_cpp(uint sim, int qubit_id);
+        private static extern void AdjS_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void SAdjoint(Qubit qubit)
-        { AdjS_cpp(Id, qubit.Id); }
+        {
+            AdjS_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void T_cpp(uint sim, int qubit_id);
+        private static extern void T_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void T(Qubit qubit)
-        { T_cpp(Id, qubit.Id); }
+        {
+            T_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
-        private static extern void AdjT_cpp(uint sim, int qubit_id);
+        private static extern void AdjT_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void TAdjoint(Qubit qubit)
-        { AdjT_cpp(Id, qubit.Id); }
+        {
+            AdjT_cpp(Id, (QubitIdType)qubit.Id);
+        }
+
         [DllImport(simulator_dll)]
         [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool M_cpp(uint sim, int qubit_id);
+        private static extern bool M_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override Result M(Qubit qubit)
         {
-            if (M_cpp(Id, qubit.Id))
+            if (M_cpp(Id, (QubitIdType)qubit.Id))
             {
                 return Result.One;
             }
@@ -177,103 +205,120 @@ namespace Microsoft.Quantum.SparseSimulation
                 return Result.Zero;
             }
         }
+
         [DllImport(simulator_dll)]
         [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool Measure_cpp(uint sim, int length, int[] basis, int[] qubits);
+        private static extern bool Measure_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
         public override Result Measure(IQArray<Pauli> bases, IQArray<Qubit> qubits)
         {
-            if (Measure_cpp(Id, bases.Count(), bases.Select(x => (int)x).ToArray(), qubits.Select(x => x.Id).ToArray())) {
+            if (Measure_cpp(Id, bases.Count(), bases.Select(x => (int)x).ToArray(), qubits.Select(x => (QubitIdType)x.Id).ToArray())) {
                 return Result.One;
-            } else { return Result.Zero; }
+            } else {
+                return Result.Zero;
+            }
         }
 
         [DllImport(simulator_dll)]
-        private static extern void Reset_cpp(uint sim, int qubit_id);
+        private static extern void Reset_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void Reset(Qubit qubit)
         {
-            Reset_cpp(Id, qubit.Id);
+            Reset_cpp(Id, (QubitIdType)qubit.Id);
         }
 
-
         [DllImport(simulator_dll)]
-        private static extern void R_cpp(uint sim, int axis, double theta, int qubit_id);
+        private static extern void R_cpp(SimulatorIdType sim, int axis, double theta, QubitIdType qubit_id);
         public override void R(Pauli axis, double theta, Qubit qubit)
         {
-            R_cpp(Id, (int)axis, theta, qubit.Id);
+            R_cpp(Id, (int)axis, theta, (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void MCR_cpp(uint sim, int basis, double angle, int length, int[] controls, int target);
+        private static extern void MCR_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledR(IQArray<Qubit> controls, Pauli axis, double theta, Qubit qubit)
         {
-            MCR_cpp(Id, (int)axis, theta, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCR_cpp(Id, (int)axis, theta, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void Rfrac_cpp(uint sim, int axis, long numerator, long power, int qubit_id);
+        private static extern void Rfrac_cpp(SimulatorIdType sim, int axis, long numerator, long power, QubitIdType qubit_id);
         public override void RFrac(Pauli axis, long numerator, long power, Qubit qubit)
         {
-            Rfrac_cpp(Id, (int)axis, numerator, power, qubit.Id);
+            Rfrac_cpp(Id, (int)axis, numerator, power, (QubitIdType)qubit.Id);
         }
 
         [DllImport(simulator_dll)]
-        private static extern void MCRFrac_cpp(uint sim, int basis, long numerator, long power, int length, int[] controls, int target);
+        private static extern void MCRFrac_cpp(SimulatorIdType sim, int basis, long numerator, long power, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledRFrac(IQArray<Qubit> controls, Pauli axis, long numerator, long power, Qubit qubit)
         {
-            MCRFrac_cpp(Id, (int)axis, numerator, power, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCRFrac_cpp(Id, (int)axis, numerator, power, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void R1_cpp(uint sim, double theta, int qubit_id);
+        private static extern void R1_cpp(SimulatorIdType sim, double theta, QubitIdType qubit_id);
         public override void R1(double theta, Qubit qubit)
         {
-            R1_cpp(Id, theta, qubit.Id);
+            R1_cpp(Id, theta, (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void MCR1_cpp(uint sim, double angle, int length, int[] controls, int target);
+        private static extern void MCR1_cpp(SimulatorIdType sim, double angle, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledR1(IQArray<Qubit> controls, double theta, Qubit qubit)
         {
-            MCR1_cpp(Id, theta, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCR1_cpp(Id, theta, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void R1frac_cpp(uint sim, long numerator, long power, int qubit_id);
+        private static extern void R1frac_cpp(SimulatorIdType sim, long numerator, long power, QubitIdType qubit_id);
         public override void R1Frac(long numerator, long power, Qubit qubit)
         {
-            R1frac_cpp(Id, numerator, power, qubit.Id);
+            R1frac_cpp(Id, numerator, power, (QubitIdType)qubit.Id);
         }
+
         [DllImport(simulator_dll)]
-        private static extern void MCR1Frac_cpp(uint sim, long numerator, long power, int length, int[] controls, int target);
+        private static extern void MCR1Frac_cpp(SimulatorIdType sim, long numerator, long power, int length, QubitIdType[] controls, QubitIdType target);
         public override void ControlledR1Frac(IQArray<Qubit> controls, long numerator, long power, Qubit qubit)
         {
-            MCR1Frac_cpp(Id, numerator, power, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit.Id);
+            MCR1Frac_cpp(Id, numerator, power, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit.Id);
         }
 
         [DllImport(simulator_dll)]
-        private static extern void SWAP_cpp(uint sim, int qubit_id_1, int qubit_id_2);
+        private static extern void SWAP_cpp(SimulatorIdType sim, QubitIdType qubit_id_1, QubitIdType qubit_id_2);
         public override void SWAP(Qubit qubit1, Qubit qubit2)
         {
-            SWAP_cpp(Id, qubit1.Id, qubit2.Id);
-        }
-        [DllImport(simulator_dll)]
-        private static extern void MCSWAP_cpp(uint sim, int length, int[] controls, int qubit_id_1, int qubit_id_2);
-        public override void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
-        {
-            MCSWAP_cpp(Id, controls.Count(), controls.Select(x => x.Id).ToArray(), qubit1.Id, qubit2.Id);
+            SWAP_cpp(Id, (QubitIdType)qubit1.Id, (QubitIdType)qubit2.Id);
         }
 
         [DllImport(simulator_dll)]
-        private static extern void Exp_cpp(uint sim, int length, int[] b, double phi, int[] q);
+        private static extern void MCSWAP_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType qubit_id_1, QubitIdType qubit_id_2);
+        public override void ControlledSWAP(IQArray<Qubit> controls, Qubit qubit1, Qubit qubit2)
+        {
+            MCSWAP_cpp(Id, controls.Count(), controls.Select(x => (QubitIdType)x.Id).ToArray(), (QubitIdType)qubit1.Id, (QubitIdType)qubit2.Id);
+        }
+
+        [DllImport(simulator_dll)]
+        private static extern void Exp_cpp(SimulatorIdType sim, int length, int[] b, double phi, QubitIdType[] q);
         public override void Exp(IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
-            Exp_cpp(Id, paulis.Count(), paulis.Select(x => (int)x).ToArray(), theta, qubits.Select(x => x.Id).ToArray());
+            Exp_cpp(Id, paulis.Count(), paulis.Select(x => (int)x).ToArray(), theta, qubits.Select(x => (QubitIdType)x.Id).ToArray());
         }
+
         [DllImport(simulator_dll)]
-        private static extern void MCExp_cpp(uint sim, int controls_length, int length, int[] c, int[] b, double phi, int[] q);
+        private static extern void MCExp_cpp(SimulatorIdType sim, int controls_length, int length, QubitIdType[] c, int[] b, double phi, QubitIdType[] q);
         public override void ControlledExp(IQArray<Qubit> controls, IQArray<Pauli> paulis, double theta, IQArray<Qubit> qubits)
         {
-            MCExp_cpp(Id, controls.Count(), paulis.Count(), controls.Select(x => x.Id).ToArray(), paulis.Select(x => (int)x).ToArray(), theta, qubits.Select(x => x.Id).ToArray());
+            MCExp_cpp(
+                Id,
+                controls.Count(),
+                paulis.Count(),
+                controls.Select(x => (QubitIdType)x.Id).ToArray(),
+                paulis.Select(x => (int)x).ToArray(),
+                theta,
+                qubits.Select(x => (QubitIdType)x.Id).ToArray());
         }
 
         [DllImport(simulator_dll)]
         [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool Assert_cpp(uint sim, int length, int[] b, int[] q, bool result);
+        private static extern bool Assert_cpp(SimulatorIdType sim, int length, int[] b, QubitIdType[] q, bool result);
         public override void Assert(IQArray<Pauli> bases, IQArray<Qubit> qubits, Result result, string msg)
         {
             // Relies on C++ catching any assertion errors and returning false
@@ -281,7 +326,7 @@ namespace Microsoft.Quantum.SparseSimulation
                 Id,
                 bases.Count(),
                 bases.Select(x => (int)x).ToArray(),
-                qubits.Select(x => x.Id).ToArray(),
+                qubits.Select(x => (QubitIdType)x.Id).ToArray(),
                 result.Equals(Result.One)))
             {
                 throw new Exception(msg);
@@ -289,10 +334,15 @@ namespace Microsoft.Quantum.SparseSimulation
         }
 
         [DllImport(simulator_dll)] 
-        private static extern double JointEnsembleProbability_cpp(uint sim, int length, int[] basis, int[] qubits);
+        private static extern double JointEnsembleProbability_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
         public override void AssertProb(IQArray<Pauli> bases, IQArray<Qubit> qubits, double probabilityOfZero, string msg, double tol)
         {
-            double result = JointEnsembleProbability_cpp(Id, bases.Count(), bases.Select(x => (int)x).ToArray(), qubits.Select(x => x.Id).ToArray());
+            double result = JointEnsembleProbability_cpp(
+                Id,
+                bases.Count(),
+                bases.Select(x => (int)x).ToArray(),
+                qubits.Select(x => (QubitIdType)x.Id).ToArray());
+
             if (System.Math.Abs(1.0 - result - probabilityOfZero) > tol)
             {
                 var extendedMsg = $"{msg}\n\tExpected:\t{probabilityOfZero}\n\tActual:\t{result}";
@@ -303,14 +353,14 @@ namespace Microsoft.Quantum.SparseSimulation
 
 
         [DllImport(simulator_dll)]
-        private static extern void allocateQubit_cpp(uint sim, int qubit_id);
+        private static extern void allocateQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void OnAllocateQubits(IQArray<Qubit> qubits)
         {
             try
             {
                 foreach (Qubit qubit in qubits)
                 {
-                    allocateQubit_cpp(Id, qubit.Id);
+                    allocateQubit_cpp(Id, (QubitIdType)qubit.Id);
                 }
             } catch (ExternalException ex)
             {
@@ -320,14 +370,14 @@ namespace Microsoft.Quantum.SparseSimulation
         }
 
         [DllImport(simulator_dll)]
-        private static extern void releaseQubit_cpp(uint sim, int qubit_id);
+        private static extern void releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void OnReleaseQubits(IQArray<Qubit> qubits)
         {
             try
             {
                 foreach (Qubit qubit in qubits)
                 {
-                    releaseQubit_cpp(Id, qubit.Id);
+                    releaseQubit_cpp(Id, (QubitIdType)qubit.Id);
                 }
             } catch (ExternalException)
             {
@@ -343,7 +393,7 @@ namespace Microsoft.Quantum.SparseSimulation
         }
 
         [DllImport(simulator_dll)]
-        private static extern void destroy_cpp(uint sim);
+        private static extern void destroy_cpp(SimulatorIdType sim);
         public void Dispose(bool Disposing)
         {
             destroy_cpp(Id);
