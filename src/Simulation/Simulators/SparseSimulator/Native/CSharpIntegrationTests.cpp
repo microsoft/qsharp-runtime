@@ -51,7 +51,7 @@ void MultiExpReferenceTest(
             Exp_cpp(sim, 3, Paulis, angle, qubits);
             // Old simulator Exp
             std::vector<Gates::Basis> actualPaulis = { (Gates::Basis)Paulis[0],(Gates::Basis)Paulis[1], (Gates::Basis)Paulis[2] };
-            apply_exp(vector_rep, actualPaulis, angle, std::vector<unsigned>{ 0, 1, 2 });
+            apply_exp(vector_rep, actualPaulis, angle, std::vector<logical_qubit_id>{ (logical_qubit_id)0, (logical_qubit_id)1, (logical_qubit_id)2 });
             for (size_t i = 0; i < 8; i++) {
                 amplitude result = getSimulator(sim)->probe(std::bitset<3>(i).to_string());
                 assert_amplitude_equality(vector_rep[i], result);

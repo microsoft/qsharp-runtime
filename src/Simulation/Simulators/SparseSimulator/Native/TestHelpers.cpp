@@ -18,7 +18,7 @@ using namespace Microsoft::Quantum::SPARSESIMULATOR;
 namespace SparseSimulatorTestHelpers
 {
 
-	inline std::size_t make_mask(std::vector<unsigned> const& qs)
+	inline std::size_t make_mask(std::vector<logical_qubit_id> const& qs)
 	{
 		std::size_t mask = 0;
 		for (std::size_t q : qs)
@@ -73,11 +73,11 @@ namespace SparseSimulatorTestHelpers
 		std::vector<amplitude>& wfn,
 		std::vector<Gates::Basis> b,
 		double phi,
-		std::vector<unsigned>  qs)
+		std::vector<logical_qubit_id> qs)
 	{
 		removeIdentities(b, qs);
 		if (qs.size() == 0) { return; }
-		unsigned lowest = *std::min_element(qs.begin(), qs.end());
+		logical_qubit_id lowest = *std::min_element(qs.begin(), qs.end());
 
 		std::size_t offset = 1ull << lowest;
 		if (isDiagonal(b))
