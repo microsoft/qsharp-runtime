@@ -15,6 +15,9 @@ using System.Text;
 
 namespace Microsoft.Quantum.SparseSimulation
 {
+    using QubitIdType = System.IntPtr;
+    using SimulatorIdType = System.UInt32;
+
     public partial class SparseSimulator : QuantumProcessorDispatcher, IDisposable
     {
         // // Converts a big integer into a string label
@@ -217,8 +220,9 @@ namespace Microsoft.Quantum.SparseSimulation
         public delegate void StringCallback(string label, double real, double img);
 
         private delegate void DumpCallback(StringBuilder label, double real, double img);
+
         [DllImport(simulator_dll)]
-        private static extern void Dump_cpp(uint sim, uint max_qubits, DumpCallback callback);
+        private static extern void Dump_cpp(SimulatorIdType sim, QubitIdType max_qubits, DumpCallback callback);
 
         // This gets called by the base class
         public bool Dump(StringCallback callback,  int max_id, IQArray<Qubit> qubits = null)
@@ -232,20 +236,20 @@ namespace Microsoft.Quantum.SparseSimulation
             // so if we just want the full state, it calls a different function     
             if (qubits == null)
             {
-                Dump_cpp(Id, (uint)max_id, _callback);
+                Dump_cpp(Id, (QubitIdType)max_id, _callback);
                 return true;
             } else
             {
-                return DumpQubits_cpp(Id, qubits.Count(), qubits.Select(x => x.Id).ToArray(), _callback) ;
+                return DumpQubits_cpp(Id, qubits.Count(), qubits.Select(x => (QubitIdType)x.Id).ToArray(), _callback) ;
             }
         }
 
         [DllImport(simulator_dll)]
         [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool DumpQubits_cpp(uint sim, int length, int[] qubit_ids, DumpCallback callback);
+        private static extern bool DumpQubits_cpp(SimulatorIdType sim, int length, QubitIdType[] qubit_ids, DumpCallback callback);
 
         [DllImport(simulator_dll)]
-        private static extern uint num_qubits_cpp(uint sim);
+        private static extern QubitIdType num_qubits_cpp(SimulatorIdType sim);
     }
 
 }

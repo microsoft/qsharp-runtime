@@ -113,7 +113,7 @@ public:
 	// Implies that the caller of this function is tracking
 	// free qubits
 	void allocate_specific_qubit(logical_qubit_id qubit) {
-		size_t num_qubits = _quantum_state->get_num_qubits();
+		logical_qubit_id num_qubits = _quantum_state->get_num_qubits();
 		// Checks that there are enough qubits
 		if (qubit >= num_qubits){
 			// We create a new wavefunction and reallocate
