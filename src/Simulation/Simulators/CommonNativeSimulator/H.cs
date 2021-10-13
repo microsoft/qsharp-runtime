@@ -8,7 +8,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-
         protected abstract void H(uint qubit);
         protected abstract void MCH(uint count, uint[] ctrls, uint qubit);
         

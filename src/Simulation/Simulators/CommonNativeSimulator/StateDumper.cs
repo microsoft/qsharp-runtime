@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         /// <summary>
         /// This class allows you to dump the state (wave function)
-        /// of the NativeCommonSimulator into a callback function.
+        /// of the CommonNativeSimulator into a callback function.
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The callback method that will be used to report the amplitude 
             /// of each basis vector of the wave function.
-            /// The method should return 'true' if the NativeCommonSimulator should 
+            /// The method should return 'true' if the CommonNativeSimulator should 
             /// continue reporting the state of the remaining basis vectors.
             /// </summary>
             /// <param name="idx">The index of the basis state vector being reported.</param>
@@ -42,7 +42,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public abstract bool Callback(uint idx, double real, double img);
 
             /// <summary>
-            /// The NativeCommonSimulator being reported.
+            /// The CommonNativeSimulator being reported.
             /// </summary>
             public CommonNativeSimulator Simulator { get; }
 
