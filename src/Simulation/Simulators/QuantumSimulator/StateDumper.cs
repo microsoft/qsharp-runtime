@@ -2,29 +2,30 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public partial class CommonNativeSimulator
+    public partial class QuantumSimulator
     {
         protected delegate bool DumpCallback(uint idx, double real, double img);
         
-        protected abstract void sim_Dump(DumpCallback callback);
-        protected abstract bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback);
+        //protected virtual void sim_Dump(DumpCallback callback);
+        //protected virtual bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback);
 
         /// <summary>
         /// This class allows you to dump the state (wave function)
-        /// of the CommonNativeSimulator into a callback function.
+        /// of the QuantumSimulator into a callback function.
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
-        public abstract class StateDumper
+        public abstract class StateDumper // Is used by "iqsharp\src\Jupyter\Visualization\StateDisplayOperations.cs".
         {
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
             /// </summary>
-            public StateDumper(CommonNativeSimulator qsim)
+            public StateDumper(QuantumSimulator qsim)
             {
                 this.Simulator = qsim;
             }
@@ -32,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The callback method that will be used to report the amplitude 
             /// of each basis vector of the wave function.
-            /// The method should return 'true' if the CommonNativeSimulator should 
+            /// The method should return 'true' if the QuantumSimulator should 
             /// continue reporting the state of the remaining basis vectors.
             /// </summary>
             /// <param name="idx">The index of the basis state vector being reported.</param>
@@ -42,9 +43,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public abstract bool Callback(uint idx, double real, double img);
 
             /// <summary>
-            /// The CommonNativeSimulator being reported.
+            /// The QuantumSimulator being reported.
             /// </summary>
-            public CommonNativeSimulator Simulator { get; }
+            public QuantumSimulator Simulator { get; }
 
             /// <summary>
             /// Entry method to get the dump of the wave function.
@@ -72,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private int _maxCharsStateId;
 
-            public SimpleDumper(CommonNativeSimulator qsim, Action<string> channel) : base(qsim)
+            public SimpleDumper(QuantumSimulator qsim, Action<string> channel) : base(qsim)
             {
                 this.Channel = channel;
             }
@@ -172,6 +173,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
+                Debug.Assert(this.Simulator.QubitManager != null);
+
                 var count = qubits == null
                     ? this.Simulator.QubitManager.AllocatedQubitsCount
                     : qubits.Length;
