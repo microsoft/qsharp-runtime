@@ -9,7 +9,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
-        private const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime";
+        public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime"; // If this is not public then
+            // we get a CI build error:
+            // Preparation\Arbitrary.cs(23,41): error CS0117: 'QuantumSimulator' does not contain a definition for
+            // 'QSIM_DLL_NAME' [D:\a\1\s\submodules\QuantumLibraries\Standard\src\Standard.csproj]
 
         private delegate void IdsCallback(uint id);
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpIds")]
