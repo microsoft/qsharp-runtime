@@ -52,7 +52,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        // TODO(rokuzmin): QsimDumpMachine is never used?
+        // `QsimDumpMachine` makes an impression that it is never used,
+        // but since it inherits from Quantum.Diagnostics.DumpMachine (which is a C# class that corresponds to a
+        // Q# operation in our core libraries), it will be automatically used.
+        // It is instantiated via reflection, hence we don't see it easily in the code.
         public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
         {
             private CommonNativeSimulator Simulator { get; }
@@ -70,7 +73,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        // TODO(rokuzmin): QSimDumpRegister is never used?
+        // `QSimDumpRegister` makes an impression that it is never used,
+        // but since it inherits from Quantum.Diagnostics.QSimDumpRegister (which is a C# class that corresponds to a
+        // Q# operation in our core libraries), it will be automatically used.
+        // It is instantiated via reflection, hence we don't see it easily in the code.
         public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
         {
             private CommonNativeSimulator Simulator { get; }

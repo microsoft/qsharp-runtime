@@ -32,7 +32,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // Make sure that the same seed used by the built-in System.Random
             // instance is also used by the native simulator itself.
             SetSeedNative(this.Id, (uint)this.Seed);
-            //((QSimQubitManager)QubitManager).Init(Id);
         }
 
         public override void Dispose()
@@ -44,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get
             {
-                return "Quantum Simulator";
+                return "Quantum Simulator"; // There is a test case that expects exactly this string literal.
             }
         }
     }

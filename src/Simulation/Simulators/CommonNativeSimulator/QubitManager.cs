@@ -10,9 +10,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        protected abstract void AllocateOne(uint qubit_id);
-        protected abstract bool ReleaseOne(uint qubit_id);
-
         protected class QSimQubitManager : QubitManager
         {
             readonly bool throwOnReleasingQubitsNotInZeroState;

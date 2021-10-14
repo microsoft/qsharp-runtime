@@ -9,9 +9,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        protected abstract double JointEnsembleProbability(uint n, Pauli[] b, uint[] q);
-
-        public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement // TODO(rokuzmin): QSimAssert is never used?
+        // `QSimAssert` makes an impression that it is never used,
+        // but since it inherits from Quantum.Diagnostics.AssertMeasurement
+        // (which is a C# class that corresponds to a Q# operation in our core libraries), it will be automatically used.
+        // It is instantiated via reflection, hence we don't see it easily in the code.
+        public class QSimAssert : Microsoft.Quantum.Diagnostics.AssertMeasurement
         {
             private CommonNativeSimulator Simulator { get; }
 

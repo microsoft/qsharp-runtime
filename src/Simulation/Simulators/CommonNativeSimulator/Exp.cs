@@ -9,9 +9,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        protected abstract void Exp(uint n, Pauli[] paulis, double angle, uint[] ids);
-        protected abstract void MCExp(uint n, Pauli[] paulis, double angle, uint nc, uint[] ctrls, uint[] ids);
-
         void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
         {
             this.CheckQubits(targets);

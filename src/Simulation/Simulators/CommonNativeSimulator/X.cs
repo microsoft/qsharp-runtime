@@ -8,9 +8,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        protected abstract void X(uint qubit);
-        protected abstract void MCX(uint count, uint[] ctrls, uint qubit);
-
         void IIntrinsicX.Body(Qubit target)
         {
             this.CheckQubit(target);

@@ -8,11 +8,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        protected abstract void S(uint qubit);
-        protected abstract void AdjS(uint qubit);
-        protected abstract void MCS(uint count, uint[] ctrls, uint qubit);
-        protected abstract void MCAdjS(uint count, uint[] ctrls, uint qubit);
-
         void IIntrinsicS.Body(Qubit target)
         {
             this.CheckQubit(target);

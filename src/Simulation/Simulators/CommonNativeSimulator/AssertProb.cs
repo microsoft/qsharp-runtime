@@ -9,7 +9,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        // TODO(rokuzmin): QSimAssertProb is never used?
+        // `QSimAssertProb` makes an impression that it is never used,
+        // but since it inherits from Quantum.Diagnostics.AssertMeasurementProbability
+        // (which is a C# class that corresponds to a Q# operation in our core libraries), it will be automatically used.
+        // It is instantiated via reflection, hence we don't see it easily in the code.
         public class QSimAssertProb : Microsoft.Quantum.Diagnostics.AssertMeasurementProbability
         {
             private CommonNativeSimulator Simulator { get; }

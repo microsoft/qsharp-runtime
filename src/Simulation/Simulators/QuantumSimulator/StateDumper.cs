@@ -11,9 +11,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
     {
         protected delegate bool DumpCallback(uint idx, double real, double img);
         
-        //protected virtual void sim_Dump(DumpCallback callback);
-        //protected virtual bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback);
-
         /// <summary>
         /// This class allows you to dump the state (wave function)
         /// of the QuantumSimulator into a callback function.
