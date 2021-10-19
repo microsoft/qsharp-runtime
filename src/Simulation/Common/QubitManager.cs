@@ -321,13 +321,13 @@ namespace Microsoft.Quantum.Simulation.Common
         /// Allocates a qubit.
         /// Returns null if the qubit cannot be allocated.
         /// </summary>
-        protected virtual Qubit Allocate(bool usedOnlyForBorrowing)
+        protected virtual Qubit? Allocate(bool usedOnlyForBorrowing)
         {
             if (free == None)
             {
                 if (!MayExtendCapacity)
                 {
-                    throw new NotEnoughQubits(1, this.FreeQubitsCount);
+                    return null;
                 }
 
                 long oldNumQubits = NumQubits;
@@ -398,7 +398,12 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         public Qubit Allocate()
         {
-            return Allocate(usedOnlyForBorrowing: false);
+            Qubit? qb = Allocate(usedOnlyForBorrowing: false);
+            if (qb == null)
+            {
+                throw new NotEnoughQubits(1, this.FreeQubitsCount);
+            }
+            return qb;
         }
 
         /// <summary>
@@ -424,7 +429,15 @@ namespace Microsoft.Quantum.Simulation.Common
             }
             for (int i = 0; i < numToAllocate; i++)
             {
-                Qubit allocated = Allocate(usedOnlyForBorrowing: false);
+                Qubit? allocated = Allocate(usedOnlyForBorrowing: false);
+                if (allocated == null)
+                {
+                    for (int k = 0; k < i; k++)
+                    {
+                        Release(result[k], wasUsedOnlyForBorrowing: false);
+                    }
+                    throw new NotEnoughQubits(numToAllocate, this.FreeQubitsCount);
+                }
                 result.Modify(i, allocated);
             }
 
@@ -581,7 +594,15 @@ namespace Microsoft.Quantum.Simulation.Common
             { // Not enough qubits to borrow. Allocate what was not borrowed.
                 for (long i = numBorrowed; i < numToBorrow; i++)
                 {
-                    Qubit allocated = Allocate(usedOnlyForBorrowing: true);
+                    Qubit? allocated = Allocate(usedOnlyForBorrowing: true);
+                    if (allocated == null)
+                    {
+                        for (long k = numBorrowed; k < i; k++)
+                        {
+                            Release(borrowed[(int)k], wasUsedOnlyForBorrowing: true);
+                        }
+                        throw new NotEnoughQubits(numToBorrow, numBorrowed + this.FreeQubitsCount);
+                    }
                     borrowed.Modify(i, allocated);
                 }
             }
