@@ -42,11 +42,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return new QSimQubit((int)id, Simulator);
             }
 
-            protected override Qubit Allocate(bool usedOnlyForBorrowing)
+            protected override Qubit? Allocate(bool usedOnlyForBorrowing)
             {
-                Qubit qubit = base.Allocate(usedOnlyForBorrowing);
-                Debug.Assert(Simulator != null);
-                Simulator.AllocateOne((uint)qubit.Id); 
+                Qubit? qubit = base.Allocate(usedOnlyForBorrowing);
+                if (qubit != null) 
+                {
+                    Debug.Assert(Simulator != null);
+                    Simulator.AllocateOne((uint)qubit.Id); 
+                }
                 return qubit;
             }
 
