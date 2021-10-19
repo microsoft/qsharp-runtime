@@ -2,19 +2,22 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
+        protected delegate bool DumpCallback(uint idx, double real, double img);
+        
         /// <summary>
         /// This class allows you to dump the state (wave function)
         /// of the QuantumSimulator into a callback function.
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
-        public abstract class StateDumper
+        public abstract class StateDumper // Is used by "iqsharp\src\Jupyter\Visualization\StateDisplayOperations.cs".
         {
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
@@ -48,13 +51,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             {
                 if (qubits == null)
                 {
-                    sim_Dump(Simulator.Id, Callback);
+                    this.Simulator.sim_Dump(Callback);
                     return true;
                 }
                 else
                 {
                     var ids = qubits.GetIds();
-                    return sim_DumpQubits(Simulator.Id, (uint)ids.Length, ids, Callback);
+                    return this.Simulator.sim_DumpQubits((uint)ids.Length, ids, Callback);
                 }
             }
         }
@@ -167,6 +170,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
+                Debug.Assert(this.Simulator.QubitManager != null);
+
                 var count = qubits == null
                     ? this.Simulator.QubitManager.AllocatedQubitsCount
                     : qubits.Length;
