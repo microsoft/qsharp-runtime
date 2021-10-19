@@ -51,8 +51,7 @@ namespace Microsoft.Azure.Quantum
             // Optional parameters:
             credential ??= CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId);
             options ??= new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = options.Diagnostics.ApplicationId
-                                                ?? Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID");
+            SetApplicationId(options);
 
             this.ResourceGroupName = resourceGroupName;
             this.WorkspaceName = workspaceName;
@@ -247,6 +246,21 @@ namespace Microsoft.Azure.Quantum
                 this.Location,
                 jobId,
                 inner);
+        }
+
+        /// <summary>
+        /// Set the ApplicationId that will be added as a UserAgent prefix 
+        /// in calls to the Azure Quantum API.
+        /// </summary>
+        private static void SetApplicationId(QuantumJobClientOptions options)
+        {
+            var environmentAppId = Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID")?.Trim();
+            if (environmentAppId?.Length > 24)
+            {
+                environmentAppId = environmentAppId?.Substring(0, 24);
+            }
+
+            options.Diagnostics.ApplicationId = string.Join(' ', options.Diagnostics.ApplicationId, environmentAppId);
         }
     }
 }
