@@ -11,7 +11,6 @@ namespace Microsoft
 {
 namespace Quantum
 {
-    // TODO: is it OK to load/unload the dll for each simulator instance?
     class CBasicRuntimeDriver : public IRuntimeDriver
     {
         std::unique_ptr<CQubitManager> qubitManager;
