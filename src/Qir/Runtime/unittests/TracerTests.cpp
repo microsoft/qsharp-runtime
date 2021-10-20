@@ -16,9 +16,9 @@ TEST_CASE("Layering distinct single-qubit operations of non-zero durations", "[t
 {
     std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1)); // L(0,3) should be created
     CHECK(0 == tr->TraceSingleQubitOp(2, 2, q1)); // add the op into L(0,3)
@@ -46,9 +46,9 @@ TEST_CASE("Layering single-qubit operations of zero duration", "[tracer]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));       // L(0,3) should be created
     CHECK(0 == tr->TraceSingleQubitOp(2, 0, q1));       // add the op into L(0,3)
@@ -66,18 +66,18 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
-    Qubit q5 = tr->AllocateQubit();
-    Qubit q6 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
+    QubitIdType q5 = tr->AllocateQubit();
+    QubitIdType q6 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceMultiQubitOp(1, 1, 1 /*nFirst*/, &q1 /*first*/, 1 /*nSecond*/, &q2 /*second*/));
     CHECK(0 == tr->TraceMultiQubitOp(2, 2, 0 /*nFirst*/, nullptr /*first*/, 1 /*nSecond*/, &q2 /*second*/));
     // q2 now is at the limit of the layer duration
 
-    Qubit qs12[2] = {q1, q2};
+    QubitIdType qs12[2] = {q1, q2};
     CHECK(1 == tr->TraceMultiQubitOp(3, 1, 0 /*nFirst*/, nullptr /*first*/, 2 /*nSecond*/, qs12 /*second*/));
     CHECK(1 == tr->TraceMultiQubitOp(4, 1, 1 /*nFirst*/, &q2 /*first*/, 1 /*nSecond*/, &q3 /*second*/));
     // because of q2, both ops should have been added to a new layer, which now "catches" q1, q2, q3
@@ -93,7 +93,7 @@ TEST_CASE("Layering distinct controlled single-qubit operations", "[tracer]")
     CHECK(0 == tr->TraceSingleQubitOp(9, 1, q5));
     // should fall through to the first layer
 
-    Qubit qs46[2] = {q4, q6};
+    QubitIdType qs46[2] = {q4, q6};
     CHECK(1 == tr->TraceMultiQubitOp(10, 1, 2 /*nFirst*/, qs46 /*first*/, 1 /*nSecond*/, &q5 /*second*/));
     // because of the controls, should be added into the second layer
 
@@ -122,9 +122,9 @@ TEST_CASE("Operations with same id are counted together", "[tracer]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     // All of these ops should fit into a single layer L(0,3)
     tr->TraceSingleQubitOp(1, 1, q1);
@@ -147,10 +147,10 @@ TEST_CASE("Global barrier", "[tracer]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(2 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 4, q1)); // L(0,4) created
     CHECK(0 == tr->TraceSingleQubitOp(2, 1, q4)); // added to L(0,4)
@@ -199,17 +199,17 @@ TEST_CASE("Layering measurements", "[tracer]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
 
     CHECK(0 == tr->GetLayerIdOfSourceMeasurement(tr->TraceSingleQubitMeasurement(1, 1, q1)));
-    Qubit qs12[2] = {q1, q2};
+    QubitIdType qs12[2] = {q1, q2};
     CHECK(1 == tr->GetLayerIdOfSourceMeasurement(tr->TraceMultiQubitMeasurement(2, 1, 2, qs12)));
     CHECK(0 == tr->TraceSingleQubitOp(3, 1, q4));
     CHECK(0 == tr->GetLayerIdOfSourceMeasurement(tr->TraceSingleQubitMeasurement(4, 1, q3)));
-    Qubit qs23[2] = {q2, q3};
+    QubitIdType qs23[2] = {q2, q3};
     CHECK(2 == tr->GetLayerIdOfSourceMeasurement(tr->TraceMultiQubitMeasurement(5, 1, 2, qs23)));
     CHECK(1 == tr->TraceSingleQubitOp(3, 1, q4));
 }
@@ -218,8 +218,8 @@ TEST_CASE("Conditionals: noops", "[tracer][tracer.conditionals]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(3 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 3, q1));
     CHECK(1 == tr->TraceSingleQubitOp(1, 3, q1));
@@ -242,9 +242,9 @@ TEST_CASE("Conditionals: a new layer because of the fence", "[tracer][tracer.con
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -262,9 +262,9 @@ TEST_CASE("Conditionals: single fence", "[tracer][tracer.conditionals]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -287,9 +287,9 @@ TEST_CASE("Conditionals: fence from two result arrays", "[tracer][tracer.conditi
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -311,11 +311,11 @@ TEST_CASE("Conditionals: nested fence is later than parent", "[tracer][tracer.co
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
-    Qubit q5 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
+    QubitIdType q5 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -342,11 +342,11 @@ TEST_CASE("Conditionals: nested fence is earlier than parent", "[tracer][tracer.
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
-    Qubit q5 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
+    QubitIdType q5 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -372,11 +372,11 @@ TEST_CASE("Conditionals: fences and barriers", "[tracer][tracer.conditionals]")
 {
     std::shared_ptr<CTracer> tr = CreateTracer(1 /*layer duration*/);
 
-    Qubit q1 = tr->AllocateQubit();
-    Qubit q2 = tr->AllocateQubit();
-    Qubit q3 = tr->AllocateQubit();
-    Qubit q4 = tr->AllocateQubit();
-    Qubit q5 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
+    QubitIdType q2 = tr->AllocateQubit();
+    QubitIdType q3 = tr->AllocateQubit();
+    QubitIdType q4 = tr->AllocateQubit();
+    QubitIdType q5 = tr->AllocateQubit();
 
     CHECK(0 == tr->TraceSingleQubitOp(1, 1, q1));
     Result r1 = tr->TraceSingleQubitMeasurement(1, 1, q1);
@@ -403,7 +403,7 @@ TEST_CASE("Output: to string", "[tracer]")
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
     std::shared_ptr<CTracer> tr                   = CreateTracer(1 /*layer duration*/, opNames);
 
-    Qubit q1 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
     tr->TraceSingleQubitOp(5, 1, q1);
     tr->InjectGlobalBarrier(4, 2);
@@ -450,7 +450,7 @@ TEST_CASE("Output: to file", "[tracer]")
     std::unordered_map<OpId, std::string> opNames = {{1, "X"}, {2, "Y"}, {3, "Z"}, {4, "b"}};
     std::shared_ptr<CTracer> tr                   = CreateTracer(1 /*layer duration*/, opNames);
 
-    Qubit q1 = tr->AllocateQubit();
+    QubitIdType q1 = tr->AllocateQubit();
     tr->TraceSingleQubitOp(3, 1, q1);
     tr->TraceSingleQubitOp(5, 1, q1);
     tr->InjectGlobalBarrier(4, 2);

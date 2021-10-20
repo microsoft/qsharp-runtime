@@ -18,18 +18,18 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth);
 using namespace Microsoft::Quantum;
 
 /*==============================================================================
-    Implementation of quantum__rt__tuple_* and quantum__rt__callable_*
+    Implementation of __quantum__rt__tuple_* and __quantum__rt__callable_*
 ==============================================================================*/
 extern "C"
 {
-    PTuple quantum__rt__tuple_create(int64_t size) // TODO: Use unsigned integer type for param (breaking change).
+    PTuple __quantum__rt__tuple_create(int64_t size) // TODO: Use unsigned integer type for param (breaking change).
     {
         assert((uint64_t)size < std::numeric_limits<QirTupleHeader::TBufSize>::max());
         // Using `<` rather than `<=` to calm down the compiler on 64-bit arch.
         return QirTupleHeader::Create(static_cast<QirTupleHeader::TBufSize>(size))->AsTuple();
     }
 
-    void quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
+    void __quantum__rt__tuple_update_reference_count(PTuple tuple, int32_t increment)
     {
         if (tuple == nullptr || increment == 0)
         {
@@ -53,7 +53,7 @@ extern "C"
         }
     }
 
-    void quantum__rt__tuple_update_alias_count(PTuple tuple, int32_t increment)
+    void __quantum__rt__tuple_update_alias_count(PTuple tuple, int32_t increment)
     {
         if (tuple == nullptr || increment == 0)
         {
@@ -64,11 +64,11 @@ extern "C"
 
         if (th->aliasCount < 0)
         {
-            quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative"));
+            __quantum__rt__fail(__quantum__rt__string_create("Alias count cannot be negative"));
         }
     }
 
-    PTuple quantum__rt__tuple_copy(PTuple tuple, bool forceNewInstance)
+    PTuple __quantum__rt__tuple_copy(PTuple tuple, bool forceNewInstance)
     {
         if (tuple == nullptr)
         {
@@ -85,7 +85,7 @@ extern "C"
         return tuple;
     }
 
-    void quantum__rt__callable_update_reference_count(QirCallable* callable, int32_t increment)
+    void __quantum__rt__callable_update_reference_count(QirCallable* callable, int32_t increment)
     {
         if (callable == nullptr || increment == 0)
         {
@@ -102,12 +102,16 @@ extern "C"
         {
             for (int i = increment; i < 0; i++)
             {
-                (void)callable->Release();
+                if (0 == callable->Release())
+                {
+                    assert(-1 == i && "Attempting to decrement reference count below zero!");
+                    break;
+                }
             }
         }
     }
 
-    void quantum__rt__callable_update_alias_count(QirCallable* callable, int32_t increment)
+    void __quantum__rt__callable_update_alias_count(QirCallable* callable, int32_t increment)
     {
         if (callable == nullptr || increment == 0)
         {
@@ -116,20 +120,20 @@ extern "C"
         callable->UpdateAliasCount(increment);
     }
 
-    QirCallable* quantum__rt__callable_create(t_CallableEntry* entries, t_CaptureCallback* captureCallbacks,
-                                              PTuple capture)
+    QirCallable* __quantum__rt__callable_create(t_CallableEntry* entries, t_CaptureCallback* captureCallbacks,
+                                                PTuple capture)
     {
         assert(entries != nullptr);
         return new QirCallable(entries, captureCallbacks, capture);
     }
 
-    void quantum__rt__callable_invoke(QirCallable* callable, PTuple args, PTuple result)
+    void __quantum__rt__callable_invoke(QirCallable* callable, PTuple args, PTuple result)
     {
         assert(callable != nullptr);
         callable->Invoke(args, result);
     }
 
-    QirCallable* quantum__rt__callable_copy(QirCallable* other, bool forceNewInstance)
+    QirCallable* __quantum__rt__callable_copy(QirCallable* other, bool forceNewInstance)
     {
         if (other == nullptr)
         {
@@ -142,21 +146,26 @@ extern "C"
         return other->CloneIfShared();
     }
 
-    void quantum__rt__callable_make_adjoint(QirCallable* callable)
+    void __quantum__rt__callable_make_adjoint(QirCallable* callable)
     {
         assert(callable != nullptr);
         callable->ApplyFunctor(QirCallable::Adjoint);
     }
 
-    void quantum__rt__callable_make_controlled(QirCallable* callable)
+    void __quantum__rt__callable_make_controlled(QirCallable* callable)
     {
         assert(callable != nullptr);
         callable->ApplyFunctor(QirCallable::Controlled);
     }
 
-    void quantum__rt__callable_memory_management(int32_t index, QirCallable* callable, int32_t parameter)
+    void __quantum__rt__capture_update_reference_count(QirCallable* callable, int32_t parameter)
     {
-        callable->InvokeCaptureCallback(index, parameter);
+        callable->InvokeCaptureCallback(0, parameter);
+    }
+
+    void __quantum__rt__capture_update_alias_count(QirCallable* callable, int32_t parameter)
+    {
+        callable->InvokeCaptureCallback(1, parameter);
     }
 }
 
@@ -318,7 +327,7 @@ void QirCallable::UpdateAliasCount(int increment)
     this->aliasCount += increment;
     if (this->aliasCount < 0)
     {
-        quantum__rt__fail(quantum__rt__string_create("Alias count cannot be negative"));
+        __quantum__rt__fail(__quantum__rt__string_create("Alias count cannot be negative"));
     }
 }
 
@@ -409,7 +418,7 @@ void QirCallable::Invoke(PTuple args, PTuple result)
         this->functionTable[this->appliedFunctor](capture, flat->AsTuple(), result);
 
         QirArray* controls = *reinterpret_cast<QirArray**>(flat->AsTuple());
-        quantum__rt__array_update_reference_count(controls, -1);
+        __quantum__rt__array_update_reference_count(controls, -1);
         flat->Release();
     }
 }
@@ -417,9 +426,9 @@ void QirCallable::Invoke(PTuple args, PTuple result)
 void QirCallable::Invoke()
 {
     assert((this->appliedFunctor & QirCallable::Controlled) == 0 && "Cannot invoke controlled callable without args");
-    PTuple args = quantum__rt__tuple_create(0);
+    PTuple args = __quantum__rt__tuple_create(0);
     this->Invoke(args, nullptr);
-    quantum__rt__tuple_update_reference_count(args, -1);
+    __quantum__rt__tuple_update_reference_count(args, -1);
 }
 
 // A + A = I; A + C = C + A = CA; C + C = C; CA + A = C; CA + C = CA
@@ -433,7 +442,7 @@ void QirCallable::ApplyFunctor(int functor)
         if (this->functionTable[this->appliedFunctor] == nullptr)
         {
             this->appliedFunctor ^= QirCallable::Adjoint;
-            quantum__rt__fail(quantum__rt__string_create("The callable doesn't provide adjoint operation"));
+            __quantum__rt__fail(__quantum__rt__string_create("The callable doesn't provide adjoint operation"));
         }
     }
     else if (functor == QirCallable::Controlled)
@@ -445,7 +454,7 @@ void QirCallable::ApplyFunctor(int functor)
             {
                 this->appliedFunctor ^= QirCallable::Controlled;
             }
-            quantum__rt__fail(quantum__rt__string_create("The callable doesn't provide controlled operation"));
+            __quantum__rt__fail(__quantum__rt__string_create("The callable doesn't provide controlled operation"));
         }
         this->controlledDepth++;
     }

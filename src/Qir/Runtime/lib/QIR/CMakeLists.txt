@@ -9,7 +9,6 @@
 # create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
-  QirRange.cpp
   OutputStream.cpp
   Output.cpp
   allocationsTracker.cpp
@@ -44,6 +43,7 @@ add_library(Microsoft.Quantum.Qir.Runtime SHARED)
 target_link_libraries(Microsoft.Quantum.Qir.Runtime
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
+  ${SPECTRE_LIBS}
 )
 
 target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})

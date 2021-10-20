@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The aliases for the simulator command-line option.
         /// </summary>
-        internal IImmutableList<string> SimulatorOptionAliases { get; }
+        internal ImmutableList<string> SimulatorOptionAliases { get; }
 
         /// <summary>
         /// The name of the quantum simulator.
@@ -59,7 +59,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
         /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
         public DriverSettings(
-            IImmutableList<string> simulatorOptionAliases,
+            ImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,

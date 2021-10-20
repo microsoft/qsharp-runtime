@@ -19,7 +19,7 @@ static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
     RESULT** results2 = reinterpret_cast<RESULT**>(rs2->buffer);
     for (QirArray::TItemCount i = 0; i < rs1->count; i++)
     {
-        if (!quantum__rt__result_equal(results1[i], results2[i]))
+        if (!__quantum__rt__result_equal(results1[i], results2[i]))
         {
             return false;
         }
@@ -29,14 +29,14 @@ static bool ArraysContainEqualResults(QirArray* rs1, QirArray* rs2)
 
 extern "C"
 {
-    void quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
+    void __quantum__qis__applyifelseintrinsic__body(RESULT* r, QirCallable* clbOnZero, QirCallable* clbOnOne)
     {
-        QirCallable* clb = quantum__rt__result_equal(r, quantum__rt__result_get_zero()) ? clbOnZero : clbOnOne;
+        QirCallable* clb = __quantum__rt__result_equal(r, __quantum__rt__result_get_zero()) ? clbOnZero : clbOnOne;
         clb->Invoke();
     }
 
-    void quantum__qis__applyconditionallyintrinsic__body(QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual,
-                                                         QirCallable* clbOnSomeDifferent)
+    void __quantum__qis__applyconditionallyintrinsic__body(QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual,
+                                                           QirCallable* clbOnSomeDifferent)
     {
         QirCallable* clb = ArraysContainEqualResults(rs1, rs2) ? clbOnAllEqual : clbOnSomeDifferent;
         clb->Invoke();

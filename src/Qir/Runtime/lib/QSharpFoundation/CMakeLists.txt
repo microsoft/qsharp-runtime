@@ -13,7 +13,6 @@ set(qsharp_foundation_sup_source_files
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qsharp-foundation-qis-support-obj OBJECT ${qsharp_foundation_sup_source_files})
-target_source_from_qir(qsharp-foundation-qis-support-obj qsharp-foundation-qis.ll)
 target_include_directories(qsharp-foundation-qis-support-obj PUBLIC
   ${public_includes}
   ${common_includes}
@@ -31,6 +30,7 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Foundation
   qsharp-foundation-qis-support-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
+  ${SPECTRE_LIBS}
 )
 add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 

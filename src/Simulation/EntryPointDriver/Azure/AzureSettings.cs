@@ -8,6 +8,7 @@ using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +100,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string JobName { get; set; } = "";
 
         /// <summary>
+        /// Additional target-specific parameters for the submitted job.
+        /// </summary>
+        public ImmutableDictionary<string, string> JobParams { get; set; } = ImmutableDictionary<string, string>.Empty;
+
+        /// <summary>
         /// The number of times the program is executed on the target machine.
         /// </summary>
         public int Shots { get; set; }
@@ -143,7 +149,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
@@ -177,6 +183,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"AadToken: {AadToken?.Substring(0, 5)}",
             $"UserAgent: {UserAgent}",
             $"Job Name: {JobName}",
+            $"Job Parameters: {string.Join(", ", JobParams.OrderBy(item => item.Key))}",
             $"Shots: {Shots}",
             $"Output: {Output}",
             $"Dry Run: {DryRun}",

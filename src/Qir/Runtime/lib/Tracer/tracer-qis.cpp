@@ -13,54 +13,54 @@
 using namespace Microsoft::Quantum;
 extern "C"
 {
-    void quantum__qis__on_operation_start(int64_t /* id */) // NOLINT
+    void __quantum__qis__on_operation_start(int64_t /* id */) // NOLINT
     {
     }
-    void quantum__qis__on_operation_end(int64_t /* id */) // NOLINT
-    {
-    }
-
-    void quantum__qis__swap(Qubit /*q1*/, Qubit /*q2*/) // NOLINT
+    void __quantum__qis__on_operation_end(int64_t /* id */) // NOLINT
     {
     }
 
-    void quantum__qis__single_qubit_op(int32_t id, int32_t duration, Qubit target) // NOLINT
+    void __quantum__qis__swap(QUBIT* /*q1*/, QUBIT* /*q2*/) // NOLINT
     {
-        (void)tracer->TraceSingleQubitOp(id, duration, target);
     }
-    void quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, Qubit target) // NOLINT
+
+    void __quantum__qis__single_qubit_op(int32_t id, int32_t duration, QUBIT* target) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), 1,
-                                        &target);
+        (void)tracer->TraceSingleQubitOp(id, duration, reinterpret_cast<QubitIdType>(target));
     }
-    void quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
+    void __quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QUBIT* target) // NOLINT
+    {
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                                        1, reinterpret_cast<QubitIdType*>(&target));
+    }
+    void __quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
         (void)tracer->TraceMultiQubitOp(id, duration, 0, nullptr, (long)(targets->count),
-                                        reinterpret_cast<Qubit*>(targets->buffer));
+                                        reinterpret_cast<QubitIdType*>(targets->buffer));
     }
-    void quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
+    void __quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer),
-                                        (long)(targets->count), reinterpret_cast<Qubit*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                                        (long)(targets->count), reinterpret_cast<QubitIdType*>(targets->buffer));
     }
 
-    void quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
+    void __quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
     {
         (void)tracer->InjectGlobalBarrier(id, duration);
     }
 
-    RESULT* quantum__qis__single_qubit_measure(int32_t id, int32_t duration, QUBIT* q) // NOLINT
+    RESULT* __quantum__qis__single_qubit_measure(int32_t id, int32_t duration, QUBIT* q) // NOLINT
     {
-        return tracer->TraceSingleQubitMeasurement(id, duration, q);
+        return tracer->TraceSingleQubitMeasurement(id, duration, reinterpret_cast<QubitIdType>(q));
     }
 
-    RESULT* quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
+    RESULT* __quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
     {
         return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count),
-                                                  reinterpret_cast<Qubit*>(qs->buffer));
+                                                  reinterpret_cast<QubitIdType*>(qs->buffer));
     }
 
-    void quantum__qis__apply_conditionally( // NOLINT
+    void __quantum__qis__apply_conditionally( // NOLINT
         QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual, QirCallable* clbOnSomeDifferent)
     {
         CTracer::FenceScope sf(tracer.get(), (long)(rs1->count), reinterpret_cast<Result*>(rs1->buffer),

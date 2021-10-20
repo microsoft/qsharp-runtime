@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "QirContext.hpp"
+#include "QirContext.h"
 
 #include "CoreTypes.hpp"
 #include "QirRuntimeApi_I.hpp"
@@ -23,6 +24,11 @@ namespace Quantum
     {
         assert(g_context == nullptr);
         g_context = std::make_unique<QirExecutionContext>(driver, trackAllocatedObjects);
+    }
+
+    extern "C" void InitializeQirContext(void* driver, bool trackAllocatedObjects)
+    {
+        InitializeQirContext((IRuntimeDriver*)driver, trackAllocatedObjects);
     }
 
     void ReleaseQirContext()

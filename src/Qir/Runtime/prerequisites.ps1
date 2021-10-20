@@ -4,11 +4,12 @@
 #Requires -Version 6.0
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+    if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
-            !(Get-Command clang-format -ErrorAction SilentlyContinue)) {
-            choco install llvm --version=11.1.0
-            Write-Host "##vso[task.setvariable variable=PATH;]$Env:Path;C:\Program Files\LLVM\bin"
+            !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
+            (Test-Path Env:/AGENT_OS)) {
+            choco install llvm --version=11.1.0 --allow-downgrade
+            Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
@@ -29,10 +30,10 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     } else {
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
             sudo apt update
-            sudo apt-get install -y ninja-build clang-11 clang-tidy-11
+            sudo apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
         } else {
             apt update
-            apt-get install -y ninja-build clang-11 clang-tidy-11
+            apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
         }
     }
 }

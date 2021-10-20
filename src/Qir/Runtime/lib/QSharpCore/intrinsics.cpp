@@ -37,142 +37,156 @@ static Microsoft::Quantum::IQuantumGateSet* GateSet()
 
 extern "C"
 {
-    void quantum__qis__exp__body(QirArray* paulis, double angle, QirArray* qubits)
+    void __quantum__qis__exp__body(QirArray* paulis, double angle, QirArray* qubits)
     {
         assert(paulis->count == qubits->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return GateSet()->Exp((long)(paulis->count), reinterpret_cast<PauliId*>(pauliIds.data()),
-                              reinterpret_cast<Qubit*>(qubits->buffer), angle);
+        GateSet()->Exp((long)(paulis->count), reinterpret_cast<PauliId*>(pauliIds.data()),
+                       reinterpret_cast<QubitIdType*>(qubits->buffer), angle);
     }
 
-    void quantum__qis__exp__adj(QirArray* paulis, double angle, QirArray* qubits)
+    void __quantum__qis__exp__adj(QirArray* paulis, double angle, QirArray* qubits)
     {
-        quantum__qis__exp__body(paulis, -angle, qubits);
+        __quantum__qis__exp__body(paulis, -angle, qubits);
     }
 
-    void quantum__qis__exp__ctl(QirArray* ctls, QirArray* paulis, double angle, QirArray* qubits)
+    void __quantum__qis__exp__ctl(QirArray* ctls, QirExpTuple* args)
     {
-        assert(paulis->count == qubits->count);
+        assert(args->paulis->count == args->targets->count);
 
-        std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
-        return GateSet()->ControlledExp((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer),
-                                        (long)(paulis->count), reinterpret_cast<PauliId*>(pauliIds.data()),
-                                        reinterpret_cast<Qubit*>(qubits->buffer), angle);
+        std::vector<PauliId> pauliIds = ExtractPauliIds(args->paulis);
+        GateSet()->ControlledExp((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                                 (long)(args->paulis->count), reinterpret_cast<PauliId*>(pauliIds.data()),
+                                 reinterpret_cast<QubitIdType*>(args->targets->buffer), args->angle);
     }
 
-    void quantum__qis__exp__ctladj(QirArray* ctls, QirArray* paulis, double angle, QirArray* qubits)
+    void __quantum__qis__exp__ctladj(QirArray* ctls, QirExpTuple* args)
     {
-        quantum__qis__exp__ctl(ctls, paulis, -angle, qubits);
+        assert(args->paulis->count == args->targets->count);
+
+        QirExpTuple updatedArgs = {args->paulis, -(args->angle), args->targets};
+
+        __quantum__qis__exp__ctl(ctls, &updatedArgs);
     }
 
-    void quantum__qis__h__body(Qubit qubit)
+    void __quantum__qis__h__body(QUBIT* qubit)
     {
-        GateSet()->H(qubit);
+        GateSet()->H(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__h__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__h__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledH((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledH((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 
-    Result quantum__qis__measure__body(QirArray* paulis, QirArray* qubits)
+    Result __quantum__qis__measure__body(QirArray* paulis, QirArray* qubits)
     {
         const QirArray::TItemCount count = qubits->count;
         assert(count == paulis->count);
 
         std::vector<PauliId> pauliIds = ExtractPauliIds(paulis);
         return GateSet()->Measure((long)(count), reinterpret_cast<PauliId*>(pauliIds.data()), (long)(count),
-                                  reinterpret_cast<Qubit*>(qubits->buffer));
+                                  reinterpret_cast<QubitIdType*>(qubits->buffer));
     }
 
-    void quantum__qis__r__body(PauliId axis, double angle, QUBIT* qubit)
+    void __quantum__qis__r__body(PauliId axis, double angle, QUBIT* qubit)
     {
-        return GateSet()->R(axis, qubit, angle);
+        GateSet()->R(axis, reinterpret_cast<QubitIdType>(qubit), angle);
     }
 
-    void quantum__qis__r__adj(PauliId axis, double angle, QUBIT* qubit)
+    void __quantum__qis__r__adj(PauliId axis, double angle, QUBIT* qubit)
     {
-        quantum__qis__r__body(axis, -angle, qubit);
+        __quantum__qis__r__body(axis, -angle, qubit);
     }
 
-    void quantum__qis__r__ctl(QirArray* ctls, PauliId axis, double angle, QUBIT* qubit)
+    void __quantum__qis__r__ctl(QirArray* ctls, QirRTuple* args)
     {
-        return GateSet()->ControlledR((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), axis, qubit, angle);
+        GateSet()->ControlledR((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer), args->pauli,
+                               reinterpret_cast<QubitIdType>(args->target), args->angle);
     }
 
-    void quantum__qis__r__ctladj(QirArray* ctls, PauliId axis, double angle, QUBIT* qubit)
+    void __quantum__qis__r__ctladj(QirArray* ctls, QirRTuple* args)
     {
-        quantum__qis__r__ctl(ctls, axis, -angle, qubit);
+        GateSet()->ControlledR((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer), args->pauli,
+                               reinterpret_cast<QubitIdType>(args->target), -(args->angle));
     }
 
-    void quantum__qis__s__body(Qubit qubit)
+    void __quantum__qis__s__body(QUBIT* qubit)
     {
-        GateSet()->S(qubit);
+        GateSet()->S(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__s__adj(Qubit qubit)
+    void __quantum__qis__s__adj(QUBIT* qubit)
     {
-        GateSet()->AdjointS(qubit);
+        GateSet()->AdjointS(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__s__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__s__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledS((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledS((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__s__ctladj(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__s__ctladj(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledAdjointS((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledAdjointS((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                                      reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__t__body(Qubit qubit)
+    void __quantum__qis__t__body(QUBIT* qubit)
     {
-        GateSet()->T(qubit);
+        GateSet()->T(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__t__adj(Qubit qubit)
+    void __quantum__qis__t__adj(QUBIT* qubit)
     {
-        GateSet()->AdjointT(qubit);
+        GateSet()->AdjointT(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__t__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__t__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledT((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledT((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__t__ctladj(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__t__ctladj(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledAdjointT((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledAdjointT((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                                      reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__x__body(Qubit qubit)
+    void __quantum__qis__x__body(QUBIT* qubit)
     {
-        GateSet()->X(qubit);
+        GateSet()->X(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__x__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__x__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledX((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledX((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__y__body(Qubit qubit)
+    void __quantum__qis__y__body(QUBIT* qubit)
     {
-        GateSet()->Y(qubit);
+        GateSet()->Y(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__y__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__y__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledY((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledY((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__z__body(Qubit qubit)
+    void __quantum__qis__z__body(QUBIT* qubit)
     {
-        GateSet()->Z(qubit);
+        GateSet()->Z(reinterpret_cast<QubitIdType>(qubit));
     }
 
-    void quantum__qis__z__ctl(QirArray* ctls, Qubit qubit)
+    void __quantum__qis__z__ctl(QirArray* ctls, QUBIT* qubit)
     {
-        GateSet()->ControlledZ((long)(ctls->count), reinterpret_cast<Qubit*>(ctls->buffer), qubit);
+        GateSet()->ControlledZ((long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
+                               reinterpret_cast<QubitIdType>(qubit));
     }
 }

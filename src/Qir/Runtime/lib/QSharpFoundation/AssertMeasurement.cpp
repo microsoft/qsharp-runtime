@@ -18,13 +18,13 @@ static IDiagnostics* GetDiagnostics()
 // Implementation:
 extern "C"
 {
-    void quantum__qis__assertmeasurementprobability__body(QirArray* bases, QirArray* qubits, RESULT* result,
-                                                          double prob, QirString* msg, double tol)
+    void __quantum__qis__assertmeasurementprobability__body(QirArray* bases, QirArray* qubits, RESULT* result,
+                                                            double prob, QirString* msg, double tol)
     {
         if (bases->count != qubits->count)
         {
-            quantum__rt__fail_cstr("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
-                                   "must be of same size.");
+            __quantum__rt__fail_cstr("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
+                                     "must be of same size.");
         }
 
         IRuntimeDriver* driver = GlobalContext()->GetDriver();
@@ -41,11 +41,20 @@ extern "C"
         }
 
         if (!GetDiagnostics()->AssertProbability((long)qubits->count, paulis.data(),
-                                                 reinterpret_cast<Qubit*>(qubits->GetItemPointer(0)), prob, tol,
+                                                 reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)), prob, tol,
                                                  nullptr))
         {
-            quantum__rt__fail(msg);
+            __quantum__rt__fail(msg);
         }
+    }
+
+    void __quantum__qis__assertmeasurementprobability__ctl(QirArray* /* ctls */,
+                                                           QirAssertMeasurementProbabilityTuple* args)
+    {
+        // Controlled AssertMeasurementProbability ignores control bits. See the discussion on
+        // https://github.com/microsoft/qsharp-runtime/pull/450 for more details.
+        __quantum__qis__assertmeasurementprobability__body(args->bases, args->qubits, args->result, args->prob,
+                                                           args->msg, args->tol);
     }
 
 } // extern "C"
