@@ -661,7 +661,7 @@ let ``Submit allows a long user-agent`` () =
         "--shots"
         "750"
         "--user-agent"
-        "a-very-long-user-agent-(it-will-not-be-truncated-at-this-point)"
+        "a-very-long-user-agent-(it-will-be-truncated)"
         "--credential"
         "cli"
     ])
