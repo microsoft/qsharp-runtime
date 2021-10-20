@@ -260,7 +260,7 @@ namespace Microsoft.Azure.Quantum
                 environmentAppId = environmentAppId?.Substring(0, 24);
             }
 
-            options.Diagnostics.ApplicationId = string.Join(' ', options.Diagnostics.ApplicationId, environmentAppId);
+            options.Diagnostics.ApplicationId = string.Join(' ', options.Diagnostics.ApplicationId?.Trim(), environmentAppId).Trim();
         }
     }
 }
