@@ -136,7 +136,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
             // This value will be added as a prefix in the UserAgent when
             // calling the Azure Quantum API
-            options.Diagnostics.ApplicationId = string.Join(' ', "Q#Sim", UserAgent);
+            options.Diagnostics.ApplicationId = string.Join(' ', "Q#Runtime", UserAgent);
             return options;
         }
 
