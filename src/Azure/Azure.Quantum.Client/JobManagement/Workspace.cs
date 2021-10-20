@@ -254,13 +254,17 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static void SetApplicationId(QuantumJobClientOptions options)
         {
-            var environmentAppId = Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID")?.Trim();
-            if (environmentAppId?.Length > 24)
+            var applicationId = string.Join(' ', 
+                                            options.Diagnostics.ApplicationId?.Trim(), 
+                                            Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID")?.Trim()
+                                            ).Trim();
+
+            if (applicationId?.Length > 24)
             {
-                environmentAppId = environmentAppId?.Substring(0, 24);
+                applicationId = applicationId?.Substring(0, 24);
             }
 
-            options.Diagnostics.ApplicationId = string.Join(' ', options.Diagnostics.ApplicationId?.Trim(), environmentAppId).Trim();
+            options.Diagnostics.ApplicationId = applicationId;
         }
     }
 }
