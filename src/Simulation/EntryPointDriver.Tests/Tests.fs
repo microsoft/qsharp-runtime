@@ -634,7 +634,7 @@ let ``Submit allows overriding default values`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
-               UserAgent: myUserAgent
+               UserAgent: Q#Run@myUserAgent
                Job Name: myJobName
                Job Parameters:
                Shots: 750
@@ -661,7 +661,7 @@ let ``Submit allows a long user-agent`` () =
         "--shots"
         "750"
         "--user-agent"
-        "a-very-long-user-agent-(it-will-be-truncated)"
+        "a-very-long-user-agent-(it-will-be-not-be-truncated-here)"
         "--credential"
         "cli"
     ])
@@ -674,7 +674,7 @@ let ``Submit allows a long user-agent`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
-               UserAgent: a-very-long-user-agent-(
+               UserAgent: a-very-long-user-agent-(it-will-be-not-be-truncated-here)
                Job Name: myJobName
                Job Parameters:
                Shots: 750
@@ -716,7 +716,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Location: westus
                 Credential: VisualStudio
                 AadToken: myTok
-                UserAgent: myUserAgent
+                UserAgent: Q#Run@myUserAgent
                 Job Name: myJobName
                 Job Parameters:
                 Shots: 750
