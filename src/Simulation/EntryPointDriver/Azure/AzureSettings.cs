@@ -143,7 +143,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             // This value will be added as a prefix in the UserAgent when
             // calling the Azure Quantum API
             // It cannot be larger than 24 characters.
-            var applicationId = string.Join('@', "Q#Run", UserAgent?.Trim()).Trim(' ', '@')
+            var applicationId = string.Join('@', "Q#Run", UserAgent?.Trim()).Trim(' ', '@');
             if (applicationId?.Length > 24)
             {
                 applicationId = applicationId.Substring(0, 24);
