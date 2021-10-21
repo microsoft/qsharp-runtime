@@ -140,16 +140,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             var options = new QuantumJobClientOptions();
 
-            var applicationId = UserAgent?.Trim();
-            if (applicationId?.Length > 24)
-            {
-                applicationId = applicationId.Substring(0, 24).Trim();
-            }
-
             // This value will be added as a prefix in the UserAgent when
             // calling the Azure Quantum API
             // It cannot be larger than 24 characters.
-            options.Diagnostics.ApplicationId = string.Join('@', "Q#Run", applicationId).Trim(' ', '@');
+            var applicationId = string.Join('@', "Q#Run", UserAgent?.Trim()).Trim(' ', '@')
+            if (applicationId?.Length > 24)
+            {
+                applicationId = applicationId.Substring(0, 24);
+            }
+
+            options.Diagnostics.ApplicationId = applicationId;
             return options;
         }
 
