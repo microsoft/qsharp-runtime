@@ -634,7 +634,7 @@ let ``Submit allows overriding default values`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
-               UserAgent: Q#Run@myUserAgent
+               UserAgent: myUserAgent
                Job Name: myJobName
                Job Parameters:
                Shots: 750
@@ -716,7 +716,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Location: westus
                 Credential: VisualStudio
                 AadToken: myTok
-                UserAgent: Q#Run@myUserAgent
+                UserAgent: myUserAgent
                 Job Name: myJobName
                 Job Parameters:
                 Shots: 750
