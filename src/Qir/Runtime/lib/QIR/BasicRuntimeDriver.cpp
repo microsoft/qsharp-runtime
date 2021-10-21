@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include <cstdint>
+#include <memory>
 
 #include "QirRuntimeApi_I.hpp"
 #include "QubitManager.hpp"
