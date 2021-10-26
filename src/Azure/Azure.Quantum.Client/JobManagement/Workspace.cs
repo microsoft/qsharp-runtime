@@ -10,7 +10,6 @@ namespace Microsoft.Azure.Quantum
     using System.Threading;
     using System.Threading.Tasks;
     using global::Azure.Core;
-    using global::Azure.Identity;
     using global::Azure.Quantum;
     using global::Azure.Quantum.Jobs;
     using global::Azure.Quantum.Jobs.Models;
@@ -50,9 +49,10 @@ namespace Microsoft.Azure.Quantum
 
             // Optional parameters:
             credential ??= CredentialFactory.CreateCredential(CredentialType.Default, subscriptionId);
-            options ??= new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = options.Diagnostics.ApplicationId
-                                                ?? Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID");
+
+            // Make sure use the property Setter as we have some logic
+            // tto apply here 
+            this.ClientOptions = options;
 
             this.ResourceGroupName = resourceGroupName;
             this.WorkspaceName = workspaceName;
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Quantum
                     workspaceName,
                     location,
                     credential,
-                    options);
+                    this.ClientOptions);
         }
 
         public string ResourceGroupName { get; }
@@ -80,6 +80,34 @@ namespace Microsoft.Azure.Quantum
         /// The client used to communicate with the service.
         /// </summary>
         public QuantumJobClient Client { get; }
+
+        /// <summary>
+        /// The options used to create the client to communicate with the service.
+        /// </summary>
+        public QuantumJobClientOptions ClientOptions 
+        { 
+            get => this.clientOptions;
+            set
+            {
+                // Set the ApplicationId that will be added as a UserAgent prefix 
+                // in calls to the Azure Quantum API.
+                var applicationId = string.Join('-',
+                                                value?.Diagnostics?.ApplicationId?.Trim(), 
+                                                Environment.GetEnvironmentVariable("AZURE_QUANTUM_NET_APPID")?.Trim()
+                                                )?.Trim('-', ' ');
+                if (applicationId?.Length > 24)
+                {
+                    applicationId = applicationId?.Substring(0, 24);
+                }
+
+                value ??= new QuantumJobClientOptions();
+                value.Diagnostics.ApplicationId = applicationId;
+
+                this.clientOptions = value;
+            }
+        }
+
+        private QuantumJobClientOptions clientOptions;
 
         /// <summary>
         /// Submits the job.

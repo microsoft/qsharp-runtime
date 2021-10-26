@@ -43,6 +43,7 @@ add_library(Microsoft.Quantum.Qir.Runtime SHARED)
 target_link_libraries(Microsoft.Quantum.Qir.Runtime
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
+  ${SPECTRE_LIBS}
 )
 
 target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})
