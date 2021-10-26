@@ -25,6 +25,14 @@ namespace Microsoft.Azure.Quantum
             new SubmitterInfo(
                 new Regex(@"\Amicrosoft\.simulator\.([\w]+\.)*[\w]+\z"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "QirSubmitter"),
+            new SubmitterInfo(
+                new Regex(@"\Ahoneywell\.qir\.([\w]+\.)*[\w]+\z"),
+                "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
+                "QirSubmitter"),
+            new SubmitterInfo(
+                new Regex(@"\Aqci\.qir\.([\w]+\.)*[\w]+\z"),
+                "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
                 "QirSubmitter"));
 
         private static readonly ImmutableList<SubmitterInfo> QirPayloadGenerators = ImmutableList.Create(
