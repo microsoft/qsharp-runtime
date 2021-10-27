@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Intrinsic {
                 H(target);
             }
             apply {
-                Controlled Z([control1, control2], target);
+                CCZ(control1, control2, target);
             }
         }
         controlled (ctls, ...) {
