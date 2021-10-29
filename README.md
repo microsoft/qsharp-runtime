@@ -6,6 +6,7 @@ This repository contains the runtime components for the [Quantum Development Kit
 It consists of the libraries and packages needed to create and simulate quantum applications using Q#.
 
 - **[Azure/](./src/Azure/)**: Source for client package to create and manage jobs in Azure Quantum.
+- **[Qir/](./src/Xunit/)**: Source for QIR's runtime.
 - **[Simulation/](./src/Simulation/)**: Source for Q# simulation. Includes code generation, full-state and other simulators.
 - **[xUnit/](./src/Xunit/)**: Source for the xUnit's Q# test-case discoverer.
 

@@ -154,11 +154,13 @@ namespace Quantum
 
         bool AreEqualResults(Result /*r1*/, Result /*r2*/) override
         {
-            throw std::logic_error("Cannot compare results while tracing!");
+            return true;
+            //throw std::logic_error("Cannot compare results while tracing!");
         }
         ResultValue GetResultValue(Result /*result*/) override
         {
-            throw std::logic_error("Result values aren't available while tracing!");
+            return Result_Zero;
+            //throw std::logic_error("Result values aren't available while tracing!");
         }
         Result UseZero() override;
         Result UseOne() override;

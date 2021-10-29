@@ -195,6 +195,15 @@ namespace Microsoft.Quantum.Intrinsic {
     }
 
     @Inline()
+    operation R1(theta : Double, qb : Qubit) : Unit
+    is Adj + Ctl {
+        body  (...) { Phys.single_qubit_op(19, 1, qb); }
+        adjoint (...) { Phys.single_qubit_op(19, 1, qb); }
+        controlled (ctls, ...) { Phys.single_qubit_op_ctl(20, 1, ctls, qb); }
+        controlled adjoint (ctls, ...) { Phys.single_qubit_op_ctl(20, 1, ctls, qb); }
+    }
+
+    @Inline()
     operation Rx(theta : Double, qb : Qubit) : Unit
     is Adj + Ctl {
         body  (...) { Phys.single_qubit_op(19, 1, qb); }
@@ -223,6 +232,24 @@ namespace Microsoft.Quantum.Intrinsic {
 
     @Inline()
     operation M(qb : Qubit) : Result {
+        body  (...) { return Phys.Mz(qb); }
+    }
+
+    @Inline()
+    operation Reset(qb : Qubit) : Unit {
+        body  (...) {  Phys.single_qubit_op(24, 1, qb); }
+    }
+    @Inline()
+    operation ResetAll(qubits : Qubit[]) : Unit {
+        body  (...) {  
+            for i in 0..Length(qubits)-1 {
+                Reset(qubits[i]);
+            }
+        }
+    }
+    
+    @Inline()
+    operation MResetZ(qb : Qubit) : Result {
         body  (...) { return Phys.Mz(qb); }
     }
 
